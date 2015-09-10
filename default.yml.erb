@@ -1,0 +1,74 @@
+--- # ascii invoicer document  (version: <%= version %>, template: <%= template %>)
+format: 2.4.0
+created: 2015.08.10
+
+client: 
+  title:     Herr # Frau, Professor, Professorin
+  first_name: John
+  last_name:  Doe
+
+  email: jon.doe@example.com
+  address: | 
+    John Doe
+    Nöthnitzerstraße 46
+    01187 Dresden
+
+event: 
+  name: "<%= project_name %>"
+  location: # might be a list
+  dates:
+  - begin: <%= (Date.today+ 14).strftime "%d.%m.%Y" %> # bezieht sich auf die veranstaltung selbst
+    #end: 
+    times:
+    -  begin: "9:00"
+       end:   "17:00"
+
+  description: |
+
+offer:
+  date: <%= Date.today.strftime "%d.%m.%Y" %>
+  appendix: 1
+
+invoice:
+  number: #27
+  date: #leave empty for auto date
+  payed_date:
+
+cataloge:
+  product: &kaffee       { name: Kaffee          , price: 2.5  , unit: 1l  }
+  product: &tee          { name: Tee             , price: 1.75 , unit: 1l  }
+  product: &wasser_gross { name: Mineralwasser   , price: 0.61 , unit: 1l  }
+  product: &wasser_klein { name: Mineralwasser   , price: 0.59 , unit: 1l  }
+  product: &apfelsaft    { name: Apfelsaft       , price: 1.64 , unit: 1l  }
+  product: &orangensaft  { name: Orangensaft     , price: 1.86 , unit: 1l  }
+  product: &bagel        { name: Bagel           , price: 2.19 , unit: stk }
+  product: &kekse        { name: Kekse Lamberts  , price: 3.40 , unit: 400g}
+  product: &broetchen    { name: halbe Brötchen  , price: 1.16 , unit: stk }
+  product: &kuchen       { name: Kuchen          , price: 0.94 , unit: stk }
+  product: &suppe        { name: Suppe           , price: 3.10 , unit: Portion }
+  product: &obstplatte   { name: Obstplatte      , price: 30.00 , unit: stk }
+
+products:
+
+  *kaffee: { amount: 4, sold:   5 }
+  *wasser_gross:
+    amount: 4
+    returned:   3
+  *kekse:
+    amount: 4
+    sold: 2
+
+hours: 
+  salary: 8.00
+  caterers:
+    "unknown" : 0 #Stunden
+    
+manager: <%= manager_name %>
+
+#canceled: yes
+#lang:
+#tax:
+
+#messages: # read default-settings.yml on how to overwrite
+
+...

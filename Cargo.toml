@@ -1,0 +1,16 @@
+[package]
+name = "ascii_invoicer"
+version = "0.1.0"
+authors = ["Hendrik Sollich <hendrik@hoodie.de>"]
+
+[dependencies]
+
+yaml-rust = "0.2"
+chrono = "0.2"
+regex = "0.1"
+
+[dev-dependencies]
+rustc-serialize = "0.3"
+#speculate = "*"
+clippy = "*"
+tempdir = "*"
