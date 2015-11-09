@@ -10,13 +10,16 @@ Here I try to rewrite the original [ascii-invoicer](http://github.com/ascii-dres
 
 ## TODO
 
-### Modules
-
 * [x] basic project file management
-    * [ ] creating
+    * [x] creating
     * [ ] git integration
     * [ ] template management
 * [ ] project type (init/open/parse yml/index/etc)
+    * [ ] template filling
+* [ ] invoiceing
+* [ ] pretty cli output
+    * [ ] all sorts of list, csv, etc
+* [ ] pdf export
 * [ ] complete this TODO
 
 

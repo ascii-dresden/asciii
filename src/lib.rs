@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 extern crate yaml_rust;
 extern crate chrono;
 extern crate regex;
@@ -8,6 +10,7 @@ mod util;
 
 pub mod project;
 pub mod manager;
+pub mod templater;
 pub mod keyword_replacement;
 
 pub use manager::Luigi;

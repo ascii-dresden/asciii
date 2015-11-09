@@ -7,7 +7,8 @@ pub trait IsKeyword {
 
 static REGEX: &'static str = r"__([0-9A-Z-]*)__*";
 
-impl IsKeyword for str {
+use std::ops::Deref;
+impl<U:Deref<Target=str>> IsKeyword for U {
 
     fn is_keyword(&self) -> bool{
         Regex::new(REGEX).ok().expect("broken regex").is_match(self)

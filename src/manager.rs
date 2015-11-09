@@ -21,14 +21,14 @@ pub type Year =  u32;
 pub fn slugify(string:&str) -> String{ slug::slugify(string) }
 
 #[derive(Debug)]
-pub enum LuigiDirectory { Working, Archive(Year), Storage, Template }
+pub enum LuigiDir { Working, Archive(Year), Storage, Template }
 
 #[derive(Debug)]
 pub enum LuigiSort { Date, Name, Index }
 
 #[derive(Debug)]
 pub enum LuigiError {
-    DirectoryDoesNotExist(LuigiDirectory),
+    DirectoryDoesNotExist(LuigiDir),
     NoProject,
     NoWorkingDir,
     ProjectFileExists,
@@ -39,6 +39,7 @@ pub enum LuigiError {
     //TemplateDoesNotExist,
 }
 
+// All you need to make try!() fun again
 impl From<io::Error>  for LuigiError {
     fn from(ioerror:io::Error) -> LuigiError{ LuigiError::Io(ioerror) }
 }
@@ -170,7 +171,7 @@ impl Luigi {
 
         let archive = try!(self.create_archive(year));
         let project_folder = try!(self.get_project_dir(
-                name, LuigiDirectory::Working
+                name, LuigiDir::Working
                 ).ok_or(LuigiError::NoProject));
         let target = archive.join(&name_in_archive);
 
@@ -182,10 +183,10 @@ impl Luigi {
     // TODO pub fn unarchive_project<T:LuigiProject>(&self, project:&T) {
     pub fn unarchive_project_with_year(&self, name:&str, year:Year) -> Result<PathBuf, LuigiError> {
         let slugged_name = slugify(name);
-        if self.get_project_dir(&slugged_name, LuigiDirectory::Working).is_some(){
+        if self.get_project_dir(&slugged_name, LuigiDir::Working).is_some(){
             return Err(LuigiError::ProjectFileExists);
         }
-        let archive_dir = try!(self.get_project_dir(&slugged_name, LuigiDirectory::Archive(year)).ok_or(LuigiError::NoProject));
+        let archive_dir = try!(self.get_project_dir(&slugged_name, LuigiDir::Archive(year)).ok_or(LuigiError::NoProject));
         let project_dir = self.working_dir.join(&slugged_name);
         if project_dir.exists() {
             // redundant? sure, but why not :D
@@ -197,12 +198,12 @@ impl Luigi {
     }
 
     // TODO make this pathbuf a path
-    pub fn get_project_dir(&self, name:&str, directory:LuigiDirectory) -> Option<PathBuf> {
+    pub fn get_project_dir(&self, name:&str, directory:LuigiDir) -> Option<PathBuf> {
         let slugged_name = slugify(name); // TODO wrap slugify in a function, so it can be adapted
         let project_dir = &self.working_dir.join(&slugged_name);
         if let Some(path) = match directory{
-            LuigiDirectory::Working => Some(self.working_dir.join(&slugged_name)),
-            LuigiDirectory::Archive(year) => self.get_project_dir_archive(&name, year),
+            LuigiDir::Working => Some(self.working_dir.join(&slugged_name)),
+            LuigiDir::Archive(year) => self.get_project_dir_archive(&name, year),
             _ => return None
         }{
             if path.exists(){
@@ -214,7 +215,7 @@ impl Luigi {
     }
 
     fn get_project_dir_archive(&self, name:&str, year:Year) -> Option<PathBuf> {
-        for project_file in self.list_project_files(LuigiDirectory::Archive(year)).iter(){
+        for project_file in self.list_project_files(LuigiDir::Archive(year)).iter(){
             if project_file.ends_with(slugify(&name) + "."+ PROJECT_FILE_EXTENSION) {
                 return project_file.parent().map(|p|p.to_owned());
             }
@@ -230,15 +231,15 @@ impl Luigi {
             .next().map(|b|b.to_owned())
     }
 
-    pub fn list_projects(&self, directory:LuigiDirectory) -> Vec<PathBuf> {
+    pub fn list_projects(&self, directory:LuigiDir) -> Vec<PathBuf> {
         match directory{
-            LuigiDirectory::Working => self.list_path_content(&self.working_dir),
-            LuigiDirectory::Archive(year) => self.list_path_content(&self.archive_dir.join(year.to_string())),
+            LuigiDir::Working => self.list_path_content(&self.working_dir),
+            LuigiDir::Archive(year) => self.list_path_content(&self.archive_dir.join(year.to_string())),
             _ => Vec::new()
         }
     }
 
-    pub fn list_project_files(&self, directory:LuigiDirectory) -> Vec<PathBuf> {
+    pub fn list_project_files(&self, directory:LuigiDir) -> Vec<PathBuf> {
         self.list_projects(directory).iter()
             .map(|dir| self.get_project_file(dir))
             .filter(|e| e.is_some())
@@ -265,7 +266,7 @@ mod realworld {
     use util;
     use util::ls;
 
-    pub use super::{Luigi,LuigiError,LuigiDirectory};
+    pub use super::{Luigi,LuigiError,LuigiDir};
 
     const STORAGE:&'static str = "/home/hendrik/ascii/caterings";
 
@@ -313,7 +314,7 @@ mod realworld {
         let (storage_path, luigi) = setup();
         assert!(luigi.create_dirs().is_ok());
 
-        let projects = luigi.list_project_files(LuigiDirectory::Archive(2015));
+        let projects = luigi.list_project_files(LuigiDir::Archive(2015));
         println!("Projects");
         for p in projects{
             println!("{:#?}", p);
@@ -335,7 +336,7 @@ mod test {
     pub use super::{Luigi,
                     LuigiProject,
                     LuigiError,
-                    LuigiDirectory};
+                    LuigiDir};
 
     // TODO implement failing cases
     const TEST_PROJECTS:[&'static str;4] = [
@@ -440,10 +441,10 @@ mod test {
             assert!(target_file.exists());
             assert_eq!(target_file, luigi.get_project_file(&target_path).unwrap());
 
-            let project = luigi.get_project_dir(test_project, LuigiDirectory::Working);
+            let project = luigi.get_project_dir(test_project, LuigiDir::Working);
             assert!(project.unwrap().exists());
 
-            let project = luigi.get_project_dir(test_project, LuigiDirectory::Working);
+            let project = luigi.get_project_dir(test_project, LuigiDir::Working);
             assert_eq!(project.unwrap(), target_path);
         }
     }
@@ -464,8 +465,8 @@ mod test {
             assert!(luigi.archive_project_with_year(&test_project, 2015).is_ok());
             assert!(!origin.exists());
 
-            assert!(luigi.get_project_dir(&test_project, LuigiDirectory::Working).is_none());
-            assert!(luigi.get_project_dir(&test_project, LuigiDirectory::Archive(2015)).is_some());
+            assert!(luigi.get_project_dir(&test_project, LuigiDir::Working).is_none());
+            assert!(luigi.get_project_dir(&test_project, LuigiDir::Archive(2015)).is_some());
 
             let false_origin = luigi.create_project(&test_project, &templates[0]).unwrap();
             assert!(luigi.archive_project_with_year(&test_project, 2015).is_err());

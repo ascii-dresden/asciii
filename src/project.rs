@@ -11,21 +11,18 @@ use std::path::PathBuf;
 
 use filter;
 
-enum ProductUnit
-{
+enum ProductUnit {
     Piece, Liter, Hour, Kilogramm, Gramm
 }
 
-struct Product
-{
+struct Product {
     pub name: String,
     pub unit: ProductUnit,
     pub tax: f64,
     pub price: f64 //TODO make this a currency
 }
 
-impl Product
-{
+impl Product {
     fn cost_before_tax()
        // -> f64
     {}
@@ -35,31 +32,27 @@ impl Product
     {}
 }
 
-struct InvoiceItem
-{
+struct InvoiceItem {
     pub amount_offered: usize,
     pub amount_sold: usize,
     pub item: Product
 }
 
 
-struct Customer
-{
+struct Customer {
     pub first_name: String,
     pub last_name: String,
     pub email: String, // TODO replace with e.g. `crate:emailaddress`
 }
 
-struct Event
-{
+struct Event {
     pub start:DateTime<UTC>,
     pub end:DateTime<UTC>,
 
 }
 
 #[derive(Debug)]
-pub struct Project
-{
+pub struct Project {
     path: Box<PathBuf>,
     yaml: Vec<Yaml>,
     //customer: Customer, //TODO
@@ -68,8 +61,7 @@ pub struct Project
 }
 
 
-impl Project
-{
+impl Project {
     pub fn from_yaml_file(path:&str) -> Project
     {
         let path = PathBuf::from(path);
