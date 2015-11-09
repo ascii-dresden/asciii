@@ -1,23 +1,24 @@
---- # ascii invoicer document  (version: <%= version %>, template: <%= template %>)
+--- # ascii invoicer document  (version: __VERSION__, template: __TEMPLATE__)
+# vim:set ft=yaml:
 format: 2.4.0
-created: 2015.08.10
+created: __DATE-CREATED__
 
 client: 
   title:     Herr # Frau, Professor, Professorin
   first_name: John
   last_name:  Doe
 
-  email: jon.doe@example.com
+  email: 
   address: | 
     John Doe
     Nöthnitzerstraße 46
     01187 Dresden
 
 event: 
-  name: "<%= project_name %>"
+  name: __PROJECT-NAME__
   location: # might be a list
   dates:
-  - begin: <%= (Date.today+ 14).strftime "%d.%m.%Y" %> # bezieht sich auf die veranstaltung selbst
+  - begin: __DATE-CREATED__
     #end: 
     times:
     -  begin: "9:00"
@@ -26,13 +27,13 @@ event:
   description: |
 
 offer:
-  date: <%= Date.today.strftime "%d.%m.%Y" %>
+  date: __DATE-CREATED__
   appendix: 1
 
 invoice:
   number: #27
-  date: #leave empty for auto date
-  payed_date:
+  date:  #required
+  payed_date: #required
 
 cataloge:
   product: &kaffee       { name: Kaffee          , price: 2.5  , unit: 1l  }
@@ -49,21 +50,22 @@ cataloge:
   product: &obstplatte   { name: Obstplatte      , price: 30.00 , unit: stk }
 
 products:
+  *kaffee: 
+    amount: 4
+    sold:   5 
 
-  *kaffee: { amount: 4, sold:   5 }
   *wasser_gross:
     amount: 4
-    returned:   3
-  *kekse:
+
+  *kekse: 
     amount: 4
-    sold: 2
 
 hours: 
-  salary: 8.00
+  salary: __SALARY__
   caterers:
-    "unknown" : 0 #Stunden
-    
-manager: <%= manager_name %>
+    "unknown" : 0
+
+manager: __MANAGER__
 
 #canceled: yes
 #lang:
@@ -71,4 +73,8 @@ manager: <%= manager_name %>
 
 #messages: # read default-settings.yml on how to overwrite
 
-...
+invoicer_version: 3.0.0-dev
+template: default
+format: 2.4.0
+created: 10.12.2015
+.

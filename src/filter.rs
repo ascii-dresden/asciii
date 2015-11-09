@@ -10,10 +10,10 @@ use yaml_rust::Yaml;
 fn unpack<'a>(yaml:&'a Yaml, key:&str) ->Result<&'a Yaml, String>
 {
     if let Yaml::BadValue = yaml[key]{
-        return Err(format!("Nothing found {:?}", key));
+        Err(format!("Nothing found {:?}", key))
     }
     else {
-        return Ok(&yaml[key]);
+        Ok(&yaml[key])
     }
 }
 

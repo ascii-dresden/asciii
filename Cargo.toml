@@ -5,12 +5,13 @@ authors = ["Hendrik Sollich <hendrik@hoodie.de>"]
 
 [dependencies]
 
-yaml-rust = "0.2"
-chrono = "0.2"
-regex = "0.1"
+csv = "*"
+yaml-rust = "*"
+chrono = "*"
+regex = "*"
+slug = "*"
 
 [dev-dependencies]
-rustc-serialize = "0.3"
-#speculate = "*"
-clippy = "*"
 tempdir = "*"
+#speculate = "*"
+#clippy = "*"

@@ -4,8 +4,7 @@
 use std::{io,fs};
 use std::path::{Path,PathBuf};
 
-pub fn freeze()
-{
+pub fn freeze() {
     let mut _devnull = String::new();
     let _ = io::stdin().read_line(&mut _devnull);
 }
@@ -21,11 +20,6 @@ pub fn ls(path:&str){
 }
 
 
-pub fn copy_template(target:PathBuf)
-{
-    fs::copy("./test/template1.yml", target.join("template1.yml")).unwrap();
-    fs::copy("./test/template2.yml", target.join("template2.yml")).unwrap();
-}
 
     //  general
     //    it "knows when to use erb"
