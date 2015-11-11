@@ -146,21 +146,7 @@ impl Luigi {
     }
 
     fn move_folder(folder:&Path, target:&Path) -> Result<(), LuigiError>{
-        // chreate target dir
-        try!(fs::create_dir(&target));
-
-        // TODO there must be a less manual way, perhaps through some crate
-        // copy all the files over
-        for file in try!(fs::read_dir(&folder)){
-            let path = try!(file).path();
-            try!(fs::copy( &path, &target.join(
-                            try!(path.file_name().ok_or(LuigiError::InvalidDirStructure))
-                        )
-                    ));
-        }
-
-        // remove old location
-        try!(fs::remove_dir_all(&folder));
+        try!(fs::rename(folder,target));
         Ok(())
     }
 
