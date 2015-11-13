@@ -14,6 +14,7 @@ use chrono::{DateTime, UTC};
 
 //TODO: add logging
 //TODO: remove asserts, is_ok()s and unwrap()s, stupid :D
+//TODO: make better use of io::ErrorKind
 
 const PROJECT_FILE_EXTENSION:&'static str = "yml";
 
@@ -41,7 +42,7 @@ pub enum LuigiError {
 
 // All you need to make try!() fun again
 impl From<io::Error>  for LuigiError {
-    fn from(ioerror:io::Error) -> LuigiError{ LuigiError::Io(ioerror) }
+    fn from(ioerror: io::Error) -> LuigiError{ LuigiError::Io(ioerror) }
 }
 
 #[derive(Debug)]

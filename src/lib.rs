@@ -12,6 +12,7 @@ pub mod project;
 pub mod manager;
 pub mod templater;
 pub mod keyword_replacement;
+pub mod config;
 
 pub use manager::Luigi;
 pub use keyword_replacement::IsKeyword;
