@@ -271,6 +271,7 @@ mod realworld {
     }
 
     #[test]
+    #[ignore]
     fn list_templates(){
         let (storage_path, luigi) = setup();
         //luigi.create_dirs().unwrap();
@@ -282,6 +283,7 @@ mod realworld {
     }
 
     #[test]
+    #[ignore]
     fn list_archives(){
         let (storage_path, luigi) = setup();
         assert!(luigi.create_dirs().is_ok());
@@ -297,6 +299,7 @@ mod realworld {
     }
 
     #[test]
+    #[ignore]
     fn list_projects(){
         let (storage_path, luigi) = setup();
         assert!(luigi.create_dirs().is_ok());

@@ -72,7 +72,6 @@ impl ConfigReader{
     /// Returns whatever it finds in that position
     ///
     /// Supports simple path syntax: "top/middle/child/node"
-    /// returns prematurely if child is no Hash
     pub fn get_path(&self, path:&str) -> Option<&Yaml>{
         let mut path = Path::new(path).iter().map(|s|s.to_str().unwrap_or("")).collect::<Vec<&str>>();
         ConfigReader::get_path_yaml(&self.yaml[0], &mut path)
@@ -87,7 +86,8 @@ impl ConfigReader{
             if let Some(content) = ConfigReader::get_yaml(&yaml, key){
                 return match content{
                     &Yaml::Hash(_) => ConfigReader::get_path_yaml(content, remainder),
-                    _ => Some(content)
+                    _ if remainder.is_empty() =>  Some(content),
+                    _ =>  None
                 };
             }
         }
@@ -121,6 +121,8 @@ fn it_works(){
 
     assert!(config.get_path(&"defaults").is_some());
     assert!(config.get_path(&"defaults/includes").is_some());
+    assert!(config.get_path(&"defaults/includes/name").is_some());
+    assert!(config.get_path(&"defaults/includes/name/foo").is_none());
 
     println!("{:?}", config.get_path("defaults/includes/name"));
     println!("{:?}", config.get_str("defaults/includes/name"));
