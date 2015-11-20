@@ -239,7 +239,7 @@ impl Luigi {
 
 pub trait LuigiProject {
     fn index(&self) -> String;
-    fn name(&self) -> String;
+    fn name(&self) -> &str;
     fn date(&self) -> Date<UTC>;
     //n path(&self) -> PathBuf;
     fn file_extension() -> &'static str;

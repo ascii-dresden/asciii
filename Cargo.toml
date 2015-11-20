@@ -2,6 +2,7 @@
 name = "ascii_invoicer"
 version = "0.1.0"
 authors = ["Hendrik Sollich <hendrik@hoodie.de>"]
+doc = false # bin is documented
 
 [dependencies]
 
@@ -13,7 +14,7 @@ slug = "*"
 clap = "*"
 term = "*"
 prettytable-rs = "*"
-pad = "0.1.4"
+pad = "*"
 
 [dev-dependencies]
 tempdir = "*"
@@ -22,4 +23,3 @@ tempdir = "*"
 
 [[bin]]
 name = "ascii"
-doc = false

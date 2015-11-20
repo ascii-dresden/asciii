@@ -13,8 +13,14 @@ use pad::{PadStr,Alignment};
 #[derive(Debug)]
 pub struct Project { yaml: Yaml }
 
-#[derive(Debug)]
-pub struct ProjectOldFormat { yaml: Yaml } // implemented differently
+//#[derive(Debug)]
+//pub struct ProjectOldFormat { yaml: Yaml } // implemented differently
+
+impl Project{
+    fn y_str<'a>(&'a self, path:&str) -> &'a str{
+        yaml::get_str(&self.yaml, &path).unwrap_or("")
+    }
+}
 
 impl LuigiProject for Project{
     fn index(&self) -> String{
@@ -24,8 +30,8 @@ impl LuigiProject for Project{
         }
     }
 
-    fn name(&self) -> String{
-        yaml::get_str(&self.yaml, "event/name").unwrap_or("").to_owned()
+    fn name<'a>(&'a self) -> &'a str{
+        self.y_str("event/name")
     }
 
     fn date(&self) -> Date<UTC>{
