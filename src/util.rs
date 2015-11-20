@@ -1,8 +1,9 @@
 #![allow(dead_code)]
-#![allow(unused_imports)]
-
-use std::{io,fs};
-use std::path::{Path,PathBuf};
+use std::io;
+use std::path::Path;
+use std::path::PathBuf;
+use std::env::home_dir;
+use chrono::*;
 
 pub fn freeze() {
     let mut _devnull = String::new();
@@ -19,7 +20,19 @@ pub fn ls(path:&str){
     println!("{}", String::from_utf8(output.stdout).unwrap());
 }
 
+/// TODO add something like this to the stdlib
+pub fn replace_home_tilde(p:&Path) -> PathBuf{
+    let path = p.to_str().unwrap();
+    PathBuf::from( path.replace("~",home_dir().unwrap().to_str().unwrap()))
+}
 
+
+pub fn parse_fwd_date(date_str:&str) -> Date<UTC>{
+        let date = date_str.split('.')
+            .map(|f|f.parse().unwrap_or(0))
+            .collect::<Vec<i32>>();
+        UTC.ymd(date[2], date[1] as u32, date[0] as u32)
+}
 
     //  general
     //    it "knows when to use erb"

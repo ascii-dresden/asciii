@@ -1,12 +1,12 @@
-#![allow(dead_code)]
-
 extern crate yaml_rust;
 extern crate chrono;
 extern crate regex;
 extern crate slug;
+extern crate pad;
 
 mod filter;
 mod util;
+mod yaml;
 
 pub mod project;
 pub mod manager;

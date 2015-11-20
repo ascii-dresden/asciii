@@ -10,15 +10,16 @@ use std::path::{Path, PathBuf};
 use std::ffi::OsStr;
 
 use slug;
-use chrono::{DateTime, UTC};
+use chrono::{Date, UTC};
 
 //TODO: add logging
 //TODO: remove asserts, is_ok()s and unwrap()s, stupid :D
 //TODO: make better use of io::ErrorKind
+//TODO: learn dealing with "~/"
 
 const PROJECT_FILE_EXTENSION:&'static str = "yml";
 
-pub type Year =  u32;
+pub type Year =  i32;
 pub fn slugify(string:&str) -> String{ slug::slugify(string) }
 
 #[derive(Debug)]
@@ -45,6 +46,7 @@ impl From<io::Error>  for LuigiError {
     fn from(ioerror: io::Error) -> LuigiError{ LuigiError::Io(ioerror) }
 }
 
+// TODO rely more on IoError, it has most of what you need
 #[derive(Debug)]
 pub struct Luigi {
     /// Root of the entire Structure.
@@ -139,7 +141,7 @@ impl Luigi {
         let project_file = project_dir.join(&(slugged_name + "." + PROJECT_FILE_EXTENSION));
 
         if self.working_dir.exists() && !project_dir.exists() {
-            //TODO replace copy with LuigiProejct::new(...).store(path)
+            //TODO replace copy with LuigiProject::new(...).store(path)
             try!(fs::create_dir(&project_dir));
             try!(fs::copy(&template, &project_file));
         }
@@ -236,13 +238,11 @@ impl Luigi {
 }
 
 pub trait LuigiProject {
-    fn new<T>(name:&str) -> T where T:LuigiProject;
-    //fn open<T: LuigiProject>(path:Path) -> Result<T,LuigiError>;
     fn index(&self) -> String;
     fn name(&self) -> String;
-    //fn date(&self) -> DateTime<UTC>;
+    fn date(&self) -> Date<UTC>;
     //n path(&self) -> PathBuf;
-    fn file_extension() -> String;
+    fn file_extension() -> &'static str;
 }
 
 
@@ -305,6 +305,7 @@ mod realworld {
         assert!(luigi.create_dirs().is_ok());
 
         let projects = luigi.list_project_files(LuigiDir::Archive(2015));
+        let projects = luigi.list_project_files(LuigiDir::Working);
         println!("Projects");
         for p in projects{
             println!("{:#?}", p);

@@ -5,13 +5,21 @@ authors = ["Hendrik Sollich <hendrik@hoodie.de>"]
 
 [dependencies]
 
-csv = "*"
+#csv = "*"
 yaml-rust = "*"
 chrono = "*"
 regex = "*"
 slug = "*"
+clap = "*"
+term = "*"
+prettytable-rs = "*"
+pad = "0.1.4"
 
 [dev-dependencies]
 tempdir = "*"
 #speculate = "*"
 #clippy = "*"
+
+[[bin]]
+name = "ascii"
+doc = false
