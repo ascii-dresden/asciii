@@ -1,4 +1,26 @@
-#![allow(dead_code)]
+//! Handles config files and default config.
+//!
+//! Looks for `~/.ascii-invoicer.yml` and patches unset fields from `DEFAULT_CONFIG`
+//!
+//! ```
+//! lazy_static!{
+//!     pub static ref CONFIG: config::ConfigReader = config::ConfigReader::new().unwrap();
+//! }
+//! ```
+
+#![warn(missing_docs,
+        missing_copy_implementations,
+        trivial_casts, trivial_numeric_casts,
+        unsafe_code,
+        unstable_features,
+        unused_import_braces, unused_qualifications)]
+//#![warn(missing_debug_implementations)]
+
+
+#![cfg_attr(feature = "dev", allow(unstable_features))]
+#![cfg_attr(feature = "dev", feature(plugin))]
+#![cfg_attr(feature = "dev", plugin(clippy))]
+
 use std::path::PathBuf;
 use std::env::home_dir;
 use yaml;
@@ -8,6 +30,7 @@ const DEFAULT_LOCATION: &'static str = ".ascii-invoicer.yml";
 
 /// Looks for a configuration yaml in your HOME_DIR
 pub struct ConfigReader{
+    /// Path of config file
     pub path: PathBuf,
     defaults: Yaml,
     user_val: Yaml
@@ -59,6 +82,7 @@ impl ConfigReader{
 
 }
 
+/// Default configuration that will be used if a value is not set in yaml file at DEFAULT_LOCATION
 pub const DEFAULT_CONFIG: &'static str = r#"
 ---
 manager_name: "The Unnamed Manager"
