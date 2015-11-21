@@ -67,6 +67,6 @@ pub fn get_int<'a>(yaml:&'a Yaml, key:&str) -> Option<i64> {
 }
 pub fn get_str<'a>(yaml:&'a Yaml, key:&str) -> Option<&'a str> {
     let mut path = Path::new(key).iter().map(|s|s.to_str().unwrap_or("")).collect::<Vec<&str>>();
-    get_path(&yaml,&mut path).and_then(|y|y.as_str())
+    get_path(&yaml,&mut path).and_then(|y|y.as_str()) // TODO turn other types into String
 }
 

@@ -2,7 +2,6 @@
 name = "ascii_invoicer"
 version = "0.1.0"
 authors = ["Hendrik Sollich <hendrik@hoodie.de>"]
-doc = false # bin is documented
 
 [dependencies]
 
@@ -15,6 +14,7 @@ clap = "*"
 term = "*"
 prettytable-rs = "*"
 pad = "*"
+lazy_static = "*"
 
 [dev-dependencies]
 tempdir = "*"
@@ -22,4 +22,5 @@ tempdir = "*"
 #clippy = "*"
 
 [[bin]]
-name = "ascii"
+name = "asciii"
+doc = false

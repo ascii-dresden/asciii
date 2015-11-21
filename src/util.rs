@@ -4,6 +4,7 @@ use std::path::Path;
 use std::path::PathBuf;
 use std::env::home_dir;
 use chrono::*;
+use super::CONFIG;
 
 pub fn freeze() {
     let mut _devnull = String::new();
@@ -26,6 +27,27 @@ pub fn replace_home_tilde(p:&Path) -> PathBuf{
     PathBuf::from( path.replace("~",home_dir().unwrap().to_str().unwrap()))
 }
 
+use std::process::Command;
+pub fn open_in_editor(path:&str){
+    let editor_config = CONFIG.get_path("editor").unwrap()
+        .as_str().unwrap()
+        .split_whitespace().collect::<Vec<&str>>();
+
+    let (editor_command,args) = editor_config
+        .split_first().unwrap() ;
+
+    println!("so this would launche {:?} with {:?} and {:?}", editor_command, args.join(" "), path);
+
+    let output = Command::new(editor_command)
+        .arg(args.join(" "))
+        .arg(&path)
+        .output()
+        .unwrap_or_else(|e| { panic!("failed to execute process: {}", e) });
+    let hello = output.stdout;
+    println!("{}", String::from_utf8(hello).unwrap());
+
+
+}
 
 pub fn parse_fwd_date(date_str:&str) -> Date<UTC>{
         let date = date_str.split('.')
@@ -34,6 +56,7 @@ pub fn parse_fwd_date(date_str:&str) -> Date<UTC>{
         UTC.ymd(date[2], date[1] as u32, date[0] as u32)
 }
 
+//  old checklist from the ruby versions rspec
     //  general
     //    it "knows when to use erb"
     //    it "raises on non existing templates"
