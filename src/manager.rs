@@ -131,6 +131,19 @@ impl Luigi {
         self.list_path_content(&self.storage_dir.join(&self.archive_dir))
     }
 
+    /// Produces a list of years for which there is an archive.
+    pub fn list_years(&self) -> Vec<Year> {
+        let mut years : Vec<Year> =
+            self.list_archives()
+            .iter()
+            .filter_map(|p| p.file_stem())
+            .filter_map(|p| p.to_str())
+            .filter_map(|year_str| year_str.parse::<Year>().ok())
+            .collect();
+        years.sort();
+        years
+    }
+
     /// Fills a template file and stores it in the working directory,
     /// in a new project directory according to it's name.
     //TODO take a T:LuigiProject
@@ -227,6 +240,16 @@ impl Luigi {
         }
     }
 
+    pub fn list_all_projects(&self) -> Vec<PathBuf>{
+        let mut all:Vec<PathBuf> = Vec::new();
+        for year in self.list_years(){
+            all.append(&mut self.list_project_files(LuigiDir::Archive(year)));
+        }
+        all.append(&mut self.list_project_files(LuigiDir::Working));
+
+        all
+    }
+
     pub fn list_project_files(&self, directory:LuigiDir) -> Vec<PathBuf> {
         self.list_projects(directory).iter()
             .map(|dir| self.get_project_file(dir))
@@ -248,9 +271,6 @@ pub trait LuigiProject {
 #[cfg(test)]
 mod realworld {
     use std::path::{Path,PathBuf};
-    use std::fs::{File,Metadata};
-    use util;
-    use util::ls;
 
     pub use super::{Luigi,LuigiError,LuigiDir};
 
@@ -316,7 +336,6 @@ mod realworld {
 mod test {
     use std::path::{Path,PathBuf};
     use std::fs;
-    use std::fs::{File,Metadata};
     use slug;
     use util;
     use util::ls;
@@ -406,12 +425,22 @@ mod test {
         util::ls(&_dir.path().to_string_lossy());
 
         let mut archives = luigi.list_archives();
+        let mut years = luigi.list_years();
         archives.sort();
+        years.sort();
         println!("ARCHIVES\n{:#?}", archives);
 
         assert!(archives[0].ends_with("1999"));
+        assert!(archives[0].is_dir());
         assert!(archives[1].ends_with("2001"));
+        assert!(archives[1].is_dir());
         assert!(archives[2].ends_with("2002"));
+        assert!(archives[2].is_dir());
+
+        println!("ARCHIVES\n{:#?}", years);
+        assert_eq!(years[0], 1999);
+        assert_eq!(years[1], 2001);
+        assert_eq!(years[2], 2002);
     }
 
     #[test]

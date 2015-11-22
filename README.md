@@ -13,7 +13,7 @@ Here I try to rewrite the original [ascii-invoicer](http://github.com/ascii-dres
 * [x] basic project file management
     * [x] creating
     * [ ] git integration
-    * [ ] template management
+    * [x] template management
 * [ ] Output
     * [ ] Displaying
     * [ ] pdf export

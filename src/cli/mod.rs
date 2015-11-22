@@ -59,6 +59,14 @@ pub fn list_templates(){
     }
 }
 
+/// Command LIST --all
+pub fn list_all_projects(){
+    let luigi = setup_luigi();
+    println!("{:#?}",
+    luigi.list_all_projects()
+    );
+}
+
 /// Command EDIT
 use itertools::Itertools;
 pub fn edit_project(dir:LuigiDir, search_term:&str, editor:&str){
@@ -77,7 +85,7 @@ pub fn edit_template(name:&str, editor:&str){
     let template_paths = luigi.list_templates()
         .iter()
         .filter(|f|f
-                .file_name()
+                .file_stem()
                 .unwrap_or(&OsStr::new("")) == name)
         .map(|p|p.display().to_string())
         .collect::<Vec<String>>();

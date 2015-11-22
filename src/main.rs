@@ -61,6 +61,10 @@ fn main(){
                           .short("a").long("archive")
                           .takes_value(true))
 
+                    .arg( Arg::with_name("all")
+                          .help("List all projects, ever")
+                          .long("all"))
+
                     .arg( Arg::with_name("templates")
                           .help("list templates")
                           .short("t").long("templates"))
@@ -128,6 +132,8 @@ fn main(){
     if let Some(matches) = matches.subcommand_matches("list") {
         if matches.is_present("templates"){
             cli::list_templates();
+        } else if matches.is_present("all"){
+            cli::list_all_projects();
         } else {
             if let Some(archive) = matches.value_of("archive"){
                 let archive = archive.parse::<i32>().unwrap();
