@@ -2,11 +2,6 @@
 //!
 //! Looks for `~/.ascii-invoicer.yml` and patches unset fields from `DEFAULT_CONFIG`
 //!
-//! ```
-//! lazy_static!{
-//!     pub static ref CONFIG: config::ConfigReader = config::ConfigReader::new().unwrap();
-//! }
-//! ```
 
 #![warn(missing_docs,
         missing_copy_implementations,
@@ -81,6 +76,8 @@ impl ConfigReader{
     }
 
 }
+
+//TODO consider https://crates.io/crates/xdg-basedir
 
 /// Default configuration that will be used if a value is not set in yaml file at DEFAULT_LOCATION
 pub const DEFAULT_CONFIG: &'static str = r#"

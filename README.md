@@ -14,15 +14,15 @@ Here I try to rewrite the original [ascii-invoicer](http://github.com/ascii-dres
     * [x] creating
     * [ ] git integration
     * [ ] template management
-* [ ] Displaying
+* [ ] Output
+    * [ ] Displaying
+    * [ ] pdf export
 * [x] Settings
     * [x] Merge HOME_DIR config with defaults
 * [ ] project type (init/open/parse yml/index/etc)
     * [ ] template filling
-* [ ] invoiceing
 * [ ] pretty cli output
     * [ ] all sorts of list, csv, etc
-* [ ] pdf export
 * [ ] complete this TODO
 * [ ] logging
 

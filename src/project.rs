@@ -2,7 +2,7 @@
 
 use yaml_rust::Yaml;
 use chrono::*;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use util;
 use yaml;
 use yaml::YamlError;
@@ -11,16 +11,10 @@ use pad::{PadStr,Alignment};
 
 
 #[derive(Debug)]
-pub struct Project { yaml: Yaml }
+pub struct Project { path: PathBuf, yaml: Yaml }
 
 //#[derive(Debug)]
 //pub struct ProjectOldFormat { yaml: Yaml } // implemented differently
-
-impl Project{
-    fn y_str<'a>(&'a self, path:&str) -> &'a str{
-        yaml::get_str(&self.yaml, &path).unwrap_or("")
-    }
-}
 
 impl LuigiProject for Project{
     fn index(&self) -> String{
@@ -40,19 +34,33 @@ impl LuigiProject for Project{
             .unwrap_or("01.01.0000");
         util::parse_fwd_date(date_str)
     }
-    //n path(&self) -> PathBuf;
+
+    fn path(&self) -> PathBuf{
+        self.path.to_owned()
+    }
+
     fn file_extension() -> &'static str {"yml"}
 }
 
 
+// TODO cache lookups
+impl Project{
 
-impl Project {
     pub fn open(path:&Path) -> Result<Project,YamlError>{
-        Ok(Project{ yaml: try!(yaml::open_yaml(&path)) })
+        Ok(Project{
+            path: path.to_owned(),
+            yaml: try!(yaml::open_yaml(&path))
+        })
     }
+
     pub fn manager(&self) -> String{
         yaml::get_str(&self.yaml, "manager").unwrap_or("").to_owned()
     }
+
+    fn y_str<'a>(&'a self, path:&str) -> &'a str{
+        yaml::get_str(&self.yaml, &path).unwrap_or("")
+    }
+
 }
 
 //#[test]

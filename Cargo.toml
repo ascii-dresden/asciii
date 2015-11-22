@@ -15,11 +15,17 @@ term = "*"
 prettytable-rs = "*"
 pad = "*"
 lazy_static = "*"
+itertools = "*"
+
+
+clippy = {version = "~0.0.23", optional = true}
+
+[features]
+default = []
+dev = ["clippy"]
 
 [dev-dependencies]
 tempdir = "*"
-#speculate = "*"
-#clippy = "*"
 
 [[bin]]
 name = "asciii"

@@ -1,11 +1,8 @@
-#![allow(dead_code)]
-#![allow(unused_imports)]
 #![allow(unused_variables)]
 #![allow(dead_code)]
 
 use std::fs;
 use std::io;
-use std::fs::{File,Metadata,DirEntry,ReadDir};
 use std::path::{Path, PathBuf};
 use std::ffi::OsStr;
 
@@ -15,7 +12,6 @@ use chrono::{Date, UTC};
 //TODO: add logging
 //TODO: remove asserts, is_ok()s and unwrap()s, stupid :D
 //TODO: make better use of io::ErrorKind
-//TODO: learn dealing with "~/"
 
 const PROJECT_FILE_EXTENSION:&'static str = "yml";
 
@@ -23,7 +19,7 @@ pub type Year =  i32;
 pub fn slugify(string:&str) -> String{ slug::slugify(string) }
 
 #[derive(Debug)]
-pub enum LuigiDir { Working, Archive(Year), Storage, Template }
+pub enum LuigiDir { Working, Archive(Year), Storage, Templates }
 
 #[derive(Debug)]
 pub enum LuigiSort { Date, Name, Index }
@@ -118,8 +114,12 @@ impl Luigi {
     }
 
     /// Produces a list of paths to all template filess in the `template_dir`
+    /// TODO extension `.tyml` currently hardcoded
     pub fn list_templates(&self) -> Vec<PathBuf> {
         self.list_path_content(&self.storage_dir.join(&self.template_dir))
+            .iter()
+            .filter(|p|p.extension().unwrap_or(OsStr::new("")) == OsStr::new("tyml"))
+            .cloned().collect()
     }
 
     /// Produces a list of paths to all archives in the `archive_dir`.
@@ -200,7 +200,6 @@ impl Luigi {
             }
         }
         None
-
     }
 
     fn get_project_dir_archive(&self, name:&str, year:Year) -> Option<PathBuf> {
@@ -241,7 +240,7 @@ pub trait LuigiProject {
     fn index(&self) -> String;
     fn name(&self) -> &str;
     fn date(&self) -> Date<UTC>;
-    //n path(&self) -> PathBuf;
+    fn path(&self) -> PathBuf;
     fn file_extension() -> &'static str;
 }
 

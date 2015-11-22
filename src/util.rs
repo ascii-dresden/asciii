@@ -4,7 +4,6 @@ use std::path::Path;
 use std::path::PathBuf;
 use std::env::home_dir;
 use chrono::*;
-use super::CONFIG;
 
 pub fn freeze() {
     let mut _devnull = String::new();
@@ -28,24 +27,31 @@ pub fn replace_home_tilde(p:&Path) -> PathBuf{
 }
 
 use std::process::Command;
-pub fn open_in_editor(path:&str){
-    let editor_config = CONFIG.get_path("editor").unwrap()
-        .as_str().unwrap()
-        .split_whitespace().collect::<Vec<&str>>();
+//TODO open_in_editor() should not block
+pub fn open_in_editor(editor:&str, paths:Vec<String>){
+    let editor_config = editor
+        .split_whitespace()
+        .collect::<Vec<&str>>();
 
     let (editor_command,args) = editor_config
         .split_first().unwrap() ;
 
-    println!("so this would launche {:?} with {:?} and {:?}", editor_command, args.join(" "), path);
+    println!("launching {:?} with {:?} and {:?}",
+             editor_command,
+             args.join(" "),
+             paths);
 
-    let output = Command::new(editor_command)
+    assert!(!paths.is_empty()); //TODO can I add a message to that?
+
+    for path in &paths{
+        assert!(Path::new(&path).exists());
+    }
+
+    Command::new(editor_command)
         .arg(args.join(" "))
-        .arg(&path)
+        .args(&paths)
         .output()
         .unwrap_or_else(|e| { panic!("failed to execute process: {}", e) });
-    let hello = output.stdout;
-    println!("{}", String::from_utf8(hello).unwrap());
-
 
 }
 

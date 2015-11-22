@@ -4,12 +4,10 @@ extern crate regex;
 extern crate slug;
 extern crate pad;
 #[macro_use] extern crate lazy_static;
+extern crate itertools;
 
 mod yaml;
 pub mod config;
-lazy_static!{
-    pub static ref CONFIG: config::ConfigReader = config::ConfigReader::new().unwrap();
-}
 mod filter;
 mod util;
 
@@ -18,6 +16,9 @@ pub mod manager;
 pub mod templater;
 pub mod keyword_replacement;
 
-pub use manager::Luigi;
-pub use keyword_replacement::IsKeyword;
+//use manager::Luigi;
+//use keyword_replacement::IsKeyword;
 
+lazy_static!{
+    pub static ref CONFIG: config::ConfigReader = config::ConfigReader::new().unwrap();
+}
