@@ -50,7 +50,7 @@ pub fn open_in_editor(editor:&str, paths:Vec<String>){
     Command::new(editor_command)
         .arg(args.join(" "))
         .args(&paths)
-        .output()
+        .spawn()
         .unwrap_or_else(|e| { panic!("failed to execute process: {}", e) });
 
 }
