@@ -8,23 +8,46 @@ Here I try to rewrite the original [ascii-invoicer](http://github.com/ascii-dres
 3. windows support (I hope)
 4. fun
 
-## TODO
+## TODO Rewrite
 
-* [x] basic project file management
-    * [x] creating
-    * [ ] git integration
-    * [x] template management
-* [ ] Output
-    * [ ] Displaying
-    * [ ] pdf export
-* [x] Settings
-    * [x] Merge HOME_DIR config with defaults
-* [ ] project type (init/open/parse yml/index/etc)
-    * [ ] template filling
-* [ ] pretty cli output
-    * [ ] all sorts of list, csv, etc
-* [ ] complete this TODO
-* [ ] logging
+* [ ] Milestone v3.0.0 *complete rewrite*
+  * [x] basic project file management
+      * [x] creating
+      * [ ] git integration
+      * [x] template management
+  * [ ] Validate
+      * [ ] Offer
+      * [ ] Invoice
+      * [ ] Archive, Payed, Calendar etc
+  * [ ] Output
+      * [ ] Displaying
+      * [ ] Pdf export (Invoice, Offer, Checklist)
+  * [x] Settings
+      * [x] Merge HOME_DIR config with defaults
+  * [ ] project type (init/open/parse yml/index/etc)
+      * [ ] template filling
+  * [ ] pretty cli output
+      * [ ] all sorts of list, csv, etc
+  * [ ] complete this TODO
+  * [ ] logging
+
+
+## Vision v3.x.x
+
+Features possible through rewrite:
+
+* [ ] xdg basedir (less setup)
+* [ ] much faster
+  * [ ] caching
+  * [ ] multi threading
+* [ ] REST API with [rustless](http://rustless.org/) or so `asciii serve`
+* [ ] Statistics (plot over time, etc)
+* [ ] platform support
+  * [ ] debian/archlinux packages
+  * [ ] windows build
+* [ ] pure library build
+  * [ ] GUI
+* [ ] third format ( machine readable/writable for GUI)
 
 
 The following is a printout of `ascii help` from the [original ascii-invoicer](http://github.com/ascii-dresden/ascii-invoicer).
