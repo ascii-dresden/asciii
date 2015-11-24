@@ -5,13 +5,16 @@ use std::fs;
 use std::io;
 use std::path::{Path, PathBuf};
 use std::ffi::OsStr;
+use std::collections::HashMap;
 
 use slug;
 use chrono::{Date, UTC};
 
-//TODO: add logging
-//TODO: remove asserts, is_ok()s and unwrap()s, stupid :D
-//TODO: make better use of io::ErrorKind
+use graceful::GracefulExit;
+use templater::Templater;
+
+// TODO: add logging
+// TODO: make better use of io::ErrorKind
 
 const PROJECT_FILE_EXTENSION:&'static str = "yml";
 
@@ -25,6 +28,7 @@ pub enum LuigiDir { Working, Archive(Year), Storage, Templates }
 pub enum LuigiSort { Date, Name, Index }
 
 #[derive(Debug)]
+// TODO Revise LuigiError
 pub enum LuigiError {
     DirectoryDoesNotExist(LuigiDir),
     NoProject,
@@ -32,6 +36,7 @@ pub enum LuigiError {
     ProjectFileExists,
     StoragePathNotAbsolute,
     InvalidDirStructure,
+    ParseError,
     Io(io::Error),
     //UnableToCreate,
     //TemplateDoesNotExist,
@@ -101,7 +106,7 @@ impl Luigi {
     ///    ├── archive
     ///        ├── 2001
     ///    ...
-    /// </pre>
+    ///</pre>
     pub fn create_archive(&self, year:Year) -> Result<PathBuf, LuigiError> {
         assert!(self.archive_dir.exists());
         //TODO there must be something nicer than to_string(), like From<u32> for Path
@@ -120,6 +125,14 @@ impl Luigi {
             .iter()
             .filter(|p|p.extension().unwrap_or(OsStr::new("")) == OsStr::new("tyml"))
             .cloned().collect()
+    }
+
+    /// Returns the Path to the template file by the given name, maybe.
+    pub fn get_template_file(&self, name:&str) -> Option<PathBuf> {
+        self.list_templates().iter()
+            .filter(|f|f.file_stem().unwrap_or(&OsStr::new("")) == name)
+            .cloned()
+            .next()
     }
 
     /// Produces a list of paths to all archives in the `archive_dir`.
@@ -144,21 +157,29 @@ impl Luigi {
         years
     }
 
-    /// Fills a template file and stores it in the working directory,
+    /// Takes a template file and stores it in the working directory,
     /// in a new project directory according to it's name.
-    //TODO take a T:LuigiProject
-    pub fn create_project(&self, project:&str, template:&Path) -> Result<PathBuf, LuigiError>{
+    pub fn create_project<P:LuigiProject>(&self, project_name:&str, template_name:&str) -> Result<PathBuf, LuigiError>{
         if !self.working_dir.exists(){ return Err(LuigiError::NoWorkingDir)}; // funny syntax
-        let slugged_name = slugify(project);
-        let project_dir = self.working_dir.join(&slugged_name);
-        let project_file = project_dir.join(&(slugged_name + "." + PROJECT_FILE_EXTENSION));
+
+        let slugged_name = slugify(&project_name);
+
+        let project_dir   = self.working_dir.join(&slugged_name);
+        let project_file  = project_dir.join(&(slugged_name + "." + PROJECT_FILE_EXTENSION));
+        let template_path = self.get_template_file(template_name)
+            .graceful(&format!("There is no template named {:?}", template_name));
 
         if self.working_dir.exists() && !project_dir.exists() {
-            //TODO replace copy with LuigiProject::new(...).store(path)
+            //creates in tempfile, when successfull move to project_file
+            let project = P::new(&project_name, &template_path).unwrap();
+            // TODO test for unreplaced template keywords
             try!(fs::create_dir(&project_dir));
-            try!(fs::copy(&template, &project_file));
+            try!(fs::copy(project.path(), &project_file));
         }
-        Ok(project_dir.to_owned())
+        else{
+            println!("working did not exist or project dir did exist" );
+        }
+        Ok(project_file.to_owned())
     }
 
     fn move_folder(folder:&Path, target:&Path) -> Result<(), LuigiError>{
@@ -240,6 +261,13 @@ impl Luigi {
         }
     }
 
+    pub fn list_broken_projects(&self, directory:LuigiDir) -> Vec<PathBuf>{
+        self.list_projects(directory).iter()
+            .filter(|dir| self.get_project_file(dir).is_none())
+            .cloned()
+            .collect()
+    }
+
     pub fn list_all_projects(&self) -> Vec<PathBuf>{
         let mut all:Vec<PathBuf> = Vec::new();
         for year in self.list_years(){
@@ -259,12 +287,20 @@ impl Luigi {
     }
 }
 
-pub trait LuigiProject {
-    fn index(&self) -> String;
+pub trait LuigiValidator{}
+
+pub trait LuigiProject{
+
+    // creates in tempfile
+    fn new(project_name:&str,template:&Path) -> Result<Self,LuigiError> where Self: Sized;
     fn name(&self) -> &str;
     fn date(&self) -> Date<UTC>;
     fn path(&self) -> PathBuf;
+    fn index(&self) -> String;
+    fn valide<C:LuigiValidator>(&self) -> Vec<C>;
+    fn validate<C:LuigiValidator>(&self, criterion:C) -> bool;
     fn file_extension() -> &'static str;
+    // fn cache // TODO Stores a faster parsable version
 }
 
 
@@ -340,7 +376,6 @@ mod test {
     use util;
     use util::ls;
 
-    extern crate tempdir;
     pub use self::tempdir::TempDir;
     pub use super::{Luigi,
                     LuigiProject,

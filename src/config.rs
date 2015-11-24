@@ -20,6 +20,7 @@ use std::path::PathBuf;
 use std::env::home_dir;
 use yaml;
 use yaml::{Yaml, YamlLoader, YamlError};
+use graceful::GracefulExit;
 
 const DEFAULT_LOCATION: &'static str = ".ascii-invoicer.yml";
 
@@ -35,7 +36,7 @@ impl ConfigReader{
 
     /// The Path of the config file.
     pub fn path() -> PathBuf {
-        let home = home_dir().expect("Can't find HOME DIRECTORY");
+        let home = home_dir().graceful("Can't find HOME DIRECTORY");
         return home.join(DEFAULT_LOCATION);
     }
 
@@ -65,14 +66,24 @@ impl ConfigReader{
     }
 
     /// Returns the string in the position or an empty string
+    ///
+    /// # Panics
+    /// this panics if nothing is found
     pub fn get_str(&self, key:&str) -> &str {
         yaml::get_str(&self.user_val, &key).or(
-        yaml::get_str(&self.defaults, &key)).unwrap_or("")
+        yaml::get_str(&self.defaults, &key)).expect(&format!("{} does not contain values", key))
     }
 
+    /// Returns the value at this position cast to str
+    ///
+    pub fn get_as_str(&self, _path:&str) -> &str { unimplemented!() }
+
     /// Returns the boolean in the position or `false`
+    ///
+    /// # Panics
+    /// this panics if nothing is found
     pub fn get_bool(&self, key:&str) -> bool {
-        self.get_path(key).and_then(|y|y.as_bool()).unwrap_or(false)
+        self.get_path(key).and_then(|y|y.as_bool()).expect(&format!("{} does not contain values", key))
     }
 
 }
@@ -80,6 +91,7 @@ impl ConfigReader{
 //TODO consider https://crates.io/crates/xdg-basedir
 
 /// Default configuration that will be used if a value is not set in yaml file at DEFAULT_LOCATION
+/// TODO use include_str!()
 pub const DEFAULT_CONFIG: &'static str = r#"
 ---
 manager_name: "The Unnamed Manager"
@@ -97,6 +109,8 @@ dirs:
   archive: archive
   templates: templates
 
+template: default # default template
+
 ## CAREFUL HERE
 project_file_extension: .yml
 use_git: true
@@ -108,6 +122,7 @@ defaults:
   tax: 0.19
   lang: de
   canceled: false
+  salery: 8.0
   includes:
     logopath:
     name:

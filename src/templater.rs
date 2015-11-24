@@ -1,27 +1,27 @@
 use std::io;
 use std::io::Read;
 use std::fs::File;
-use std::path::PathBuf;
+use std::path::{Path,PathBuf};
 use std::collections::HashMap;
 
 use keyword_replacement::IsKeyword;
 
 /// Simple templating module
+#[derive(Debug)]
 pub struct Templater{
     /// path to used template file
     pub path: PathBuf,
 
     /// content of template file after reading
-    pub template: String,
+    pub original: String,
 
     /// content of filled template
     pub filled: String,
 }
 
-// TODO work only on yaml r-values
+// TODO make templater work only on yaml r-values
 impl Templater{
-
-    pub fn new (path:&str) -> Result<Templater, io::Error> {
+    pub fn new (path:&Path) -> Result<Templater, io::Error> {
         let template = try!(File::open(&path)
             .and_then(|mut file| {
                 let mut content = String::new();
@@ -30,17 +30,13 @@ impl Templater{
 
         Ok(Templater{
             path:PathBuf::from(path),
-            template:template,
+            original:template,
             filled: String::new()
         })
     }
 
     pub fn finalize(&mut self) -> Templater {
-        Templater{
-            path : self.path.to_owned(),
-            template: self.template.to_owned(),
-            filled: self.filled.to_owned()
-        }
+        self.to_owned()
     }
 
     pub fn fill_in_data(&mut self, data: &HashMap<&str,&str>) -> &mut Templater {
@@ -50,9 +46,25 @@ impl Templater{
         })
     }
 
+    pub fn list_keywords(&self) -> Vec<String>{
+        self.original.list_keywords()
+    }
+
     pub fn fill_template<F>(&mut self, closure: F) -> &mut Templater
         where F:Fn(&str) -> String {
-        self.filled = self.template.map_keywords(closure);
+        self.filled = self.original.map_keywords(closure);
         self
+    }
+}
+
+use std::borrow::ToOwned;
+impl ToOwned for Templater{
+    type Owned = Templater;
+    fn to_owned(&self) -> Templater {
+        Templater{
+            path :    self.path.to_owned(),
+            original: self.original.to_owned(),
+            filled:   self.filled.to_owned()
+        }
     }
 }

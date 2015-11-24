@@ -1,25 +1,23 @@
---- # ascii invoicer document  (version: __VERSION__, template: __TEMPLATE__)
+--- # asciii document  (version: __VERSION__, template: __TEMPLATE__)
 # vim:set ft=yaml:
-format: 2.4.0
-created: __DATE-CREATED__
 
-client: 
+client:
   title:     Herr # Frau, Professor, Professorin
   first_name: John
   last_name:  Doe
 
-  email: 
-  address: | 
+  email:
+  address: |
     John Doe
     Nöthnitzerstraße 46
     01187 Dresden
 
-event: 
+event:
   name: __PROJECT-NAME__
   location: # might be a list
   dates:
-  - begin: __DATE-CREATED__
-    #end: 
+  - begin: __DATE-EVENT__
+    #end:
     times:
     -  begin: "9:00"
        end:   "17:00"
@@ -31,8 +29,8 @@ offer:
   appendix: 1
 
 invoice:
-  number: #27
-  date:  #required
+  number:     #27
+  date:       #required
   payed_date: #required
 
 cataloge:
@@ -50,17 +48,17 @@ cataloge:
   product: &obstplatte   { name: Obstplatte      , price: 30.00 , unit: stk }
 
 products:
-  *kaffee: 
+  *kaffee:
     amount: 4
-    sold:   5 
+    sold:   5
 
   *wasser_gross:
     amount: 4
 
-  *kekse: 
+  *kekse:
     amount: 4
 
-hours: 
+hours:
   salary: __SALARY__
   caterers:
     "unknown" : 0
@@ -73,8 +71,8 @@ manager: __MANAGER__
 
 #messages: # read default-settings.yml on how to overwrite
 
-invoicer_version: 3.0.0-dev
-template: default
+invoicer_version: 3.0.0-dev (__VERSION__)
+template: __TEMPLATE__
 format: 2.4.0
-created: 10.12.2015
+created: __DATE-CREATED__
 ...

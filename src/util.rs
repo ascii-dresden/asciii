@@ -27,7 +27,7 @@ pub fn replace_home_tilde(p:&Path) -> PathBuf{
 }
 
 use std::process::Command;
-//TODO open_in_editor() should not block
+//TODO use https://crates.io/crates/open (supports linux, windows, mac)
 pub fn open_in_editor(editor:&str, paths:Vec<String>){
     let editor_config = editor
         .split_whitespace()

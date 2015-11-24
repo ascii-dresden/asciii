@@ -22,14 +22,18 @@ impl From<ScanError> for YamlError{
     fn from(scanerror: ScanError) -> YamlError{ YamlError::Scan(scanerror) }
 }
 
+//TODO Rename to open()
 pub fn open_yaml( path:&Path ) -> Result<Yaml, YamlError> {
-    let settings_file = try!(File::open(&path)
+    let file_content = try!(File::open(&path)
                              .and_then(|mut file| {
                                  let mut content = String::new();
                                  file.read_to_string(&mut content).map(|_| content)
                              }));
+    parse( &file_content )
+}
 
-    Ok(try!(YamlLoader::load_from_str(&settings_file)).get(0).unwrap().to_owned())
+pub fn parse( file_content:&str ) -> Result<Yaml, YamlError> {
+    Ok(try!(YamlLoader::load_from_str(&file_content)).get(0).unwrap().to_owned())
 }
 
 /// Wrapper for `Yaml.get()`

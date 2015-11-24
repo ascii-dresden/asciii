@@ -1,6 +1,13 @@
+//! Hooks for the commandline interface
+//!
+//! # Note to self
+//! Put as little logic in here as possible.
+//! That makes it easier to derive a pure library version later.
+
 #![allow(unused_variables)]
 use std::path::{Path,PathBuf};
 use std::ffi::OsStr;
+
 use config;
 use super::CONFIG;
 use manager::{Luigi,LuigiDir};
@@ -42,7 +49,8 @@ pub fn search_projects(dir:LuigiDir, search_term:&str) -> Vec<Project> {
 pub fn list_projects(dir:LuigiDir){
     let luigi = setup_luigi();
     let project_paths = luigi.list_project_files(dir);
-    let projects: Vec<Project> = project_paths.iter().map(|path| Project::open(path).unwrap()).collect();
+    let projects: Vec<Project> = project_paths
+        .iter().map(|path| Project::open(path).unwrap()).collect();
 
     for project in projects{
         println!("{} {} {} {}", project.index(), project.name(), project.manager(), project.date());
@@ -62,9 +70,19 @@ pub fn list_templates(){
 /// Command LIST --all
 pub fn list_all_projects(){
     let luigi = setup_luigi();
-    println!("{:#?}",
-    luigi.list_all_projects()
-    );
+    let projects: Vec<Project> = luigi.list_all_projects()
+        .iter()
+        .map(|p|Project::open(p).unwrap())
+        .collect() ;
+    for project in projects{
+        println!("{} {} {} {}", project.index(), project.name(), project.manager(), project.date());
+    }
+}
+
+/// Command LIST --broken
+pub fn list_broken_projects(dir:LuigiDir){
+    let luigi = setup_luigi();
+    println!("{:#?}", luigi.list_broken_projects(dir));
 }
 
 /// Command EDIT
@@ -97,6 +115,23 @@ pub fn show_project(dir:LuigiDir, search_term:&str){
     for project in search_projects(dir, &search_term){
         println!("{} {} {} {}", project.index(), project.name(), project.manager(), project.date());
     }
+}
+
+/// Command SHOW --template
+use templater::Templater;
+pub fn show_template(name:&str){
+    let luigi = setup_luigi();
+    let templater = Templater::new(&luigi.get_template_file(name).unwrap()).unwrap();
+    println!("{:#?}", templater.list_keywords());
+}
+
+/// Command NEW
+pub fn new_project(project_name:&str, template_name:&str, editor:&str, edit:bool){
+    let luigi = setup_luigi();
+    let project_path = luigi.create_project::<Project>(&project_name, &template_name).unwrap();
+    util::open_in_editor(&editor, vec![project_path.display().to_string()]);
+
+    println!("created?");
 }
 
 /// Command CONFIG --show

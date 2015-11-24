@@ -5,8 +5,10 @@ extern crate chrono;
 extern crate regex;
 extern crate slug;
 extern crate pad;
-#[macro_use] extern crate lazy_static;
 extern crate itertools;
+extern crate tempdir;
+#[macro_use] extern crate lazy_static;
+#[macro_use] extern crate maplit;
 #[macro_use] extern crate clap;
 
 use clap::{App, SubCommand, Arg};
@@ -14,6 +16,7 @@ use manager::LuigiDir;
 
 mod yaml;
 mod config;
+mod graceful;
 
 mod filter;
 mod util;
@@ -27,6 +30,7 @@ mod cli;
 lazy_static!{
     pub static ref CONFIG: config::ConfigReader = config::ConfigReader::new().unwrap();
 }
+//TODO: remove: asserts!, is_ok(), to_owned() and unwrap()s, stupid :D
 
 fn main(){
     let matches = App::new("ascii-invoicer")
@@ -69,6 +73,10 @@ fn main(){
                           .help("list templates")
                           .short("t").long("templates"))
 
+                    .arg( Arg::with_name("broken")
+                          .help("list broken projects (without project file)")
+                          .short("b").long("broken"))
+
                     )
 
         .subcommand(SubCommand::with_name("edit")
@@ -104,7 +112,37 @@ fn main(){
                           .help("Pick an archived project")
                           .short("a").long("archive")
                           .takes_value(true))
+
+                    .arg( Arg::with_name("template")
+                          .help("Show show fields in templates that are filled")
+                          .short("t").long("template")
+                          .conflicts_with("archive")
+                          )
                    )
+
+        .subcommand(SubCommand::with_name("new")
+                    .arg( Arg::with_name("name")
+                          .help("Project name")
+                          .required(true))
+
+                    .arg( Arg::with_name("template")
+                          .help("Use a specific template")
+                          .short("t").long("template")
+                          .takes_value(true))
+
+                    .arg( Arg::with_name("editor")
+                          .help("Override the configured editor")
+                          .short("e").long("editor")
+                          .takes_value(true))
+
+                    .arg( Arg::with_name("don't edit")
+                          .help("Do not edit the file after creation")
+                          .short("d"))
+
+                    )
+
+        //.subcommand(SubCommand::with_name("archive"))
+        //.subcommand(SubCommand::with_name("unarchive"))
 
         .subcommand(SubCommand::with_name("config")
                     .about("Show and edit your config")
@@ -124,22 +162,40 @@ fn main(){
                           .short("d").long("default")
                           )
                    )
+
         .subcommand(SubCommand::with_name("whoami"))
 
         .get_matches();
 
+    // command: "new"
+    if let Some(matches) = matches.subcommand_matches("new") {
+        let name     = matches.value_of("name").unwrap();
+        let editor   = CONFIG.get_path("editor").unwrap().as_str().unwrap();
+
+        let template = matches.value_of("template").or(
+            CONFIG.get_path("template").unwrap().as_str()
+            ).unwrap();
+
+        cli::new_project(&name, &template, &editor, !matches.is_present("don't edit"));
+    }
+
     // command: "list"
-    if let Some(matches) = matches.subcommand_matches("list") {
+    else if let Some(matches) = matches.subcommand_matches("list") {
         if matches.is_present("templates"){
             cli::list_templates();
         } else if matches.is_present("all"){
             cli::list_all_projects();
         } else {
-            if let Some(archive) = matches.value_of("archive"){
+            let dir = if let Some(archive) = matches.value_of("archive"){
                 let archive = archive.parse::<i32>().unwrap();
-                cli::list_projects(LuigiDir::Archive(archive));
+                LuigiDir::Archive(archive)
             } else {
-                cli::list_projects(LuigiDir::Working);
+                LuigiDir::Working
+            };
+            if matches.is_present("broken"){
+                cli::list_broken_projects(dir);
+            } else {
+                cli::list_projects(dir);
             }
         }
     }
@@ -168,6 +224,8 @@ fn main(){
         if let Some(archive) = matches.value_of("archive"){
             let archive = archive.parse::<i32>().unwrap();
             cli::show_project(LuigiDir::Archive(archive), &search_term);
+        } else if  matches.is_present("template"){
+            cli::show_template(search_term);
         } else {
             cli::show_project(LuigiDir::Working, &search_term);
         }

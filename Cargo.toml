@@ -16,16 +16,14 @@ prettytable-rs = "*"
 pad = "*"
 lazy_static = "*"
 itertools = "*"
-
+maplit = "*"
+tempdir = "*"
 
 clippy = {version = "~0.0.23", optional = true}
 
 [features]
 default = []
 dev = ["clippy"]
-
-[dev-dependencies]
-tempdir = "*"
 
 [[bin]]
 name = "asciii"
