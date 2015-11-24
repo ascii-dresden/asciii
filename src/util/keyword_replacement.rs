@@ -13,7 +13,6 @@ use std::ops::Deref;
 impl<U:Deref<Target=str>> IsKeyword for U {
 
     fn is_keyword(&self) -> bool{
-        // TODO make the Regex::new() lazy_static!
         Regex::new(REGEX).ok().expect("broken regex").is_match(self)
     }
 

@@ -14,23 +14,21 @@ extern crate tempdir;
 use clap::{App, SubCommand, Arg};
 use manager::LuigiDir;
 
-mod yaml;
-mod config;
-mod graceful;
-
-mod filter;
 mod util;
+mod config;
 
 mod project;
 mod manager;
 mod templater;
-mod keyword_replacement;
 mod cli;
 
 lazy_static!{
     pub static ref CONFIG: config::ConfigReader = config::ConfigReader::new().unwrap();
 }
-//TODO: remove: asserts!, is_ok(), to_owned() and unwrap()s, stupid :D
+
+// TODO: add logging
+// TODO: make better use of io::ErrorKind
+// TODO: remove: asserts!, is_ok(), to_owned() and unwrap()s, stupid :D
 
 fn main(){
     let matches = App::new("ascii-invoicer")

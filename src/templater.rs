@@ -4,7 +4,7 @@ use std::fs::File;
 use std::path::{Path,PathBuf};
 use std::collections::HashMap;
 
-use keyword_replacement::IsKeyword;
+use util::IsKeyword;
 
 /// Simple templating module
 #[derive(Debug)]

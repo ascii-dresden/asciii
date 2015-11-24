@@ -18,9 +18,9 @@
 
 use std::path::PathBuf;
 use std::env::home_dir;
-use yaml;
-use yaml::{Yaml, YamlLoader, YamlError};
-use graceful::GracefulExit;
+use util::yaml;
+use util::yaml::{Yaml, YamlLoader, YamlError};
+use util::GracefulExit;
 
 const DEFAULT_LOCATION: &'static str = ".ascii-invoicer.yml";
 

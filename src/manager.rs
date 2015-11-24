@@ -10,11 +10,8 @@ use std::collections::HashMap;
 use slug;
 use chrono::{Date, UTC};
 
-use graceful::GracefulExit;
+use util::GracefulExit;
 use templater::Templater;
-
-// TODO: add logging
-// TODO: make better use of io::ErrorKind
 
 const PROJECT_FILE_EXTENSION:&'static str = "yml";
 
@@ -28,7 +25,7 @@ pub enum LuigiDir { Working, Archive(Year), Storage, Templates }
 pub enum LuigiSort { Date, Name, Index }
 
 #[derive(Debug)]
-// TODO Revise LuigiError
+// TODO: Revise LuigiError
 pub enum LuigiError {
     DirectoryDoesNotExist(LuigiDir),
     NoProject,
@@ -38,8 +35,6 @@ pub enum LuigiError {
     InvalidDirStructure,
     ParseError,
     Io(io::Error),
-    //UnableToCreate,
-    //TemplateDoesNotExist,
 }
 
 // All you need to make try!() fun again

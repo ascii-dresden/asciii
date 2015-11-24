@@ -12,9 +12,9 @@ use pad::{PadStr,Alignment};
 use tempdir::TempDir;
 
 use util;
-use yaml;
+use util::yaml;
+use util::yaml::YamlError;
 use manager::{LuigiProject, LuigiValidator, LuigiError};
-use yaml::YamlError;
 use templater::Templater;
 
 pub struct Project {
