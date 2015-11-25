@@ -31,6 +31,7 @@ pub enum LuigiError {
     NoProject,
     NoWorkingDir,
     ProjectFileExists,
+    ProjectDirExists,
     StoragePathNotAbsolute,
     InvalidDirStructure,
     ParseError,
@@ -67,6 +68,8 @@ impl Luigi {
     }
 
     fn list_path_content(&self, path:&Path) -> Vec<PathBuf> {
+        println!("{}: {}", path.display(), path.exists());
+
         let entries = fs::read_dir(path).unwrap();
         entries.map(|entry|{
             entry.unwrap().path()
@@ -123,6 +126,15 @@ impl Luigi {
             .cloned().collect()
     }
 
+    /// Produces a list of names of all template filess in the `template_dir`
+    pub fn list_template_names(&self) -> Vec<String> {
+        self.list_templates() .iter()
+            .filter_map(|p|p.file_stem())
+            .filter_map(|n|n.to_str())
+            .map(|s|s.to_owned())
+            .collect()
+    }
+
     /// Returns the Path to the template file by the given name, maybe.
     pub fn get_template_file(&self, name:&str) -> Result<PathBuf, LuigiError> {
         self.list_templates().iter()
@@ -155,27 +167,26 @@ impl Luigi {
 
     /// Takes a template file and stores it in the working directory,
     /// in a new project directory according to it's name.
-    pub fn create_project<P:LuigiProject>(&self, project_name:&str, template_name:&str) -> Result<PathBuf, LuigiError>{
-        if !self.working_dir.exists(){ return Err(LuigiError::NoWorkingDir)}; // funny syntax
+    pub fn create_project<P:LuigiProject>(&self, project_name:&str, template_name:&str)
+        -> Result<P, LuigiError>
+        {
+            if !self.working_dir.exists(){ return Err(LuigiError::NoWorkingDir)}; // funny syntax
+            let slugged_name = slugify(&project_name);
+            let project_dir  = self.working_dir.join(&slugged_name);
+            if project_dir.exists() { return Err(LuigiError::ProjectDirExists); }
 
-        let slugged_name = slugify(&project_name);
+            let target_file  = project_dir
+                .join(&(slugged_name + "." + PROJECT_FILE_EXTENSION));
 
-        let project_dir   = self.working_dir.join(&slugged_name);
-        let project_file  = project_dir.join(&(slugged_name + "." + PROJECT_FILE_EXTENSION));
-        let template_path = try!(self.get_template_file(template_name));
+            let template_path = try!(self.get_template_file(template_name));
+            let mut project = P::new(&project_name, &template_path).unwrap();
 
-        if self.working_dir.exists() && !project_dir.exists() {
-            //creates in tempfile, when successfull move to project_file
-            let project = P::new(&project_name, &template_path).unwrap();
             // TODO test for unreplaced template keywords
             try!(fs::create_dir(&project_dir));
-            try!(fs::copy(project.path(), &project_file));
+            try!(fs::copy(project.file(), &target_file));
+            project.set_file(&target_file);
+            return Ok(project);
         }
-        else{
-            println!("working did not exist or project dir did exist" );
-        }
-        Ok(project_file.to_owned())
-    }
 
     fn move_folder(folder:&Path, target:&Path) -> Result<(), LuigiError>{
         try!(fs::rename(folder,target));
@@ -282,19 +293,24 @@ impl Luigi {
     }
 }
 
+pub trait LuigiProject{
+    /// creates in tempfile
+    fn new(project_name:&str,template:&Path) -> Result<Self,LuigiError> where Self: Sized;
+    fn name(&self) -> String;
+    fn date(&self) -> Date<UTC>;
+    fn index(&self) -> String;
+
+    fn file_extension() -> &'static str {PROJECT_FILE_EXTENSION}
+    fn file(&self) -> PathBuf; // Path to project file
+    fn set_file(&mut self, new_file:&Path);
+    fn dir(&self)  -> PathBuf{ self.file().parent().unwrap().to_owned() }
+}
+
 pub trait LuigiValidator{}
 
-pub trait LuigiProject{
-
-    // creates in tempfile
-    fn new(project_name:&str,template:&Path) -> Result<Self,LuigiError> where Self: Sized;
-    fn name(&self) -> &str;
-    fn date(&self) -> Date<UTC>;
-    fn path(&self) -> PathBuf;
-    fn index(&self) -> String;
+pub trait LuigiValidatable{
     fn valide<C:LuigiValidator>(&self) -> Vec<C>;
     fn validate<C:LuigiValidator>(&self, criterion:C) -> bool;
-    fn file_extension() -> &'static str;
     // fn cache // TODO Stores a faster parsable version
 }
 
@@ -367,15 +383,46 @@ mod realworld {
 mod test {
     use std::path::{Path,PathBuf};
     use std::fs;
+    use std::fs::File;
     use slug;
     use util;
     use util::ls;
 
-    pub use self::tempdir::TempDir;
-    pub use super::{Luigi,
+    use chrono::*;
+    use tempdir::TempDir;
+    use super::{Luigi,
                     LuigiProject,
                     LuigiError,
                     LuigiDir};
+
+    pub struct TestProject {
+        file_path: PathBuf,
+        temp_dir: Option<TempDir>
+    }
+
+    impl LuigiProject for TestProject{
+        // creates in tempfile
+        fn new(project_name:&str,template:&Path) -> Result<Self,LuigiError> where Self: Sized {
+            // generates a temp file
+            let temp_dir  = TempDir::new_in(".",&project_name).unwrap();
+            let temp_file = temp_dir.path().join(project_name);
+
+            // just copy over template
+            try!(fs::copy(template, &temp_file));
+
+            // project now lives in the temp_file
+            Ok(TestProject{
+                file_path: temp_file,
+                temp_dir: Some(temp_dir),
+            })
+        }
+        fn name(&self) -> String{ self.file().file_stem().unwrap().to_str().unwrap().to_owned() }
+        fn date(&self) -> Date<UTC>{ UTC::today() }
+        fn file(&self) -> PathBuf{ self.file_path.to_owned() }
+        fn set_file(&mut self, new_file:&Path){ self.file_path = new_file.to_owned(); }
+        fn index(&self) -> String{ "ZZ99".into() }
+    }
+
 
     // TODO implement failing cases
     const TEST_PROJECTS:[&'static str;4] = [
@@ -432,6 +479,17 @@ mod test {
     }
 
     #[test]
+    fn create_test_project(){
+        let (_dir , storage_path, luigi) = setup();
+        luigi.create_dirs().unwrap();
+        assert_existens(&storage_path);
+
+        copy_template(storage_path.join("templates"));
+        let template_path = luigi.get_template_file("template1").unwrap();
+        let test_p = TestProject::new("testproject", &template_path).unwrap();
+    }
+
+    #[test]
     fn create_archive(){
         let (_dir , storage_path, luigi) = setup();
         assert!(luigi.create_dirs().is_ok());
@@ -480,21 +538,22 @@ mod test {
         assert_existens(&storage_path);
         copy_template(storage_path.join("templates"));
 
-        let templates = luigi.list_templates();
+        let templates = luigi.list_template_names();
 
         for test_project in TEST_PROJECTS.iter() {
-            let target_path = luigi.create_project( &test_project, &templates[0]).unwrap();
+            let project     = luigi.create_project::<TestProject>(&test_project, &templates[0]).unwrap();
+            let target_file = project.file();
+            let target_path = target_file.parent().unwrap();
             assert!(target_path.exists());
-
-            let target_file = target_path.join(&(slug::slugify(test_project) + "." + super::PROJECT_FILE_EXTENSION));
             assert!(target_file.exists());
+            util::ls(&target_path.display().to_string());
             assert_eq!(target_file, luigi.get_project_file(&target_path).unwrap());
 
-            let project = luigi.get_project_dir(test_project, LuigiDir::Working);
-            assert!(project.unwrap().exists());
+            let project_dir = luigi.get_project_dir(test_project, LuigiDir::Working);
+            assert!(project_dir.unwrap().exists());
 
-            let project = luigi.get_project_dir(test_project, LuigiDir::Working);
-            assert_eq!(project.unwrap(), target_path);
+            let project_dir = luigi.get_project_dir(test_project, LuigiDir::Working);
+            assert_eq!(project_dir.unwrap(), target_path);
         }
     }
 
@@ -505,19 +564,19 @@ mod test {
         assert_existens(&storage_path);
         copy_template(storage_path.join("templates"));
 
-        let templates = luigi.list_templates();
+        let templates = luigi.list_template_names();
         for test_project in TEST_PROJECTS.iter() {
             // tested above
-            let origin = luigi.create_project( &test_project, &templates[0]).unwrap();
+            let origin = luigi.create_project::<TestProject>( &test_project, &templates[0]).unwrap();
 
             // the actual tests
             assert!(luigi.archive_project_with_year(&test_project, 2015).is_ok());
-            assert!(!origin.exists());
+            assert!(!origin.file().exists());
 
             assert!(luigi.get_project_dir(&test_project, LuigiDir::Working).is_none());
             assert!(luigi.get_project_dir(&test_project, LuigiDir::Archive(2015)).is_some());
 
-            let false_origin = luigi.create_project(&test_project, &templates[0]).unwrap();
+            let false_origin = luigi.create_project::<TestProject>(&test_project, &templates[0]).unwrap();
             assert!(luigi.archive_project_with_year(&test_project, 2015).is_err());
         }
     }
@@ -529,18 +588,18 @@ mod test {
         assert_existens(&storage_path);
         copy_template(storage_path.join("templates"));
 
-        let templates = luigi.list_templates();
+        let templates = luigi.list_template_names();
         for test_project in TEST_PROJECTS.iter() {
             // tested above
-            let origin = luigi.create_project( &test_project, &templates[0]).unwrap();
+            let origin = luigi.create_project::<TestProject>( &test_project, &templates[0]).unwrap();
             luigi.archive_project_with_year(test_project, 2015).unwrap();
 
             // similarly looking archive
-            luigi.create_project( &test_project, &templates[0]).unwrap();
+            luigi.create_project::<TestProject>( &test_project, &templates[0]).unwrap();
             luigi.archive_project_with_year(test_project, 2014).unwrap();
 
             // the actual tests
-            assert_eq!(origin, luigi.unarchive_project_with_year(test_project,2015).unwrap());
+            assert_eq!(origin.dir(), luigi.unarchive_project_with_year(test_project,2015).unwrap());
             assert!(luigi.unarchive_project_with_year(test_project,2014).is_err());
         }
     }

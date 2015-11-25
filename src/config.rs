@@ -193,5 +193,4 @@ fn simple_reading(){
 
     println!("{:?}", config.get_path("defaults/includes/name"));
     println!("{:?}", config.get_str("defaults/includes/name"));
-    println!("{:?}", config.get_str("defaults/includes/name/foo"));
 }

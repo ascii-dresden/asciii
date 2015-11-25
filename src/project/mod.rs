@@ -10,15 +10,20 @@ use chrono::*;
 use yaml_rust::Yaml;
 use pad::{PadStr,Alignment};
 use tempdir::TempDir;
+use slug;
 
 use util;
 use util::yaml;
 use util::yaml::YamlError;
-use manager::{LuigiProject, LuigiValidator, LuigiError};
+use manager::{
+    LuigiProject,
+    LuigiValidatable,
+    LuigiValidator,
+    LuigiError};
 use templater::Templater;
 
 pub struct Project {
-    pub path: PathBuf,
+    file_path: PathBuf,
     temp_dir: Option<TempDir>,
     yaml: Yaml
 }
@@ -41,6 +46,7 @@ impl From<yaml::YamlError>  for LuigiError {
 //pub struct ProjectOldFormat { yaml: Yaml } // implemented differently
 
 impl LuigiProject for Project{
+
     fn new(project_name:&str,template:&Path) -> Result<Project,LuigiError> {
         let template_name = template.file_stem().unwrap().to_str().unwrap();
 
@@ -63,7 +69,7 @@ impl LuigiProject for Project{
 
         // generates a temp file
         let temp_dir  = TempDir::new(&project_name).unwrap();
-        let temp_file = temp_dir.path().join(project_name);
+        let temp_file = temp_dir.path().join(slug::slugify(project_name) + "." + Self::file_extension());
 
         // write into a file
         let mut file = try!( File::create(&temp_file) );
@@ -72,7 +78,7 @@ impl LuigiProject for Project{
 
         // project now lives in the temp_file
         Ok(Project{
-            path: temp_file,
+            file_path: temp_file,
             temp_dir: Some(temp_dir), // needs to be kept alive to avoid deletion TODO: try something manually
             yaml: try!(yaml::parse(&templater.filled))
         })
@@ -85,8 +91,8 @@ impl LuigiProject for Project{
         }
     }
 
-    fn name<'a>(&'a self) -> &'a str{
-        self.y_str("event/name")
+    fn name(&self) -> String {
+        self.y_str("event/name").to_owned()
     }
 
     fn date(&self) -> Date<UTC>{
@@ -96,11 +102,12 @@ impl LuigiProject for Project{
         util::parse_fwd_date(date_str)
     }
 
-    fn path(&self) -> PathBuf{
-        self.path.to_owned()
-    }
+    fn file(&self) -> PathBuf{ self.file_path.to_owned() } // TODO reconsider returning PathBuf at all
+    fn set_file(&mut self, new_file:&Path){ self.file_path = new_file.to_owned(); }
+}
 
-    fn file_extension() -> &'static str {"yml"}
+impl LuigiValidatable for Project{
+
 
     fn valide<ProjectValidity>(&self) -> Vec<ProjectValidity>{ Vec::new() }
 
@@ -110,14 +117,14 @@ impl LuigiProject for Project{
 // TODO cache lookups
 impl Project{
     /// Opens a yaml and parses it.
-    pub fn open(path:&Path) -> Result<Project,YamlError>{
-        let file_content = try!(File::open(&path)
+    pub fn open(file_path:&Path) -> Result<Project,YamlError>{
+        let file_content = try!(File::open(&file_path)
                                 .and_then(|mut file| {
                                     let mut content = String::new();
                                     file.read_to_string(&mut content).map(|_| content)
                                 }));
         Ok(Project{
-            path: path.to_owned(),
+            file_path: file_path.to_owned(),
             temp_dir: None,
             yaml: try!(yaml::parse(&file_content))
         })

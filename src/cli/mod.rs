@@ -90,7 +90,7 @@ use itertools::Itertools;
 pub fn edit_project(dir:LuigiDir, search_term:&str, editor:&str){
     let paths = search_projects(dir, &search_term) .iter()
         .filter_map(|project|
-                    project.path().to_str()
+                    project.file().to_str()
                     .map(|s|s.to_owned())
                     )
         .collect::<Vec<String>>();
@@ -128,7 +128,9 @@ pub fn show_template(name:&str){
 /// Command NEW
 pub fn new_project(project_name:&str, template_name:&str, editor:&str, edit:bool){
     let luigi = setup_luigi();
-    let project_path = luigi.create_project::<Project>(&project_name, &template_name).unwrap();
+    let project = luigi.create_project::<Project>(&project_name, &template_name).unwrap();
+    let project_file = project.file();
+    let project_path = project_file.parent().unwrap();
     util::open_in_editor(&editor, vec![project_path.display().to_string()]);
 
     println!("created?");
