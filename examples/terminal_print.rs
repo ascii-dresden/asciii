@@ -9,7 +9,6 @@ use term::{Attr, color};
 
 #[allow(dead_code)]
 fn main() {
-    let _ = table!();
     let mut table = Table::new();
     table.set_format(TableFormat::new(' ', None, None));
     // Add style to a cell

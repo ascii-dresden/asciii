@@ -7,6 +7,8 @@ extern crate slug;
 extern crate pad;
 extern crate itertools;
 extern crate tempdir;
+extern crate term;
+#[macro_use] extern crate prettytable;
 #[macro_use] extern crate lazy_static;
 #[macro_use] extern crate maplit;
 #[macro_use] extern crate clap;

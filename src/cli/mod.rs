@@ -15,6 +15,8 @@ use manager::LuigiProject;
 use project::Project;
 use util;
 
+pub mod print;
+
 fn setup_luigi() -> Luigi{
     let storage_path = PathBuf::from(CONFIG.get_str("path")).join("caterings");
     let storage_path = util::replace_home_tilde(&storage_path);
@@ -52,9 +54,7 @@ pub fn list_projects(dir:LuigiDir){
     let projects: Vec<Project> = project_paths
         .iter().map(|path| Project::open(path).unwrap()).collect();
 
-    for project in projects{
-        println!("{} {} {} {}", project.index(), project.name(), project.manager(), project.date());
-    }
+    print::print_projects(&projects);
 }
 
 /// Command LIST --templates

@@ -1,3 +1,4 @@
+// TODO: This has "crate potential"
 use std::process;
 use std::error::Error;
 

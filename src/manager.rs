@@ -34,6 +34,7 @@ pub enum LuigiError {
     StoragePathNotAbsolute,
     InvalidDirStructure,
     ParseError,
+    TemplateNotFound,
     Io(io::Error),
 }
 
@@ -123,11 +124,11 @@ impl Luigi {
     }
 
     /// Returns the Path to the template file by the given name, maybe.
-    pub fn get_template_file(&self, name:&str) -> Option<PathBuf> {
+    pub fn get_template_file(&self, name:&str) -> Result<PathBuf, LuigiError> {
         self.list_templates().iter()
             .filter(|f|f.file_stem().unwrap_or(&OsStr::new("")) == name)
             .cloned()
-            .next()
+            .next().ok_or(LuigiError::TemplateNotFound)
     }
 
     /// Produces a list of paths to all archives in the `archive_dir`.
@@ -161,8 +162,7 @@ impl Luigi {
 
         let project_dir   = self.working_dir.join(&slugged_name);
         let project_file  = project_dir.join(&(slugged_name + "." + PROJECT_FILE_EXTENSION));
-        let template_path = self.get_template_file(template_name)
-            .graceful(&format!("There is no template named {:?}", template_name));
+        let template_path = try!(self.get_template_file(template_name));
 
         if self.working_dir.exists() && !project_dir.exists() {
             //creates in tempfile, when successfull move to project_file
