@@ -68,8 +68,6 @@ impl Luigi {
     }
 
     fn list_path_content(&self, path:&Path) -> Vec<PathBuf> {
-        println!("{}: {}", path.display(), path.exists());
-
         let entries = fs::read_dir(path).unwrap();
         entries.map(|entry|{
             entry.unwrap().path()
