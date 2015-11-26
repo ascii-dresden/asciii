@@ -19,7 +19,7 @@
 use std::path::PathBuf;
 use std::env::home_dir;
 use util::yaml;
-use util::yaml::{Yaml, YamlLoader, YamlError};
+use util::yaml::{Yaml, YamlError};
 use util::GracefulExit;
 
 const DEFAULT_LOCATION: &'static str = ".ascii-invoicer.yml";
@@ -45,15 +45,15 @@ impl ConfigReader{
         let path = ConfigReader::path();
         Ok(ConfigReader{
             path: path.to_owned(),
-            defaults: try!(YamlLoader::load_from_str(&DEFAULT_CONFIG)).get(0).unwrap().to_owned(),
+            defaults: try!(yaml::parse(&DEFAULT_CONFIG)),
             user_val: try!(yaml::open_yaml(&path))
         })
     }
 
     /// Returns whatever it finds in that position
     pub fn get(&self, key:&str) -> Option<&Yaml>{
-        yaml::gey_hash_content(&self.user_val, &key).or(
-        yaml::gey_hash_content(&self.defaults, &key))
+        yaml::get(&self.user_val, &key).or(
+        yaml::get(&self.defaults, &key))
     }
 
     /// Returns whatever it finds in that position

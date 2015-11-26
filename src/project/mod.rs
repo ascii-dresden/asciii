@@ -46,7 +46,6 @@ impl From<yaml::YamlError>  for LuigiError {
 //pub struct ProjectOldFormat { yaml: Yaml } // implemented differently
 
 impl LuigiProject for Project{
-
     fn new(project_name:&str,template:&Path) -> Result<Project,LuigiError> {
         let template_name = template.file_stem().unwrap().to_str().unwrap();
 
@@ -91,9 +90,7 @@ impl LuigiProject for Project{
         }
     }
 
-    fn name(&self) -> String {
-        self.y_str("event/name").to_owned()
-    }
+    fn name(&self) -> String { self.y_str("event/name").to_owned() }
 
     fn date(&self) -> Date<UTC>{
         let date_str = yaml::get_str(&self.yaml, "event/date").or(
@@ -107,8 +104,6 @@ impl LuigiProject for Project{
 }
 
 impl LuigiValidatable for Project{
-
-
     fn valide<ProjectValidity>(&self) -> Vec<ProjectValidity>{ Vec::new() }
 
     fn validate<ProjectValidity>(&self, criterion:ProjectValidity) -> bool{ false }
@@ -128,6 +123,15 @@ impl Project{
             temp_dir: None,
             yaml: try!(yaml::parse(&file_content))
         })
+    }
+
+    pub fn data(&self, paths:&[&str]) -> Option<Yaml> {
+        for path in paths{
+            if let Some(result) = yaml::get(&self.yaml, path){
+                return Some(result.to_owned());
+            }
+        }
+        None
     }
 
     pub fn manager(&self) -> String{

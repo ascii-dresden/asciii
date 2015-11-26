@@ -7,8 +7,7 @@ use yaml_rust::Yaml;
 //    for key in path
 //}
 
-fn unpack<'a>(yaml:&'a Yaml, key:&str) ->Result<&'a Yaml, String>
-{
+fn unpack<'a>(yaml:&'a Yaml, key:&str) ->Result<&'a Yaml, String> {
     if let Yaml::BadValue = yaml[key]{
         Err(format!("Nothing found {:?}", key))
     }
@@ -17,8 +16,7 @@ fn unpack<'a>(yaml:&'a Yaml, key:&str) ->Result<&'a Yaml, String>
     }
 }
 
-pub mod date
-{
+pub mod date {
     use chrono::*;
     use regex::Regex;
     use yaml_rust::Yaml;
