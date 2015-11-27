@@ -20,7 +20,6 @@ use std::path::PathBuf;
 use std::env::home_dir;
 use util::yaml;
 use util::yaml::{Yaml, YamlError};
-use util::GracefulExit;
 
 const DEFAULT_LOCATION: &'static str = ".ascii-invoicer.yml";
 
@@ -36,7 +35,7 @@ impl ConfigReader{
 
     /// The Path of the config file.
     pub fn path() -> PathBuf {
-        let home = home_dir().graceful("Can't find HOME DIRECTORY");
+        let home = home_dir().expect("Can't find HOME DIRECTORY");
         return home.join(DEFAULT_LOCATION);
     }
 

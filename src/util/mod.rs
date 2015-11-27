@@ -3,10 +3,6 @@ use std::io;
 use std::path::Path;
 use std::path::PathBuf;
 use std::env::home_dir;
-use chrono::*;
-
-pub mod graceful;
-pub use self::graceful::GracefulExit;
 
 pub mod keyword_replacement;
 pub use self::keyword_replacement::IsKeyword;
@@ -64,12 +60,6 @@ pub fn open_in_editor(editor:&str, paths:Vec<String>){
 
 }
 
-pub fn parse_fwd_date(date_str:&str) -> Date<UTC>{
-        let date = date_str.split('.')
-            .map(|f|f.parse().unwrap_or(0))
-            .collect::<Vec<i32>>();
-        UTC.ymd(date[2], date[1] as u32, date[0] as u32)
-}
 
 //  old checklist from the ruby versions rspec
     //  general

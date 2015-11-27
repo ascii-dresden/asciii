@@ -8,6 +8,7 @@ use std::path::Path;
 pub use yaml_rust::{Yaml};
 use yaml_rust::{YamlLoader};
 use yaml_rust::scanner::ScanError;
+use chrono::*;
 
 #[derive(Debug)]
 pub enum YamlError{
@@ -33,11 +34,40 @@ pub fn parse( file_content:&str ) -> Result<Yaml, YamlError> {
     Ok(try!(YamlLoader::load_from_str(&file_content)).get(0).unwrap().to_owned())
 }
 
+pub fn parse_fwd_date(date_str:&str) -> Date<UTC>{
+        let date = date_str.split('.')
+            .map(|f|f.parse().unwrap_or(0))
+            .collect::<Vec<i32>>();
+        UTC.ymd(date[2], date[1] as u32, date[0] as u32)
+}
+
+use std::collections::BTreeMap;
+pub fn get_hash<'a>(yaml:&'a Yaml, key:&str) -> Option<&'a BTreeMap<Yaml,Yaml>> {
+    get(&yaml,&key).and_then(|y|y.as_hash())
+}
+
+pub fn get_bool<'a>(yaml:&'a Yaml, key:&str) -> Option<bool> {
+    get(&yaml,&key).and_then(|y|y.as_bool())
+}
+
+pub fn get_f64<'a>(yaml:&'a Yaml, key:&str) -> Option<f64> {
+    get(&yaml,&key).and_then(|y|y.as_f64())
+}
+
 pub fn get_int<'a>(yaml:&'a Yaml, key:&str) -> Option<i64> {
     get(&yaml,&key).and_then(|y|y.as_i64())
 }
+
 pub fn get_str<'a>(yaml:&'a Yaml, key:&str) -> Option<&'a str> {
     get(&yaml,&key).and_then(|y|y.as_str())
+}
+
+pub fn get_string(yaml:&Yaml, key:&str) -> Option<String> {
+    get_str(&yaml,&key).map(|s|s.to_owned())
+}
+
+pub fn get_dmy<'a>(yaml:&'a Yaml, key:&str) -> Option<Date<UTC>> {
+    get(&yaml,&key).and_then(|y|y.as_str()).map(|d|parse_fwd_date(d))
 }
 
 pub fn get<'a>(yaml:&'a Yaml, key:&str) -> Option<&'a Yaml>{

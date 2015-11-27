@@ -1,0 +1,76 @@
+---
+version: 20130802
+
+# always include 'Herr' oder 'Frau'
+# defaults to male
+# look at lib/lang.yml for more, add if needed
+# NO FIRSTNAME HERE
+client: |
+  Herr
+  Zahl
+
+email: this.man@example.com
+request_message: |
+description: |
+  Party hard all night long.
+  Lots of drinks and food and loud music
+
+
+address: |
+  Graf Zahl
+  Nummernhöllenstraße 666
+  01234 Countilvania
+
+event: Party Hard
+anumber: 1 # fortlaufende nummer fuer mehere Angebote an einem Tag
+manumber: A20141107-1
+rnumber: 41
+
+date: 01.05.1512 # bezieht sich auf die veranstaltung selbst
+payed_date: 08.12.2014
+invoice_date: 06.12.2014
+
+products:
+  "Mineralwasser (1l)":
+    amount: 8
+    price: 0.61
+    sold: 0
+  "Orangensaft (1l)":
+    amount: 8
+    price: 1.82
+    sold: 2
+  "Sekt  (0,75l)":
+    amount: 4
+    price: 6.0
+    sold: 2
+  "Belegte Brötchen":
+    amount: 90
+    price: 1.16
+  "Obstkorb:":
+    amount: 1
+    price: 15
+  "Kuchen:":
+    amount: 70
+    price: .94
+  "Kekese:":
+    amount: 5
+    price: 3.4
+    sold: 0
+
+hours:
+  time: 3
+  salary: 8.00
+
+  caterers:
+    "Hendrik" : 3 #Stunden
+
+signature: |
+  Hendrik Sollich
+
+#messages: # read default-settings.yml on how to overwrite
+
+lang: de
+tax: 0.19
+canceled: false # not yet implemented
+
+...

@@ -4,7 +4,6 @@ extern crate yaml_rust;
 extern crate chrono;
 extern crate regex;
 extern crate slug;
-extern crate pad;
 extern crate itertools;
 extern crate tempdir;
 extern crate term;

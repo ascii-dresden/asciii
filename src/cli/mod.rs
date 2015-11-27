@@ -72,17 +72,17 @@ pub fn list_all_projects(){
     let luigi = setup_luigi();
     let projects: Vec<Project> = luigi.list_all_projects()
         .iter()
-        .map(|p|Project::open(p).unwrap())
-        .collect() ;
-    for project in projects{
-        println!("{} {} {} {}", project.index(), project.name(), project.manager(), project.date());
-    }
+        .map(|p|Project::open(p).unwrap()).collect() ;
+    print::print_projects(&projects);
 }
 
 /// Command LIST --broken
 pub fn list_broken_projects(dir:LuigiDir){
     let luigi = setup_luigi();
-    println!("{:#?}", luigi.list_broken_projects(dir));
+    let projects: Vec<Project> = luigi.list_broken_projects(dir)
+        .iter()
+        .map(|p|Project::open(p).unwrap()).collect() ;
+    print::print_projects(&projects);
 }
 
 /// Command EDIT
@@ -113,7 +113,7 @@ pub fn edit_template(name:&str, editor:&str){
 /// Command SHOW
 pub fn show_project(dir:LuigiDir, search_term:&str){
     for project in search_projects(dir, &search_term){
-        println!("{} {} {} {}", project.index(), project.name(), project.manager(), project.date());
+        println!("{} {} {} {}", project.index().unwrap_or("".into()), project.name(), project.manager(), project.date().unwrap());
     }
 }
 

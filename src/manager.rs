@@ -10,7 +10,6 @@ use std::collections::HashMap;
 use slug;
 use chrono::{Date, UTC};
 
-use util::GracefulExit;
 use templater::Templater;
 
 const PROJECT_FILE_EXTENSION:&'static str = "yml";
@@ -295,8 +294,8 @@ pub trait LuigiProject{
     /// creates in tempfile
     fn new(project_name:&str,template:&Path) -> Result<Self,LuigiError> where Self: Sized;
     fn name(&self) -> String;
-    fn date(&self) -> Date<UTC>;
-    fn index(&self) -> String;
+    fn date(&self) -> Option<Date<UTC>>;
+    fn index(&self) -> Option<String>;
 
     fn file_extension() -> &'static str {PROJECT_FILE_EXTENSION}
     fn file(&self) -> PathBuf; // Path to project file
@@ -415,10 +414,10 @@ mod test {
             })
         }
         fn name(&self) -> String{ self.file().file_stem().unwrap().to_str().unwrap().to_owned() }
-        fn date(&self) -> Date<UTC>{ UTC::today() }
+        fn date(&self) -> Option<Date<UTC>>{ Some(UTC::today()) }
         fn file(&self) -> PathBuf{ self.file_path.to_owned() }
         fn set_file(&mut self, new_file:&Path){ self.file_path = new_file.to_owned(); }
-        fn index(&self) -> String{ "ZZ99".into() }
+        fn index(&self) -> Option<String>{ Some("ZZ99".into()) }
     }
 
 

@@ -1,3 +1,4 @@
+use chrono::UTC;
 use prettytable::Table;
 use prettytable::row::Row;
 use prettytable::cell::Cell;
@@ -18,7 +19,12 @@ pub fn print_projects(projects:&[Project]){
     let mut table = Table::new();
     table.set_format(TableFormat::new("", None, None));
     for project in projects{
-        table.add_row(row![project.index(), project.name(), project.manager(), project.date()]);
+        table.add_row(row![
+                      project.index().unwrap_or("".into()),
+                      project.name(),
+                      project.manager(),
+                      project.date().unwrap_or(UTC::today())]
+                      );
     }
     table.printstd();
 }

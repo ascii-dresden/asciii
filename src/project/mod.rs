@@ -1,6 +1,7 @@
 #![allow(unused_variables)]
 #![allow(dead_code)]
 
+
 use std::fs::File;
 use std::io::prelude::*;
 use std::path::{Path, PathBuf};
@@ -8,7 +9,6 @@ use std::collections::HashMap;
 
 use chrono::*;
 use yaml_rust::Yaml;
-use pad::{PadStr,Alignment};
 use tempdir::TempDir;
 use slug;
 
@@ -21,6 +21,8 @@ use manager::{
     LuigiValidator,
     LuigiError};
 use templater::Templater;
+
+pub mod spec;
 
 pub struct Project {
     file_path: PathBuf,
@@ -83,21 +85,9 @@ impl LuigiProject for Project{
         })
     }
 
-    fn index(&self) -> String{
-        match yaml::get_int(&self.yaml, "invoice/number"){
-            Some(num) => num.to_string().pad_to_width_with_alignment(3,Alignment::Right),
-            None => "   ".to_owned()
-        }
-    }
-
-    fn name(&self) -> String { self.y_str("event/name").to_owned() }
-
-    fn date(&self) -> Date<UTC>{
-        let date_str = yaml::get_str(&self.yaml, "event/date").or(
-                       yaml::get_str(&self.yaml, "created"))
-            .unwrap_or("01.01.0000");
-        util::parse_fwd_date(date_str)
-    }
+    fn index(&self) -> Option<String>{ spec::invoice::number_str(self.yaml()) }
+    fn name(&self) -> String { spec::project::name(self.yaml()).unwrap_or("unnamed").to_owned() }
+    fn date(&self) -> Option<Date<UTC>>{ spec::project::date(self.yaml()) }
 
     fn file(&self) -> PathBuf{ self.file_path.to_owned() } // TODO reconsider returning PathBuf at all
     fn set_file(&mut self, new_file:&Path){ self.file_path = new_file.to_owned(); }
@@ -125,30 +115,45 @@ impl Project{
         })
     }
 
-    pub fn data(&self, paths:&[&str]) -> Option<Yaml> {
-        for path in paths{
-            if let Some(result) = yaml::get(&self.yaml, path){
-                return Some(result.to_owned());
-            }
-        }
-        None
-    }
+    pub fn yaml(&self) -> &Yaml{ &self.yaml }
 
     pub fn manager(&self) -> String{
         yaml::get_str(&self.yaml, "manager").unwrap_or("").to_owned()
     }
 
-    fn y_str<'a>(&'a self, path:&str) -> &'a str{
-        // TODO benchmark all these yaml lookups
-        // TODO perhaps replace Path parsing with simpler splitting
-        // TODO replace a bunch of this with compile time macros
-        yaml::get_str(&self.yaml, &path).unwrap_or("")
-    }
 }
 
-//#[test]
-//fn it_works() {
-//    let p = Project::from_yaml_file("./test.yml");
-//    p.filter_all();
-//    println!("{:?}", p);
-//}
+#[cfg(test)]
+mod test{
+    use std::path::Path;
+    use super::super::project::spec;
+    use super::super::project::Project;
+
+    #[test]
+    fn compare_basics(){
+        println!("{:?}", ::std::env::current_dir());
+        let new_project = Project::open(Path::new("./tests/current.yml")).unwrap();
+        let old_project = Project::open(Path::new("./tests/old.yml")).unwrap();
+        let new_yaml = new_project.yaml();
+        let old_yaml = old_project.yaml();
+        let config = &super::super::CONFIG;
+
+        assert_eq!(spec::project::name(&old_yaml), spec::project::name(&new_yaml));
+
+        //assert_eq!(spec::project::manager(&old_yaml), //fails
+        //           spec::project::manager(&new_yaml));
+
+        assert_eq!(spec::offer::number(&old_yaml), spec::offer::number(&new_yaml));
+
+        //assert_eq!(spec::date::offer(&old_yaml), //fails
+        //           spec::date::offer(&new_yaml));
+
+        assert_eq!(spec::invoice::number_str(&old_yaml), spec::invoice::number_str(&new_yaml));
+        assert_eq!(spec::date::invoice(&old_yaml), spec::date::invoice(&new_yaml));
+        assert_eq!(spec::date::payed(&old_yaml), spec::date::payed(&new_yaml));
+        assert_eq!(spec::client::title(&old_yaml), spec::client::title(&new_yaml));
+        assert_eq!(spec::client::last_name(&old_yaml), spec::client::last_name(&new_yaml));
+        assert_eq!(spec::client::addressing(&old_yaml, &config), spec::client::addressing(&new_yaml, &config));
+
+    }
+}

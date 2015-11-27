@@ -13,7 +13,6 @@ slug = "*"
 clap = "*"
 term = "*"
 prettytable-rs = {git= "https://github.com/hoodie/prettytable-rs"}
-pad = "*"
 lazy_static = "*"
 itertools = "*"
 maplit = "*"
