@@ -38,6 +38,13 @@ pub enum LuigiError {
     Io(io::Error),
 }
 
+#[derive(Debug)]
+enum GitStatus{
+    IndexNew, IndexModified , IndexDeleted, IndexRenamed, IndexTypechange,
+    WorkingNew, WorkingModified, WorkingDeleted, WorkingTypechange, WorkingRenamed,
+    Ignored, Conflict, Unknown
+}
+
 // All you need to make try!() fun again
 impl From<io::Error>  for LuigiError {
     fn from(ioerror: io::Error) -> LuigiError{ LuigiError::Io(ioerror) }
@@ -56,6 +63,8 @@ pub struct Luigi {
     template_dir: PathBuf,
 }
 
+use git2;
+use git2::{Repository,Status,Statuses,StatusOptions, SubmoduleIgnore, Error as GitError};
 impl Luigi {
     pub fn new(storage:&Path, working:&str, archive:&str, template:&str) -> Result<Luigi, LuigiError> {
         Ok( Luigi{ // TODO check for the existence
@@ -64,6 +73,47 @@ impl Luigi {
             archive_dir:  storage.join(archive),
             template_dir: storage.join(template),
         })
+    }
+
+    pub fn repo(&self) -> Result<Repository, GitError> {
+        Repository::open(&self.storage_dir)
+    }
+
+    pub fn statuses(&self) -> Result<Vec<(String, GitStatus)>, GitError> {
+        use git2::*;
+        use self::GitStatus::*;
+
+        let repo = try!(self.repo());
+        let git_statuses = try!(repo.statuses( Some(
+                    StatusOptions::new()
+                    .include_ignored(false)
+                    .include_untracked(true)))
+                           );
+
+        let mut statuses = Vec::new();
+
+        for entry in git_statuses.iter(){
+            let status = match entry.status() {
+                s if s.contains(STATUS_INDEX_NEW        ) => IndexNew,
+                s if s.contains(STATUS_INDEX_MODIFIED   ) => IndexModified ,
+                s if s.contains(STATUS_INDEX_DELETED    ) => IndexDeleted,
+                s if s.contains(STATUS_INDEX_RENAMED    ) => IndexRenamed,
+                s if s.contains(STATUS_INDEX_TYPECHANGE ) => IndexTypechange,
+                s if s.contains(STATUS_WT_NEW           ) => WorkingNew,
+                s if s.contains(STATUS_WT_MODIFIED      ) => WorkingModified,
+                s if s.contains(STATUS_WT_DELETED       ) => WorkingDeleted,
+                s if s.contains(STATUS_WT_TYPECHANGE    ) => WorkingTypechange,
+                s if s.contains(STATUS_WT_RENAMED       ) => WorkingRenamed,
+                s if s.contains(STATUS_IGNORED          ) => Ignored,
+                s if s.contains(STATUS_CONFLICTED       ) => Conflict,
+                _ => Unknown
+            };
+
+            if let Some(path) = entry.path(){
+                statuses.push((path.to_owned(), status))
+            }
+        }
+        Ok(statuses)
     }
 
     fn list_path_content(&self, path:&Path) -> Vec<PathBuf> {

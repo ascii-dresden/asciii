@@ -31,6 +31,16 @@ fn assert_existens(storage_path:&Path) {
             &&  storage_path.join("templates").exists());
 }
 
+pub fn status(){
+    let luigi = setup_luigi();
+    let project_paths = luigi.list_project_files(LuigiDir::Working);
+    let projects: Vec<Project> = project_paths
+        .iter().map(|path| Project::open(path).unwrap()).collect();
+
+    println!("{:#?}", luigi.statuses().unwrap());
+    //print::print_projects(&projects);
+}
+
 /// Opens up all projects to look inside and check content.
 ///
 /// TODO This could be parallelized

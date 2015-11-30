@@ -17,6 +17,7 @@ lazy_static = "*"
 itertools = "*"
 maplit = "*"
 tempdir = "*"
+git2    = "*"
 
 clippy = {version = "~0.0.23", optional = true}
 

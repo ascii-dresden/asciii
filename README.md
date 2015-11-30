@@ -48,6 +48,7 @@ Features possible through rewrite:
 * [ ] pure library build
   * [ ] GUI
 * [ ] third format ( machine readable/writable for GUI)
+* [ ] markdown export (for git[hub|lab])
 
 
 The following is a printout of `ascii help` from the [original ascii-invoicer](http://github.com/ascii-dresden/ascii-invoicer).

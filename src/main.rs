@@ -7,21 +7,23 @@ extern crate slug;
 extern crate itertools;
 extern crate tempdir;
 extern crate term;
+extern crate git2;
 #[macro_use] extern crate prettytable;
 #[macro_use] extern crate lazy_static;
 #[macro_use] extern crate maplit;
 #[macro_use] extern crate clap;
-
-use clap::{App, SubCommand, Arg};
-use manager::LuigiDir;
 
 mod util;
 mod config;
 
 mod project;
 mod manager;
+
 mod templater;
 mod cli;
+
+use clap::{App, SubCommand, Arg};
+use manager::LuigiDir;
 
 lazy_static!{
     pub static ref CONFIG: config::ConfigReader = config::ConfigReader::new().unwrap();
@@ -162,6 +164,8 @@ fn main(){
                           )
                    )
 
+        .subcommand(SubCommand::with_name("status"))
+
         .subcommand(SubCommand::with_name("whoami"))
 
         .get_matches();
@@ -239,6 +243,11 @@ fn main(){
             let editor = CONFIG.get_path("editor").unwrap().as_str().unwrap();
             cli::config_edit(&editor); }
         else if matches.is_present("default"){ cli::config_show_default(); }
+    }
+
+    // command: "status"
+    else if  matches.is_present("status") {
+        cli::status();
     }
 
     // command: "whoami"
