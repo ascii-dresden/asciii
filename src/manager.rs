@@ -68,9 +68,10 @@ impl Luigi {
 
     fn list_path_content(&self, path:&Path) -> Vec<PathBuf> {
         let entries = fs::read_dir(path).unwrap();
-        entries.map(|entry|{
-            entry.unwrap().path()
-        }).collect::<Vec<PathBuf>>()
+        entries
+            .filter_map(|entry| entry.ok())
+            .map(|entry| entry.path())
+            .collect::<Vec<PathBuf>>()
     }
 
     /// Creates the basic dir structure inside the storage directory.
@@ -176,7 +177,7 @@ impl Luigi {
                 .join(&(slugged_name + "." + PROJECT_FILE_EXTENSION));
 
             let template_path = try!(self.get_template_file(template_name));
-            let mut project = P::new(&project_name, &template_path).unwrap();
+            let mut project = try!(P::new(&project_name, &template_path));
 
             // TODO test for unreplaced template keywords
             try!(fs::create_dir(&project_dir));
@@ -283,9 +284,7 @@ impl Luigi {
 
     pub fn list_project_files(&self, directory:LuigiDir) -> Vec<PathBuf> {
         self.list_projects(directory).iter()
-            .map(|dir| self.get_project_file(dir))
-            .filter(|e| e.is_some())
-            .map(|e| e.unwrap())
+            .filter_map(|dir| self.get_project_file(dir))
             .collect()
     }
 }
