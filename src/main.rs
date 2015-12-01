@@ -1,3 +1,4 @@
+#![feature(drain)]
 #![allow(dead_code)]
 #![allow(unused_imports)]
 extern crate yaml_rust;

@@ -8,6 +8,8 @@
 use std::path::{Path,PathBuf};
 use std::ffi::OsStr;
 
+use chrono::UTC;
+
 use config;
 use super::CONFIG;
 use manager::{Luigi,LuigiDir};
@@ -40,7 +42,7 @@ pub fn status(){
     let projects: Vec<Project> = project_paths
         .iter().map(|path| Project::open(path).unwrap()).collect();
     println!("{:#?}", repo.status);
-    //print::print_projects(&projects);
+    print::print_projects(print::status_rows(&projects,&repo));
 }
 
 /// Opens up all projects to look inside and check content.
@@ -61,6 +63,7 @@ pub fn search_projects(dir:LuigiDir, search_term:&str) -> Vec<Project> {
 
 /// Command LIST [--archive]
 pub fn list_projects(dir:LuigiDir){
+
     let luigi = setup_luigi();
     let project_paths = luigi.list_project_files(dir);
     let mut projects: Vec<Project> = project_paths
@@ -71,7 +74,9 @@ pub fn list_projects(dir:LuigiDir){
     //projects.sort_by(|pa,pb| pa.date().unwrap().cmp( &pb.date().unwrap()));
     projects.sort_by(|pa,pb| pa.index().unwrap().cmp( &pb.index().unwrap()));
 
-    print::print_projects(&projects);
+    //print::print_projects(print::simple_rows(&projects));
+    let repo = Repo::new(luigi.storage_dir()).unwrap();
+    print::print_projects(print::status_rows(&projects,&repo));
 }
 
 /// Command LIST --templates
@@ -90,7 +95,7 @@ pub fn list_all_projects(){
     let projects: Vec<Project> = luigi.list_all_projects()
         .iter()
         .map(|p|Project::open(p).unwrap()).collect() ;
-    print::print_projects(&projects);
+    print::print_projects(print::simple_rows(&projects));
 }
 
 /// Command LIST --broken
@@ -99,7 +104,7 @@ pub fn list_broken_projects(dir:LuigiDir){
     let projects: Vec<Project> = luigi.list_broken_projects(dir)
         .iter()
         .map(|p|Project::open(p).unwrap()).collect() ;
-    print::print_projects(&projects);
+    print::print_projects(print::simple_rows(&projects));
 }
 
 /// Command EDIT

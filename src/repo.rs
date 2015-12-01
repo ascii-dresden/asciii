@@ -1,3 +1,4 @@
+#![allow(dead_code, unused_variables)]
 use std::path::{Path, PathBuf};
 use std::collections::HashMap;
 
@@ -7,11 +8,17 @@ use git2::Error as GitError;
 
 use manager::LuigiDir;
 
-#[derive(Debug)]
+#[derive(Debug,Clone)]
 pub enum GitStatus{
     IndexNew, IndexModified , IndexDeleted, IndexRenamed, IndexTypechange,
     WorkingNew, WorkingModified, WorkingDeleted, WorkingTypechange, WorkingRenamed,
     Ignored, Conflict, Unknown
+}
+
+impl ToString for GitStatus{
+    fn to_string(&self) -> String{
+        format!("{:?}", self)
+    }
 }
 
 pub struct Repo {
@@ -32,6 +39,7 @@ impl Repo{
 
     fn status(repo:&Repository) -> Result<HashMap<PathBuf, GitStatus>, GitError>{
         use self::GitStatus::*;
+        let repo_path = repo.path().parent().unwrap().to_owned();
 
         let git_statuses = try!(repo.statuses( Some( StatusOptions::new()
                                                      .include_ignored(false)
@@ -57,7 +65,13 @@ impl Repo{
             };
 
             if let Some(path) = entry.path(){
-                statuses.insert(PathBuf::from(path), status);
+                let path = repo_path.join(PathBuf::from(path));
+                if path.is_file() {
+                    if let Some(parent) = path.parent(){
+                        statuses.insert(parent.to_path_buf(), status.to_owned());
+                    }
+                }
+                statuses.insert(path, status);
             }
         }
 
@@ -67,15 +81,12 @@ impl Repo{
     pub fn git_pull(&self) -> Result<(), GitError> {
         let remote = self.repo.find_remote("origin");
         unimplemented!();
-
-        Ok(())
     }
 
     pub fn git_add_directory(&self, name:&str, path:&Path) -> Result<(), GitError> {
         let index = self.repo.index();
         unimplemented!();
         //try!(index.add_path(&dir));
-        Ok(()) // actually Err(....)
     }
 
     pub fn git_commit(&self, message:&str){
