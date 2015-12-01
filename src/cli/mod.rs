@@ -32,12 +32,13 @@ fn assert_existens(storage_path:&Path) {
 }
 
 pub fn status(){
-    let luigi = setup_luigi();
+    let mut luigi = setup_luigi();
+    luigi.git_init().unwrap();
+
     let project_paths = luigi.list_project_files(LuigiDir::Working);
     let projects: Vec<Project> = project_paths
         .iter().map(|path| Project::open(path).unwrap()).collect();
-
-    println!("{:#?}", luigi.statuses().unwrap());
+    println!("{:#?}", luigi.git_status);
     //print::print_projects(&projects);
 }
 
@@ -61,8 +62,13 @@ pub fn search_projects(dir:LuigiDir, search_term:&str) -> Vec<Project> {
 pub fn list_projects(dir:LuigiDir){
     let luigi = setup_luigi();
     let project_paths = luigi.list_project_files(dir);
-    let projects: Vec<Project> = project_paths
-        .iter().map(|path| Project::open(path).unwrap()).collect();
+    let mut projects: Vec<Project> = project_paths
+        .iter()
+        .filter_map(|path| Project::open(path).ok())
+        .collect();
+
+    //projects.sort_by(|pa,pb| pa.date().unwrap().cmp( &pb.date().unwrap()));
+    projects.sort_by(|pa,pb| pa.index().unwrap().cmp( &pb.index().unwrap()));
 
     print::print_projects(&projects);
 }

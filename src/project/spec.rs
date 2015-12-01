@@ -7,12 +7,12 @@ pub mod project{
 
     pub fn name(yaml:&Yaml) -> Option<&str>{
         yaml::get_str(yaml, "event/name")
+            // old spec
             .or( yaml::get_str(yaml, "event"))
     }
 
     pub fn date(yaml:&Yaml) -> Option<Date<UTC>>{
-        yaml::get_dmy(&yaml, "event/date")
-        .or(yaml::get_dmy(&yaml, "created"))
+        super::date::date(&yaml)
     }
 
     pub fn manager(yaml:&Yaml) -> Option<&str>{
@@ -91,7 +91,7 @@ pub mod date {
     use util::yaml::Yaml;
 
     pub fn date(yaml:&Yaml) -> Option<Date<UTC>>{
-        yaml::get_dmy(&yaml, "event/date")
+        yaml::get_dmy(&yaml, "event/dates/0/begin")
         .or(yaml::get_dmy(&yaml, "created"))
         .or(yaml::get_dmy(&yaml, "date"))
     }
@@ -189,6 +189,21 @@ pub mod hours {
                              ).unwrap_or(0f64)))
                  .collect::<Vec<(String,f64)>>()
                  )
+    }
+}
+
+pub mod products{
+    use util::yaml;
+    use util::yaml::Yaml;
+    use std::collections::BTreeMap;
+
+    pub fn all(yaml:&Yaml) -> Option<Vec<Yaml>>{
+        yaml::get_hash(yaml, "products")
+            .map(|h|h
+            .keys()
+            .cloned()
+            .collect()
+            )
     }
 }
 

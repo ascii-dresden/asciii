@@ -18,12 +18,14 @@ pub fn print_project(_project:&Project){
 pub fn print_projects(projects:&[Project]){
     let mut table = Table::new();
     table.set_format(TableFormat::new("", None, None));
-    for project in projects{
+    for (i, project) in projects.iter().enumerate(){
         table.add_row(row![
-                      project.index().unwrap_or("".into()),
+                      i+1,
                       project.name(),
                       project.manager(),
-                      project.date().unwrap_or(UTC::today())]
+                      project.invoice_num(),
+                      project.date().unwrap_or(UTC::today())
+                             .format("%d.%m.%Y").to_string()]
                       );
     }
     table.printstd();

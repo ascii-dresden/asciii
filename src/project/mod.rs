@@ -85,7 +85,12 @@ impl LuigiProject for Project{
         })
     }
 
-    fn index(&self) -> Option<String>{ spec::invoice::number_str(self.yaml()) }
+    fn index(&self) -> Option<String>{
+        spec::invoice::number_str(self.yaml()).or(
+            self.date().map(|d|d.format("ZZ%Y%m%d").to_string())
+            )
+    }
+
     fn name(&self) -> String { spec::project::name(self.yaml()).unwrap_or("unnamed").to_owned() }
     fn date(&self) -> Option<Date<UTC>>{ spec::project::date(self.yaml()) }
 
@@ -115,12 +120,15 @@ impl Project{
         })
     }
 
-    pub fn yaml(&self) -> &Yaml{ &self.yaml }
+    fn yaml(&self) -> &Yaml{ &self.yaml }
 
     pub fn manager(&self) -> String{
-        yaml::get_str(&self.yaml, "manager").unwrap_or("").to_owned()
+        spec::project::manager(self.yaml()).unwrap_or("____").into()
     }
 
+    pub fn invoice_num(&self) -> String{
+        spec::invoice::number_str(self.yaml()).unwrap_or("".into())
+    }
 }
 
 #[cfg(test)]

@@ -39,7 +39,7 @@ pub enum LuigiError {
 }
 
 #[derive(Debug)]
-enum GitStatus{
+pub enum GitStatus{
     IndexNew, IndexModified , IndexDeleted, IndexRenamed, IndexTypechange,
     WorkingNew, WorkingModified, WorkingDeleted, WorkingTypechange, WorkingRenamed,
     Ignored, Conflict, Unknown
@@ -51,7 +51,6 @@ impl From<io::Error>  for LuigiError {
 }
 
 // TODO rely more on IoError, it has most of what you need
-#[derive(Debug)]
 pub struct Luigi {
     /// Root of the entire Structure.
     storage_dir:  PathBuf,
@@ -61,10 +60,12 @@ pub struct Luigi {
     archive_dir:  PathBuf,
     /// Place for template files.
     template_dir: PathBuf,
+    pub git_repo: Option<Repository>,
+    pub git_status: Option<HashMap<PathBuf, GitStatus> >
 }
 
 use git2;
-use git2::{Repository,Status,Statuses,StatusOptions, SubmoduleIgnore, Error as GitError};
+use git2::{Repository,Status,Statuses,StatusOptions, FetchOptions, SubmoduleIgnore, Error as GitError};
 impl Luigi {
     pub fn new(storage:&Path, working:&str, archive:&str, template:&str) -> Result<Luigi, LuigiError> {
         Ok( Luigi{ // TODO check for the existence
@@ -72,25 +73,23 @@ impl Luigi {
             working_dir:  storage.join(working),
             archive_dir:  storage.join(archive),
             template_dir: storage.join(template),
+            git_repo: None,
+            git_status: None
         })
     }
 
-    pub fn repo(&self) -> Result<Repository, GitError> {
-        Repository::open(&self.storage_dir)
-    }
-
-    pub fn statuses(&self) -> Result<Vec<(String, GitStatus)>, GitError> {
+    pub fn git_init(&mut self) -> Result<(), GitError> {
         use git2::*;
         use self::GitStatus::*;
 
-        let repo = try!(self.repo());
-        let git_statuses = try!(repo.statuses( Some(
-                    StatusOptions::new()
-                    .include_ignored(false)
-                    .include_untracked(true)))
-                           );
+        let repo = try!(Repository::open(&self.storage_dir));
 
-        let mut statuses = Vec::new();
+        {
+        let git_statuses = try!(repo.statuses( Some( StatusOptions::new()
+                                                     .include_ignored(false)
+                                                     .include_untracked(true) )));
+
+        let mut statuses:HashMap<PathBuf,GitStatus> = HashMap::new();
 
         for entry in git_statuses.iter(){
             let status = match entry.status() {
@@ -110,10 +109,41 @@ impl Luigi {
             };
 
             if let Some(path) = entry.path(){
-                statuses.push((path.to_owned(), status))
+                statuses.insert(PathBuf::from(path), status);
             }
         }
-        Ok(statuses)
+        self.git_status = Some(statuses);
+        }
+        self.git_repo = Some(repo);
+        Ok(())
+    }
+
+    pub fn git_pull(&self) -> Result<(), GitError> {
+        if let Some(ref repo) = self.git_repo{
+            let remote = try!(repo.find_remote("origin"));
+            unimplemented!();
+        }
+        Ok(())
+    }
+
+    pub fn git_add_directory(&self, name:&str, directory:LuigiDir) -> Result<(), GitError> {
+        if let Some(ref repo) = self.git_repo{
+            let index = try!(repo.index());
+            if let Some(dir) = self.get_project_dir(&name, directory){
+                unimplemented!();
+                //try!(index.add_path(&dir));
+            }
+            return Ok(());
+        }
+        Ok(()) // actually Err(....)
+    }
+
+    pub fn git_commit(&self, message:&str){
+        unimplemented!();
+    }
+
+    pub fn git_push(&self){
+        unimplemented!();
     }
 
     fn list_path_content(&self, path:&Path) -> Vec<PathBuf> {
