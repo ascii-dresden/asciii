@@ -34,11 +34,15 @@ pub fn parse( file_content:&str ) -> Result<Yaml, YamlError> {
     Ok(try!(YamlLoader::load_from_str(&file_content)).get(0).unwrap().to_owned())
 }
 
-pub fn parse_fwd_date(date_str:&str) -> Date<UTC>{
-        let date = date_str.split('.')
-            .map(|f|f.parse().unwrap_or(0))
-            .collect::<Vec<i32>>();
-        UTC.ymd(date[2], date[1] as u32, date[0] as u32)
+pub fn parse_fwd_date(date_str:&str) -> Option<Date<UTC>>{
+    let date = date_str.split('.')
+        .map(|f|f.parse().unwrap_or(0))
+        .collect::<Vec<i32>>();
+    if date[0] > 0 {
+        // XXX this neglects the old "01-05.12.2015" format
+        return Some(UTC.ymd(date[2], date[1] as u32, date[0] as u32))
+    }
+    None
 }
 
 use std::collections::BTreeMap;
@@ -67,7 +71,7 @@ pub fn get_string(yaml:&Yaml, key:&str) -> Option<String> {
 }
 
 pub fn get_dmy<'a>(yaml:&'a Yaml, key:&str) -> Option<Date<UTC>> {
-    get(&yaml,&key).and_then(|y|y.as_str()).map(|d|parse_fwd_date(d))
+    get(&yaml,&key).and_then(|y|y.as_str()).and_then(|d|parse_fwd_date(d))
 }
 
 pub fn get<'a>(yaml:&'a Yaml, key:&str) -> Option<&'a Yaml>{

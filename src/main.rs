@@ -18,6 +18,7 @@ mod config;
 
 mod project;
 mod manager;
+mod repo;
 
 mod templater;
 mod cli;

@@ -38,13 +38,6 @@ pub enum LuigiError {
     Io(io::Error),
 }
 
-#[derive(Debug)]
-pub enum GitStatus{
-    IndexNew, IndexModified , IndexDeleted, IndexRenamed, IndexTypechange,
-    WorkingNew, WorkingModified, WorkingDeleted, WorkingTypechange, WorkingRenamed,
-    Ignored, Conflict, Unknown
-}
-
 // All you need to make try!() fun again
 impl From<io::Error>  for LuigiError {
     fn from(ioerror: io::Error) -> LuigiError{ LuigiError::Io(ioerror) }
@@ -60,12 +53,8 @@ pub struct Luigi {
     archive_dir:  PathBuf,
     /// Place for template files.
     template_dir: PathBuf,
-    pub git_repo: Option<Repository>,
-    pub git_status: Option<HashMap<PathBuf, GitStatus> >
 }
 
-use git2;
-use git2::{Repository,Status,Statuses,StatusOptions, FetchOptions, SubmoduleIgnore, Error as GitError};
 impl Luigi {
     pub fn new(storage:&Path, working:&str, archive:&str, template:&str) -> Result<Luigi, LuigiError> {
         Ok( Luigi{ // TODO check for the existence
@@ -73,77 +62,7 @@ impl Luigi {
             working_dir:  storage.join(working),
             archive_dir:  storage.join(archive),
             template_dir: storage.join(template),
-            git_repo: None,
-            git_status: None
         })
-    }
-
-    pub fn git_init(&mut self) -> Result<(), GitError> {
-        use git2::*;
-        use self::GitStatus::*;
-
-        let repo = try!(Repository::open(&self.storage_dir));
-
-        {
-        let git_statuses = try!(repo.statuses( Some( StatusOptions::new()
-                                                     .include_ignored(false)
-                                                     .include_untracked(true) )));
-
-        let mut statuses:HashMap<PathBuf,GitStatus> = HashMap::new();
-
-        for entry in git_statuses.iter(){
-            let status = match entry.status() {
-                s if s.contains(STATUS_INDEX_NEW        ) => IndexNew,
-                s if s.contains(STATUS_INDEX_MODIFIED   ) => IndexModified ,
-                s if s.contains(STATUS_INDEX_DELETED    ) => IndexDeleted,
-                s if s.contains(STATUS_INDEX_RENAMED    ) => IndexRenamed,
-                s if s.contains(STATUS_INDEX_TYPECHANGE ) => IndexTypechange,
-                s if s.contains(STATUS_WT_NEW           ) => WorkingNew,
-                s if s.contains(STATUS_WT_MODIFIED      ) => WorkingModified,
-                s if s.contains(STATUS_WT_DELETED       ) => WorkingDeleted,
-                s if s.contains(STATUS_WT_TYPECHANGE    ) => WorkingTypechange,
-                s if s.contains(STATUS_WT_RENAMED       ) => WorkingRenamed,
-                s if s.contains(STATUS_IGNORED          ) => Ignored,
-                s if s.contains(STATUS_CONFLICTED       ) => Conflict,
-                _ => Unknown
-            };
-
-            if let Some(path) = entry.path(){
-                statuses.insert(PathBuf::from(path), status);
-            }
-        }
-        self.git_status = Some(statuses);
-        }
-        self.git_repo = Some(repo);
-        Ok(())
-    }
-
-    pub fn git_pull(&self) -> Result<(), GitError> {
-        if let Some(ref repo) = self.git_repo{
-            let remote = try!(repo.find_remote("origin"));
-            unimplemented!();
-        }
-        Ok(())
-    }
-
-    pub fn git_add_directory(&self, name:&str, directory:LuigiDir) -> Result<(), GitError> {
-        if let Some(ref repo) = self.git_repo{
-            let index = try!(repo.index());
-            if let Some(dir) = self.get_project_dir(&name, directory){
-                unimplemented!();
-                //try!(index.add_path(&dir));
-            }
-            return Ok(());
-        }
-        Ok(()) // actually Err(....)
-    }
-
-    pub fn git_commit(&self, message:&str){
-        unimplemented!();
-    }
-
-    pub fn git_push(&self){
-        unimplemented!();
     }
 
     fn list_path_content(&self, path:&Path) -> Vec<PathBuf> {
@@ -174,6 +93,10 @@ impl Luigi {
         if !self.template_dir.exists() { try!(fs::create_dir(&self.template_dir)); }
 
         Ok(())
+    }
+
+    pub fn storage_dir(&self) -> &Path{
+        self.storage_dir.as_ref()
     }
 
     /// Creates an archive for a certain year.

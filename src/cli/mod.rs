@@ -13,6 +13,7 @@ use super::CONFIG;
 use manager::{Luigi,LuigiDir};
 use manager::LuigiProject;
 use project::Project;
+use repo::Repo;
 use util;
 
 pub mod print;
@@ -32,13 +33,13 @@ fn assert_existens(storage_path:&Path) {
 }
 
 pub fn status(){
-    let mut luigi = setup_luigi();
-    luigi.git_init().unwrap();
+    let luigi = setup_luigi();
+    let repo = Repo::new(luigi.storage_dir()).unwrap();
 
     let project_paths = luigi.list_project_files(LuigiDir::Working);
     let projects: Vec<Project> = project_paths
         .iter().map(|path| Project::open(path).unwrap()).collect();
-    println!("{:#?}", luigi.git_status);
+    println!("{:#?}", repo.status);
     //print::print_projects(&projects);
 }
 
