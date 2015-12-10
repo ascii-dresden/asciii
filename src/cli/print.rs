@@ -48,7 +48,7 @@ pub fn status_rows(projects:&[Project], repo:&Repo) -> Vec<Row>{
 // TODO add this code to prettytable-rs
 pub fn print_projects(mut rows:Vec<Row>){
     let mut table = Table::new();
-    table.set_format(TableFormat::new("", None, None));
+    table.set_format(TableFormat::new(None, None, None));
     for (i, mut row) in rows.drain(..).enumerate(){
         row.insert_cell(0,cell!(r:i+1)); // make this optional
         table.add_row(row);

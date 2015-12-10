@@ -12,7 +12,7 @@ regex = "*"
 slug = "*"
 clap = "*"
 term = "*"
-prettytable-rs = {git= "https://github.com/hoodie/prettytable-rs"}
+prettytable-rs = "*"
 lazy_static = "*"
 itertools = "*"
 maplit = "*"
