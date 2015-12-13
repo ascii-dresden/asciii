@@ -45,6 +45,19 @@ pub fn parse_fwd_date(date_str:&str) -> Option<Date<UTC>>{
     None
 }
 
+//takes care of the old, stupid, dd-dd.mm.yyyy format, what was I thinking?
+pub fn parse_fwd_date_range(date_str:&str) -> Option<Date<UTC>>{
+    let date = date_str.split('.')
+        .map(|s|s.split('-').nth(0).unwrap_or("0"))
+        .map(|f|f.parse().unwrap_or(0))
+        .collect::<Vec<i32>>();
+    if date[0] > 0 {
+        return Some(UTC.ymd(date[2], date[1] as u32, date[0] as u32))
+    }
+    None
+}
+
+
 use std::collections::BTreeMap;
 pub fn get_hash<'a>(yaml:&'a Yaml, key:&str) -> Option<&'a BTreeMap<Yaml,Yaml>> {
     get(&yaml,&key).and_then(|y|y.as_hash())

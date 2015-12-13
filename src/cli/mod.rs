@@ -71,8 +71,7 @@ pub fn list_projects(dir:LuigiDir){
         .filter_map(|path| Project::open(path).ok())
         .collect();
 
-    //projects.sort_by(|pa,pb| pa.date().unwrap().cmp( &pb.date().unwrap()));
-    projects.sort_by(|pa,pb| pa.index().unwrap().cmp( &pb.index().unwrap()));
+    projects.sort_by(|pa,pb| pa.index().unwrap_or("zzzz".to_owned()).cmp( &pb.index().unwrap_or("zzzz".to_owned())));
 
     //print::print_projects(print::simple_rows(&projects));
     let repo = Repo::new(luigi.storage_dir()).unwrap();
@@ -92,9 +91,10 @@ pub fn list_templates(){
 /// Command LIST --all
 pub fn list_all_projects(){
     let luigi = setup_luigi();
-    let projects: Vec<Project> = luigi.list_all_projects()
+    let mut projects: Vec<Project> = luigi.list_all_projects()
         .iter()
         .map(|p|Project::open(p).unwrap()).collect() ;
+    projects.sort_by(|pa,pb| pa.index().unwrap_or("zzzz".to_owned()).cmp( &pb.index().unwrap_or("zzzz".to_owned())));
     print::print_projects(print::simple_rows(&projects));
 }
 
@@ -135,7 +135,13 @@ pub fn edit_template(name:&str, editor:&str){
 /// Command SHOW
 pub fn show_project(dir:LuigiDir, search_term:&str){
     for project in search_projects(dir, &search_term){
-        println!("{} {} {} {}", project.index().unwrap_or("".into()), project.name(), project.manager(), project.date().unwrap());
+        println!("{} {} {} {}, {}",
+                 project.index().unwrap_or("".into()),
+                 project.name(),
+                 project.manager(),
+                 project.date().unwrap(),
+                 project.file().display()
+                 );
     }
 }
 

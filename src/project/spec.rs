@@ -43,7 +43,7 @@ pub mod project{
     pub fn manager(yaml:&Yaml) -> Option<&str>{
         yaml::get_str(yaml, "manager")
         // old spec
-        .or( yaml::get_str(&yaml, "signature").and_then(|c|c.lines().nth(0)))
+        .or( yaml::get_str(&yaml, "signature").and_then(|c|c.lines().last()))
     }
 
     pub fn format(yaml:&Yaml) -> Option<&str>{
@@ -154,6 +154,8 @@ pub mod date {
         yaml::get_dmy(&yaml, "event/dates/0/begin")
         .or(yaml::get_dmy(&yaml, "created"))
         .or(yaml::get_dmy(&yaml, "date"))
+        // probably the dd-dd.mm.yyyy format
+        .or(yaml::get_str(&yaml, "date").and_then(|s|util::yaml::parse_fwd_date_range(s)))
     }
 
     pub fn payed(yaml:&Yaml) -> Option<Date<UTC>> {

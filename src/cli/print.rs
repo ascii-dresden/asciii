@@ -22,7 +22,11 @@ pub fn simple_rows(projects:&[Project]) -> Vec<Row>{
                       cell!(project.manager()),
                       cell!(project.invoice_num()),
                       cell!(project.date().unwrap_or(UTC::today())
-                            .format("%d.%m.%Y").to_string())
+                            .format("%d.%m.%Y").to_string()),
+
+                      cell!(project.index().unwrap_or("no_index".into())),
+                      cell!(project.date().map(|d|d.to_string()).unwrap_or("no_date".into())),
+                      //cell!(project.file().display()),
              ])
             )
         .collect()
@@ -45,12 +49,12 @@ pub fn status_rows(projects:&[Project], repo:&Repo) -> Vec<Row>{
                      cell!(project.manager()),
                      cell!(project.invoice_num()),
                      cell!(project.date().unwrap_or(UTC::today()).format("%d.%m.%Y").to_string()),
-                     //cell!(repo.status.get(&project.file()).unwrap_or(&GitStatus::Unknown)),
-                     //cell!(repo.status.get(&project.dir()).unwrap_or(&GitStatus::Unknown))
-                     //cell!(project.validate(ProjectValidity::Invoice).map_err(|e|e.join(",")).err().unwrap_or("ok".to_owned()))
                      cell!(print_result(&project.valid_stage1())),
                      cell!(print_result(&project.valid_stage2())),
                      cell!(print_result(&project.valid_stage3())),
+
+                     cell!(repo.status.get(&project.file()).unwrap_or(&GitStatus::Unknown)),
+                     cell!(repo.status.get(&project.dir()).unwrap_or(&GitStatus::Unknown)),
             ])
         })
         .collect()

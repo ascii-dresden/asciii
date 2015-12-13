@@ -3,14 +3,20 @@ use std::path::Path;
 
 use ascii_invoicer::project::spec;
 use ascii_invoicer::project::Project;
+use ascii_invoicer::manager::LuigiProject;
 
 fn main(){
-    let new_project = Project::open(Path::new("./examples/current.yml")).unwrap();
-    let old_project = Project::open(Path::new("./examples/old.yml")).unwrap();
     let config = &ascii_invoicer::CONFIG;
 
-    for yaml in [old_project.yaml(), new_project.yaml()]
-        .iter(){
+    for project in [
+    Project::open(Path::new("./examples/pfeffer.yml")).unwrap(),
+    Project::open(Path::new("./examples/current.yml")).unwrap(),
+    Project::open(Path::new("./examples/old.yml")).unwrap()
+].iter(){
+        let yaml = project.yaml();
+        println!("Index:     {:?}", project.index());
+        println!("Canceled   {:?}", project.canceled());
+        println!("Date:      {:?}", project.date());
         println!("Name:      {:?}", spec::project::name(&yaml));
         println!("Manager:   {:?}", spec::project::manager(&yaml));
         println!("Offer:     {:?}", spec::offer::number(&yaml));

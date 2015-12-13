@@ -27,7 +27,7 @@ anumber: 1 # fortlaufende nummer fuer mehere Angebote an einem Tag
 manumber: A20131220-1 #A20110520
 
 # rechnungsnummer
-rnumber: 2 #27
+rnumber: #2 #27
 
 date: 14.01.2014 # bezieht sich auf die veranstaltung selbst
 payed_date: 15.01.2014

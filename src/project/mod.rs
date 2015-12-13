@@ -70,9 +70,13 @@ impl LuigiProject for Project{
     }
 
     fn index(&self) -> Option<String>{
-        spec::invoice::number_str(self.yaml()).or(
-            self.date().map(|d|d.format("ZZ%Y%m%d").to_string())
-            )
+        if let Some(date) = self.date(){
+            spec::invoice::number_str(self.yaml())
+                .map(|num| format!("{}{}", date.format("%Y%m%d").to_string(),num))
+                .or( Some(date.format("%Y%m%d").to_string()))
+        } else {
+            None
+        }
     }
 
     fn name(&self) -> String { spec::project::name(self.yaml()).unwrap_or("unnamed").to_owned() }
@@ -101,6 +105,10 @@ impl Project{
 
     pub fn manager(&self) -> String{
         spec::project::manager(self.yaml()).unwrap_or("____").into()
+    }
+
+    pub fn canceled(&self) -> bool{
+        spec::project::canceled(self.yaml())
     }
 
     pub fn invoice_num(&self) -> String{
