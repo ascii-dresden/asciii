@@ -1,0 +1,88 @@
+---
+version: 20130802
+
+# always include 'Herr' oder 'Frau'
+# defaults to male
+# look at lib/lang.yml for more, add if needed
+# NO FIRSTNAME HERE
+client: |
+  Herr
+  Weinhold
+
+email:
+request_message: |
+description: |
+
+
+address: |
+  Carsten Weinhold
+  Nöthnitzerstraße 46
+  01187 Dresden
+
+event: "Weinhold Promotionsfeier"
+
+anumber: 1 # fortlaufende nummer fuer mehere Angebote an einem Tag
+
+# manuelle Angebotsnummer, überschreibt anumber
+manumber: A20131220-1 #A20110520
+
+# rechnungsnummer
+rnumber: 2 #27
+
+date: 14.01.2014 # bezieht sich auf die veranstaltung selbst
+payed_date: 15.01.2014
+invoice_date: 14.01.2014
+
+# Preise:
+# Mineralwasser:    0.61 / 1l   # Mineralwasser:    0.59 / 0,5l
+# Orangensaft:      1.82 / 1l   # Apfelsaft:        1.65 / 1l
+# Kaffee:           2.50 / 1l   # Tee:              1.75 / 1l
+# Bagel:            2.19 / stk  # Halbes Brötchen:  1.16 / stk
+# Lachsbrötchen:    1.38 / stk  # Kuchen:           0.94 / stk
+# Donut/Muffin:     0.94 / stk  # Brownie:          1.10 / stk
+# Kekse Lamberts:   3.40 / 400g
+
+products:
+  "Mineralwasser (1l)":
+    amount: 8
+    price: 0.61
+    sold: 0
+  "Orangensaft (1l)":
+    amount: 8
+    price: 1.82
+    sold: 2
+  "Sekt  (0,75l)":
+    amount: 4
+    price: 6.0
+    sold: 2
+  "Belegte Brötchen":
+    amount: 90
+    price: 1.16
+  "Obstkorb:":
+    amount: 1
+    price: 15
+  "Kuchen:":
+    amount: 70
+    price: .94
+  "Kekese:":
+    amount: 5
+    price: 3.4
+    sold: 0
+
+hours:
+  time: 3
+  salary: 8.00
+
+  caterers:
+    "Hendrik" : 3 #Stunden
+
+signature: |
+  Hendrik Sollich
+
+#messages: # read default-settings.yml on how to overwrite
+
+lang: de
+tax: 0.19
+canceled: false # not yet implemented
+
+...

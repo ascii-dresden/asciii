@@ -38,8 +38,10 @@ pub fn status_rows(projects:&[Project], repo:&Repo) -> Vec<Row>{
                      cell!(project.manager()),
                      cell!(project.invoice_num()),
                      cell!(project.date().unwrap_or(UTC::today()).format("%d.%m.%Y").to_string()),
-                     cell!(repo.status.get(&project.file()).unwrap_or(&GitStatus::Unknown)),
-                     cell!(repo.status.get(&project.dir()).unwrap_or(&GitStatus::Unknown))
+                     //cell!(repo.status.get(&project.file()).unwrap_or(&GitStatus::Unknown)),
+                     //cell!(repo.status.get(&project.dir()).unwrap_or(&GitStatus::Unknown))
+                     //cell!(project.validate(ProjectValidity::Invoice).map_err(|e|e.join(",")).err().unwrap_or("ok".to_owned()))
+                     cell!(project.errors().join(", ")),
             ])
         })
         .collect()

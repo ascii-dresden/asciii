@@ -9,21 +9,22 @@ fn main(){
     let old_project = Project::open(Path::new("./examples/old.yml")).unwrap();
     let config = &ascii_invoicer::CONFIG;
 
-    for yaml in []//[old_project.yaml(), new_project.yaml()]
+    for yaml in [old_project.yaml(), new_project.yaml()]
         .iter(){
-        println!("Name:     {:?}", spec::project::name(&yaml));
-        println!("Manager:  {:?}", spec::project::manager(&yaml));
-        println!("Offer:    {:?}", spec::offer::number(&yaml));
-        println!("          {:?}", spec::date::offer(&yaml));
-        println!("Invoice:  {:?}", spec::invoice::number_str(&yaml));
-        println!("          {:?}", spec::date::invoice(&yaml));
-        println!("Payed     {:?}", spec::date::payed(&yaml));
-        println!("Title:    {:?}", spec::client::title(&yaml));
-        println!("LastName: {:?}", spec::client::last_name(&yaml));
-        println!("Client:   {:?}", spec::client::addressing(&yaml, config));
+        println!("Name:      {:?}", spec::project::name(&yaml));
+        println!("Manager:   {:?}", spec::project::manager(&yaml));
+        println!("Offer:     {:?}", spec::offer::number(&yaml));
+        println!("           {:?}", spec::date::offer(&yaml));
+        println!("Invoice:   {:?}", spec::invoice::number_str(&yaml));
+        println!("           {:?}", spec::date::invoice(&yaml));
+        println!("Payed      {:?}", spec::date::payed(&yaml));
+        println!("Title:     {:?}", spec::client::title(&yaml));
+        println!("FirstName: {:?}", spec::client::first_name(&yaml));
+        println!("LastName:  {:?}", spec::client::last_name(&yaml));
+        println!("Client:    {:?}", spec::client::addressing(&yaml, config));
         println!("--------------");
     }
 
-    println!("Products: {:#?}", spec::products::all(new_project.yaml()));
+    //println!("Products: {:#?}", spec::products::all(new_project.yaml()));
 }
 

@@ -1,5 +1,44 @@
 #![allow(dead_code)]
 
+pub mod validate{
+    use util::yaml;
+    use util::yaml::Yaml;
+
+    pub fn existence<'a>(yaml:&Yaml, mut paths:Vec<&'a str>) -> Vec<&'a str>{
+        paths.drain(..)
+            .filter(|path| yaml::get(yaml,path).is_none())
+            .collect::<Vec<&'a str>>()
+    }
+
+    /// Stage 1: project
+
+    /// Stage 2: offer
+
+    /// Stage 3: invoice
+    pub fn invoice<'a>(yaml:&Yaml) -> Vec<&'a str>{
+        let mut errors = existence(&yaml,vec![
+                                   "invoice/number",
+                                   "invoice/date",
+                                   "invoice/payed_date",
+        ]);
+        if super::date::invoice(&yaml).is_none(){
+            errors.push("invoice_date_format");}
+        errors
+    }
+
+    /// Stage 4: archiveable
+    pub fn payed<'a>(yaml:&Yaml)   -> bool {
+        // TODO validate date
+       !super::date::payed(&yaml).is_none()
+    }
+
+    pub fn wages<'a>(yaml:&Yaml)   -> bool {
+        // TODO validate date
+       // !super::date::wages(&yaml).is_none()
+       false
+    }
+}
+
 pub mod project{
     use util::yaml;
     use util::yaml::Yaml;
@@ -17,6 +56,8 @@ pub mod project{
 
     pub fn manager(yaml:&Yaml) -> Option<&str>{
         yaml::get_str(yaml, "manager")
+        // old spec
+        .or( yaml::get_str(&yaml, "signature").and_then(|c|c.lines().nth(0)))
     }
 
     pub fn format(yaml:&Yaml) -> Option<&str>{
@@ -30,6 +71,15 @@ pub mod project{
     pub fn salary(yaml:&Yaml) -> Option<f64>{
         yaml::get_f64(yaml, "hours/salary")
     }
+
+    pub fn validate(yaml:&Yaml) -> bool{
+        name(&yaml).is_some() &&
+        date(&yaml).is_some() &&
+        manager(&yaml).is_some() &&
+        format(&yaml).is_some() &&
+        salary(&yaml).is_some()
+    }
+
 }
 
 pub mod client{
@@ -49,6 +99,12 @@ pub mod client{
         yaml::get_str(&yaml, "client/title")
         // old spec
         .or( yaml::get_str(&yaml, "client").and_then(|c|c.lines().next()))
+    }
+
+    pub fn first_name(yaml:&Yaml) -> Option<&str>{
+        yaml::get_str(&yaml, "client/first_name")
+        // old spec
+        //.or( yaml::get_str(&yaml, "client").and_then(|c|c.lines().nth(0)))
     }
 
     pub fn last_name(yaml:&Yaml) -> Option<&str>{
@@ -80,6 +136,25 @@ pub mod client{
             last_name.and(
                 Some(format!("{} {} {}", addr, title, last_name.unwrap_or(""))))
         } else { None }
+    }
+
+    pub fn validate(yaml:&Yaml) -> Result<(), Vec<&str>>{
+        let mut errors = super::validate::existence(&yaml, vec![
+                 "client/email",
+                 "client/address",
+                 "client/last_name",
+                 "client/first_name",
+        ]);
+
+        if title(&yaml).is_none(){       errors.push("client_title");}
+        if first_name(&yaml).is_none(){  errors.push("client_first_name");}
+        if last_name(&yaml).is_none(){   errors.push("client_last_name");}
+
+        if !errors.is_empty(){
+            return Err(errors);
+        }
+
+        Ok(())
     }
 }
 
@@ -149,6 +224,23 @@ pub mod offer{
     pub fn appendix(yaml:&Yaml) -> Option<i64> {
         yaml::get_int(&yaml, "offer/appendix")
     }
+
+    pub fn validate(yaml:&Yaml) -> Result<(), Vec<&str>>{
+        // TODO validate products
+        let mut errors = super::validate::existence(&yaml, vec![
+                 "offer/date",
+                 "offer/appendix",
+        ]);
+        if super::date::offer(&yaml).is_none(){
+            errors.push("offer_date_format");}
+
+        if !errors.is_empty(){
+            return Err(errors);
+        }
+
+        Ok(())
+    }
+
 }
 
 pub mod invoice{
@@ -163,6 +255,23 @@ pub mod invoice{
 
     pub fn number_str(yaml:&Yaml) -> Option<String> {
         number(&yaml).map(|n| format!("R{:03}", n))
+    }
+
+    pub fn validate(yaml:&Yaml) -> Result<(), Vec<&str>>{
+        let mut errors = super::validate::existence(&yaml,vec![
+                                   "invoice/number",
+                                   "invoice/date",
+                                   "invoice/payed_date",
+        ]);
+
+        if super::offer::validate(&yaml).is_err() {errors.push("offer")}
+        if super::date::invoice(&yaml).is_none(){ errors.push("invoice_date_format");}
+
+        if !errors.is_empty(){
+            return Err(errors);
+        }
+
+        Ok(())
     }
 }
 
@@ -207,3 +316,73 @@ pub mod products{
     }
 }
 
+#[cfg(test)]
+mod tests{
+
+    use util::yaml;
+    use util::yaml::YamlError;
+
+static CLIENT_TEST_DOC:&'static str =
+r#"
+client:
+  title:      Herr # Frau, Professor, Professorin
+  first_name: Graf
+  last_name:  Zahl
+
+  email: this.man@example.com
+  address: |
+    Graf Zahl
+    Nummernhöllenstraße 666
+    01234 Countilvania
+"#;
+
+static OFFER_TEST_DOC:&'static str =
+r#"
+offer:
+  date: 07.11.2014
+  appendix: 1
+"#;
+
+static INVOICE_TEST_DOC:&'static str =
+r#"
+invoice:
+  number: 41
+  date: 06.12.2014
+  payed_date: 08.12.2014
+"#;
+
+    #[test]
+    fn validate_stage1(){
+        let doc = yaml::parse(CLIENT_TEST_DOC).unwrap();
+        assert!(super::client::validate(&doc).is_ok());
+    }
+
+    #[test]
+    fn validate_stage2(){
+        let doc = yaml::parse(OFFER_TEST_DOC).unwrap();
+        let errors = super::offer::validate(&doc);
+        println!("{:#?}", errors);
+        assert!(errors.is_ok());
+    }
+
+    #[test]
+    fn validate_stage3(){
+        let doc = yaml::parse(INVOICE_TEST_DOC).unwrap();
+        let errors = super::validate::invoice(&doc);
+        println!("{:#?}", errors);
+        assert!(errors.is_empty());
+    }
+
+    #[test]
+    fn validate_stage4(){
+        let doc = yaml::parse(INVOICE_TEST_DOC).unwrap();
+        assert!(super::validate::payed(&doc));
+    }
+
+    //#[test]
+    //fn validate_stage5(){
+    //    let doc = yaml::parse(CLIENT_TEST_DOC).unwrap();
+    //    assert!(super::validate::wages(&doc));
+    //}
+
+}

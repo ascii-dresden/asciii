@@ -10,7 +10,7 @@ use term::{Attr, color};
 #[allow(dead_code)]
 fn main() {
     let mut table = Table::new();
-    table.set_format(TableFormat::new(" ", None, None));
+    table.set_format(TableFormat::new(None, None, None));
     // Add style to a cell
     table.add_row(row![FrByb:"ABC", "DEFG", "HIJKLMN"]);
     // Add style to a full row
@@ -35,6 +35,6 @@ fn main() {
     let mut table = table!([Frb -> "A", "B", "C"], [1, 2, 3, 4], ["A\nBCCZZZ\nDDD", 2, table]);
     // Set a title line, with all text centered in the cell
     table.set_titles(row![c -> "Title 1", "Title 2"]);
-    table.set_format(TableFormat::new(" ", None, None));
+    table.set_format(TableFormat::new(None, None, None));
     table.printstd();
 }

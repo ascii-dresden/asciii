@@ -305,15 +305,6 @@ pub trait LuigiProject{
     fn dir(&self)  -> PathBuf{ self.file().parent().unwrap().to_owned() }
 }
 
-pub trait LuigiValidator{}
-
-pub trait LuigiValidatable{
-    fn valide<C:LuigiValidator>(&self) -> Vec<C>;
-    fn validate<C:LuigiValidator>(&self, criterion:C) -> bool;
-    // fn cache // TODO Stores a faster parsable version
-}
-
-
 #[cfg(test)]
 mod realworld {
     use std::path::{Path,PathBuf};

@@ -15,11 +15,7 @@ use slug;
 use util;
 use util::yaml;
 use util::yaml::YamlError;
-use manager::{
-    LuigiProject,
-    LuigiValidatable,
-    LuigiValidator,
-    LuigiError};
+use manager::{LuigiProject, LuigiError};
 use templater::Templater;
 
 pub mod spec;
@@ -30,22 +26,9 @@ pub struct Project {
     yaml: Yaml
 }
 
-enum ProjectValidity{
-    TemplateFilled,
-    Offer,
-    Invoice,
-    Payed,
-    Archive
-}
-
-impl LuigiValidator for ProjectValidity{}
-
 impl From<yaml::YamlError>  for LuigiError {
     fn from(yerror: yaml::YamlError) -> LuigiError{ LuigiError::ParseError }
 }
-
-//#[derive(Debug)]
-//pub struct ProjectOldFormat { yaml: Yaml } // implemented differently
 
 impl LuigiProject for Project{
     fn new(project_name:&str,template:&Path) -> Result<Project,LuigiError> {
@@ -98,13 +81,6 @@ impl LuigiProject for Project{
     fn set_file(&mut self, new_file:&Path){ self.file_path = new_file.to_owned(); }
 }
 
-impl LuigiValidatable for Project{
-    fn valide<ProjectValidity>(&self) -> Vec<ProjectValidity>{ Vec::new() }
-
-    fn validate<ProjectValidity>(&self, criterion:ProjectValidity) -> bool{ false }
-}
-
-// TODO cache lookups
 impl Project{
     /// Opens a yaml and parses it.
     pub fn open(file_path:&Path) -> Result<Project,YamlError>{
@@ -120,7 +96,7 @@ impl Project{
         })
     }
 
-    fn yaml(&self) -> &Yaml{ &self.yaml }
+    pub fn yaml(&self) -> &Yaml{ &self.yaml }
 
     pub fn manager(&self) -> String{
         spec::project::manager(self.yaml()).unwrap_or("____").into()
@@ -128,6 +104,10 @@ impl Project{
 
     pub fn invoice_num(&self) -> String{
         spec::invoice::number_str(self.yaml()).unwrap_or("".into())
+    }
+
+    pub fn errors(&self) -> Vec<&str>{
+        vec![]
     }
 }
 
@@ -162,6 +142,6 @@ mod test{
         assert_eq!(spec::client::title(&old_yaml), spec::client::title(&new_yaml));
         assert_eq!(spec::client::last_name(&old_yaml), spec::client::last_name(&new_yaml));
         assert_eq!(spec::client::addressing(&old_yaml, &config), spec::client::addressing(&new_yaml, &config));
-
     }
+
 }

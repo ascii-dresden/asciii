@@ -75,7 +75,10 @@ pub fn get_dmy<'a>(yaml:&'a Yaml, key:&str) -> Option<Date<UTC>> {
 }
 
 pub fn get<'a>(yaml:&'a Yaml, key:&str) -> Option<&'a Yaml>{
-    get_path(&yaml, &key.split('/').filter(|k|!k.is_empty()).collect::<Vec<&str>>())
+    match get_path(&yaml, &key.split('/').filter(|k|!k.is_empty()).collect::<Vec<&str>>()) {
+        Some(&Yaml::Null) => None,
+        content => content
+    }
 }
 
 fn get_path<'a>(yaml:&'a Yaml, path:&[&str]) -> Option<&'a Yaml>{
