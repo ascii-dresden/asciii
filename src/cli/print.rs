@@ -28,6 +28,13 @@ pub fn simple_rows(projects:&[Project]) -> Vec<Row>{
         .collect()
 }
 
+fn print_result(res:&Result<(), Vec<&str>>) -> String{
+    match res{
+        &Ok(_) => String::from("✓"), // ✗
+        &Err(ref errors) => String::from("✗")// + &errors.join(", ")
+    }
+}
+
 pub fn status_rows(projects:&[Project], repo:&Repo) -> Vec<Row>{
     projects
         .iter()
@@ -41,7 +48,9 @@ pub fn status_rows(projects:&[Project], repo:&Repo) -> Vec<Row>{
                      //cell!(repo.status.get(&project.file()).unwrap_or(&GitStatus::Unknown)),
                      //cell!(repo.status.get(&project.dir()).unwrap_or(&GitStatus::Unknown))
                      //cell!(project.validate(ProjectValidity::Invoice).map_err(|e|e.join(",")).err().unwrap_or("ok".to_owned()))
-                     cell!(project.errors().join(", ")),
+                     cell!(print_result(&project.valid_stage1())),
+                     cell!(print_result(&project.valid_stage2())),
+                     cell!(print_result(&project.valid_stage3())),
             ])
         })
         .collect()

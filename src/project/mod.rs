@@ -19,6 +19,7 @@ use manager::{LuigiProject, LuigiError};
 use templater::Templater;
 
 pub mod spec;
+use self::spec::SpecResult;
 
 pub struct Project {
     file_path: PathBuf,
@@ -104,6 +105,18 @@ impl Project{
 
     pub fn invoice_num(&self) -> String{
         spec::invoice::number_str(self.yaml()).unwrap_or("".into())
+    }
+
+    pub fn valid_stage1(&self) -> SpecResult{
+        spec::offer::validate(&self.yaml)
+    }
+
+    pub fn valid_stage2(&self) -> SpecResult{
+        spec::invoice::validate(&self.yaml)
+    }
+
+    pub fn valid_stage3(&self) -> SpecResult{
+        spec::archive::validate(&self.yaml)
     }
 
     pub fn errors(&self) -> Vec<&str>{

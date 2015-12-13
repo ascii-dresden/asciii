@@ -1,5 +1,7 @@
 #![allow(dead_code)]
 
+pub type SpecResult<'a> = Result<(), Vec<&'a str>>;
+
 pub mod validate{
     use util::yaml;
     use util::yaml::Yaml;
@@ -10,11 +12,6 @@ pub mod validate{
             .collect::<Vec<&'a str>>()
     }
 
-    /// Stage 1: project
-
-    /// Stage 2: offer
-
-    /// Stage 3: invoice
     pub fn invoice<'a>(yaml:&Yaml) -> Vec<&'a str>{
         let mut errors = existence(&yaml,vec![
                                    "invoice/number",
@@ -25,20 +22,9 @@ pub mod validate{
             errors.push("invoice_date_format");}
         errors
     }
-
-    /// Stage 4: archiveable
-    pub fn payed<'a>(yaml:&Yaml)   -> bool {
-        // TODO validate date
-       !super::date::payed(&yaml).is_none()
-    }
-
-    pub fn wages<'a>(yaml:&Yaml)   -> bool {
-        // TODO validate date
-       // !super::date::wages(&yaml).is_none()
-       false
-    }
 }
 
+//stage 0
 pub mod project{
     use util::yaml;
     use util::yaml::Yaml;
@@ -79,7 +65,6 @@ pub mod project{
         format(&yaml).is_some() &&
         salary(&yaml).is_some()
     }
-
 }
 
 pub mod client{
@@ -98,7 +83,7 @@ pub mod client{
     pub fn title(yaml:&Yaml) -> Option<&str>{
         yaml::get_str(&yaml, "client/title")
         // old spec
-        .or( yaml::get_str(&yaml, "client").and_then(|c|c.lines().next()))
+        .or( yaml::get_str(&yaml, "client").and_then(|c|c.lines().nth(0)))
     }
 
     pub fn first_name(yaml:&Yaml) -> Option<&str>{
@@ -138,7 +123,7 @@ pub mod client{
         } else { None }
     }
 
-    pub fn validate(yaml:&Yaml) -> Result<(), Vec<&str>>{
+    pub fn validate(yaml:&Yaml) -> super::SpecResult {
         let mut errors = super::validate::existence(&yaml, vec![
                  "client/email",
                  "client/address",
@@ -177,6 +162,12 @@ pub mod date {
         .or( yaml::get_dmy(yaml, "payed_date"))
     }
 
+    pub fn wages(yaml:&Yaml) -> Option<Date<UTC>> {
+        yaml::get_dmy(yaml, "hours/wages_date")
+        // old spec
+        .or( yaml::get_dmy(yaml, "wages_date"))
+    }
+
     pub fn offer(yaml:&Yaml) -> Option<Date<UTC>> {
         yaml::get_dmy(yaml, "offer/date")
     }
@@ -206,6 +197,7 @@ pub mod date {
     }
 }
 
+//stage 1
 pub mod offer{
     use chrono::*;
     use util::yaml;
@@ -225,7 +217,7 @@ pub mod offer{
         yaml::get_int(&yaml, "offer/appendix")
     }
 
-    pub fn validate(yaml:&Yaml) -> Result<(), Vec<&str>>{
+    pub fn validate(yaml:&Yaml) -> super::SpecResult {
         // TODO validate products
         let mut errors = super::validate::existence(&yaml, vec![
                  "offer/date",
@@ -240,9 +232,9 @@ pub mod offer{
 
         Ok(())
     }
-
 }
 
+//stage 2
 pub mod invoice{
     use util::yaml;
     use util::yaml::Yaml;
@@ -257,16 +249,32 @@ pub mod invoice{
         number(&yaml).map(|n| format!("R{:03}", n))
     }
 
-    pub fn validate(yaml:&Yaml) -> Result<(), Vec<&str>>{
+    pub fn validate(yaml:&Yaml) -> super::SpecResult {
         let mut errors = super::validate::existence(&yaml,vec![
                                    "invoice/number",
                                    "invoice/date",
-                                   "invoice/payed_date",
         ]);
 
         if super::offer::validate(&yaml).is_err() {errors.push("offer")}
         if super::date::invoice(&yaml).is_none(){ errors.push("invoice_date_format");}
 
+        if !errors.is_empty(){
+            return Err(errors);
+        }
+
+        Ok(())
+    }
+}
+
+//stage 3
+pub mod archive{
+    use util::yaml;
+    use util::yaml::Yaml;
+
+    pub fn validate(yaml:&Yaml) -> super::SpecResult {
+        let mut errors = Vec::new();
+        if super::date::payed(&yaml).is_none(){ errors.push("payed_date");}
+        if super::date::wages(&yaml).is_none(){ errors.push("wages_date");}
         if !errors.is_empty(){
             return Err(errors);
         }
@@ -318,7 +326,6 @@ pub mod products{
 
 #[cfg(test)]
 mod tests{
-
     use util::yaml;
     use util::yaml::YamlError;
 
