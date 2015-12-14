@@ -34,15 +34,47 @@ fn assert_existens(storage_path:&Path) {
             &&  storage_path.join("templates").exists());
 }
 
-pub fn status(){
+fn status(){
     let luigi = setup_luigi();
     let repo = Repo::new(luigi.storage_dir()).unwrap();
 
     let project_paths = luigi.list_project_files(LuigiDir::Working);
     let projects: Vec<Project> = project_paths
-        .iter().map(|path| Project::open(path).unwrap()).collect();
+        .iter()
+        .map(|path| Project::open(path).unwrap())
+        .collect();
+
     println!("{:#?}", repo.status);
     print::print_projects(print::status_rows(&projects,&repo));
+}
+
+pub enum SortOptions{ Index }
+
+fn sort_by_(option:&str, projects:&mut [Project]){
+    println!("sorting by {}", option);
+    match option {
+        "manager" => sort_by_manager(projects),
+        "date" => sort_by_date(projects),
+        "name" => sort_by_name(projects),
+
+        _ => sort_by_index(projects),
+    }
+}
+
+fn sort_by_index(projects:&mut [Project]){
+    projects.sort_by(|pa,pb| pa.index().unwrap_or("zzzz".to_owned()).cmp( &pb.index().unwrap_or("zzzz".to_owned())))
+}
+
+fn sort_by_name(projects:&mut [Project]){
+    projects.sort_by(|pa,pb| pa.name().cmp( &pb.name()))
+}
+
+fn sort_by_date(projects:&mut [Project]){
+    projects.sort_by(|pa,pb| pa.date().cmp( &pb.date()))
+}
+
+fn sort_by_manager(projects:&mut [Project]){
+    projects.sort_by(|pa,pb| pa.manager().cmp( &pb.manager()))
 }
 
 /// Opens up all projects to look inside and check content.
@@ -61,41 +93,18 @@ pub fn search_projects(dir:LuigiDir, search_term:&str) -> Vec<Project> {
     projects
 }
 
-/// Command LIST [--archive]
-pub fn list_projects(dir:LuigiDir){
+/// Command LIST [--archive, --all]
+pub fn list_projects(dir:LuigiDir, sort:&str){
 
     let luigi = setup_luigi();
     let project_paths = luigi.list_project_files(dir);
-    let mut projects: Vec<Project> = project_paths
-        .iter()
+    let mut projects: Vec<Project> = project_paths.iter()
         .filter_map(|path| Project::open(path).ok())
         .collect();
 
-    projects.sort_by(|pa,pb| pa.index().unwrap_or("zzzz".to_owned()).cmp( &pb.index().unwrap_or("zzzz".to_owned())));
-
-    //print::print_projects(print::simple_rows(&projects));
+    sort_by_(sort, &mut projects);
     let repo = Repo::new(luigi.storage_dir()).unwrap();
     print::print_projects(print::status_rows(&projects,&repo));
-}
-
-/// Command LIST --templates
-pub fn list_templates(){
-    let luigi = setup_luigi();
-    let template_paths = luigi.list_templates();
-
-    for path in template_paths{
-        println!("{}", path.display());
-    }
-}
-
-/// Command LIST --all
-pub fn list_all_projects(){
-    let luigi = setup_luigi();
-    let mut projects: Vec<Project> = luigi.list_all_projects()
-        .iter()
-        .map(|p|Project::open(p).unwrap()).collect() ;
-    projects.sort_by(|pa,pb| pa.index().unwrap_or("zzzz".to_owned()).cmp( &pb.index().unwrap_or("zzzz".to_owned())));
-    print::print_projects(print::simple_rows(&projects));
 }
 
 /// Command LIST --broken
@@ -107,10 +116,20 @@ pub fn list_broken_projects(dir:LuigiDir){
     print::print_projects(print::simple_rows(&projects));
 }
 
+/// Command LIST --templates
+pub fn list_templates(){
+    let luigi = setup_luigi();
+    let template_paths = luigi.list_template_files();
+
+    for path in template_paths{
+        println!("{}", path.display());
+    }
+}
+
 /// Command EDIT
-use itertools::Itertools;
 pub fn edit_project(dir:LuigiDir, search_term:&str, editor:&str){
-    let paths = search_projects(dir, &search_term) .iter()
+    let paths = search_projects(dir, &search_term)
+        .iter()
         .filter_map(|project|
                     project.file().to_str()
                     .map(|s|s.to_owned())
@@ -122,7 +141,7 @@ pub fn edit_project(dir:LuigiDir, search_term:&str, editor:&str){
 
 pub fn edit_template(name:&str, editor:&str){
     let luigi = setup_luigi();
-    let template_paths = luigi.list_templates()
+    let template_paths = luigi.list_template_files()
         .iter()
         .filter(|f|f
                 .file_stem()

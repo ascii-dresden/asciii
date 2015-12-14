@@ -1,10 +1,10 @@
 #![allow(dead_code)]
 #![allow(unused_imports)]
+#![cfg(not(test))]
 extern crate yaml_rust;
 extern crate chrono;
 extern crate regex;
 extern crate slug;
-extern crate itertools;
 extern crate tempdir;
 extern crate term;
 extern crate git2;
@@ -25,6 +25,7 @@ mod cli;
 
 use clap::{App, SubCommand, Arg};
 use manager::LuigiDir;
+use cli::SortOptions;
 
 lazy_static!{
     pub static ref CONFIG: config::ConfigReader = config::ConfigReader::new().unwrap();
@@ -65,6 +66,12 @@ fn main(){
                     .arg( Arg::with_name("archive")
                           .help("list archived projects")
                           .short("a").long("archive")
+                          .takes_value(true))
+
+                    .arg( Arg::with_name("sort")
+                          .help("sort by [date | index | name | manager]")
+                          .short("s").long("sort")
+                          //.possible_values(vec![ String::from("date"), String::from("index"), String::from("name"), String::from("manager") ])
                           .takes_value(true))
 
                     .arg( Arg::with_name("all")
@@ -165,8 +172,6 @@ fn main(){
                           )
                    )
 
-        .subcommand(SubCommand::with_name("status"))
-
         .subcommand(SubCommand::with_name("whoami"))
 
         .get_matches();
@@ -187,19 +192,19 @@ fn main(){
     else if let Some(matches) = matches.subcommand_matches("list") {
         if matches.is_present("templates"){
             cli::list_templates();
-        } else if matches.is_present("all"){
-            cli::list_all_projects();
         } else {
             let dir = if let Some(archive) = matches.value_of("archive"){
                 let archive = archive.parse::<i32>().unwrap();
                 LuigiDir::Archive(archive)
+            } else if matches.is_present("all"){
+                LuigiDir::All
             } else {
                 LuigiDir::Working
             };
             if matches.is_present("broken"){
                 cli::list_broken_projects(dir);
             } else {
-                cli::list_projects(dir);
+                cli::list_projects(dir, matches.value_of("sort").unwrap_or("index"));
             }
         }
     }
@@ -244,11 +249,6 @@ fn main(){
             let editor = CONFIG.get_path("editor").unwrap().as_str().unwrap();
             cli::config_edit(&editor); }
         else if matches.is_present("default"){ cli::config_show_default(); }
-    }
-
-    // command: "status"
-    else if  matches.is_present("status") {
-        cli::status();
     }
 
     // command: "whoami"

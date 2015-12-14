@@ -382,11 +382,11 @@ invoice:
         assert!(errors.is_empty());
     }
 
-    #[test]
-    fn validate_stage4(){
-        let doc = yaml::parse(INVOICE_TEST_DOC).unwrap();
-        assert!(super::validate::payed(&doc));
-    }
+    //#[test]
+    //fn validate_stage4(){
+    //    let doc = yaml::parse(INVOICE_TEST_DOC).unwrap();
+    //    assert!(super::payed::validate(&doc));
+    //}
 
     //#[test]
     //fn validate_stage5(){
