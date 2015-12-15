@@ -51,11 +51,10 @@ fn status(){
 pub enum SortOptions{ Index }
 
 fn sort_by_(option:&str, projects:&mut [Project]){
-    println!("sorting by {}", option);
     match option {
         "manager" => sort_by_manager(projects),
-        "date" => sort_by_date(projects),
-        "name" => sort_by_name(projects),
+        "date"    => sort_by_date(projects),
+        "name"    => sort_by_name(projects),
 
         _ => sort_by_index(projects),
     }
@@ -95,7 +94,6 @@ pub fn search_projects(dir:LuigiDir, search_term:&str) -> Vec<Project> {
 
 /// Command LIST [--archive, --all]
 pub fn list_projects(dir:LuigiDir, sort:&str){
-
     let luigi = setup_luigi();
     let project_paths = luigi.list_project_files(dir);
     let mut projects: Vec<Project> = project_paths.iter()

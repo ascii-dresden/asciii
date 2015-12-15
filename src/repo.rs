@@ -1,10 +1,13 @@
 #![allow(dead_code, unused_variables)]
+use std::fmt;
 use std::path::{Path, PathBuf};
 use std::collections::HashMap;
 
 use git2;
 use git2::*;
 use git2::Error as GitError;
+use term::color;
+use term::color::Color;
 
 use manager::LuigiDir;
 
@@ -15,11 +18,35 @@ pub enum GitStatus{
     Ignored, Conflict, Unknown
 }
 
-impl ToString for GitStatus{
-    fn to_string(&self) -> String{
-        format!("{:?}", self)
+impl GitStatus{
+    pub fn to_color(&self) -> Color {
+        match *self{
+        // => write!(f, "{:?}", self)
+         GitStatus::Unknown         => color::YELLOW,
+         GitStatus::Conflict        => color::RED,
+         GitStatus::WorkingNew      => color::GREEN,
+         GitStatus::WorkingModified => color::YELLOW,
+         _                          => color::BLUE
+        }
     }
 }
+
+impl fmt::Display for GitStatus{
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+
+        match *self{
+        // => write!(f, "{:?}", self)
+         GitStatus::Unknown         => write!(f, " "),
+         GitStatus::Conflict        => write!(f, "✘"),
+         GitStatus::WorkingNew      => write!(f, "✚"),
+         GitStatus::WorkingModified => write!(f, "*"),
+         _                          => write!(f, "{:?}", self),
+
+         //✘ ✔ ✚ ● ❌
+        }
+    }
+}
+
 
 pub struct Repo {
     pub repo: Repository,
@@ -27,7 +54,6 @@ pub struct Repo {
 }
 
 impl Repo{
-
     pub fn new(path:&Path) -> Result<Self, GitError> {
         let repo = try!(Repository::open(path));
         let status = try!(Self::status(&repo));
@@ -76,6 +102,10 @@ impl Repo{
         }
 
         Ok(statuses)
+    }
+
+    pub fn get_status(&self,path:&Path) -> GitStatus{
+        self.status.get(path).unwrap_or(&GitStatus::Unknown).to_owned()
     }
 
     pub fn git_pull(&self) -> Result<(), GitError> {

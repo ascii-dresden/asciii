@@ -190,22 +190,29 @@ fn main(){
 
     // command: "list"
     else if let Some(matches) = matches.subcommand_matches("list") {
+
         if matches.is_present("templates"){
-            cli::list_templates();
-        } else {
-            let dir = if let Some(archive) = matches.value_of("archive"){
-                let archive = archive.parse::<i32>().unwrap();
-                LuigiDir::Archive(archive)
-            } else if matches.is_present("all"){
-                LuigiDir::All
-            } else {
-                LuigiDir::Working
-            };
-            if matches.is_present("broken"){
-                cli::list_broken_projects(dir);
-            } else {
-                cli::list_projects(dir, matches.value_of("sort").unwrap_or("index"));
-            }
+            cli::list_templates(); }
+        else {
+
+        let mut sort = matches.value_of("sort").unwrap_or("index");
+
+        // list archive of year `archive`
+        let dir = if let Some(archive) = matches.value_of("archive"){
+            let archive = archive.parse::<i32>().unwrap();
+            LuigiDir::Archive(archive)
+        }
+
+        // or list all, but sort by date
+        else if matches.is_present("all"){
+            // sort by date on --all of not overriden
+            if !matches.is_present("sort"){ sort = "date" }
+            LuigiDir::All }
+
+        // or list normal
+        else { LuigiDir::Working };
+
+        cli::list_projects(dir, sort);
         }
     }
 

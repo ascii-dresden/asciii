@@ -72,8 +72,8 @@ impl LuigiProject for Project{
     fn index(&self) -> Option<String>{
         if let Some(date) = self.date(){
             spec::invoice::number_str(self.yaml())
-                .map(|num| format!("{}{}", date.format("%Y%m%d").to_string(),num))
-                .or( Some(date.format("zz%Y%m%d").to_string()))
+                .map(|num| format!("{1}{0}", date.format("%Y%m%d").to_string(),num))
+                .or( Some(date.format("zzz%Ym%d").to_string()))
         } else {
             None
         }
@@ -127,8 +127,8 @@ impl Project{
         spec::archive::validate(&self.yaml)
     }
 
-    pub fn errors(&self) -> Vec<&str>{
-        vec![]
+    pub fn age(&self) -> i64 {
+        (Local::today() - self.date()).num_days();
     }
 }
 

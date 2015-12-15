@@ -14,7 +14,10 @@ fn main() {
     // Add style to a cell
     table.add_row(row![FrByb:"ABC", "DEFG", "HIJKLMN"]);
     // Add style to a full row
-    table.add_row(row![FY -> "styled", "bar", "foo"]);
+    table.add_row(row![FY -> "bright", "yellow", "cells"]);
+    table.add_row(row![Fy -> "normal", "yellow", "cells"]);
+    table.add_row(row![By -> "normal", "yellow", "cells"]);
+    table.add_row(row![BY -> "bright", "yellow", "cells"]);
     table.add_row(Row::new(vec![
     		Cell::new("foobar2"),
     		// Create a cell with a red foreground color
