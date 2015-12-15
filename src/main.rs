@@ -33,7 +33,7 @@ lazy_static!{
 
 // TODO: add logging
 // TODO: make better use of io::ErrorKind
-// TODO: remove: asserts!, is_ok(), to_owned() and unwrap()s, stupid :D
+// TODO: remove: to_owned() and unwrap()s, stupid :D
 
 fn main(){
     let matches = App::new("ascii-invoicer")
@@ -43,25 +43,6 @@ fn main(){
         .arg_required_else_help(true)
 
         .subcommand(SubCommand::with_name("list")
-                    //Options:
-                    //  -a, [--archive=N]                    # list archived projects
-                    //      [--archives], [--no-archives]    # lists all years for which there are archives
-                    //      [--all], [--no-all]              # lists all projects, ever
-                    //      [--templates], [--no-templates]  # lists all templates
-                    //  -p, [--paths], [--no-paths]          # list paths to .yml files
-                    //  -b, [--blockers], [--no-blockers]    # list blockers
-                    //  -e, [--errors], [--no-errors]        # list errors
-                    //  -s, [--simple], [--no-simple]        # overrides the verbose setting
-                    //  -c, [--colors], [--no-colors]        # overrides the colors setting # Default: true
-                    //  -f, [--filter=key:value]             # filter by manager, caterer etc (experimental)
-                    //  -n, [--no-colors], [--no-no-colors]  # overrides the colors setting
-                    //  -d, [--details=one two three]        # adds details
-                    //      [--edit=one two three]           # open all listed files for edit
-                    //      [--csv], [--no-csv]              # output as csv
-                    //      [--sort=SORT]                    # sort by [date | index | name | manager] # Possible values: date, index, name, manager
-                    //      [--final], [--no-final]          # list shows final sum
-                    //      [--caterers], [--no-caterers]    # list caterers
-                    //      [--wages], [--no-wages]          # list wages
 
                     .arg( Arg::with_name("archive")
                           .help("list archived projects")
@@ -190,7 +171,6 @@ fn main(){
 
     // command: "list"
     else if let Some(matches) = matches.subcommand_matches("list") {
-
         if matches.is_present("templates"){
             cli::list_templates(); }
         else {

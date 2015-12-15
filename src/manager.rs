@@ -1,6 +1,3 @@
-#![allow(unused_variables)]
-#![allow(dead_code)]
-
 use std::fs;
 use std::io;
 use std::path::{Path, PathBuf};
@@ -9,6 +6,7 @@ use std::collections::HashMap;
 
 use slug;
 use chrono::{Date, UTC};
+use util::yaml::YamlError;
 
 use templater::Templater;
 
@@ -24,7 +22,6 @@ pub enum LuigiDir { Working, Archive(Year), Storage, Templates, All }
 pub enum LuigiSort { Date, Name, Index }
 
 #[derive(Debug)]
-// TODO: Revise LuigiError
 pub enum LuigiError {
     DirectoryDoesNotExist(LuigiDir),
     NoProject,
@@ -33,10 +30,12 @@ pub enum LuigiError {
     ProjectDirExists,
     StoragePathNotAbsolute,
     InvalidDirStructure,
-    ParseError,
+    ParseError(YamlError),
     TemplateNotFound,
     Io(io::Error),
 }
+
+pub type LuigiResult<T> = Result<T, LuigiError>;
 
 // All you need to make try!() fun again
 impl From<io::Error>  for LuigiError {
@@ -65,7 +64,7 @@ pub struct Luigi {
 
 impl Luigi {
     /// Inits luigi, does not check existence, yet. TODO
-    pub fn new(storage:&Path, working:&str, archive:&str, template:&str) -> Result<Luigi, LuigiError> {
+    pub fn new(storage:&Path, working:&str, archive:&str, template:&str) -> LuigiResult<Luigi> {
         Ok( Luigi{ // TODO check for the existence
             storage_dir:  storage.to_path_buf(),
             working_dir:  storage.join(working),
@@ -99,7 +98,7 @@ impl Luigi {
     /// If the directories already exist as expected, that's fine
     /// TODO ought to fail when storage_dir already contains directories that do not correspond
     /// with the names given in this setup.
-    pub fn create_dirs(&self) -> Result<(), LuigiError> {
+    pub fn create_dirs(&self) -> LuigiResult<()> {
         if !self.storage_dir.as_path().is_absolute() { return Err(LuigiError::StoragePathNotAbsolute) }
 
         if !self.storage_dir.exists()  { try!(fs::create_dir(&self.storage_dir));  }
@@ -118,7 +117,7 @@ impl Luigi {
     ///        ├── 2001
     ///    ...
     ///</pre>
-    pub fn create_archive(&self, year:Year) -> Result<PathBuf, LuigiError> {
+    pub fn create_archive(&self, year:Year) -> LuigiResult<PathBuf> {
         assert!(self.archive_dir.exists());
         //TODO there must be something nicer than to_string(), like From<u32> for Path
         let archive = &self.archive_dir.join(year.to_string());
@@ -148,7 +147,7 @@ impl Luigi {
     }
 
     /// Returns the Path to the template file by the given name, maybe.
-    pub fn get_template_file(&self, name:&str) -> Result<PathBuf, LuigiError> {
+    pub fn get_template_file(&self, name:&str) -> LuigiResult<PathBuf> {
         self.list_template_files().iter()
             .filter(|f|f.file_stem().unwrap_or(&OsStr::new("")) == name)
             .cloned()
@@ -179,30 +178,28 @@ impl Luigi {
 
     /// Takes a template file and stores it in the working directory,
     /// in a new project directory according to it's name.
-    pub fn create_project<P:LuigiProject>(&self, project_name:&str, template_name:&str)
-        -> Result<P, LuigiError>
-        {
-            if !self.working_dir.exists(){ return Err(LuigiError::NoWorkingDir)}; // funny syntax
-            let slugged_name = slugify(&project_name);
-            let project_dir  = self.working_dir.join(&slugged_name);
-            if project_dir.exists() { return Err(LuigiError::ProjectDirExists); }
+    pub fn create_project<P:LuigiProject>(&self, project_name:&str, template_name:&str) -> LuigiResult<P> {
+        if !self.working_dir.exists(){ return Err(LuigiError::NoWorkingDir)}; // funny syntax
+        let slugged_name = slugify(&project_name);
+        let project_dir  = self.working_dir.join(&slugged_name);
+        if project_dir.exists() { return Err(LuigiError::ProjectDirExists); }
 
-            let target_file  = project_dir
-                .join(&(slugged_name + "." + PROJECT_FILE_EXTENSION));
+        let target_file  = project_dir
+            .join(&(slugged_name + "." + PROJECT_FILE_EXTENSION));
 
-            let template_path = try!(self.get_template_file(template_name));
-            let mut project = try!(P::new(&project_name, &template_path));
+        let template_path = try!(self.get_template_file(template_name));
+        let mut project = try!(P::new(&project_name, &template_path));
 
-            // TODO test for unreplaced template keywords
-            try!(fs::create_dir(&project_dir));
-            try!(fs::copy(project.file(), &target_file));
-            project.set_file(&target_file);
-            return Ok(project);
-        }
+        // TODO test for unreplaced template keywords
+        try!(fs::create_dir(&project_dir));
+        try!(fs::copy(project.file(), &target_file));
+        project.set_file(&target_file);
+        return Ok(project);
+    }
 
     /// Moves a project folder from `/working` dir to `/archive/$year`.
     //TODO pub fn archive_project<T:LuigiProject>(&self, project:&T) {
-    pub fn archive_project_with_year(&self, name:&str, year:Year) -> Result<PathBuf, LuigiError> {
+    pub fn archive_project_with_year(&self, name:&str, year:Year) -> LuigiResult<PathBuf> {
         let slugged_name = slugify(name);
         let name_in_archive = format!("R000_{}", slugged_name); // TODO use actual index of project as Prefix
 
@@ -219,7 +216,7 @@ impl Luigi {
 
     /// Moves a project folder back from `/archive/$year` to `/working` dir.
     // TODO pub fn unarchive_project<T:LuigiProject>(&self, project:&T) {
-    pub fn unarchive_project_with_year(&self, name:&str, year:Year) -> Result<PathBuf, LuigiError> {
+    pub fn unarchive_project_with_year(&self, name:&str, year:Year) -> LuigiResult<PathBuf> {
         let slugged_name = slugify(name);
         if self.get_project_dir(&slugged_name, LuigiDir::Working).is_some(){
             return Err(LuigiError::ProjectFileExists);
@@ -239,7 +236,6 @@ impl Luigi {
     // TODO make this pathbuf a path
     pub fn get_project_dir(&self, name:&str, directory:LuigiDir) -> Option<PathBuf> {
         let slugged_name = slugify(name); // TODO wrap slugify in a function, so it can be adapted
-        let project_dir = &self.working_dir.join(&slugged_name);
         if let Some(path) = match directory{
             LuigiDir::Working => Some(self.working_dir.join(&slugged_name)),
             LuigiDir::Archive(year) => self.get_project_dir_archive(&name, year),
@@ -255,8 +251,7 @@ impl Luigi {
     /// Locates the project file inside a folder.
     ///
     /// This is the first file with the `PROJECT_FILE_EXTENSION` in the folder
-    // TODO make this private
-    pub fn get_project_file(&self, directory:&Path) -> Option<PathBuf> {
+    fn get_project_file(&self, directory:&Path) -> Option<PathBuf> {
         self.list_path_content(directory)
             .iter()
             .filter(|f|f.extension().unwrap_or(&OsStr::new("")) == PROJECT_FILE_EXTENSION)
@@ -292,6 +287,7 @@ impl Luigi {
 
     /// Produces a list of project files.
     /// **Deprecated**
+    /// TODO make this a byproduct of a validation process
     pub fn list_broken_projects(&self, directory:LuigiDir) -> Vec<PathBuf>{
         self.list_project_folders(directory).iter()
             .filter(|dir| self.get_project_file(dir).is_none())
@@ -309,7 +305,7 @@ impl Luigi {
 
 pub trait LuigiProject{
     /// creates in tempfile
-    fn new(project_name:&str,template:&Path) -> Result<Self,LuigiError> where Self: Sized;
+    fn new(project_name:&str,template:&Path) -> LuigiResult<Self> where Self: Sized;
     fn name(&self) -> String;
     fn date(&self) -> Option<Date<UTC>>;
     fn index(&self) -> Option<String>;
@@ -395,10 +391,7 @@ mod test {
 
     use chrono::*;
     use tempdir::TempDir;
-    use super::{Luigi,
-                    LuigiProject,
-                    LuigiError,
-                    LuigiDir};
+    use super::{Luigi, LuigiProject, LuigiError, LuigiDir};
 
     pub struct TestProject {
         file_path: PathBuf,
@@ -407,7 +400,7 @@ mod test {
 
     impl LuigiProject for TestProject{
         // creates in tempfile
-        fn new(project_name:&str,template:&Path) -> Result<Self,LuigiError> where Self: Sized {
+        fn new(project_name:&str,template:&Path) -> LuigiResult<Self> where Self: Sized {
             // generates a temp file
             let temp_dir  = TempDir::new_in(".",&project_name).unwrap();
             let temp_file = temp_dir.path().join(project_name);

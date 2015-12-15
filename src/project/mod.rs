@@ -1,7 +1,3 @@
-#![allow(unused_variables)]
-#![allow(dead_code)]
-
-
 use std::fs::File;
 use std::io::prelude::*;
 use std::path::{Path, PathBuf};
@@ -28,7 +24,7 @@ pub struct Project {
 }
 
 impl From<yaml::YamlError>  for LuigiError {
-    fn from(yerror: yaml::YamlError) -> LuigiError{ LuigiError::ParseError }
+    fn from(yerror: yaml::YamlError) -> LuigiError{ LuigiError::ParseError(yerror) }
 }
 
 impl LuigiProject for Project{
@@ -127,9 +123,11 @@ impl Project{
         spec::archive::validate(&self.yaml)
     }
 
-    pub fn age(&self) -> i64 {
-        (Local::today() - self.date()).num_days();
+    pub fn age(&self) -> Option<i64> {
+        self.date()
+            .map(|date| (Local::today() - date).num_days() )
     }
+
 }
 
 #[cfg(test)]

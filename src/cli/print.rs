@@ -13,29 +13,10 @@ pub fn print_project(_project:&Project){
     unimplemented!();
 }
 
-pub fn simple_rows(projects:&[Project]) -> Vec<Row>{
-    projects
-        .iter()
-        .map(|project|
-             Row::new(vec![
-                      cell!(project.name()),
-                      cell!(project.manager()),
-                      cell!(project.invoice_num()),
-                      cell!(project.date().unwrap_or(UTC::today())
-                            .format("%d.%m.%Y").to_string()),
-
-                      cell!(project.index().unwrap_or("no_index".into())),
-                      cell!(project.date().map(|d|d.to_string()).unwrap_or("no_date".into())),
-                      //cell!(project.file().display()),
-             ])
-            )
-        .collect()
-}
-
 fn result_to_cell(res:&Result<(), Vec<&str>>) -> Cell{
     match res{
         &Ok(_)           => Cell::new("✓").with_style(Attr::ForegroundColor(color::GREEN)), // ✗
-        &Err(ref errors) => Cell::new("✗").with_style(Attr::ForegroundColor(color::RED))// + &errors.join(", ")
+        &Err(ref _errors) => Cell::new("✗").with_style(Attr::ForegroundColor(color::RED))// + &errors.join(", ")
     }
 }
 
@@ -59,10 +40,29 @@ fn project_to_style<'a>(project:&'a Project) -> &'a str{
     "Fr"
 }
 
-pub fn status_rows(projects:&[Project], repo:&Repo) -> Vec<Row>{
+/// produces the rows used in `print_projects()`
+pub fn simple_rows(projects:&[Project]) -> Vec<Row>{
     projects
         .iter()
-        .enumerate()
+        .map(|project|
+             Row::new(vec![
+                      cell!(project.name()),
+                      cell!(project.manager()),
+                      cell!(project.invoice_num()),
+                      cell!(project.date().unwrap_or(UTC::today())
+                            .format("%d.%m.%Y").to_string()),
+
+                      cell!(project.index().unwrap_or("no_index".into())),
+                      cell!(project.date().map(|d|d.to_string()).unwrap_or("no_date".into())),
+                      //cell!(project.file().display()),
+             ])
+            )
+        .collect()
+}
+
+/// produces the rows used in `print_projects()`
+pub fn status_rows(projects:&[Project], repo:&Repo) -> Vec<Row>{
+    projects.iter().enumerate()
         .map(|(i, project)| {
             let status = repo.get_status(&project.dir());
             let row_style = project_to_style(&project);
@@ -71,7 +71,7 @@ pub fn status_rows(projects:&[Project], repo:&Repo) -> Vec<Row>{
                 Cell::new( &status.to_string() )
                     .with_style( Attr::ForegroundColor(status.to_color()) ),
 
-                cell!(r:i),
+                cell!(r:i+1),
 
                 cell!(project.name())
                     .style_spec(row_style),
@@ -96,7 +96,7 @@ pub fn status_rows(projects:&[Project], repo:&Repo) -> Vec<Row>{
         .collect()
 }
 
-// TODO add this code to prettytable-rs
+/// Prints Projects
 pub fn print_projects(rows:Vec<Row>){
     let mut table = Table::init(rows);
     table.set_format(TableFormat::new(None, None, None));

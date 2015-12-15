@@ -4,16 +4,15 @@
 //! Put as little logic in here as possible.
 //! That makes it easier to derive a pure library version later.
 
-#![allow(unused_variables)]
 use std::path::{Path,PathBuf};
 use std::ffi::OsStr;
+use std::process::exit;
 
 use chrono::UTC;
 
 use config;
 use super::CONFIG;
-use manager::{Luigi,LuigiDir};
-use manager::LuigiProject;
+use manager::{Luigi, LuigiDir, LuigiProject, LuigiResult, LuigiError};
 use project::Project;
 use repo::Repo;
 use util;
@@ -46,6 +45,15 @@ fn status(){
 
     println!("{:#?}", repo.status);
     print::print_projects(print::status_rows(&projects,&repo));
+}
+
+
+/// Execute a command returning a LuigiError
+fn execute<F, S>(command:F) -> S where F: Fn() -> LuigiResult<S> {
+    match command(){
+        Ok(s) => return s,
+        Err(lerr) => { println!("ERROR: {:?}", lerr); exit(1) }
+    }
 }
 
 pub enum SortOptions{ Index }
@@ -173,12 +181,10 @@ pub fn show_template(name:&str){
 /// Command NEW
 pub fn new_project(project_name:&str, template_name:&str, editor:&str, edit:bool){
     let luigi = setup_luigi();
-    let project = luigi.create_project::<Project>(&project_name, &template_name).unwrap();
+    let project = execute(|| luigi.create_project::<Project>(&project_name, &template_name));
     let project_file = project.file();
     let project_path = project_file.parent().unwrap();
-    util::open_in_editor(&editor, vec![project_path.display().to_string()]);
-
-    println!("created?");
+    if edit { util::open_in_editor(&editor, vec![project_path.display().to_string()]); }
 }
 
 /// Command CONFIG --show
