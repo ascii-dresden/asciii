@@ -24,10 +24,12 @@ pub enum LuigiSort { Date, Name, Index }
 #[derive(Debug)]
 pub enum LuigiError {
     DirectoryDoesNotExist(LuigiDir),
+    BadChoice,
     NoProject,
     NoWorkingDir,
     ProjectFileExists,
     ProjectDirExists,
+    ProjectDoesNotExist,
     StoragePathNotAbsolute,
     InvalidDirStructure,
     ParseError(YamlError),
@@ -79,12 +81,12 @@ impl Luigi {
     }
 
     /// Generic Filesystem wrapper.
-    fn list_path_content(&self, path:&Path) -> Vec<PathBuf> {
-        let entries = fs::read_dir(path).unwrap();
-        entries
+    fn list_path_content(&self, path:&Path) -> LuigiResult<Vec<PathBuf>> {
+        let entries = try!(fs::read_dir(path))
             .filter_map(|entry| entry.ok())
             .map(|entry| entry.path())
-            .collect::<Vec<PathBuf>>()
+            .collect::<Vec<PathBuf>>();
+        Ok(entries)
     }
 
     /// Creates the basic dir structure inside the storage directory.
@@ -130,28 +132,32 @@ impl Luigi {
 
     /// Produces a list of files in the `template_dir`
     /// TODO extension `.tyml` currently hardcoded
-    pub fn list_template_files(&self) -> Vec<PathBuf> {
-        self.list_path_content(&self.storage_dir.join(&self.template_dir))
+    pub fn list_template_files(&self) -> LuigiResult<Vec<PathBuf>> {
+        let template_files = 
+        try!(self.list_path_content(&self.storage_dir.join(&self.template_dir)))
             .iter()
             .filter(|p|p.extension().unwrap_or(OsStr::new("")) == OsStr::new("tyml"))
-            .cloned().collect()
+            .cloned().collect();
+        Ok(template_files)
     }
 
     /// Produces a list of names of all template filess in the `template_dir`
-    pub fn list_template_names(&self) -> Vec<String> {
-        self.list_template_files().iter()
+    pub fn list_template_names(&self) -> LuigiResult<Vec<String>> {
+        let template_names = 
+        try!(self.list_template_files()).iter()
             .filter_map(|p|p.file_stem())
             .filter_map(|n|n.to_str())
             .map(|s|s.to_owned())
-            .collect()
+            .collect();
+        Ok(template_names)
     }
 
     /// Returns the Path to the template file by the given name, maybe.
     pub fn get_template_file(&self, name:&str) -> LuigiResult<PathBuf> {
-        self.list_template_files().iter()
+        try!(self.list_template_files()).iter()
             .filter(|f|f.file_stem().unwrap_or(&OsStr::new("")) == name)
             .cloned()
-            .next().ok_or(LuigiError::TemplateNotFound)
+            .nth(0).ok_or(LuigiError::TemplateNotFound)
     }
 
     /// Produces a list of paths to all archives in the `archive_dir`.
@@ -159,21 +165,21 @@ impl Luigi {
     /// therefore it essentially has the same structure as the `working_dir`,
     /// with the difference, that the project folders may be prefixed with the projects index, e.g.
     /// an invoice number etc.
-    pub fn list_archives(&self) -> Vec<PathBuf> {
+    pub fn list_archives(&self) -> LuigiResult<Vec<PathBuf>> {
         self.list_path_content(&self.storage_dir.join(&self.archive_dir))
     }
 
     /// Produces a list of years for which there is an archive.
-    pub fn list_years(&self) -> Vec<Year> {
+    pub fn list_years(&self) -> LuigiResult<Vec<Year>> {
         let mut years : Vec<Year> =
-            self.list_archives()
+            try!(self.list_archives())
             .iter()
             .filter_map(|p| p.file_stem())
             .filter_map(|p| p.to_str())
             .filter_map(|year_str| year_str.parse::<Year>().ok())
             .collect();
         years.sort();
-        years
+        Ok(years)
     }
 
     /// Takes a template file and stores it in the working directory,
@@ -204,9 +210,8 @@ impl Luigi {
         let name_in_archive = format!("R000_{}", slugged_name); // TODO use actual index of project as Prefix
 
         let archive = try!(self.create_archive(year));
-        let project_folder = try!(self.get_project_dir(
-                name, LuigiDir::Working
-                ).ok_or(LuigiError::NoProject));
+        let project_folder = try!(self.get_project_dir( name, LuigiDir::Working));
+        //.ok_or(LuigiError::NoProject));
         let target = archive.join(&name_in_archive);
 
         try!(fs::rename(&project_folder, &target));
@@ -218,10 +223,10 @@ impl Luigi {
     // TODO pub fn unarchive_project<T:LuigiProject>(&self, project:&T) {
     pub fn unarchive_project_with_year(&self, name:&str, year:Year) -> LuigiResult<PathBuf> {
         let slugged_name = slugify(name);
-        if self.get_project_dir(&slugged_name, LuigiDir::Working).is_some(){
+        if self.get_project_dir(&slugged_name, LuigiDir::Working).is_ok(){
             return Err(LuigiError::ProjectFileExists);
         }
-        let archive_dir = try!(self.get_project_dir(&slugged_name, LuigiDir::Archive(year)).ok_or(LuigiError::NoProject));
+        let archive_dir = try!(self.get_project_dir(&slugged_name, LuigiDir::Archive(year)));
         let project_dir = self.working_dir.join(&slugged_name);
         if project_dir.exists() {
             // redundant? sure, but why not :D
@@ -234,72 +239,74 @@ impl Luigi {
 
     /// Tries to find a concrete Project.
     // TODO make this pathbuf a path
-    pub fn get_project_dir(&self, name:&str, directory:LuigiDir) -> Option<PathBuf> {
+    pub fn get_project_dir(&self, name:&str, directory:LuigiDir) -> LuigiResult<PathBuf> {
         let slugged_name = slugify(name); // TODO wrap slugify in a function, so it can be adapted
-        if let Some(path) = match directory{
-            LuigiDir::Working => Some(self.working_dir.join(&slugged_name)),
-            LuigiDir::Archive(year) => self.get_project_dir_archive(&name, year),
-            _ => return None
+        if let Ok(path) = match directory{
+            LuigiDir::Working => Ok(self.working_dir.join(&slugged_name)),
+            LuigiDir::Archive(year) => self.get_project_dir_from_archive(&name, year),
+            _ => return Err(LuigiError::BadChoice)
         }{
             if path.exists(){
-                return Some(path);
+                return Ok(path);
             }
         }
-        None
+        Err(LuigiError::ProjectDoesNotExist)
     }
 
     /// Locates the project file inside a folder.
     ///
     /// This is the first file with the `PROJECT_FILE_EXTENSION` in the folder
-    fn get_project_file(&self, directory:&Path) -> Option<PathBuf> {
-        self.list_path_content(directory)
-            .iter()
+    fn get_project_file(&self, directory:&Path) -> LuigiResult<PathBuf> {
+        try!(self.list_path_content(directory)).iter()
             .filter(|f|f.extension().unwrap_or(&OsStr::new("")) == PROJECT_FILE_EXTENSION)
-            .next().map(|b|b.to_owned())
+            .nth(0).map(|b|b.to_owned())
+            .ok_or(LuigiError::ProjectDoesNotExist)
     }
 
 
-    fn get_project_dir_archive(&self, name:&str, year:Year) -> Option<PathBuf> {
-        for project_file in self.list_project_files(LuigiDir::Archive(year)).iter(){
+    fn get_project_dir_from_archive(&self, name:&str, year:Year) -> LuigiResult<PathBuf> {
+        for project_file in try!(self.list_project_files(LuigiDir::Archive(year))).iter(){
             if project_file.ends_with(slugify(&name) + "."+ PROJECT_FILE_EXTENSION) {
-                return project_file.parent().map(|p|p.to_owned());
+                return project_file.parent().map(|p|p.to_owned()).ok_or(LuigiError::NoProject);
             }
         }
-        None
+        Err(LuigiError::ProjectDoesNotExist)
     }
 
     /// Produces a list of project folders.
-    pub fn list_project_folders(&self, directory:LuigiDir) -> Vec<PathBuf> {
+    pub fn list_project_folders(&self, directory:LuigiDir) -> LuigiResult<Vec<PathBuf>> {
         match directory{
             LuigiDir::Working       => self.list_path_content(&self.working_dir),
             LuigiDir::Archive(year) => self.list_path_content(&self.archive_dir.join(year.to_string())),
             LuigiDir::All           => {
                 let mut all:Vec<PathBuf> = Vec::new();
-                for year in self.list_years(){
-                    all.append(&mut self.list_path_content(&self.archive_dir.join(year.to_string())));
+                for year in try!(self.list_years()){
+                    all.append(&mut try!(self.list_path_content(&self.archive_dir.join(year.to_string()))));
                 }
-                all.append(&mut self.list_path_content(&self.working_dir));
-                all
+                all.append(&mut try!(self.list_path_content(&self.working_dir)));
+                Ok(all)
             },
-            _ => Vec::new()
+            _ => Err(LuigiError::BadChoice)
         }
     }
 
     /// Produces a list of project files.
     /// **Deprecated**
     /// TODO make this a byproduct of a validation process
-    pub fn list_broken_projects(&self, directory:LuigiDir) -> Vec<PathBuf>{
-        self.list_project_folders(directory).iter()
-            .filter(|dir| self.get_project_file(dir).is_none())
+    pub fn list_broken_projects(&self, directory:LuigiDir) -> LuigiResult<Vec<PathBuf>> {
+        let projects = try!(self.list_project_folders(directory)).iter()
+            .filter(|dir| self.get_project_file(dir).is_err())
             .cloned()
-            .collect()
+            .collect();
+        Ok(projects)
     }
 
     /// Produces a list of project files.
-    pub fn list_project_files(&self, directory:LuigiDir) -> Vec<PathBuf> {
-        self.list_project_folders(directory).iter()
-            .filter_map(|dir| self.get_project_file(dir))
-            .collect()
+    pub fn list_project_files(&self, directory:LuigiDir) -> LuigiResult<Vec<PathBuf>> {
+        let projects = try!(self.list_project_folders(directory)).iter()
+            .filter_map(|dir| self.get_project_file(dir).ok())
+            .collect();
+        Ok(projects)
     }
 }
 

@@ -37,7 +37,7 @@ fn status(){
     let luigi = setup_luigi();
     let repo = Repo::new(luigi.storage_dir()).unwrap();
 
-    let project_paths = luigi.list_project_files(LuigiDir::Working);
+    let project_paths = execute(||luigi.list_project_files(LuigiDir::Working));
     let projects: Vec<Project> = project_paths
         .iter()
         .map(|path| Project::open(path).unwrap())
@@ -49,7 +49,8 @@ fn status(){
 
 
 /// Execute a command returning a LuigiError
-fn execute<F, S>(command:F) -> S where F: Fn() -> LuigiResult<S> {
+/// TODO make this a `try!` like macro
+fn execute<F, S>(command:F) -> S where F: FnOnce() -> LuigiResult<S> {
     match command(){
         Ok(s) => return s,
         Err(lerr) => { println!("ERROR: {:?}", lerr); exit(1) }
@@ -91,7 +92,7 @@ fn sort_by_manager(projects:&mut [Project]){
 pub fn search_projects(dir:LuigiDir, search_term:&str) -> Vec<Project> {
     let luigi = setup_luigi();
 
-    let projects: Vec<Project> = luigi.list_project_files(dir)
+    let projects: Vec<Project> = execute(||luigi.list_project_files(dir))
         .iter()
         .map(|path| Project::open(path).unwrap())
         .filter(|project| project.name().to_lowercase().contains(&search_term.to_lowercase()))
@@ -103,7 +104,7 @@ pub fn search_projects(dir:LuigiDir, search_term:&str) -> Vec<Project> {
 /// Command LIST [--archive, --all]
 pub fn list_projects(dir:LuigiDir, sort:&str){
     let luigi = setup_luigi();
-    let project_paths = luigi.list_project_files(dir);
+    let project_paths = execute(||luigi.list_project_files(dir));
     let mut projects: Vec<Project> = project_paths.iter()
         .filter_map(|path| Project::open(path).ok())
         .collect();
@@ -116,7 +117,7 @@ pub fn list_projects(dir:LuigiDir, sort:&str){
 /// Command LIST --broken
 pub fn list_broken_projects(dir:LuigiDir){
     let luigi = setup_luigi();
-    let projects: Vec<Project> = luigi.list_broken_projects(dir)
+    let projects: Vec<Project> = execute(||luigi.list_broken_projects(dir))
         .iter()
         .map(|p|Project::open(p).unwrap()).collect() ;
     print::print_projects(print::simple_rows(&projects));
@@ -125,7 +126,7 @@ pub fn list_broken_projects(dir:LuigiDir){
 /// Command LIST --templates
 pub fn list_templates(){
     let luigi = setup_luigi();
-    let template_paths = luigi.list_template_files();
+    let template_paths = execute(||luigi.list_template_files());
 
     for path in template_paths{
         println!("{}", path.display());
@@ -147,7 +148,7 @@ pub fn edit_project(dir:LuigiDir, search_term:&str, editor:&str){
 
 pub fn edit_template(name:&str, editor:&str){
     let luigi = setup_luigi();
-    let template_paths = luigi.list_template_files()
+    let template_paths = execute(||luigi.list_template_files())
         .iter()
         .filter(|f|f
                 .file_stem()
