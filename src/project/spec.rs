@@ -315,14 +315,41 @@ pub mod products{
     use util::yaml;
     use util::yaml::Yaml;
     use std::collections::BTreeMap;
+    use project::product::{Product, InvoiceItem, ProductUnit};
 
-    pub fn all(yaml:&Yaml) -> Option<Vec<Yaml>>{
+    pub fn all(yaml:&Yaml) -> Option<Vec<InvoiceItem>>{
         yaml::get_hash(yaml, "products")
-            .map(|h|h
-            .keys()
-            .cloned()
-            .collect()
-            )
+            .map(|hmap| hmap.iter()
+                 .map(|(desc,values)|{
+                     let product =
+                         match *desc {
+                             yaml::Yaml::Hash(_) => {
+                                 Product{
+                                     name:  yaml::get_str(desc, "name").unwrap_or("unnamed"),
+                                     unit:  yaml::get_str(desc, "unit"),
+                                     price: yaml::get_f64(desc, "price").unwrap_or(0.0),
+                                     tax:   yaml::get_f64(desc, "tax").unwrap_or(0.19),
+                                 }
+                             },
+                             yaml::Yaml::String(ref name) => {
+                                 Product{
+                                     name:  name,
+                                     unit:  yaml::get_str(values, "unit"),
+                                     price: yaml::get_f64(values, "price").unwrap_or(0.0),
+                                     tax:   yaml::get_f64(values, "tax").unwrap_or(0.19),
+                                 }
+                             }
+                             _ => unreachable!()
+                         };
+                     InvoiceItem {
+                         amount_offered: yaml::get_f64(values, "amount").unwrap_or(0f64),
+                         amount_sold: yaml::get_f64(values, "").unwrap_or(0f64),
+                         item: product
+                     }
+
+                 })
+                 .collect::<Vec<InvoiceItem>>()
+                )
     }
 }
 

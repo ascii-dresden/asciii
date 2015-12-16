@@ -6,7 +6,7 @@ authors = ["Hendrik Sollich <hendrik@hoodie.de>"]
 [dependencies]
 
 #csv = "*"
-yaml-rust = "*"
+yaml-rust = {git="https://github.com/chyh1990/yaml-rust/", branch="alias"}
 chrono = "*"
 regex = "*"
 slug = "*"

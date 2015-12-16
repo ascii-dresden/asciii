@@ -29,6 +29,8 @@ fn main(){
         println!("LastName:  {:?}", spec::client::last_name(&yaml));
         println!("Client:    {:?}", spec::client::addressing(&yaml, config));
         println!("--------------");
+        println!("Products:  {:?}", spec::products::all(&yaml).unwrap());
+        println!("--------------");
     }
 
     //println!("Products: {:#?}", spec::products::all(new_project.yaml()));

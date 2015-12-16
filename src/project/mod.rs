@@ -14,6 +14,7 @@ use util::yaml::YamlError;
 use manager::{LuigiProject, LuigiError};
 use templater::Templater;
 
+pub mod product;
 pub mod spec;
 use self::spec::SpecResult;
 
@@ -127,7 +128,6 @@ impl Project{
         self.date()
             .map(|date| (Local::today() - date).num_days() )
     }
-
 }
 
 #[cfg(test)]
