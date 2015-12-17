@@ -8,6 +8,7 @@ extern crate slug;
 extern crate tempdir;
 extern crate term;
 extern crate git2;
+extern crate currency;
 #[macro_use] extern crate prettytable;
 #[macro_use] extern crate lazy_static;
 #[macro_use] extern crate maplit;

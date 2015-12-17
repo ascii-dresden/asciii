@@ -1,3 +1,5 @@
+use currency::Currency;
+
 pub enum ProductUnit {
     Piece, Liter, Hour, Kilogramm, Gramm, None
 }
@@ -7,7 +9,7 @@ pub struct Product<'a> {
     pub name: &'a str,
     pub unit: Option<&'a str>,
     pub tax: f64,
-    pub price: f64 //TODO make this a currency
+    pub price: Currency
 }
 
 impl<'a> Product<'a> {

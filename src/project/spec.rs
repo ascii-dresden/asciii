@@ -316,6 +316,19 @@ pub mod products{
     use util::yaml::Yaml;
     use std::collections::BTreeMap;
     use project::product::{Product, InvoiceItem, ProductUnit};
+    use currency::Currency;
+
+    fn get_currency(f:f64) -> Currency {
+        // TODO take symbol from config
+        println!("{:?}", f);
+        Currency::from_string(&format!("{:.*}", 2, f))
+            .map_or( Currency(Some('€'), 0),
+            |mut cur| {
+                cur.0 = Some('€');
+                cur
+            }
+            )
+    }
 
     pub fn all(yaml:&Yaml) -> Option<Vec<InvoiceItem>>{
         yaml::get_hash(yaml, "products")
@@ -327,7 +340,9 @@ pub mod products{
                                  Product{
                                      name:  yaml::get_str(desc, "name").unwrap_or("unnamed"),
                                      unit:  yaml::get_str(desc, "unit"),
-                                     price: yaml::get_f64(desc, "price").unwrap_or(0.0),
+                                     price: yaml::get_f64(desc, "price")
+                                         .map(get_currency).unwrap(),
+                                         //.map(get_currency).unwrap_or( Currency(Some('€'), -1)),
                                      tax:   yaml::get_f64(desc, "tax").unwrap_or(0.19),
                                  }
                              },
@@ -335,7 +350,9 @@ pub mod products{
                                  Product{
                                      name:  name,
                                      unit:  yaml::get_str(values, "unit"),
-                                     price: yaml::get_f64(values, "price").unwrap_or(0.0),
+                                     price: yaml::get_f64(values, "price")
+                                         .map(get_currency).unwrap(),
+                                         //.map(get_currency).unwrap_or( Currency(Some('€'), -1)),
                                      tax:   yaml::get_f64(values, "tax").unwrap_or(0.19),
                                  }
                              }

@@ -32,13 +32,16 @@ impl LuigiProject for Project{
     fn new(project_name:&str,template:&Path) -> Result<Project,LuigiError> {
         let template_name = template.file_stem().unwrap().to_str().unwrap();
 
+        let event_date = (Local::today() + Duration::days(14)).format("%d.%m.%Y").to_string();
+        let created_date = Local::today().format("%d.%m.%Y").to_string();
+
         // fill template with this data
         let data = &hashmap!{
             "VERSION"       => "3.0.0-alpha",
             "TEMPLATE"      => template_name,
             "PROJECT-NAME"  => project_name,
-            "DATE-EVENT"    => "11.11.2011",
-            "DATE-CREATED"  => "11.11.2011",
+            "DATE-EVENT"    => &event_date,
+            "DATE-CREATED"  => &created_date,
             "SALARY"        => "8.0", //super::CONFIG.get_as_str("defaults/salery"),
             "MANAGER"       => super::CONFIG.get_str("manager_name")
         };

@@ -156,7 +156,7 @@ defaults:
         - "Wir bitten um eine Begleichung des Betrags innerhalb von 14 Tagen nach Erhalt der Rechnung."
       signature: Mit freundlichen Grüßen
 
-currency: "eur" # see gem "money"
+currency: "€" # see gem "money"
 
 gender_matches:
   herr: male
