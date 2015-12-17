@@ -67,8 +67,9 @@ pub fn get_bool<'a>(yaml:&'a Yaml, key:&str) -> Option<bool> {
     get(&yaml,&key).and_then(|y|y.as_bool())
 }
 
+// also takes a Yaml::I64 and reinterprets it
 pub fn get_f64<'a>(yaml:&'a Yaml, key:&str) -> Option<f64> {
-    get(&yaml,&key).and_then(|y|y.as_f64())
+    get(&yaml,&key).and_then(|y| y.as_f64().or( y.as_i64().map(|y|y as f64)))
 }
 
 pub fn get_int<'a>(yaml:&'a Yaml, key:&str) -> Option<i64> {
