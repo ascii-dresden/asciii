@@ -1,6 +1,5 @@
 #![allow(dead_code)]
 #![allow(unused_imports)]
-#![cfg(not(test))]
 extern crate yaml_rust;
 extern crate chrono;
 extern crate regex;
@@ -17,26 +16,24 @@ extern crate currency;
 mod util;
 mod config;
 
-mod project;
-mod manager;
+pub mod project;
+pub mod manager;
 mod repo;
 
 mod templater;
-mod cli;
+pub mod cli;
 
 use clap::{App, SubCommand, Arg};
 use manager::LuigiDir;
-use cli::SortOptions;
+
+pub use project::spec;
 
 lazy_static!{
     pub static ref CONFIG: config::ConfigReader = config::ConfigReader::new().unwrap();
 }
 
+
 // TODO: add logging
 // TODO: make better use of io::ErrorKind
-// TODO: remove: to_owned() and unwrap()s, stupid :D
-
-fn main(){
-    cli::app();
-}
+// TODO: remove: asserts!, is_ok(), to_owned() and unwrap()s, stupid :D
 
