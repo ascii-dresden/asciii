@@ -13,7 +13,7 @@ slug = "*"
 clap = "*"
 term = "*"
 prettytable-rs = "*"
-currency = {git="https://github.com/hoodie/rust-lang-currency/"}
+currency = {git="https://github.com/hoodie/rust-lang-currency"}
 lazy_static = "*"
 maplit = "*"
 tempdir = "*"

@@ -39,7 +39,7 @@ impl fmt::Display for GitStatus{
          GitStatus::Unknown         => write!(f, " "),
          GitStatus::Conflict        => write!(f, "✘"),
          GitStatus::WorkingNew      => write!(f, "✚"),
-         GitStatus::WorkingModified => write!(f, "*"),
+         GitStatus::WorkingModified => write!(f, "~"),
          _                          => write!(f, "{:?}", self),
 
          //✘ ✔ ✚ ● ❌

@@ -78,6 +78,10 @@ pub fn status_rows(projects:&[Project], repo:&Repo) -> Vec<Row>{
                 // Hendrik Sollich
                 cell!(project.manager())
                     .style_spec(row_style),
+
+                // sort index
+                //cell!(project.index().unwrap_or(String::from(""))),
+
                 // R042
                 cell!(project.invoice_num())
                     .style_spec(row_style),
@@ -90,6 +94,9 @@ pub fn status_rows(projects:&[Project], repo:&Repo) -> Vec<Row>{
                 result_to_cell(&project.valid_stage2()),
                 result_to_cell(&project.valid_stage3()),
 
+                //cell!(project.sum_invoice().map(|i|i.to_string()).unwrap_or(String::from("none"))),
+                //cell!(project.wages().map(|i|i.to_string()).unwrap_or(String::from("none"))),
+                cell!(project.sum_sold_and_wages().map(|i|i.to_string()).unwrap_or(String::from("none"))),
             ];
             Row::new(cells)
         })
@@ -101,4 +108,29 @@ pub fn print_projects(rows:Vec<Row>){
     let mut table = Table::init(rows);
     table.set_format(TableFormat::new(None, None, None));
     table.printstd();
+}
+
+pub fn show_items(project:&Project){
+
+    println!("{}", project.name());
+
+    let mut table = Table::new();
+    table.set_format(TableFormat::new(None, None, None));
+    for item in project.invoice_items().unwrap().iter(){
+        table.add_row( Row::new(vec![
+                                Cell::new(item.item.name),
+                                Cell::new(&item.amount_sold.to_string()),
+                                Cell::new(&item.item.price.to_string()),
+                                Cell::new(&(item.item.price * item.amount_sold).to_string()),
+        ]));
+    }
+    table.printstd();
+    println!("{}", project.sum_sold().unwrap());
+    println!("{}", project.tax_sold().unwrap());
+    println!("{}", project.sum_sold_and_taxes().unwrap());
+    println!("{}", project.sum_sold_and_wages().unwrap());
+
+    //println!("{}", project.sum_offered().unwrap());
+    //println!("{}", project.tax_offered().unwrap());
+
 }

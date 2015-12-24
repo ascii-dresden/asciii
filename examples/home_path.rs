@@ -1,7 +1,7 @@
 use std::path::Path;
 use std::path::PathBuf;
-use std::fs::Metadata;
-use std::ffi::OsString;
+//use std::fs::Metadata;
+//use std::ffi::OsString;
 
 fn replace_home_tilde(p:&Path) -> PathBuf{
     let path = p.to_str().unwrap();

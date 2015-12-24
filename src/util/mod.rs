@@ -8,10 +8,34 @@ pub use self::keyword_replacement::IsKeyword;
 
 pub mod yaml;
 
+
+pub fn freeze() {
+    let mut _devnull = String::new();
+    let _ = io::stdin().read_line(&mut _devnull);
+}
+
+pub fn ls(path:&str){
+    use std::process::Command;
+    println!("tree {}", path);
+    let output = Command::new("tree")
+        .arg(&path)
+        .output()
+        .unwrap_or_else(|e| { panic!("failed to execute process: {}", e) });
+    println!("{}", String::from_utf8(output.stdout).unwrap());
+}
+
 /// TODO add something like this to the stdlib
 pub fn replace_home_tilde(p:&Path) -> PathBuf{
     let path = p.to_str().unwrap();
     PathBuf::from( path.replace("~",home_dir().unwrap().to_str().unwrap()))
+}
+
+#[export_macro]
+macro_rules! try_some {
+    ($expr:expr) => (match $expr {
+        Some(val) => val,
+        None => return None,
+    });
 }
 
 use std::process::Command;

@@ -7,6 +7,7 @@ use chrono::*;
 use yaml_rust::Yaml;
 use tempdir::TempDir;
 use slug;
+use currency::Currency;
 
 use util;
 use util::yaml;
@@ -17,6 +18,7 @@ use templater::Templater;
 pub mod product;
 pub mod spec;
 use self::spec::SpecResult;
+use self::spec::products::{ProductError,ProductResult};
 
 pub struct Project {
     file_path: PathBuf,
@@ -24,7 +26,7 @@ pub struct Project {
     yaml: Yaml
 }
 
-impl From<yaml::YamlError>  for LuigiError {
+impl From<yaml::YamlError> for LuigiError {
     fn from(yerror: yaml::YamlError) -> LuigiError{ LuigiError::ParseError(yerror) }
 }
 
@@ -42,7 +44,7 @@ impl LuigiProject for Project{
             "PROJECT-NAME"  => project_name,
             "DATE-EVENT"    => &event_date,
             "DATE-CREATED"  => &created_date,
-            "SALARY"        => "8.0", //super::CONFIG.get_as_str("defaults/salery"),
+            "SALARY"        => "8.0", //super::CONFIG.get_as_str("defaults/salary"),
             "MANAGER"       => super::CONFIG.get_str("manager_name")
         };
 
@@ -73,7 +75,7 @@ impl LuigiProject for Project{
         if let Some(date) = self.date(){
             spec::invoice::number_str(self.yaml())
                 .map(|num| format!("{1}{0}", date.format("%Y%m%d").to_string(),num))
-                .or( Some(date.format("zzz%Ym%d").to_string()))
+                .or( Some(date.format("zzz%Y%m%d").to_string()))
         } else {
             None
         }
@@ -131,6 +133,50 @@ impl Project{
         self.date()
             .map(|date| (Local::today() - date).num_days() )
     }
+
+    pub fn invoice_items(&self) -> ProductResult<Vec<product::InvoiceItem>> {
+        spec::products::all(self.yaml())
+    }
+
+    pub fn wages(&self) -> Option<Currency> {
+        if let (Some(total), Some(salary)) = (spec::hours::total(&self.yaml), spec::hours::salary(&self.yaml)){
+            Some(total * salary)
+        } else{None}
+    }
+
+    pub fn sum_offered(&self) -> Option<Currency> {
+        spec::products::all(self.yaml()).ok() .map(|products| spec::products::sum_offered(&products))
+    }
+
+    pub fn sum_sold(&self) -> Option<Currency> {
+        spec::products::all(self.yaml()).ok()
+            .map(|products| spec::products::sum_sold(&products))
+    }
+
+    pub fn tax_offered(&self) -> Option<Currency> {
+        spec::products::all(self.yaml()).ok()
+            .map(|products| spec::products::sum_offered(&products))
+            .map(|sum| sum * 0.19)
+    }
+
+    pub fn tax_sold(&self) -> Option<Currency> {
+        spec::products::all(self.yaml()).ok()
+            .map(|products| spec::products::sum_sold(&products))
+            .map(|sum| sum * 0.19)
+    }
+
+    pub fn sum_sold_and_taxes(&self) -> Option<Currency> {
+        if let (Some(wages), Some(tax), Some(sum)) = (self.wages(), self.tax_sold(), self.sum_sold()){
+            Some(sum+tax)
+        } else{ None }
+    }
+
+    pub fn sum_sold_and_wages(&self) -> Option<Currency> {
+        if let (Some(wages), Some(tax), Some(sum)) = (self.wages(), self.tax_sold(), self.sum_sold()){
+            Some(wages+sum+tax)
+        } else{ None }
+    }
+
 }
 
 #[cfg(test)]

@@ -1,6 +1,20 @@
 #![allow(dead_code)]
 
+use currency::Currency;
+
 pub type SpecResult<'a> = Result<(), Vec<&'a str>>;
+
+
+//TODO there may be cases where an f64 can't be converted into Currency
+fn to_currency(f:f64) -> Currency {
+    Currency::from_string(&format!("{:.*}", 2, f))
+        .map_or( Currency(Some('€'), 0),
+        |mut cur| {
+            cur.0 = Some('€');
+            cur
+        }
+        )
+}
 
 pub mod validate{
     use util::yaml;
@@ -29,6 +43,7 @@ pub mod project{
     use util::yaml;
     use util::yaml::Yaml;
     use chrono::{Date,UTC};
+    use super::hours;
 
     pub fn name(yaml:&Yaml) -> Option<&str>{
         yaml::get_str(yaml, "event/name")
@@ -54,16 +69,12 @@ pub mod project{
         yaml::get_bool(yaml, "canceled").unwrap_or(false)
     }
 
-    pub fn salary(yaml:&Yaml) -> Option<f64>{
-        yaml::get_f64(yaml, "hours/salary")
-    }
-
     pub fn validate(yaml:&Yaml) -> bool{
         name(&yaml).is_some() &&
         date(&yaml).is_some() &&
         manager(&yaml).is_some() &&
         format(&yaml).is_some() &&
-        salary(&yaml).is_some()
+        hours::salary(&yaml).is_some()
     }
 }
 
@@ -220,7 +231,6 @@ pub mod offer{
     }
 
     pub fn validate(yaml:&Yaml) -> super::SpecResult {
-        // TODO validate products
         let mut errors = super::validate::existence(&yaml, vec![
                  "offer/date",
                  "offer/appendix",
@@ -286,9 +296,14 @@ pub mod archive{
 }
 
 pub mod hours {
+    use currency::Currency;
     use util::yaml;
     use util::yaml::Yaml;
+    use super::to_currency;
 
+    pub fn salary(yaml:&Yaml) -> Option<Currency>{
+        yaml::get_f64(yaml, "hours/salary").map(to_currency)
+    }
 
     pub fn total(yaml:&Yaml) -> Option<f64> {
         caterers(&yaml).map(|vec|vec.iter()
@@ -312,68 +327,124 @@ pub mod hours {
 }
 
 pub mod products{
+    use std::collections::BTreeMap;
+    use currency::Currency;
     use util::yaml;
     use util::yaml::Yaml;
-    use std::collections::BTreeMap;
     use project::product::{Product, InvoiceItem, ProductUnit};
-    use currency::Currency;
+    use super::to_currency;
 
-    fn get_currency(f:f64) -> Currency {
-        // TODO take symbol from config
-        println!("{:?}", f);
-        Currency::from_string(&format!("{:.*}", 2, f))
-            .map_or( Currency(Some('€'), 0),
-            |mut cur| {
-                cur.0 = Some('€');
-                cur
-            }
-            )
+    #[derive(Debug, PartialEq, Eq)]
+    pub enum ProductError{
+        //DuplicateProduct // not an error
+        AmbiguousAmounts(String),
+        MissingAmount(String),
+        TooMuchReturned(String),
+        UnknownFormat
     }
 
-    pub fn all(yaml:&Yaml) -> Option<Vec<InvoiceItem>>{
+    pub type ProductResult<T> = Result<T, ProductError>;
+
+    fn build_product<'a>(desc: &'a Yaml, values: &'a Yaml) -> ProductResult<Product<'a>> {
+        let default_tax = 0.19;
+        match *desc {
+            yaml::Yaml::Hash(_) => {
+                Ok(Product{
+                    name:  yaml::get_str(desc, "name").unwrap_or("unnamed"),
+                    unit:  yaml::get_str(desc, "unit"),
+                    price: yaml::get_f64(desc, "price")
+                        .map(to_currency).unwrap(),
+                    tax:   yaml::get_f64(desc, "tax").unwrap_or(default_tax),
+                })
+            },
+            yaml::Yaml::String(ref name) => {
+                Ok(Product{
+                    name:  name,
+                    unit:  yaml::get_str(values, "unit"),
+                    price: yaml::get_f64(values, "price")
+                        .map(to_currency).unwrap(),
+                    tax:   yaml::get_f64(values, "tax").unwrap_or(default_tax),
+                })
+            }
+            _ => Err(ProductError::UnknownFormat)
+        }
+    }
+
+    fn build_invoice_item<'a>(product:Product<'a>, values:&'a Yaml) -> ProductResult<InvoiceItem<'a>> {
+        let offered = try!(yaml::get_f64(values, "amount").ok_or(ProductError::MissingAmount(product.name.to_owned())));
+        let sold = yaml::get_f64(values, "sold");
+        let sold =
+            if let Some(returned) = yaml::get_f64(values, "returned"){
+                // if "returned", there must be no "sold"
+                if sold.is_some() {return Err(ProductError::AmbiguousAmounts(product.name.to_owned()));}
+                if returned > offered {return Err(ProductError::TooMuchReturned(product.name.to_owned()));}
+                offered - returned
+            } else if let Some(sold) = sold {
+                sold
+            } else {
+                offered
+            };
+
+        Ok(InvoiceItem {
+            amount_offered: offered,
+            amount_sold: sold,
+            item: product
+        })
+    }
+
+    pub fn all0(yaml:&Yaml) -> Vec<ProductResult<InvoiceItem>>{
         yaml::get_hash(yaml, "products")
             .map(|hmap| hmap.iter()
                  .map(|(desc,values)|{
-                     let product =
-                         match *desc {
-                             yaml::Yaml::Hash(_) => {
-                                 Product{
-                                     name:  yaml::get_str(desc, "name").unwrap_or("unnamed"),
-                                     unit:  yaml::get_str(desc, "unit"),
-                                     price: yaml::get_f64(desc, "price")
-                                         .map(get_currency).unwrap(),
-                                         //.map(get_currency).unwrap_or( Currency(Some('€'), -1)),
-                                     tax:   yaml::get_f64(desc, "tax").unwrap_or(0.19),
-                                 }
-                             },
-                             yaml::Yaml::String(ref name) => {
-                                 Product{
-                                     name:  name,
-                                     unit:  yaml::get_str(values, "unit"),
-                                     price: yaml::get_f64(values, "price")
-                                         .map(get_currency).unwrap(),
-                                         //.map(get_currency).unwrap_or( Currency(Some('€'), -1)),
-                                     tax:   yaml::get_f64(values, "tax").unwrap_or(0.19),
-                                 }
-                             }
-                             _ => unreachable!()
-                         };
-                     InvoiceItem {
-                         amount_offered: yaml::get_f64(values, "amount").unwrap_or(0f64),
-                         amount_sold: yaml::get_f64(values, "").unwrap_or(0f64),
-                         item: product
-                     }
-
-                 })
-                 .collect::<Vec<InvoiceItem>>()
-                )
+                     build_product(&desc, &values)
+                         .and_then(|product|
+                              build_invoice_item(product, values))
+                 }
+                 ).collect::<Vec< ProductResult<InvoiceItem> >>())
+            .unwrap_or(Vec::new())
     }
+
+    pub fn all(yaml:&Yaml) -> ProductResult<Vec<InvoiceItem>>{
+        let products = yaml::get_hash(yaml, "products").ok_or(ProductError::UnknownFormat).map(|products|
+        products.iter()
+                 .map(|(desc,values)|
+                     build_product(&desc, &values)
+                     .and_then(|product| build_invoice_item(product, &values))
+                 ).collect::<Vec< ProductResult<InvoiceItem> >>());
+        let mut list = Vec::new();
+
+        // Why can't I do this with mapping?
+        for product in try!(products){
+            match product{
+                Ok(item) => list.push(item),
+                Err(err) => return Err(err)
+            }
+        }
+        Ok(list)
+    }
+
+    pub fn sum_offered(items:&[InvoiceItem]) -> Currency{
+        items.iter()
+             .fold(Currency(Some('€'), 0),
+             |acc, item| acc + item.item.price * item.amount_offered)
+    }
+
+    pub fn sum_sold(items:&[InvoiceItem]) -> Currency{
+        items.iter()
+             .fold(Currency(Some('€'), 0),
+             |acc, item| acc + item.item.price * item.amount_sold)
+    }
+
 }
 
 #[cfg(test)]
 mod tests{
     use util::yaml;
     use util::yaml::YamlError;
+    use currency::Currency;
+
+    use super::products::ProductResult;
+    use super::products::ProductError;
 
 static CLIENT_TEST_DOC:&'static str =
 r#"
@@ -426,11 +497,84 @@ invoice:
         assert!(errors.is_empty());
     }
 
-    //#[test]
-    //fn validate_stage4(){
-    //    let doc = yaml::parse(INVOICE_TEST_DOC).unwrap();
-    //    assert!(super::payed::validate(&doc));
-    //}
+static PRODUCT_TEST_DOC_VALID:&'static str =
+r#"
+---
+cataloge:
+  product: &coffee    { name: Kaffee, price: 2.5, unit: 1l  }
+  product: &tea       { name: Tee,    price: 2.5, unit: 1l  }
+  product: &water     { name: Wasser, price: 2.5, unit: 1l  }
+
+products:
+  *coffee: { amount: 5 }
+  *tea: { amount: 6, sold: 2 }
+  *water:
+    amount: 6
+    returned: 4
+...
+"#;
+
+static PRODUCT_TEST_DOC_INVALID1:&'static str =
+r#"
+--- # sold and returend
+cataloge:
+  product: &tea       { name: Tee,    price: 2.5, unit: 1l  }
+products:
+  *tea: { amount: 6, sold: 2, returned: 4 }
+...
+"#;
+
+static PRODUCT_TEST_DOC_INVALID2:&'static str =
+r#"
+--- # returning too much
+cataloge:
+  product: &tea { name: Tee, price: 2.5, unit: 1l }
+products:
+  *tea: { amount: 6, returned: 7 }
+...
+"#;
+
+static PRODUCT_TEST_DOC_INVALID3:&'static str =
+r#"
+--- # returning too much
+cataloge:
+  product: &tea { name: Tee, price: 2.5, unit: 1l }
+products:
+  *tea: { returned: 7 }
+...
+"#;
+
+#[test]
+fn validate_products(){
+    let doc = yaml::parse(PRODUCT_TEST_DOC_VALID).unwrap();
+
+    println!("{:#?}",doc);
+    let products = super::products::all(&doc).unwrap();
+    println!("Products {:#?}",products);
+    assert_eq!(products[0].item.name, "Kaffee");
+    assert_eq!(products[0].amount_offered, 5f64);
+    assert_eq!(products[0].amount_sold, 5f64);
+    assert_eq!(products[0].cost_before_tax(), Currency(Some('€'), 1250));
+    assert_eq!(products[0].cost_after_tax(), Currency(Some('€'), 1487));
+
+    assert_eq!(products[1].item.name, "Tee");
+    assert_eq!(products[1].amount_offered, 6f64);
+    assert_eq!(products[1].amount_sold, 2f64);
+
+    assert_eq!(products[2].item.name, "Wasser");
+    assert_eq!(products[2].amount_offered, 6f64);
+    assert_eq!(products[2].amount_sold, 2f64);
+}
+
+#[test]
+fn validate_invalid_products(){
+    let invalid1= yaml::parse(PRODUCT_TEST_DOC_INVALID1).unwrap();
+    let invalid2= yaml::parse(PRODUCT_TEST_DOC_INVALID2).unwrap();
+    let invalid3= yaml::parse(PRODUCT_TEST_DOC_INVALID3).unwrap();
+    assert_eq!( super::products::all(&invalid1).unwrap_err(), ProductError::AmbiguousAmounts("Tee".to_owned()));
+    assert_eq!( super::products::all(&invalid2).unwrap_err(), ProductError::TooMuchReturned("Tee".to_owned()));
+    assert_eq!( super::products::all(&invalid3).unwrap_err(), ProductError::MissingAmount("Tee".to_owned()));
+}
 
     //#[test]
     //fn validate_stage5(){

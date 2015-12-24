@@ -351,7 +351,7 @@ mod realworld {
         //luigi.create_dirs().unwrap();
         assert_existens(&storage_path);
 
-        let templates = luigi.list_template_files();
+        let templates = luigi.list_template_files().unwrap();
         println!("{:#?}",templates);
         assert!(templates.len() == 3);
     }
@@ -359,10 +359,10 @@ mod realworld {
     #[test]
     #[ignore]
     fn list_archives(){
-        let (storage_path, luigi) = setup();
+        let (_storage_path, luigi) = setup();
         assert!(luigi.create_dirs().is_ok());
 
-        let mut archives = luigi.list_archives();
+        let mut archives = luigi.list_archives().unwrap();
         archives.sort();
         println!("ARCHIVES\n{:#?}", archives);
 
@@ -375,10 +375,10 @@ mod realworld {
     #[test]
     #[ignore]
     fn list_project_folders(){
-        let (storage_path, luigi) = setup();
+        let (_storage_path, luigi) = setup();
         assert!(luigi.create_dirs().is_ok());
 
-        let projects = luigi.list_project_files(LuigiDir::Archive(2015));
+        //let projects = luigi.list_project_files(LuigiDir::Archive(2015));
         let projects = luigi.list_project_files(LuigiDir::Working);
         println!("Projects");
         for p in projects{
@@ -398,7 +398,7 @@ mod test {
 
     use chrono::*;
     use tempdir::TempDir;
-    use super::{Luigi, LuigiProject, LuigiError, LuigiDir};
+    use super::{Luigi, LuigiProject, LuigiResult, LuigiError, LuigiDir};
 
     pub struct TestProject {
         file_path: PathBuf,
@@ -476,7 +476,7 @@ mod test {
 
         copy_template(storage_path.join("templates"));
 
-        let templates = luigi.list_template_files();
+        let templates = luigi.list_template_files().unwrap();
         println!("{:#?}",templates);
         assert!(templates.len() == 2);
 
@@ -491,7 +491,7 @@ mod test {
 
         copy_template(storage_path.join("templates"));
         let template_path = luigi.get_template_file("template1").unwrap();
-        let test_p = TestProject::new("testproject", &template_path).unwrap();
+        TestProject::new("testproject", &template_path).unwrap();
     }
 
     #[test]
@@ -517,8 +517,8 @@ mod test {
         luigi.create_archive(1999).unwrap();
         util::ls(&_dir.path().to_string_lossy());
 
-        let mut archives = luigi.list_archives();
-        let mut years = luigi.list_years();
+        let mut archives = luigi.list_archives().unwrap();
+        let mut years = luigi.list_years().unwrap();
         archives.sort();
         years.sort();
         println!("ARCHIVES\n{:#?}", archives);
@@ -543,7 +543,7 @@ mod test {
         assert_existens(&storage_path);
         copy_template(storage_path.join("templates"));
 
-        let templates = luigi.list_template_names();
+        let templates = luigi.list_template_names().unwrap();
 
         for test_project in TEST_PROJECTS.iter() {
             let project     = luigi.create_project::<TestProject>(&test_project, &templates[0]).unwrap();
@@ -569,7 +569,7 @@ mod test {
         assert_existens(&storage_path);
         copy_template(storage_path.join("templates"));
 
-        let templates = luigi.list_template_names();
+        let templates = luigi.list_template_names().unwrap();
         for test_project in TEST_PROJECTS.iter() {
             // tested above
             let origin = luigi.create_project::<TestProject>( &test_project, &templates[0]).unwrap();
@@ -578,10 +578,10 @@ mod test {
             assert!(luigi.archive_project_with_year(&test_project, 2015).is_ok());
             assert!(!origin.file().exists());
 
-            assert!(luigi.get_project_dir(&test_project, LuigiDir::Working).is_none());
-            assert!(luigi.get_project_dir(&test_project, LuigiDir::Archive(2015)).is_some());
+            assert!(luigi.get_project_dir(&test_project, LuigiDir::Working).is_err());
+            assert!(luigi.get_project_dir(&test_project, LuigiDir::Archive(2015)).is_ok());
 
-            let false_origin = luigi.create_project::<TestProject>(&test_project, &templates[0]).unwrap();
+            //let false_origin = luigi.create_project::<TestProject>(&test_project, &templates[0]).unwrap();
             assert!(luigi.archive_project_with_year(&test_project, 2015).is_err());
         }
     }
@@ -593,7 +593,7 @@ mod test {
         assert_existens(&storage_path);
         copy_template(storage_path.join("templates"));
 
-        let templates = luigi.list_template_names();
+        let templates = luigi.list_template_names().unwrap();
         for test_project in TEST_PROJECTS.iter() {
             // tested above
             let origin = luigi.create_project::<TestProject>( &test_project, &templates[0]).unwrap();

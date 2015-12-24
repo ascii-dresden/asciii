@@ -56,7 +56,6 @@ cataloge:
   product: &premiumcola	 { name: Premium-Cola    , price: 0.85,	 unit: 0.5l }
 
 products:
-
   *kaffee:
     amount: 5
   *tee:

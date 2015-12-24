@@ -375,13 +375,7 @@ pub fn edit_template(name:&str, editor:&str){
 /// Command SHOW
 pub fn show_project(dir:LuigiDir, search_term:&str){
     for project in search_projects(dir, &search_term){
-        println!("{} {} {} {}, {}",
-                 project.index().unwrap_or("".into()),
-                 project.name(),
-                 project.manager(),
-                 project.date().unwrap(),
-                 project.file().display()
-                 );
+        print::show_items(&project);
     }
 }
 
