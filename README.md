@@ -15,17 +15,17 @@ Here I try to rewrite the original [ascii-invoicer](http://github.com/ascii-dres
       * [x] creating
       * [ ] git integration
       * [x] template management
-  * [ ] Validate
-      * [ ] Offer
-      * [ ] Invoice
-      * [ ] Archive, Payed, Calendar etc
+  * [x] Validate
+      * [x] Offer
+      * [x] Invoice
+      * [x] Archive, Payed, Calendar etc
   * [ ] Output
       * [ ] Displaying
       * [ ] Pdf export (Invoice, Offer, Checklist)
   * [x] Settings
       * [x] Merge HOME_DIR config with defaults
-  * [ ] project type (init/open/parse yml/index/etc)
-      * [ ] template filling
+  * [x] project type (init/open/parse yml/index/etc)
+      * [x] template filling
   * [ ] pretty cli output
       * [ ] all sorts of list, csv, etc
   * [ ] complete this TODO
