@@ -106,7 +106,7 @@ impl Project{
     pub fn yaml(&self) -> &Yaml{ &self.yaml }
 
     pub fn manager(&self) -> String{
-        spec::project::manager(self.yaml()).unwrap_or("____").into()
+        spec::project::manager(self.yaml()).unwrap_or("").into()
     }
 
     pub fn canceled(&self) -> bool{

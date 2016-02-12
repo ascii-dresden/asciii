@@ -2,7 +2,7 @@ use chrono::*;
 use prettytable::Table;
 use prettytable::row::Row;
 use prettytable::cell::Cell;
-use prettytable::format::TableFormat;
+use prettytable::format::{TableFormat,FormatBuilder};
 use term::{Attr, color};
 
 use project::Project;
@@ -16,7 +16,8 @@ pub fn print_project(_project:&Project){
 fn result_to_cell(res:&Result<(), Vec<&str>>) -> Cell{
     match res{
         &Ok(_)           => Cell::new("✓").with_style(Attr::ForegroundColor(color::GREEN)), // ✗
-        &Err(ref _errors) => Cell::new("✗").with_style(Attr::ForegroundColor(color::RED))// + &errors.join(", ")
+        &Err(ref _errors) => Cell::new("✗").with_style(Attr::ForegroundColor(color::RED))// + &errors.join(", ") )
+        //&Err(ref errors) => Cell::new( &format!("✗ {}",  &errors.join(", ") )) .with_style(Attr::ForegroundColor(color::RED))
     }
 }
 
@@ -27,6 +28,9 @@ fn project_to_style<'a>(project:&'a Project) -> &'a str{
 
     if let Some(date) = project.date(){
         let age = (Local::today() - date).num_days();
+        if project.canceled(){
+            return ""
+        }
         return match age{
             _ if age > 28  => "Fm",
               1 ... 28     => "Fc",
@@ -73,8 +77,12 @@ pub fn status_rows(projects:&[Project], repo:&Repo) -> Vec<Row>{
 
                 cell!(r->i+1),
 
-                cell!(project.name())
-                    .style_spec(row_style),
+                cell!(
+                    if project.canceled() {
+                        format!("canceled: {name}", name=project.name())
+                    } else{ project.name() }
+                    ).style_spec(row_style),
+
                 // Hendrik Sollich
                 cell!(project.manager())
                     .style_spec(row_style),
@@ -85,6 +93,7 @@ pub fn status_rows(projects:&[Project], repo:&Repo) -> Vec<Row>{
                 // R042
                 cell!(project.invoice_num())
                     .style_spec(row_style),
+
                 // Date
                 cell!(project.date().unwrap_or(UTC::today()).format("%d.%m.%Y").to_string())
                     .style_spec(row_style),
@@ -106,7 +115,7 @@ pub fn status_rows(projects:&[Project], repo:&Repo) -> Vec<Row>{
 /// Prints Projects
 pub fn print_projects(rows:Vec<Row>){
     let mut table = Table::init(rows);
-    table.set_format(TableFormat::new());
+    table.set_format(FormatBuilder::new().column_separator(' ').padding(0,0).build());
     table.printstd();
 }
 
