@@ -64,7 +64,19 @@ pub fn get_hash<'a>(yaml:&'a Yaml, key:&str) -> Option<&'a BTreeMap<Yaml,Yaml>> 
 }
 
 pub fn get_bool<'a>(yaml:&'a Yaml, key:&str) -> Option<bool> {
-    get(&yaml,&key).and_then(|y|y.as_bool())
+    get(&yaml,&key)
+        .and_then(|y| y
+                  .as_bool()
+                  // allowing it to be a str: "yes" or "no"
+                  .or( y.as_str()
+                       .map( |yes_or_no|
+                             match yes_or_no.to_lowercase().as_ref() // XXX ??? why as_ref?
+                             {
+                                 "yes" => true,
+                                 "no" => false,
+                                 _ => false
+                             })
+                     ))
 }
 
 // also takes a Yaml::I64 and reinterprets it
