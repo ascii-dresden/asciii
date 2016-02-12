@@ -2,7 +2,7 @@ use chrono::*;
 use prettytable::Table;
 use prettytable::row::Row;
 use prettytable::cell::Cell;
-use prettytable::format::{TableFormat,Align};
+use prettytable::format::TableFormat;
 use term::{Attr, color};
 
 use project::Project;
@@ -71,7 +71,7 @@ pub fn status_rows(projects:&[Project], repo:&Repo) -> Vec<Row>{
                 Cell::new( &status.to_string() )
                     .with_style( Attr::ForegroundColor(status.to_color()) ),
 
-                cell!(r:i+1),
+                cell!(r->i+1),
 
                 cell!(project.name())
                     .style_spec(row_style),
@@ -106,7 +106,7 @@ pub fn status_rows(projects:&[Project], repo:&Repo) -> Vec<Row>{
 /// Prints Projects
 pub fn print_projects(rows:Vec<Row>){
     let mut table = Table::init(rows);
-    table.set_format(TableFormat::new(None, None, None));
+    table.set_format(TableFormat::new());
     table.printstd();
 }
 
@@ -115,7 +115,7 @@ pub fn show_items(project:&Project){
     println!("{}", project.name());
 
     let mut table = Table::new();
-    table.set_format(TableFormat::new(None, None, None));
+    table.set_format(TableFormat::new());
     for item in project.invoice_items().unwrap().iter(){
         table.add_row( Row::new(vec![
                                 Cell::new(item.item.name),
