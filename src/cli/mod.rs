@@ -9,7 +9,7 @@ use std::ffi::OsStr;
 use std::process::exit;
 
 use chrono::UTC;
-use clap::{App, SubCommand, Arg};
+use clap::{App, SubCommand, Arg, AppSettings};
 
 use config;
 use super::CONFIG;
@@ -25,7 +25,8 @@ pub fn app(){
         .version(&crate_version!()[..])
         .author("Hendrik Sollich <hendrik@hoodie.de>")
         .about("The ascii invoicer III")
-        .arg_required_else_help(true)
+        .setting(AppSettings::ArgRequiredElseHelp)
+        //.arg_required_else_help(true)
 
         .subcommand(SubCommand::with_name("list")
 
