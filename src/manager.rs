@@ -324,7 +324,7 @@ pub trait LuigiProject{
 }
 
 #[cfg(test)]
-mod realworld {
+pub mod realworld {
     use std::path::{Path,PathBuf};
 
     pub use super::{Luigi,LuigiError,LuigiDir};

@@ -9,7 +9,6 @@ use std::ffi::OsStr;
 use std::process::exit;
 
 use chrono::UTC;
-use clap::{App, SubCommand, Arg, AppSettings};
 
 use config;
 use super::CONFIG;
@@ -20,231 +19,14 @@ use util;
 
 pub mod print;
 
-pub fn app(){
-    let matches = App::new("ascii-invoicer")
-        .version(&crate_version!()[..])
-        .author("Hendrik Sollich <hendrik@hoodie.de>")
-        .about("The ascii invoicer III")
-        .setting(AppSettings::ArgRequiredElseHelp)
-        //.arg_required_else_help(true)
-
-        .subcommand(SubCommand::with_name("list")
-
-                    .arg( Arg::with_name("archive")
-                          .help("list archived projects")
-                          .short("a").long("archive")
-                          .takes_value(true))
-
-                    .arg( Arg::with_name("sort")
-                          .help("sort by [date | index | name | manager]")
-                          .short("s").long("sort")
-                          //.possible_values(vec![ String::from("date"), String::from("index"), String::from("name"), String::from("manager") ])
-                          .takes_value(true))
-
-                    .arg( Arg::with_name("all")
-                          .help("List all projects, ever")
-                          .long("all"))
-
-                    .arg( Arg::with_name("templates")
-                          .help("list templates")
-                          .short("t").long("templates"))
-
-                    .arg( Arg::with_name("broken")
-                          .help("list broken projects (without project file)")
-                          .short("b").long("broken"))
-
-                    )
-
-        .subcommand(SubCommand::with_name("edit")
-                    .about("Edit a specific project")
-
-                    .arg( Arg::with_name("search_term")
-                          .help("Search term, possibly event name")
-                          .required(true))
-
-                    .arg( Arg::with_name("archive")
-                          .help("Pick an archived project")
-                          .short("a").long("archive")
-                          .takes_value(true))
-
-                    .arg( Arg::with_name("template")
-                          .help("Edit a template (currently .tyml)")
-                          .short("t").long("template"))
-
-                    .arg( Arg::with_name("editor")
-                          .help("Override the configured editor")
-                          .short("e").long("editor")
-                          .takes_value(true))
-                   )
-
-        .subcommand(SubCommand::with_name("show")
-                    .about("Display a specific project")
-
-                    .arg( Arg::with_name("search_term")
-                          .help("Search term, possibly event name")
-                          .required(true))
-
-                    .arg( Arg::with_name("archive")
-                          .help("Pick an archived project")
-                          .short("a").long("archive")
-                          .takes_value(true))
-
-                    .arg( Arg::with_name("template")
-                          .help("Show show fields in templates that are filled")
-                          .short("t").long("template")
-                          .conflicts_with("archive")
-                          )
-                   )
-
-        .subcommand(SubCommand::with_name("new")
-                    .arg( Arg::with_name("name")
-                          .help("Project name")
-                          .required(true))
-
-                    .arg( Arg::with_name("template")
-                          .help("Use a specific template")
-                          .short("t").long("template")
-                          .takes_value(true))
-
-                    .arg( Arg::with_name("editor")
-                          .help("Override the configured editor")
-                          .short("e").long("editor")
-                          .takes_value(true))
-
-                    .arg( Arg::with_name("don't edit")
-                          .help("Do not edit the file after creation")
-                          .short("d"))
-
-                    )
-
-        //.subcommand(SubCommand::with_name("archive"))
-        //.subcommand(SubCommand::with_name("unarchive"))
-
-        .subcommand(SubCommand::with_name("config")
-                    .about("Show and edit your config")
-
-                    .arg( Arg::with_name("edit")
-                          .help("Edit your config")
-                          .short("e").long("edit")
-                          )
-
-                    .arg( Arg::with_name("show")
-                          .help("Show a specific config value")
-                          .short("s").long("show")
-                          .takes_value(true))
-
-                    .arg( Arg::with_name("default")
-                          .help("Show default config")
-                          .short("d").long("default")
-                          )
-                   )
-
-        .subcommand(SubCommand::with_name("whoami"))
-
-        .get_matches();
-
-    // command: "new"
-    if let Some(matches) = matches.subcommand_matches("new") {
-        let name     = matches.value_of("name").unwrap();
-        let editor   = CONFIG.get_path("editor").unwrap().as_str().unwrap();
-
-        let template = matches.value_of("template").or(
-            CONFIG.get_path("template").unwrap().as_str()
-            ).unwrap();
-
-        new_project(&name, &template, &editor, !matches.is_present("don't edit"));
-    }
-
-    // command: "list"
-    else if let Some(matches) = matches.subcommand_matches("list") {
-        if matches.is_present("templates"){
-            list_templates(); }
-        else {
-
-        let mut sort = matches.value_of("sort").unwrap_or("index");
-
-        // list archive of year `archive`
-        let dir = if let Some(archive) = matches.value_of("archive"){
-            let archive = archive.parse::<i32>().unwrap();
-            LuigiDir::Archive(archive)
-        }
-
-        // or list all, but sort by date
-        else if matches.is_present("all"){
-            // sort by date on --all of not overriden
-            if !matches.is_present("sort"){ sort = "date" }
-            LuigiDir::All }
-
-        // or list normal
-        else { LuigiDir::Working };
-
-        list_projects(dir, sort);
-        }
-    }
-
-    // command: "edit"
-    else if let Some(matches) = matches.subcommand_matches("edit") {
-        let search_term = matches.value_of("search_term").unwrap();
-
-        let editor = matches.value_of("editor").unwrap_or( CONFIG.get_path("editor").unwrap().as_str().unwrap());
-
-        if matches.is_present("template"){
-            edit_template(search_term,&editor);
-        } else {
-            if let Some(archive) = matches.value_of("archive"){
-                let archive = archive.parse::<i32>().unwrap();
-                edit_project(LuigiDir::Archive(archive), &search_term, &editor);
-            } else {
-                edit_project(LuigiDir::Working, &search_term, &editor);
-            }
-        }
-    }
-
-    // command: "show"
-    else if let Some(matches) = matches.subcommand_matches("show") {
-        let search_term = matches.value_of("search_term").unwrap();
-        if let Some(archive) = matches.value_of("archive"){
-            let archive = archive.parse::<i32>().unwrap();
-            show_project(LuigiDir::Archive(archive), &search_term);
-        } else if  matches.is_present("template"){
-            show_template(search_term);
-        } else {
-            show_project(LuigiDir::Working, &search_term);
-        }
-    }
-
-    // command: "config"
-    else if let Some(matches) = matches.subcommand_matches("config") {
-        if let Some(path) = matches.value_of("show"){
-            config_show(&path);
-        }
-        else if matches.is_present("edit"){
-            let editor = CONFIG.get_path("editor").unwrap().as_str().unwrap();
-            config_edit(&editor); }
-        else if matches.is_present("default"){ config_show_default(); }
-    }
-
-    // command: "whoami"
-    else if  matches.is_present("whoami") {
-        config_show("manager_name");
-    }
-}
-
 fn setup_luigi() -> Luigi{
-    let storage_path = PathBuf::from(CONFIG.get_str("path")).join("caterings");
+    let storage_path = PathBuf::from( CONFIG.get_str("path")) .join( CONFIG.get_str("dirs/storage"));
     let storage_path = util::replace_home_tilde(&storage_path);
     let luigi = Luigi::new(&storage_path, "working", "archive", "templates").unwrap();
     luigi
 }
 
-fn assert_existens(storage_path:&Path) {
-    assert!(storage_path.exists()
-            &&  storage_path.join("working").exists()
-            &&  storage_path.join("archive").exists()
-            &&  storage_path.join("templates").exists());
-}
-
-fn status(){
+fn show_status(){
     let luigi = setup_luigi();
     let repo = Repo::new(luigi.storage_dir()).unwrap();
 
@@ -270,7 +52,7 @@ fn execute<F, S>(command:F) -> S where F: FnOnce() -> LuigiResult<S> {
 
 pub enum SortOptions{ Index }
 
-fn sort_by_(option:&str, projects:&mut [Project]){
+fn sort_by_option(option:&str, projects:&mut [Project]){
     match option {
         "manager" => sort_by_manager(projects),
         "date"    => sort_by_date(projects),
@@ -320,7 +102,7 @@ pub fn list_projects(dir:LuigiDir, sort:&str){
         .filter_map(|path| Project::open(path).ok())
         .collect();
 
-    sort_by_(sort, &mut projects);
+    sort_by_option(sort, &mut projects);
     let repo = Repo::new(luigi.storage_dir()).unwrap();
     print::print_projects(print::status_rows(&projects,&repo));
 }

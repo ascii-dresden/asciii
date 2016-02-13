@@ -10,16 +10,19 @@ yaml-rust = "*" #{git="https://github.com/chyh1990/yaml-rust/", branch="alias"}
 chrono = "*"
 regex = "*"
 slug = "*"
-clap = "*"
 term = "*"
 prettytable-rs = "*"
-currency = {git="https://github.com/hoodie/rust-lang-currency"}
+currency = {path="../currency/"}
 lazy_static = "*"
 maplit = "*"
 tempdir = "*"
 git2    = "*"
 
 clippy = {version = "~0.0.23", optional = true}
+
+[dependencies.clap]
+version = "2"
+features= ["yaml"]
 
 [features]
 default = []

@@ -1,0 +1,9 @@
+name: asciii
+version: 0.1.0
+author: Hendrik Sollich <hendrik@hoodie.de>
+about: The ascii invoicer III
+
+settings:
+    - ArgRequiredElseHelp
+
+subcommands:
