@@ -193,3 +193,29 @@ pub fn config_edit(editor:&str){
 pub fn config_show_default(){
     println!("{}", config::DEFAULT_CONFIG);
 }
+
+
+/// Command STATUS
+pub fn git_status(){
+    println!("git_status");
+    let luigi = setup_luigi();
+    let repo = Repo::new(luigi.storage_dir()).unwrap();
+
+    let project_paths = execute(||luigi.list_project_files(LuigiDir::Working));
+    let projects: Vec<Project> = project_paths
+        .iter()
+        .map(|path| Project::open(path).unwrap())
+        .collect();
+
+    println!("{:#?}", repo.status);
+}
+
+
+/// Command PULL
+pub fn git_pull(){
+    println!("git_pull");
+
+    let luigi = setup_luigi();
+    let repo = Repo::new(luigi.storage_dir()).unwrap();
+    repo.fetch();
+}

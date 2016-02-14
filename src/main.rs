@@ -38,128 +38,26 @@ lazy_static!{
 // TODO: remove: to_owned() and unwrap()s, stupid :D
 
 pub fn setup_app(){
-    let matches = App::new("ascii-invoicer")
+    let cli_setup = load_yaml!("cli/cli.yml"); // TODO use this later
+
+    // TODO replace this block with the line above
+    //use std::fs::File;
+    //use std::io::Read;
+    //use yaml_rust::{Yaml};
+    //use util::yaml;
+    //let content = File::open("./src/cli/cli.yml")
+    //                        .and_then(|mut file| {
+    //                            let mut content = String::new();
+    //                            file.read_to_string(&mut content)
+    //                                .map(|_| content)
+    //                        }).unwrap();
+    //let cli_setup = yaml::parse(&content).unwrap();
+    // TODO replace this block with the line above
+
+
+    let matches = App::from_yaml(&cli_setup)
         .version(&crate_version!()[..])
-        .author("Hendrik Sollich <hendrik@hoodie.de>")
-        .about("The ascii invoicer III")
-        .setting(AppSettings::ArgRequiredElseHelp)
-        //.arg_required_else_help(true)
-
-        .subcommand(SubCommand::with_name("list")
-
-                    .arg( Arg::with_name("archive")
-                          .help("list archived projects")
-                          .short("a").long("archive")
-                          .takes_value(true))
-
-                    .arg( Arg::with_name("sort")
-                          .help("sort by [date | index | name | manager]")
-                          .short("s").long("sort")
-                          //.possible_values(vec![ String::from("date"), String::from("index"), String::from("name"), String::from("manager") ])
-                          .takes_value(true))
-
-                    .arg( Arg::with_name("all")
-                          .help("List all projects, ever")
-                          .long("all"))
-
-                    .arg( Arg::with_name("templates")
-                          .help("list templates")
-                          .short("t").long("templates"))
-
-                    .arg( Arg::with_name("broken")
-                          .help("list broken projects (without project file)")
-                          .short("b").long("broken"))
-                    )
-
-        .subcommand(SubCommand::with_name("edit")
-                    .about("Edit a specific project")
-
-                    .arg( Arg::with_name("search_term")
-                          .help("Search term, possibly event name")
-                          .required(true))
-
-                    .arg( Arg::with_name("archive")
-                          .help("Pick an archived project")
-                          .short("a").long("archive")
-                          .takes_value(true))
-
-                    .arg( Arg::with_name("template")
-                          .help("Edit a template (currently .tyml)")
-                          .short("t").long("template"))
-
-                    .arg( Arg::with_name("editor")
-                          .help("Override the configured editor")
-                          .short("e").long("editor")
-                          .takes_value(true))
-                   )
-
-        .subcommand(SubCommand::with_name("show")
-                    .about("Display a specific project")
-
-                    .arg( Arg::with_name("search_term")
-                          .help("Search term, possibly event name")
-                          .required(true))
-
-                    .arg( Arg::with_name("archive")
-                          .help("Pick an archived project")
-                          .short("a").long("archive")
-                          .takes_value(true))
-
-                    .arg( Arg::with_name("template")
-                          .help("Show show fields in templates that are filled")
-                          .short("t").long("template")
-                          .conflicts_with("archive")
-                          )
-                   )
-
-        .subcommand(SubCommand::with_name("new")
-                    .arg( Arg::with_name("name")
-                          .help("Project name")
-                          .required(true))
-
-                    .arg( Arg::with_name("template")
-                          .help("Use a specific template")
-                          .short("t").long("template")
-                          .takes_value(true))
-
-                    .arg( Arg::with_name("editor")
-                          .help("Override the configured editor")
-                          .short("e").long("editor")
-                          .takes_value(true))
-
-                    .arg( Arg::with_name("don't edit")
-                          .help("Do not edit the file after creation")
-                          .short("d"))
-
-                    )
-
-        .subcommand(SubCommand::with_name("archive"))
-        .subcommand(SubCommand::with_name("unarchive"))
-
-        .subcommand(SubCommand::with_name("config")
-                    .about("Show and edit your config")
-
-                    .arg( Arg::with_name("edit")
-                          .help("Edit your config")
-                          .short("e").long("edit")
-                          )
-
-                    .arg( Arg::with_name("show")
-                          .help("Show a specific config value")
-                          .short("s").long("show")
-                          .takes_value(true))
-
-                    .arg( Arg::with_name("default")
-                          .help("Show default config")
-                          .short("d").long("default")
-                          )
-                   )
-
-        .subcommand(SubCommand::with_name("path"))
-        .subcommand(SubCommand::with_name("whoami"))
-
         .get_matches();
-    //let matches = App::from_yaml(load_yaml!("cli.yml"));
 
     // command: "new"
     if let Some(matches) = matches.subcommand_matches("new") {
@@ -251,6 +149,11 @@ pub fn setup_app(){
             .join( CONFIG.get_str("dirs/storage"))
             .display());
     }
+    // command: "status"
+    else if  matches.is_present("status") { cli::git_status(); }
+
+    // command: "pull"
+    else if  matches.is_present("pull") { cli::git_pull(); }
 
     // command: "whoami"
     else if  matches.is_present("whoami") {
