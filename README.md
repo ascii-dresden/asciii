@@ -22,9 +22,12 @@ Here I try to rewrite the original [ascii-invoicer](http://github.com/ascii-dres
       * [x] Offer
       * [x] Invoice
       * [x] Archive, Payed, Calendar etc
-      * [ ] Absofuckinglutely complete price/wages calculation
+      * [ ] Absofuckinglutely correct price/wages calculation
   * [ ] Output
       * [ ] Displaying
+      * [ ] CSV and YAML output
+        * [ ] full list equivalence
+        * [ ] each project as csv (offer andor invoice)
       * [ ] Pdf export (Invoice, Offer, Checklist)
       * [ ] make like behavior:
         * [ ] `open` triggers `invoice` or `offer`

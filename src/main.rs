@@ -1,4 +1,3 @@
-#![allow(dead_code)]
 #![allow(unused_imports)]
 #![cfg(not(test))]
 extern crate yaml_rust;
@@ -7,6 +6,7 @@ extern crate regex;
 extern crate slug;
 extern crate tempdir;
 extern crate term;
+extern crate terminal_size;
 extern crate git2;
 extern crate currency;
 #[macro_use] extern crate prettytable;
@@ -101,7 +101,7 @@ pub fn setup_app(){
             if matches.is_present("broken"){
                 cli::list_broken_projects(dir);
             } else {
-                cli::list_projects(dir, sort);
+                cli::list_projects(dir, sort, matches.is_present("simple"));
             }
         }
     }
@@ -182,6 +182,15 @@ pub fn setup_app(){
     // command: "whoami"
     else if matches.is_present("whoami") {
         cli::config_show("manager_name");
+    }
+
+    else if matches.is_present("term") {
+        use terminal_size::{Width, Height, terminal_size };
+        if let Some((Width(w), Height(h))) = terminal_size() {
+            println!("Your terminal is {} cols wide and {} lines tall", w, h);
+        } else {
+            println!("Unable to get terminal size");
+        }
     }
 }
 

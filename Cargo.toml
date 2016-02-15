@@ -11,6 +11,7 @@ chrono = "*"
 regex = "*"
 slug = "*"
 term = "*"
+terminal_size = "0.1.1"
 prettytable-rs = "*"
 currency = {git="https://github.com/hoodie/rust-lang-currency"}
 lazy_static = "*"

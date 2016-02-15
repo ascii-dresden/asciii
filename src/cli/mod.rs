@@ -9,6 +9,7 @@ use std::ffi::OsStr;
 use std::process::exit;
 
 use chrono::UTC;
+use terminal_size::{Width, Height, terminal_size };
 
 use config;
 use super::CONFIG;
@@ -18,6 +19,9 @@ use repo::Repo;
 use util;
 
 pub mod print;
+
+// TODO keep this up to date or find a way to make this dynamic
+const STATUS_ROWS_WIDTH:u16 = 90;
 
 fn setup_luigi() -> Luigi{
     let storage_path = PathBuf::from( CONFIG.get_str("path")) .join( CONFIG.get_str("dirs/storage"));
@@ -67,7 +71,7 @@ fn sort_by_manager(projects:&mut [Project]){
 
 
 /// Command LIST [--archive, --all]
-pub fn list_projects(dir:LuigiDir, sort:&str){
+pub fn list_projects(dir:LuigiDir, sort:&str, simple:bool){
     let luigi = setup_luigi();
     let project_paths = execute(||luigi.list_project_files(dir));
     let mut projects: Vec<Project> = project_paths.iter()
@@ -81,8 +85,19 @@ pub fn list_projects(dir:LuigiDir, sort:&str){
         .collect();
 
     sort_by_option(sort, &mut projects);
-    let repo = Repo::new(luigi.storage_dir()).unwrap();
-    print::print_projects(print::status_rows(&projects,&repo));
+
+    let wide_enough = match terminal_size() {
+        Some((Width(w), _)) if w >= STATUS_ROWS_WIDTH => true,
+        _ => false
+    };
+
+    if simple || !wide_enough {
+        print::print_projects(print::simple_rows(&projects));
+    }
+    else {
+        let repo = Repo::new(luigi.storage_dir()).unwrap();
+        print::print_projects(print::status_rows(&projects,&repo));
+    }
 }
 
 /// Command LIST --broken
@@ -238,7 +253,7 @@ pub fn git_status(){
     let project_paths = execute(||luigi.list_project_files(LuigiDir::Working));
     let projects: Vec<Project> = project_paths
         .iter()
-        .map(|path| Project::open(path).unwrap())
+        .filter_map(|path| Project::open(path).ok())
         .collect();
 
     println!("{:#?}", repo.status);

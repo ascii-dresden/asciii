@@ -9,10 +9,11 @@ use project::Project;
 use manager::LuigiProject;
 use repo::{Repo,GitStatus};
 
+//TODO construct table rows way more dynamically
+
 pub fn print_project(_project:&Project){
     unimplemented!();
 }
-
 fn result_to_cell(res:&Result<(), Vec<&str>>) -> Cell{
     match res{
         &Ok(_)           => Cell::new("✓").with_style(Attr::ForegroundColor(color::GREEN)), // ✗
@@ -48,25 +49,27 @@ fn project_to_style<'a>(project:&'a Project) -> &'a str{
 pub fn simple_rows(projects:&[Project]) -> Vec<Row>{
     projects
         .iter()
-        .map(|project|
-             Row::new(vec![
-                      cell!(project.name()),
-                      cell!(project.manager()),
-                      cell!(project.invoice_num().unwrap_or("".into())),
-                      cell!(project.date().unwrap_or(UTC::today())
-                            .format("%d.%m.%Y").to_string()),
+        .map(|project| {
+            let row_style = project_to_style(&project);
+            Row::new(vec![
+                     cell!(
+                         if project.canceled() { format!("X {name}", name=project.name()) }
+                         else{ project.name() }
+                         ).style_spec(row_style),
 
-                      cell!(project.index().unwrap_or("no_index".into())),
-                      cell!(project.date().map(|d|d.to_string()).unwrap_or("no_date".into())),
-                      //cell!(project.file().display()),
-             ])
-            )
-        .collect()
+                         //cell!(project.manager()),
+                         cell!(project.invoice_num().unwrap_or("".into())),
+
+                         cell!(project.date().map(|d|d.format("%d.%m.%Y").to_string()).unwrap_or("no_date".into())),
+                         //cell!(project.file().display()),
+            ])
+        })
+    .collect()
 }
 
 /// produces the rows used in `print_projects()`
 pub fn status_rows(projects:&[Project], repo:&Repo) -> Vec<Row>{
-    projects.iter().enumerate()
+ s   projects.iter().enumerate()
         .map(|(i, project)| {
             let status = repo.get_status(&project.dir());
             let row_style = project_to_style(&project);

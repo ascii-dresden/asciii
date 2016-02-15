@@ -36,6 +36,11 @@ subcommands:
               long: "archive"
               takes_value: true
 
+        - "simple":
+              help: "use simple list"
+              short: "e"
+              long: "simple"
+
         - "sort":
               help: "sort by [date | index | name | manager]"
               short: "s"
@@ -81,8 +86,6 @@ subcommands:
         - NAME:
             help: The name of the project, duh!
             required: true
-
-  - status:
 
   - path:
       about: Show storage path
@@ -151,4 +154,7 @@ subcommands:
                 short: "d"
                 long: "default"
 
+
+  - term:
+      about: terminal info
 

@@ -73,10 +73,6 @@ impl ConfigReader{
         yaml::get_str(&self.defaults, &key)).expect(&format!("{} does not contain values", key))
     }
 
-    /// Returns the value at this position cast to str
-    ///
-    pub fn get_as_str(&self, _path:&str) -> &str { unimplemented!() }
-
     /// Returns the boolean in the position or `false`
     ///
     /// # Panics
