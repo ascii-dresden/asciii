@@ -11,6 +11,7 @@ use util::yaml::YamlError;
 use templater::Templater;
 
 const PROJECT_FILE_EXTENSION:&'static str = "yml";
+const TEMPLATE_FILE_EXTENSION:&'static str = "tyml";
 
 pub type Year =  i32;
 pub fn slugify(string:&str) -> String{ slug::slugify(string) }
@@ -130,12 +131,11 @@ impl Luigi {
     }
 
     /// Produces a list of files in the `template_dir`
-    /// TODO extension `.tyml` currently hardcoded, use config here
     pub fn list_template_files(&self) -> LuigiResult<Vec<PathBuf>> {
         let template_files =
         try!(self.list_path_content(&self.storage_dir.join(&self.template_dir)))
             .iter()
-            .filter(|p|p.extension().unwrap_or(OsStr::new("")) == OsStr::new("tyml"))
+            .filter(|p|p.extension().unwrap_or(OsStr::new("")) == OsStr::new(TEMPLATE_FILE_EXTENSION))
             .cloned().collect();
         Ok(template_files)
     }
@@ -219,6 +219,16 @@ impl Luigi {
         Ok(target)
     }
 
+    /// Moves a project folder from `/working` dir to `/archive/$year`.
+    /// Also adds the project.prefix() to the folder name.
+    ///<pre>
+    ///└── storage
+    ///    ├── archive
+    ///        ├── 2001
+    ///            ├── R0815_Birthdayparty
+    ///    ...
+    ///</pre>
+    // TODO write extra tests
     pub fn archive_project<T:LuigiProject>(&self, project:&T, year:Year) -> LuigiResult<PathBuf> {
         let name_in_archive = match project.prefix(){
             Some(prefix) => format!("{}_{}", prefix, project.ident()),
@@ -234,6 +244,7 @@ impl Luigi {
         Ok(target)
     }
 
+    /// Moves a project folder from `/working` dir to `/archive/$year`.
     pub fn unarchive_project_file(&self, archived_file:&Path) -> LuigiResult<PathBuf> {
         let archived_dir = if archived_file.is_file() { try!(archived_file.parent().ok_or(LuigiError::InvalidDirStructure)) } else {archived_file};
 
@@ -626,7 +637,7 @@ mod test {
     }
 
     #[test]
-    fn archive_project(){
+    fn archive_project_by_name(){
         let (_dir , storage_path, luigi) = setup();
         assert!(luigi.create_dirs().is_ok());
         assert_existens(&storage_path);
@@ -646,6 +657,36 @@ mod test {
 
             //let false_origin = luigi.create_project::<TestProject>(&test_project, &templates[0]).unwrap();
             assert!(luigi.archive_project_by_name(&test_project, 2015, None).is_err());
+        }
+    }
+
+    #[test]
+    fn archive_project(){
+        let (_dir , storage_path, luigi) = setup();
+        assert!(luigi.create_dirs().is_ok());
+        assert_existens(&storage_path);
+        copy_template(storage_path.join("templates"));
+
+        let year = UTC::today().year();
+
+        let templates = luigi.list_template_names().unwrap();
+        for test_project_name in TEST_PROJECTS.iter() {
+            // tested above
+            let project = luigi.create_project::<TestProject>( &test_project_name, &templates[0]).unwrap();
+
+            // Before archiving
+            assert!(project.file().exists());
+            assert!(luigi.get_project_dir(&test_project_name, LuigiDir::Working).is_ok());
+
+            // ARCHIVING
+            assert!(luigi.archive_project(&project, project.year().unwrap()).is_ok());
+
+            // After archiving
+            assert!(!project.file().exists());
+            assert!(luigi.get_project_dir(&test_project_name, LuigiDir::Working).is_err());
+            assert!(luigi.get_project_dir(&test_project_name, LuigiDir::Archive(year)).is_ok());
+
+            assert!(luigi.archive_project(&project, year).is_err());
         }
     }
 
