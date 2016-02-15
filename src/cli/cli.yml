@@ -29,105 +29,126 @@ subcommands:
 
   - list:
       about: List Projects
-      args: 
+      args:
         - "archive":
-              help: "list archived projects" 
+              help: "list archived projects"
               short: "a"
-              long: "archive" 
-              takes_value: true  
+              long: "archive"
+              takes_value: true
 
         - "sort":
-              help: "sort by [date | index | name | manager]" 
+              help: "sort by [date | index | name | manager]"
               short: "s"
-              long: "sort" 
-              #possible_values: vec![ String::from "date" , String::from "index" , String::from "name" , String::from "manager"  ] 
-              takes_value: true  
+              long: "sort"
+              #possible_values: vec![ String::from "date" , String::from "index" , String::from "name" , String::from "manager"  ]
+              takes_value: true
 
         - "all":
-              help: "List all projects, ever" 
-              long: "all"  
+              help: "List all projects, ever"
+              long: "all"
 
         - "templates":
-              help: "list templates" 
+              help: "list templates"
               short: "t"
-              long: "templates"  
+              long: "templates"
 
         - "broken":
-              help: "list broken projects  without project file " 
+              help: "list broken projects  without project file "
               short: "b"
-              long: "broken"  
-         
+              long: "broken"
+
   - archive:
       about: Move a Project into the archive
+      args:
+        - NAME:
+            help: The name of the project, duh!
+            required: true
+
+        - force:
+            help: Archives the Project, even though it is not completely valid
+
+        - year:
+            help: Override the year
+            long: year
+            takes_value: true
+
   - unarchive:
       about: Move a Project out of the archive
+      args:
+        - YEAR:
+            help: Specify the Archiv
+            required: true
+        - NAME:
+            help: The name of the project, duh!
+            required: true
+
+  - status:
+
   - path:
       about: Show storage path
+
   - edit:
       about: Edit a specific project
       args:
         - "search_term":
-              help: "Search term, possibly event name" 
-              required: true  
+              help: "Search term, possibly event name"
+              required: true
 
         - "archive":
-              help: "Pick an archived project" 
-              short: "a" 
-              long: "archive" 
-              takes_value: true  
+              help: "Pick an archived project"
+              short: "a"
+              long: "archive"
+              takes_value: true
 
         - "template":
-              help: "Edit a template  currently tyml: " 
-              short: "t" 
-              long: "template"  
+              help: "Edit a template  currently tyml: "
+              short: "t"
+              long: "template"
 
         - "editor":
-              help: "Override the configured editor" 
-              short: "e" 
-              long: "editor" 
-              takes_value: true  
+              help: "Override the configured editor"
+              short: "e"
+              long: "editor"
+              takes_value: true
+
   - show:
       about: Display a specific project
       args:
         - "search_term":
-              help: "Search term, possibly event name" 
-              required: true  
+              help: "Search term, possibly event name"
+              required: true
 
         - "archive":
-              help: "Pick an archived project" 
-              short: "a" 
-              long: "archive" 
-              takes_value: true  
+              help: "Pick an archived project"
+              short: "a"
+              long: "archive"
+              takes_value: true
 
         - "template":
-              help: "Show show fields in templates that are filled" 
-              short: "t" 
-              long: "template" 
+              help: "Show show fields in templates that are filled"
+              short: "t"
+              long: "template"
               #conflicts_with: "archive"  # this causes a crash
-                           
-                    
 
   - config:
       about: Show and edit your config
       args:
 
           - "edit":
-                help: "Edit your config" 
-                short: "e" 
-                long: "edit" 
-                 
+                help: "Edit your config"
+                short: "e"
+                long: "edit"
+
 
           - "show":
-                help: "Show a specific config value" 
-                short: "s" 
-                long: "show" 
-                takes_value: true  
+                help: "Show a specific config value"
+                short: "s"
+                long: "show"
+                takes_value: true
 
           - "default":
-                help: "Show default config" 
-                short: "d" 
-                long: "default" 
-                 
-          
+                help: "Show default config"
+                short: "d"
+                long: "default"
 
 

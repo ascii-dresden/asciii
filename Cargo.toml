@@ -12,7 +12,7 @@ regex = "*"
 slug = "*"
 term = "*"
 prettytable-rs = "*"
-currency = {path="../currency/"}
+currency = {git="https://github.com/hoodie/rust-lang-currency"}
 lazy_static = "*"
 maplit = "*"
 tempdir = "*"

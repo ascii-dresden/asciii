@@ -559,7 +559,7 @@ fn validate_products(){
     assert_eq!(products[0].amount_offered, 5f64);
     assert_eq!(products[0].amount_sold, 5f64);
     assert_eq!(products[0].cost_before_tax(), Currency(Some('€'), 1250));
-    assert_eq!(products[0].cost_after_tax(), Currency(Some('€'), 1487));
+    assert_eq!(products[0].cost_after_tax(), Currency(Some('€'), 1488));
 
     assert_eq!(products[1].item.name, "Tee");
     assert_eq!(products[1].amount_offered, 6f64);

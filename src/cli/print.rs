@@ -52,7 +52,7 @@ pub fn simple_rows(projects:&[Project]) -> Vec<Row>{
              Row::new(vec![
                       cell!(project.name()),
                       cell!(project.manager()),
-                      cell!(project.invoice_num()),
+                      cell!(project.invoice_num().unwrap_or("".into())),
                       cell!(project.date().unwrap_or(UTC::today())
                             .format("%d.%m.%Y").to_string()),
 
@@ -91,7 +91,7 @@ pub fn status_rows(projects:&[Project], repo:&Repo) -> Vec<Row>{
                 //cell!(project.index().unwrap_or(String::from(""))),
 
                 // R042
-                cell!(project.invoice_num())
+                cell!(project.invoice_num().unwrap_or("".into()))
                     .style_spec(row_style),
 
                 // Date

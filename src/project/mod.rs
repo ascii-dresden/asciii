@@ -71,6 +71,10 @@ impl LuigiProject for Project{
         })
     }
 
+    fn prefix(&self) -> Option<String>{
+        self.invoice_num()
+    }
+
     fn index(&self) -> Option<String>{
         if let Some(date) = self.date(){
             spec::invoice::number_str(self.yaml())
@@ -81,7 +85,11 @@ impl LuigiProject for Project{
         }
     }
 
-    fn name(&self) -> String { spec::project::name(self.yaml()).unwrap_or("unnamed").to_owned() }
+    fn name(&self) -> String {
+        spec::project::name(self.yaml())
+            .unwrap_or("unnamed").to_owned()
+    }
+
     fn date(&self) -> Option<Date<UTC>>{ spec::project::date(self.yaml()) }
 
     fn file(&self) -> PathBuf{ self.file_path.to_owned() } // TODO reconsider returning PathBuf at all
@@ -113,8 +121,8 @@ impl Project{
         spec::project::canceled(self.yaml())
     }
 
-    pub fn invoice_num(&self) -> String{
-        spec::invoice::number_str(self.yaml()).unwrap_or("".into())
+    pub fn invoice_num(&self) -> Option<String>{
+        spec::invoice::number_str(self.yaml())
     }
 
     pub fn valid_stage1(&self) -> SpecResult{

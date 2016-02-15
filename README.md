@@ -14,14 +14,21 @@ Here I try to rewrite the original [ascii-invoicer](http://github.com/ascii-dres
   * [x] basic project file management
       * [x] creating
       * [ ] git integration
+        * [ ] stage1: pull, push, add, commit
+        * [ ] stage2: remind of stale projects and sync backlog
       * [x] template management
+      * [ ] command line control
   * [x] Validate
       * [x] Offer
       * [x] Invoice
       * [x] Archive, Payed, Calendar etc
+      * [ ] Absofuckinglutely complete price/wages calculation
   * [ ] Output
       * [ ] Displaying
       * [ ] Pdf export (Invoice, Offer, Checklist)
+      * [ ] make like behavior:
+        * [ ] `open` triggers `invoice` or `offer`
+        * [ ] tell if project file is newer then pdf
   * [x] Settings
       * [x] Merge HOME_DIR config with defaults
   * [x] project type (init/open/parse yml/index/etc)
@@ -30,6 +37,7 @@ Here I try to rewrite the original [ascii-invoicer](http://github.com/ascii-dres
       * [ ] all sorts of list, csv, etc
   * [ ] complete this TODO
   * [ ] logging
+  * [ ] Documentation!!!
 
 
 ## Vision v3.x.x

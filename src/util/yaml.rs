@@ -1,5 +1,6 @@
 //! Yaml Utility functions
 
+use std::fmt;
 use std::io;
 use std::io::Read;
 use std::fs::File;
@@ -19,6 +20,14 @@ pub enum YamlError{
 // All you need to make try!() fun again
 impl From<io::Error> for YamlError { fn from(ioerror: io::Error)   -> YamlError{ YamlError::Io(ioerror) } }
 impl From<ScanError> for YamlError { fn from(scanerror: ScanError) -> YamlError{ YamlError::Scan(scanerror) } }
+impl fmt::Display for YamlError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match *self{
+            YamlError::Scan(ref err) => write!(f, "{}", err),
+            YamlError::Io(ref err) => write!(f, "{}", err)
+        }
+    }
+ }
 
 //TODO Rename to open()
 pub fn open_yaml( path:&Path ) -> Result<Yaml, YamlError> {

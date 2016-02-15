@@ -26,21 +26,6 @@ fn setup_luigi() -> Luigi{
     luigi
 }
 
-fn show_status(){
-    let luigi = setup_luigi();
-    let repo = Repo::new(luigi.storage_dir()).unwrap();
-
-    let project_paths = execute(||luigi.list_project_files(LuigiDir::Working));
-    let projects: Vec<Project> = project_paths
-        .iter()
-        .map(|path| Project::open(path).unwrap())
-        .collect();
-
-    println!("{:#?}", repo.status);
-    print::print_projects(print::status_rows(&projects,&repo));
-}
-
-
 /// Execute a command returning a LuigiError
 /// TODO make this a `try!` like macro
 fn execute<F, S>(command:F) -> S where F: FnOnce() -> LuigiResult<S> {
@@ -78,28 +63,21 @@ fn sort_by_manager(projects:&mut [Project]){
     projects.sort_by(|pa,pb| pa.manager().cmp( &pb.manager()))
 }
 
-/// Opens up all projects to look inside and check content.
-///
-/// TODO This could be parallelized
-/// TODO move this into `Luigi`
-pub fn search_projects(dir:LuigiDir, search_term:&str) -> Vec<Project> {
-    let luigi = setup_luigi();
 
-    let projects: Vec<Project> = execute(||luigi.list_project_files(dir))
-        .iter()
-        .map(|path| Project::open(path).unwrap())
-        .filter(|project| project.name().to_lowercase().contains(&search_term.to_lowercase()))
-        .collect();
 
-    projects
-}
 
 /// Command LIST [--archive, --all]
 pub fn list_projects(dir:LuigiDir, sort:&str){
     let luigi = setup_luigi();
     let project_paths = execute(||luigi.list_project_files(dir));
     let mut projects: Vec<Project> = project_paths.iter()
-        .filter_map(|path| Project::open(path).ok())
+        .filter_map(|path| match Project::open(path){
+            Ok(project) => Some(project),
+            Err(err) => {
+                println!("Erroneous Project: {}\n {}", path.display(), err);
+                None
+            }
+        })
         .collect();
 
     sort_by_option(sort, &mut projects);
@@ -109,11 +87,17 @@ pub fn list_projects(dir:LuigiDir, sort:&str){
 
 /// Command LIST --broken
 pub fn list_broken_projects(dir:LuigiDir){
+    use util::yaml::YamlError;
     let luigi = setup_luigi();
-    let projects: Vec<Project> = execute(||luigi.list_broken_projects(dir))
+    let invalid_files = execute(||luigi.list_project_files(dir));
+    let tups = invalid_files
         .iter()
-        .map(|p|Project::open(p).unwrap()).collect() ;
-    print::print_projects(print::simple_rows(&projects));
+        .filter_map(|dir| Project::open(dir).err().map(|e|(e, dir)) )
+        .collect::<Vec<(YamlError,&PathBuf)>>();
+
+    for (err,path) in tups{
+        println!("{}: {}", path.display(), err);
+    }
 }
 
 /// Command LIST --templates
@@ -130,10 +114,15 @@ pub fn list_templates(){
     }
 }
 
+
+
+
 /// Command EDIT
 pub fn edit_project(dir:LuigiDir, search_term:&str, editor:&str){
-    let paths = search_projects(dir, &search_term)
+    let luigi = setup_luigi();
+    let paths = execute(||luigi.search_projects(dir, &search_term))
         .iter()
+        .filter_map(|path| Project::open(path).ok())
         .filter_map(|project|
                     project.file().to_str()
                     .map(|s|s.to_owned())
@@ -143,6 +132,7 @@ pub fn edit_project(dir:LuigiDir, search_term:&str, editor:&str){
     util::open_in_editor(&editor, paths);
 }
 
+/// Command EDIT --template
 pub fn edit_template(name:&str, editor:&str){
     let luigi = setup_luigi();
     let template_paths = execute(||luigi.list_template_files())
@@ -157,10 +147,17 @@ pub fn edit_template(name:&str, editor:&str){
 
 /// Command SHOW
 pub fn show_project(dir:LuigiDir, search_term:&str){
-    for project in search_projects(dir, &search_term){
+    let luigi = setup_luigi();
+    for project in execute(||luigi.search_projects(dir, &search_term))
+        .iter()
+        .filter_map(|path| Project::open(path).ok())
+    {
         print::show_items(&project);
     }
 }
+
+
+
 
 /// Command SHOW --template
 use templater::Templater;
@@ -170,6 +167,9 @@ pub fn show_template(name:&str){
     println!("{:#?}", templater.list_keywords());
 }
 
+
+
+
 /// Command NEW
 pub fn new_project(project_name:&str, template_name:&str, editor:&str, edit:bool){
     let luigi = setup_luigi();
@@ -177,6 +177,40 @@ pub fn new_project(project_name:&str, template_name:&str, editor:&str, edit:bool
     let project_file = project.file();
     if edit { util::open_in_editor(&editor, vec![project_file.display().to_string()]); }
 }
+
+
+/// Command ARCHIVW <NAME>
+pub fn archive_project(name:&str, manual_year:Option<i32>){
+    let luigi = setup_luigi();
+    if let Ok(projects) = luigi.search_projects(LuigiDir::Working, name){
+        for project in projects.iter().filter_map(|path| Project::open(path).ok()) {
+            if project.valid_stage3().is_ok(){
+                let year = manual_year.or(project.year()).unwrap();
+                println!("archiving {} ({})",  project.ident(), project.year().unwrap());
+                execute(||luigi.archive_project(&project, year));
+            }
+            else {
+                println!("CANNOT archive {} ({})",
+                project.ident(), project.file().display());
+            }
+        }
+    }
+}
+
+
+/// Command UNARCHIVW <YEAR> <NAME>
+pub fn unarchive_project(year:i32, name:&str){
+    let luigi = setup_luigi();
+    if let Ok(projects) = luigi.search_projects(LuigiDir::Archive(year), name){
+        if projects.len() == 1 {
+            println!("{:?}", projects);
+            luigi.unarchive_project_file(&projects[0]);
+        } else{
+            println!("Ambiguous: multiple matches: {:#?}", projects );
+        }
+    }
+}
+
 
 /// Command CONFIG --show
 pub fn config_show(path:&str){
@@ -209,7 +243,6 @@ pub fn git_status(){
 
     println!("{:#?}", repo.status);
 }
-
 
 /// Command PULL
 pub fn git_pull(){

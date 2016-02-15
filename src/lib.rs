@@ -1,5 +1,6 @@
 #![allow(dead_code)]
 #![allow(unused_imports)]
+#![cfg(test)]
 extern crate yaml_rust;
 extern crate chrono;
 extern crate regex;
