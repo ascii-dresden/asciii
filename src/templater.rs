@@ -19,7 +19,6 @@ pub struct Templater{
     pub filled: String,
 }
 
-// TODO make templater work only on yaml r-values
 impl Templater{
     pub fn new (path:&Path) -> Result<Templater, io::Error> {
         let template = try!(File::open(&path)

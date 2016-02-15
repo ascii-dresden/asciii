@@ -29,8 +29,7 @@ impl fmt::Display for YamlError {
     }
  }
 
-//TODO Rename to open()
-pub fn open_yaml( path:&Path ) -> Result<Yaml, YamlError> {
+pub fn open( path:&Path ) -> Result<Yaml, YamlError> {
     let file_content = try!(File::open(&path)
                              .and_then(|mut file| {
                                  let mut content = String::new();

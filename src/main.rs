@@ -55,7 +55,7 @@ fn init_matches() -> yaml_rust::yaml::Yaml
 }
 
 pub fn setup_app(){
-    let cli_setup = init_matches();
+    let cli_setup = init_matches(); //TODO Font forget this in production
     //let cli_setup = load_yaml!("cli/cli.yml");
 
 

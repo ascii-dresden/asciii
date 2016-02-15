@@ -67,7 +67,7 @@ pub struct Luigi {
 impl Luigi {
     /// Inits luigi, does not check existence, yet. TODO
     pub fn new(storage:&Path, working:&str, archive:&str, template:&str) -> LuigiResult<Luigi> {
-        Ok( Luigi{ // TODO check for the existence
+        Ok( Luigi{
             storage_dir:  storage.to_path_buf(),
             working_dir:  storage.join(working),
             archive_dir:  storage.join(archive),
@@ -121,7 +121,6 @@ impl Luigi {
     ///</pre>
     pub fn create_archive(&self, year:Year) -> LuigiResult<PathBuf> {
         assert!(self.archive_dir.exists());
-        //TODO there must be something nicer than to_string(), like From<u32> for Path
         let archive = &self.archive_dir.join(year.to_string());
 
         if self.archive_dir.exists() && !archive.exists() {
@@ -131,7 +130,7 @@ impl Luigi {
     }
 
     /// Produces a list of files in the `template_dir`
-    /// TODO extension `.tyml` currently hardcoded
+    /// TODO extension `.tyml` currently hardcoded, use config here
     pub fn list_template_files(&self) -> LuigiResult<Vec<PathBuf>> {
         let template_files =
         try!(self.list_path_content(&self.storage_dir.join(&self.template_dir)))
@@ -291,9 +290,8 @@ impl Luigi {
     }
 
     /// Tries to find a concrete Project.
-    // TODO make this pathbuf a path
     pub fn get_project_dir(&self, name:&str, directory:LuigiDir) -> LuigiResult<PathBuf> {
-        let slugged_name = slugify(name); // TODO wrap slugify in a function, so it can be adapted
+        let slugged_name = slugify(name);
         if let Ok(path) = match directory{
             LuigiDir::Working => Ok(self.working_dir.join(&slugged_name)),
             LuigiDir::Archive(year) => self.get_project_dir_from_archive(&name, year),

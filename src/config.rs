@@ -45,7 +45,7 @@ impl ConfigReader{
         Ok(ConfigReader{
             path: path.to_owned(),
             defaults: try!(yaml::parse(&DEFAULT_CONFIG)),
-            user_val: try!(yaml::open_yaml(&path))
+            user_val: try!(yaml::open(&path))
         })
     }
 
@@ -87,92 +87,8 @@ impl ConfigReader{
 
 }
 
-//TODO consider https://crates.io/crates/xdg-basedir
-
 /// Default configuration that will be used if a value is not set in yaml file at DEFAULT_LOCATION
-/// TODO use include_str!()
-pub const DEFAULT_CONFIG: &'static str = r#"
----
-manager_name: "The Unnamed Manager"
-verbose:  false
-editor:   "vim -O"
-opener:   "xdg-open"
-colors:   false
-list_sort: index
-
-path: "~"
-output_path: "."
-dirs:
-  storage: caterings
-  working: working
-  archive: archive
-  templates: templates
-
-template: default # default template
-
-## CAREFUL HERE
-project_file_extension: .yml
-use_git: true
-latex:    pdflatex
-log_file: ~/.ascii_log
-calendar_file: invoicer.ics # will be put in current directory
-
-defaults:
-  tax: 0.19
-  lang: de
-  canceled: false
-  salery: 8.0
-  includes:
-    logopath:
-    name:
-    strasse:
-    universitaet:
-    fakultaet:
-    zusatz:
-    retouradresse:
-    ort:
-    land:
-    telefon:
-    telefax:
-    telex:
-    http:
-    email:
-    bank:
-    blz:
-    iban:
-    bic:
-    konto:
-    steuernummer:
-
-  messages:
-    de:
-      offer:
-        - Angebot
-        - "hiermit möchten wir Ihnen für die gastronomische Betreuung Ihrer Veranstaltung am __EVENT__PRETTYDATE__ folgendes Angebot unterbreiten:"
-        - ""
-      invoice:
-        - Rechnung
-        - "wir bedanken uns für Ihren Auftrag für das Catering am __EVENT__PRETTYDATE__ und erlauben uns Ihnen folgende Rechnung zu stellen:"
-        - "Wir bitten um eine Begleichung des Betrags innerhalb von 14 Tagen nach Erhalt der Rechnung."
-      signature: Mit freundlichen Grüßen
-
-currency: "€" # see gem "money"
-
-gender_matches:
-  herr: male
-  frau: female
-  professor: male
-  professorin: female
-
-lang_addressing:
-  de:
-    male: Sehr geehrter
-    female: Sehr geehrte
-  en:
-    male: Dear
-    female: Dear
-...
-"#;
+pub const DEFAULT_CONFIG: &'static str = include_str!("./default_config.yml");
 
 #[test]
 fn simple_reading(){
