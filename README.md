@@ -32,6 +32,9 @@ Here I try to rewrite the original [ascii-invoicer](http://github.com/ascii-dres
       * [ ] make like behavior:
         * [ ] `open` triggers `invoice` or `offer`
         * [ ] tell if project file is newer then pdf
+  * [ ] Search!!
+      * [ ] keyword search
+      * [ ] filtering and stats
   * [x] Settings
       * [x] Merge HOME_DIR config with defaults
   * [x] project type (init/open/parse yml/index/etc)

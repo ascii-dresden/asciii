@@ -8,6 +8,11 @@ use std::collections::HashMap;
 
 use slug;
 use chrono::{Date, UTC, Datelike};
+use git2::Error as GitError;
+use git2::Repository;
+
+use repo;
+use repo::GitStatus;
 use util::yaml::YamlError;
 
 use templater::Templater;
@@ -16,9 +21,20 @@ const PROJECT_FILE_EXTENSION:&'static str = "yml";
 const TEMPLATE_FILE_EXTENSION:&'static str = "tyml";
 
 pub type Year =  i32;
-pub fn slugify(string:&str) -> String{ slug::slugify(string) }
+pub type LuigiResult<T> = Result<T, LuigiError>;
 
-#[derive(Debug,Clone,Copy)]
+// All you need to make try!() fun again
+impl From<io::Error>  for LuigiError {
+    fn from(io_error: io::Error) -> LuigiError{ LuigiError::Io(io_error) }
+}
+
+impl From<GitError>  for LuigiError {
+    fn from(git_error: GitError) -> LuigiError{ LuigiError::Git(git_error) }
+}
+
+fn slugify(string:&str) -> String{ slug::slugify(string) }
+
+#[derive(Debug)]
 pub enum LuigiDir { Working, Archive(Year), Storage, Templates, All }
 
 #[derive(Debug)]
@@ -37,14 +53,41 @@ pub enum LuigiError {
     InvalidDirStructure,
     ParseError(YamlError),
     TemplateNotFound,
+    Git(GitError),
     Io(io::Error),
 }
 
-pub type LuigiResult<T> = Result<T, LuigiError>;
+pub trait LuigiProject{
+    /// creates in tempfile
+    fn new(project_name:&str,template:&Path) -> LuigiResult<Self> where Self: Sized;
 
-// All you need to make try!() fun again
-impl From<io::Error>  for LuigiError {
-    fn from(ioerror: io::Error) -> LuigiError{ LuigiError::Io(ioerror) }
+    /// For file names
+    fn ident(&self) -> String{ self.dir().file_stem().and_then(|s|s.to_str()).unwrap().to_owned() }
+
+    fn name(&self) -> String;
+    fn date(&self) -> Option<Date<UTC>>;
+    fn year(&self) -> Option<i32>{ self.date().map(|d|d.year()) }
+
+    /// For sorting
+    fn index(&self) -> Option<String>;
+    /// For archiving
+    fn prefix(&self) -> Option<String>;
+
+    fn set_file(&mut self, new_file:&Path);
+    fn file_extension() -> &'static str {PROJECT_FILE_EXTENSION}
+
+    /// Path to project file
+    fn file(&self) -> PathBuf;
+
+    /// Path to project folder
+    fn dir(&self)  -> PathBuf{ self.file().parent().unwrap().to_owned() }
+}
+
+struct RepoBox {
+    /// Git Repository for StorageDir
+    pub repo: Repository,
+    /// Maps GitStatus to each path
+    pub statuses: HashMap<PathBuf, GitStatus>
 }
 
 // TODO rely more on IoError, it has most of what you need
@@ -65,6 +108,8 @@ pub struct Luigi {
     archive_dir:  PathBuf,
     /// Place for template files.
     template_dir: PathBuf,
+
+    repo_box: Option<RepoBox>,
 }
 
 impl Luigi {
@@ -75,6 +120,20 @@ impl Luigi {
             working_dir:  storage.join(working),
             archive_dir:  storage.join(archive),
             template_dir: storage.join(template),
+            repo_box: None,
+        })
+    }
+
+    /// Inits luigi with git capabilities.
+    pub fn new_with_git(storage:&Path, working:&str, archive:&str, template:&str) -> LuigiResult<Self> {
+        let repo = try!(Repository::open(&storage));
+        let statuses = try!(repo::check_statuses(&repo));
+        Ok( Luigi{
+            repo_box: Some(RepoBox{
+                repo: repo,
+                statuses: statuses
+            }),
+            .. try!{Self::new(storage,working,archive,template)}
         })
     }
 
@@ -209,7 +268,7 @@ impl Luigi {
         let slugged_name = slugify(name);
         let name_in_archive = match prefix{
             Some(prefix) => format!("{}_{}", prefix, slugged_name),
-                    None =>  slugged_name
+                    None => slugged_name
         };
 
         let archive = try!(self.create_archive(year));
@@ -374,28 +433,15 @@ impl Luigi {
             .collect();
         Ok(projects)
     }
-}
 
-pub trait LuigiProject{
-    /// creates in tempfile
-    fn new(project_name:&str,template:&Path) -> LuigiResult<Self> where Self: Sized;
+    /// Returns the status to a given path
+    pub fn get_status(&self,path:&Path) -> GitStatus{
+        if let Some(ref repo_box) = self.repo_box{
+            return repo_box.statuses.get(path).unwrap_or(&GitStatus::Unknown).to_owned()
+        }
+        GitStatus::Unknown
+    }
 
-    /// For file names
-    fn ident(&self) -> String{ self.dir().file_stem().and_then(|s|s.to_str()).unwrap().to_owned() }
-
-    fn name(&self) -> String;
-    fn date(&self) -> Option<Date<UTC>>;
-    fn year(&self) -> Option<i32>{ self.date().map(|d|d.year()) }
-
-    /// For sorting
-    fn index(&self) -> Option<String>;
-    /// For archiving
-    fn prefix(&self) -> Option<String>;
-
-    fn set_file(&mut self, new_file:&Path);
-    fn file_extension() -> &'static str {PROJECT_FILE_EXTENSION}
-    fn file(&self) -> PathBuf; // Path to project file
-    fn dir(&self)  -> PathBuf{ self.file().parent().unwrap().to_owned() }
 }
 
 #[cfg(test)]

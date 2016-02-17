@@ -1,4 +1,8 @@
 #![allow(unused_imports)]
+#![allow(unused_variables)]
+#![allow(dead_code)]
+#![feature(path_relative_from)]
+#![feature(deprecated)]
 #![cfg(not(test))]
 extern crate yaml_rust;
 extern crate chrono;
@@ -191,6 +195,10 @@ pub fn setup_app(){
         } else {
             println!("Unable to get terminal size");
         }
+    }
+
+    else if matches.is_present("remote") {
+        cli::git_remote();
     }
 }
 

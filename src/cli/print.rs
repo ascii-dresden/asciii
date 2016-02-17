@@ -6,8 +6,8 @@ use prettytable::format::{TableFormat,FormatBuilder};
 use term::{Attr, color};
 
 use project::Project;
-use manager::LuigiProject;
-use repo::{Repo,GitStatus};
+use manager::{Luigi,LuigiProject};
+use git2;
 
 //TODO construct table rows way more dynamically
 
@@ -68,10 +68,10 @@ pub fn simple_rows(projects:&[Project]) -> Vec<Row>{
 }
 
 /// produces the rows used in `print_projects()`
-pub fn status_rows(projects:&[Project], repo:&Repo) -> Vec<Row>{
- s   projects.iter().enumerate()
+pub fn status_rows(projects:&[Project], luigi:&Luigi) -> Vec<Row>{
+    projects.iter().enumerate()
         .map(|(i, project)| {
-            let status = repo.get_status(&project.dir());
+            let status = luigi.get_status(&project.dir());
             let row_style = project_to_style(&project);
             let cells = vec![
 
