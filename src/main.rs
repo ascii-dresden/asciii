@@ -1,8 +1,9 @@
 #![allow(unused_imports)]
 #![allow(unused_variables)]
 #![allow(dead_code)]
-#![feature(path_relative_from)]
+
 #![feature(deprecated)]
+
 #![cfg(not(test))]
 extern crate yaml_rust;
 extern crate chrono;
@@ -171,11 +172,26 @@ pub fn setup_app(){
     }
 
     // command: "path"
-    else if matches.is_present("path") {
-        println!("{}", PathBuf::from(
-                CONFIG.get_str("path"))
-            .join( CONFIG.get_str("dirs/storage"))
-            .display());
+    else if let Some(matches) = matches.subcommand_matches("path") {
+        if matches.is_present("templates"){
+            println!("{}", PathBuf::from(CONFIG.get_str("path"))
+                     .join( CONFIG.get_str("dirs/storage"))
+                     .join( CONFIG.get_str("dirs/templates"))
+                     .canonicalize().unwrap()
+                     .display());
+        }
+        else if matches.is_present("output"){
+            println!("{}", CONFIG.get_str("output_path"));
+        }
+        else if matches.is_present("bin"){
+            println!("{}", std::env::current_exe().unwrap().display());
+        }
+        else { // default case
+            println!("{}", PathBuf::from(CONFIG.get_str("path"))
+                     .join( CONFIG.get_str("dirs/storage"))
+                     .canonicalize().unwrap()
+                     .display());
+        }
     }
     // command: "status"
     else if matches.is_present("status") { cli::git_status(); }

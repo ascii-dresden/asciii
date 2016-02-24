@@ -184,7 +184,6 @@ impl Project{
             Some(wages+sum+tax)
         } else{ None }
     }
-
 }
 
 #[cfg(test)]

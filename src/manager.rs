@@ -9,10 +9,9 @@ use std::collections::HashMap;
 use slug;
 use chrono::{Date, UTC, Datelike};
 use git2::Error as GitError;
-use git2::Repository;
 
 use repo;
-use repo::GitStatus;
+use repo::{GitStatus,Repository};
 use util::yaml::YamlError;
 
 use templater::Templater;
@@ -83,13 +82,6 @@ pub trait LuigiProject{
     fn dir(&self)  -> PathBuf{ self.file().parent().unwrap().to_owned() }
 }
 
-struct RepoBox {
-    /// Git Repository for StorageDir
-    pub repo: Repository,
-    /// Maps GitStatus to each path
-    pub statuses: HashMap<PathBuf, GitStatus>
-}
-
 // TODO rely more on IoError, it has most of what you need
 /// Does all the internal plumbing.
 ///
@@ -109,7 +101,7 @@ pub struct Luigi {
     /// Place for template files.
     template_dir: PathBuf,
 
-    repo_box: Option<RepoBox>,
+    pub repository: Option<Repository>
 }
 
 impl Luigi {
@@ -120,19 +112,14 @@ impl Luigi {
             working_dir:  storage.join(working),
             archive_dir:  storage.join(archive),
             template_dir: storage.join(template),
-            repo_box: None,
+            repository: None,
         })
     }
 
     /// Inits luigi with git capabilities.
     pub fn new_with_git(storage:&Path, working:&str, archive:&str, template:&str) -> LuigiResult<Self> {
-        let repo = try!(Repository::open(&storage));
-        let statuses = try!(repo::check_statuses(&repo));
         Ok( Luigi{
-            repo_box: Some(RepoBox{
-                repo: repo,
-                statuses: statuses
-            }),
+            repository: Some(try!(Repository::new(&storage))),
             .. try!{Self::new(storage,working,archive,template)}
         })
     }
@@ -432,14 +419,6 @@ impl Luigi {
             .filter_map(|dir| self.get_project_file(dir).ok())
             .collect();
         Ok(projects)
-    }
-
-    /// Returns the status to a given path
-    pub fn get_status(&self,path:&Path) -> GitStatus{
-        if let Some(ref repo_box) = self.repo_box{
-            return repo_box.statuses.get(path).unwrap_or(&GitStatus::Unknown).to_owned()
-        }
-        GitStatus::Unknown
     }
 
 }

@@ -89,6 +89,22 @@ subcommands:
 
   - path:
       about: Show storage path
+      args:
+        - templates:
+            help: "Show path to templates instead"
+            long: templates
+            short: t
+            conflicts_with: [output, bin]
+        - output:
+            help: "Show path to created documents instead"
+            long: output
+            short: o
+            conflicts_with: [templates, bin]
+        - bin:
+            help: "Show path to current binary instead"
+            long: bin
+            short: b
+            conflicts_with: [templates, output]
 
   - edit:
       about: Edit a specific project

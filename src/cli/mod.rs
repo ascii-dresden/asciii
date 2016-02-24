@@ -15,18 +15,25 @@ use config;
 use super::CONFIG;
 use manager::{Luigi, LuigiDir, LuigiProject, LuigiResult, LuigiError};
 use project::Project;
-use git2::{Repository};
 use util;
+use repo::{GitStatus,Repository};
 
 pub mod print;
 
 // TODO keep this up to date or find a way to make this dynamic
 const STATUS_ROWS_WIDTH:u16 = 90;
 
-fn setup_luigi() -> Luigi{
+fn setup_luigi_with_git() -> Luigi{
     let storage_path = PathBuf::from( CONFIG.get_str("path")) .join( CONFIG.get_str("dirs/storage"));
     let storage_path = util::replace_home_tilde(&storage_path);
     let luigi = Luigi::new_with_git(&storage_path, "working", "archive", "templates").unwrap();
+    luigi
+}
+
+fn setup_luigi() -> Luigi{
+    let storage_path = PathBuf::from( CONFIG.get_str("path")) .join( CONFIG.get_str("dirs/storage"));
+    let storage_path = util::replace_home_tilde(&storage_path);
+    let luigi = Luigi::new(&storage_path, "working", "archive", "templates").unwrap();
     luigi
 }
 
@@ -72,7 +79,7 @@ fn sort_by_manager(projects:&mut [Project]){
 
 /// Command LIST [--archive, --all]
 pub fn list_projects(dir:LuigiDir, sort:&str, simple:bool){
-    let luigi = setup_luigi();
+    let luigi = setup_luigi_with_git();
     let project_paths = execute(||luigi.list_project_files(dir));
     let mut projects: Vec<Project> = project_paths.iter()
         .filter_map(|path| match Project::open(path){
@@ -95,8 +102,7 @@ pub fn list_projects(dir:LuigiDir, sort:&str, simple:bool){
         print::print_projects(print::simple_rows(&projects));
     }
     else {
-        let repo = Repository::open(luigi.storage_dir()).unwrap();
-        print::print_projects(print::status_rows(&projects,&luigi));
+        print::print_projects(print::status_rows(&projects,&luigi.repository.unwrap()));
     }
 }
 
@@ -252,37 +258,14 @@ pub fn config_show_default(){
 
 /// Command STATUS
 pub fn git_status(){
-    println!("git_status");
-    let luigi = setup_luigi();
-    let repo = Repository::open(luigi.storage_dir()).unwrap();
-    unimplemented!();
-
-    let project_paths = execute(||luigi.list_project_files(LuigiDir::Working));
-    let projects: Vec<Project> = project_paths
-        .iter()
-        .filter_map(|path| Project::open(path).ok())
-        .collect();
-
-    //println!("{:#?}", repo.status);
+    let repo = Repository::new(&Path::new(CONFIG.get_str("path")));
 }
 
 /// Command REMOTE
 pub fn git_remote(){
-    let luigi = setup_luigi();
-    let repo = Repository::open(luigi.storage_dir()).unwrap();
-    if let Ok(remotes) = repo.remotes(){
-        for remote in remotes.iter(){
-            println!("{:?}", remote);
-        }
-    }
-    else {println!("say what?");}
 }
 
 /// Command PULL
 pub fn git_pull(){
-    println!("git_pull");
-
-    let luigi = setup_luigi();
-    let repo = Repository::open(luigi.storage_dir()).unwrap();
-    //repo.fetch();
+    unimplemented!()
 }
