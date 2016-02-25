@@ -9,7 +9,7 @@ list_sort: index
 path: "~"
 output_path: "."
 dirs:
-  storage: caterings
+  storage: asciii
   working: working
   archive: archive
   templates: templates

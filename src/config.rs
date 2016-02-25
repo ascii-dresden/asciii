@@ -16,7 +16,7 @@
 #![cfg_attr(feature = "dev", feature(plugin))]
 #![cfg_attr(feature = "dev", plugin(clippy))]
 
-use std::path::PathBuf;
+use std::path::{Path,PathBuf};
 use std::env::home_dir;
 use util::yaml;
 use util::yaml::{Yaml, YamlError};
@@ -28,40 +28,43 @@ pub struct ConfigReader{
     /// Path of config file
     pub path: PathBuf,
     defaults: Yaml,
-    user_val: Yaml
+    custom: Yaml,
+    local: Yaml
 }
 
 impl ConfigReader{
 
     /// The Path of the config file.
-    pub fn path() -> PathBuf {
+    pub fn path_home() -> PathBuf {
         let home = home_dir().expect("Can't find HOME DIRECTORY");
         return home.join(DEFAULT_LOCATION);
     }
 
     /// Opens config from `self.path()` and parses Yaml right away.
     pub fn new () -> Result<ConfigReader, YamlError> {
-        let path = ConfigReader::path();
+        let path = ConfigReader::path_home();
         Ok(ConfigReader{
             path: path.to_owned(),
             defaults: try!(yaml::parse(&DEFAULT_CONFIG)),
-            user_val: try!(yaml::open(&path))
+            custom: yaml::open(&path).unwrap_or(Yaml::Null),
+            local:  yaml::open(Path::new(&DEFAULT_LOCATION)).unwrap_or(Yaml::Null)
         })
     }
 
     /// Returns whatever it finds in that position
     pub fn get(&self, key:&str) -> Option<&Yaml>{
-        yaml::get(&self.user_val, &key).or(
-        yaml::get(&self.defaults, &key))
+        yaml::get(&self.local, &key)
+            .or(yaml::get(&self.custom, &key))
+            .or(yaml::get(&self.defaults, &key))
     }
 
     /// Returns whatever it finds in that position
     ///
     /// Supports simple path syntax: "top/middle/child/node"
     pub fn get_path(&self, path:&str) -> Option<&Yaml>{
-        yaml::get(&self.user_val, &path).or(
-        yaml::get(&self.defaults, &path)
-            )
+        yaml::get(&self.local, &path)
+            .or( yaml::get(&self.custom, &path))
+            .or( yaml::get(&self.defaults, &path))
     }
 
     /// Returns the string in the position or an empty string
@@ -69,8 +72,10 @@ impl ConfigReader{
     /// # Panics
     /// this panics if nothing is found
     pub fn get_str(&self, key:&str) -> &str {
-        yaml::get_str(&self.user_val, &key).or(
-        yaml::get_str(&self.defaults, &key)).expect(&format!("{} does not contain values", key))
+        yaml::get_str(&self.local, &key)
+            .or(yaml::get_str(&self.custom, &key))
+            .or(yaml::get_str(&self.defaults, &key))
+            .expect(&format!("{} does not contain values", key))
     }
 
     /// Returns the boolean in the position or `false`
@@ -78,7 +83,9 @@ impl ConfigReader{
     /// # Panics
     /// this panics if nothing is found
     pub fn get_bool(&self, key:&str) -> bool {
-        self.get_path(key).and_then(|y|y.as_bool()).expect(&format!("{} does not contain values", key))
+        self.get_path(key)
+            .and_then(|y|y.as_bool())
+            .expect(&format!("{} does not contain values", key))
     }
 
 }

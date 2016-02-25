@@ -26,6 +26,7 @@ pub fn ls(path:&str){
 }
 
 /// TODO add something like this to the stdlib
+/// TODO ~ must be first character
 pub fn replace_home_tilde(p:&Path) -> PathBuf{
     let path = p.to_str().unwrap();
     PathBuf::from( path.replace("~",home_dir().unwrap().to_str().unwrap()))
