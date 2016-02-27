@@ -3,6 +3,7 @@ use std::io;
 use std::path::Path;
 use std::path::PathBuf;
 use std::env::home_dir;
+use std::process::Command;
 
 pub mod keyword_replacement;
 pub use self::keyword_replacement::IsKeyword;
@@ -16,7 +17,6 @@ pub fn freeze() {
 }
 
 pub fn ls(path:&str){
-    use std::process::Command;
     println!("tree {}", path);
     let output = Command::new("tree")
         .arg(&path)
@@ -40,7 +40,6 @@ macro_rules! try_some {
     });
 }
 
-use std::process::Command;
 //TODO use https://crates.io/crates/open (supports linux, windows, mac)
 pub fn open_in_editor(editor:&str, paths:Vec<String>){
     let editor_config = editor
@@ -62,8 +61,8 @@ pub fn open_in_editor(editor:&str, paths:Vec<String>){
     }
 
     Command::new(editor_command)
-        .arg(args.join(" "))
+        .args(&args)
         .args(&paths)
-        .spawn()
+        .status()
         .unwrap_or_else(|e| { panic!("failed to execute process: {}", e) });
 }
