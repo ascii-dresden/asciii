@@ -104,6 +104,22 @@ pub struct Luigi {
     pub repository: Option<Repository>
 }
 
+use std::fmt;
+impl fmt::Debug for Luigi{
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result
+    {
+        write!(f, "Luigi: storage  = {storage:?}
+                          working  = {working:?}
+                          archive  = {archive:?}
+                          template = {template:?}",
+               storage  = self.storage_dir,
+               working  = self.working_dir,
+               archive  = self.archive_dir,
+               template = self.template_dir,
+               )
+    }
+}
+
 impl Luigi {
     /// Inits luigi, does not check existence, yet. TODO
     pub fn new(storage:&Path, working:&str, archive:&str, template:&str) -> LuigiResult<Luigi> {
@@ -181,7 +197,7 @@ impl Luigi {
     /// Produces a list of files in the `template_dir`
     pub fn list_template_files(&self) -> LuigiResult<Vec<PathBuf>> {
         let template_files =
-        try!(self.list_path_content(&self.storage_dir.join(&self.template_dir)))
+        try!(self.list_path_content(&self.template_dir))
             .iter()
             .filter(|p|p.extension().unwrap_or(OsStr::new("")) == OsStr::new(TEMPLATE_FILE_EXTENSION))
             .cloned().collect();
@@ -213,7 +229,7 @@ impl Luigi {
     /// with the difference, that the project folders may be prefixed with the projects index, e.g.
     /// an invoice number etc.
     pub fn list_archives(&self) -> LuigiResult<Vec<PathBuf>> {
-        self.list_path_content(&self.storage_dir.join(&self.archive_dir))
+        self.list_path_content(&self.archive_dir)
     }
 
     /// Produces a list of years for which there is an archive.

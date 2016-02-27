@@ -2,3 +2,6 @@ target
 *.swp
 *.swo
 Cargo.lock
+*.yml
+*.sh
+tests/caterings
