@@ -289,10 +289,35 @@ pub fn git_status(){
 }
 
 /// Command REMOTE
+/// exact replica of `git remote -v`
 pub fn git_remote(){
+    let luigi = setup_luigi(true);
+    let repo = luigi.repository.unwrap().repo;
+
+    for remote_name in repo.remotes().unwrap().iter(){ // Option<Option<&str>> oh, boy
+        if let Some(name) = remote_name{
+            if let Ok(remote) = repo.find_remote(name){
+            println!("{}  {} (fetch)\n{}  {} (push)",
+                    remote.name().unwrap_or("no name"),
+                    remote.url().unwrap_or("no url"),
+                    remote.name().unwrap_or("no name"),
+                    remote.pushurl().or(remote.url()).unwrap_or(""),
+                    );
+            }else{println!("no remote")}
+        }else{println!("no remote name")}
+    }
 }
 
 /// Command PULL
 pub fn git_pull(){
-    unimplemented!()
+    let luigi = setup_luigi(true);
+    let repo = luigi.repository.unwrap();
+
+    let fetch_result = repo.fetch();
+
+    match fetch_result{
+        Ok(_) => println!("fetching successfull"),
+        Err(e) => println!("fetching failed {:?}", e),
+    }
+
 }

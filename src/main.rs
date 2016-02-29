@@ -201,6 +201,8 @@ pub fn setup_app(){
     // command: "pull"
     else if matches.is_present("pull") { cli::git_pull(); }
 
+    else if matches.is_present("remote") { cli::git_remote(); }
+
     // command: "whoami"
     else if matches.is_present("whoami") {
         cli::config_show("manager_name");
