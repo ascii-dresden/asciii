@@ -60,8 +60,8 @@ fn init_matches() -> yaml_rust::yaml::Yaml
 }
 
 pub fn setup_app(){
-    let cli_setup = init_matches(); //TODO Font forget this in production
-    //let cli_setup = load_yaml!("cli/cli.yml");
+    //let cli_setup = init_matches(); //TODO Font forget this in production
+    let cli_setup = load_yaml!("cli/cli.yml");
 
 
     let matches = App::from_yaml(&cli_setup)
@@ -84,6 +84,8 @@ pub fn setup_app(){
     else if let Some(matches) = matches.subcommand_matches("list") {
         if matches.is_present("templates"){
             cli::list_templates();
+        } else if matches.is_present("years"){
+            cli::list_years();
         } else {
 
             let mut sort = matches.value_of("sort").unwrap_or("index");
@@ -103,7 +105,9 @@ pub fn setup_app(){
             // or list normal
             else { LuigiDir::Working };
 
-            if matches.is_present("broken"){
+            if matches.is_present("paths"){
+                cli::list_paths(dir);
+            } else if matches.is_present("broken"){
                 cli::list_broken_projects(dir);
             } else {
                 cli::list_projects(dir, sort, matches.is_present("simple"));
@@ -177,7 +181,6 @@ pub fn setup_app(){
             println!("{}", PathBuf::from(CONFIG.get_str("path"))
                      .join( CONFIG.get_str("dirs/storage"))
                      .join( CONFIG.get_str("dirs/templates"))
-                     .canonicalize().unwrap()
                      .display());
         }
         else if matches.is_present("output"){
@@ -187,10 +190,9 @@ pub fn setup_app(){
             println!("{}", std::env::current_exe().unwrap().display());
         }
         else { // default case
-            println!("{}", PathBuf::from(CONFIG.get_str("path"))
-                     .join( CONFIG.get_str("dirs/storage"))
-                     .canonicalize().unwrap()
-                     .display());
+            let path = util::replace_home_tilde(Path::new(CONFIG.get_str("path")))
+                .join( CONFIG.get_str("dirs/storage"));
+            println!("{}", path.display());
         }
     }
     // command: "status"

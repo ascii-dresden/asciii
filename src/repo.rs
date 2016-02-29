@@ -17,7 +17,7 @@ use manager::LuigiDir;
 pub enum GitStatus{
     IndexNew, IndexModified , IndexDeleted, IndexRenamed, IndexTypechange,
     WorkingNew, WorkingModified, WorkingDeleted, WorkingTypechange, WorkingRenamed,
-    Ignored, Conflict, Unknown
+    Ignored, Conflict, Current, Unknown
 }
 
 impl GitStatus{
@@ -25,6 +25,7 @@ impl GitStatus{
         match *self{
         // => write!(f, "{:?}", self)
          GitStatus::Unknown         => color::YELLOW,
+         GitStatus::Current         => color::BLUE,
          GitStatus::Conflict        => color::RED,
          GitStatus::WorkingNew      => color::GREEN,
          GitStatus::WorkingModified => color::YELLOW,
@@ -38,10 +39,11 @@ impl fmt::Display for GitStatus{
 
         match *self{
         // => write!(f, "{:?}", self)
-         GitStatus::Unknown         => write!(f, "?"),
          GitStatus::Conflict        => write!(f, "X"),
+         GitStatus::Current         => write!(f, "+"),
          GitStatus::WorkingNew      => write!(f, "+"),
          GitStatus::WorkingModified => write!(f, "~"),
+         GitStatus::Unknown         => write!(f, ""),
          _                          => write!(f, "{:?}", self),
 
         }
@@ -51,6 +53,7 @@ impl fmt::Display for GitStatus{
 impl From<git2::Status> for GitStatus{
     fn from(status:git2::Status) -> Self{
         match status{
+            //s if s.contains(git2::STATUS_CURRENT)          => GitStatus::Current,
             s if s.contains(git2::STATUS_INDEX_NEW)        => GitStatus::IndexNew,
             s if s.contains(git2::STATUS_INDEX_MODIFIED)   => GitStatus::IndexModified ,
             s if s.contains(git2::STATUS_INDEX_DELETED)    => GitStatus::IndexDeleted,

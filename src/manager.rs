@@ -123,13 +123,17 @@ impl fmt::Debug for Luigi{
 impl Luigi {
     /// Inits luigi, does not check existence, yet. TODO
     pub fn new(storage:&Path, working:&str, archive:&str, template:&str) -> LuigiResult<Luigi> {
-        Ok( Luigi{
-            storage_dir:  storage.to_path_buf(),
-            working_dir:  storage.join(working),
-            archive_dir:  storage.join(archive),
-            template_dir: storage.join(template),
-            repository: None,
-        })
+        if storage.is_absolute(){
+            Ok( Luigi{
+                storage_dir:  storage.to_path_buf(),
+                working_dir:  storage.join(working),
+                archive_dir:  storage.join(archive),
+                template_dir: storage.join(template),
+                repository: None,
+            })
+        } else {
+            Err(LuigiError::StoragePathNotAbsolute)
+        }
     }
 
     /// Inits luigi with git capabilities.

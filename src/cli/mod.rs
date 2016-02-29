@@ -7,6 +7,7 @@
 use std::path::{Path,PathBuf};
 use std::ffi::OsStr;
 use std::process::exit;
+use std::env::current_dir;
 
 use chrono::UTC;
 use terminal_size::{Width, Height, terminal_size };
@@ -23,17 +24,20 @@ pub mod print;
 // TODO keep this up to date or find a way to make this dynamic
 const STATUS_ROWS_WIDTH:u16 = 90;
 
-fn setup_luigi_with_git() -> Luigi{
-    let storage_path = PathBuf::from( CONFIG.get_str("path")) .join( CONFIG.get_str("dirs/storage"));
-    let storage_path = util::replace_home_tilde(&storage_path);
-    let luigi = Luigi::new_with_git(&storage_path, "working", "archive", "templates").unwrap();
-    luigi
-}
+fn setup_luigi(with_git:bool) -> Luigi{
+    let storage_path = PathBuf::from(CONFIG.get_str("path"))
+        .join( CONFIG.get_str("dirs/storage"));
 
-fn setup_luigi() -> Luigi{
-    let storage_path = PathBuf::from( CONFIG.get_str("path")) .join( CONFIG.get_str("dirs/storage"));
-    let storage_path = util::replace_home_tilde(&storage_path);
-    let luigi = Luigi::new(&storage_path, "working", "archive", "templates").unwrap();
+    let mut storage_path = util::replace_home_tilde(&storage_path);
+    if !storage_path.is_absolute(){
+        storage_path = current_dir().unwrap().join(storage_path);
+    }
+
+    let luigi = if with_git {
+        execute(||Luigi::new_with_git(&storage_path, "working", "archive", "templates"))
+    } else {
+        Luigi::new(&storage_path, "working", "archive", "templates").unwrap()
+    };
     luigi
 }
 
@@ -79,7 +83,7 @@ fn sort_by_manager(projects:&mut [Project]){
 
 /// Command LIST [--archive, --all]
 pub fn list_projects(dir:LuigiDir, sort:&str, simple:bool){
-    let luigi = setup_luigi_with_git();
+    let luigi = setup_luigi(true);
     let project_paths = execute(||luigi.list_project_files(dir));
     let mut projects: Vec<Project> = project_paths.iter()
         .filter_map(|path| match Project::open(path){
@@ -109,7 +113,7 @@ pub fn list_projects(dir:LuigiDir, sort:&str, simple:bool){
 /// Command LIST --broken
 pub fn list_broken_projects(dir:LuigiDir){
     use util::yaml::YamlError;
-    let luigi = setup_luigi();
+    let luigi = setup_luigi(false);
     let invalid_files = execute(||luigi.list_project_files(dir));
     let tups = invalid_files
         .iter()
@@ -123,7 +127,7 @@ pub fn list_broken_projects(dir:LuigiDir){
 
 /// Command LIST --templates
 pub fn list_templates(){
-    let luigi = setup_luigi();
+    let luigi = setup_luigi(false);
     let template_paths = execute(||luigi.list_template_files());
 
     for path in template_paths{
@@ -135,12 +139,31 @@ pub fn list_templates(){
     }
 }
 
+/// Command LIST --years
+pub fn list_years(){
+    let luigi = setup_luigi(false);
+    let years = execute(||luigi.list_years());
+    println!("{:?}", years);
+}
+
+
+
+
+/// Command LIST --years
+pub fn list_paths(dir:LuigiDir){
+    let luigi = setup_luigi(false);
+    let paths = execute(||luigi.list_project_files(dir));
+    for path in paths{
+    println!("{}", path.display());
+    }
+}
+
 
 
 
 /// Command EDIT
 pub fn edit_project(dir:LuigiDir, search_term:&str, editor:&str){
-    let luigi = setup_luigi();
+    let luigi = setup_luigi(false);
     let paths = execute(||luigi.search_projects(dir, &search_term))
         .iter()
         .filter_map(|path| Project::open(path).ok())
@@ -160,7 +183,7 @@ pub fn edit_project(dir:LuigiDir, search_term:&str, editor:&str){
 
 /// Command EDIT --template
 pub fn edit_template(name:&str, editor:&str){
-    let luigi = setup_luigi();
+    let luigi = setup_luigi(false);
     let template_paths = execute(||luigi.list_template_files())
         .iter()
         .filter(|f|f
@@ -173,7 +196,7 @@ pub fn edit_template(name:&str, editor:&str){
 
 /// Command SHOW
 pub fn show_project(dir:LuigiDir, search_term:&str){
-    let luigi = setup_luigi();
+    let luigi = setup_luigi(false);
     for project in execute(||luigi.search_projects(dir, &search_term))
         .iter()
         .filter_map(|path| Project::open(path).ok())
@@ -188,7 +211,7 @@ pub fn show_project(dir:LuigiDir, search_term:&str){
 /// Command SHOW --template
 use templater::Templater;
 pub fn show_template(name:&str){
-    let luigi = setup_luigi();
+    let luigi = setup_luigi(false);
     let templater = Templater::new(&luigi.get_template_file(name).unwrap()).unwrap();
     println!("{:#?}", templater.list_keywords());
 }
@@ -198,16 +221,18 @@ pub fn show_template(name:&str){
 
 /// Command NEW
 pub fn new_project(project_name:&str, template_name:&str, editor:&str, edit:bool){
-    let luigi = setup_luigi();
-    let project = execute(|| luigi.create_project::<Project>(&project_name, &template_name));
+    let luigi = setup_luigi(false);
+    //let project = execute(|| luigi.create_project::<Project>(&project_name, &template_name));
+    let project = luigi.create_project::<Project>(&project_name, &template_name).unwrap();
     let project_file = project.file();
-    if edit { util::open_in_editor(&editor, vec![project_file.display().to_string()]); }
+    if edit { util::open_in_editor(&editor, vec![project_file.display().to_string()]);
+    }
 }
 
 
-/// Command ARCHIVW <NAME>
+/// Command ARCHIVE <NAME>
 pub fn archive_project(name:&str, manual_year:Option<i32>){
-    let luigi = setup_luigi();
+    let luigi = setup_luigi(false);
     if let Ok(projects) = luigi.search_projects(LuigiDir::Working, name){
         for project in projects.iter().filter_map(|path| Project::open(path).ok()) {
             if project.valid_stage3().is_ok(){
@@ -226,7 +251,7 @@ pub fn archive_project(name:&str, manual_year:Option<i32>){
 
 /// Command UNARCHIVW <YEAR> <NAME>
 pub fn unarchive_project(year:i32, name:&str){
-    let luigi = setup_luigi();
+    let luigi = setup_luigi(false);
     if let Ok(projects) = luigi.search_projects(LuigiDir::Archive(year), name){
         if projects.len() == 1 {
             println!("{:?}", projects);
@@ -258,7 +283,9 @@ pub fn config_show_default(){
 
 /// Command STATUS
 pub fn git_status(){
-    let repo = Repository::new(&Path::new(CONFIG.get_str("path")));
+    let luigi = setup_luigi(true);
+    println!("{:#?}", luigi);
+    println!("{:#?}", luigi.repository.unwrap().statuses);
 }
 
 /// Command REMOTE

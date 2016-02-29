@@ -57,6 +57,16 @@ subcommands:
               short: "t"
               long: "templates"
 
+        - "years":
+              help: "list years in archive"
+              short: "y"
+              long: "years"
+
+        - "paths":
+              help: "list paths of each file"
+              short: "p"
+              long: "paths"
+
         - "broken":
               help: "list broken projects  without project file "
               short: "b"
