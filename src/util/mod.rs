@@ -1,8 +1,7 @@
 #![allow(dead_code)]
 use std::io;
-use std::path::Path;
-use std::path::PathBuf;
-use std::env::home_dir;
+use std::env::{home_dir,current_dir};
+use std::path::{Path,PathBuf};
 use std::process::Command;
 
 pub mod keyword_replacement;
@@ -65,4 +64,18 @@ pub fn open_in_editor(editor:&str, paths:Vec<String>){
         .args(&paths)
         .status()
         .unwrap_or_else(|e| { panic!("failed to execute process: {}", e) });
+}
+
+pub fn get_storage_path() -> PathBuf
+{
+    let storage_path = PathBuf::from(super::CONFIG.get_str("path"))
+        .join( super::CONFIG.get_str("dirs/storage"));
+
+    // TODO make replace tilde a Trait function
+    let mut storage_path = replace_home_tilde(&storage_path);
+
+    if !storage_path.is_absolute(){
+        storage_path = current_dir().unwrap().join(storage_path);
+    }
+    storage_path
 }

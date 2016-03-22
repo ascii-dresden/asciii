@@ -122,7 +122,8 @@ impl fmt::Debug for Luigi{
 
 impl Luigi {
     /// Inits luigi, does not check existence, yet. TODO
-    pub fn new(storage:&Path, working:&str, archive:&str, template:&str) -> LuigiResult<Luigi> {
+    pub fn new<P: AsRef<Path>>(storage:P, working:&str, archive:&str, template:&str) -> LuigiResult<Luigi> {
+        let storage = storage.as_ref();
         if storage.is_absolute(){
             Ok( Luigi{
                 storage_dir:  storage.to_path_buf(),
@@ -137,9 +138,9 @@ impl Luigi {
     }
 
     /// Inits luigi with git capabilities.
-    pub fn new_with_git(storage:&Path, working:&str, archive:&str, template:&str) -> LuigiResult<Self> {
+    pub fn new_with_git<P: AsRef<Path>>(storage:P, working:&str, archive:&str, template:&str) -> LuigiResult<Self> {
         Ok( Luigi{
-            repository: Some(try!(Repository::new(&storage))),
+            repository: Some(try!(Repository::new(storage.as_ref()))),
             .. try!{Self::new(storage,working,archive,template)}
         })
     }
