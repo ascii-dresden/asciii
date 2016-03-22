@@ -24,12 +24,12 @@ impl GitStatus{
     pub fn to_color(&self) -> Color {
         match *self{
         // => write!(f, "{:?}", self)
-         GitStatus::Unknown         => color::YELLOW,
          GitStatus::Current         => color::BLUE,
          GitStatus::Conflict        => color::RED,
          GitStatus::WorkingNew      => color::GREEN,
          GitStatus::WorkingModified => color::YELLOW,
-         _                          => color::BLUE
+         //GitStatus::Unknown         => color::WHITE,
+         _                          => color::WHITE
         }
     }
 }
@@ -120,7 +120,7 @@ impl Repository {
 
     /// Returns the status to a given path
     pub fn get_status(&self,path:&Path) -> GitStatus{
-        return self.statuses.get(path).unwrap_or(&GitStatus::Unknown).to_owned()
+        self.statuses.get(path).unwrap_or(&GitStatus::Unknown).to_owned()
     }
 
     pub fn fetch(&self) -> Result<(), git2::Error>{

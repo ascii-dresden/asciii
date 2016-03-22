@@ -3,8 +3,11 @@
 #![allow(dead_code)]
 
 //#![feature(deprecated)]
-//#![feature(plugin)]
-//#![plugin(clippy)]
+#![feature(plugin)]
+
+#![cfg_attr(feature = "dev", allow(unstable_features))]
+#![cfg_attr(feature = "dev", feature(plugin))]
+#![cfg_attr(feature = "dev", plugin(clippy))]
 
 #![cfg(not(test))]
 extern crate yaml_rust;
@@ -46,12 +49,13 @@ lazy_static!{
 
 fn init_matches() -> yaml_rust::yaml::Yaml
 {
-    // TODO replace this block with the line above
-    println!("loading cli config at runtime!");
     use std::fs::File;
     use std::io::Read;
     use yaml_rust::{Yaml};
     use util::yaml;
+
+    // TODO replace this block with the line above
+    println!("loading cli config at runtime!");
     let content = File::open("./src/cli/cli.yml")
         .and_then(|mut file| {
             let mut content = String::new();
@@ -109,9 +113,11 @@ pub fn setup_app(){
 
             if matches.is_present("paths"){
                 cli::list_paths(dir);
-            } else if matches.is_present("broken"){
+            }
+            else if matches.is_present("broken"){
                 cli::list_broken_projects(dir);
-            } else {
+            }
+            else {
                 cli::list_projects(dir, sort, matches.is_present("simple"));
             }
         }

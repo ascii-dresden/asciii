@@ -15,14 +15,14 @@ pub fn print_project(_project:&Project){
     unimplemented!();
 }
 fn result_to_cell(res:&Result<(), Vec<&str>>) -> Cell{
-    match res{
-        &Ok(_)           => Cell::new("✓").with_style(Attr::ForegroundColor(color::GREEN)), // ✗
-        &Err(ref _errors) => Cell::new("✗").with_style(Attr::ForegroundColor(color::RED))// + &errors.join(", ") )
+    match *res{
+        Ok(_)           => Cell::new("✓").with_style(Attr::ForegroundColor(color::GREEN)), // ✗
+        Err(ref _errors) => Cell::new("✗").with_style(Attr::ForegroundColor(color::RED))// + &errors.join(", ") )
         //&Err(ref errors) => Cell::new( &format!("✗ {}",  &errors.join(", ") )) .with_style(Attr::ForegroundColor(color::RED))
     }
 }
 
-fn project_to_style<'a>(project:&'a Project) -> &'a str{
+fn project_to_style(project:&Project) -> &str{
     if project.valid_stage2().is_ok(){
         return "d";
     }
@@ -128,7 +128,7 @@ pub fn show_items(project:&Project){
 
     let mut table = Table::new();
     table.set_format(TableFormat::new());
-    for item in project.invoice_items().unwrap().iter(){
+    for item in &project.invoice_items().unwrap(){
         table.add_row( Row::new(vec![
                                 Cell::new(item.item.name),
                                 Cell::new(&item.amount_sold.to_string()),

@@ -13,25 +13,25 @@ use std::ops::Deref;
 impl<U:Deref<Target=str>> IsKeyword for U {
 
     fn is_keyword(&self) -> bool{
-        Regex::new(REGEX).ok().expect("broken regex").is_match(self)
+        Regex::new(REGEX).expect("broken regex").is_match(self)
     }
 
     fn get_keyword(&self) -> Option<String> {
-        Regex::new(REGEX).ok().expect("broken regex")
+        Regex::new(REGEX).expect("broken regex")
             .captures(&self)
             .and_then(|caps| caps.at(1).map(|c| c.to_owned()))
     }
 
     fn list_keywords(&self) -> Vec<String>{
-        Regex::new(REGEX).ok().expect("broken regex")
+        Regex::new(REGEX).expect("broken regex")
             .captures_iter(&self)
-            .map(|c|c.at(1).unwrap().to_string())
+            .map(|c|c.at(1).unwrap().to_owned())
             .collect()
     }
 
     fn map_keywords<F>(&self, closure: F) -> String
         where F:Fn(&str) -> String{
-        Regex::new(REGEX).ok().expect("broken regex")
+        Regex::new(REGEX).expect("broken regex")
             .replace_all(&self, |caps:&Captures| {
                 closure(caps.at(1).unwrap())
             })

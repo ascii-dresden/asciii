@@ -12,10 +12,6 @@
 //#![warn(missing_debug_implementations)]
 
 
-#![cfg_attr(feature = "dev", allow(unstable_features))]
-#![cfg_attr(feature = "dev", feature(plugin))]
-#![cfg_attr(feature = "dev", plugin(clippy))]
-
 use std::path::{Path,PathBuf};
 use std::env::home_dir;
 use util::yaml;
@@ -37,7 +33,7 @@ impl ConfigReader{
     /// The Path of the config file.
     pub fn path_home() -> PathBuf {
         let home = home_dir().expect("Can't find HOME DIRECTORY");
-        return home.join(DEFAULT_LOCATION);
+        home.join(DEFAULT_LOCATION)
     }
 
     /// Opens config from `self.path()` and parses Yaml right away.
@@ -54,8 +50,8 @@ impl ConfigReader{
     /// Returns whatever it finds in that position
     pub fn get(&self, key:&str) -> Option<&Yaml>{
         yaml::get(&self.local, &key)
-            .or(yaml::get(&self.custom, &key))
-            .or(yaml::get(&self.defaults, &key))
+            .or_else(||yaml::get(&self.custom, &key))
+            .or_else(||yaml::get(&self.defaults, &key))
     }
 
     /// Returns whatever it finds in that position
@@ -63,8 +59,8 @@ impl ConfigReader{
     /// Supports simple path syntax: "top/middle/child/node"
     pub fn get_path(&self, path:&str) -> Option<&Yaml>{
         yaml::get(&self.local, &path)
-            .or( yaml::get(&self.custom, &path))
-            .or( yaml::get(&self.defaults, &path))
+            .or_else(||yaml::get(&self.custom, &path))
+            .or_else(||yaml::get(&self.defaults, &path))
     }
 
     /// Returns the string in the position or an empty string
@@ -73,8 +69,8 @@ impl ConfigReader{
     /// this panics if nothing is found
     pub fn get_str(&self, key:&str) -> &str {
         yaml::get_str(&self.local, &key)
-            .or(yaml::get_str(&self.custom, &key))
-            .or(yaml::get_str(&self.defaults, &key))
+            .or_else(||yaml::get_str(&self.custom, &key))
+            .or_else(||yaml::get_str(&self.defaults, &key))
             .expect(&format!("{} does not contain values", key))
     }
 

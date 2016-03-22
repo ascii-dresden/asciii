@@ -79,7 +79,7 @@ impl LuigiProject for Project{
         if let Some(date) = self.date(){
             spec::invoice::number_str(self.yaml())
                 .map(|num| format!("{1}{0}", date.format("%Y%m%d").to_string(),num))
-                .or( Some(date.format("zzz%Y%m%d").to_string()))
+                .or_else(||Some(date.format("zzz%Y%m%d").to_string()))
         } else {
             None
         }

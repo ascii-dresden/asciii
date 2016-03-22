@@ -204,7 +204,9 @@ impl Luigi {
         let template_files =
         try!(self.list_path_content(&self.template_dir))
             .iter()
-            .filter(|p|p.extension().unwrap_or(OsStr::new("")) == OsStr::new(TEMPLATE_FILE_EXTENSION))
+            .filter(|p|p.extension()
+                        .unwrap_or_else(|| OsStr::new("")) == OsStr::new(TEMPLATE_FILE_EXTENSION)
+                        )
             .cloned().collect();
         Ok(template_files)
     }
@@ -268,7 +270,8 @@ impl Luigi {
         try!(fs::create_dir(&project_dir));
         try!(fs::copy(project.file(), &target_file));
         project.set_file(&target_file);
-        return Ok(project);
+
+        Ok(project)
     }
 
     /// Moves a project folder from `/working` dir to `/archive/$year`.
@@ -327,7 +330,8 @@ impl Luigi {
         let parent_is_num =  archived_dir.parent()
             .and_then(|p| p.file_stem())
             .and_then(|p| p.to_str())
-            .map(|s| s.parse::<i32>().is_ok() ).unwrap_or(false);
+            .map(|s| s.parse::<i32>().is_ok() )
+            .unwrap_or(false);
 
         let name = try!(self.get_project_name(archived_dir));
         let target = self.working_dir.join(&name);
@@ -400,7 +404,7 @@ impl Luigi {
     }
 
     fn get_project_dir_from_archive(&self, name:&str, year:Year) -> LuigiResult<PathBuf> {
-        for project_file in try!(self.list_project_files(LuigiDir::Archive(year))).iter(){
+        for project_file in &try!(self.list_project_files(LuigiDir::Archive(year))){
             if project_file.ends_with(slugify(&name) + "."+ PROJECT_FILE_EXTENSION) {
                 return project_file.parent().map(|p|p.to_owned()).ok_or(LuigiError::NoProject);
             }

@@ -11,8 +11,7 @@ pub mod yaml;
 
 
 pub fn freeze() {
-    let mut _devnull = String::new();
-    let _ = io::stdin().read_line(&mut _devnull);
+    io::stdin().read_line(&mut String::new()).unwrap();
 }
 
 pub fn ls(path:&str){

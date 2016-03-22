@@ -40,7 +40,7 @@ impl Templater{
 
     pub fn fill_in_data(&mut self, data: &HashMap<&str,&str>) -> &mut Templater {
         self.fill_template(|keyword| match data.get(keyword){
-            Some(content) => content.to_string(),
+            Some(content) => String::from(*content),
             None => format!("__{}__", keyword)
         })
     }

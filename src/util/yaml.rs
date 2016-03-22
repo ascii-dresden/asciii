@@ -73,7 +73,7 @@ pub fn get_hash<'a>(yaml:&'a Yaml, key:&str) -> Option<&'a BTreeMap<Yaml,Yaml>> 
     get(&yaml,&key).and_then(|y|y.as_hash())
 }
 
-pub fn get_bool<'a>(yaml:&'a Yaml, key:&str) -> Option<bool> {
+pub fn get_bool(yaml:&Yaml, key:&str) -> Option<bool> {
     get(&yaml,&key)
         .and_then(|y| y
                   .as_bool()
@@ -83,18 +83,18 @@ pub fn get_bool<'a>(yaml:&'a Yaml, key:&str) -> Option<bool> {
                              match yes_or_no.to_lowercase().as_ref() // XXX ??? why as_ref?
                              {
                                  "yes" => true,
-                                 "no" => false,
+                                 //"no" => false,
                                  _ => false
                              })
                      ))
 }
 
 // also takes a Yaml::I64 and reinterprets it
-pub fn get_f64<'a>(yaml:&'a Yaml, key:&str) -> Option<f64> {
+pub fn get_f64(yaml:&Yaml, key:&str) -> Option<f64> {
     get(&yaml,&key).and_then(|y| y.as_f64().or( y.as_i64().map(|y|y as f64)))
 }
 
-pub fn get_int<'a>(yaml:&'a Yaml, key:&str) -> Option<i64> {
+pub fn get_int(yaml:&Yaml, key:&str) -> Option<i64> {
     get(&yaml,&key).and_then(|y|y.as_i64())
 }
 
@@ -106,7 +106,7 @@ pub fn get_string(yaml:&Yaml, key:&str) -> Option<String> {
     get_str(&yaml,&key).map(|s|s.to_owned())
 }
 
-pub fn get_dmy<'a>(yaml:&'a Yaml, key:&str) -> Option<Date<UTC>> {
+pub fn get_dmy(yaml:&Yaml, key:&str) -> Option<Date<UTC>> {
     get(&yaml,&key).and_then(|y|y.as_str()).and_then(|d|parse_fwd_date(d))
 }
 
@@ -120,8 +120,8 @@ pub fn get<'a>(yaml:&'a Yaml, key:&str) -> Option<&'a Yaml>{
 fn get_path<'a>(yaml:&'a Yaml, path:&[&str]) -> Option<&'a Yaml>{
     if let Some((&key, remainder)) = path.split_first(){
 
-        return match yaml{
-            &Yaml::Hash(ref hash) =>
+        return match *yaml{
+            Yaml::Hash(ref hash) =>
             {
                 if remainder.is_empty(){
                     hash.get(&Yaml::String(key.to_owned()))
@@ -131,7 +131,7 @@ fn get_path<'a>(yaml:&'a Yaml, path:&[&str]) -> Option<&'a Yaml>{
                 }
             },
 
-            &Yaml::Array(ref vec) =>
+            Yaml::Array(ref vec) =>
             {
                 if let Ok(index) = key.parse::<usize>() {
                     if remainder.is_empty(){

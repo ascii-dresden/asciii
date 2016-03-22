@@ -48,7 +48,7 @@ pub mod project{
     pub fn name(yaml:&Yaml) -> Option<&str>{
         yaml::get_str(yaml, "event/name")
             // old spec
-            .or( yaml::get_str(yaml, "event"))
+            .or_else(|| yaml::get_str(yaml, "event"))
     }
 
     pub fn date(yaml:&Yaml) -> Option<Date<UTC>>{
@@ -58,7 +58,7 @@ pub mod project{
     pub fn manager(yaml:&Yaml) -> Option<&str>{
         yaml::get_str(yaml, "manager")
         // old spec
-        .or( yaml::get_str(&yaml, "signature").and_then(|c|c.lines().last()))
+        .or_else(|| yaml::get_str(&yaml, "signature").and_then(|c|c.lines().last()))
     }
 
     pub fn format(yaml:&Yaml) -> Option<&str>{
@@ -94,19 +94,19 @@ pub mod client{
     pub fn title(yaml:&Yaml) -> Option<&str>{
         yaml::get_str(&yaml, "client/title")
         // old spec
-        .or( yaml::get_str(&yaml, "client").and_then(|c|c.lines().nth(0)))
+        .or_else(|| yaml::get_str(&yaml, "client").and_then(|c|c.lines().nth(0)))
     }
 
     pub fn first_name(yaml:&Yaml) -> Option<&str>{
         yaml::get_str(&yaml, "client/first_name")
         // old spec
-        //.or( yaml::get_str(&yaml, "client").and_then(|c|c.lines().nth(0)))
+        //.or_else(|| yaml::get_str(&yaml, "client").and_then(|c|c.lines().nth(0)))
     }
 
     pub fn last_name(yaml:&Yaml) -> Option<&str>{
         yaml::get_str(&yaml, "client/last_name")
         // old spec
-        .or( yaml::get_str(&yaml, "client").and_then(|c|c.lines().nth(1)))
+        .or_else(|| yaml::get_str(&yaml, "client").and_then(|c|c.lines().nth(1)))
     }
 
     pub fn full_name(yaml:&Yaml) -> Option<String>{
@@ -117,7 +117,7 @@ pub mod client{
     }
 
     pub fn addressing(yaml:&Yaml, config:&ConfigReader) -> Option<String>{
-        return if let Some(title) = title(&yaml){
+        if let Some(title) = title(&yaml){
             let last_name = last_name(&yaml);
 
             let lang = config.get_str("defaults/lang");
@@ -163,22 +163,22 @@ pub mod date {
 
     pub fn date(yaml:&Yaml) -> Option<Date<UTC>>{
         yaml::get_dmy(&yaml, "event/dates/0/begin")
-        .or(yaml::get_dmy(&yaml, "created"))
-        .or(yaml::get_dmy(&yaml, "date"))
+        .or_else(||yaml::get_dmy(&yaml, "created"))
+        .or_else(||yaml::get_dmy(&yaml, "date"))
         // probably the dd-dd.mm.yyyy format
-        .or(yaml::get_str(&yaml, "date").and_then(|s|util::yaml::parse_fwd_date_range(s)))
+        .or_else(||yaml::get_str(&yaml, "date").and_then(|s|util::yaml::parse_fwd_date_range(s)))
     }
 
     pub fn payed(yaml:&Yaml) -> Option<Date<UTC>> {
         yaml::get_dmy(yaml, "invoice/payed_date")
         // old spec
-        .or( yaml::get_dmy(yaml, "payed_date"))
+        .or_else(|| yaml::get_dmy(yaml, "payed_date"))
     }
 
     pub fn wages(yaml:&Yaml) -> Option<Date<UTC>> {
         yaml::get_dmy(yaml, "hours/wages_date")
         // old spec
-        .or( yaml::get_dmy(yaml, "wages_date"))
+        .or_else(|| yaml::get_dmy(yaml, "wages_date"))
     }
 
     pub fn offer(yaml:&Yaml) -> Option<Date<UTC>> {
@@ -188,21 +188,22 @@ pub mod date {
     pub fn invoice(yaml:&Yaml) -> Option<Date<UTC>> {
         yaml::get_dmy(yaml, "invoice/date")
         // old spec
-        .or( yaml::get_dmy(yaml, "invoice_date"))
+        .or_else(|| yaml::get_dmy(yaml, "invoice_date"))
     }
 
     pub fn event(yaml:&Yaml) -> Option<Date<UTC>> {
         yaml::get_dmy(yaml, "event/dates/0/begin")
     }
 
-    // TODO packed to deep?
+    // TODO packed to deep? Clippy says YES, remove this allow!
+    #[allow(type_complexity)]
     pub fn events(yaml:&Yaml) -> Option< Vec< (Option<Date<UTC>>,Option<Date<UTC>>) > > {
         yaml::get(yaml, "event/dates/")
             .and_then(|e|e.as_vec())
             .map(|v| v.iter()
                  .map(|e| (
                          yaml::get_dmy(e, "begin"),
-                         yaml::get_dmy(e, "end").or( yaml::get_dmy(e, "begin"))
+                         yaml::get_dmy(e, "end").or_else(|| yaml::get_dmy(e, "begin"))
                          )
                      )
                  .collect::<Vec<(Option<Date<UTC>>,Option<Date<UTC>>)>>()
@@ -223,7 +224,7 @@ pub mod offer{
             .map(|s| format!("{}-{}", s, num))
 
         // old spec
-        .or( yaml::get_string(&yaml, "manumber"))
+        .or_else(|| yaml::get_string(&yaml, "manumber"))
     }
 
     pub fn appendix(yaml:&Yaml) -> Option<i64> {
@@ -258,7 +259,7 @@ pub mod invoice{
     pub fn number(yaml:&Yaml) -> Option<i64> {
         yaml::get_int(&yaml, "invoice/number")
         // old spec
-        .or( yaml::get_int(&yaml, "rnumber"))
+        .or_else(|| yaml::get_int(&yaml, "rnumber"))
     }
 
     pub fn number_str(yaml:&Yaml) -> Option<String> {
@@ -322,7 +323,7 @@ pub mod hours {
                  .iter()
                  .map(|(c, h)| (// argh, those could be int or float, grrr
                          c.as_str().unwrap_or("").to_owned(),
-                         h.as_f64().or( // sorry for this
+                         h.as_f64().or_else(|| // sorry for this
                              h.as_i64().map(|f|f as f64 )
                              ).unwrap_or(0f64)))
                  .collect::<Vec<(String,f64)>>()
@@ -396,6 +397,7 @@ pub mod products{
         })
     }
 
+    #[allow(option_map_unwrap_or_else)]
     pub fn all0(yaml:&Yaml) -> Vec<ProductResult<InvoiceItem>>{
         yaml::get_hash(yaml, "products")
             .map(|hmap| hmap.iter()
@@ -405,7 +407,7 @@ pub mod products{
                               build_invoice_item(product, values))
                  }
                  ).collect::<Vec< ProductResult<InvoiceItem> >>())
-            .unwrap_or(Vec::new())
+            .unwrap_or_else(Vec::new)
     }
 
     pub fn all(yaml:&Yaml) -> ProductResult<Vec<InvoiceItem>>{

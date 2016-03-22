@@ -36,7 +36,7 @@ fn setup_luigi() -> Luigi {
 /// TODO make this a `try!` like macro
 fn execute<F, S>(command:F) -> S where F: FnOnce() -> LuigiResult<S> {
     match command(){
-        Ok(s) => return s,
+        Ok(s) => s,
         Err(lerr) => { println!("ERROR: {:?}", lerr); exit(1) }
     }
 }
@@ -164,11 +164,11 @@ pub fn edit_project(dir:LuigiDir, search_term:&str, editor:&str){
                     )
         .collect::<Vec<String>>();
 
-    if paths.len() > 0{
-    util::open_in_editor(&editor, paths);
+    if paths.is_empty(){
+        println!{"Nothing found for {:?}", search_term}
     }
     else {
-        println!{"Nothing found for {:?}", search_term}
+        util::open_in_editor(&editor, paths);
     }
 }
 

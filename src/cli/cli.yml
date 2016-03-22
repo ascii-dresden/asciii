@@ -48,6 +48,11 @@ subcommands:
               #possible_values: vec![ String::from "date" , String::from "index" , String::from "name" , String::from "manager"  ]
               takes_value: true
 
+        - no-git:
+              help: do not display git status when listing
+              short: n
+              long: no-git
+
         - "all":
               help: "List all projects, ever"
               long: "all"
