@@ -2,7 +2,9 @@
 #![allow(unused_variables)]
 #![allow(dead_code)]
 
-#![feature(deprecated)]
+//#![feature(deprecated)]
+//#![feature(plugin)]
+//#![plugin(clippy)]
 
 #![cfg(not(test))]
 extern crate yaml_rust;
@@ -217,7 +219,7 @@ pub fn setup_app(){
         }
     }
 
-    else if matches.is_present("remote") {
+    if matches.is_present("remote") {
         cli::git_remote();
     }
 }

@@ -24,7 +24,7 @@ pub mod print;
 // TODO keep this up to date or find a way to make this dynamic
 const STATUS_ROWS_WIDTH:u16 = 90;
 
-fn setup_luigi(with_git:bool) -> Luigi{
+fn setup_luigi(with_git:bool) -> Luigi{ // TODO bool argument? what was I thinking
     let storage_path = PathBuf::from(CONFIG.get_str("path"))
         .join( CONFIG.get_str("dirs/storage"));
 
@@ -255,7 +255,7 @@ pub fn unarchive_project(year:i32, name:&str){
     if let Ok(projects) = luigi.search_projects(LuigiDir::Archive(year), name){
         if projects.len() == 1 {
             println!("{:?}", projects);
-            luigi.unarchive_project_file(&projects[0]);
+            luigi.unarchive_project_file(&projects[0]).unwrap();
         } else{
             println!("Ambiguous: multiple matches: {:#?}", projects );
         }

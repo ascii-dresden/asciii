@@ -182,20 +182,20 @@ subcommands:
 
 
 # GIT STUFF
-  - status:
-      about: Show the working tree status
-  - fetch:
-      about: Fetch new changes from remote
-  - pull:
-      about: Pull and merge new commits from remote
-  - add:
-      about: Add file contents to the index
-  - commit:
-      about: Save changes locally
-  - remote:
-      about: Show information about the remote
-  - push:
-      about: Upload locally saved changes to the remote
+#  - status:
+#      about: Show the working tree status
+#  - fetch:
+#      about: Fetch new changes from remote
+#  - pull:
+#      about: Pull and merge new commits from remote
+#  - add:
+#      about: Add file contents to the index
+#  - commit:
+#      about: Save changes locally
+#  - remote:
+#      about: Show information about the remote
+#  - push:
+#      about: Upload locally saved changes to the remote
 
   - term:
       about: terminal info

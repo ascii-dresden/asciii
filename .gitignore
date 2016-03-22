@@ -5,3 +5,8 @@ Cargo.lock
 *.yml
 *.sh
 tests/caterings
+.directory
+*.dot
+*.erb
+*.csv
+*.png
