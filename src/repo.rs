@@ -4,7 +4,7 @@ use std::env;
 use std::path::{Path, PathBuf};
 use std::collections::HashMap;
 use std::io::{self, Write};
-use std::str;
+use std::process::Command;
 
 use git2;
 use term::color;
@@ -123,99 +123,19 @@ impl Repository {
         self.statuses.get(path).unwrap_or(&GitStatus::Unknown).to_owned()
     }
 
-    pub fn fetch(&self) -> Result<(), git2::Error>{
-        let remote_name = "origin";
+    pub fn pull(&self) //-> Result<(), git2::Error>
+    {
 
-        // Figure out whether it's a named remote or a URL
-        println!("Fetching {} for repo", remote_name);
-        let mut cb = git2::RemoteCallbacks::new();
-        let mut remote = try!(self.repo.find_remote(remote_name).or_else(|_| {
-            self.repo.remote_anonymous(remote_name)
-        }));
-        cb.sideband_progress(|data| {
-            print!("remote: {}", str::from_utf8(data).unwrap());
-            io::stdout().flush().unwrap();
-            true
-        });
+        let workdir = self.repo.workdir().unwrap();
+        let gitdir  = workdir.join(".git");
+        Command::new("git")
+            .args(&["--work-tree", workdir.to_str().unwrap()])
+            .args(&["--git-dir",   gitdir.to_str().unwrap()])
+            .arg("pull")
+            .args(&["origin", "master"])
 
-        cb.credentials(|str1, opt_str2, ty|{
-            println!("{:?}; {:?}; {:?}", str1, opt_str2, ty.bits());
-            //Err(git2::Error::from_str("test error"))
-            git2::Cred::ssh_key_from_agent("hendrik")
-        });
-
-        // This callback gets called for each remote-tracking branch that gets
-        // updated. The message we output depends on whether it's a new one or an
-        // update.
-        cb.update_tips(|refname, a, b| {
-            if a.is_zero() {
-                println!("[new]     {:20} {}", b, refname);
-            } else {
-                println!("[updated] {:10}..{:10} {}", a, b, refname);
-            }
-            true
-        });
-
-        // Here we show processed and total objects in the pack and the amount of
-        // received data. Most frontends will probably want to show a percentage and
-        // the download rate.
-        cb.transfer_progress(|stats| {
-            if stats.received_objects() == stats.total_objects() {
-                print!("Resolving deltas {}/{}\r", stats.indexed_deltas(),
-                stats.total_deltas());
-            } else if stats.total_objects() > 0 {
-                print!("Received {}/{} objects ({}) in {} bytes\r",
-                stats.received_objects(),
-                stats.total_objects(),
-                stats.indexed_objects(),
-                stats.received_bytes());
-            }
-            io::stdout().flush().unwrap();
-            true
-        });
-
-        // Connect to the remote end specifying that we want to fetch information
-        // from it.
-        println!("canary 0");
-        try!(remote.connect(git2::Direction::Fetch));
-        println!("canary 1");
-
-        // Download the packfile and index it. This function updates the amount of
-        // received data and the indexer stats which lets you inform the user about
-        // progress.
-        let mut fo = git2::FetchOptions::new();
-        fo.remote_callbacks(cb);
-        try!(remote.download(&[], Some(&mut fo)));
-
-        println!("canary 2");
-        {
-            // If there are local objects (we got a thin pack), then tell the user
-            // how many objects we saved from having to cross the network.
-            let stats = remote.stats();
-            if stats.local_objects() > 0 {
-                println!("\rReceived {}/{} objects in {} bytes (used {} local \
-                      objects)", stats.indexed_objects(),
-                      stats.total_objects(), stats.received_bytes(),
-                      stats.local_objects());
-            } else {
-                println!("\rReceived {}/{} objects in {} bytes",
-                         stats.indexed_objects(), stats.total_objects(),
-                         stats.received_bytes());
-            }
-        }
-        println!("canary 3");
-
-        // Disconnect the underlying connection to prevent from idling.
-        remote.disconnect();
-
-        // Update the references in the remote's namespace to point to the right
-        // commits. This may be needed even if there was no packfile to download,
-        // which can happen e.g. when the branches have been changed but all the
-        // needed objects are available locally.
-        try!(remote.update_tips(None, true,
-                                git2::AutotagOption::Unspecified, None));
-
-        Ok(())
+            .status()
+            .unwrap_or_else(|e| { panic!("failed to execute process: {}", e) });
 
     }
 }

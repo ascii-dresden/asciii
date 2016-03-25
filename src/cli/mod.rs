@@ -303,12 +303,5 @@ pub fn git_remote(){
 pub fn git_pull(){
     let luigi = setup_luigi_with_git();
     let repo = luigi.repository.unwrap();
-
-    let fetch_result = repo.fetch();
-
-    match fetch_result{
-        Ok(_) => println!("fetching successfull"),
-        Err(e) => println!("fetching failed {:?}", e),
-    }
-
+    repo.pull();
 }
