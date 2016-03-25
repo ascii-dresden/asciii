@@ -1,16 +1,13 @@
 #![allow(dead_code, unused_variables)]
 use std::fmt;
-use std::env;
 use std::path::{Path, PathBuf};
 use std::collections::HashMap;
-use std::io::{self, Write};
+use std::io::Write;
 use std::process::Command;
 
 use git2;
 use term::color;
 use term::color::Color;
-
-use manager::LuigiDir;
 
 /// More Rustacious way of representing a git status
 #[derive(Debug,Clone)]
@@ -92,7 +89,6 @@ impl Repository {
     }
 
     fn cache_statuses(repo:&git2::Repository) -> Result<HashMap<PathBuf, GitStatus>, git2::Error>{
-        use self::GitStatus::*;
         let repo_path = repo.path().parent().unwrap().to_owned();
 
         let git_statuses = try!(repo.statuses( Some( git2::StatusOptions::new()
@@ -123,19 +119,32 @@ impl Repository {
         self.statuses.get(path).unwrap_or(&GitStatus::Unknown).to_owned()
     }
 
-    pub fn pull(&self) //-> Result<(), git2::Error>
-    {
+    fn execute_git(&self, command:&str, args:&[&str]){
+        println!("running git {:?} with {:?}", command, args);
 
         let workdir = self.repo.workdir().unwrap();
         let gitdir  = workdir.join(".git");
+
         Command::new("git")
             .args(&["--work-tree", workdir.to_str().unwrap()])
             .args(&["--git-dir",   gitdir.to_str().unwrap()])
-            .arg("pull")
-            .args(&["origin", "master"])
-
+            .arg(command)
+            .args(args)
             .status()
             .unwrap_or_else(|e| { panic!("failed to execute process: {}", e) });
+    }
+
+    pub fn add(&self, paths:&[&Path]) {
+        println!("adding to git {:?}", paths);
+
+        //self.execute_git("add", paths
+        //                 .filter_map(|p|p.to_str())
+        //                 .filter(|p|p.exists())
+        //                 );
+    }
+
+    pub fn pull(&self) {
+        self.execute_git("pull", &["origin", "master"]);
 
     }
 }

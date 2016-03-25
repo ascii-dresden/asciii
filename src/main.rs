@@ -1,10 +1,7 @@
-#![allow(unused_imports)]
 #![allow(unused_variables)]
 #![allow(dead_code)]
 
-//#![feature(deprecated)]
 #![feature(plugin)]
-
 #![cfg_attr(feature = "dev", allow(unstable_features))]
 #![cfg_attr(feature = "dev", feature(plugin))]
 #![cfg_attr(feature = "dev", plugin(clippy))]
@@ -35,9 +32,7 @@ mod templater;
 mod cli;
 
 use std::path::{Path,PathBuf};
-use clap::{App, SubCommand, Arg, AppSettings};
-use manager::LuigiDir;
-use cli::SortOptions;
+use clap::App;
 
 lazy_static!{
     pub static ref CONFIG: config::ConfigReader = config::ConfigReader::new().unwrap();
@@ -51,7 +46,6 @@ fn init_matches() -> yaml_rust::yaml::Yaml
 {
     use std::fs::File;
     use std::io::Read;
-    use yaml_rust::{Yaml};
     use util::yaml;
 
     // TODO replace this block with the line above
@@ -75,116 +69,24 @@ pub fn setup_app(){
         .get_matches();
 
     // command: "new"
-    if let Some(matches) = matches.subcommand_matches("new") {
-        let name     = matches.value_of("name").unwrap();
-        let editor   = CONFIG.get_path("editor").unwrap().as_str().unwrap();
-
-        let template = matches.value_of("template")
-            .or( CONFIG.get_path("template").unwrap().as_str())
-            .unwrap();
-
-        cli::new_project(&name, &template, &editor, !matches.is_present("don't edit"));
-    }
+    cli::subcommands::new(&matches);
 
     // command: "list"
-    else if let Some(matches) = matches.subcommand_matches("list") {
-        if matches.is_present("templates"){
-            cli::list_templates();
-        } else if matches.is_present("years"){
-            cli::list_years();
-        } else {
-
-            let mut sort = matches.value_of("sort").unwrap_or("index");
-
-            // list archive of year `archive`
-            let dir = if let Some(archive_year) = matches.value_of("archive"){
-                let archive = archive_year.parse::<i32>().unwrap();
-                LuigiDir::Archive(archive)
-            }
-
-            // or list all, but sort by date
-            else if matches.is_present("all"){
-                // sort by date on --all of not overriden
-                if !matches.is_present("sort"){ sort = "date" }
-                LuigiDir::All }
-
-            // or list normal
-            else { LuigiDir::Working };
-
-            if matches.is_present("paths"){
-                cli::list_paths(dir);
-            }
-            else if matches.is_present("broken"){
-                cli::list_broken_projects(dir);
-            }
-            else {
-                cli::list_projects(dir, sort, matches.is_present("simple"));
-            }
-        }
-    }
+    cli::subcommands::list(&matches);
 
     // command: "edit"
-    else if let Some(matches) = matches.subcommand_matches("edit") {
-        let search_term = matches.value_of("search_term").unwrap();
-
-        let editor = matches.value_of("editor").unwrap_or( CONFIG.get_path("editor").unwrap().as_str().unwrap());
-
-        if matches.is_present("template"){
-            cli::edit_template(search_term,&editor);
-        } else {
-            if let Some(archive) = matches.value_of("archive"){
-                let archive = archive.parse::<i32>().unwrap();
-                cli::edit_project(LuigiDir::Archive(archive), &search_term, &editor);
-            } else {
-                cli::edit_project(LuigiDir::Working, &search_term, &editor);
-            }
-        }
-    }
+    cli::subcommands::edit(&matches);
 
     // command: "show"
-    else if let Some(matches) = matches.subcommand_matches("show") {
-        let search_term = matches.value_of("search_term").unwrap();
-        if let Some(year) = matches.value_of("archive"){
-            let year = year.parse::<i32>().unwrap();
-            cli::show_project(LuigiDir::Archive(year), &search_term);
-        } else if  matches.is_present("template"){
-            cli::show_template(search_term);
-        } else {
-            cli::show_project(LuigiDir::Working, &search_term);
-        }
-    }
+    cli::subcommands::show(&matches);
 
     // command: "archive"
-    else if let Some(matches) = matches.subcommand_matches("archive") {
-        let name = matches.value_of("NAME").unwrap();
-        let year = matches.value_of("year")
-            .and_then(|s|s.parse::<i32>().ok());
-        cli::archive_project(&name, year);
-    }
-
-    // command: "unarchive"
-    else if let Some(matches) = matches.subcommand_matches("unarchive") {
-        let year = matches.value_of("YEAR").unwrap();
-        let name = matches.value_of("NAME").unwrap();
-        let year = year.parse::<i32>().unwrap_or_else(|e|panic!("can't parse year {:?}, {:?}", year, e));
-        cli::unarchive_project(year, &name);
-    }
-
-    // command: "config"
-    else if let Some(matches) = matches.subcommand_matches("config") {
-        if let Some(path) = matches.value_of("show"){
-            cli::config_show(&path);
-        }
-
-        else if matches.is_present("edit"){
-            let editor = CONFIG.get_path("editor").unwrap().as_str().unwrap();
-            cli::config_edit(&editor); }
-
-        else if matches.is_present("default"){ cli::config_show_default(); }
-    }
+    cli::subcommands::archive(&matches);
+    cli::subcommands::unarchive(&matches);
+    cli::subcommands::config(&matches);
 
     // command: "path"
-    else if let Some(matches) = matches.subcommand_matches("path") {
+    if let Some(matches) = matches.subcommand_matches("path") {
         if matches.is_present("templates"){
             println!("{}", PathBuf::from(CONFIG.get_str("path"))
                      .join( CONFIG.get_str("dirs/storage"))
@@ -204,19 +106,18 @@ pub fn setup_app(){
         }
     }
     // command: "status"
-    else if matches.is_present("status") { cli::git_status(); }
+    if matches.is_present("status") { cli::git_status(); }
+
+    // command: "add"
+    if matches.is_present("add") { cli::git_add(); }
 
     // command: "pull"
-    else if matches.is_present("pull") { cli::git_pull(); }
+    if matches.is_present("pull") { cli::git_pull(); }
 
-    else if matches.is_present("remote") { cli::git_remote(); }
+    if matches.is_present("remote") { cli::git_remote(); }
 
-    // command: "whoami"
-    else if matches.is_present("whoami") {
-        cli::config_show("manager_name");
-    }
 
-    else if matches.is_present("term") {
+    if matches.is_present("term") {
         use terminal_size::{Width, Height, terminal_size };
         if let Some((Width(w), Height(h))) = terminal_size() {
             println!("Your terminal is {} cols wide and {} lines tall", w, h);

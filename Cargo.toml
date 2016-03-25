@@ -15,9 +15,9 @@ terminal_size = "0.1.1"
 prettytable-rs = "*"
 currency = {git="https://github.com/hoodie/rust-lang-currency"}
 lazy_static = "*"
-maplit = "*"
+maplit = {path="../packages/maplit"}#"*"
 tempdir = "*"
-git2    = "*"
+git2    = { version = "*", features = ["unstable"]}
 
 clippy = {version = "~0.0.23", optional = true}
 

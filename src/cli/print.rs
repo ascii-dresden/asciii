@@ -6,7 +6,7 @@ use prettytable::format::{TableFormat,FormatBuilder};
 use term::{Attr, color};
 
 use project::Project;
-use manager::{Luigi,LuigiProject};
+use manager::LuigiProject;
 use repo::Repository;
 
 //TODO construct table rows way more dynamically

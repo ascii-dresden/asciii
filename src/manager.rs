@@ -4,17 +4,13 @@ use std::fs;
 use std::io;
 use std::path::{Path, PathBuf};
 use std::ffi::OsStr;
-use std::collections::HashMap;
 
 use slug;
 use chrono::{Date, UTC, Datelike};
 use git2::Error as GitError;
 
-use repo;
-use repo::{GitStatus,Repository};
+use repo::Repository;
 use util::yaml::YamlError;
-
-use templater::Templater;
 
 const PROJECT_FILE_EXTENSION:&'static str = "yml";
 const TEMPLATE_FILE_EXTENSION:&'static str = "tyml";

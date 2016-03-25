@@ -1,7 +1,6 @@
 use std::fs::File;
 use std::io::prelude::*;
 use std::path::{Path, PathBuf};
-use std::collections::HashMap;
 
 use chrono::*;
 use yaml_rust::Yaml;
@@ -9,7 +8,6 @@ use tempdir::TempDir;
 use slug;
 use currency::Currency;
 
-use util;
 use util::yaml;
 use util::yaml::YamlError;
 use manager::{LuigiProject, LuigiError};
@@ -18,7 +16,7 @@ use templater::Templater;
 pub mod product;
 pub mod spec;
 use self::spec::SpecResult;
-use self::spec::products::{ProductError,ProductResult};
+use self::spec::products::{ProductResult};
 
 pub struct Project {
     file_path: PathBuf,
