@@ -127,6 +127,7 @@ subcommands:
         - "search_term":
               help: "Search term, possibly event name"
               required: true
+              multiple: true
 
         - "archive":
               help: "Pick an archived project"
@@ -151,6 +152,7 @@ subcommands:
         - "search_term":
               help: "Search term, possibly event name"
               required: true
+              multiple: true
 
         - "archive":
               help: "Pick an archived project"
@@ -189,12 +191,15 @@ subcommands:
 # GIT STUFF
   - status:
       about: Show the working tree status
-  - fetch:
-      about: Fetch new changes from remote
   - pull:
       about: Pull and merge new commits from remote
   - add:
       about: Add file contents to the index
+      args:
+        - "search_term":
+              help: "Search term, possibly event name"
+              required: true
+              multiple: true
   - commit:
       about: Save changes locally
   - remote:

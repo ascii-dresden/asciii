@@ -1,3 +1,8 @@
+use std::path::{Path,PathBuf};
+use std::ffi::OsStr;
+use std::env;
+use std::process;
+
 use clap::ArgMatches;
 use config;
 use super::super::CONFIG;
@@ -6,15 +11,12 @@ use manager::{LuigiDir, LuigiProject,};
 use project::Project;
 use util;
 use super::print;
-use std::path::PathBuf;
-use std::ffi::OsStr;
 
 // TODO keep this up to date or find a way to make this dynamic
 const STATUS_ROWS_WIDTH:u16 = 96;
 
 /// Create NEW Project
 pub fn new(matches:&ArgMatches) {
-    println!("{:#?}", matches);
     if let Some(matches) = matches.subcommand_matches("new") {
         let name     = matches.value_of("name").unwrap();
         let editor   = CONFIG.get_path("editor").unwrap().as_str().unwrap();
@@ -33,7 +35,7 @@ fn new_project(project_name:&str, template_name:&str, editor:&str, edit:bool){
     let project = luigi.create_project::<Project>(&project_name, &template_name).unwrap();
     let project_file = project.file();
     if edit {
-        util::open_in_editor(&editor, vec![project_file.display().to_string()]);
+        util::open_in_editor(&editor, &[project_file]);
     }
 }
 
@@ -182,39 +184,43 @@ fn list_paths(dir:LuigiDir){
 /// Command EDIT
 pub fn edit(matches:&ArgMatches) {
     if let Some(matches) = matches.subcommand_matches("edit") {
+
         let search_term = matches.value_of("search_term").unwrap();
+        let search_terms = matches.values_of("search_term").unwrap().collect::<Vec<&str>>();
 
         let editor = matches.value_of("editor").unwrap_or( CONFIG.get_path("editor").unwrap().as_str().unwrap());
 
         if matches.is_present("template"){
             edit_template(search_term,&editor);
+
         } else {
             if let Some(archive) = matches.value_of("archive"){
                 let archive = archive.parse::<i32>().unwrap();
-                edit_project(LuigiDir::Archive(archive), &search_term, &editor);
+                edit_projects(LuigiDir::Archive(archive), &search_terms, &editor);
             } else {
-                edit_project(LuigiDir::Working, &search_term, &editor);
+                edit_projects(LuigiDir::Working, &search_terms, &editor);
             }
         }
     }
 }
 
-fn edit_project(dir:LuigiDir, search_term:&str, editor:&str){
+fn edit_projects(dir:LuigiDir, search_terms:&[&str], editor:&str){
     let luigi = super::setup_luigi();
-    let paths = super::execute(||luigi.search_projects(dir, &search_term))
-        .iter()
-        .filter_map(|path| Project::open(path).ok())
-        .filter_map(|project|
-                    project.file().to_str()
-                    .map(|s|s.to_owned())
-                   )
-        .collect::<Vec<String>>();
-
-    if paths.is_empty(){
-        println!{"Nothing found for {:?}", search_term}
+    let mut all_paths = Vec::new();
+    for search_term in search_terms{
+        let mut paths = super::execute(||luigi.search_projects(dir.clone(), &search_term));
+        if paths.is_empty(){
+            //println!{"Nothing found for {:?}", search_term}
+        } else {
+            all_paths.append(&mut paths);
+        }
     }
-    else {
-        util::open_in_editor(&editor, paths);
+
+    if all_paths.is_empty(){
+        println!{"Nothing found for {:?}", search_terms}
+        process::exit(1);
+    } else {
+        util::open_in_editor(&editor, all_paths.as_slice());
     }
 }
 
@@ -223,12 +229,10 @@ fn edit_template(name:&str, editor:&str){
     let luigi = super::setup_luigi();
     let template_paths = super::execute(||luigi.list_template_files())
         .iter()
-        .filter(|f|f
-                .file_stem()
-                .unwrap_or(&OsStr::new("")) == name)
-        .map(|p|p.display().to_string())
-        .collect::<Vec<String>>();
-    util::open_in_editor(&editor, template_paths);
+        .filter(|f|f.file_stem() .unwrap_or(&OsStr::new("")) == name)
+        .cloned()
+        .collect::<Vec<PathBuf>>();
+    util::open_in_editor(&editor, &template_paths);
 }
 
 
@@ -276,7 +280,6 @@ pub fn archive(matches:&ArgMatches){
     }
 }
 
-// command: "unarchive"
 pub fn unarchive(matches:&ArgMatches){
     if let Some(matches) = matches.subcommand_matches("unarchive") {
         let year = matches.value_of("YEAR").unwrap();
@@ -286,7 +289,6 @@ pub fn unarchive(matches:&ArgMatches){
     }
 }
 
-// command: "config"
 pub fn config(matches:&ArgMatches){
     if let Some(matches) = matches.subcommand_matches("config") {
         if let Some(path) = matches.value_of("show"){
@@ -348,10 +350,110 @@ fn config_show(path:&str){
 /// Command CONFIG --edit
 fn config_edit(editor:&str){
     //println!("{:?}{:?}", &editor, vec![CONFIG.path.to_str().unwrap().to_owned()]);
-    util::open_in_editor(&editor, vec![CONFIG.path.to_str().unwrap().to_owned()]);
+    util::open_in_editor(&editor, &[CONFIG.path.to_owned()]);
 }
 
 /// Command CONFIG --default
 fn config_show_default(){
     println!("{}", config::DEFAULT_CONFIG);
+}
+
+pub fn path(matches:&ArgMatches){
+    if let Some(matches) = matches.subcommand_matches("path") {
+        if matches.is_present("templates"){
+            println!("{}", PathBuf::from(CONFIG.get_str("path"))
+                     .join( CONFIG.get_str("dirs/storage"))
+                     .join( CONFIG.get_str("dirs/templates"))
+                     .display());
+        }
+        else if matches.is_present("output"){
+            println!("{}", CONFIG.get_str("output_path"));
+        }
+        else if matches.is_present("bin"){
+            println!("{}", env::current_exe().unwrap().display());
+        }
+        else { // default case
+            let path = util::replace_home_tilde(Path::new(CONFIG.get_str("path")))
+                .join( CONFIG.get_str("dirs/storage"));
+            println!("{}", path.display());
+        }
+    }
+}
+
+
+
+pub fn git(matches:&ArgMatches){
+    if matches.is_present("status") {
+        git_status();
+    }
+
+    if let Some(matches) = matches.subcommand_matches("add") {
+        let search_terms = matches
+            .values_of("search_term")
+            .unwrap()
+            .collect::<Vec<&str>>();
+        git_add(&search_terms);
+    }
+
+    if matches.is_present("pull") {
+        git_pull();
+    }
+
+    if matches.is_present("remote") {
+        git_remote();
+    }
+}
+/// Command STATUS
+fn git_status(){
+    let luigi = super::setup_luigi_with_git();
+    println!("{:#?}", luigi);
+    for (path,status) in luigi.repository.unwrap().statuses{
+        println!("{:?}: {:#?}", path.file_stem(),  status);
+    }
+}
+
+/// Command REMOTE
+/// exact replica of `git remote -v`
+fn git_remote(){
+    let luigi = super::setup_luigi_with_git();
+    let repo = luigi.repository.unwrap().repo;
+
+    for remote_name in repo.remotes().unwrap().iter(){ // Option<Option<&str>> oh, boy
+        if let Some(name) = remote_name{
+            if let Ok(remote) = repo.find_remote(name){
+                println!("{}  {} (fetch)\n{}  {} (push)",
+                remote.name().unwrap_or("no name"),
+                remote.url().unwrap_or("no url"),
+                remote.name().unwrap_or("no name"),
+                remote.pushurl().or(remote.url()).unwrap_or(""),
+                );
+            }else{println!("no remote")}
+        }else{println!("no remote name")}
+    }
+}
+
+/// Command ADD
+fn git_add(search_terms:&[&str]){
+    let luigi = super::setup_luigi_with_git();
+    let projects = luigi.search_multiple_projects(LuigiDir::Working, search_terms)
+        .unwrap()
+        .iter()
+        .filter_map(|path| match Project::open(path){
+            Ok(project) => Some(project),
+            Err(err) => {
+                println!("Erroneous Project: {}\n {}", path.display(), err);
+                None
+            }
+        })
+    .map(|project|project.dir())
+    .collect::<Vec<PathBuf>>();
+    let repo = luigi.repository.unwrap();
+    repo.add(&projects);
+}
+
+/// Command PULL
+fn git_pull(){
+    let luigi = super::setup_luigi_with_git();
+    let repo = luigi.repository.unwrap();
+    repo.pull();
 }

@@ -1,11 +1,9 @@
-#![allow(unused_variables)]
-#![allow(dead_code)]
-
 #![feature(plugin)]
 #![cfg_attr(feature = "dev", allow(unstable_features))]
 #![cfg_attr(feature = "dev", feature(plugin))]
 #![cfg_attr(feature = "dev", plugin(clippy))]
 
+#![cfg(not(doc))]
 #![cfg(not(test))]
 extern crate yaml_rust;
 extern crate chrono;
@@ -14,6 +12,7 @@ extern crate slug;
 extern crate tempdir;
 extern crate term;
 extern crate terminal_size;
+//TODO make libgit2 optional
 extern crate git2;
 extern crate currency;
 #[macro_use] extern crate prettytable;
@@ -31,7 +30,6 @@ mod repo;
 mod templater;
 mod cli;
 
-use std::path::{Path,PathBuf};
 use clap::App;
 
 lazy_static!{
@@ -42,6 +40,7 @@ lazy_static!{
 // TODO: make better use of io::ErrorKind
 // TODO: remove: to_owned() and unwrap()s, stupid :D
 
+#[allow(dead_code)]
 fn init_matches() -> yaml_rust::yaml::Yaml
 {
     use std::fs::File;
@@ -60,61 +59,31 @@ fn init_matches() -> yaml_rust::yaml::Yaml
 }
 
 pub fn setup_app(){
-    //let cli_setup = init_matches(); //TODO Font forget this in production
-    let cli_setup = load_yaml!("cli/cli.yml");
+    let cli_setup = init_matches(); //TODO Font forget this in production
+    //let cli_setup = load_yaml!("cli/cli.yml");
 
 
     let matches = App::from_yaml(&cli_setup)
         .version(&crate_version!()[..])
         .get_matches();
 
-    // command: "new"
     cli::subcommands::new(&matches);
 
-    // command: "list"
     cli::subcommands::list(&matches);
 
-    // command: "edit"
     cli::subcommands::edit(&matches);
 
-    // command: "show"
     cli::subcommands::show(&matches);
 
-    // command: "archive"
     cli::subcommands::archive(&matches);
+
     cli::subcommands::unarchive(&matches);
+
     cli::subcommands::config(&matches);
 
-    // command: "path"
-    if let Some(matches) = matches.subcommand_matches("path") {
-        if matches.is_present("templates"){
-            println!("{}", PathBuf::from(CONFIG.get_str("path"))
-                     .join( CONFIG.get_str("dirs/storage"))
-                     .join( CONFIG.get_str("dirs/templates"))
-                     .display());
-        }
-        else if matches.is_present("output"){
-            println!("{}", CONFIG.get_str("output_path"));
-        }
-        else if matches.is_present("bin"){
-            println!("{}", std::env::current_exe().unwrap().display());
-        }
-        else { // default case
-            let path = util::replace_home_tilde(Path::new(CONFIG.get_str("path")))
-                .join( CONFIG.get_str("dirs/storage"));
-            println!("{}", path.display());
-        }
-    }
-    // command: "status"
-    if matches.is_present("status") { cli::git_status(); }
+    cli::subcommands::path(&matches);
 
-    // command: "add"
-    if matches.is_present("add") { cli::git_add(); }
-
-    // command: "pull"
-    if matches.is_present("pull") { cli::git_pull(); }
-
-    if matches.is_present("remote") { cli::git_remote(); }
+    cli::subcommands::git(&matches);
 
 
     if matches.is_present("term") {
@@ -126,9 +95,6 @@ pub fn setup_app(){
         }
     }
 
-    if matches.is_present("remote") {
-        cli::git_remote();
-    }
 }
 
 fn main(){

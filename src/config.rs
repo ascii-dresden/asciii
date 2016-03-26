@@ -91,7 +91,7 @@ pub const DEFAULT_CONFIG: &'static str = include_str!("./default_config.yml");
 
 #[test]
 fn simple_reading(){
-    assert!(ConfigReader::path().exists());
+    assert!(ConfigReader::path_home().exists());
     let config = ConfigReader::new().unwrap();
 
     assert_eq!(config.get("manager_name").unwrap().as_str().unwrap(),

@@ -39,7 +39,7 @@ macro_rules! try_some {
 }
 
 //TODO use https://crates.io/crates/open (supports linux, windows, mac)
-pub fn open_in_editor(editor:&str, paths:Vec<String>){
+pub fn open_in_editor(editor:&str, paths:&[PathBuf]){
     let editor_config = editor
         .split_whitespace()
         .collect::<Vec<&str>>();
@@ -54,7 +54,7 @@ pub fn open_in_editor(editor:&str, paths:Vec<String>){
 
     assert!(!paths.is_empty()); //TODO can I add a message to that?
 
-    for path in &paths{
+    for path in paths{
         assert!(Path::new(&path).exists());
     }
 

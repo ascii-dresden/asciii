@@ -1,3 +1,6 @@
+#![allow(unused_variables)]
+#![allow(dead_code)]
+
 use std::fs::File;
 use std::io::prelude::*;
 use std::path::{Path, PathBuf};
@@ -29,7 +32,7 @@ impl From<yaml::YamlError> for LuigiError {
 }
 
 impl LuigiProject for Project{
-    fn new(project_name:&str,template:&Path) -> Result<Project,LuigiError> {
+    fn from_template(project_name:&str,template:&Path) -> Result<Project,LuigiError> {
         let template_name = template.file_stem().unwrap().to_str().unwrap();
 
         let event_date = (Local::today() + Duration::days(14)).format("%d.%m.%Y").to_string();

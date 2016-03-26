@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 use chrono::*;
 use prettytable::Table;
 use prettytable::row::Row;

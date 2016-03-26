@@ -197,8 +197,9 @@ pub mod date {
     }
 
     // TODO packed to deep? Clippy says YES, remove this allow!
-    #[allow(type_complexity)]
-    pub fn events(yaml:&Yaml) -> Option< Vec< (Option<Date<UTC>>,Option<Date<UTC>>) > > {
+    pub type DateRange = (Option<Date<UTC>>,Option<Date<UTC>>);
+    pub type DateRanges =  Vec< DateRange > ;
+    pub fn events(yaml:&Yaml) -> Option<DateRanges> {
         yaml::get(yaml, "event/dates/")
             .and_then(|e|e.as_vec())
             .map(|v| v.iter()
@@ -398,6 +399,7 @@ pub mod products{
         })
     }
 
+    #[allow(unknown_lints)] // this is just for clippy
     #[allow(option_map_unwrap_or_else)]
     pub fn all0(yaml:&Yaml) -> Vec<ProductResult<InvoiceItem>>{
         yaml::get_hash(yaml, "products")

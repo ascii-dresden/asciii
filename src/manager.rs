@@ -29,7 +29,7 @@ impl From<GitError>  for LuigiError {
 
 fn slugify(string:&str) -> String{ slug::slugify(string) }
 
-#[derive(Debug)]
+#[derive(Debug,Clone)]
 pub enum LuigiDir { Working, Archive(Year), Storage, Templates, All }
 
 #[derive(Debug)]
@@ -54,7 +54,7 @@ pub enum LuigiError {
 
 pub trait LuigiProject{
     /// creates in tempfile
-    fn new(project_name:&str,template:&Path) -> LuigiResult<Self> where Self: Sized;
+    fn from_template(project_name:&str,template:&Path) -> LuigiResult<Self> where Self: Sized;
 
     /// For file names
     fn ident(&self) -> String{ self.dir().file_stem().and_then(|s|s.to_str()).unwrap().to_owned() }
@@ -260,7 +260,7 @@ impl Luigi {
             .join(&(slugged_name + "." + PROJECT_FILE_EXTENSION));
 
         let template_path = try!(self.get_template_file(template_name));
-        let mut project = try!(P::new(&project_name, &template_path));
+        let mut project = try!(P::from_template(&project_name, &template_path));
 
         // TODO test for unreplaced template keywords
         try!(fs::create_dir(&project_dir));
@@ -360,13 +360,23 @@ impl Luigi {
 
     /// Matches LuigiDir's content against a term and returns matching project files.
     pub fn search_projects(&self, dir:LuigiDir, search_term:&str) -> LuigiResult<Vec<PathBuf>> {
-        let projects: Vec<PathBuf> = try!(self.list_project_files(dir))
+        let project_paths: Vec<PathBuf> = try!(self.list_project_files(dir))
             .iter()
             .filter(|path| path.to_str().unwrap_or("??").to_lowercase().contains(&search_term.to_lowercase()))
             .cloned()
-            .collect()
-            ;
-        Ok(projects)
+            .collect();
+        Ok(project_paths)
+    }
+
+    /// Matches LuigiDir's content against a term and returns matching project files.
+    pub fn search_multiple_projects(&self, dir:LuigiDir, search_terms:&[&str]) -> LuigiResult<Vec<PathBuf>> {
+        let mut all_paths = Vec::new();
+        for search_term in search_terms{
+            let mut paths = try!(self.search_projects(dir.clone(), &search_term));
+            all_paths.append(&mut paths);
+        }
+
+        Ok(all_paths)
     }
 
     /// Tries to find a concrete Project.
@@ -528,7 +538,7 @@ mod test {
 
     impl LuigiProject for TestProject{
         // creates in tempfile
-        fn new(project_name:&str,template:&Path) -> LuigiResult<Self> where Self: Sized {
+        fn from_template(project_name:&str,template:&Path) -> LuigiResult<Self> where Self: Sized {
             // generates a temp file
             let temp_dir  = TempDir::new_in(".",&project_name).unwrap();
             let temp_file = temp_dir.path().join(project_name);

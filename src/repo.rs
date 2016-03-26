@@ -134,17 +134,23 @@ impl Repository {
             .unwrap_or_else(|e| { panic!("failed to execute process: {}", e) });
     }
 
-    pub fn add(&self, paths:&[&Path]) {
+    pub fn add(&self, paths:&[PathBuf]) {
         println!("adding to git {:?}", paths);
+    }
 
-        //self.execute_git("add", paths
-        //                 .filter_map(|p|p.to_str())
-        //                 .filter(|p|p.exists())
-        //                 );
+    pub fn commit(&self) {
+        self.execute_git("commit", &["origin", "master"]);
+    }
+
+    pub fn status(&self) {
+        self.execute_git("status", &["origin", "master"]);
+    }
+
+    pub fn push(&self) {
+        self.execute_git("push", &["origin", "master"]);
     }
 
     pub fn pull(&self) {
         self.execute_git("pull", &["origin", "master"]);
-
     }
 }
