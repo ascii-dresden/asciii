@@ -10,6 +10,7 @@ use terminal_size::{Width, terminal_size }; // TODO replace with other lib
 use manager::{LuigiDir, LuigiProject,};
 use project::Project;
 use util;
+use util::exit;
 use super::print;
 
 // TODO keep this up to date or find a way to make this dynamic
@@ -395,6 +396,10 @@ pub fn git(matches:&ArgMatches){
         git_add(&search_terms);
     }
 
+    if matches.is_present("commit") {
+        git_commit();
+    }
+
     if matches.is_present("pull") {
         git_pull();
     }
@@ -406,10 +411,15 @@ pub fn git(matches:&ArgMatches){
 /// Command STATUS
 fn git_status(){
     let luigi = super::setup_luigi_with_git();
-    println!("{:#?}", luigi);
-    for (path,status) in luigi.repository.unwrap().statuses{
-        println!("{:?}: {:#?}", path.file_stem(),  status);
-    }
+    let repo = luigi.repository.unwrap();
+    //exit(repo.status()) // FIXME this does not behave right
+}
+
+/// Command COMMIT
+fn git_commit(){
+    let luigi = super::setup_luigi_with_git();
+    let repo = luigi.repository.unwrap();
+    exit(repo.commit())
 }
 
 /// Command REMOTE
@@ -445,15 +455,15 @@ fn git_add(search_terms:&[&str]){
                 None
             }
         })
-    .map(|project|project.dir())
-    .collect::<Vec<PathBuf>>();
+        .map(|project|project.dir())
+        .collect::<Vec<PathBuf>>();
     let repo = luigi.repository.unwrap();
-    repo.add(&projects);
+    exit(repo.add(&projects));
 }
 
 /// Command PULL
 fn git_pull(){
     let luigi = super::setup_luigi_with_git();
     let repo = luigi.repository.unwrap();
-    repo.pull();
+    exit(repo.pull())
 }

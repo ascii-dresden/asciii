@@ -3,7 +3,7 @@ use std::fmt;
 use std::path::{Path, PathBuf};
 use std::collections::HashMap;
 use std::io::Write;
-use std::process::Command;
+use std::process::{Command,ExitStatus};
 
 use git2;
 use term::color;
@@ -72,6 +72,7 @@ impl From<git2::Status> for GitStatus{
 pub struct Repository{
     /// Git Repository for StorageDir
     pub repo: git2::Repository,
+    pub workdir: PathBuf,
     /// Maps GitStatus to each path
     pub statuses: HashMap<PathBuf, GitStatus>
 }
@@ -83,6 +84,7 @@ impl Repository {
         Ok(
             Repository{
                 repo: repo,
+                workdir: path.to_owned(),
                 statuses: statuses
             }
           )
@@ -119,11 +121,16 @@ impl Repository {
         self.statuses.get(path).unwrap_or(&GitStatus::Unknown).to_owned()
     }
 
-    fn execute_git(&self, command:&str, args:&[&str]){
-        println!("running git {:?} with {:?}", command, args);
+    fn execute_git(&self, command:&str, args:&[&str]) -> ExitStatus{
 
         let workdir = self.repo.workdir().unwrap();
         let gitdir  = workdir.join(".git");
+
+
+        println!("running: {:#?}", Command::new("git")
+                 .args(&["--work-tree", workdir.to_str().unwrap()])
+                 .args(&["--git-dir",   gitdir.to_str().unwrap()])
+                 .arg(command).args(args));
 
         Command::new("git")
             .args(&["--work-tree", workdir.to_str().unwrap()])
@@ -131,26 +138,29 @@ impl Repository {
             .arg(command)
             .args(args)
             .status()
-            .unwrap_or_else(|e| { panic!("failed to execute process: {}", e) });
+            .unwrap_or_else(|e| { panic!("failed to execute process: {}", e) })
     }
 
-    pub fn add(&self, paths:&[PathBuf]) {
+    pub fn add(&self, paths:&[PathBuf]) -> ExitStatus{
         println!("adding to git {:?}", paths);
+        let paths:Vec<&str> = paths.iter().filter_map(|p|p.to_str()).collect();
+        self.execute_git("add", &paths)
     }
 
-    pub fn commit(&self) {
-        self.execute_git("commit", &["origin", "master"]);
+    pub fn commit(&self) -> ExitStatus{
+        // override git editor with asciii editor
+        self.execute_git("commit", &[])
     }
 
-    pub fn status(&self) {
-        self.execute_git("status", &["origin", "master"]);
+    pub fn status(&self) -> ExitStatus{
+        self.execute_git("status", &["origin", "master"])
     }
 
-    pub fn push(&self) {
-        self.execute_git("push", &["origin", "master"]);
+    pub fn push(&self) -> ExitStatus{
+        self.execute_git("push", &["origin", "master"])
     }
 
-    pub fn pull(&self) {
-        self.execute_git("pull", &["origin", "master"]);
+    pub fn pull(&self) -> ExitStatus{
+        self.execute_git("pull", &["origin", "master"])
     }
 }

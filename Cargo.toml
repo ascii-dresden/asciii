@@ -17,7 +17,6 @@ currency = {git="https://github.com/hoodie/rust-lang-currency"}
 lazy_static = "*"
 maplit = {path="../packages/maplit"}#"*"
 tempdir = "*"
-git2    = { version = "*", features = ["unstable"]}
 
 clippy = {version = "~0.0.23", optional = true}
 
@@ -25,9 +24,14 @@ clippy = {version = "~0.0.23", optional = true}
 version = "2"
 features= ["yaml"]
 
+[dependencies.git2]
+version = "*"
+optional = true
+
 [features]
-default = []
+default = ["git"]
 dev = ["clippy"]
+git = ["git2"]
 
 [[bin]]
 name = "asciii"

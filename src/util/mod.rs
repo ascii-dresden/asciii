@@ -2,7 +2,8 @@
 use std::io;
 use std::env::{home_dir,current_dir};
 use std::path::{Path,PathBuf};
-use std::process::Command;
+use std::process;
+use std::process::{Command, ExitStatus};
 
 pub mod keyword_replacement;
 pub use self::keyword_replacement::IsKeyword;
@@ -77,4 +78,8 @@ pub fn get_storage_path() -> PathBuf
         storage_path = current_dir().unwrap().join(storage_path);
     }
     storage_path
+}
+
+pub fn exit(status:ExitStatus) -> !{
+    process::exit(status.code().unwrap_or(1));
 }

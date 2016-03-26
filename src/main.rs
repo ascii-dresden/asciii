@@ -13,6 +13,7 @@ extern crate tempdir;
 extern crate term;
 extern crate terminal_size;
 //TODO make libgit2 optional
+#[cfg(feature = "git")]
 extern crate git2;
 extern crate currency;
 #[macro_use] extern crate prettytable;

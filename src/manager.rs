@@ -7,6 +7,7 @@ use std::ffi::OsStr;
 
 use slug;
 use chrono::{Date, UTC, Datelike};
+#[cfg(feature = "git")]
 use git2::Error as GitError;
 
 use repo::Repository;
@@ -23,6 +24,7 @@ impl From<io::Error>  for LuigiError {
     fn from(io_error: io::Error) -> LuigiError{ LuigiError::Io(io_error) }
 }
 
+#[cfg(feature = "git")]
 impl From<GitError>  for LuigiError {
     fn from(git_error: GitError) -> LuigiError{ LuigiError::Git(git_error) }
 }
@@ -48,6 +50,7 @@ pub enum LuigiError {
     InvalidDirStructure,
     ParseError(YamlError),
     TemplateNotFound,
+    #[cfg(feature = "git")]
     Git(GitError),
     Io(io::Error),
 }
@@ -134,6 +137,7 @@ impl Luigi {
     }
 
     /// Inits luigi with git capabilities.
+    #[cfg(feature = "git")]
     pub fn new_with_git<P: AsRef<Path>>(storage:P, working:&str, archive:&str, template:&str) -> LuigiResult<Self> {
         Ok( Luigi{
             repository: Some(try!(Repository::new(storage.as_ref()))),
