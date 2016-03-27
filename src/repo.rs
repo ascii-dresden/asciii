@@ -23,8 +23,9 @@ impl GitStatus{
         // => write!(f, "{:?}", self)
          GitStatus::Current         => color::BLUE,
          GitStatus::Conflict        => color::RED,
-         GitStatus::WorkingNew      => color::GREEN,
+         GitStatus::WorkingNew      => color::YELLOW,
          GitStatus::WorkingModified => color::YELLOW,
+         GitStatus::IndexNew        => color::GREEN,
          //GitStatus::Unknown         => color::WHITE,
          _                          => color::WHITE
         }
@@ -40,6 +41,7 @@ impl fmt::Display for GitStatus{
          GitStatus::Current         => write!(f, "+"),
          GitStatus::WorkingNew      => write!(f, "+"),
          GitStatus::WorkingModified => write!(f, "~"),
+         GitStatus::IndexNew        => write!(f, "+"),
          GitStatus::Unknown         => write!(f, ""),
          _                          => write!(f, "{:?}", self),
 
