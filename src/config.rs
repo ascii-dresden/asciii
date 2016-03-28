@@ -71,7 +71,7 @@ impl ConfigReader{
         yaml::get_str(&self.local, &key)
             .or_else(||yaml::get_str(&self.custom, &key))
             .or_else(||yaml::get_str(&self.defaults, &key))
-            .expect(&format!("{} does not contain values", key))
+            .expect(&format!("Config file {} in field {} does not contain a string value", DEFAULT_LOCATION, key))
     }
 
     /// Returns the boolean in the position or `false`
@@ -81,7 +81,7 @@ impl ConfigReader{
     pub fn get_bool(&self, key:&str) -> bool {
         self.get_path(key)
             .and_then(|y|y.as_bool())
-            .expect(&format!("{} does not contain values", key))
+            .expect(&format!("Config file {} in field {} does not contain a boolean value", DEFAULT_LOCATION, key))
     }
 
 }
