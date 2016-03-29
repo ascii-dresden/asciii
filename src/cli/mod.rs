@@ -5,15 +5,14 @@
 //! That makes it easier to derive a pure library version later.
 
 use std::process::exit;
-use std::path::PathBuf;
+pub use super::CONFIG;
 
-use manager::{Luigi, LuigiProject, LuigiResult};
+use manager::{Luigi, LuigiResult};
 use util;
 
 /// Contains concrete implementation of each subcommand
 pub mod subcommands ;
 pub mod print;
-
 
 /// Execute a command returning a LuigiError
 /// TODO make this a `try!` like macro
@@ -32,3 +31,30 @@ fn setup_luigi() -> Luigi {
     execute(|| Luigi::new(util::get_storage_path(), "working", "archive", "templates"))
 }
 
+#[allow(dead_code)]
+pub struct ListConfig<'a>{
+    verbose:      bool,
+    simple:       bool,
+    show_errors:  bool,
+    git_status:   bool,
+    sort_by:      &'a str,
+    filter_by:    &'a[&'a str],
+    use_colors:   bool,
+    details:      &'a[&'a str],
+}
+
+impl<'a> Default for ListConfig<'a>{
+    fn default() -> ListConfig<'a>{
+        ListConfig{
+            verbose:      CONFIG.get_bool("list/verbose"),
+            simple:       false,
+            git_status:   CONFIG.get_bool("list/gitstatus"),
+            show_errors:  false,
+            sort_by:      CONFIG.get_str("list/sort"),
+            filter_by:    &[],
+            use_colors:   CONFIG.get_bool("list/colors"),
+            details:      &[],
+        }
+
+    }
+}

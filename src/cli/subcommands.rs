@@ -5,13 +5,12 @@ use std::process;
 
 use clap::ArgMatches;
 use config;
-use super::super::CONFIG;
+use super::CONFIG;
 use terminal_size::{Width, terminal_size }; // TODO replace with other lib
 use manager::{LuigiDir, LuigiProject,};
 use project::Project;
 use util;
-use util::exit;
-use super::print;
+use super::{print,ListConfig};
 
 // TODO keep this up to date or find a way to make this dynamic
 const STATUS_ROWS_WIDTH:u16 = 96;
@@ -49,88 +48,85 @@ pub fn list(matches:&ArgMatches) {
             list_years();
         } else {
 
-            let mut sort = matches.value_of("sort").unwrap_or("index");
+
+            let mut list_config = ListConfig{
+                sort_by: matches.value_of("sort").unwrap_or_else(||CONFIG.get_str("list/sort")),
+                simple: matches.is_present("simple"),
+                ..Default::default()
+            };
 
             // list archive of year `archive`
-            let dir = if let Some(archive_year) = matches.value_of("archive"){
-                let archive = archive_year.parse::<i32>().unwrap();
-                LuigiDir::Archive(archive)
-            }
+            let dir =
+                if let Some(archive_year) = matches.value_of("archive"){
+                    let archive = archive_year.parse::<i32>().unwrap();
+                    LuigiDir::Archive(archive)
+                }
 
-            // or list all, but sort by date
-            else if matches.is_present("all"){
-                // sort by date on --all of not overriden
-                if !matches.is_present("sort"){ sort = "date" }
-                LuigiDir::All }
+                // or list all, but sort by date
+                else if matches.is_present("all"){
+                    // sort by date on --all of not overriden
+                    if !matches.is_present("sort"){ list_config.sort_by = "date" }
+                    LuigiDir::All }
 
-            // or list normal
-            else { LuigiDir::Working };
+                // or list normal
+                else { LuigiDir::Working };
 
             if matches.is_present("paths"){
                 list_paths(dir);
-            }
-            else if matches.is_present("broken"){
+            } else if matches.is_present("broken"){
                 list_broken_projects(dir);
-            }
-            else {
-                list_projects(dir, sort, matches.is_present("simple"));
+            } else {
+                list_projects(dir, &list_config);
             }
         }
     }
 }
 
-
 fn sort_by_option(option:&str, projects:&mut [Project]){
     match option {
-        "manager" => sort_by_manager(projects),
-        "date"    => sort_by_date(projects),
-        "name"    => sort_by_name(projects),
-
-        _ => sort_by_index(projects),
+        "manager" => projects.sort_by(|pa,pb| pa.manager().cmp( &pb.manager())),
+        "date"    => projects.sort_by(|pa,pb| pa.date().cmp( &pb.date())),
+        "name"    => projects.sort_by(|pa,pb| pa.name().cmp( &pb.name())),
+        "index"   => projects.sort_by(|pa,pb| pa.index().unwrap_or("zzzz".to_owned()).cmp( &pb.index().unwrap_or("zzzz".to_owned()))) ,
+        _         => projects.sort_by(|pa,pb| pa.index().unwrap_or("zzzz".to_owned()).cmp( &pb.index().unwrap_or("zzzz".to_owned()))) ,
     }
 }
 
-fn sort_by_index(projects:&mut [Project]){
-    projects.sort_by(|pa,pb| pa.index().unwrap_or("zzzz".to_owned()).cmp( &pb.index().unwrap_or("zzzz".to_owned())))
-}
-
-fn sort_by_name(projects:&mut [Project]){
-    projects.sort_by(|pa,pb| pa.name().cmp( &pb.name()))
-}
-
-fn sort_by_date(projects:&mut [Project]){
-    projects.sort_by(|pa,pb| pa.date().cmp( &pb.date()))
-}
-
-fn sort_by_manager(projects:&mut [Project]){
-    projects.sort_by(|pa,pb| pa.manager().cmp( &pb.manager()))
-}
 /// Command LIST [--archive, --all]
-fn list_projects(dir:LuigiDir, sort:&str, simple:bool){
-    let luigi = super::setup_luigi_with_git();
+fn list_projects(dir:LuigiDir, list_config:&ListConfig){
+
+    let luigi = if CONFIG.get_bool("list/gitstatus"){
+        super::setup_luigi_with_git()
+    } else {
+        super::setup_luigi()
+    };
+
     let project_paths = super::execute(||luigi.list_project_files(dir));
-    let mut projects: Vec<Project> = project_paths.iter()
+    let mut projects = project_paths.iter()
         .filter_map(|path| match Project::open(path){
             Ok(project) => Some(project),
             Err(err) => {
                 println!("Erroneous Project: {}\n {}", path.display(), err);
                 None
             }
-        })
-    .collect();
+        }).collect::<Vec<Project>>();
 
-    sort_by_option(sort, &mut projects);
+    //filter_by_option(filter_by, &mut projects);
+    sort_by_option(list_config.sort_by, &mut projects);
 
     let wide_enough = match terminal_size() {
         Some((Width(w), _)) if w >= STATUS_ROWS_WIDTH => true,
         _ => false
     };
 
-    if simple || !wide_enough {
-        print::print_projects(print::simple_rows(&projects));
-    }
-    else {
-        print::print_projects(print::status_rows(&projects,&luigi.repository.unwrap()));
+    if !wide_enough {
+        print::print_projects(print::simple_rows(&projects, &list_config));
+    } else if list_config.simple {
+        print::print_projects(print::simple_rows(&projects, &list_config));
+    } else if list_config.verbose {
+        print::print_projects(print::verbose_rows(&projects,&list_config,luigi.repository));
+    } else {
+        print::print_projects(print::rows(&projects, &list_config));
     }
 }
 
@@ -410,16 +406,16 @@ pub fn git(matches:&ArgMatches){
 }
 /// Command STATUS
 fn git_status(){
-    let luigi = super::setup_luigi_with_git();
-    let repo = luigi.repository.unwrap();
-    //exit(repo.status()) // FIXME this does not behave right
+    //let luigi = super::setup_luigi_with_git();
+    //let repo = luigi.repository.unwrap();
+    //util::exit(repo.status()) // FIXME this does not behave right
 }
 
 /// Command COMMIT
 fn git_commit(){
     let luigi = super::setup_luigi_with_git();
     let repo = luigi.repository.unwrap();
-    exit(repo.commit())
+    util::exit(repo.commit())
 }
 
 /// Command REMOTE
@@ -458,12 +454,12 @@ fn git_add(search_terms:&[&str]){
         .map(|project|project.dir())
         .collect::<Vec<PathBuf>>();
     let repo = luigi.repository.unwrap();
-    exit(repo.add(&projects));
+    util::exit(repo.add(&projects));
 }
 
 /// Command PULL
 fn git_pull(){
     let luigi = super::setup_luigi_with_git();
     let repo = luigi.repository.unwrap();
-    exit(repo.pull())
+    util::exit(repo.pull())
 }

@@ -13,9 +13,9 @@ subcommands:
       about: Create a new project
       args:
         - name:
-            help: "Project name"
+            help: Project name
         - template:
-            help: "Use a specific template"
+            help: Use a specific template.
             short: T
             long: template
         - editor:
@@ -36,8 +36,12 @@ subcommands:
               long: "archive"
               takes_value: true
 
+        - fields:
+              help: List of fields to print for each project listed
+              multiple: true
+
         - "simple":
-              help: "use simple list"
+              help: Use simple list
               short: "e"
               long: "simple"
 
@@ -45,13 +49,8 @@ subcommands:
               help: "sort by [date | index | name | manager]"
               short: "s"
               long: "sort"
-              #possible_values: vec![ String::from "date" , String::from "index" , String::from "name" , String::from "manager"  ]
+              possible_values: ["date",  "index",  "name",  "manager"]
               takes_value: true
-
-        - no-git:
-              help: do not display git status when listing
-              short: n
-              long: no-git
 
         - "all":
               help: "List all projects, ever"
