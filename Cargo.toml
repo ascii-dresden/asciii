@@ -3,10 +3,11 @@ name = "ascii_invoicer"
 version = "0.1.0"
 authors = ["Hendrik Sollich <hendrik@hoodie.de>"]
 
+
 [dependencies]
 
 #csv = "*"
-yaml-rust = "*" #{git="https://github.com/chyh1990/yaml-rust/", branch="alias"}
+yaml-rust = {path="../packages/yaml-rust"}
 chrono = "*"
 regex = "*"
 slug = "*"
@@ -36,3 +37,4 @@ git = ["git2"]
 [[bin]]
 name = "asciii"
 doc = false
+crate-type = ["staticlib"]

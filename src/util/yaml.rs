@@ -106,6 +106,10 @@ pub fn get_string(yaml:&Yaml, key:&str) -> Option<String> {
     get_str(&yaml,&key).map(|s|s.to_owned())
 }
 
+pub fn get_as_string(yaml:&Yaml, key:&str) -> Option<String> {
+    get(&yaml,&key).map(|y|y.to_string())
+}
+
 pub fn get_dmy(yaml:&Yaml, key:&str) -> Option<Date<UTC>> {
     get(&yaml,&key).and_then(|y|y.as_str()).and_then(|d|parse_fwd_date(d))
 }

@@ -14,10 +14,11 @@ Here I try to rewrite the original [ascii-invoicer](http://github.com/ascii-dres
   * [x] basic project file management
       * [x] creating
       * [ ] git integration
-        * [ ] stage1: pull, push, add, commit
+        * [x] stage1: pull, push, add, commit
         * [ ] stage2: remind of stale projects and sync backlog
       * [x] template management
       * [ ] command line control
+        * [ ] fill things like payed_date
   * [x] Validate
       * [x] Offer
       * [x] Invoice

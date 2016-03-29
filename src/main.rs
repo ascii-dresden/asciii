@@ -60,41 +60,39 @@ fn init_matches() -> yaml_rust::yaml::Yaml
 }
 
 pub fn setup_app(){
-    let cli_setup = init_matches(); //TODO Font forget this in production
-    //let cli_setup = load_yaml!("cli/cli.yml");
+    use cli::subcommands::*;
+    //let cli_setup = init_matches(); //TODO Font forget this in production
+    let cli_setup = load_yaml!("cli/cli.yml");
 
 
     let matches = App::from_yaml(&cli_setup)
         .version(&crate_version!()[..])
         .get_matches();
 
-    cli::subcommands::new(&matches);
+    match matches.subcommand() {
+     ("list",      Some(sub_m)) => list(&sub_m),
+     ("new",       Some(sub_m)) => new(&sub_m),
+     ("edit",      Some(sub_m)) => edit(&sub_m),
+     ("show",      Some(sub_m)) => show(&sub_m),
+     ("archive",   Some(sub_m)) => archive(&sub_m),
+     ("unarchive", Some(sub_m)) => unarchive(&sub_m),
+     ("config",    Some(sub_m)) => config(&sub_m),
+     ("whoami",    _          ) => config_show("whoami"),
 
-    cli::subcommands::list(&matches);
+     ("path",      Some(sub_m)) => path(&sub_m),
 
-    cli::subcommands::edit(&matches);
+     ("term",      Some(   _m)) => term(),
 
-    cli::subcommands::show(&matches);
-
-    cli::subcommands::archive(&matches);
-
-    cli::subcommands::unarchive(&matches);
-
-    cli::subcommands::config(&matches);
-
-    cli::subcommands::path(&matches);
-
-    cli::subcommands::git(&matches);
-
-
-    if matches.is_present("term") {
-        use terminal_size::{Width, Height, terminal_size };
-        if let Some((Width(w), Height(h))) = terminal_size() {
-            println!("Your terminal is {} cols wide and {} lines tall", w, h);
-        } else {
-            println!("Unable to get terminal size");
-        }
+     ("remote",    Some(   _m)) => git_remote(),
+     ("pull",      Some(   _m)) => git_pull(),
+     ("status",    Some(   _m)) => git_status(),
+     ("add",       Some(sub_m)) => git_add(&sub_m),
+     ("commit",    Some(   _m)) => git_commit(),
+     ("push",      Some(   _m)) => git_push(),
+     //("", Some(sub_m))     =>
+     _                       => ()
     }
+
 
 }
 

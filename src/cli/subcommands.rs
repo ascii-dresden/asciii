@@ -17,7 +17,6 @@ const STATUS_ROWS_WIDTH:u16 = 96;
 
 /// Create NEW Project
 pub fn new(matches:&ArgMatches) {
-    if let Some(matches) = matches.subcommand_matches("new") {
         let name     = matches.value_of("name").unwrap();
         let editor   = CONFIG.get_path("editor").unwrap().as_str().unwrap();
 
@@ -26,7 +25,6 @@ pub fn new(matches:&ArgMatches) {
             .unwrap();
 
         new_project(&name, &template, &editor, !matches.is_present("don't edit"));
-    }
 }
 
 fn new_project(project_name:&str, template_name:&str, editor:&str, edit:bool){
@@ -41,7 +39,6 @@ fn new_project(project_name:&str, template_name:&str, editor:&str, edit:bool){
 
 /// Command LIST
 pub fn list(matches:&ArgMatches) {
-    if let Some(matches) = matches.subcommand_matches("list") {
         if matches.is_present("templates"){
             list_templates();
         } else if matches.is_present("years"){
@@ -79,7 +76,6 @@ pub fn list(matches:&ArgMatches) {
                 list_projects(dir, &list_config);
             }
         }
-    }
 }
 
 fn sort_by_option(option:&str, projects:&mut [Project]){
@@ -180,7 +176,6 @@ fn list_paths(dir:LuigiDir){
 
 /// Command EDIT
 pub fn edit(matches:&ArgMatches) {
-    if let Some(matches) = matches.subcommand_matches("edit") {
 
         let search_term = matches.value_of("search_term").unwrap();
         let search_terms = matches.values_of("search_term").unwrap().collect::<Vec<&str>>();
@@ -198,7 +193,6 @@ pub fn edit(matches:&ArgMatches) {
                 edit_projects(LuigiDir::Working, &search_terms, &editor);
             }
         }
-    }
 }
 
 fn edit_projects(dir:LuigiDir, search_terms:&[&str], editor:&str){
@@ -235,7 +229,6 @@ fn edit_template(name:&str, editor:&str){
 
 /// Command SHOW
 pub fn show(matches:&ArgMatches){
-    if let Some(matches) = matches.subcommand_matches("show") {
         let search_term = matches.value_of("search_term").unwrap();
         if let Some(year) = matches.value_of("archive"){
             let year = year.parse::<i32>().unwrap();
@@ -245,7 +238,6 @@ pub fn show(matches:&ArgMatches){
         } else {
             show_project(LuigiDir::Working, &search_term);
         }
-    }
 }
 
 fn show_project(dir:LuigiDir, search_term:&str){
@@ -269,25 +261,20 @@ fn show_template(name:&str){
     println!("{:#?}", templater.list_keywords());
 }
 pub fn archive(matches:&ArgMatches){
-    if let Some(matches) = matches.subcommand_matches("archive") {
         let name = matches.value_of("NAME").unwrap();
         let year = matches.value_of("year")
             .and_then(|s|s.parse::<i32>().ok());
         archive_project(&name, year);
-    }
 }
 
 pub fn unarchive(matches:&ArgMatches){
-    if let Some(matches) = matches.subcommand_matches("unarchive") {
         let year = matches.value_of("YEAR").unwrap();
         let name = matches.value_of("NAME").unwrap();
         let year = year.parse::<i32>().unwrap_or_else(|e|panic!("can't parse year {:?}, {:?}", year, e));
         unarchive_project(year, &name);
-    }
 }
 
 pub fn config(matches:&ArgMatches){
-    if let Some(matches) = matches.subcommand_matches("config") {
         if let Some(path) = matches.value_of("show"){
             config_show(&path);
         }
@@ -297,12 +284,6 @@ pub fn config(matches:&ArgMatches){
             config_edit(&editor); }
 
         else if matches.is_present("default"){ config_show_default(); }
-    }
-
-    // command: "whoami"
-    if matches.is_present("whoami") {
-        config_show("manager_name");
-    }
 }
 
 /// Command ARCHIVE <NAME>
@@ -339,7 +320,7 @@ fn unarchive_project(year:i32, name:&str){
 
 
 /// Command CONFIG --show
-fn config_show(path:&str){
+pub fn config_show(path:&str){
     //TODO config_show could be prettier
     println!("{:#?}", CONFIG.get_str(&path));
 }
@@ -355,8 +336,18 @@ fn config_show_default(){
     println!("{}", config::DEFAULT_CONFIG);
 }
 
+
+/// Command TERM
+pub fn term(){
+    use terminal_size::{Width, Height, terminal_size };
+    if let Some((Width(w), Height(h))) = terminal_size() {
+        println!("Your terminal is {} cols wide and {} lines tall", w, h);
+    } else {
+        println!("Unable to get terminal size");
+    }
+}
+
 pub fn path(matches:&ArgMatches){
-    if let Some(matches) = matches.subcommand_matches("path") {
         if matches.is_present("templates"){
             println!("{}", PathBuf::from(CONFIG.get_str("path"))
                      .join( CONFIG.get_str("dirs/storage"))
@@ -374,45 +365,19 @@ pub fn path(matches:&ArgMatches){
                 .join( CONFIG.get_str("dirs/storage"));
             println!("{}", path.display());
         }
-    }
 }
 
 
 
-pub fn git(matches:&ArgMatches){
-    if matches.is_present("status") {
-        git_status();
-    }
-
-    if let Some(matches) = matches.subcommand_matches("add") {
-        let search_terms = matches
-            .values_of("search_term")
-            .unwrap()
-            .collect::<Vec<&str>>();
-        git_add(&search_terms);
-    }
-
-    if matches.is_present("commit") {
-        git_commit();
-    }
-
-    if matches.is_present("pull") {
-        git_pull();
-    }
-
-    if matches.is_present("remote") {
-        git_remote();
-    }
-}
 /// Command STATUS
-fn git_status(){
+pub fn git_status(){
     //let luigi = super::setup_luigi_with_git();
     //let repo = luigi.repository.unwrap();
     //util::exit(repo.status()) // FIXME this does not behave right
 }
 
 /// Command COMMIT
-fn git_commit(){
+pub fn git_commit(){
     let luigi = super::setup_luigi_with_git();
     let repo = luigi.repository.unwrap();
     util::exit(repo.commit())
@@ -420,7 +385,7 @@ fn git_commit(){
 
 /// Command REMOTE
 /// exact replica of `git remote -v`
-fn git_remote(){
+pub fn git_remote(){
     let luigi = super::setup_luigi_with_git();
     let repo = luigi.repository.unwrap().repo;
 
@@ -439,9 +404,15 @@ fn git_remote(){
 }
 
 /// Command ADD
-fn git_add(search_terms:&[&str]){
-    let luigi = super::setup_luigi_with_git();
-    let projects = luigi.search_multiple_projects(LuigiDir::Working, search_terms)
+pub fn git_add(matches:&ArgMatches){
+    let luigi = super::setup_luigi();
+    let search_terms = matches
+        .values_of("search_term")
+        .unwrap()
+        .collect::<Vec<&str>>();
+
+
+    let projects = luigi.search_multiple_projects(LuigiDir::Working, &search_terms)
         .unwrap()
         .iter()
         .filter_map(|path| match Project::open(path){
@@ -458,8 +429,16 @@ fn git_add(search_terms:&[&str]){
 }
 
 /// Command PULL
-fn git_pull(){
+pub fn git_pull(){
+    // TODO this doesn't need _with_git
     let luigi = super::setup_luigi_with_git();
     let repo = luigi.repository.unwrap();
     util::exit(repo.pull())
+}
+
+/// Command PUSH
+pub fn git_push(){
+    let luigi = super::setup_luigi_with_git();
+    let repo = luigi.repository.unwrap();
+    util::exit(repo.push())
 }

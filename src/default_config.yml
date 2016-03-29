@@ -1,13 +1,16 @@
 ---
 manager_name: "The Unnamed Manager"
-verbose:  false
 editor:   "vim -O"
 opener:   "xdg-open"
-colors:   false
-list_sort: index
 
 path: "~"
 output_path: "."
+list:
+  colors:    false
+  verbose:   true
+  sort: index
+  gitstatus: true
+
 dirs:
   storage: asciii
   working: working

@@ -150,7 +150,7 @@ impl Repository {
     }
 
     pub fn commit(&self) -> ExitStatus{
-        // override git editor with asciii editor
+        // TODO override git editor with asciii editor
         self.execute_git("commit", &[])
     }
 
