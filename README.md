@@ -1,7 +1,7 @@
 # ascii-invoicer rust rewrite
 
 
-Here I try to rewrite the original [ascii-invoicer](http://github.com/ascii-dresden/ascii-invoicer) in Rust. Why? Because?
+Here I try to rewrite the original [ascii-invoicer](http://github.com/ascii-dresden/ascii-invoicer) in Rust. Why? Because!
 
 1. performence (rust instead of ruby)
 2. deployment (one bin instead of n gems)
@@ -19,10 +19,13 @@ Here I try to rewrite the original [ascii-invoicer](http://github.com/ascii-dres
       * [x] template management
       * [ ] command line control
         * [ ] fill things like payed_date
+  * [ ] Listing
   * [x] Validate
       * [x] Offer
       * [x] Invoice
       * [x] Archive, Payed, Calendar etc
+      * [ ] Access dynamic values as if they were static
+        * things like invoice number
       * [ ] Absofuckinglutely correct price/wages calculation
   * [ ] Output
       * [ ] Displaying

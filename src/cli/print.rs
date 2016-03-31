@@ -153,6 +153,11 @@ pub fn verbose_rows(projects:&[Project], list_config:&ListConfig, repo:Option<Re
                 cell!(project.sum_sold_and_wages().map(|i|i.to_string()).unwrap_or(String::from("none"))),
                 ]);
 
+            if list_config.details{
+                // TODO
+                //
+            }
+
             if list_config.show_errors{
                 cells.extend_from_slice( &[
                                          // Errors

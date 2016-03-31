@@ -32,15 +32,16 @@ fn setup_luigi() -> Luigi {
 }
 
 #[allow(dead_code)]
+#[derive(Debug)]
 pub struct ListConfig<'a>{
     verbose:      bool,
     simple:       bool,
     show_errors:  bool,
     git_status:   bool,
     sort_by:      &'a str,
-    filter_by:    &'a[&'a str],
+    filter_by:    Option<Vec<&'a str>>,
     use_colors:   bool,
-    details:      &'a[&'a str],
+    details:      Option<Vec<&'a str>>,
 }
 
 impl<'a> Default for ListConfig<'a>{
@@ -51,9 +52,9 @@ impl<'a> Default for ListConfig<'a>{
             git_status:   CONFIG.get_bool("list/gitstatus"),
             show_errors:  false,
             sort_by:      CONFIG.get_str("list/sort"),
-            filter_by:    &[],
+            filter_by:    None,
             use_colors:   CONFIG.get_bool("list/colors"),
-            details:      &[],
+            details:      None,
         }
 
     }

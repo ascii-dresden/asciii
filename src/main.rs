@@ -1,7 +1,6 @@
-#![feature(plugin)]
-#![cfg_attr(feature = "dev", allow(unstable_features))]
-#![cfg_attr(feature = "dev", feature(plugin))]
-#![cfg_attr(feature = "dev", plugin(clippy))]
+#![cfg_attr(feature = "lints", allow(unstable_features))]
+#![cfg_attr(feature = "lints", feature(plugin))]
+#![cfg_attr(feature = "lints", plugin(clippy))]
 
 #![cfg(not(doc))]
 #![cfg(not(test))]
@@ -89,7 +88,6 @@ pub fn setup_app(){
      ("add",       Some(sub_m)) => git_add(&sub_m),
      ("commit",    Some(   _m)) => git_commit(),
      ("push",      Some(   _m)) => git_push(),
-     //("", Some(sub_m))     =>
      _                       => ()
     }
 

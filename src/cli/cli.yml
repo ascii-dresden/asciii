@@ -7,6 +7,9 @@ settings:
     - ArgRequiredElseHelp
 
 args:
+  - debug:
+      help: Show debug information, may be anything
+      long: debug
 
 subcommands:
   - new:
@@ -31,18 +34,31 @@ subcommands:
       about: List Projects
       args:
         - "archive":
-              help: "list archived projects"
-              short: "a"
-              long: "archive"
+              help: list archived projects
+              short: a
+              long: archive
               takes_value: true
 
-        - fields:
+        - "details":
               help: List of fields to print for each project listed
+              short: d
+              long: details
+              takes_value: true
               multiple: true
+
+        - "filter-by":
+              help: List of fields to print for each project listed
+              short: f
+              long: filter-by
+              takes_value: true
+              multiple: true
+
+        - "errors":
+              help: Show Errors for each project
+              long: "errors"
 
         - "simple":
               help: Use simple list
-              short: "e"
               long: "simple"
 
         - "sort":

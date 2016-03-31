@@ -114,6 +114,16 @@ impl Project{
 
     pub fn yaml(&self) -> &Yaml{ &self.yaml }
 
+    pub fn matches_filter(&self, key: &str, val: &str) -> bool{
+        // TODO here I need an abstraction in order to serve the old format too
+        // filtering "manager:hendrik" should also look at "signature:hendrik"
+        // this is also needed in printing
+        // Or I just assume that the old format is deprecated
+        yaml::get_as_string(&self.yaml, key).map(|c|{
+            c.to_lowercase().contains(&val.to_lowercase())
+        }).unwrap_or(false)
+    }
+
     pub fn manager(&self) -> String{
         spec::project::manager(self.yaml()).unwrap_or("").into()
     }

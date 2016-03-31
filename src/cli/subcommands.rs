@@ -16,7 +16,7 @@ use super::{print,ListConfig};
 const STATUS_ROWS_WIDTH:u16 = 96;
 
 /// Create NEW Project
-pub fn new(matches:&ArgMatches) {
+pub fn new(matches:&ArgMatches){
         let name     = matches.value_of("name").unwrap();
         let editor   = CONFIG.get_path("editor").unwrap().as_str().unwrap();
 
@@ -38,44 +38,48 @@ fn new_project(project_name:&str, template_name:&str, editor:&str, edit:bool){
 }
 
 /// Command LIST
-pub fn list(matches:&ArgMatches) {
-        if matches.is_present("templates"){
-            list_templates();
-        } else if matches.is_present("years"){
-            list_years();
-        } else {
+pub fn list(matches:&ArgMatches){
+    if matches.is_present("templates"){
+        list_templates();
+    } else if matches.is_present("years"){
+        list_years();
+    } else {
 
 
-            let mut list_config = ListConfig{
-                sort_by: matches.value_of("sort").unwrap_or_else(||CONFIG.get_str("list/sort")),
-                simple: matches.is_present("simple"),
-                ..Default::default()
-            };
+        let mut list_config = ListConfig{
+            sort_by:   matches.value_of("sort") .unwrap_or_else(||CONFIG.get_str("list/sort")),
+            simple:    matches.is_present("simple"),
+            details:   matches.values_of("details").map(|v|v.collect::<Vec<&str>>()),
+            filter_by: matches.values_of("filter-by").map(|v|v.collect::<Vec<&str>>()),
 
-            // list archive of year `archive`
-            let dir =
-                if let Some(archive_year) = matches.value_of("archive"){
-                    let archive = archive_year.parse::<i32>().unwrap();
-                    LuigiDir::Archive(archive)
-                }
+            ..Default::default()
+        };
+        //println!("list_config: {:#?}", list_config);
 
-                // or list all, but sort by date
-                else if matches.is_present("all"){
-                    // sort by date on --all of not overriden
-                    if !matches.is_present("sort"){ list_config.sort_by = "date" }
-                    LuigiDir::All }
-
-                // or list normal
-                else { LuigiDir::Working };
-
-            if matches.is_present("paths"){
-                list_paths(dir);
-            } else if matches.is_present("broken"){
-                list_broken_projects(dir);
-            } else {
-                list_projects(dir, &list_config);
+        // list archive of year `archive`
+        let dir =
+            if let Some(archive_year) = matches.value_of("archive"){
+                let archive = archive_year.parse::<i32>().unwrap();
+                LuigiDir::Archive(archive)
             }
+
+            // or list all, but sort by date
+            else if matches.is_present("all"){
+                // sort by date on --all of not overriden
+                if !matches.is_present("sort"){ list_config.sort_by = "date" }
+                LuigiDir::All }
+
+            // or list normal
+            else { LuigiDir::Working };
+
+        if matches.is_present("paths"){
+            list_paths(dir);
+        } else if matches.is_present("broken"){
+            list_broken_projects(dir);
+        } else {
+            list_projects(dir, &list_config);
         }
+    }
 }
 
 fn sort_by_option(option:&str, projects:&mut [Project]){
@@ -107,9 +111,21 @@ fn list_projects(dir:LuigiDir, list_config:&ListConfig){
             }
         }).collect::<Vec<Project>>();
 
-    //filter_by_option(filter_by, &mut projects);
+
+    // filtering, can you read this
+    if let Some(ref filters) = list_config.filter_by{
+        projects = projects.into_iter().filter(|p|{
+            filters.iter().map(|filter|{
+                let kv_pair = filter.split(':').collect::<Vec<&str>>(); // can I parse this readonly
+                p.matches_filter(kv_pair[0], kv_pair[1])
+            }).fold(true, |sum, i| sum && i) // all of them have to be true
+        }).collect::<Vec<Project>>();
+    }
+
+    // sorting
     sort_by_option(list_config.sort_by, &mut projects);
 
+    // fit screen
     let wide_enough = match terminal_size() {
         Some((Width(w), _)) if w >= STATUS_ROWS_WIDTH => true,
         _ => false
