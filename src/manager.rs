@@ -1,3 +1,25 @@
+//! Manages file structure of templates, working directory and archive.
+//!
+//! This module takes care of all the plumbing underneath,
+//! that is why it's called *"Luigi"*.
+//!
+//! Your ordinary file structure would look something like this:
+//!
+//! ```bash
+//! PROJECTS  # storage dir
+//! ├── working
+//! │   └── Project1
+//! │       └── Project1.yml
+//! ├── archive
+//! │   ├── 2013
+//! │   └── 2014
+//! │       └── R036_Project3
+//! │           ├── Project3.yml
+//! │           └── R036 Project3 2014-10-08.tex
+//! ...
+//! ```
+//!
+
 #![allow(dead_code)]
 
 use std::fs;
@@ -31,11 +53,9 @@ impl From<GitError>  for LuigiError {
 
 fn slugify(string:&str) -> String{ slug::slugify(string) }
 
+/// Used to identify what directory you are talking about.
 #[derive(Debug,Clone)]
 pub enum LuigiDir { Working, Archive(Year), Storage, Templates, All }
-
-#[derive(Debug)]
-pub enum LuigiSort { Date, Name, Index }
 
 #[derive(Debug)]
 pub enum LuigiError {
@@ -50,7 +70,6 @@ pub enum LuigiError {
     InvalidDirStructure,
     ParseError(YamlError),
     TemplateNotFound,
-    #[cfg(feature = "git")]
     Git(GitError),
     Io(io::Error),
 }

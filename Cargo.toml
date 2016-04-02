@@ -1,5 +1,5 @@
 [package]
-name = "ascii_invoicer"
+name = "asciii"
 version = "0.1.0"
 authors = ["Hendrik Sollich <hendrik@hoodie.de>"]
 
@@ -7,7 +7,7 @@ authors = ["Hendrik Sollich <hendrik@hoodie.de>"]
 [dependencies]
 
 #csv = "*"
-yaml-rust = {path="../packages/yaml-rust"}
+yaml-rust = {git="https://github.com/hoodie/yaml-rust", branch="feature/to_string"}
 chrono = "*"
 regex = "*"
 slug = "*"
@@ -16,7 +16,7 @@ terminal_size = "0.1.1"
 prettytable-rs = "*"
 currency = {git="https://github.com/hoodie/rust-lang-currency"}
 lazy_static = "*"
-maplit = {path="../packages/maplit"}#"*"
+maplit = {path="../hub/maplit"}#"*"
 tempdir = "*"
 
 clippy = {version = "~0.0.23", optional = true}
@@ -33,8 +33,3 @@ optional = true
 default = ["git"]
 lints = ["clippy"]
 git = ["git2"]
-
-[[bin]]
-name = "asciii"
-doc = false
-crate-type = ["staticlib"]

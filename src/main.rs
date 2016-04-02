@@ -2,14 +2,13 @@
 #![cfg_attr(feature = "lints", feature(plugin))]
 #![cfg_attr(feature = "lints", plugin(clippy))]
 
-#![cfg(not(doc))]
 #![cfg(not(test))]
 extern crate yaml_rust;
 extern crate chrono;
 extern crate regex;
 extern crate slug;
 extern crate tempdir;
-extern crate term;
+extern crate term; // TODO consolidate term, ansi_term and terminal_size
 extern crate terminal_size;
 //TODO make libgit2 optional
 #[cfg(feature = "git")]
@@ -20,15 +19,15 @@ extern crate currency;
 #[macro_use] extern crate maplit;
 #[macro_use] extern crate clap;
 
-mod util;
-mod config;
+pub mod util;
+pub mod config;
 
-mod project;
-mod manager;
-mod repo;
+pub mod project;
+pub mod manager;
+pub mod repo;
 
-mod templater;
-mod cli;
+pub mod templater;
+pub mod cli;
 
 use clap::App;
 

@@ -45,8 +45,8 @@ impl LuigiProject for Project{
             "PROJECT-NAME"  => project_name,
             "DATE-EVENT"    => &event_date,
             "DATE-CREATED"  => &created_date,
-            "SALARY"        => "8.0", //super::CONFIG.get_as_str("defaults/salary"),
-            "MANAGER"       => super::CONFIG.get_str("manager_name")
+            "SALARY"        => "8.0", //::CONFIG.get_as_str("defaults/salary"),
+            "MANAGER"       => ::CONFIG.get_str("manager_name")
         };
 
         // fills the template
@@ -114,6 +114,14 @@ impl Project{
 
     pub fn yaml(&self) -> &Yaml{ &self.yaml }
 
+    /// wrapper around yaml::get() with replacement
+    pub fn get<'a>(&self, path:&str) -> Option<String>{
+        match path{
+            "manager" => Some(spec::project::manager(self.yaml()).unwrap_or("").to_owned()),
+                _ => None
+        }
+    }
+
     pub fn matches_filter(&self, key: &str, val: &str) -> bool{
         // TODO here I need an abstraction in order to serve the old format too
         // filtering "manager:hendrik" should also look at "signature:hendrik"
@@ -136,21 +144,29 @@ impl Project{
         spec::invoice::number_str(self.yaml())
     }
 
+    /// Minimum correctness.
+    ///
+    /// Ready to send an **offer** to the client.
     pub fn valid_stage1(&self) -> SpecResult{
         spec::offer::validate(&self.yaml)
     }
 
+    /// Valid project
+    ///
+    /// Ready to send an **invoice** to the client.
     pub fn valid_stage2(&self) -> SpecResult{
         spec::invoice::validate(&self.yaml)
     }
 
+    /// Completely done and in the past.
+    ///
+    /// Ready to be **archived**.
     pub fn valid_stage3(&self) -> SpecResult{
         spec::archive::validate(&self.yaml)
     }
 
     pub fn age(&self) -> Option<i64> {
-        self.date()
-            .map(|date| (Local::today() - date).num_days() )
+        self.date().map(|date| (Local::today() - date).num_days() )
     }
 
     pub fn invoice_items(&self) -> ProductResult<Vec<product::InvoiceItem>> {
@@ -200,8 +216,8 @@ impl Project{
 #[cfg(test)]
 mod test{
     use std::path::Path;
-    use super::super::project::spec;
-    use super::super::project::Project;
+    use ::project::spec;
+    use ::project::Project;
 
     #[test]
     fn compare_basics(){
@@ -210,7 +226,7 @@ mod test{
         let old_project = Project::open(Path::new("./tests/old.yml")).unwrap();
         let new_yaml = new_project.yaml();
         let old_yaml = old_project.yaml();
-        let config = &super::super::CONFIG;
+        let config = &::CONFIG;
 
         assert_eq!(spec::project::name(&old_yaml), spec::project::name(&new_yaml));
 

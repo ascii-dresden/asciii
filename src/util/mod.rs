@@ -1,3 +1,4 @@
+//! Utility functions that are needed all over the places.
 #![allow(dead_code)]
 use std::io;
 use std::env::{home_dir,current_dir};
@@ -11,10 +12,12 @@ pub use self::keyword_replacement::IsKeyword;
 pub mod yaml;
 
 
+/// Freezes the program until for inspection
 pub fn freeze() {
     io::stdin().read_line(&mut String::new()).unwrap();
 }
 
+/// Shells out to print directory structure
 pub fn ls(path:&str){
     println!("tree {}", path);
     let output = Command::new("tree")
@@ -24,8 +27,12 @@ pub fn ls(path:&str){
     println!("{}", String::from_utf8(output.stdout).unwrap());
 }
 
-/// TODO add something like this to the stdlib
-/// TODO ~ must be first character
+/// Replaces `~` with `$HOME`, rust stdlib doesn't do this yet.
+///
+/// This is by far the most important function of all utility functions.
+///
+/// **TODO** add something like this to the stdlib
+/// **TODO** ~ must be first character
 pub fn replace_home_tilde(p:&Path) -> PathBuf{
     let path = p.to_str().unwrap();
     PathBuf::from( path.replace("~",home_dir().unwrap().to_str().unwrap()))
@@ -39,6 +46,9 @@ macro_rules! try_some {
     });
 }
 
+/// Opens the passed paths in the editor set int config.
+///
+/// This is by far the most important function of all utility functions.
 //TODO use https://crates.io/crates/open (supports linux, windows, mac)
 pub fn open_in_editor(editor:&str, paths:&[PathBuf]){
     let editor_config = editor
@@ -66,10 +76,14 @@ pub fn open_in_editor(editor:&str, paths:&[PathBuf]){
         .unwrap_or_else(|e| { panic!("failed to execute process: {}", e) });
 }
 
+/// Interprets storage path from config.
+///
+/// Even if it starts with `~` or is a relatetive path.
+/// This is by far the most important function of all utility functions.
 pub fn get_storage_path() -> PathBuf
 {
-    let storage_path = PathBuf::from(super::CONFIG.get_str("path"))
-        .join( super::CONFIG.get_str("dirs/storage"));
+    let storage_path = PathBuf::from(::CONFIG.get_str("path"))
+        .join( ::CONFIG.get_str("dirs/storage"));
 
     // TODO make replace tilde a Trait function
     let mut storage_path = replace_home_tilde(&storage_path);
@@ -80,6 +94,7 @@ pub fn get_storage_path() -> PathBuf
     storage_path
 }
 
+/// Exits with the exit status of a child process.
 pub fn exit(status:ExitStatus) -> !{
     process::exit(status.code().unwrap_or(1));
 }

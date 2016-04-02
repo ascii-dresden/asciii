@@ -5,7 +5,7 @@ use std::process;
 
 use clap::ArgMatches;
 use config;
-use super::CONFIG;
+use ::CONFIG;
 use terminal_size::{Width, terminal_size }; // TODO replace with other lib
 use manager::{LuigiDir, LuigiProject,};
 use project::Project;

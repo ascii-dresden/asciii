@@ -167,7 +167,7 @@ pub mod date {
         .or_else(||yaml::get_dmy(&yaml, "created"))
         .or_else(||yaml::get_dmy(&yaml, "date"))
         // probably the dd-dd.mm.yyyy format
-        .or_else(||yaml::get_str(&yaml, "date").and_then(|s|util::yaml::parse_fwd_date_range(s)))
+        .or_else(||yaml::get_str(&yaml, "date").and_then(|s|util::yaml::parse_dmy_date_range(s)))
     }
 
     pub fn payed(yaml:&Yaml) -> Option<Date<UTC>> {

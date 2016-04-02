@@ -1,12 +1,13 @@
-# ascii-invoicer rust rewrite
+# asciii-rs
 
+The advanced but simple commandline interface to invoice invocation.
 
 Here I try to rewrite the original [ascii-invoicer](http://github.com/ascii-dresden/ascii-invoicer) in Rust. Why? Because!
 
 1. performence (rust instead of ruby)
 2. deployment (one bin instead of n gems)
 3. windows support (I hope)
-4. fun
+4. fun and learning more rust
 
 ## TODO Rewrite
 
@@ -111,3 +112,37 @@ original ascii invoicer commands:
 Options:
   -v, [--verbose], [--no-verbose]  # Change default in /home/hendrik/.ascii-invoicer.yml
 ```
+
+## Technical TODO
+
+* [ ] test on windows and mac
+* [ ] build on raspberry py
+* [ ] see if you can `#[inline]` to improve perfomance
+* [ ] break up code into crates
+  * [ ] config
+  * [ ] yaml helpers
+  * [ ] templating
+  * [ ] utilities etc
+
+### make use if these crates (optional)
+
+* rayon / simple_parallel
+* sparkline
+* xdg / xdg-basedir
+* env_logger
+* filetime
+* itertools
+* multimap
+* cool faces
+* open
+* notify-rust
+* colored
+
+## Side Effects
+
+While working on this I had the chance to also contribute to a number of crates that asciii depends on.
+These include:
+
+* [prettytables-rs](https://github.com/phsym/prettytable-rs/)
+* [yaml-rust](https://github.com/chyh1990/yaml-rust)
+* [currency](https://github.com/Tahler/rust-lang-currency)

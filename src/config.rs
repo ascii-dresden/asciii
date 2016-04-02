@@ -56,7 +56,7 @@ impl ConfigReader{
 
     /// Returns whatever it finds in that position
     ///
-    /// Supports simple path syntax: "top/middle/child/node"
+    /// Supports simple path syntax: `top/middle/child/node`
     pub fn get_path(&self, path:&str) -> Option<&Yaml>{
         yaml::get(&self.local, &path)
             .or_else(||yaml::get(&self.custom, &path))
@@ -66,7 +66,8 @@ impl ConfigReader{
     /// Returns the string in the position or an empty string
     ///
     /// # Panics
-    /// this panics if nothing is found
+    /// This panics if nothing is found.
+    /// You should have a default config for everything that you use.
     pub fn get_str(&self, key:&str) -> &str {
         yaml::get_str(&self.local, &key)
             .or_else(||yaml::get_str(&self.custom, &key))
@@ -77,7 +78,8 @@ impl ConfigReader{
     /// Returns the boolean in the position or `false`
     ///
     /// # Panics
-    /// this panics if nothing is found
+    /// This panics if nothing is found.
+    /// You should have a default config for everything that you use.
     pub fn get_bool(&self, key:&str) -> bool {
         self.get_path(key)
             .and_then(|y|y.as_bool())

@@ -5,7 +5,7 @@
 //! That makes it easier to derive a pure library version later.
 
 use std::process::exit;
-pub use super::CONFIG;
+pub use ::CONFIG;
 
 use manager::{Luigi, LuigiResult};
 use util;
@@ -31,6 +31,7 @@ fn setup_luigi() -> Luigi {
     execute(|| Luigi::new(util::get_storage_path(), "working", "archive", "templates"))
 }
 
+/// Configuration for this list output.
 #[allow(dead_code)]
 #[derive(Debug)]
 pub struct ListConfig<'a>{
