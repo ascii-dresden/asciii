@@ -6,9 +6,6 @@ use std::path::{Path,PathBuf};
 use std::process;
 use std::process::{Command, ExitStatus};
 
-pub mod keyword_replacement;
-pub use self::keyword_replacement::IsKeyword;
-
 pub mod yaml;
 
 
