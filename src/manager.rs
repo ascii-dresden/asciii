@@ -72,9 +72,10 @@ pub enum LuigiError {
     TemplateNotFound,
     Git(GitError),
     Io(io::Error),
+    NotImplemented
 }
 
-pub trait LuigiProject{
+pub trait LuigiProject:Sized{
     /// creates in tempfile
     fn from_template(project_name:&str,template:&Path) -> LuigiResult<Self> where Self: Sized;
 
@@ -471,6 +472,16 @@ impl Luigi {
     pub fn list_project_files(&self, directory:LuigiDir) -> LuigiResult<Vec<PathBuf>> {
         let projects = try!(self.list_project_folders(directory)).iter()
             .filter_map(|dir| self.get_project_file(dir).ok())
+            .collect();
+        Ok(projects)
+    }
+
+    pub fn filter_project_files<F>(&self, directory:LuigiDir, filter:F) -> LuigiResult<Vec<PathBuf>>
+        where F:FnMut(&PathBuf) -> bool
+    {
+        let projects = try!(self.list_project_folders(directory)).iter()
+            .filter_map(|dir| self.get_project_file(dir).ok())
+            .filter(filter)
             .collect();
         Ok(projects)
     }

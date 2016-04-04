@@ -7,10 +7,11 @@ use clap::ArgMatches;
 use config;
 use ::CONFIG;
 use terminal_size::{Width, terminal_size }; // TODO replace with other lib
-use manager::{LuigiDir, LuigiProject,};
+use manager::{LuigiDir, LuigiProject};
 use project::Project;
 use util;
-use super::{print,ListConfig};
+use super::{print,setup_luigi, setup_luigi_with_git};
+use super::{ListConfig,ProjectList};
 
 // TODO keep this up to date or find a way to make this dynamic
 const STATUS_ROWS_WIDTH:u16 = 96;
@@ -28,7 +29,7 @@ pub fn new(matches:&ArgMatches){
 }
 
 fn new_project(project_name:&str, template_name:&str, editor:&str, edit:bool){
-    let luigi = super::setup_luigi();
+    let luigi = setup_luigi();
     //let project = execute(|| luigi.create_project::<Project>(&project_name, &template_name));
     let project = luigi.create_project::<Project>(&project_name, &template_name).unwrap();
     let project_file = project.file();
@@ -92,34 +93,22 @@ fn sort_by_option(option:&str, projects:&mut [Project]){
     }
 }
 
+
+
 /// Command LIST [--archive, --all]
 fn list_projects(dir:LuigiDir, list_config:&ListConfig){
 
     let luigi = if CONFIG.get_bool("list/gitstatus"){
-        super::setup_luigi_with_git()
+        setup_luigi_with_git()
     } else {
-        super::setup_luigi()
+        setup_luigi()
     };
 
-    let project_paths = super::execute(||luigi.list_project_files(dir));
-    let mut projects = project_paths.iter()
-        .filter_map(|path| match Project::open(path){
-            Ok(project) => Some(project),
-            Err(err) => {
-                println!("Erroneous Project: {}\n {}", path.display(), err);
-                None
-            }
-        }).collect::<Vec<Project>>();
-
+    let mut projects = super::execute(||ProjectList::open_dir(dir));
 
     // filtering, can you read this
     if let Some(ref filters) = list_config.filter_by{
-        projects = projects.into_iter().filter(|p|{
-            filters.iter().map(|filter|{
-                let kv_pair = filter.split(':').collect::<Vec<&str>>(); // can I parse this readonly
-                p.matches_filter(kv_pair[0], kv_pair[1])
-            }).fold(true, |sum, i| sum && i) // all of them have to be true
-        }).collect::<Vec<Project>>();
+        projects.filter_by_all(filters);
     }
 
     // sorting
@@ -145,7 +134,7 @@ fn list_projects(dir:LuigiDir, list_config:&ListConfig){
 /// Command LIST --broken
 fn list_broken_projects(dir:LuigiDir){
     use util::yaml::YamlError;
-    let luigi = super::setup_luigi();
+    let luigi = setup_luigi();
     let invalid_files = super::execute(||luigi.list_project_files(dir));
     let tups = invalid_files
         .iter()
@@ -159,7 +148,7 @@ fn list_broken_projects(dir:LuigiDir){
 
 /// Command LIST --templates
 fn list_templates(){
-    let luigi = super::setup_luigi();
+    let luigi = setup_luigi();
     let template_paths = super::execute(||luigi.list_template_files());
 
     for path in template_paths{
@@ -173,7 +162,7 @@ fn list_templates(){
 
 /// Command LIST --years
 fn list_years(){
-    let luigi = super::setup_luigi();
+    let luigi = setup_luigi();
     let years = super::execute(||luigi.list_years());
     println!("{:?}", years);
 }
@@ -183,7 +172,7 @@ fn list_years(){
 
 /// Command LIST --years
 fn list_paths(dir:LuigiDir){
-    let luigi = super::setup_luigi();
+    let luigi = setup_luigi();
     let paths = super::execute(||luigi.list_project_files(dir));
     for path in paths{
         println!("{}", path.display());
@@ -212,7 +201,7 @@ pub fn edit(matches:&ArgMatches) {
 }
 
 fn edit_projects(dir:LuigiDir, search_terms:&[&str], editor:&str){
-    let luigi = super::setup_luigi();
+    let luigi = setup_luigi();
     let mut all_paths = Vec::new();
     for search_term in search_terms{
         let mut paths = super::execute(||luigi.search_projects(dir.clone(), &search_term));
@@ -233,7 +222,7 @@ fn edit_projects(dir:LuigiDir, search_terms:&[&str], editor:&str){
 
 /// Command EDIT --template
 fn edit_template(name:&str, editor:&str){
-    let luigi = super::setup_luigi();
+    let luigi = setup_luigi();
     let template_paths = super::execute(||luigi.list_template_files())
         .iter()
         .filter(|f|f.file_stem() .unwrap_or(&OsStr::new("")) == name)
@@ -257,7 +246,7 @@ pub fn show(matches:&ArgMatches){
 }
 
 fn show_project(dir:LuigiDir, search_term:&str){
-    let luigi = super::setup_luigi();
+    let luigi = setup_luigi();
     for project in super::execute(||luigi.search_projects(dir, &search_term))
         .iter()
             .filter_map(|path| Project::open(path).ok())
@@ -272,7 +261,7 @@ fn show_project(dir:LuigiDir, search_term:&str){
 /// Command SHOW --template
 use templater::Templater;
 fn show_template(name:&str){
-    let luigi = super::setup_luigi();
+    let luigi = setup_luigi();
     let templater = Templater::new(&luigi.get_template_file(name).unwrap()).unwrap();
     println!("{:#?}", templater.list_keywords());
 }
@@ -304,7 +293,7 @@ pub fn config(matches:&ArgMatches){
 
 /// Command ARCHIVE <NAME>
 fn archive_project(name:&str, manual_year:Option<i32>){
-    let luigi = super::setup_luigi();
+    let luigi = setup_luigi();
     if let Ok(projects) = luigi.search_projects(LuigiDir::Working, name){
         for project in projects.iter().filter_map(|path| Project::open(path).ok()) {
             if project.valid_stage3().is_ok(){
@@ -323,7 +312,7 @@ fn archive_project(name:&str, manual_year:Option<i32>){
 
 /// Command UNARCHIVW <YEAR> <NAME>
 fn unarchive_project(year:i32, name:&str){
-    let luigi = super::setup_luigi();
+    let luigi = setup_luigi();
     if let Ok(projects) = luigi.search_projects(LuigiDir::Archive(year), name){
         if projects.len() == 1 {
             println!("{:?}", projects);
@@ -387,14 +376,14 @@ pub fn path(matches:&ArgMatches){
 
 /// Command STATUS
 pub fn git_status(){
-    //let luigi = super::setup_luigi_with_git();
+    //let luigi = setup_luigi_with_git();
     //let repo = luigi.repository.unwrap();
     //util::exit(repo.status()) // FIXME this does not behave right
 }
 
 /// Command COMMIT
 pub fn git_commit(){
-    let luigi = super::setup_luigi_with_git();
+    let luigi = setup_luigi_with_git();
     let repo = luigi.repository.unwrap();
     util::exit(repo.commit())
 }
@@ -402,7 +391,7 @@ pub fn git_commit(){
 /// Command REMOTE
 /// exact replica of `git remote -v`
 pub fn git_remote(){
-    let luigi = super::setup_luigi_with_git();
+    let luigi = setup_luigi_with_git();
     let repo = luigi.repository.unwrap().repo;
 
     for remote_name in repo.remotes().unwrap().iter(){ // Option<Option<&str>> oh, boy
@@ -421,7 +410,7 @@ pub fn git_remote(){
 
 /// Command ADD
 pub fn git_add(matches:&ArgMatches){
-    let luigi = super::setup_luigi();
+    let luigi = setup_luigi();
     let search_terms = matches
         .values_of("search_term")
         .unwrap()
@@ -447,14 +436,14 @@ pub fn git_add(matches:&ArgMatches){
 /// Command PULL
 pub fn git_pull(){
     // TODO this doesn't need _with_git
-    let luigi = super::setup_luigi_with_git();
+    let luigi = setup_luigi_with_git();
     let repo = luigi.repository.unwrap();
     util::exit(repo.pull())
 }
 
 /// Command PUSH
 pub fn git_push(){
-    let luigi = super::setup_luigi_with_git();
+    let luigi = setup_luigi_with_git();
     let repo = luigi.repository.unwrap();
     util::exit(repo.push())
 }

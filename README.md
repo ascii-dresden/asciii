@@ -49,6 +49,11 @@ Here I try to rewrite the original [ascii-invoicer](http://github.com/ascii-dres
   * [ ] complete this TODO
   * [ ] logging
   * [ ] Documentation!!!
+  * [ ] Be rustacious!
+  * [ ] Releasing
+    * [ ] Travis
+    * [ ] Doc = dev + usage
+    * [ ] auto build Debian and arch packages
 
 
 ## Vision v3.x.x

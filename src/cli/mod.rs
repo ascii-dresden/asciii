@@ -5,10 +5,10 @@
 //! That makes it easier to derive a pure library version later.
 
 use std::process::exit;
-pub use ::CONFIG;
-
-use manager::{Luigi, LuigiResult};
+use project::Project;
+use manager::{Luigi, LuigiDir, LuigiResult};
 use util;
+use ::CONFIG;
 
 /// Contains concrete implementation of each subcommand
 pub mod subcommands ;
@@ -58,5 +58,64 @@ impl<'a> Default for ListConfig<'a>{
             details:      None,
         }
 
+    }
+}
+
+//TODO make this generic over LuigiProject
+//TODO this belongs into ::manger::
+pub struct ProjectList{
+    pub projects: Vec<Project>
+}
+
+impl ProjectList{
+    pub fn open_dir(dir:LuigiDir) -> LuigiResult<ProjectList>{
+        setup_luigi().list_project_files(dir)
+            .map(|project_paths|
+                 ProjectList{
+                     projects: project_paths.iter()
+                         .filter_map(|path| match Project::open(path){
+                             Ok(project) => Some(project),
+                             Err(err) => {
+                                 println!("Erroneous Project: {}\n {}", path.display(), err);
+                                 None
+                             }
+                         }).collect::<Vec<Project>>()
+                 }
+                )
+    }
+
+    pub fn filter_by_all(&mut self, filters:&[&str]){
+        for filter in filters{
+            self.filter_by(filter);
+        }
+    }
+
+    pub fn filter_by(&mut self, filter:&str){
+        self.projects.retain(|p|{
+            let (key,val) = filter.split_at(filter.find(':').unwrap_or(0));
+            p.matches_filter(&key, &val[1..])
+        });
+    }
+}
+
+use std::ops::{Deref, DerefMut};
+impl Deref for ProjectList{
+    type Target=Vec<Project>;
+    fn deref(&self) -> &Vec<Project>{
+        &self.projects
+    }
+}
+
+impl DerefMut for ProjectList{
+    fn deref_mut(&mut self) -> &mut Vec<Project>{
+        &mut self.projects
+    }
+}
+
+impl IntoIterator for ProjectList{
+    type Item = Project;
+    type IntoIter= ::std::vec::IntoIter<Project>;
+    fn into_iter(self) -> Self::IntoIter{
+        self.projects.into_iter()
     }
 }
