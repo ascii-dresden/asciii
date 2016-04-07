@@ -6,7 +6,7 @@
 
 use std::process::exit;
 use project::Project;
-use manager::{Luigi, LuigiDir, LuigiResult};
+use manager::{Luigi, LuigiDir, LuigiProject, LuigiResult};
 use util;
 use ::CONFIG;
 
@@ -23,11 +23,11 @@ fn execute<F, S>(command:F) -> S where F: FnOnce() -> LuigiResult<S> {
     }
 }
 
-fn setup_luigi_with_git() -> Luigi {
+fn setup_luigi_with_git() -> Luigi<Project> {
     execute(||Luigi::new_with_git(util::get_storage_path(), "working", "archive", "templates"))
 }
 
-fn setup_luigi() -> Luigi {
+fn setup_luigi() -> Luigi<Project> {
     execute(|| Luigi::new(util::get_storage_path(), "working", "archive", "templates"))
 }
 
@@ -61,61 +61,12 @@ impl<'a> Default for ListConfig<'a>{
     }
 }
 
-//TODO make this generic over LuigiProject
-//TODO this belongs into ::manger::
-pub struct ProjectList{
-    pub projects: Vec<Project>
-}
-
-impl ProjectList{
-    pub fn open_dir(dir:LuigiDir) -> LuigiResult<ProjectList>{
-        setup_luigi().list_project_files(dir)
-            .map(|project_paths|
-                 ProjectList{
-                     projects: project_paths.iter()
-                         .filter_map(|path| match Project::open(path){
-                             Ok(project) => Some(project),
-                             Err(err) => {
-                                 println!("Erroneous Project: {}\n {}", path.display(), err);
-                                 None
-                             }
-                         }).collect::<Vec<Project>>()
-                 }
-                )
-    }
-
-    pub fn filter_by_all(&mut self, filters:&[&str]){
-        for filter in filters{
-            self.filter_by(filter);
-        }
-    }
-
-    pub fn filter_by(&mut self, filter:&str){
-        self.projects.retain(|p|{
-            let (key,val) = filter.split_at(filter.find(':').unwrap_or(0));
-            p.matches_filter(&key, &val[1..])
-        });
-    }
-}
-
-use std::ops::{Deref, DerefMut};
-impl Deref for ProjectList{
-    type Target=Vec<Project>;
-    fn deref(&self) -> &Vec<Project>{
-        &self.projects
-    }
-}
-
-impl DerefMut for ProjectList{
-    fn deref_mut(&mut self) -> &mut Vec<Project>{
-        &mut self.projects
-    }
-}
-
-impl IntoIterator for ProjectList{
-    type Item = Project;
-    type IntoIter= ::std::vec::IntoIter<Project>;
-    fn into_iter(self) -> Self::IntoIter{
-        self.projects.into_iter()
+fn sort_by(projects:&mut Vec<Project>, option:&str){
+    match option {
+        "manager" => projects.sort_by(|pa,pb| pa.manager().cmp( &pb.manager())),
+        "date"    => projects.sort_by(|pa,pb| pa.date().cmp( &pb.date())),
+        "name"    => projects.sort_by(|pa,pb| pa.name().cmp( &pb.name())),
+        "index"   => projects.sort_by(|pa,pb| pa.index().unwrap_or("zzzz".to_owned()).cmp( &pb.index().unwrap_or("zzzz".to_owned()))) ,
+        _         => projects.sort_by(|pa,pb| pa.index().unwrap_or("zzzz".to_owned()).cmp( &pb.index().unwrap_or("zzzz".to_owned()))) ,
     }
 }

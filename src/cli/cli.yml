@@ -46,10 +46,10 @@ subcommands:
               takes_value: true
               multiple: true
 
-        - "filter-by":
+        - "filter":
               help: List of fields to print for each project listed
               short: f
-              long: filter-by
+              long: filter
               takes_value: true
               multiple: true
 

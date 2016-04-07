@@ -7,11 +7,11 @@ use clap::ArgMatches;
 use config;
 use ::CONFIG;
 use terminal_size::{Width, terminal_size }; // TODO replace with other lib
-use manager::{LuigiDir, LuigiProject};
+use manager::{LuigiDir, LuigiProject, LuigiError};
 use project::Project;
 use util;
 use super::{print,setup_luigi, setup_luigi_with_git};
-use super::{ListConfig,ProjectList};
+use super::ListConfig;
 
 // TODO keep this up to date or find a way to make this dynamic
 const STATUS_ROWS_WIDTH:u16 = 96;
@@ -31,7 +31,7 @@ pub fn new(matches:&ArgMatches){
 fn new_project(project_name:&str, template_name:&str, editor:&str, edit:bool){
     let luigi = setup_luigi();
     //let project = execute(|| luigi.create_project::<Project>(&project_name, &template_name));
-    let project = luigi.create_project::<Project>(&project_name, &template_name).unwrap();
+    let project = luigi.create_project(&project_name, &template_name).unwrap();
     let project_file = project.file();
     if edit {
         util::open_in_editor(&editor, &[project_file]);
@@ -83,18 +83,6 @@ pub fn list(matches:&ArgMatches){
     }
 }
 
-fn sort_by_option(option:&str, projects:&mut [Project]){
-    match option {
-        "manager" => projects.sort_by(|pa,pb| pa.manager().cmp( &pb.manager())),
-        "date"    => projects.sort_by(|pa,pb| pa.date().cmp( &pb.date())),
-        "name"    => projects.sort_by(|pa,pb| pa.name().cmp( &pb.name())),
-        "index"   => projects.sort_by(|pa,pb| pa.index().unwrap_or("zzzz".to_owned()).cmp( &pb.index().unwrap_or("zzzz".to_owned()))) ,
-        _         => projects.sort_by(|pa,pb| pa.index().unwrap_or("zzzz".to_owned()).cmp( &pb.index().unwrap_or("zzzz".to_owned()))) ,
-    }
-}
-
-
-
 /// Command LIST [--archive, --all]
 fn list_projects(dir:LuigiDir, list_config:&ListConfig){
 
@@ -104,7 +92,7 @@ fn list_projects(dir:LuigiDir, list_config:&ListConfig){
         setup_luigi()
     };
 
-    let mut projects = super::execute(||ProjectList::open_dir(dir));
+    let mut projects = super::execute(||luigi.open_project_files(dir));
 
     // filtering, can you read this
     if let Some(ref filters) = list_config.filter_by{
@@ -112,7 +100,7 @@ fn list_projects(dir:LuigiDir, list_config:&ListConfig){
     }
 
     // sorting
-    sort_by_option(list_config.sort_by, &mut projects);
+    super::sort_by(&mut projects,list_config.sort_by);
 
     // fit screen
     let wide_enough = match terminal_size() {
@@ -139,10 +127,10 @@ fn list_broken_projects(dir:LuigiDir){
     let tups = invalid_files
         .iter()
         .filter_map(|dir| Project::open(dir).err().map(|e|(e, dir)) )
-        .collect::<Vec<(YamlError,&PathBuf)>>();
+        .collect::<Vec<(LuigiError,&PathBuf)>>();
 
     for (err,path) in tups{
-        println!("{}: {}", path.display(), err);
+        println!("{}: {:?}", path.display(), err);
     }
 }
 
@@ -420,10 +408,10 @@ pub fn git_add(matches:&ArgMatches){
     let projects = luigi.search_multiple_projects(LuigiDir::Working, &search_terms)
         .unwrap()
         .iter()
-        .filter_map(|path| match Project::open(path){
+        .filter_map(|path| match Project::open(path){ // TODO use ProjectList
             Ok(project) => Some(project),
             Err(err) => {
-                println!("Erroneous Project: {}\n {}", path.display(), err);
+                println!("Erroneous Project: {}\n {:#?}", path.display(), err);
                 None
             }
         })

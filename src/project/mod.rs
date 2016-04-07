@@ -13,7 +13,7 @@ use currency::Currency;
 
 use util::yaml;
 use util::yaml::YamlError;
-use manager::{LuigiProject, LuigiError};
+use manager::{LuigiProject, LuigiResult, LuigiError};
 use templater::Templater;
 
 pub mod product;
@@ -95,11 +95,9 @@ impl LuigiProject for Project{
 
     fn file(&self) -> PathBuf{ self.file_path.to_owned() } // TODO reconsider returning PathBuf at all
     fn set_file(&mut self, new_file:&Path){ self.file_path = new_file.to_owned(); }
-}
 
-impl Project{
     /// Opens a yaml and parses it.
-    pub fn open(file_path:&Path) -> Result<Project,YamlError>{
+    fn open(file_path:&Path) -> LuigiResult<Project>{
         let file_content = try!(File::open(&file_path)
                                 .and_then(|mut file| {
                                     let mut content = String::new();
@@ -112,6 +110,19 @@ impl Project{
         })
     }
 
+    fn matches_filter(&self, key: &str, val: &str) -> bool{
+        // TODO here I need an abstraction in order to serve the old format too
+        // filtering "manager:hendrik" should also look at "signature:hendrik"
+        // this is also needed in printing
+        // Or I just assume that the old format is deprecated
+        yaml::get_as_string(&self.yaml, key).map(|c|{
+            c.to_lowercase().contains(&val.to_lowercase())
+        }).unwrap_or(false)
+    }
+
+}
+
+impl Project{
     pub fn yaml(&self) -> &Yaml{ &self.yaml }
 
     /// wrapper around yaml::get() with replacement
@@ -120,16 +131,6 @@ impl Project{
             "manager" => Some(spec::project::manager(self.yaml()).unwrap_or("").to_owned()),
                 _ => None
         }
-    }
-
-    pub fn matches_filter(&self, key: &str, val: &str) -> bool{
-        // TODO here I need an abstraction in order to serve the old format too
-        // filtering "manager:hendrik" should also look at "signature:hendrik"
-        // this is also needed in printing
-        // Or I just assume that the old format is deprecated
-        yaml::get_as_string(&self.yaml, key).map(|c|{
-            c.to_lowercase().contains(&val.to_lowercase())
-        }).unwrap_or(false)
     }
 
     pub fn manager(&self) -> String{
@@ -218,6 +219,7 @@ mod test{
     use std::path::Path;
     use ::project::spec;
     use ::project::Project;
+    use ::manager::LuigiProject;
 
     #[test]
     fn compare_basics(){

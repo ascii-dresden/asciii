@@ -26,10 +26,11 @@ use std::fs;
 use std::io;
 use std::path::{Path, PathBuf};
 use std::ffi::OsStr;
+use std::marker::PhantomData;
+use std::error::Error;
 
 use slug;
 use chrono::{Date, UTC, Datelike};
-#[cfg(feature = "git")]
 use git2::Error as GitError;
 
 use repo::Repository;
@@ -46,7 +47,6 @@ impl From<io::Error>  for LuigiError {
     fn from(io_error: io::Error) -> LuigiError{ LuigiError::Io(io_error) }
 }
 
-#[cfg(feature = "git")]
 impl From<GitError>  for LuigiError {
     fn from(git_error: GitError) -> LuigiError{ LuigiError::Git(git_error) }
 }
@@ -68,14 +68,17 @@ pub enum LuigiError {
     ProjectDoesNotExist,
     StoragePathNotAbsolute,
     InvalidDirStructure,
-    ParseError(YamlError),
+    ParseError(YamlError), // TODO: Make ParseError more generic
     TemplateNotFound,
     Git(GitError),
     Io(io::Error),
     NotImplemented
 }
 
-pub trait LuigiProject:Sized{
+pub trait LuigiProject{
+    /// opens a projectfile
+    fn open(&Path) -> LuigiResult<Self> where Self: Sized;
+
     /// creates in tempfile
     fn from_template(project_name:&str,template:&Path) -> LuigiResult<Self> where Self: Sized;
 
@@ -99,6 +102,8 @@ pub trait LuigiProject:Sized{
 
     /// Path to project folder
     fn dir(&self)  -> PathBuf{ self.file().parent().unwrap().to_owned() }
+
+    fn matches_filter(&self, key: &str, val: &str) -> bool;
 }
 
 // TODO rely more on IoError, it has most of what you need
@@ -110,7 +115,7 @@ pub trait LuigiProject:Sized{
 /// * listing templates
 /// * archiving and unarchiving projects
 /// * git interaction ( not yet )
-pub struct Luigi {
+pub struct Luigi<L:LuigiProject> {
     /// Root of the entire Structure.
     storage_dir:  PathBuf,
     /// Place for project directories.
@@ -120,11 +125,12 @@ pub struct Luigi {
     /// Place for template files.
     template_dir: PathBuf,
 
+    project_type: PhantomData<L>,
+
     pub repository: Option<Repository>
 }
-
 use std::fmt;
-impl fmt::Debug for Luigi{
+impl<P:LuigiProject> fmt::Debug for Luigi<P>{
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result
     {
         write!(f, "Luigi: storage  = {storage:?}
@@ -139,9 +145,9 @@ impl fmt::Debug for Luigi{
     }
 }
 
-impl Luigi {
+impl<L:LuigiProject> Luigi<L> {
     /// Inits luigi, does not check existence, yet. TODO
-    pub fn new<P: AsRef<Path>>(storage:P, working:&str, archive:&str, template:&str) -> LuigiResult<Luigi> {
+    pub fn new<P: AsRef<Path>>(storage:P, working:&str, archive:&str, template:&str) -> LuigiResult<Self> {
         let storage = storage.as_ref();
         if storage.is_absolute(){
             Ok( Luigi{
@@ -149,6 +155,7 @@ impl Luigi {
                 working_dir:  storage.join(working),
                 archive_dir:  storage.join(archive),
                 template_dir: storage.join(template),
+                project_type: PhantomData,
                 repository: None,
             })
         } else {
@@ -157,7 +164,6 @@ impl Luigi {
     }
 
     /// Inits luigi with git capabilities.
-    #[cfg(feature = "git")]
     pub fn new_with_git<P: AsRef<Path>>(storage:P, working:&str, archive:&str, template:&str) -> LuigiResult<Self> {
         Ok( Luigi{
             repository: Some(try!(Repository::new(storage.as_ref()))),
@@ -274,7 +280,7 @@ impl Luigi {
 
     /// Takes a template file and stores it in the working directory,
     /// in a new project directory according to it's name.
-    pub fn create_project<P:LuigiProject>(&self, project_name:&str, template_name:&str) -> LuigiResult<P> {
+    pub fn create_project(&self, project_name:&str, template_name:&str) -> LuigiResult<L> {
         if !self.working_dir.exists(){ return Err(LuigiError::NoWorkingDir)}; // funny syntax
         let slugged_name = slugify(&project_name);
         let project_dir  = self.working_dir.join(&slugged_name);
@@ -284,7 +290,7 @@ impl Luigi {
             .join(&(slugged_name + "." + PROJECT_FILE_EXTENSION));
 
         let template_path = try!(self.get_template_file(template_name));
-        let mut project = try!(P::from_template(&project_name, &template_path));
+        let mut project = try!(L::from_template(&project_name, &template_path));
 
         // TODO test for unreplaced template keywords
         try!(fs::create_dir(&project_dir));
@@ -321,7 +327,7 @@ impl Luigi {
     ///    ...
     ///</pre>
     // TODO write extra tests
-    pub fn archive_project<T:LuigiProject>(&self, project:&T, year:Year) -> LuigiResult<PathBuf> {
+    pub fn archive_project(&self, project:&L, year:Year) -> LuigiResult<PathBuf> {
         let name_in_archive = match project.prefix(){
             Some(prefix) => format!("{}_{}", prefix, project.ident()),
                     None =>  project.ident()
@@ -393,6 +399,7 @@ impl Luigi {
     }
 
     /// Matches LuigiDir's content against a term and returns matching project files.
+    /// TODO add search_multiple_projects_deep
     pub fn search_multiple_projects(&self, dir:LuigiDir, search_terms:&[&str]) -> LuigiResult<Vec<PathBuf>> {
         let mut all_paths = Vec::new();
         for search_term in search_terms{
@@ -486,17 +493,67 @@ impl Luigi {
         Ok(projects)
     }
 
+    /// Behaves like `list_project_files()` but also opens projects directly.
+    pub fn open_project_files(&self, dir:LuigiDir) -> LuigiResult<ProjectList<L>>{
+        self.list_project_files(dir)
+            .map(|paths| ProjectList{projects:paths.iter()
+                 .filter_map(|path| match L::open(path){
+                     Ok(project) => Some(project),
+                     Err(err) => {
+                         println!("Erroneous Project: {}\n {:#?}", path.display(), err);
+                         None
+                     }
+                 }).collect::<Vec<L>>()}
+                )
+    }
+}
+
+/// Wrapper around `Vec<LuigiProject>`
+pub struct ProjectList<P:LuigiProject+Sized>{
+    pub projects: Vec<P>
+}
+
+impl<L:LuigiProject> ProjectList<L>{
+
+    pub fn filter_by_all(&mut self, filters:&[&str]){
+        for filter in filters{
+            self.filter_by(filter);
+        }
+    }
+
+    pub fn filter_by(&mut self, filter:&str){
+        self.projects.retain(|p|{
+            let (key,val) = filter.split_at(filter.find(':').unwrap_or(0));
+            p.matches_filter(&key, &val[1..])
+        });
+    }
+
+}
+
+use std::ops::{Deref, DerefMut};
+impl<L:LuigiProject> Deref for ProjectList<L>{
+    type Target=Vec<L>;
+    fn deref(&self) -> &Vec<L>{
+        &self.projects
+    }
+}
+
+impl<L:LuigiProject> DerefMut for ProjectList<L>{
+    fn deref_mut(&mut self) -> &mut Vec<L>{
+        &mut self.projects
+    }
 }
 
 #[cfg(test)]
 pub mod realworld {
     use std::path::{Path,PathBuf};
 
-    pub use super::{Luigi,LuigiError,LuigiDir};
+    use super::{Luigi,LuigiError,LuigiDir};
+    use super::test::TestProject;
 
     const STORAGE:&'static str = "/home/hendrik/ascii/caterings";
 
-    fn setup() -> (PathBuf, Luigi) {
+    fn setup() -> (PathBuf, Luigi<TestProject>) {
         let storage_path = PathBuf::from(STORAGE);
         let luigi = Luigi::new(&storage_path, "working", "archive", "templates").unwrap();
         (storage_path, luigi)
@@ -592,6 +649,14 @@ mod test {
         fn set_file(&mut self, new_file:&Path){ self.file_path = new_file.to_owned(); }
         fn index(&self) -> Option<String>{ Some("ZZ99".into()) }
         fn prefix(&self) -> Option<String>{ self.index() }
+
+        fn open(path:&Path) -> LuigiResult<Self>{
+            Ok(TestProject{
+                file_path: PathBuf::from(path),
+                temp_dir: None
+            })
+        }
+
     }
 
 
@@ -602,7 +667,7 @@ mod test {
     ];
 
 
-    fn setup() -> (TempDir, PathBuf, Luigi) {
+    fn setup() -> (TempDir, PathBuf, Luigi<TestProject>) {
         let dir = TempDir::new_in(Path::new("."),"luigi_test").unwrap();
         let storage_path = dir.path().join("storage");
         let luigi = Luigi::new(&storage_path, "working", "archive", "templates").unwrap();
@@ -647,17 +712,6 @@ mod test {
         assert!(templates.len() == 2);
 
         ////util::freeze();
-    }
-
-    #[test]
-    fn create_test_project(){
-        let (_dir , storage_path, luigi) = setup();
-        luigi.create_dirs().unwrap();
-        assert_existens(&storage_path);
-
-        copy_template(storage_path.join("templates"));
-        let template_path = luigi.get_template_file("template1").unwrap();
-        TestProject::new("testproject", &template_path).unwrap();
     }
 
     #[test]
@@ -712,7 +766,7 @@ mod test {
         let templates = luigi.list_template_names().unwrap();
 
         for test_project in TEST_PROJECTS.iter() {
-            let project     = luigi.create_project::<TestProject>(&test_project, &templates[0]).unwrap();
+            let project     = luigi.create_project(&test_project, &templates[0]).unwrap();
             let target_file = project.file();
             let target_path = target_file.parent().unwrap();
             assert!(target_path.exists());
@@ -738,7 +792,7 @@ mod test {
         let templates = luigi.list_template_names().unwrap();
         for test_project in TEST_PROJECTS.iter() {
             // tested above
-            let origin = luigi.create_project::<TestProject>( &test_project, &templates[0]).unwrap();
+            let origin = luigi.create_project( &test_project, &templates[0]).unwrap();
 
             // the actual tests
             assert!(luigi.archive_project_by_name(&test_project, 2015, None).is_ok());
@@ -747,7 +801,7 @@ mod test {
             assert!(luigi.get_project_dir(&test_project, LuigiDir::Working).is_err());
             assert!(luigi.get_project_dir(&test_project, LuigiDir::Archive(2015)).is_ok());
 
-            //let false_origin = luigi.create_project::<TestProject>(&test_project, &templates[0]).unwrap();
+            //let false_origin = luigi.create_project(&test_project, &templates[0]).unwrap();
             assert!(luigi.archive_project_by_name(&test_project, 2015, None).is_err());
         }
     }
@@ -764,7 +818,7 @@ mod test {
         let templates = luigi.list_template_names().unwrap();
         for test_project_name in TEST_PROJECTS.iter() {
             // tested above
-            let project = luigi.create_project::<TestProject>( &test_project_name, &templates[0]).unwrap();
+            let project = luigi.create_project( &test_project_name, &templates[0]).unwrap();
 
             // Before archiving
             assert!(project.file().exists());
@@ -792,11 +846,11 @@ mod test {
         let templates = luigi.list_template_names().unwrap();
         for test_project in TEST_PROJECTS.iter() {
             // tested above
-            let origin = luigi.create_project::<TestProject>( &test_project, &templates[0]).unwrap();
+            let origin = luigi.create_project( &test_project, &templates[0]).unwrap();
             luigi.archive_project_by_name(test_project, 2015, None).unwrap();
 
             // similarly looking archive
-            luigi.create_project::<TestProject>( &test_project, &templates[0]).unwrap();
+            luigi.create_project( &test_project, &templates[0]).unwrap();
             luigi.archive_project_by_name(test_project, 2014, None).unwrap();
 
             // the actual tests
@@ -813,7 +867,7 @@ mod test {
 
         let templates = luigi.list_template_names().unwrap();
         for test_project in TEST_PROJECTS.iter() {
-            let origin = luigi.create_project::<TestProject>( &test_project, &templates[0]).unwrap();
+            let origin = luigi.create_project( &test_project, &templates[0]).unwrap();
             luigi.archive_project_by_name(test_project, 2015, None).unwrap();
         }
 

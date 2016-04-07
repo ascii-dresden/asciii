@@ -64,7 +64,7 @@ Features possible through rewrite:
 * [ ] much faster
   * [ ] caching
   * [ ] multi threading
-* [ ] REST API with [rustless](http://rustless.org/) or so `asciii serve`
+* [ ] REST API with [rustless](http://rustless.org/) or something alike `asciii serve`
 * [ ] Statistics (plot over time, etc)
 * [ ] platform support
   * [ ] debian/archlinux packages
