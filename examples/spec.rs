@@ -1,12 +1,12 @@
-extern crate ascii_invoicer;
+extern crate asciii;
 use std::path::Path;
 
-use ascii_invoicer::project::spec;
-use ascii_invoicer::project::Project;
-use ascii_invoicer::manager::LuigiProject;
+use asciii::project::spec;
+use asciii::project::Project;
+use asciii::manager::LuigiProject;
 
 fn main(){
-    let config = &ascii_invoicer::CONFIG;
+    let config = &asciii::CONFIG;
 
     for project in [
     Project::open(Path::new("./examples/pfeffer.yml")).unwrap(),

@@ -17,6 +17,7 @@ prettytable-rs = "*"
 #currency = {git="https://github.com/hoodie/rust-lang-currency"}
 currency = {path="../currency"}
 lazy_static = "*"
+git2 = "*"
 maplit = "*"
 tempdir = "*"
 
@@ -26,11 +27,12 @@ clippy = {version = "~0.0.23", optional = true}
 version = "2"
 features= ["yaml"]
 
-[dependencies.git2]
-version = "*"
-optional = true
 
 [features]
-default = ["git"]
+default = []
 lints = ["clippy"]
-git = ["git2"]
+
+[lib]
+doc = false
+[[bin]]
+name = "asciii"

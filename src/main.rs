@@ -2,7 +2,6 @@
 #![cfg_attr(feature = "lints", feature(plugin))]
 #![cfg_attr(feature = "lints", plugin(clippy))]
 
-#![cfg(not(test))]
 extern crate yaml_rust;
 extern crate chrono;
 extern crate regex;
@@ -11,7 +10,6 @@ extern crate tempdir;
 extern crate term; // TODO consolidate term, ansi_term and terminal_size
 extern crate terminal_size;
 //TODO make libgit2 optional
-#[cfg(feature = "git")]
 extern crate git2;
 extern crate currency;
 #[macro_use] extern crate prettytable;
