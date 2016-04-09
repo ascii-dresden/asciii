@@ -1,9 +1,66 @@
 #![allow(dead_code)]
 #![allow(unused_imports)]
 
+use util::yaml::Yaml;
 use currency::Currency;
+use super::Project;
 
 pub type SpecResult<'a> = Result<(), Vec<&'a str>>;
+
+#[export_macro]
+macro_rules! try_some {
+    ($expr:expr) => (match $expr {
+        Some(val) => val,
+        None => return None,
+    });
+}
+
+/// Fields that are accessible but are not directly found in the file format.
+#[derive(Debug)]
+pub enum VirtualField{
+    /// Usually `manager`, or in legacy part of `signature`
+    Responsible,
+    /// Pretty version of `invoice/number`: "`R042`"
+    InvoiceNumber,
+    /// Pretty version of `invoice/number` including year: "`R2016-042`"
+    InvoiceNumberLong,
+    ///Overall Cost Project, including taxes
+    Final,
+    Invalid
+}
+
+impl<'a> From<&'a str> for VirtualField{
+    fn from(s:&'a str) -> VirtualField{
+        match s.to_lowercase().as_ref(){
+            "responsible"       => VirtualField::Responsible,
+            "invoicenumber"     => VirtualField::InvoiceNumber,
+            "invoicenumberlong" => VirtualField::InvoiceNumberLong,
+            "final"             => VirtualField::Final,
+            _                   => VirtualField::Invalid
+        }
+    }
+}
+
+impl VirtualField{
+    pub fn get(&self,project:&Project) -> Option<String>{
+        match *self{
+            VirtualField::Responsible       => project::manager(project.yaml()).map(|s|s.to_owned()),
+            VirtualField::InvoiceNumber     => invoice::number_str(project.yaml()),
+            VirtualField::InvoiceNumberLong => invoice::number_long_str(project.yaml()),
+            VirtualField::Final             => project.sum_sold().map(|c|c.to_string()),
+            VirtualField::Invalid           => None,
+        }
+    }
+}
+
+/// TODO: make this generated
+pub static VIRTUALFIELDS: [VirtualField;4]  = [
+    VirtualField::Responsible,
+    VirtualField::InvoiceNumber,
+    VirtualField::InvoiceNumberLong,
+    VirtualField::Final
+];
+
 
 
 //TODO there may be cases where an f64 can't be converted into Currency
@@ -257,7 +314,9 @@ pub mod offer{
 pub mod invoice{
     use util::yaml;
     use util::yaml::Yaml;
+    use chrono::Datelike;
 
+    /// plain access to `invoice/number`
     pub fn number(yaml:&Yaml) -> Option<i64> {
         yaml::get_int(&yaml, "invoice/number")
         // old spec
@@ -266,6 +325,12 @@ pub mod invoice{
 
     pub fn number_str(yaml:&Yaml) -> Option<String> {
         number(&yaml).map(|n| format!("R{:03}", n))
+    }
+
+    pub fn number_long_str(yaml:&Yaml) -> Option<String> {
+        let year = try_some!(super::date::invoice(&yaml)).year();
+        // TODO Length or format should be a setting
+        number(&yaml).map(|n| format!("R-{}{:03}", year, n))
     }
 
     pub fn validate(yaml:&Yaml) -> super::SpecResult {

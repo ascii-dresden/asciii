@@ -75,6 +75,8 @@ pub enum LuigiError {
     NotImplemented
 }
 
+//TODO implement Display for LuigiError or use Quickerror
+
 pub trait LuigiProject{
     /// opens a projectfile
     fn open(&Path) -> LuigiResult<Self> where Self: Sized;

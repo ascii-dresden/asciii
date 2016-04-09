@@ -119,7 +119,6 @@ pub fn verbose_rows(projects:&[Project], list_config:&ListConfig, repo:Option<Re
             let validation3 = project.valid_stage3();
 
             cells.extend_from_slice( &[
-
                 cell!(r->i+1),
 
                 cell!(
@@ -151,7 +150,17 @@ pub fn verbose_rows(projects:&[Project], list_config:&ListConfig, repo:Option<Re
                 //cell!(project.sum_invoice().map(|i|i.to_string()).unwrap_or(String::from("none"))),
                 //cell!(project.wages().map(|i|i.to_string()).unwrap_or(String::from("none"))),
                 cell!(project.sum_sold_and_wages().map(|i|i.to_string()).unwrap_or(String::from("none"))),
-                ]);
+
+            ]);
+
+            if let Some(ref details) = list_config.details{
+                cells.extend_from_slice(
+                    &details.iter().map(|d|
+                                 cell!( project.get(&d).unwrap_or_else(||String::from(""))),
+                                 ).collect::<Vec<Cell>>()
+                    );
+            }
+
 
             //if list_config.details{
             //    // TODO

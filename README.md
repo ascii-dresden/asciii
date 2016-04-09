@@ -21,6 +21,8 @@ Here I try to rewrite the original [ascii-invoicer](http://github.com/ascii-dres
       * [ ] command line control
         * [ ] fill things like payed_date
   * [ ] Listing
+      * [ ] pretty cli output
+          * [ ] all sorts of list, csv, etc
   * [x] Validate
       * [x] Offer
       * [x] Invoice
@@ -31,8 +33,8 @@ Here I try to rewrite the original [ascii-invoicer](http://github.com/ascii-dres
   * [ ] Output
       * [ ] Displaying
       * [ ] CSV and YAML output
-        * [ ] full list equivalence
-        * [ ] each project as csv (offer andor invoice)
+        * [ ] full `list` equivalence
+        * [ ] each project as csv (offer and/or invoice)
       * [ ] Pdf export (Invoice, Offer, Checklist)
       * [ ] make like behavior:
         * [ ] `open` triggers `invoice` or `offer`
@@ -44,8 +46,6 @@ Here I try to rewrite the original [ascii-invoicer](http://github.com/ascii-dres
       * [x] Merge HOME_DIR config with defaults
   * [x] project type (init/open/parse yml/index/etc)
       * [x] template filling
-  * [ ] pretty cli output
-      * [ ] all sorts of list, csv, etc
   * [ ] complete this TODO
   * [ ] logging
   * [ ] Documentation!!!

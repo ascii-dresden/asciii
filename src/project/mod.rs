@@ -18,7 +18,7 @@ use templater::Templater;
 
 pub mod product;
 pub mod spec;
-use self::spec::SpecResult;
+use self::spec::{SpecResult, VirtualField};
 use self::spec::products::{ProductResult};
 
 pub struct Project {
@@ -119,7 +119,6 @@ impl LuigiProject for Project{
             c.to_lowercase().contains(&val.to_lowercase())
         }).unwrap_or(false)
     }
-
 }
 
 impl Project{
@@ -127,10 +126,9 @@ impl Project{
 
     /// wrapper around yaml::get() with replacement
     pub fn get<'a>(&self, path:&str) -> Option<String>{
-        match path{
-            "manager" => Some(spec::project::manager(self.yaml()).unwrap_or("").to_owned()),
-                _ => None
-        }
+        VirtualField::from(path).get(self).or_else(||
+            yaml::get_as_string(self.yaml(),path)
+        )
     }
 
     pub fn manager(&self) -> String{

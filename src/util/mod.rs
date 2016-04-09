@@ -35,14 +35,6 @@ pub fn replace_home_tilde(p:&Path) -> PathBuf{
     PathBuf::from( path.replace("~",home_dir().unwrap().to_str().unwrap()))
 }
 
-#[export_macro]
-macro_rules! try_some {
-    ($expr:expr) => (match $expr {
-        Some(val) => val,
-        None => return None,
-    });
-}
-
 /// Opens the passed paths in the editor set int config.
 ///
 /// This is by far the most important function of all utility functions.

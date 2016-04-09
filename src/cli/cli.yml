@@ -17,6 +17,7 @@ subcommands:
       args:
         - name:
             help: Project name
+            required: true
         - template:
             help: Use a specific template.
             short: T
@@ -88,9 +89,13 @@ subcommands:
               long: "paths"
 
         - "broken":
-              help: "list broken projects  without project file "
+              help: List broken projects  without project file
               short: "b"
               long: "broken"
+
+        - "virtual_fields":
+              help: List all virtual data fields that can be used with "--details"
+              long: virtual
 
   - archive:
       about: Move a Project into the archive

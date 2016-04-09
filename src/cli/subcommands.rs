@@ -18,7 +18,7 @@ const STATUS_ROWS_WIDTH:u16 = 96;
 
 /// Create NEW Project
 pub fn new(matches:&ArgMatches){
-        let name     = matches.value_of("name").unwrap();
+        let name     = matches.value_of("name").expect("You did not pass a \"Name\"!");
         let editor   = CONFIG.get_path("editor").unwrap().as_str().unwrap();
 
         let template = matches.value_of("template")
@@ -44,14 +44,16 @@ pub fn list(matches:&ArgMatches){
         list_templates();
     } else if matches.is_present("years"){
         list_years();
-    } else {
+    } else if matches.is_present("virtual_fields"){
+        list_virtual_fields();
+    }
 
-
+    else {
         let mut list_config = ListConfig{
             sort_by:   matches.value_of("sort") .unwrap_or_else(||CONFIG.get_str("list/sort")),
             simple:    matches.is_present("simple"),
             details:   matches.values_of("details").map(|v|v.collect::<Vec<&str>>()),
-            filter_by: matches.values_of("filter-by").map(|v|v.collect::<Vec<&str>>()),
+            filter_by: matches.values_of("filter").map(|v|v.collect::<Vec<&str>>()),
 
             ..Default::default()
         };
@@ -85,7 +87,6 @@ pub fn list(matches:&ArgMatches){
 
 /// Command LIST [--archive, --all]
 fn list_projects(dir:LuigiDir, list_config:&ListConfig){
-
     let luigi = if CONFIG.get_bool("list/gitstatus"){
         setup_luigi_with_git()
     } else {
@@ -153,6 +154,11 @@ fn list_years(){
     let luigi = setup_luigi();
     let years = super::execute(||luigi.list_years());
     println!("{:?}", years);
+}
+
+/// Command LIST --virt
+fn list_virtual_fields(){
+    println!("{:?}", ::project::spec::VIRTUALFIELDS);
 }
 
 

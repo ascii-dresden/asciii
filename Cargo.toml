@@ -32,7 +32,7 @@ features= ["yaml"]
 default = []
 lints = ["clippy"]
 
-[lib]
-doc = false
-[[bin]]
-name = "asciii"
+#[lib]
+#doc = false
+#[[bin]]
+#name = "asciii"
