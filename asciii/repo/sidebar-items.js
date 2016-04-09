@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["GitStatus","More Rustacious way of representing a git status"]],"struct":[["Repository","Convenience Wrapper for `git2::Repository`"]]});

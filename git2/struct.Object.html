@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="rustdoc">
+    <meta name="description" content="API documentation for the Rust `Object` struct in crate `git2`.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, Object">
+
+    <title>git2::Object - Rust</title>
+
+    <link rel="stylesheet" type="text/css" href="../rustdoc.css">
+    <link rel="stylesheet" type="text/css" href="../main.css">
+
+    
+    
+</head>
+<body class="rustdoc">
+    <!--[if lte IE 8]>
+    <div class="warning">
+        This old browser is unsupported and will most likely display funky
+        things.
+    </div>
+    <![endif]-->
+
+    
+
+    <nav class="sidebar">
+        
+        <p class='location'><a href='index.html'>git2</a></p><script>window.sidebarCurrent = {name: 'Object', ty: 'struct', relpath: ''};</script><script defer src="sidebar-items.js"></script>
+    </nav>
+
+    <nav class="sub">
+        <form class="search-form js-only">
+            <div class="search-container">
+                <input class="search-input" name="search"
+                       autocomplete="off"
+                       placeholder="Click or press ‘S’ to search, ‘?’ for more options…"
+                       type="search">
+            </div>
+        </form>
+    </nav>
+
+    <section id='main' class="content struct">
+<h1 class='fqn'><span class='in-band'>Struct <a href='index.html'>git2</a>::<wbr><a class='struct' href=''>Object</a></span><span class='out-of-band'><span id='render-detail'>
+                   <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                       [<span class='inner'>&#x2212;</span>]
+                   </a>
+               </span><a id='src-3515' class='srclink' href='../src/git2/object.rs.html#11-14' title='goto source code'>[src]</a></span></h1>
+<pre class='rust struct'>pub struct Object&lt;'repo&gt; {
+    // some fields omitted
+}</pre><div class='docblock'><p>A structure to represent a git <a href="http://git-scm.com/book/en/Git-Internals-Git-Objects">object</a></p>
+</div><h2 id='methods'>Methods</h2><h3 class='impl'><code>impl&lt;'repo&gt; <a class='struct' href='../git2/struct.Object.html' title='git2::Object'>Object</a>&lt;'repo&gt;</code></h3><div class='impl-items'><h4 id='method.id' class='method'><code>fn <a href='#method.id' class='fnname'>id</a>(&amp;self) -&gt; <a class='struct' href='../git2/struct.Oid.html' title='git2::Oid'>Oid</a></code></h4>
+<div class='docblock'><p>Get the id (SHA1) of a repository object</p>
+</div><h4 id='method.kind' class='method'><code>fn <a href='#method.kind' class='fnname'>kind</a>(&amp;self) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='enum' href='../git2/enum.ObjectType.html' title='git2::ObjectType'>ObjectType</a>&gt;</code></h4>
+<div class='docblock'><p>Get the object type of an object.</p>
+
+<p>If the type is unknown, then <code>None</code> is returned.</p>
+</div><h4 id='method.peel' class='method'><code>fn <a href='#method.peel' class='fnname'>peel</a>(&amp;self, kind: <a class='enum' href='../git2/enum.ObjectType.html' title='git2::ObjectType'>ObjectType</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='struct' href='../git2/struct.Object.html' title='git2::Object'>Object</a>&lt;'repo&gt;, <a class='struct' href='../git2/struct.Error.html' title='git2::Error'>Error</a>&gt;</code></h4>
+<div class='docblock'><p>Recursively peel an object until an object of the specified type is met.</p>
+
+<p>If you pass <code>Any</code> as the target type, then the object will be
+peeled until the type changes (e.g. a tag will be chased until the
+referenced object is no longer a tag).</p>
+</div><h4 id='method.short_id' class='method'><code>fn <a href='#method.short_id' class='fnname'>short_id</a>(&amp;self) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='struct' href='../git2/struct.Buf.html' title='git2::Buf'>Buf</a>, <a class='struct' href='../git2/struct.Error.html' title='git2::Error'>Error</a>&gt;</code></h4>
+<div class='docblock'><p>Get a short abbreviated OID string for the object</p>
+
+<p>This starts at the &quot;core.abbrev&quot; length (default 7 characters) and
+iteratively extends to a longer string if that length is ambiguous. The
+result will be unambiguous (at least until new objects are added to the
+repository).</p>
+</div><h4 id='method.as_commit' class='method'><code>fn <a href='#method.as_commit' class='fnname'>as_commit</a>(&amp;self) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;&amp;<a class='struct' href='../git2/struct.Commit.html' title='git2::Commit'>Commit</a>&lt;'repo&gt;&gt;</code></h4>
+<div class='docblock'><p>Attempt to view this object as a commit.</p>
+
+<p>Returns <code>None</code> if the object is not actually a commit.</p>
+</div><h4 id='method.as_tag' class='method'><code>fn <a href='#method.as_tag' class='fnname'>as_tag</a>(&amp;self) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;&amp;<a class='struct' href='../git2/struct.Tag.html' title='git2::Tag'>Tag</a>&lt;'repo&gt;&gt;</code></h4>
+<div class='docblock'><p>Attempt to view this object as a tag.</p>
+
+<p>Returns <code>None</code> if the object is not actually a tag.</p>
+</div><h4 id='method.as_tree' class='method'><code>fn <a href='#method.as_tree' class='fnname'>as_tree</a>(&amp;self) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;&amp;<a class='struct' href='../git2/struct.Tree.html' title='git2::Tree'>Tree</a>&lt;'repo&gt;&gt;</code></h4>
+<div class='docblock'><p>Attempt to view this object as a tree.</p>
+
+<p>Returns <code>None</code> if the object is not actually a tree.</p>
+</div><h4 id='method.as_blob' class='method'><code>fn <a href='#method.as_blob' class='fnname'>as_blob</a>(&amp;self) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;&amp;<a class='struct' href='../git2/struct.Blob.html' title='git2::Blob'>Blob</a>&lt;'repo&gt;&gt;</code></h4>
+<div class='docblock'><p>Attempt to view this object as a blob.</p>
+
+<p>Returns <code>None</code> if the object is not actually a blob.</p>
+</div><h4 id='method.describe' class='method'><code>fn <a href='#method.describe' class='fnname'>describe</a>(&amp;self, opts: &amp;<a class='struct' href='../git2/struct.DescribeOptions.html' title='git2::DescribeOptions'>DescribeOptions</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='struct' href='../git2/struct.Describe.html' title='git2::Describe'>Describe</a>, <a class='struct' href='../git2/struct.Error.html' title='git2::Error'>Error</a>&gt;</code></h4>
+<div class='docblock'><p>Describes a commit</p>
+
+<p>Performs a describe operation on this commitish object.</p>
+</div></div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><code>impl&lt;'repo&gt; <a class='trait' href='https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html' title='core::clone::Clone'>Clone</a> for <a class='struct' href='../git2/struct.Object.html' title='git2::Object'>Object</a>&lt;'repo&gt;</code></h3><div class='impl-items'><h4 id='method.clone' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#tymethod.clone' class='fnname'>clone</a>(&amp;self) -&gt; <a class='struct' href='../git2/struct.Object.html' title='git2::Object'>Object</a>&lt;'repo&gt;</code></h4>
+<h4 id='method.clone_from' class='method'><span class="since">1.0.0</span><code>fn <a href='https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#method.clone_from' class='fnname'>clone_from</a>(&amp;mut self, source: &amp;Self)</code></h4>
+</div><h3 class='impl'><code>impl&lt;'repo&gt; <a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.Drop.html' title='core::ops::Drop'>Drop</a> for <a class='struct' href='../git2/struct.Object.html' title='git2::Object'>Object</a>&lt;'repo&gt;</code></h3><div class='impl-items'><h4 id='method.drop' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/ops/trait.Drop.html#tymethod.drop' class='fnname'>drop</a>(&amp;mut self)</code></h4>
+</div></section>
+    <section id='search' class="content hidden"></section>
+
+    <section class="footer"></section>
+
+    <aside id="help" class="hidden">
+        <div>
+            <h1 class="hidden">Help</h1>
+
+            <div class="shortcuts">
+                <h2>Keyboard Shortcuts</h2>
+
+                <dl>
+                    <dt>?</dt>
+                    <dd>Show this help dialog</dd>
+                    <dt>S</dt>
+                    <dd>Focus the search field</dd>
+                    <dt>&larrb;</dt>
+                    <dd>Move up in search results</dd>
+                    <dt>&rarrb;</dt>
+                    <dd>Move down in search results</dd>
+                    <dt>&#9166;</dt>
+                    <dd>Go to active search result</dd>
+                </dl>
+            </div>
+
+            <div class="infos">
+                <h2>Search Tricks</h2>
+
+                <p>
+                    Prefix searches with a type followed by a colon (e.g.
+                    <code>fn:</code>) to restrict the search to a given type.
+                </p>
+
+                <p>
+                    Accepted types are: <code>fn</code>, <code>mod</code>,
+                    <code>struct</code>, <code>enum</code>,
+                    <code>trait</code>, <code>type</code>, <code>macro</code>,
+                    and <code>const</code>.
+                </p>
+
+                <p>
+                    Search functions by type signature (e.g.
+                    <code>vec -> usize</code> or <code>* -> vec</code>)
+                </p>
+            </div>
+        </div>
+    </aside>
+
+    
+
+    <script>
+        window.rootPath = "../";
+        window.currentCrate = "git2";
+        window.playgroundUrl = "";
+    </script>
+    <script src="../jquery.js"></script>
+    <script src="../main.js"></script>
+    
+    <script defer src="../search-index.js"></script>
+</body>
+</html>

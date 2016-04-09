@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["Describe","The result of a `describe` operation on either an `Describe` or a `Repository`."],["DescribeFormatOptions","Options which can be used to customize how a description is formatted."],["DescribeOptions","Options which indicate how a `Describe` is created."]]});

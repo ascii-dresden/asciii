@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["Tag","A structure to represent a git [tag][1]"]]});

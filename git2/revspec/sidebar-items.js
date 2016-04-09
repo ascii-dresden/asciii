@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["Revspec","A revspec represents a range of revisions within a repository."]]});

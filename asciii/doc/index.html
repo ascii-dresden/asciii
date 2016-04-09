@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="rustdoc">
+    <meta name="description" content="API documentation for the Rust `doc` mod in crate `asciii`.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, doc">
+
+    <title>asciii::doc - Rust</title>
+
+    <link rel="stylesheet" type="text/css" href="../../rustdoc.css">
+    <link rel="stylesheet" type="text/css" href="../../main.css">
+
+    
+    
+</head>
+<body class="rustdoc">
+    <!--[if lte IE 8]>
+    <div class="warning">
+        This old browser is unsupported and will most likely display funky
+        things.
+    </div>
+    <![endif]-->
+
+    
+
+    <nav class="sidebar">
+        
+        <p class='location'><a href='../index.html'>asciii</a></p><script>window.sidebarCurrent = {name: 'doc', ty: 'mod', relpath: '../'};</script><script defer src="../sidebar-items.js"></script>
+    </nav>
+
+    <nav class="sub">
+        <form class="search-form js-only">
+            <div class="search-container">
+                <input class="search-input" name="search"
+                       autocomplete="off"
+                       placeholder="Click or press ‘S’ to search, ‘?’ for more options…"
+                       type="search">
+            </div>
+        </form>
+    </nav>
+
+    <section id='main' class="content mod">
+<h1 class='fqn'><span class='in-band'>Module <a href='../index.html'>asciii</a>::<wbr><a class='mod' href=''>doc</a></span><span class='out-of-band'><span id='render-detail'>
+                   <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                       [<span class='inner'>&#x2212;</span>]
+                   </a>
+               </span><a id='src-247' class='srclink' href='../../src/asciii/src/doc.rs.html#1-181' title='goto source code'>[src]</a></span></h1>
+<div class='docblock'><p><strong>User Manual</strong></p>
+
+<p>This user documentation has been ripped off straight from the <a href="https://github.com/ascii-dresden/ascii-invoicer/">original
+README</a>, so please forgive if you find any
+mistakes or unimplemented material, please <strong><a href="https://github.com/hoodie/asciii-rs/issues/new">write an issue
+immediately</a></strong>.</p>
+
+<h1 id='ascii-invoicer' class='section-header'><a href='#ascii-invoicer'>ascii invoicer</a></h1>
+<h2 id='introduction' class='section-header'><a href='#introduction'>Introduction</a></h2>
+<p>The ascii-invoicer is a command-line tool that manages projects and stores them not in a database but in a folder structure. New projects can be created from templates and are stored in a working directory. Projects can be archived, each year will have its own archive. A project consists of a folder containing a yaml file describing it and a number of attached files, such tex files. Projects can contain products and personal. You can create preliminary offers and invoices from your projects.</p>
+
+<h2 id='installation' class='section-header'><a href='#installation'>Installation</a></h2>
+<p>...</p>
+
+<h2 id='usage' class='section-header'><a href='#usage'>Usage</a></h2>
+<p>Each of these sections starts with a list of commands.
+Read the help to each command with <code>ascii help [COMMAND]</code> to find out about all parameters, especially <em>list</em> has quite a few of them.</p>
+
+<h3 id='get-started-with' class='section-header'><a href='#get-started-with'>Get started with</a></h3>
+<pre><code class="language-bash">asciii help [COMMAND]                # Describe available commands or one specific command
+asciii list                          # List current Projects
+asciii display NAMES                 # Shows information about a project in different ways
+</code></pre>
+
+<h3 id='project-life-cycle' class='section-header'><a href='#project-life-cycle'>Project Life-Cycle</a></h3>
+<pre><code class="language-bash">asciii new NAME                      # Creating a new project
+asciii edit NAMES                    # Edit project
+asciii offer NAMES                   # Create an offer from project
+asciii invoice NAMES                 # Create an invoice from project
+asciii archive NAME                  # Move project to archive
+asciii unarchive YEAR NAME           # reopen an archived project
+</code></pre>
+
+<h3 id='git-features' class='section-header'><a href='#git-features'>GIT Features</a></h3>
+<pre><code class="language-bash">asciii add NAMES
+asciii commit -m, --message=MESSAGE
+asciii log
+asciii pull
+asciii push
+asciii status
+</code></pre>
+
+<p>These commands behave similar to the original git commands.
+The only difference is that you select projects just like you do with other ascii commands (see edit, display, offer, invoice).
+Commit uses -m (like in git) but unlike git does not (yet) open an editor if you leave out the message.</p>
+
+<h4 id='careful' class='section-header'><a href='#careful'>CAREFUL:</a></h4>
+<p>These commands are meant as a convenience, they ARE NOT however a <em>complete</em> replacement for git!
+You should always pull before you start working and push right after you are done in order to avoid merge conflicts.
+If you do run into such problems go to storage directory <code>cd $(ascii path)</code> and resolve them using git.</p>
+
+<p>Personal advice N°1: use <code>git pull --rebase</code></p>
+
+<p>Personal advice N°2: add this to your .bash_aliases:
+<code>alias agit=&quot;git --git-dir=$(ascii path)/.git --work-tree=$(ascii path)&quot;</code></p>
+
+<h3 id='more-details' class='section-header'><a href='#more-details'>More Details</a></h3>
+<p>The commands <code>ascii list</code> and <code>ascii display</code> (equals <code>ascii show</code>) allow to display all sorts of details from a project.
+You can define sort of path through the document structure to the key you want to be displayed.
+<code>ascii show -d client/email</code> will display the clients email.
+<code>ascii show -d invoice/date</code> will display the date of the invoice.</p>
+
+<p><code>ascii list --details</code> will add columns to the table.
+For example try <code>ascii list --details client/fullname client/email</code></p>
+
+<h3 id='exporting' class='section-header'><a href='#exporting'>Exporting</a></h3>
+<pre><code class="language-bash">asciii calendar # Create a calendar file from all caterings named &quot;invoicer.ics&quot;
+asciii csv      # Prints a CSV list of current year into CSV
+</code></pre>
+
+<p>You can pipe the csv into column (<code>ascii csv | column -ts\;</code>) to display the table in you terminal.</p>
+
+<h3 id='miscellaneous' class='section-header'><a href='#miscellaneous'>Miscellaneous</a></h3>
+<pre><code class="language-bash">asciii path      # Return projects storage path
+asciii settings  # View settings
+asciii templates # List or add templates
+asciii whoami    # Invoke settings --show manager_name
+asciii version   # Display version
+</code></pre>
+
+<h2 id='filesstructure' class='section-header'><a href='#filesstructure'>Filesstructure</a></h2>
+<p>Your config-file is located in ~/.ascii-invoicer.yml but you can also access it using <code>ascii settings --edit</code> or even <code>ascii edit --settings</code>.
+The projects directory contains working, archive and templates. If you start with a blank slate you might want to put the templates folder into the storage folder (not well tested yet).</p>
+
+<p>By default in your <code>path</code> folder you fill find:</p>
+
+<pre><code class="language-bash">caterings
+├── archive
+│   ├── 2013
+│   │   ├── Foobar1
+│   │   │   └── Foobar1.yml
+│   │   └── Foobar2
+│   │       ├── Foobar2.yml
+│   │       └── R007 Foobar2 2013-02-11.tex
+│   └── 2014
+│       ├── canceled_foobar1
+│       │   ├── A20141009-1 foobar.tex
+│       │   └── foobar1.yml
+│       ├── R029_foobar2
+│       │   └── R029 foobar2 2014-09-10.tex
+│       └── R036_foobar3
+│           ├── foobar3.yml
+│           └── R036 foobar3 2014-10-08.tex
+├── templates
+│   ├── default.yml.erb
+│   └── document.tex.erb
+└── working
+    ├── Foobar1
+    │   ├── A20141127-1 Foobar1.tex
+    │   └── Foobar1.yml
+    ├── Foobar2
+    │   ├── A20141124-1 Foobar2.tex
+    │   └── Foobar2.yml
+    └── Foobar3
+        ├── A20140325-1 Foobar3.tex
+        ├── A20140327-1 Foobar3.tex
+        ├── R008 Foobar3 2014-03-31.tex
+        └── Foobar3.yml
+</code></pre>
+
+<h2 id='aliases' class='section-header'><a href='#aliases'>Aliases</a></h2>
+<h2 id='pro-tips' class='section-header'><a href='#pro-tips'>Pro tips</a></h2>
+<h2 id='known-issues' class='section-header'><a href='#known-issues'>Known Issues</a></h2>
+<p>Some strings may cause problems when rendering latex, e.g.
+a client called <code>&quot;ABC GmbH &amp; Co. KG&quot;</code>.
+The <code>&quot;&amp;&quot;</code> causes latex to fail, <code>\&amp;&quot;</code> bugs the yaml parser but <code>&quot;\\&amp;&quot;</code> will do the trick.</p>
+
+<h1 id='building' class='section-header'><a href='#building'>Building</a></h1>
+<h2 id='dependencies' class='section-header'><a href='#dependencies'>Dependencies</a></h2></div></table></section>
+    <section id='search' class="content hidden"></section>
+
+    <section class="footer"></section>
+
+    <aside id="help" class="hidden">
+        <div>
+            <h1 class="hidden">Help</h1>
+
+            <div class="shortcuts">
+                <h2>Keyboard Shortcuts</h2>
+
+                <dl>
+                    <dt>?</dt>
+                    <dd>Show this help dialog</dd>
+                    <dt>S</dt>
+                    <dd>Focus the search field</dd>
+                    <dt>&larrb;</dt>
+                    <dd>Move up in search results</dd>
+                    <dt>&rarrb;</dt>
+                    <dd>Move down in search results</dd>
+                    <dt>&#9166;</dt>
+                    <dd>Go to active search result</dd>
+                </dl>
+            </div>
+
+            <div class="infos">
+                <h2>Search Tricks</h2>
+
+                <p>
+                    Prefix searches with a type followed by a colon (e.g.
+                    <code>fn:</code>) to restrict the search to a given type.
+                </p>
+
+                <p>
+                    Accepted types are: <code>fn</code>, <code>mod</code>,
+                    <code>struct</code>, <code>enum</code>,
+                    <code>trait</code>, <code>type</code>, <code>macro</code>,
+                    and <code>const</code>.
+                </p>
+
+                <p>
+                    Search functions by type signature (e.g.
+                    <code>vec -> usize</code> or <code>* -> vec</code>)
+                </p>
+            </div>
+        </div>
+    </aside>
+
+    
+
+    <script>
+        window.rootPath = "../../";
+        window.currentCrate = "asciii";
+        window.playgroundUrl = "";
+    </script>
+    <script src="../../jquery.js"></script>
+    <script src="../../main.js"></script>
+    
+    <script defer src="../../search-index.js"></script>
+</body>
+</html>

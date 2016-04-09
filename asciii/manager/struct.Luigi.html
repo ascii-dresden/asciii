@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="rustdoc">
+    <meta name="description" content="API documentation for the Rust `Luigi` struct in crate `asciii`.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, Luigi">
+
+    <title>asciii::manager::Luigi - Rust</title>
+
+    <link rel="stylesheet" type="text/css" href="../../rustdoc.css">
+    <link rel="stylesheet" type="text/css" href="../../main.css">
+
+    
+    
+</head>
+<body class="rustdoc">
+    <!--[if lte IE 8]>
+    <div class="warning">
+        This old browser is unsupported and will most likely display funky
+        things.
+    </div>
+    <![endif]-->
+
+    
+
+    <nav class="sidebar">
+        
+        <p class='location'><a href='../index.html'>asciii</a>::<wbr><a href='index.html'>manager</a></p><script>window.sidebarCurrent = {name: 'Luigi', ty: 'struct', relpath: ''};</script><script defer src="sidebar-items.js"></script>
+    </nav>
+
+    <nav class="sub">
+        <form class="search-form js-only">
+            <div class="search-container">
+                <input class="search-input" name="search"
+                       autocomplete="off"
+                       placeholder="Click or press ‘S’ to search, ‘?’ for more options…"
+                       type="search">
+            </div>
+        </form>
+    </nav>
+
+    <section id='main' class="content struct">
+<h1 class='fqn'><span class='in-band'>Struct <a href='../index.html'>asciii</a>::<wbr><a href='index.html'>manager</a>::<wbr><a class='struct' href=''>Luigi</a></span><span class='out-of-band'><span id='render-detail'>
+                   <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                       [<span class='inner'>&#x2212;</span>]
+                   </a>
+               </span><a id='src-955' class='srclink' href='../../src/asciii/src/manager.rs.html#121-134' title='goto source code'>[src]</a></span></h1>
+<pre class='rust struct'>pub struct Luigi&lt;L: <a class='trait' href='../../asciii/manager/trait.LuigiProject.html' title='asciii::manager::LuigiProject'>LuigiProject</a>&gt; {
+    pub repository: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='struct' href='../../asciii/repo/struct.Repository.html' title='asciii::repo::Repository'>Repository</a>&gt;,
+    // some fields omitted
+}</pre><div class='docblock'><p>Does all the internal plumbing.</p>
+
+<p>This includes:</p>
+
+<ul>
+<li>listing project folders and files</li>
+<li>listing templates</li>
+<li>archiving and unarchiving projects</li>
+<li>git interaction ( not yet )</li>
+</ul>
+</div><h2 class='fields'>Fields</h2>
+<table><tr class='stab '>
+                             <td id='structfield.repository'><code>repository</code></td><td></td></tr></table><h2 id='methods'>Methods</h2><h3 class='impl'><code>impl&lt;L: <a class='trait' href='../../asciii/manager/trait.LuigiProject.html' title='asciii::manager::LuigiProject'>LuigiProject</a>&gt; <a class='struct' href='../../asciii/manager/struct.Luigi.html' title='asciii::manager::Luigi'>Luigi</a>&lt;L&gt;</code></h3><div class='impl-items'><h4 id='method.new' class='method'><code>fn <a href='#method.new' class='fnname'>new</a>&lt;P: <a class='trait' href='https://doc.rust-lang.org/nightly/core/convert/trait.AsRef.html' title='core::convert::AsRef'>AsRef</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/std/path/struct.Path.html' title='std::path::Path'>Path</a>&gt;&gt;(storage: P, working: &amp;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>, archive: &amp;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>, template: &amp;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>) -&gt; <a class='type' href='../../asciii/manager/type.LuigiResult.html' title='asciii::manager::LuigiResult'>LuigiResult</a>&lt;Self&gt;</code></h4>
+<div class='docblock'><p>Inits luigi, does not check existence, yet. TODO</p>
+</div><h4 id='method.new_with_git' class='method'><code>fn <a href='#method.new_with_git' class='fnname'>new_with_git</a>&lt;P: <a class='trait' href='https://doc.rust-lang.org/nightly/core/convert/trait.AsRef.html' title='core::convert::AsRef'>AsRef</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/std/path/struct.Path.html' title='std::path::Path'>Path</a>&gt;&gt;(storage: P, working: &amp;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>, archive: &amp;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>, template: &amp;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>) -&gt; <a class='type' href='../../asciii/manager/type.LuigiResult.html' title='asciii::manager::LuigiResult'>LuigiResult</a>&lt;Self&gt;</code></h4>
+<div class='docblock'><p>Inits luigi with git capabilities.</p>
+</div><h4 id='method.storage_dir' class='method'><code>fn <a href='#method.storage_dir' class='fnname'>storage_dir</a>(&amp;self) -&gt; &amp;<a class='struct' href='https://doc.rust-lang.org/nightly/std/path/struct.Path.html' title='std::path::Path'>Path</a></code></h4>
+<div class='docblock'><p>Getter for Luigi::storage_dir.</p>
+</div><h4 id='method.create_dirs' class='method'><code>fn <a href='#method.create_dirs' class='fnname'>create_dirs</a>(&amp;self) -&gt; <a class='type' href='../../asciii/manager/type.LuigiResult.html' title='asciii::manager::LuigiResult'>LuigiResult</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>()</a>&gt;</code></h4>
+<div class='docblock'><p>Creates the basic dir structure inside the storage directory.</p>
+
+<pre>
+└── storage
+    ├── archive
+    ├── templates
+    └── working
+</pre>
+
+<p>If the directories already exist as expected, that&#39;s fine
+ TODO ought to fail when storage_dir already contains directories that do not correspond
+ with the names given in this setup.</p>
+</div><h4 id='method.create_archive' class='method'><code>fn <a href='#method.create_archive' class='fnname'>create_archive</a>(&amp;self, year: <a class='type' href='../../asciii/manager/type.Year.html' title='asciii::manager::Year'>Year</a>) -&gt; <a class='type' href='../../asciii/manager/type.LuigiResult.html' title='asciii::manager::LuigiResult'>LuigiResult</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/std/path/struct.PathBuf.html' title='std::path::PathBuf'>PathBuf</a>&gt;</code></h4>
+<div class='docblock'><p>Creates an archive for a certain year.
+ This is a subdirectory under the archive directory.
+<pre>
+└── storage
+    ├── archive
+        ├── 2001
+    ...
+</pre></p>
+</div><h4 id='method.list_template_files' class='method'><code>fn <a href='#method.list_template_files' class='fnname'>list_template_files</a>(&amp;self) -&gt; <a class='type' href='../../asciii/manager/type.LuigiResult.html' title='asciii::manager::LuigiResult'>LuigiResult</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/std/path/struct.PathBuf.html' title='std::path::PathBuf'>PathBuf</a>&gt;&gt;</code></h4>
+<div class='docblock'><p>Produces a list of files in the <code>template_dir</code></p>
+</div><h4 id='method.list_template_names' class='method'><code>fn <a href='#method.list_template_names' class='fnname'>list_template_names</a>(&amp;self) -&gt; <a class='type' href='../../asciii/manager/type.LuigiResult.html' title='asciii::manager::LuigiResult'>LuigiResult</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>&gt;&gt;</code></h4>
+<div class='docblock'><p>Produces a list of names of all template filess in the <code>template_dir</code></p>
+</div><h4 id='method.get_template_file' class='method'><code>fn <a href='#method.get_template_file' class='fnname'>get_template_file</a>(&amp;self, name: &amp;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>) -&gt; <a class='type' href='../../asciii/manager/type.LuigiResult.html' title='asciii::manager::LuigiResult'>LuigiResult</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/std/path/struct.PathBuf.html' title='std::path::PathBuf'>PathBuf</a>&gt;</code></h4>
+<div class='docblock'><p>Returns the Path to the template file by the given name, maybe.</p>
+</div><h4 id='method.list_archives' class='method'><code>fn <a href='#method.list_archives' class='fnname'>list_archives</a>(&amp;self) -&gt; <a class='type' href='../../asciii/manager/type.LuigiResult.html' title='asciii::manager::LuigiResult'>LuigiResult</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/std/path/struct.PathBuf.html' title='std::path::PathBuf'>PathBuf</a>&gt;&gt;</code></h4>
+<div class='docblock'><p>Produces a list of paths to all archives in the <code>archive_dir</code>.
+An archive itself is a folder that contains project dirs,
+therefore it essentially has the same structure as the <code>working_dir</code>,
+with the difference, that the project folders may be prefixed with the projects index, e.g.
+an invoice number etc.</p>
+</div><h4 id='method.list_years' class='method'><code>fn <a href='#method.list_years' class='fnname'>list_years</a>(&amp;self) -&gt; <a class='type' href='../../asciii/manager/type.LuigiResult.html' title='asciii::manager::LuigiResult'>LuigiResult</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='type' href='../../asciii/manager/type.Year.html' title='asciii::manager::Year'>Year</a>&gt;&gt;</code></h4>
+<div class='docblock'><p>Produces a list of years for which there is an archive.</p>
+</div><h4 id='method.create_project' class='method'><code>fn <a href='#method.create_project' class='fnname'>create_project</a>(&amp;self, project_name: &amp;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>, template_name: &amp;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>) -&gt; <a class='type' href='../../asciii/manager/type.LuigiResult.html' title='asciii::manager::LuigiResult'>LuigiResult</a>&lt;L&gt;</code></h4>
+<div class='docblock'><p>Takes a template file and stores it in the working directory,
+in a new project directory according to it&#39;s name.</p>
+</div><h4 id='method.archive_project_by_name' class='method'><code>fn <a href='#method.archive_project_by_name' class='fnname'>archive_project_by_name</a>(&amp;self, name: &amp;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>, year: <a class='type' href='../../asciii/manager/type.Year.html' title='asciii::manager::Year'>Year</a>, prefix: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>&gt;) -&gt; <a class='type' href='../../asciii/manager/type.LuigiResult.html' title='asciii::manager::LuigiResult'>LuigiResult</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/std/path/struct.PathBuf.html' title='std::path::PathBuf'>PathBuf</a>&gt;</code></h4>
+<div class='docblock'><p>Moves a project folder from <code>/working</code> dir to <code>/archive/$year</code>.</p>
+</div><h4 id='method.archive_project' class='method'><code>fn <a href='#method.archive_project' class='fnname'>archive_project</a>(&amp;self, project: &amp;L, year: <a class='type' href='../../asciii/manager/type.Year.html' title='asciii::manager::Year'>Year</a>) -&gt; <a class='type' href='../../asciii/manager/type.LuigiResult.html' title='asciii::manager::LuigiResult'>LuigiResult</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/std/path/struct.PathBuf.html' title='std::path::PathBuf'>PathBuf</a>&gt;</code></h4>
+<div class='docblock'><p>Moves a project folder from <code>/working</code> dir to <code>/archive/$year</code>.
+ Also adds the project.prefix() to the folder name.
+<pre>
+└── storage
+    ├── archive
+        ├── 2001
+            ├── R0815_Birthdayparty
+    ...
+</pre></p>
+</div><h4 id='method.unarchive_project_file' class='method'><code>fn <a href='#method.unarchive_project_file' class='fnname'>unarchive_project_file</a>(&amp;self, archived_file: &amp;<a class='struct' href='https://doc.rust-lang.org/nightly/std/path/struct.Path.html' title='std::path::Path'>Path</a>) -&gt; <a class='type' href='../../asciii/manager/type.LuigiResult.html' title='asciii::manager::LuigiResult'>LuigiResult</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/std/path/struct.PathBuf.html' title='std::path::PathBuf'>PathBuf</a>&gt;</code></h4>
+<div class='docblock'><p>Moves a project folder from <code>/working</code> dir to <code>/archive/$year</code>.</p>
+</div><h4 id='method.unarchive_project_by_name' class='method'><code>fn <a href='#method.unarchive_project_by_name' class='fnname'>unarchive_project_by_name</a>(&amp;self, name: &amp;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>, year: <a class='type' href='../../asciii/manager/type.Year.html' title='asciii::manager::Year'>Year</a>) -&gt; <a class='type' href='../../asciii/manager/type.LuigiResult.html' title='asciii::manager::LuigiResult'>LuigiResult</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/std/path/struct.PathBuf.html' title='std::path::PathBuf'>PathBuf</a>&gt;</code></h4>
+<div class='docblock'><p>Moves a project folder back from <code>/archive/$year</code> to <code>/working</code> dir.</p>
+</div><h4 id='method.search_projects' class='method'><code>fn <a href='#method.search_projects' class='fnname'>search_projects</a>(&amp;self, dir: <a class='enum' href='../../asciii/manager/enum.LuigiDir.html' title='asciii::manager::LuigiDir'>LuigiDir</a>, search_term: &amp;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>) -&gt; <a class='type' href='../../asciii/manager/type.LuigiResult.html' title='asciii::manager::LuigiResult'>LuigiResult</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/std/path/struct.PathBuf.html' title='std::path::PathBuf'>PathBuf</a>&gt;&gt;</code></h4>
+<div class='docblock'><p>Matches LuigiDir&#39;s content against a term and returns matching project files.</p>
+</div><h4 id='method.search_multiple_projects' class='method'><code>fn <a href='#method.search_multiple_projects' class='fnname'>search_multiple_projects</a>(&amp;self, dir: <a class='enum' href='../../asciii/manager/enum.LuigiDir.html' title='asciii::manager::LuigiDir'>LuigiDir</a>, search_terms: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>&amp;[</a>&amp;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>]</a>) -&gt; <a class='type' href='../../asciii/manager/type.LuigiResult.html' title='asciii::manager::LuigiResult'>LuigiResult</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/std/path/struct.PathBuf.html' title='std::path::PathBuf'>PathBuf</a>&gt;&gt;</code></h4>
+<div class='docblock'><p>Matches LuigiDir&#39;s content against a term and returns matching project files.
+TODO add search_multiple_projects_deep</p>
+</div><h4 id='method.get_project_dir' class='method'><code>fn <a href='#method.get_project_dir' class='fnname'>get_project_dir</a>(&amp;self, name: &amp;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>, directory: <a class='enum' href='../../asciii/manager/enum.LuigiDir.html' title='asciii::manager::LuigiDir'>LuigiDir</a>) -&gt; <a class='type' href='../../asciii/manager/type.LuigiResult.html' title='asciii::manager::LuigiResult'>LuigiResult</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/std/path/struct.PathBuf.html' title='std::path::PathBuf'>PathBuf</a>&gt;</code></h4>
+<div class='docblock'><p>Tries to find a concrete Project.</p>
+</div><h4 id='method.list_project_folders' class='method'><code>fn <a href='#method.list_project_folders' class='fnname'>list_project_folders</a>(&amp;self, directory: <a class='enum' href='../../asciii/manager/enum.LuigiDir.html' title='asciii::manager::LuigiDir'>LuigiDir</a>) -&gt; <a class='type' href='../../asciii/manager/type.LuigiResult.html' title='asciii::manager::LuigiResult'>LuigiResult</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/std/path/struct.PathBuf.html' title='std::path::PathBuf'>PathBuf</a>&gt;&gt;</code></h4>
+<div class='docblock'><p>Produces a list of project folders.</p>
+</div><h4 id='method.list_empty_project_dirs' class='method'><code>fn <a href='#method.list_empty_project_dirs' class='fnname'>list_empty_project_dirs</a>(&amp;self, directory: <a class='enum' href='../../asciii/manager/enum.LuigiDir.html' title='asciii::manager::LuigiDir'>LuigiDir</a>) -&gt; <a class='type' href='../../asciii/manager/type.LuigiResult.html' title='asciii::manager::LuigiResult'>LuigiResult</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/std/path/struct.PathBuf.html' title='std::path::PathBuf'>PathBuf</a>&gt;&gt;</code></h4>
+<div class='docblock'><p>Produces a list of empty project folders.</p>
+</div><h4 id='method.list_project_files' class='method'><code>fn <a href='#method.list_project_files' class='fnname'>list_project_files</a>(&amp;self, directory: <a class='enum' href='../../asciii/manager/enum.LuigiDir.html' title='asciii::manager::LuigiDir'>LuigiDir</a>) -&gt; <a class='type' href='../../asciii/manager/type.LuigiResult.html' title='asciii::manager::LuigiResult'>LuigiResult</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/std/path/struct.PathBuf.html' title='std::path::PathBuf'>PathBuf</a>&gt;&gt;</code></h4>
+<div class='docblock'><p>Produces a list of project files.</p>
+</div><h4 id='method.filter_project_files' class='method'><code>fn <a href='#method.filter_project_files' class='fnname'>filter_project_files</a>&lt;F&gt;(&amp;self, directory: <a class='enum' href='../../asciii/manager/enum.LuigiDir.html' title='asciii::manager::LuigiDir'>LuigiDir</a>, filter: F) -&gt; <a class='type' href='../../asciii/manager/type.LuigiResult.html' title='asciii::manager::LuigiResult'>LuigiResult</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/std/path/struct.PathBuf.html' title='std::path::PathBuf'>PathBuf</a>&gt;&gt; <span class='where'>where F: <a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.FnMut.html' title='core::ops::FnMut'>FnMut</a>(&amp;<a class='struct' href='https://doc.rust-lang.org/nightly/std/path/struct.PathBuf.html' title='std::path::PathBuf'>PathBuf</a>) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></span></code></h4>
+<h4 id='method.open_project_files' class='method'><code>fn <a href='#method.open_project_files' class='fnname'>open_project_files</a>(&amp;self, dir: <a class='enum' href='../../asciii/manager/enum.LuigiDir.html' title='asciii::manager::LuigiDir'>LuigiDir</a>) -&gt; <a class='type' href='../../asciii/manager/type.LuigiResult.html' title='asciii::manager::LuigiResult'>LuigiResult</a>&lt;<a class='struct' href='../../asciii/manager/struct.ProjectList.html' title='asciii::manager::ProjectList'>ProjectList</a>&lt;L&gt;&gt;</code></h4>
+<div class='docblock'><p>Behaves like <code>list_project_files()</code> but also opens projects directly.</p>
+</div></div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><code>impl&lt;P: <a class='trait' href='../../asciii/manager/trait.LuigiProject.html' title='asciii::manager::LuigiProject'>LuigiProject</a>&gt; <a class='trait' href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html' title='core::fmt::Debug'>Debug</a> for <a class='struct' href='../../asciii/manager/struct.Luigi.html' title='asciii::manager::Luigi'>Luigi</a>&lt;P&gt;</code></h3><div class='impl-items'><h4 id='method.fmt' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html#tymethod.fmt' class='fnname'>fmt</a>(&amp;self, f: &amp;mut <a class='struct' href='https://doc.rust-lang.org/nightly/core/fmt/struct.Formatter.html' title='core::fmt::Formatter'>Formatter</a>) -&gt; <a class='type' href='https://doc.rust-lang.org/nightly/core/fmt/type.Result.html' title='core::fmt::Result'>Result</a></code></h4>
+</div></section>
+    <section id='search' class="content hidden"></section>
+
+    <section class="footer"></section>
+
+    <aside id="help" class="hidden">
+        <div>
+            <h1 class="hidden">Help</h1>
+
+            <div class="shortcuts">
+                <h2>Keyboard Shortcuts</h2>
+
+                <dl>
+                    <dt>?</dt>
+                    <dd>Show this help dialog</dd>
+                    <dt>S</dt>
+                    <dd>Focus the search field</dd>
+                    <dt>&larrb;</dt>
+                    <dd>Move up in search results</dd>
+                    <dt>&rarrb;</dt>
+                    <dd>Move down in search results</dd>
+                    <dt>&#9166;</dt>
+                    <dd>Go to active search result</dd>
+                </dl>
+            </div>
+
+            <div class="infos">
+                <h2>Search Tricks</h2>
+
+                <p>
+                    Prefix searches with a type followed by a colon (e.g.
+                    <code>fn:</code>) to restrict the search to a given type.
+                </p>
+
+                <p>
+                    Accepted types are: <code>fn</code>, <code>mod</code>,
+                    <code>struct</code>, <code>enum</code>,
+                    <code>trait</code>, <code>type</code>, <code>macro</code>,
+                    and <code>const</code>.
+                </p>
+
+                <p>
+                    Search functions by type signature (e.g.
+                    <code>vec -> usize</code> or <code>* -> vec</code>)
+                </p>
+            </div>
+        </div>
+    </aside>
+
+    
+
+    <script>
+        window.rootPath = "../../";
+        window.currentCrate = "asciii";
+        window.playgroundUrl = "";
+    </script>
+    <script src="../../jquery.js"></script>
+    <script src="../../main.js"></script>
+    
+    <script defer src="../../search-index.js"></script>
+</body>
+</html>

@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["Reflog","A reference log of a git repository."],["ReflogEntry","An entry inside the reflog of a repository"],["ReflogIter","An iterator over the entries inside of a reflog."]]});

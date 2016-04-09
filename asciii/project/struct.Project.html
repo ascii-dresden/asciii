@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="rustdoc">
+    <meta name="description" content="API documentation for the Rust `Project` struct in crate `asciii`.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, Project">
+
+    <title>asciii::project::Project - Rust</title>
+
+    <link rel="stylesheet" type="text/css" href="../../rustdoc.css">
+    <link rel="stylesheet" type="text/css" href="../../main.css">
+
+    
+    
+</head>
+<body class="rustdoc">
+    <!--[if lte IE 8]>
+    <div class="warning">
+        This old browser is unsupported and will most likely display funky
+        things.
+    </div>
+    <![endif]-->
+
+    
+
+    <nav class="sidebar">
+        
+        <p class='location'><a href='../index.html'>asciii</a>::<wbr><a href='index.html'>project</a></p><script>window.sidebarCurrent = {name: 'Project', ty: 'struct', relpath: ''};</script><script defer src="sidebar-items.js"></script>
+    </nav>
+
+    <nav class="sub">
+        <form class="search-form js-only">
+            <div class="search-container">
+                <input class="search-input" name="search"
+                       autocomplete="off"
+                       placeholder="Click or press ‘S’ to search, ‘?’ for more options…"
+                       type="search">
+            </div>
+        </form>
+    </nav>
+
+    <section id='main' class="content struct">
+<h1 class='fqn'><span class='in-band'>Struct <a href='../index.html'>asciii</a>::<wbr><a href='index.html'>project</a>::<wbr><a class='struct' href=''>Project</a></span><span class='out-of-band'><span id='render-detail'>
+                   <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                       [<span class='inner'>&#x2212;</span>]
+                   </a>
+               </span><a id='src-706' class='srclink' href='../../src/asciii/src/project/mod.rs.html#23-27' title='goto source code'>[src]</a></span></h1>
+<pre class='rust struct'>pub struct Project {
+    // some fields omitted
+}</pre><h2 id='methods'>Methods</h2><h3 class='impl'><code>impl <a class='struct' href='../../asciii/project/struct.Project.html' title='asciii::project::Project'>Project</a></code></h3><div class='impl-items'><h4 id='method.yaml' class='method'><code>fn <a href='#method.yaml' class='fnname'>yaml</a>(&amp;self) -&gt; &amp;<a class='enum' href='../../asciii/util/yaml/enum.Yaml.html' title='asciii::util::yaml::Yaml'>Yaml</a></code></h4>
+<h4 id='method.get' class='method'><code>fn <a href='#method.get' class='fnname'>get</a>&lt;'a&gt;(&amp;self, path: &amp;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>&gt;</code></h4>
+<div class='docblock'><p>wrapper around yaml::get() with replacement</p>
+</div><h4 id='method.manager' class='method'><code>fn <a href='#method.manager' class='fnname'>manager</a>(&amp;self) -&gt; <a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a></code></h4>
+<h4 id='method.canceled' class='method'><code>fn <a href='#method.canceled' class='fnname'>canceled</a>(&amp;self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></code></h4>
+<h4 id='method.invoice_num' class='method'><code>fn <a href='#method.invoice_num' class='fnname'>invoice_num</a>(&amp;self) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>&gt;</code></h4>
+<h4 id='method.valid_stage1' class='method'><code>fn <a href='#method.valid_stage1' class='fnname'>valid_stage1</a>(&amp;self) -&gt; <a class='type' href='../../asciii/project/spec/type.SpecResult.html' title='asciii::project::spec::SpecResult'>SpecResult</a></code></h4>
+<div class='docblock'><p>Minimum correctness.</p>
+
+<p>Ready to send an <strong>offer</strong> to the client.</p>
+</div><h4 id='method.valid_stage2' class='method'><code>fn <a href='#method.valid_stage2' class='fnname'>valid_stage2</a>(&amp;self) -&gt; <a class='type' href='../../asciii/project/spec/type.SpecResult.html' title='asciii::project::spec::SpecResult'>SpecResult</a></code></h4>
+<div class='docblock'><p>Valid project</p>
+
+<p>Ready to send an <strong>invoice</strong> to the client.</p>
+</div><h4 id='method.valid_stage3' class='method'><code>fn <a href='#method.valid_stage3' class='fnname'>valid_stage3</a>(&amp;self) -&gt; <a class='type' href='../../asciii/project/spec/type.SpecResult.html' title='asciii::project::spec::SpecResult'>SpecResult</a></code></h4>
+<div class='docblock'><p>Completely done and in the past.</p>
+
+<p>Ready to be <strong>archived</strong>.</p>
+</div><h4 id='method.age' class='method'><code>fn <a href='#method.age' class='fnname'>age</a>(&amp;self) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i64.html'>i64</a>&gt;</code></h4>
+<h4 id='method.invoice_items' class='method'><code>fn <a href='#method.invoice_items' class='fnname'>invoice_items</a>(&amp;self) -&gt; <a class='type' href='../../asciii/project/spec/products/type.ProductResult.html' title='asciii::project::spec::products::ProductResult'>ProductResult</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='struct' href='../../asciii/project/product/struct.InvoiceItem.html' title='asciii::project::product::InvoiceItem'>InvoiceItem</a>&gt;&gt;</code></h4>
+<h4 id='method.wages' class='method'><code>fn <a href='#method.wages' class='fnname'>wages</a>(&amp;self) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='struct' href='../../currency/struct.Currency.html' title='currency::Currency'>Currency</a>&gt;</code></h4>
+<h4 id='method.sum_offered' class='method'><code>fn <a href='#method.sum_offered' class='fnname'>sum_offered</a>(&amp;self) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='struct' href='../../currency/struct.Currency.html' title='currency::Currency'>Currency</a>&gt;</code></h4>
+<h4 id='method.sum_sold' class='method'><code>fn <a href='#method.sum_sold' class='fnname'>sum_sold</a>(&amp;self) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='struct' href='../../currency/struct.Currency.html' title='currency::Currency'>Currency</a>&gt;</code></h4>
+<h4 id='method.tax_offered' class='method'><code>fn <a href='#method.tax_offered' class='fnname'>tax_offered</a>(&amp;self) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='struct' href='../../currency/struct.Currency.html' title='currency::Currency'>Currency</a>&gt;</code></h4>
+<h4 id='method.tax_sold' class='method'><code>fn <a href='#method.tax_sold' class='fnname'>tax_sold</a>(&amp;self) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='struct' href='../../currency/struct.Currency.html' title='currency::Currency'>Currency</a>&gt;</code></h4>
+<h4 id='method.sum_sold_and_taxes' class='method'><code>fn <a href='#method.sum_sold_and_taxes' class='fnname'>sum_sold_and_taxes</a>(&amp;self) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='struct' href='../../currency/struct.Currency.html' title='currency::Currency'>Currency</a>&gt;</code></h4>
+<h4 id='method.sum_sold_and_wages' class='method'><code>fn <a href='#method.sum_sold_and_wages' class='fnname'>sum_sold_and_wages</a>(&amp;self) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='struct' href='../../currency/struct.Currency.html' title='currency::Currency'>Currency</a>&gt;</code></h4>
+</div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><code>impl <a class='trait' href='../../asciii/manager/trait.LuigiProject.html' title='asciii::manager::LuigiProject'>LuigiProject</a> for <a class='struct' href='../../asciii/project/struct.Project.html' title='asciii::project::Project'>Project</a></code></h3><div class='impl-items'><h4 id='method.from_template' class='method'><code>fn <a href='../../asciii/manager/trait.LuigiProject.html#tymethod.from_template' class='fnname'>from_template</a>(project_name: &amp;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>, template: &amp;<a class='struct' href='https://doc.rust-lang.org/nightly/std/path/struct.Path.html' title='std::path::Path'>Path</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='struct' href='../../asciii/project/struct.Project.html' title='asciii::project::Project'>Project</a>, <a class='enum' href='../../asciii/manager/enum.LuigiError.html' title='asciii::manager::LuigiError'>LuigiError</a>&gt;</code></h4>
+<h4 id='method.prefix' class='method'><code>fn <a href='../../asciii/manager/trait.LuigiProject.html#tymethod.prefix' class='fnname'>prefix</a>(&amp;self) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>&gt;</code></h4>
+<h4 id='method.index' class='method'><code>fn <a href='../../asciii/manager/trait.LuigiProject.html#tymethod.index' class='fnname'>index</a>(&amp;self) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>&gt;</code></h4>
+<h4 id='method.name' class='method'><code>fn <a href='../../asciii/manager/trait.LuigiProject.html#tymethod.name' class='fnname'>name</a>(&amp;self) -&gt; <a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a></code></h4>
+<h4 id='method.date' class='method'><code>fn <a href='../../asciii/manager/trait.LuigiProject.html#tymethod.date' class='fnname'>date</a>(&amp;self) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='struct' href='../../chrono/date/struct.Date.html' title='chrono::date::Date'>Date</a>&lt;<a class='struct' href='../../chrono/offset/utc/struct.UTC.html' title='chrono::offset::utc::UTC'>UTC</a>&gt;&gt;</code></h4>
+<h4 id='method.file' class='method'><code>fn <a href='../../asciii/manager/trait.LuigiProject.html#tymethod.file' class='fnname'>file</a>(&amp;self) -&gt; <a class='struct' href='https://doc.rust-lang.org/nightly/std/path/struct.PathBuf.html' title='std::path::PathBuf'>PathBuf</a></code></h4>
+<h4 id='method.set_file' class='method'><code>fn <a href='../../asciii/manager/trait.LuigiProject.html#tymethod.set_file' class='fnname'>set_file</a>(&amp;mut self, new_file: &amp;<a class='struct' href='https://doc.rust-lang.org/nightly/std/path/struct.Path.html' title='std::path::Path'>Path</a>)</code></h4>
+<h4 id='method.open' class='method'><code>fn <a href='../../asciii/manager/trait.LuigiProject.html#tymethod.open' class='fnname'>open</a>(file_path: &amp;<a class='struct' href='https://doc.rust-lang.org/nightly/std/path/struct.Path.html' title='std::path::Path'>Path</a>) -&gt; <a class='type' href='../../asciii/manager/type.LuigiResult.html' title='asciii::manager::LuigiResult'>LuigiResult</a>&lt;<a class='struct' href='../../asciii/project/struct.Project.html' title='asciii::project::Project'>Project</a>&gt;</code></h4>
+<h4 id='method.matches_filter' class='method'><code>fn <a href='../../asciii/manager/trait.LuigiProject.html#tymethod.matches_filter' class='fnname'>matches_filter</a>(&amp;self, key: &amp;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>, val: &amp;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></code></h4>
+<h4 id='method.ident' class='method'><code>fn <a href='../../asciii/manager/trait.LuigiProject.html#method.ident' class='fnname'>ident</a>(&amp;self) -&gt; <a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a></code></h4>
+<h4 id='method.year' class='method'><code>fn <a href='../../asciii/manager/trait.LuigiProject.html#method.year' class='fnname'>year</a>(&amp;self) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i32.html'>i32</a>&gt;</code></h4>
+<h4 id='method.file_extension' class='method'><code>fn <a href='../../asciii/manager/trait.LuigiProject.html#method.file_extension' class='fnname'>file_extension</a>() -&gt; &amp;'static <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a></code></h4>
+<h4 id='method.dir' class='method'><code>fn <a href='../../asciii/manager/trait.LuigiProject.html#method.dir' class='fnname'>dir</a>(&amp;self) -&gt; <a class='struct' href='https://doc.rust-lang.org/nightly/std/path/struct.PathBuf.html' title='std::path::PathBuf'>PathBuf</a></code></h4>
+</div></section>
+    <section id='search' class="content hidden"></section>
+
+    <section class="footer"></section>
+
+    <aside id="help" class="hidden">
+        <div>
+            <h1 class="hidden">Help</h1>
+
+            <div class="shortcuts">
+                <h2>Keyboard Shortcuts</h2>
+
+                <dl>
+                    <dt>?</dt>
+                    <dd>Show this help dialog</dd>
+                    <dt>S</dt>
+                    <dd>Focus the search field</dd>
+                    <dt>&larrb;</dt>
+                    <dd>Move up in search results</dd>
+                    <dt>&rarrb;</dt>
+                    <dd>Move down in search results</dd>
+                    <dt>&#9166;</dt>
+                    <dd>Go to active search result</dd>
+                </dl>
+            </div>
+
+            <div class="infos">
+                <h2>Search Tricks</h2>
+
+                <p>
+                    Prefix searches with a type followed by a colon (e.g.
+                    <code>fn:</code>) to restrict the search to a given type.
+                </p>
+
+                <p>
+                    Accepted types are: <code>fn</code>, <code>mod</code>,
+                    <code>struct</code>, <code>enum</code>,
+                    <code>trait</code>, <code>type</code>, <code>macro</code>,
+                    and <code>const</code>.
+                </p>
+
+                <p>
+                    Search functions by type signature (e.g.
+                    <code>vec -> usize</code> or <code>* -> vec</code>)
+                </p>
+            </div>
+        </div>
+    </aside>
+
+    
+
+    <script>
+        window.rootPath = "../../";
+        window.currentCrate = "asciii";
+        window.playgroundUrl = "";
+    </script>
+    <script src="../../jquery.js"></script>
+    <script src="../../main.js"></script>
+    
+    <script defer src="../../search-index.js"></script>
+</body>
+</html>

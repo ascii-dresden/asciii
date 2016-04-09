@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["Buf","A structure to wrap an intermediate buffer used by libgit2."]]});

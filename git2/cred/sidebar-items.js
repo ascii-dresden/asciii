@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["Cred","A structure to represent git credentials in libgit2."],["CredentialHelper","Management of the gitcredentials(7) interface."]]});

@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["Tree","A structure to represent a git [tree][1]"],["TreeEntry","A structure representing an entry inside of a tree. An entry is borrowed from a tree."],["TreeIter","An iterator over the entries in a tree."]]});

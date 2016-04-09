@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["Branch","A structure to represent a git [branch][1]"],["Branches","An iterator over the branches inside of a repository."]]});

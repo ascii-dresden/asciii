@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["Oid","Unique identity of any object (commit, tree, blob, tag)."]]});

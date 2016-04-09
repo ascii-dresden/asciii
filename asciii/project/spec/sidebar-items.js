@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["VirtualField",""]],"mod":[["archive",""],["client",""],["date",""],["hours",""],["invoice",""],["offer",""],["products",""],["project",""]],"struct":[["VirtualFieldNames",""],["VirtualFields",""]],"type":[["SpecResult",""]]});

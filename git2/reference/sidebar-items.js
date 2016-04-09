@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["Reference","A structure to represent a git [reference][1]."],["ReferenceNames","An iterator over the names of references in a repository."],["References","An iterator over the references in a repository."]]});

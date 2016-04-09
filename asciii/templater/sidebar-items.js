@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["Templater","Simple templating module"]],"trait":[["IsKeyword","Simple template style keyword replacement."]]});

@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["Blame","Opaque structure to hold blame results."],["BlameHunk","Structure that represents a blame hunk."],["BlameIter","An iterator over the hunks in a blame."],["BlameOptions","Blame options"]]});
