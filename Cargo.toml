@@ -21,7 +21,10 @@ git2 = "*"
 maplit = "*"
 tempdir = "*"
 
-clippy = {version = "~0.0.23", optional = true}
+enum_derive = "*"
+custom_derive = "*"
+
+clippy = {version = "*", optional = true}
 
 [dependencies.clap]
 version = "2"

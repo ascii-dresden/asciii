@@ -1,6 +1,7 @@
 #![allow(dead_code)]
 #![allow(unused_imports)]
 
+use util::yaml;
 use util::yaml::Yaml;
 use currency::Currency;
 use super::Project;
@@ -16,28 +17,30 @@ macro_rules! try_some {
 }
 
 /// Fields that are accessible but are not directly found in the file format.
-#[derive(Debug)]
-pub enum VirtualField{
-    /// Usually `manager`, or in legacy part of `signature`
-    Responsible,
-    /// Pretty version of `invoice/number`: "`R042`"
-    InvoiceNumber,
-    /// Pretty version of `invoice/number` including year: "`R2016-042`"
-    InvoiceNumberLong,
-    ///Overall Cost Project, including taxes
-    Final,
-    Invalid
+/// This is used to get fields that are computed through an ordinary `get("responsible")`
+custom_derive! {
+    #[derive(Debug,
+             IterVariants(VirtualFields), IterVariantNames(VirtualFieldNames),
+             EnumFromStr
+             )]
+    pub enum VirtualField{
+        /// Usually `manager`, or in legacy part of `signature`
+        Responsible,
+        /// Pretty version of `invoice/number`: "`R042`"
+        InvoiceNumber,
+        /// Pretty version of `invoice/number` including year: "`R2016-042`"
+        InvoiceNumberLong,
+        ///Overall Cost Project, including taxes
+        Final,
+        Caterers,
+        ClientFullName,
+        Invalid
+    }
 }
 
 impl<'a> From<&'a str> for VirtualField{
     fn from(s:&'a str) -> VirtualField{
-        match s.to_lowercase().as_ref(){
-            "responsible"       => VirtualField::Responsible,
-            "invoicenumber"     => VirtualField::InvoiceNumber,
-            "invoicenumberlong" => VirtualField::InvoiceNumberLong,
-            "final"             => VirtualField::Final,
-            _                   => VirtualField::Invalid
-        }
+        s.parse::<VirtualField>().unwrap_or(VirtualField::Invalid)
     }
 }
 
@@ -48,20 +51,15 @@ impl VirtualField{
             VirtualField::InvoiceNumber     => invoice::number_str(project.yaml()),
             VirtualField::InvoiceNumberLong => invoice::number_long_str(project.yaml()),
             VirtualField::Final             => project.sum_sold().map(|c|c.to_string()),
+
+            VirtualField::Caterers       => hours::caterers_string(project.yaml()),
+            VirtualField::ClientFullName => client::full_name(project.yaml()),
             VirtualField::Invalid           => None,
+
+            //_ => None
         }
     }
 }
-
-/// TODO: make this generated
-pub static VIRTUALFIELDS: [VirtualField;4]  = [
-    VirtualField::Responsible,
-    VirtualField::InvoiceNumber,
-    VirtualField::InvoiceNumberLong,
-    VirtualField::Final
-];
-
-
 
 //TODO there may be cases where an f64 can't be converted into Currency
 fn to_currency(f:f64) -> Currency {
@@ -74,26 +72,11 @@ fn to_currency(f:f64) -> Currency {
         )
 }
 
-pub mod validate{
-    use util::yaml;
-    use util::yaml::Yaml;
-
-    pub fn existence<'a>(yaml:&Yaml, mut paths:Vec<&'a str>) -> Vec<&'a str>{
-        paths.drain(..)
-            .filter(|path| yaml::get(yaml,path).is_none())
-            .collect::<Vec<&'a str>>()
-    }
-
-    pub fn invoice<'a>(yaml:&Yaml) -> Vec<&'a str>{
-        let mut errors = existence(&yaml,vec![
-                                   "invoice/number",
-                                   "invoice/date",
-                                   "invoice/payed_date",
-        ]);
-        if super::date::invoice(&yaml).is_none(){
-            errors.push("invoice_date_format");}
-        errors
-    }
+fn field_exists<'a>(yaml:&Yaml, paths:&[&'a str]) -> Vec<&'a str>{
+    paths.iter()
+        .filter(|path| yaml::get(yaml,path).is_none())
+        .cloned()
+        .collect::<Vec<&'a str>>()
 }
 
 //stage 0
@@ -193,7 +176,7 @@ pub mod client{
     }
 
     pub fn validate(yaml:&Yaml) -> super::SpecResult {
-        let mut errors = super::validate::existence(&yaml, vec![
+        let mut errors = super::field_exists(&yaml, &[
                  "client/email",
                  "client/address",
                  "client/last_name",
@@ -295,7 +278,7 @@ pub mod offer{
             return Err(vec!["canceled"])
         }
 
-        let mut errors = super::validate::existence(&yaml, vec![
+        let mut errors = super::field_exists(&yaml, &[
                  "offer/date",
                  "offer/appendix",
         ]);
@@ -334,7 +317,7 @@ pub mod invoice{
     }
 
     pub fn validate(yaml:&Yaml) -> super::SpecResult {
-        let mut errors = super::validate::existence(&yaml,vec![
+        let mut errors = super::field_exists(&yaml,&[
                                    "invoice/number",
                                    "invoice/date",
         ]);
@@ -382,6 +365,11 @@ pub mod hours {
             .map(|&(_,h)| h)
             .fold(0f64,|acc, h| acc + h)
             )
+    }
+
+    pub fn caterers_string(yaml:&Yaml) -> Option<String> {
+        caterers(yaml).map(|v| v.iter() .map(|t| format!("{}: ({})", t.0,t.1) )
+                           .collect::<Vec<String>>().join(", "))
     }
 
     pub fn caterers(yaml:&Yaml) -> Option<Vec<(String, f64)>> {
@@ -566,7 +554,7 @@ invoice:
     #[test]
     fn validate_stage3(){
         let doc = yaml::parse(INVOICE_TEST_DOC).unwrap();
-        let errors = super::validate::invoice(&doc);
+        let errors = super::invoice::validate(&doc);
         println!("{:#?}", errors);
         assert!(errors.is_empty());
     }

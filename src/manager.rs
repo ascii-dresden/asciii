@@ -21,6 +21,7 @@
 //!
 
 #![allow(dead_code)]
+#![allow(unused_imports)]
 
 use std::fs;
 use std::io;
@@ -658,6 +659,7 @@ mod test {
                 temp_dir: None
             })
         }
+        fn matches_filter(&self, key: &str, val: &str) -> bool{false}
 
     }
 

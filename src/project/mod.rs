@@ -12,7 +12,6 @@ use slug;
 use currency::Currency;
 
 use util::yaml;
-use util::yaml::YamlError;
 use manager::{LuigiProject, LuigiResult, LuigiError};
 use templater::Templater;
 
@@ -115,7 +114,7 @@ impl LuigiProject for Project{
         // filtering "manager:hendrik" should also look at "signature:hendrik"
         // this is also needed in printing
         // Or I just assume that the old format is deprecated
-        yaml::get_as_string(&self.yaml, key).map(|c|{
+        self.get(key).map(|c|{
             c.to_lowercase().contains(&val.to_lowercase())
         }).unwrap_or(false)
     }

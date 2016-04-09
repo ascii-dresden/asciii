@@ -6,7 +6,7 @@
 
 use std::process::exit;
 use project::Project;
-use manager::{Luigi, LuigiDir, LuigiProject, LuigiResult};
+use manager::{Luigi, LuigiProject, LuigiResult};
 use util;
 use ::CONFIG;
 

@@ -16,6 +16,8 @@ extern crate currency;
 #[macro_use] extern crate lazy_static;
 #[macro_use] extern crate maplit;
 #[macro_use] extern crate clap;
+#[macro_use] extern crate custom_derive;
+#[macro_use] extern crate enum_derive;
 
 pub mod util;
 pub mod config;

@@ -122,7 +122,6 @@ fn list_projects(dir:LuigiDir, list_config:&ListConfig){
 
 /// Command LIST --broken
 fn list_broken_projects(dir:LuigiDir){
-    use util::yaml::YamlError;
     let luigi = setup_luigi();
     let invalid_files = super::execute(||luigi.list_project_files(dir));
     let tups = invalid_files
@@ -158,7 +157,8 @@ fn list_years(){
 
 /// Command LIST --virt
 fn list_virtual_fields(){
-    println!("{:?}", ::project::spec::VIRTUALFIELDS);
+    use ::project::spec::VirtualField;
+    println!("or {:?}", VirtualField::iter_variant_names().filter(|v|*v!="Invalid").collect::<Vec<&str>>());
 }
 
 

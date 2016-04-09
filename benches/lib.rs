@@ -41,3 +41,44 @@ mod path_split{
     }
 
 }
+
+#[cfg(test)]
+mod list_move{
+    //! when checking items of a list and appending them to an error list,
+    //! is it faster to copy or to drain and move?
+
+    use std::path::Path;
+    use super::test::Bencher;
+
+
+    #[bench]
+    fn drain(b: &mut Bencher) {
+        fn existence<'a>(mut paths:Vec<&'a str>) -> Vec<&'a str>{
+            paths.drain(..).collect()
+        }
+        b.iter(||{ 
+            existence(vec![
+                     "foo",
+                     "bar",
+                     "foobar",
+                     "foobarbazdeadbeefcafebaberustisfast",
+            ])
+        });
+    }
+
+    #[bench]
+    fn copy(b: &mut Bencher) {
+        fn existence<'a>(mut paths:&[&'a str]) -> Vec<&'a str>{
+            paths.iter().map(|s|s.to_owned()).collect()
+        }
+        b.iter(||{ 
+            existence(&[
+                     "foo",
+                     "bar",
+                     "foobar",
+                     "foobarbazdeadbeefcafebaberustisfast",
+            ])
+        });
+    }
+
+}
