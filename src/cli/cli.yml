@@ -7,9 +7,9 @@ settings:
     - ArgRequiredElseHelp
 
 args:
-  - debug:
-      help: Show debug information, may be anything
-      long: debug
+  #- debug:
+  #    help: Show debug information, may be anything
+  #    long: debug
 
 subcommands:
   - new:
@@ -207,6 +207,8 @@ subcommands:
                 short: "d"
                 long: "default"
 
+  - whoami:
+      about: Show your name from config
 
 # GIT STUFF
   - status:

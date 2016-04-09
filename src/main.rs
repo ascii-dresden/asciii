@@ -76,18 +76,18 @@ pub fn setup_app(){
      ("archive",   Some(sub_m)) => archive(&sub_m),
      ("unarchive", Some(sub_m)) => unarchive(&sub_m),
      ("config",    Some(sub_m)) => config(&sub_m),
-     ("whoami",    _          ) => config_show("whoami"),
+     ("whoami",    _          ) => config_show("manager_name"),
 
      ("path",      Some(sub_m)) => path(&sub_m),
 
-     ("term",      Some(   _m)) => term(),
+     ("term",      _          ) => term(),
 
-     ("remote",    Some(   _m)) => git_remote(),
-     ("pull",      Some(   _m)) => git_pull(),
-     ("status",    Some(   _m)) => git_status(),
+     ("remote",    _          ) => git_remote(),
+     ("pull",      _          ) => git_pull(),
+     ("status",    _          ) => git_status(),
      ("add",       Some(sub_m)) => git_add(&sub_m),
-     ("commit",    Some(   _m)) => git_commit(),
-     ("push",      Some(   _m)) => git_push(),
+     ("commit",    _          ) => git_commit(),
+     ("push",      _          ) => git_push(),
      _                       => ()
     }
 
