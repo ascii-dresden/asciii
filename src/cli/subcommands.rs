@@ -12,7 +12,7 @@ use manager::{LuigiDir, LuigiProject, LuigiError};
 use project::Project;
 use util;
 use super::{print,setup_luigi, setup_luigi_with_git};
-use super::ListConfig;
+use super::{ListConfig, ListMode};
 
 // TODO keep this up to date or find a way to make this dynamic
 const STATUS_ROWS_WIDTH:u16 = 96;
@@ -39,6 +39,20 @@ fn new_project(project_name:&str, template_name:&str, editor:&Option<&str>, edit
     }
 }
 
+fn decide_mode(simple:bool, verbose:bool, paths:bool,nothing:bool) -> Option<ListMode>{
+    if nothing{ Some(ListMode::Nothing) }
+    else if paths{ Some(ListMode::Paths) }
+    else {
+        match (simple, verbose){
+            (true, true) => None,
+            (false, false) => Some(ListMode::Simple),
+            (true,  false) => Some(ListMode::Simple),
+            (false, true ) => Some(ListMode::Verbose),
+        }
+    }
+}
+
+
 /// Command LIST
 pub fn list(matches:&ArgMatches){
     if matches.is_present("templates"){
@@ -50,12 +64,18 @@ pub fn list(matches:&ArgMatches){
     }
 
     else {
+        let list_mode = decide_mode(
+            matches.is_present("simple"),
+            matches.is_present("verbose") || CONFIG.get_bool("list/verbose"),
+            matches.is_present("paths"),
+            matches.is_present("nothing")
+            ).unwrap();
+
         let mut list_config = ListConfig{
             sort_by:   matches.value_of("sort") .unwrap_or_else(||CONFIG.get_str("list/sort")),
-            simple:    matches.is_present("simple"),
+            mode:      list_mode,
             details:   matches.values_of("details").map(|v|v.collect::<Vec<&str>>()),
             filter_by: matches.values_of("filter").map(|v|v.collect::<Vec<&str>>()),
-            paths:     matches.is_present("paths"),
 
             ..Default::default()
         };
@@ -86,6 +106,14 @@ pub fn list(matches:&ArgMatches){
 }
 
 /// Command LIST [--archive, --all]
+///
+/// This interprets the `ListConfig` struct and passes it on to either
+///
+/// * `print::rows()`
+/// * `print::simple_rows()`
+/// * `print::verbose_rows()`
+///
+/// which it prints with `print::print_projects()`
 fn list_projects(dir:LuigiDir, list_config:&ListConfig){
     let luigi = if CONFIG.get_bool("list/gitstatus"){
         setup_luigi_with_git()
@@ -109,18 +137,17 @@ fn list_projects(dir:LuigiDir, list_config:&ListConfig){
         _ => false
     };
 
-    use super::print::{simple_rows, verbose_rows, path_rows, rows, print_projects};
+    use super::print::{simple_rows, verbose_rows, path_rows, rows, print_projects, dynamic_rows};
 
     if !wide_enough { // TODO room for improvement
         print_projects(simple_rows(&projects, &list_config));
-    } else if list_config.paths{
-        print_projects(path_rows(&projects, &list_config));
-    } else if list_config.simple {
-        print_projects(simple_rows(&projects, &list_config));
-    } else if list_config.verbose {
-        print_projects(verbose_rows(&projects,&list_config,luigi.repository));
     } else {
-        print_projects(rows(&projects, &list_config));
+        match list_config.mode{
+            ListMode::Paths   => print_projects(path_rows(&projects, &list_config)),
+            ListMode::Simple  => print_projects(simple_rows(&projects, &list_config)),
+            ListMode::Verbose => print_projects(verbose_rows(&projects,&list_config,luigi.repository)),
+            ListMode::Nothing => print_projects(dynamic_rows(&projects,&list_config,luigi.repository)),
+        }
     }
 }
 
@@ -167,15 +194,6 @@ fn list_virtual_fields(){
 
 
 
-
-/// Command LIST --years
-fn list_paths(dir:LuigiDir){
-    let luigi = setup_luigi();
-    let paths = super::execute(||luigi.list_project_files(dir));
-    for path in paths{
-        println!("{}", path.display());
-    }
-}
 
 /// Command EDIT
 pub fn edit(matches:&ArgMatches) {

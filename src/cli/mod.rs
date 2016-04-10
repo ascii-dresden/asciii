@@ -35,28 +35,30 @@ fn setup_luigi() -> Luigi<Project> {
 #[allow(dead_code)]
 #[derive(Debug)]
 pub struct ListConfig<'a>{
-    verbose:      bool,
-    simple:       bool,
+    mode:         ListMode,
     show_errors:  bool,
     git_status:   bool,
     sort_by:      &'a str,
     filter_by:    Option<Vec<&'a str>>,
     use_colors:   bool,
-    paths:        bool,
     details:      Option<Vec<&'a str>>,
+}
+
+#[derive(Debug)]
+pub enum ListMode{
+    Simple, Verbose, Nothing, Paths
 }
 
 impl<'a> Default for ListConfig<'a>{
     fn default() -> ListConfig<'a>{
         ListConfig{
-            verbose:      CONFIG.get_bool("list/verbose"),
-            simple:       false,
+            mode:         if CONFIG.get_bool("list/verbose"){ ListMode::Verbose }
+                          else{ ListMode::Simple },
             git_status:   CONFIG.get_bool("list/gitstatus"),
             show_errors:  false,
             sort_by:      CONFIG.get_str("list/sort"),
             filter_by:    None,
             use_colors:   CONFIG.get_bool("list/colors"),
-            paths:        false,
             details:      None,
         }
 

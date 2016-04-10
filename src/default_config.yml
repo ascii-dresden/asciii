@@ -6,9 +6,9 @@ path: "~"
 output_path: "."
 list:
   colors:    false
-  verbose:   true
+  verbose:   false
   sort:      index
-  gitstatus: true
+  gitstatus: false
 
 dirs:
   storage: projects

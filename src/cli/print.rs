@@ -1,4 +1,4 @@
-#![allow(dead_code)]
+//! All the printing code lives here.
 
 use chrono::*;
 use prettytable::Table;
@@ -95,6 +95,7 @@ pub fn simple_rows(projects:&[Project], list_config:&ListConfig) -> Vec<Row>{
 }
 
 /// produces the rows used in `print_projects()`
+/// probably dead
 pub fn rows(projects:&[Project], list_config:&ListConfig) -> Vec<Row>{
     projects.iter().enumerate()
         .map(|(i, project)| {
@@ -200,20 +201,25 @@ pub fn verbose_rows(projects:&[Project], list_config:&ListConfig, repo:Option<Re
         }).collect()
 }
 
-#[allow(dead_code,unused_variables)]
-pub fn dynamic_rows(projects:&[Project], fields:&[&str], repo:Option<Repository>) -> Vec<Row>{
-    projects.iter().enumerate()
-        .map(|(i, project)| {
-            let mut cells = vec![
-                cell!(r->i+1)
-            ];
-            for field in fields{
-                let data = yaml::get_as_string(project.yaml(), field)
-                    .unwrap_or_else(||String::from(""));
-                cells.push(cell!(data))
+/// This prints nothing unless you tell it to with `--details`
+pub fn dynamic_rows(projects:&[Project], list_config:&ListConfig, repo:Option<Repository>) -> Vec<Row>{
+    projects
+        .iter()
+        .map(|project| {
+            let row_style = if list_config.use_colors {project_to_style(&project)}else{""};
+
+            let mut cells = Vec::new();
+
+            if let Some(ref details) = list_config.details{
+                cells.extend_from_slice(
+                    &details.iter().map(|d|
+                                 cell!( project.get(&d).unwrap_or_else(||String::from(""))),
+                                 ).collect::<Vec<Cell>>()
+                    );
             }
             Row::new(cells)
-        }).collect()
+        })
+    .collect()
 }
 
 /// Prints Projects

@@ -41,7 +41,7 @@ subcommands:
               takes_value: true
 
         - "details":
-              help: List of fields to print for each project listed
+              help: Add extra fields to print for each project listed
               short: d
               long: details
               takes_value: true
@@ -60,42 +60,47 @@ subcommands:
 
         - "simple":
               help: Use simple list
-              long: "simple"
+              long: simple
 
         - "sort":
               help: "sort by [date | index | name | manager]"
-              short: "s"
-              long: "sort"
+              long: sort
+              short: s
               possible_values: ["date",  "index",  "name",  "manager"]
               takes_value: true
 
         - "all":
-              help: "List all projects, ever"
-              long: "all"
+              help: List all projects, ever
+              long: all
 
         - "templates":
-              help: "list templates"
-              short: "t"
-              long: "templates"
+              help: List templates
+              long: templates
+              short: t
 
         - "years":
-              help: "list years in archive"
-              short: "y"
-              long: "years"
+              help: List years in archive
+              long: years
+              short: y
 
         - "paths":
-              help: "list paths of each file"
-              short: "p"
-              long: "paths"
+              help: List paths to each project file
+              long: paths
+              short: p
 
         - "broken":
               help: List broken projects  without project file
-              short: "b"
-              long: "broken"
+              long: broken
+              short: b
 
         - "virtual_fields":
               help: List all virtual data fields that can be used with "--details"
               long: virtual
+
+        - "nothing":
+              help: Print nothing, expect the fields supplied via "--details"
+              long: nothing
+              short: n
 
   - archive:
       about: Move a Project into the archive
@@ -176,15 +181,43 @@ subcommands:
 
         - "archive":
               help: "Pick an archived project"
-              short: "a"
               long: "archive"
+              short: "a"
               takes_value: true
 
         - "template":
               help: "Show show fields in templates that are filled"
-              short: "t"
               long: "template"
+              short: "t"
               #conflicts_with: "archive"  # this causes a crash
+
+        - "files":
+              help: List files that belong to a project
+              long: files
+
+        - "invoice":
+              help: Display values in invoice mode
+              long: invoice
+              short: i
+
+        - "offer":
+              help: Display values in offer mode
+              long: offer
+              short: o
+
+        - "hours": # what used to be "--caterers"
+              help: Display hours
+              long: hours
+
+        - "csv":
+              help: Show as csv
+              long: csv
+              short: c
+
+        - "markdown":
+              help: Show as markdown
+              long: markdown
+              short: m
 
   - config:
       about: Show and edit your config
