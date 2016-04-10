@@ -12,7 +12,6 @@ use super::ListConfig;
 use project::Project;
 use manager::LuigiProject;
 use repo::Repository;
-use util::yaml;
 
 //TODO construct table rows way more dynamically
 
@@ -95,35 +94,6 @@ pub fn simple_rows(projects:&[Project], list_config:&ListConfig) -> Vec<Row>{
 }
 
 /// produces the rows used in `print_projects()`
-/// probably dead
-pub fn rows(projects:&[Project], list_config:&ListConfig) -> Vec<Row>{
-    projects.iter().enumerate()
-        .map(|(i, project)| {
-            let row_style = if list_config.use_colors {project_to_style(&project)}else{""};
-            let cells = vec![
-
-                cell!(r->i+1),
-
-                cell!(
-                    if project.canceled() {
-                        format!("CANCELED: {name}", name=project.name())
-                    } else{ project.name() }
-                    ).style_spec(row_style),
-
-                // R042
-                cell!(project.invoice_num().unwrap_or("".into()))
-                    .style_spec(row_style),
-
-                // Date
-                cell!(project.date().unwrap_or(UTC::today()).format("%d.%m.%Y").to_string())
-                    .style_spec(row_style),
-           ];
-
-            Row::new(cells)
-        }).collect()
-}
-
-/// produces the rows used in `print_projects()`
 pub fn verbose_rows(projects:&[Project], list_config:&ListConfig, repo:Option<Repository>) -> Vec<Row>{
     projects.iter().enumerate()
         .map(|(i, project)| {
@@ -202,7 +172,7 @@ pub fn verbose_rows(projects:&[Project], list_config:&ListConfig, repo:Option<Re
 }
 
 /// This prints nothing unless you tell it to with `--details`
-pub fn dynamic_rows(projects:&[Project], list_config:&ListConfig, repo:Option<Repository>) -> Vec<Row>{
+pub fn dynamic_rows(projects:&[Project], list_config:&ListConfig, _repo:Option<Repository>) -> Vec<Row>{
     projects
         .iter()
         .map(|project| {
@@ -213,7 +183,7 @@ pub fn dynamic_rows(projects:&[Project], list_config:&ListConfig, repo:Option<Re
             if let Some(ref details) = list_config.details{
                 cells.extend_from_slice(
                     &details.iter().map(|d|
-                                 cell!( project.get(&d).unwrap_or_else(||String::from(""))),
+                                 cell!( project.get(&d).unwrap_or_else(||String::from(""))).style_spec(row_style),
                                  ).collect::<Vec<Cell>>()
                     );
             }

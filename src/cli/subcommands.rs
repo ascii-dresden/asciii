@@ -137,7 +137,7 @@ fn list_projects(dir:LuigiDir, list_config:&ListConfig){
         _ => false
     };
 
-    use super::print::{simple_rows, verbose_rows, path_rows, rows, print_projects, dynamic_rows};
+    use super::print::{simple_rows, verbose_rows, path_rows, dynamic_rows, print_projects};
 
     if !wide_enough { // TODO room for improvement
         print_projects(simple_rows(&projects, &list_config));

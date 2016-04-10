@@ -32,7 +32,6 @@ fn setup_luigi() -> Luigi<Project> {
 }
 
 /// Configuration for this list output.
-#[allow(dead_code)]
 #[derive(Debug)]
 pub struct ListConfig<'a>{
     mode:         ListMode,
