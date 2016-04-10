@@ -82,3 +82,10 @@ fn sort_by(projects:&mut Vec<Project>, option:&str){
         _         => projects.sort_by(|pa,pb| pa.index().unwrap_or("zzzz".to_owned()).cmp( &pb.index().unwrap_or("zzzz".to_owned()))) ,
     }
 }
+
+use std::fmt::Display;
+/// prints a message and exist with code 1
+pub fn fail<T:Display>(message:T) -> !{
+    println!("{}", message);
+    exit(1);
+}

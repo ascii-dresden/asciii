@@ -1,7 +1,6 @@
 use std::path::{Path,PathBuf};
 use std::ffi::OsStr;
 use std::env;
-use std::process;
 
 use clap::ArgMatches;
 
@@ -11,7 +10,7 @@ use terminal_size::{Width, terminal_size }; // TODO replace with other lib
 use manager::{LuigiDir, LuigiProject, LuigiError};
 use project::Project;
 use util;
-use super::{print,setup_luigi, setup_luigi_with_git};
+use super::{print,setup_luigi, setup_luigi_with_git, fail};
 use super::{ListConfig, ListMode};
 
 // TODO keep this up to date or find a way to make this dynamic
@@ -230,8 +229,7 @@ fn edit_projects(dir:LuigiDir, search_terms:&[&str], editor:&Option<&str>){
     }
 
     if all_paths.is_empty(){
-        println!{"Nothing found for {:?}", search_terms}
-        process::exit(1);
+        fail(format!("Nothing found for {:?}", search_terms));
     } else {
         util::open_in_editor(&editor, all_paths.as_slice());
     }
@@ -282,6 +280,7 @@ fn show_template(name:&str){
     let templater = Templater::new(&luigi.get_template_file(name).unwrap()).unwrap();
     println!("{:#?}", templater.list_keywords());
 }
+
 pub fn archive(matches:&ArgMatches){
         let name = matches.value_of("NAME").unwrap();
         let year = matches.value_of("year")
@@ -313,6 +312,7 @@ pub fn config(matches:&ArgMatches){
 fn archive_project(name:&str, manual_year:Option<i32>){
     let luigi = setup_luigi();
     if let Ok(projects) = luigi.search_projects(LuigiDir::Working, name){
+        if projects.is_empty(){ fail(format!("Nothing found for {:?}", name)); }
         for project in projects.iter().filter_map(|path| Project::open(path).ok()) {
             if project.valid_stage3().is_ok(){
                 let year = manual_year.or(project.year()).unwrap();
@@ -325,6 +325,9 @@ fn archive_project(name:&str, manual_year:Option<i32>){
             }
         }
     }
+    else{
+        fail(format!("Nothing found for {:?}", name));
+    }
 }
 
 
@@ -336,7 +339,7 @@ fn unarchive_project(year:i32, name:&str){
             println!("{:?}", projects);
             luigi.unarchive_project_file(&projects[0]).unwrap();
         } else{
-            println!("Ambiguous: multiple matches: {:#?}", projects );
+            fail(format!("Ambiguous: multiple matches: {:#?}", projects ));
         }
     }
 }
