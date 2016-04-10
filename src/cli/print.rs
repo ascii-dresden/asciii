@@ -69,6 +69,7 @@ pub fn path_rows(projects:&[Project], list_config:&ListConfig) -> Vec<Row>{
     .collect()
 }
 
+/// Triggered by `list --simple`, usually you set this in your config under `list/verbose`.
 pub fn simple_rows(projects:&[Project], list_config:&ListConfig) -> Vec<Row>{
     projects
         .iter()
@@ -93,6 +94,8 @@ pub fn simple_rows(projects:&[Project], list_config:&ListConfig) -> Vec<Row>{
     .collect()
 }
 
+/// Triggered by `list --verbose`, usually you set this in your config under `list/verbose`.
+///
 /// produces the rows used in `print_projects()`
 pub fn verbose_rows(projects:&[Project], list_config:&ListConfig, repo:Option<Repository>) -> Vec<Row>{
     projects.iter().enumerate()
@@ -171,6 +174,8 @@ pub fn verbose_rows(projects:&[Project], list_config:&ListConfig, repo:Option<Re
         }).collect()
 }
 
+/// Triggered by `list --nothing`
+///
 /// This prints nothing unless you tell it to with `--details`
 pub fn dynamic_rows(projects:&[Project], list_config:&ListConfig, _repo:Option<Repository>) -> Vec<Row>{
     projects
@@ -192,7 +197,11 @@ pub fn dynamic_rows(projects:&[Project], list_config:&ListConfig, _repo:Option<R
     .collect()
 }
 
-/// Prints Projects
+/// Prints Projects Rows
+/// 
+/// This doesn't do much, except taking a Vec of Rows and printing it,
+/// the interesting code is in dynamic_rows, verbose_rows, path_rows or simple_rows.
+/// This Documentations is redundant, infact, it is already longer than the function itself.
 pub fn print_projects(rows:Vec<Row>){
     let mut table = Table::init(rows);
     table.set_format(FormatBuilder::new().column_separator(' ').padding(0,0).build());

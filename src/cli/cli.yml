@@ -62,6 +62,11 @@ subcommands:
               help: Use simple list
               long: simple
 
+        - "verbose" :
+            help: Opposite of "simple"
+            long: verbose
+            short: v
+
         - "sort":
               help: "sort by [date | index | name | manager]"
               long: sort
