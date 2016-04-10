@@ -109,14 +109,19 @@ impl LuigiProject for Project{
         })
     }
 
+    /// Checks against a certain key-val pair.
     fn matches_filter(&self, key: &str, val: &str) -> bool{
-        // TODO here I need an abstraction in order to serve the old format too
-        // filtering "manager:hendrik" should also look at "signature:hendrik"
-        // this is also needed in printing
-        // Or I just assume that the old format is deprecated
         self.get(key).map(|c|{
             c.to_lowercase().contains(&val.to_lowercase())
         }).unwrap_or(false)
+    }
+
+    /// UNIMPLEMENTED: Checks against a certain search term.
+    ///
+    /// TODO compare agains InvoiceNumber, ClientFullName, Email, event/name, invoice/official Etc
+    fn matches_search(&self, term: &str) -> bool{
+        // may use matches_filter internally
+        unimplemented!()
     }
 }
 

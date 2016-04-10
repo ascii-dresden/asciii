@@ -107,6 +107,7 @@ pub trait LuigiProject{
     fn dir(&self)  -> PathBuf{ self.file().parent().unwrap().to_owned() }
 
     fn matches_filter(&self, key: &str, val: &str) -> bool;
+    fn matches_search(&self, term: &str) -> bool;
 }
 
 // TODO rely more on IoError, it has most of what you need
@@ -399,6 +400,7 @@ impl<L:LuigiProject> Luigi<L> {
     pub fn search_projects(&self, dir:LuigiDir, search_term:&str) -> LuigiResult<Vec<PathBuf>> {
         let project_paths: Vec<PathBuf> = try!(self.list_project_files(dir))
             .iter()
+            // TODO use `Project::matches_search`
             .filter(|path| path.to_str().unwrap_or("??").to_lowercase().contains(&search_term.to_lowercase()))
             .cloned()
             .collect();
@@ -664,6 +666,7 @@ mod test {
             })
         }
         fn matches_filter(&self, key: &str, val: &str) -> bool{false}
+        fn matches_search(&self, term: &str) -> bool {false}
 
     }
 
