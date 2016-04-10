@@ -4,6 +4,7 @@ use std::env;
 use std::process;
 
 use clap::ArgMatches;
+
 use config;
 use ::CONFIG;
 use terminal_size::{Width, terminal_size }; // TODO replace with other lib
@@ -19,7 +20,7 @@ const STATUS_ROWS_WIDTH:u16 = 96;
 /// Create NEW Project
 pub fn new(matches:&ArgMatches){
         let name     = matches.value_of("name").expect("You did not pass a \"Name\"!");
-        let editor   = CONFIG.get_path("editor").unwrap().as_str().unwrap();
+        let editor   = CONFIG.get_path("editor").and_then(|e|e.as_str());
 
         let template = matches.value_of("template")
             .or( CONFIG.get_path("template").unwrap().as_str())
@@ -28,7 +29,7 @@ pub fn new(matches:&ArgMatches){
         new_project(&name, &template, &editor, !matches.is_present("don't edit"));
 }
 
-fn new_project(project_name:&str, template_name:&str, editor:&str, edit:bool){
+fn new_project(project_name:&str, template_name:&str, editor:&Option<&str>, edit:bool){
     let luigi = setup_luigi();
     //let project = execute(|| luigi.create_project::<Project>(&project_name, &template_name));
     let project = luigi.create_project(&project_name, &template_name).unwrap();
@@ -179,10 +180,11 @@ pub fn edit(matches:&ArgMatches) {
         let search_term = matches.value_of("search_term").unwrap();
         let search_terms = matches.values_of("search_term").unwrap().collect::<Vec<&str>>();
 
-        let editor = matches.value_of("editor").unwrap_or( CONFIG.get_path("editor").unwrap().as_str().unwrap());
+        let editor = matches.value_of("editor")
+            .or( CONFIG.get_path("editor").and_then(|e|e.as_str()));
 
         if matches.is_present("template"){
-            edit_template(search_term,&editor);
+            edit_template(search_term, &editor);
 
         } else {
             if let Some(archive) = matches.value_of("archive"){
@@ -194,7 +196,7 @@ pub fn edit(matches:&ArgMatches) {
         }
 }
 
-fn edit_projects(dir:LuigiDir, search_terms:&[&str], editor:&str){
+fn edit_projects(dir:LuigiDir, search_terms:&[&str], editor:&Option<&str>){
     let luigi = setup_luigi();
     let mut all_paths = Vec::new();
     for search_term in search_terms{
@@ -215,7 +217,7 @@ fn edit_projects(dir:LuigiDir, search_terms:&[&str], editor:&str){
 }
 
 /// Command EDIT --template
-fn edit_template(name:&str, editor:&str){
+fn edit_template(name:&str, editor:&Option<&str>){
     let luigi = setup_luigi();
     let template_paths = super::execute(||luigi.list_template_files())
         .iter()
@@ -279,7 +281,8 @@ pub fn config(matches:&ArgMatches){
         }
 
         else if matches.is_present("edit"){
-            let editor = CONFIG.get_path("editor").unwrap().as_str().unwrap();
+            let editor = matches.value_of("editor")
+                .or( CONFIG.get_path("editor").and_then(|e|e.as_str()));
             config_edit(&editor); }
 
         else if matches.is_present("default"){ config_show_default(); }
@@ -320,13 +323,13 @@ fn unarchive_project(year:i32, name:&str){
 
 /// Command CONFIG --show
 pub fn config_show(path:&str){
-    //TODO config_show could be prettier
-    println!("{:#?}", CONFIG.get_str(&path));
+    println!("{:#?}", CONFIG.get_path(&path)
+             .map(|v|v.to_string())
+             .unwrap_or_else(||format!("{} not set", path)));
 }
 
 /// Command CONFIG --edit
-fn config_edit(editor:&str){
-    //println!("{:?}{:?}", &editor, vec![CONFIG.path.to_str().unwrap().to_owned()]);
+fn config_edit(editor:&Option<&str>){
     util::open_in_editor(&editor, &[CONFIG.path.to_owned()]);
 }
 

@@ -37,8 +37,8 @@ use git2::Error as GitError;
 use repo::Repository;
 use util::yaml::YamlError;
 
-const PROJECT_FILE_EXTENSION:&'static str = "yml";
-const TEMPLATE_FILE_EXTENSION:&'static str = "tyml";
+static PROJECT_FILE_EXTENSION:&'static str = "yml";
+static TEMPLATE_FILE_EXTENSION:&'static str = "tyml";
 
 pub type Year =  i32;
 pub type LuigiResult<T> = Result<T, LuigiError>;
@@ -230,14 +230,18 @@ impl<L:LuigiProject> Luigi<L> {
 
     /// Produces a list of files in the `template_dir`
     pub fn list_template_files(&self) -> LuigiResult<Vec<PathBuf>> {
-        let template_files =
+        let template_files :Vec<PathBuf>=
         try!(self.list_path_content(&self.template_dir))
             .iter()
             .filter(|p|p.extension()
                         .unwrap_or_else(|| OsStr::new("")) == OsStr::new(TEMPLATE_FILE_EXTENSION)
                         )
             .cloned().collect();
-        Ok(template_files)
+        if template_files.is_empty(){
+            Err(LuigiError::TemplateNotFound) // TODO: RFC perhaps "NoTemplates"?
+        } else {
+            Ok(template_files)
+        }
     }
 
     /// Produces a list of names of all template filess in the `template_dir`

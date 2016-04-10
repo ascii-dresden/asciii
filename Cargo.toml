@@ -14,12 +14,13 @@ slug = "*"
 term = "*"
 terminal_size = "0.1.1"
 prettytable-rs = "*"
-#currency = {git="https://github.com/hoodie/rust-lang-currency"}
-currency = {path="../currency"}
+currency = {git="https://github.com/hoodie/rust-lang-currency"}
+#currency = {path="../currency"}
 lazy_static = "*"
 git2 = "*"
 maplit = "*"
 tempdir = "*"
+open = "*"
 
 enum_derive = "*"
 custom_derive = "*"

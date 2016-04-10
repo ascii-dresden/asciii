@@ -1,7 +1,6 @@
 ---
-manager_name: "The Unnamed Manager"
-editor:   "vim -O"
-opener:   "xdg-open"
+manager_name: #"The Unnamed Manager"
+editor:   #"vim -O"
 
 path: "~"
 output_path: "."

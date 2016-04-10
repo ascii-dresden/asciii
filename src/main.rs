@@ -18,6 +18,7 @@ extern crate terminal_size;
 //TODO make libgit2 optional
 extern crate git2;
 extern crate currency;
+extern crate open;
 #[macro_use] extern crate prettytable;
 #[macro_use] extern crate lazy_static;
 #[macro_use] extern crate maplit;
