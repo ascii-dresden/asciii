@@ -323,7 +323,7 @@ fn unarchive_project(year:i32, name:&str){
 
 /// Command CONFIG --show
 pub fn config_show(path:&str){
-    println!("{:#?}", CONFIG.get_path(&path)
+    println!("{}: {:#?}", path, CONFIG.get_path(&path)
              .map(|v|v.to_string())
              .unwrap_or_else(||format!("{} not set", path)));
 }

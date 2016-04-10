@@ -17,7 +17,7 @@ use std::env::home_dir;
 use util::yaml;
 use util::yaml::{Yaml, YamlError};
 
-const DEFAULT_LOCATION: &'static str = ".ascii-invoicer.yml";
+const DEFAULT_LOCATION: &'static str = ".asciii.yml";
 
 /// Looks for a configuration yaml in your HOME_DIR
 pub struct ConfigReader{
