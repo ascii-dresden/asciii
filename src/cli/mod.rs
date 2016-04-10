@@ -23,13 +23,22 @@ fn execute<F, S>(command:F) -> S where F: FnOnce() -> LuigiResult<S> {
     }
 }
 
-fn setup_luigi_with_git() -> Luigi<Project> {
-    execute(||Luigi::new_with_git(util::get_storage_path(), "working", "archive", "templates"))
+/// Sets up an instance of Luigi.
+fn setup_luigi() -> Luigi<Project> {
+    let working = CONFIG.get_str("dirs/working");
+    let archive = CONFIG.get_str("dirs/archive");
+    let templates = CONFIG.get_str("dirs/templates");
+    execute(|| Luigi::new(util::get_storage_path(), working, archive, templates))
 }
 
-fn setup_luigi() -> Luigi<Project> {
-    execute(|| Luigi::new(util::get_storage_path(), "working", "archive", "templates"))
+/// Sets up an instance of Luigi, with git turned on.
+fn setup_luigi_with_git() -> Luigi<Project> {
+    let working = CONFIG.get_str("dirs/working");
+    let archive = CONFIG.get_str("dirs/archive");
+    let templates = CONFIG.get_str("dirs/templates");
+    execute(||Luigi::new_with_git(util::get_storage_path(), working, archive, templates))
 }
+
 
 /// Configuration for this list output.
 #[derive(Debug)]
