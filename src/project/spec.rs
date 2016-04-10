@@ -322,7 +322,7 @@ pub mod invoice{
                                    "invoice/date",
         ]);
 
-        if super::offer::validate(&yaml).is_err() {errors.push("offer")}
+        //if super::offer::validate(&yaml).is_err() {errors.push("offer")}
         if super::date::invoice(&yaml).is_none(){ errors.push("invoice_date_format");}
 
         if !errors.is_empty(){
@@ -556,7 +556,7 @@ invoice:
         let doc = yaml::parse(INVOICE_TEST_DOC).unwrap();
         let errors = super::invoice::validate(&doc);
         println!("{:#?}", errors);
-        assert!(errors.is_empty());
+        assert!(errors.is_ok());
     }
 
 static PRODUCT_TEST_DOC_VALID:&'static str =

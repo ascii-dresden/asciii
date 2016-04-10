@@ -99,8 +99,8 @@ fn simple_reading(){
     assert_eq!(config.get("manager_name").unwrap().as_str().unwrap(),
                config.get_str("manager_name"));
 
-    assert_eq!(config.get("colors").unwrap().as_bool().unwrap(),
-               config.get_bool("colors"));
+    assert_eq!(config.get("list/colors").unwrap().as_bool().unwrap(),
+               config.get_bool("list/colors"));
 
     assert!(config.get_path(&"defaults").is_some());
     assert!(config.get_path(&"defaults/includes").is_some());

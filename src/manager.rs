@@ -665,8 +665,8 @@ mod test {
                 temp_dir: None
             })
         }
-        fn matches_filter(&self, key: &str, val: &str) -> bool{false}
-        fn matches_search(&self, term: &str) -> bool {false}
+        fn matches_filter(&self, _key: &str, _val: &str) -> bool{false}
+        fn matches_search(&self, _term: &str) -> bool {false}
 
     }
 
