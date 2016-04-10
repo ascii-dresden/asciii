@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="rustdoc">
-    <meta name="description" content="Source to the Rust file `/home/hendrik/code/rust/currency/src/lib.rs`.">
+    <meta name="description" content="Source to the Rust file `/home/hendrik/.multirust/toolchains/nightly/cargo/git/checkouts/rust-lang-currency-4d3c4d923e2b885a/master/src/lib.rs`.">
     <meta name="keywords" content="rust, rustlang, rust-lang">
 
     <title>lib.rs.html -- source</title>
@@ -630,7 +630,7 @@
 
     <span class='attribute'>#[<span class='ident'>inline</span>]</span>
     <span class='kw'>fn</span> <span class='ident'>mul</span>(<span class='self'>self</span>, <span class='ident'>rhs</span>: <span class='ident'>f64</span>) <span class='op'>-&gt;</span> <span class='ident'>Currency</span> {
-        <span class='ident'>Currency</span>(<span class='self'>self</span>.<span class='number'>0</span>, (<span class='self'>self</span>.<span class='number'>1</span> <span class='kw'>as</span> <span class='ident'>f64</span> <span class='op'>*</span> <span class='ident'>rhs</span>).<span class='ident'>round</span>() <span class='kw'>as</span> <span class='ident'>i64</span>)
+        <span class='ident'>Currency</span>(<span class='self'>self</span>.<span class='number'>0</span>, (<span class='self'>self</span>.<span class='number'>1</span> <span class='kw'>as</span> <span class='ident'>f64</span> <span class='op'>*</span> <span class='ident'>rhs</span>).<span class='ident'>ceil</span>() <span class='kw'>as</span> <span class='ident'>i64</span>)
     }
 }
 

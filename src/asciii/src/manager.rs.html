@@ -927,6 +927,10 @@
 <span id="884">884</span>
 <span id="885">885</span>
 <span id="886">886</span>
+<span id="887">887</span>
+<span id="888">888</span>
+<span id="889">889</span>
+<span id="890">890</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! Manages file structure of templates, working directory and archive.</span>
 <span class='doccomment'>//!</span>
@@ -967,8 +971,8 @@
 <span class='kw'>use</span> <span class='ident'>repo</span>::<span class='ident'>Repository</span>;
 <span class='kw'>use</span> <span class='ident'>util</span>::<span class='ident'>yaml</span>::<span class='ident'>YamlError</span>;
 
-<span class='kw'>const</span> <span class='ident'>PROJECT_FILE_EXTENSION</span>:<span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='ident'>str</span> <span class='op'>=</span> <span class='string'>&quot;yml&quot;</span>;
-<span class='kw'>const</span> <span class='ident'>TEMPLATE_FILE_EXTENSION</span>:<span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='ident'>str</span> <span class='op'>=</span> <span class='string'>&quot;tyml&quot;</span>;
+<span class='kw'>static</span> <span class='ident'>PROJECT_FILE_EXTENSION</span>:<span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='ident'>str</span> <span class='op'>=</span> <span class='string'>&quot;yml&quot;</span>;
+<span class='kw'>static</span> <span class='ident'>TEMPLATE_FILE_EXTENSION</span>:<span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='ident'>str</span> <span class='op'>=</span> <span class='string'>&quot;tyml&quot;</span>;
 
 <span class='kw'>pub</span> <span class='kw'>type</span> <span class='ident'>Year</span> <span class='op'>=</span>  <span class='ident'>i32</span>;
 <span class='kw'>pub</span> <span class='kw'>type</span> <span class='ident'>LuigiResult</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> <span class='op'>=</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>T</span>, <span class='ident'>LuigiError</span><span class='op'>&gt;</span>;
@@ -1160,14 +1164,18 @@
 
     <span class='doccomment'>/// Produces a list of files in the `template_dir`</span>
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>list_template_files</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>LuigiResult</span><span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>PathBuf</span><span class='op'>&gt;&gt;</span> {
-        <span class='kw'>let</span> <span class='ident'>template_files</span> <span class='op'>=</span>
+        <span class='kw'>let</span> <span class='ident'>template_files</span> :<span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>PathBuf</span><span class='op'>&gt;=</span>
         <span class='macro'>try</span><span class='macro'>!</span>(<span class='self'>self</span>.<span class='ident'>list_path_content</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>template_dir</span>))
             .<span class='ident'>iter</span>()
             .<span class='ident'>filter</span>(<span class='op'>|</span><span class='ident'>p</span><span class='op'>|</span><span class='ident'>p</span>.<span class='ident'>extension</span>()
                         .<span class='ident'>unwrap_or_else</span>(<span class='op'>||</span> <span class='ident'>OsStr</span>::<span class='ident'>new</span>(<span class='string'>&quot;&quot;</span>)) <span class='op'>==</span> <span class='ident'>OsStr</span>::<span class='ident'>new</span>(<span class='ident'>TEMPLATE_FILE_EXTENSION</span>)
                         )
             .<span class='ident'>cloned</span>().<span class='ident'>collect</span>();
-        <span class='prelude-val'>Ok</span>(<span class='ident'>template_files</span>)
+        <span class='kw'>if</span> <span class='ident'>template_files</span>.<span class='ident'>is_empty</span>(){
+            <span class='prelude-val'>Err</span>(<span class='ident'>LuigiError</span>::<span class='ident'>TemplateNotFound</span>) <span class='comment'>// TODO: RFC perhaps &quot;NoTemplates&quot;?</span>
+        } <span class='kw'>else</span> {
+            <span class='prelude-val'>Ok</span>(<span class='ident'>template_files</span>)
+        }
     }
 
     <span class='doccomment'>/// Produces a list of names of all template filess in the `template_dir`</span>

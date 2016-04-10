@@ -484,6 +484,30 @@
 <span id="441">441</span>
 <span id="442">442</span>
 <span id="443">443</span>
+<span id="444">444</span>
+<span id="445">445</span>
+<span id="446">446</span>
+<span id="447">447</span>
+<span id="448">448</span>
+<span id="449">449</span>
+<span id="450">450</span>
+<span id="451">451</span>
+<span id="452">452</span>
+<span id="453">453</span>
+<span id="454">454</span>
+<span id="455">455</span>
+<span id="456">456</span>
+<span id="457">457</span>
+<span id="458">458</span>
+<span id="459">459</span>
+<span id="460">460</span>
+<span id="461">461</span>
+<span id="462">462</span>
+<span id="463">463</span>
+<span id="464">464</span>
+<span id="465">465</span>
+<span id="466">466</span>
+<span id="467">467</span>
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>path</span>::{<span class='ident'>Path</span>,<span class='ident'>PathBuf</span>};
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>ffi</span>::<span class='ident'>OsStr</span>;
@@ -491,6 +515,7 @@
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>process</span>;
 
 <span class='kw'>use</span> <span class='ident'>clap</span>::<span class='ident'>ArgMatches</span>;
+
 <span class='kw'>use</span> <span class='ident'>config</span>;
 <span class='kw'>use</span> ::<span class='ident'>CONFIG</span>;
 <span class='kw'>use</span> <span class='ident'>terminal_size</span>::{<span class='ident'>Width</span>, <span class='ident'>terminal_size</span> }; <span class='comment'>// TODO replace with other lib</span>
@@ -498,7 +523,7 @@
 <span class='kw'>use</span> <span class='ident'>project</span>::<span class='ident'>Project</span>;
 <span class='kw'>use</span> <span class='ident'>util</span>;
 <span class='kw'>use</span> <span class='ident'>super</span>::{<span class='ident'>print</span>,<span class='ident'>setup_luigi</span>, <span class='ident'>setup_luigi_with_git</span>};
-<span class='kw'>use</span> <span class='ident'>super</span>::<span class='ident'>ListConfig</span>;
+<span class='kw'>use</span> <span class='ident'>super</span>::{<span class='ident'>ListConfig</span>, <span class='ident'>ListMode</span>};
 
 <span class='comment'>// TODO keep this up to date or find a way to make this dynamic</span>
 <span class='kw'>const</span> <span class='ident'>STATUS_ROWS_WIDTH</span>:<span class='ident'>u16</span> <span class='op'>=</span> <span class='number'>96</span>;
@@ -506,7 +531,7 @@
 <span class='doccomment'>/// Create NEW Project</span>
 <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>new</span>(<span class='ident'>matches</span>:<span class='kw-2'>&amp;</span><span class='ident'>ArgMatches</span>){
         <span class='kw'>let</span> <span class='ident'>name</span>     <span class='op'>=</span> <span class='ident'>matches</span>.<span class='ident'>value_of</span>(<span class='string'>&quot;name&quot;</span>).<span class='ident'>expect</span>(<span class='string'>&quot;You did not pass a \&quot;Name\&quot;!&quot;</span>);
-        <span class='kw'>let</span> <span class='ident'>editor</span>   <span class='op'>=</span> <span class='ident'>CONFIG</span>.<span class='ident'>get_path</span>(<span class='string'>&quot;editor&quot;</span>).<span class='ident'>unwrap</span>().<span class='ident'>as_str</span>().<span class='ident'>unwrap</span>();
+        <span class='kw'>let</span> <span class='ident'>editor</span>   <span class='op'>=</span> <span class='ident'>CONFIG</span>.<span class='ident'>get_path</span>(<span class='string'>&quot;editor&quot;</span>).<span class='ident'>and_then</span>(<span class='op'>|</span><span class='ident'>e</span><span class='op'>|</span><span class='ident'>e</span>.<span class='ident'>as_str</span>());
 
         <span class='kw'>let</span> <span class='ident'>template</span> <span class='op'>=</span> <span class='ident'>matches</span>.<span class='ident'>value_of</span>(<span class='string'>&quot;template&quot;</span>)
             .<span class='ident'>or</span>( <span class='ident'>CONFIG</span>.<span class='ident'>get_path</span>(<span class='string'>&quot;template&quot;</span>).<span class='ident'>unwrap</span>().<span class='ident'>as_str</span>())
@@ -515,7 +540,7 @@
         <span class='ident'>new_project</span>(<span class='kw-2'>&amp;</span><span class='ident'>name</span>, <span class='kw-2'>&amp;</span><span class='ident'>template</span>, <span class='kw-2'>&amp;</span><span class='ident'>editor</span>, <span class='op'>!</span><span class='ident'>matches</span>.<span class='ident'>is_present</span>(<span class='string'>&quot;don&#39;t edit&quot;</span>));
 }
 
-<span class='kw'>fn</span> <span class='ident'>new_project</span>(<span class='ident'>project_name</span>:<span class='kw-2'>&amp;</span><span class='ident'>str</span>, <span class='ident'>template_name</span>:<span class='kw-2'>&amp;</span><span class='ident'>str</span>, <span class='ident'>editor</span>:<span class='kw-2'>&amp;</span><span class='ident'>str</span>, <span class='ident'>edit</span>:<span class='ident'>bool</span>){
+<span class='kw'>fn</span> <span class='ident'>new_project</span>(<span class='ident'>project_name</span>:<span class='kw-2'>&amp;</span><span class='ident'>str</span>, <span class='ident'>template_name</span>:<span class='kw-2'>&amp;</span><span class='ident'>str</span>, <span class='ident'>editor</span>:<span class='kw-2'>&amp;</span><span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='ident'>str</span><span class='op'>&gt;</span>, <span class='ident'>edit</span>:<span class='ident'>bool</span>){
     <span class='kw'>let</span> <span class='ident'>luigi</span> <span class='op'>=</span> <span class='ident'>setup_luigi</span>();
     <span class='comment'>//let project = execute(|| luigi.create_project::&lt;Project&gt;(&amp;project_name, &amp;template_name));</span>
     <span class='kw'>let</span> <span class='ident'>project</span> <span class='op'>=</span> <span class='ident'>luigi</span>.<span class='ident'>create_project</span>(<span class='kw-2'>&amp;</span><span class='ident'>project_name</span>, <span class='kw-2'>&amp;</span><span class='ident'>template_name</span>).<span class='ident'>unwrap</span>();
@@ -524,6 +549,20 @@
         <span class='ident'>util</span>::<span class='ident'>open_in_editor</span>(<span class='kw-2'>&amp;</span><span class='ident'>editor</span>, <span class='kw-2'>&amp;</span>[<span class='ident'>project_file</span>]);
     }
 }
+
+<span class='kw'>fn</span> <span class='ident'>decide_mode</span>(<span class='ident'>simple</span>:<span class='ident'>bool</span>, <span class='ident'>verbose</span>:<span class='ident'>bool</span>, <span class='ident'>paths</span>:<span class='ident'>bool</span>,<span class='ident'>nothing</span>:<span class='ident'>bool</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>ListMode</span><span class='op'>&gt;</span>{
+    <span class='kw'>if</span> <span class='ident'>nothing</span>{ <span class='prelude-val'>Some</span>(<span class='ident'>ListMode</span>::<span class='ident'>Nothing</span>) }
+    <span class='kw'>else</span> <span class='kw'>if</span> <span class='ident'>paths</span>{ <span class='prelude-val'>Some</span>(<span class='ident'>ListMode</span>::<span class='ident'>Paths</span>) }
+    <span class='kw'>else</span> {
+        <span class='kw'>match</span> (<span class='ident'>simple</span>, <span class='ident'>verbose</span>){
+            (<span class='boolval'>true</span>, <span class='boolval'>true</span>) <span class='op'>=&gt;</span> <span class='prelude-val'>None</span>,
+            (<span class='boolval'>false</span>, <span class='boolval'>false</span>) <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='ident'>ListMode</span>::<span class='ident'>Simple</span>),
+            (<span class='boolval'>true</span>,  <span class='boolval'>false</span>) <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='ident'>ListMode</span>::<span class='ident'>Simple</span>),
+            (<span class='boolval'>false</span>, <span class='boolval'>true</span> ) <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='ident'>ListMode</span>::<span class='ident'>Verbose</span>),
+        }
+    }
+}
+
 
 <span class='doccomment'>/// Command LIST</span>
 <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>list</span>(<span class='ident'>matches</span>:<span class='kw-2'>&amp;</span><span class='ident'>ArgMatches</span>){
@@ -536,9 +575,16 @@
     }
 
     <span class='kw'>else</span> {
+        <span class='kw'>let</span> <span class='ident'>list_mode</span> <span class='op'>=</span> <span class='ident'>decide_mode</span>(
+            <span class='ident'>matches</span>.<span class='ident'>is_present</span>(<span class='string'>&quot;simple&quot;</span>),
+            <span class='ident'>matches</span>.<span class='ident'>is_present</span>(<span class='string'>&quot;verbose&quot;</span>) <span class='op'>||</span> <span class='ident'>CONFIG</span>.<span class='ident'>get_bool</span>(<span class='string'>&quot;list/verbose&quot;</span>),
+            <span class='ident'>matches</span>.<span class='ident'>is_present</span>(<span class='string'>&quot;paths&quot;</span>),
+            <span class='ident'>matches</span>.<span class='ident'>is_present</span>(<span class='string'>&quot;nothing&quot;</span>)
+            ).<span class='ident'>unwrap</span>();
+
         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>list_config</span> <span class='op'>=</span> <span class='ident'>ListConfig</span>{
             <span class='ident'>sort_by</span>:   <span class='ident'>matches</span>.<span class='ident'>value_of</span>(<span class='string'>&quot;sort&quot;</span>) .<span class='ident'>unwrap_or_else</span>(<span class='op'>||</span><span class='ident'>CONFIG</span>.<span class='ident'>get_str</span>(<span class='string'>&quot;list/sort&quot;</span>)),
-            <span class='ident'>simple</span>:    <span class='ident'>matches</span>.<span class='ident'>is_present</span>(<span class='string'>&quot;simple&quot;</span>),
+            <span class='ident'>mode</span>:      <span class='ident'>list_mode</span>,
             <span class='ident'>details</span>:   <span class='ident'>matches</span>.<span class='ident'>values_of</span>(<span class='string'>&quot;details&quot;</span>).<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>v</span><span class='op'>|</span><span class='ident'>v</span>.<span class='ident'>collect</span>::<span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='ident'>str</span><span class='op'>&gt;&gt;</span>()),
             <span class='ident'>filter_by</span>: <span class='ident'>matches</span>.<span class='ident'>values_of</span>(<span class='string'>&quot;filter&quot;</span>).<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>v</span><span class='op'>|</span><span class='ident'>v</span>.<span class='ident'>collect</span>::<span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='ident'>str</span><span class='op'>&gt;&gt;</span>()),
 
@@ -562,9 +608,7 @@
             <span class='comment'>// or list normal</span>
             <span class='kw'>else</span> { <span class='ident'>LuigiDir</span>::<span class='ident'>Working</span> };
 
-        <span class='kw'>if</span> <span class='ident'>matches</span>.<span class='ident'>is_present</span>(<span class='string'>&quot;paths&quot;</span>){
-            <span class='ident'>list_paths</span>(<span class='ident'>dir</span>);
-        } <span class='kw'>else</span> <span class='kw'>if</span> <span class='ident'>matches</span>.<span class='ident'>is_present</span>(<span class='string'>&quot;broken&quot;</span>){
+        <span class='kw'>if</span> <span class='ident'>matches</span>.<span class='ident'>is_present</span>(<span class='string'>&quot;broken&quot;</span>){
             <span class='ident'>list_broken_projects</span>(<span class='ident'>dir</span>);
         } <span class='kw'>else</span> {
             <span class='ident'>list_projects</span>(<span class='ident'>dir</span>, <span class='kw-2'>&amp;</span><span class='ident'>list_config</span>);
@@ -573,6 +617,14 @@
 }
 
 <span class='doccomment'>/// Command LIST [--archive, --all]</span>
+<span class='doccomment'>///</span>
+<span class='doccomment'>/// This interprets the `ListConfig` struct and passes it on to either</span>
+<span class='doccomment'>///</span>
+<span class='doccomment'>/// * `print::rows()`</span>
+<span class='doccomment'>/// * `print::simple_rows()`</span>
+<span class='doccomment'>/// * `print::verbose_rows()`</span>
+<span class='doccomment'>///</span>
+<span class='doccomment'>/// which it prints with `print::print_projects()`</span>
 <span class='kw'>fn</span> <span class='ident'>list_projects</span>(<span class='ident'>dir</span>:<span class='ident'>LuigiDir</span>, <span class='ident'>list_config</span>:<span class='kw-2'>&amp;</span><span class='ident'>ListConfig</span>){
     <span class='kw'>let</span> <span class='ident'>luigi</span> <span class='op'>=</span> <span class='kw'>if</span> <span class='ident'>CONFIG</span>.<span class='ident'>get_bool</span>(<span class='string'>&quot;list/gitstatus&quot;</span>){
         <span class='ident'>setup_luigi_with_git</span>()
@@ -596,14 +648,17 @@
         _ <span class='op'>=&gt;</span> <span class='boolval'>false</span>
     };
 
-    <span class='kw'>if</span> <span class='op'>!</span><span class='ident'>wide_enough</span> {
-        <span class='ident'>print</span>::<span class='ident'>print_projects</span>(<span class='ident'>print</span>::<span class='ident'>simple_rows</span>(<span class='kw-2'>&amp;</span><span class='ident'>projects</span>, <span class='kw-2'>&amp;</span><span class='ident'>list_config</span>));
-    } <span class='kw'>else</span> <span class='kw'>if</span> <span class='ident'>list_config</span>.<span class='ident'>simple</span> {
-        <span class='ident'>print</span>::<span class='ident'>print_projects</span>(<span class='ident'>print</span>::<span class='ident'>simple_rows</span>(<span class='kw-2'>&amp;</span><span class='ident'>projects</span>, <span class='kw-2'>&amp;</span><span class='ident'>list_config</span>));
-    } <span class='kw'>else</span> <span class='kw'>if</span> <span class='ident'>list_config</span>.<span class='ident'>verbose</span> {
-        <span class='ident'>print</span>::<span class='ident'>print_projects</span>(<span class='ident'>print</span>::<span class='ident'>verbose_rows</span>(<span class='kw-2'>&amp;</span><span class='ident'>projects</span>,<span class='kw-2'>&amp;</span><span class='ident'>list_config</span>,<span class='ident'>luigi</span>.<span class='ident'>repository</span>));
+    <span class='kw'>use</span> <span class='ident'>super</span>::<span class='ident'>print</span>::{<span class='ident'>simple_rows</span>, <span class='ident'>verbose_rows</span>, <span class='ident'>path_rows</span>, <span class='ident'>dynamic_rows</span>, <span class='ident'>print_projects</span>};
+
+    <span class='kw'>if</span> <span class='op'>!</span><span class='ident'>wide_enough</span> { <span class='comment'>// TODO room for improvement</span>
+        <span class='ident'>print_projects</span>(<span class='ident'>simple_rows</span>(<span class='kw-2'>&amp;</span><span class='ident'>projects</span>, <span class='kw-2'>&amp;</span><span class='ident'>list_config</span>));
     } <span class='kw'>else</span> {
-        <span class='ident'>print</span>::<span class='ident'>print_projects</span>(<span class='ident'>print</span>::<span class='ident'>rows</span>(<span class='kw-2'>&amp;</span><span class='ident'>projects</span>, <span class='kw-2'>&amp;</span><span class='ident'>list_config</span>));
+        <span class='kw'>match</span> <span class='ident'>list_config</span>.<span class='ident'>mode</span>{
+            <span class='ident'>ListMode</span>::<span class='ident'>Paths</span>   <span class='op'>=&gt;</span> <span class='ident'>print_projects</span>(<span class='ident'>path_rows</span>(<span class='kw-2'>&amp;</span><span class='ident'>projects</span>, <span class='kw-2'>&amp;</span><span class='ident'>list_config</span>)),
+            <span class='ident'>ListMode</span>::<span class='ident'>Simple</span>  <span class='op'>=&gt;</span> <span class='ident'>print_projects</span>(<span class='ident'>simple_rows</span>(<span class='kw-2'>&amp;</span><span class='ident'>projects</span>, <span class='kw-2'>&amp;</span><span class='ident'>list_config</span>)),
+            <span class='ident'>ListMode</span>::<span class='ident'>Verbose</span> <span class='op'>=&gt;</span> <span class='ident'>print_projects</span>(<span class='ident'>verbose_rows</span>(<span class='kw-2'>&amp;</span><span class='ident'>projects</span>,<span class='kw-2'>&amp;</span><span class='ident'>list_config</span>,<span class='ident'>luigi</span>.<span class='ident'>repository</span>)),
+            <span class='ident'>ListMode</span>::<span class='ident'>Nothing</span> <span class='op'>=&gt;</span> <span class='ident'>print_projects</span>(<span class='ident'>dynamic_rows</span>(<span class='kw-2'>&amp;</span><span class='ident'>projects</span>,<span class='kw-2'>&amp;</span><span class='ident'>list_config</span>,<span class='ident'>luigi</span>.<span class='ident'>repository</span>)),
+        }
     }
 }
 
@@ -651,25 +706,17 @@
 
 
 
-<span class='doccomment'>/// Command LIST --years</span>
-<span class='kw'>fn</span> <span class='ident'>list_paths</span>(<span class='ident'>dir</span>:<span class='ident'>LuigiDir</span>){
-    <span class='kw'>let</span> <span class='ident'>luigi</span> <span class='op'>=</span> <span class='ident'>setup_luigi</span>();
-    <span class='kw'>let</span> <span class='ident'>paths</span> <span class='op'>=</span> <span class='ident'>super</span>::<span class='ident'>execute</span>(<span class='op'>||</span><span class='ident'>luigi</span>.<span class='ident'>list_project_files</span>(<span class='ident'>dir</span>));
-    <span class='kw'>for</span> <span class='ident'>path</span> <span class='kw'>in</span> <span class='ident'>paths</span>{
-        <span class='macro'>println</span><span class='macro'>!</span>(<span class='string'>&quot;{}&quot;</span>, <span class='ident'>path</span>.<span class='ident'>display</span>());
-    }
-}
-
 <span class='doccomment'>/// Command EDIT</span>
 <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>edit</span>(<span class='ident'>matches</span>:<span class='kw-2'>&amp;</span><span class='ident'>ArgMatches</span>) {
 
         <span class='kw'>let</span> <span class='ident'>search_term</span> <span class='op'>=</span> <span class='ident'>matches</span>.<span class='ident'>value_of</span>(<span class='string'>&quot;search_term&quot;</span>).<span class='ident'>unwrap</span>();
         <span class='kw'>let</span> <span class='ident'>search_terms</span> <span class='op'>=</span> <span class='ident'>matches</span>.<span class='ident'>values_of</span>(<span class='string'>&quot;search_term&quot;</span>).<span class='ident'>unwrap</span>().<span class='ident'>collect</span>::<span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='ident'>str</span><span class='op'>&gt;&gt;</span>();
 
-        <span class='kw'>let</span> <span class='ident'>editor</span> <span class='op'>=</span> <span class='ident'>matches</span>.<span class='ident'>value_of</span>(<span class='string'>&quot;editor&quot;</span>).<span class='ident'>unwrap_or</span>( <span class='ident'>CONFIG</span>.<span class='ident'>get_path</span>(<span class='string'>&quot;editor&quot;</span>).<span class='ident'>unwrap</span>().<span class='ident'>as_str</span>().<span class='ident'>unwrap</span>());
+        <span class='kw'>let</span> <span class='ident'>editor</span> <span class='op'>=</span> <span class='ident'>matches</span>.<span class='ident'>value_of</span>(<span class='string'>&quot;editor&quot;</span>)
+            .<span class='ident'>or</span>( <span class='ident'>CONFIG</span>.<span class='ident'>get_path</span>(<span class='string'>&quot;editor&quot;</span>).<span class='ident'>and_then</span>(<span class='op'>|</span><span class='ident'>e</span><span class='op'>|</span><span class='ident'>e</span>.<span class='ident'>as_str</span>()));
 
         <span class='kw'>if</span> <span class='ident'>matches</span>.<span class='ident'>is_present</span>(<span class='string'>&quot;template&quot;</span>){
-            <span class='ident'>edit_template</span>(<span class='ident'>search_term</span>,<span class='kw-2'>&amp;</span><span class='ident'>editor</span>);
+            <span class='ident'>edit_template</span>(<span class='ident'>search_term</span>, <span class='kw-2'>&amp;</span><span class='ident'>editor</span>);
 
         } <span class='kw'>else</span> {
             <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Some</span>(<span class='ident'>archive</span>) <span class='op'>=</span> <span class='ident'>matches</span>.<span class='ident'>value_of</span>(<span class='string'>&quot;archive&quot;</span>){
@@ -681,7 +728,7 @@
         }
 }
 
-<span class='kw'>fn</span> <span class='ident'>edit_projects</span>(<span class='ident'>dir</span>:<span class='ident'>LuigiDir</span>, <span class='ident'>search_terms</span>:<span class='kw-2'>&amp;</span>[<span class='kw-2'>&amp;</span><span class='ident'>str</span>], <span class='ident'>editor</span>:<span class='kw-2'>&amp;</span><span class='ident'>str</span>){
+<span class='kw'>fn</span> <span class='ident'>edit_projects</span>(<span class='ident'>dir</span>:<span class='ident'>LuigiDir</span>, <span class='ident'>search_terms</span>:<span class='kw-2'>&amp;</span>[<span class='kw-2'>&amp;</span><span class='ident'>str</span>], <span class='ident'>editor</span>:<span class='kw-2'>&amp;</span><span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='ident'>str</span><span class='op'>&gt;</span>){
     <span class='kw'>let</span> <span class='ident'>luigi</span> <span class='op'>=</span> <span class='ident'>setup_luigi</span>();
     <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>all_paths</span> <span class='op'>=</span> <span class='ident'>Vec</span>::<span class='ident'>new</span>();
     <span class='kw'>for</span> <span class='ident'>search_term</span> <span class='kw'>in</span> <span class='ident'>search_terms</span>{
@@ -702,7 +749,7 @@
 }
 
 <span class='doccomment'>/// Command EDIT --template</span>
-<span class='kw'>fn</span> <span class='ident'>edit_template</span>(<span class='ident'>name</span>:<span class='kw-2'>&amp;</span><span class='ident'>str</span>, <span class='ident'>editor</span>:<span class='kw-2'>&amp;</span><span class='ident'>str</span>){
+<span class='kw'>fn</span> <span class='ident'>edit_template</span>(<span class='ident'>name</span>:<span class='kw-2'>&amp;</span><span class='ident'>str</span>, <span class='ident'>editor</span>:<span class='kw-2'>&amp;</span><span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='ident'>str</span><span class='op'>&gt;</span>){
     <span class='kw'>let</span> <span class='ident'>luigi</span> <span class='op'>=</span> <span class='ident'>setup_luigi</span>();
     <span class='kw'>let</span> <span class='ident'>template_paths</span> <span class='op'>=</span> <span class='ident'>super</span>::<span class='ident'>execute</span>(<span class='op'>||</span><span class='ident'>luigi</span>.<span class='ident'>list_template_files</span>())
         .<span class='ident'>iter</span>()
@@ -766,7 +813,8 @@
         }
 
         <span class='kw'>else</span> <span class='kw'>if</span> <span class='ident'>matches</span>.<span class='ident'>is_present</span>(<span class='string'>&quot;edit&quot;</span>){
-            <span class='kw'>let</span> <span class='ident'>editor</span> <span class='op'>=</span> <span class='ident'>CONFIG</span>.<span class='ident'>get_path</span>(<span class='string'>&quot;editor&quot;</span>).<span class='ident'>unwrap</span>().<span class='ident'>as_str</span>().<span class='ident'>unwrap</span>();
+            <span class='kw'>let</span> <span class='ident'>editor</span> <span class='op'>=</span> <span class='ident'>matches</span>.<span class='ident'>value_of</span>(<span class='string'>&quot;editor&quot;</span>)
+                .<span class='ident'>or</span>( <span class='ident'>CONFIG</span>.<span class='ident'>get_path</span>(<span class='string'>&quot;editor&quot;</span>).<span class='ident'>and_then</span>(<span class='op'>|</span><span class='ident'>e</span><span class='op'>|</span><span class='ident'>e</span>.<span class='ident'>as_str</span>()));
             <span class='ident'>config_edit</span>(<span class='kw-2'>&amp;</span><span class='ident'>editor</span>); }
 
         <span class='kw'>else</span> <span class='kw'>if</span> <span class='ident'>matches</span>.<span class='ident'>is_present</span>(<span class='string'>&quot;default&quot;</span>){ <span class='ident'>config_show_default</span>(); }
@@ -807,13 +855,13 @@
 
 <span class='doccomment'>/// Command CONFIG --show</span>
 <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>config_show</span>(<span class='ident'>path</span>:<span class='kw-2'>&amp;</span><span class='ident'>str</span>){
-    <span class='comment'>//TODO config_show could be prettier</span>
-    <span class='macro'>println</span><span class='macro'>!</span>(<span class='string'>&quot;{:#?}&quot;</span>, <span class='ident'>CONFIG</span>.<span class='ident'>get_str</span>(<span class='kw-2'>&amp;</span><span class='ident'>path</span>));
+    <span class='macro'>println</span><span class='macro'>!</span>(<span class='string'>&quot;{}: {:#?}&quot;</span>, <span class='ident'>path</span>, <span class='ident'>CONFIG</span>.<span class='ident'>get_path</span>(<span class='kw-2'>&amp;</span><span class='ident'>path</span>)
+             .<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>v</span><span class='op'>|</span><span class='ident'>v</span>.<span class='ident'>to_string</span>())
+             .<span class='ident'>unwrap_or_else</span>(<span class='op'>||</span><span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;{} not set&quot;</span>, <span class='ident'>path</span>)));
 }
 
 <span class='doccomment'>/// Command CONFIG --edit</span>
-<span class='kw'>fn</span> <span class='ident'>config_edit</span>(<span class='ident'>editor</span>:<span class='kw-2'>&amp;</span><span class='ident'>str</span>){
-    <span class='comment'>//println!(&quot;{:?}{:?}&quot;, &amp;editor, vec![CONFIG.path.to_str().unwrap().to_owned()]);</span>
+<span class='kw'>fn</span> <span class='ident'>config_edit</span>(<span class='ident'>editor</span>:<span class='kw-2'>&amp;</span><span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='ident'>str</span><span class='op'>&gt;</span>){
     <span class='ident'>util</span>::<span class='ident'>open_in_editor</span>(<span class='kw-2'>&amp;</span><span class='ident'>editor</span>, <span class='kw-2'>&amp;</span>[<span class='ident'>CONFIG</span>.<span class='ident'>path</span>.<span class='ident'>to_owned</span>()]);
 }
 

@@ -113,6 +113,9 @@
 <span id="70">70</span>
 <span id="71">71</span>
 <span id="72">72</span>
+<span id="73">73</span>
+<span id="74">74</span>
+<span id="75">75</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! Hooks for the commandline interface</span>
 <span class='doccomment'>//!</span>
@@ -148,11 +151,9 @@
 }
 
 <span class='doccomment'>/// Configuration for this list output.</span>
-<span class='attribute'>#[<span class='ident'>allow</span>(<span class='ident'>dead_code</span>)]</span>
 <span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Debug</span>)]</span>
 <span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>ListConfig</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span>{
-    <span class='ident'>verbose</span>:      <span class='ident'>bool</span>,
-    <span class='ident'>simple</span>:       <span class='ident'>bool</span>,
+    <span class='ident'>mode</span>:         <span class='ident'>ListMode</span>,
     <span class='ident'>show_errors</span>:  <span class='ident'>bool</span>,
     <span class='ident'>git_status</span>:   <span class='ident'>bool</span>,
     <span class='ident'>sort_by</span>:      <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>str</span>,
@@ -161,11 +162,16 @@
     <span class='ident'>details</span>:      <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>str</span><span class='op'>&gt;&gt;</span>,
 }
 
+<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Debug</span>)]</span>
+<span class='kw'>pub</span> <span class='kw'>enum</span> <span class='ident'>ListMode</span>{
+    <span class='ident'>Simple</span>, <span class='ident'>Verbose</span>, <span class='ident'>Nothing</span>, <span class='ident'>Paths</span>
+}
+
 <span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span> <span class='ident'>Default</span> <span class='kw'>for</span> <span class='ident'>ListConfig</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span>{
     <span class='kw'>fn</span> <span class='ident'>default</span>() <span class='op'>-&gt;</span> <span class='ident'>ListConfig</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span>{
         <span class='ident'>ListConfig</span>{
-            <span class='ident'>verbose</span>:      <span class='ident'>CONFIG</span>.<span class='ident'>get_bool</span>(<span class='string'>&quot;list/verbose&quot;</span>),
-            <span class='ident'>simple</span>:       <span class='boolval'>false</span>,
+            <span class='ident'>mode</span>:         <span class='kw'>if</span> <span class='ident'>CONFIG</span>.<span class='ident'>get_bool</span>(<span class='string'>&quot;list/verbose&quot;</span>){ <span class='ident'>ListMode</span>::<span class='ident'>Verbose</span> }
+                          <span class='kw'>else</span>{ <span class='ident'>ListMode</span>::<span class='ident'>Simple</span> },
             <span class='ident'>git_status</span>:   <span class='ident'>CONFIG</span>.<span class='ident'>get_bool</span>(<span class='string'>&quot;list/gitstatus&quot;</span>),
             <span class='ident'>show_errors</span>:  <span class='boolval'>false</span>,
             <span class='ident'>sort_by</span>:      <span class='ident'>CONFIG</span>.<span class='ident'>get_str</span>(<span class='string'>&quot;list/sort&quot;</span>),
