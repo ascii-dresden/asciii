@@ -42,6 +42,7 @@ pub struct ListConfig<'a>{
     sort_by:      &'a str,
     filter_by:    Option<Vec<&'a str>>,
     use_colors:   bool,
+    paths:        bool,
     details:      Option<Vec<&'a str>>,
 }
 
@@ -55,6 +56,7 @@ impl<'a> Default for ListConfig<'a>{
             sort_by:      CONFIG.get_str("list/sort"),
             filter_by:    None,
             use_colors:   CONFIG.get_bool("list/colors"),
+            paths:        false,
             details:      None,
         }
 

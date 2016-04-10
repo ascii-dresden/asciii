@@ -53,6 +53,23 @@ fn project_to_style(project:&Project) -> &str{
 }
 
 /// produces the rows used in `print_projects()`
+pub fn path_rows(projects:&[Project], list_config:&ListConfig) -> Vec<Row>{
+    projects
+        .iter()
+        .map(|project| {
+            let row_style = if list_config.use_colors {project_to_style(&project)}else{""};
+            Row::new(vec![
+                     cell!(project.invoice_num().unwrap_or("".into())),
+                     cell!(project.name()).style_spec(row_style),
+                     cell!(project.file().display()),
+
+                     //cell!(project.date().map(|d|d.format("%d.%m.%Y").to_string()).unwrap_or("no_date".into())),
+                     //cell!(project.file().display()),
+            ])
+        })
+    .collect()
+}
+
 pub fn simple_rows(projects:&[Project], list_config:&ListConfig) -> Vec<Row>{
     projects
         .iter()
@@ -60,15 +77,18 @@ pub fn simple_rows(projects:&[Project], list_config:&ListConfig) -> Vec<Row>{
             let row_style = if list_config.use_colors {project_to_style(&project)}else{""};
             Row::new(vec![
                      cell!(
-                         if project.canceled() { format!("X {name}", name=project.name()) }
-                         else{ project.name() }
-                         ).style_spec(row_style),
+                         if project.canceled() {
+                             format!("X {name}", name=project.name())
+                         } else{
+                             project.name()
+                         })
+                     .style_spec(row_style),
 
-                         //cell!(project.manager()),
-                         cell!(project.invoice_num().unwrap_or("".into())),
+                     //cell!(project.manager()),
+                     cell!(project.invoice_num().unwrap_or("".into())),
 
-                         cell!(project.date().map(|d|d.format("%d.%m.%Y").to_string()).unwrap_or("no_date".into())),
-                         //cell!(project.file().display()),
+                     cell!(project.date().map(|d|d.format("%d.%m.%Y").to_string()).unwrap_or("no_date".into())),
+                     //cell!(project.file().display()),
             ])
         })
     .collect()

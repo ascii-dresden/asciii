@@ -55,6 +55,7 @@ pub fn list(matches:&ArgMatches){
             simple:    matches.is_present("simple"),
             details:   matches.values_of("details").map(|v|v.collect::<Vec<&str>>()),
             filter_by: matches.values_of("filter").map(|v|v.collect::<Vec<&str>>()),
+            paths:     matches.is_present("paths"),
 
             ..Default::default()
         };
@@ -76,9 +77,7 @@ pub fn list(matches:&ArgMatches){
             // or list normal
             else { LuigiDir::Working };
 
-        if matches.is_present("paths"){
-            list_paths(dir);
-        } else if matches.is_present("broken"){
+        if matches.is_present("broken"){
             list_broken_projects(dir);
         } else {
             list_projects(dir, &list_config);
@@ -110,14 +109,18 @@ fn list_projects(dir:LuigiDir, list_config:&ListConfig){
         _ => false
     };
 
-    if !wide_enough {
-        print::print_projects(print::simple_rows(&projects, &list_config));
+    use super::print::{simple_rows, verbose_rows, path_rows, rows, print_projects};
+
+    if !wide_enough { // TODO room for improvement
+        print_projects(simple_rows(&projects, &list_config));
+    } else if list_config.paths{
+        print_projects(path_rows(&projects, &list_config));
     } else if list_config.simple {
-        print::print_projects(print::simple_rows(&projects, &list_config));
+        print_projects(simple_rows(&projects, &list_config));
     } else if list_config.verbose {
-        print::print_projects(print::verbose_rows(&projects,&list_config,luigi.repository));
+        print_projects(verbose_rows(&projects,&list_config,luigi.repository));
     } else {
-        print::print_projects(print::rows(&projects, &list_config));
+        print_projects(rows(&projects, &list_config));
     }
 }
 

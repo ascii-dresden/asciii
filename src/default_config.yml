@@ -1,17 +1,17 @@
 ---
 manager_name: #"The Unnamed Manager"
-editor:   #"vim -O"
+editor:       #"vim -O"
 
 path: "~"
 output_path: "."
 list:
   colors:    false
   verbose:   true
-  sort: index
+  sort:      index
   gitstatus: true
 
 dirs:
-  storage: asciii
+  storage: projects
   working: working
   archive: archive
   templates: templates
@@ -20,7 +20,6 @@ template: default # default template
 
 ## CAREFUL HERE
 project_file_extension: .yml
-use_git: true
 latex:    pdflatex
 log_file: ~/.ascii_log
 calendar_file: invoicer.ics # will be put in current directory
