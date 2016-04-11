@@ -104,6 +104,10 @@ pub fn verbose_rows(projects:&[Project], list_config:&ListConfig, repo:Option<Re
             let mut cells = Vec::new();
 
             if let Some(ref repo) = repo{
+                // TODO how can we illustrate that a project has been removed? what about a red x
+                // for every project that was just moved to the archive?
+                // Or just git-add them when archiving automatically, that is what ascii2 would
+                // have done
                 let status = repo.get_status(&project.dir());
                 cells.push( Cell::new( &status.to_string() ).with_style( Attr::ForegroundColor(status.to_color()) ));
             };
