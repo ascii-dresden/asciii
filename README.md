@@ -8,30 +8,30 @@ Next steps: finish [3.0.0](https://github.com/hoodie/asciii-rs/milestones/3.0.0)
 
 ```
   DOCUMENTS:
- sc ascii display NAMES                 # Shows information about a project in different ways
-  ascii help [COMMAND]                # Describe available commands or one specific command
-  ascii invoice NAMES                 # Create an invoice from project
-  ascii offer NAMES                   # Create an offer from project
-  ascii open NAMES                    # Open created documents
+  asciii display NAMES                 # Shows information about a project in different ways
+  asciii help [COMMAND]                # Describe available commands or one specific command
+  asciii invoice NAMES                 # Create an invoice from project
+  asciii offer NAMES                   # Create an offer from project
+  asciii open NAMES                    # Open created documents
 
   SUGAR:
-  ascii csv                           # Equal to: ascii list --all --csv --sort=index --filter event/date:2015
-  ascii calendar                      # Create a calendar file from all caterings named "invoicer.ics"
+  asciii csv                           # Equal to: ascii list --all --csv --sort=index --filter event/date:2015
+  asciii calendar                      # Create a calendar file from all caterings named "invoicer.ics"
 
   GIT INTEGRATION:
-  ascii add NAMES                     # Git Integration
-  ascii pull                          # Git Integration
-  ascii push                          # Git Integration
-  ascii status                        # Git Integration
-  ascii log                           # Git Integration
-  ascii commit -m, --message=MESSAGE  # Git Integration
+  asciii add NAMES                     # Git Integration
+  asciii pull                          # Git Integration
+  asciii push                          # Git Integration
+  asciii status                        # Git Integration
+  asciii log                           # Git Integration
+  asciii commit -m, --message=MESSAGE  # Git Integration
 
-  ascii search QUERY                  # Search everything, only one query currently
+  asciii search QUERY                  # Search everything, only one query currently
 
-  ascii version                       # Display version
+  asciii version                       # Display version
 
 Options:
-  -v, [--verbose], [--no-verbose]  # Change default in /home/hendrik/.ascii-invoicer.yml
+  -v, [--verbose], [--no-verbose]  # Change default in $HOME/.asciii.yml
 ```
 
 ## Technical TODO
@@ -51,7 +51,7 @@ Options:
 * sparkline
 * xdg / xdg-basedir
 * env_logger
-* filetime
+* filetime, for make like features
 * itertools
 * multimap
 * cool faces
