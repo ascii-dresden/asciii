@@ -1,6 +1,6 @@
 [package]
 name = "asciii"
-version = "0.1.0"
+version = "3.0.0-alpha0"
 authors = ["Hendrik Sollich <hendrik@hoodie.de>"]
 
 
@@ -31,12 +31,11 @@ clippy = {version = "*", optional = true}
 version = "2"
 features= ["yaml"]
 
-
 [features]
 default = []
 lints = ["clippy"]
 
-#[lib]
-#doc = false
-#[[bin]]
-#name = "asciii"
+[[bin]]
+test = false
+doc = false
+name = "asciii"

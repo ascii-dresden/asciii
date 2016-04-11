@@ -1,12 +1,9 @@
-//! Thank you for choosing `asciii`, the new and improved `ascii`.
-//!
-//! This contains user and developer documentation together.
-//! For pure user documentation please refer to [doc](doc/index.html).
-//!
-
 #![cfg_attr(feature = "lints", allow(unstable_features))]
 #![cfg_attr(feature = "lints", feature(plugin))]
 #![cfg_attr(feature = "lints", plugin(clippy))]
+
+#![feature(alloc_system)]
+extern crate alloc_system;
 
 extern crate yaml_rust;
 extern crate chrono;
