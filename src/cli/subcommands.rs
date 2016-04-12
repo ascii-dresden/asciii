@@ -38,15 +38,14 @@ fn new_project(project_name:&str, template_name:&str, editor:&Option<&str>, edit
     }
 }
 
-fn decide_mode(simple:bool, verbose:bool, paths:bool,nothing:bool) -> Option<ListMode>{
-    if nothing{ Some(ListMode::Nothing) }
-    else if paths{ Some(ListMode::Paths) }
+fn decide_mode(simple:bool, verbose:bool, paths:bool,nothing:bool) -> ListMode{
+    if nothing{ ListMode::Nothing } else
+    if paths{   ListMode::Paths }
     else {
-        match (simple, verbose){
-            (true, true) => None,
-            (false, false) => Some(ListMode::Simple),
-            (true,  false) => Some(ListMode::Simple),
-            (false, true ) => Some(ListMode::Verbose),
+        match (simple, verbose, CONFIG.get_bool("list/verbose")){
+            (false, true,  _   ) => {debugln!("-v overwrites config"); ListMode::Verbose },
+            (false,    _, true ) => {debugln!("-v from config");ListMode::Verbose},
+                          _      => {debugln!("simple mode");ListMode::Simple},
         }
     }
 }
@@ -65,10 +64,10 @@ pub fn list(matches:&ArgMatches){
     else {
         let list_mode = decide_mode(
             matches.is_present("simple"),
-            matches.is_present("verbose") || CONFIG.get_bool("list/verbose"),
+            matches.is_present("verbose"),
             matches.is_present("paths"),
             matches.is_present("nothing")
-            ).unwrap();
+            );
 
         let mut list_config = ListConfig{
             sort_by:   matches.value_of("sort") .unwrap_or_else(||CONFIG.get_str("list/sort")),

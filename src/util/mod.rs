@@ -10,7 +10,6 @@ use open;
 
 pub mod yaml;
 
-
 /// Freezes the program until for inspection
 pub fn freeze() {
     io::stdin().read_line(&mut String::new()).unwrap();
@@ -98,3 +97,46 @@ pub fn get_storage_path() -> PathBuf
 pub fn exit(status:ExitStatus) -> !{
     process::exit(status.code().unwrap_or(1));
 }
+
+#[cfg(feature = "debug")]
+#[cfg_attr(feature = "debug", macro_use)]
+mod debug_macros {
+    macro_rules! debugln {
+        ($fmt:expr) => (println!(concat!("DEBUG: ", $fmt)));
+        ($fmt:expr, $($arg:tt)*) => (println!(concat!("DEBUG: ",$fmt), $($arg)*));
+    }
+    macro_rules! sdebugln {
+        ($fmt:expr) => (println!($fmt));
+        ($fmt:expr, $($arg:tt)*) => (println!($fmt, $($arg)*));
+    }
+    macro_rules! debug {
+        ($fmt:expr) => (print!(concat!("DEBUG: ", $fmt)));
+        ($fmt:expr, $($arg:tt)*) => (print!(concat!("DEBUG: ",$fmt), $($arg)*));
+    }
+    macro_rules! sdebug {
+        ($fmt:expr) => (print!($fmt));
+        ($fmt:expr, $($arg:tt)*) => (print!($fmt, $($arg)*));
+    }
+}
+
+#[cfg(not(feature = "debug"))]
+#[cfg_attr(not(feature = "debug"), macro_use)]
+mod debug_macros {
+    macro_rules! debugln {
+        ($fmt:expr) => ();
+        ($fmt:expr, $($arg:tt)*) => ();
+    }
+    macro_rules! sdebugln {
+        ($fmt:expr) => ();
+        ($fmt:expr, $($arg:tt)*) => ();
+    }
+    macro_rules! sdebug {
+        ($fmt:expr) => ();
+        ($fmt:expr, $($arg:tt)*) => ();
+    }
+    macro_rules! debug {
+        ($fmt:expr) => ();
+        ($fmt:expr, $($arg:tt)*) => ();
+    }
+}
+

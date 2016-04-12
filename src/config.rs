@@ -36,7 +36,23 @@ impl ConfigReader{
         home.join(DEFAULT_LOCATION)
     }
 
+    /// DEBUG: Opens config from `self.path()` and parses Yaml right away.
+    #[cfg(feature = "debug")]
+    pub fn new () -> Result<ConfigReader, YamlError> {
+        let path = ConfigReader::path_home();
+        let config = Ok(ConfigReader{
+            path: path.to_owned(),
+            defaults: try!(yaml::parse(&DEFAULT_CONFIG)),
+            custom: yaml::open(&path).unwrap_or(Yaml::Null),
+            local:  yaml::open(Path::new(&DEFAULT_LOCATION)).unwrap_or(Yaml::Null)
+        });
+        println!("loading config from {default_path:?} or {local_path:?}", default_path = path, local_path = DEFAULT_LOCATION);
+
+        config
+    }
+
     /// Opens config from `self.path()` and parses Yaml right away.
+    #[cfg(not(feature = "debug"))]
     pub fn new () -> Result<ConfigReader, YamlError> {
         let path = ConfigReader::path_home();
         Ok(ConfigReader{
@@ -46,6 +62,7 @@ impl ConfigReader{
             local:  yaml::open(Path::new(&DEFAULT_LOCATION)).unwrap_or(Yaml::Null)
         })
     }
+
 
     /// Returns whatever it finds in that position
     pub fn get(&self, key:&str) -> Option<&Yaml>{

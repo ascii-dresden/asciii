@@ -33,6 +33,7 @@ features= ["yaml"]
 
 [features]
 default = []
+debug = []
 lints = ["clippy"]
 
 [[bin]]

@@ -23,19 +23,20 @@ extern crate open;
 #[macro_use] extern crate custom_derive;
 #[macro_use] extern crate enum_derive;
 
-
-pub mod util;
-pub mod config;
-pub mod doc;
-
-pub mod project;
-pub mod manager;
-pub mod repo;
-
-pub mod templater;
-pub mod cli;
-
 use clap::App;
+
+
+#[macro_use]
+mod util;
+mod config;
+mod doc;
+
+mod project;
+mod manager;
+mod repo;
+
+mod templater;
+mod cli;
 
 lazy_static!{
     pub static ref CONFIG: config::ConfigReader = config::ConfigReader::new().unwrap();

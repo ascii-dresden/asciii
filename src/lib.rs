@@ -26,6 +26,7 @@ extern crate open;
 #[macro_use] extern crate custom_derive;
 #[macro_use] extern crate enum_derive;
 
+#[macro_use]
 pub mod util;
 pub mod config;
 pub mod doc;
