@@ -284,7 +284,7 @@ pub fn archive(matches:&ArgMatches){
         let name = matches.value_of("NAME").unwrap();
         let year = matches.value_of("year")
             .and_then(|s|s.parse::<i32>().ok());
-        archive_project(&name, year);
+        archive_project(&name, year, matches.is_present("force"));
 }
 
 pub fn unarchive(matches:&ArgMatches){
@@ -308,12 +308,14 @@ pub fn config(matches:&ArgMatches){
 }
 
 /// Command ARCHIVE <NAME>
-fn archive_project(name:&str, manual_year:Option<i32>){
+// TODO perhaps move this code out of `::cli`
+fn archive_project(name:&str, manual_year:Option<i32>, force:bool){
     let luigi = setup_luigi();
+    debugln!("using the force: {}", force);
     if let Ok(projects) = luigi.search_projects(LuigiDir::Working, name){
         if projects.is_empty(){ fail(format!("Nothing found for {:?}", name)); }
         for project in projects.iter().filter_map(|path| Project::open(path).ok()) {
-            if project.valid_stage3().is_ok(){
+            if project.valid_stage3().is_ok() || force{
                 let year = manual_year.or(project.year()).unwrap();
                 println!("archiving {} ({})",  project.ident(), project.year().unwrap());
                 super::execute(||luigi.archive_project(&project, year));

@@ -116,6 +116,7 @@ subcommands:
 
         - force:
             help: Archives the Project, even though it is not completely valid
+            long: force
 
         - year:
             help: Override the year
