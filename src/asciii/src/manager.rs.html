@@ -11,6 +11,7 @@
 
     <link rel="stylesheet" type="text/css" href="../../../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../../../main.css">
+    
 
     
     
@@ -931,6 +932,9 @@
 <span id="888">888</span>
 <span id="889">889</span>
 <span id="890">890</span>
+<span id="891">891</span>
+<span id="892">892</span>
+<span id="893">893</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! Manages file structure of templates, working directory and archive.</span>
 <span class='doccomment'>//!</span>
@@ -1041,6 +1045,7 @@
     <span class='kw'>fn</span> <span class='ident'>dir</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>)  <span class='op'>-&gt;</span> <span class='ident'>PathBuf</span>{ <span class='self'>self</span>.<span class='ident'>file</span>().<span class='ident'>parent</span>().<span class='ident'>unwrap</span>().<span class='ident'>to_owned</span>() }
 
     <span class='kw'>fn</span> <span class='ident'>matches_filter</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>key</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>, <span class='ident'>val</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>) <span class='op'>-&gt;</span> <span class='ident'>bool</span>;
+    <span class='kw'>fn</span> <span class='ident'>matches_search</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>term</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>) <span class='op'>-&gt;</span> <span class='ident'>bool</span>;
 }
 
 <span class='comment'>// TODO rely more on IoError, it has most of what you need</span>
@@ -1333,6 +1338,7 @@
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>search_projects</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>dir</span>:<span class='ident'>LuigiDir</span>, <span class='ident'>search_term</span>:<span class='kw-2'>&amp;</span><span class='ident'>str</span>) <span class='op'>-&gt;</span> <span class='ident'>LuigiResult</span><span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>PathBuf</span><span class='op'>&gt;&gt;</span> {
         <span class='kw'>let</span> <span class='ident'>project_paths</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>PathBuf</span><span class='op'>&gt;</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='self'>self</span>.<span class='ident'>list_project_files</span>(<span class='ident'>dir</span>))
             .<span class='ident'>iter</span>()
+            <span class='comment'>// TODO use `Project::matches_search`</span>
             .<span class='ident'>filter</span>(<span class='op'>|</span><span class='ident'>path</span><span class='op'>|</span> <span class='ident'>path</span>.<span class='ident'>to_str</span>().<span class='ident'>unwrap_or</span>(<span class='string'>&quot;??&quot;</span>).<span class='ident'>to_lowercase</span>().<span class='ident'>contains</span>(<span class='kw-2'>&amp;</span><span class='ident'>search_term</span>.<span class='ident'>to_lowercase</span>()))
             .<span class='ident'>cloned</span>()
             .<span class='ident'>collect</span>();
@@ -1597,7 +1603,8 @@
                 <span class='ident'>temp_dir</span>: <span class='prelude-val'>None</span>
             })
         }
-        <span class='kw'>fn</span> <span class='ident'>matches_filter</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>key</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>, <span class='ident'>val</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>) <span class='op'>-&gt;</span> <span class='ident'>bool</span>{<span class='boolval'>false</span>}
+        <span class='kw'>fn</span> <span class='ident'>matches_filter</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>_key</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>, <span class='ident'>_val</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>) <span class='op'>-&gt;</span> <span class='ident'>bool</span>{<span class='boolval'>false</span>}
+        <span class='kw'>fn</span> <span class='ident'>matches_search</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>_term</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>) <span class='op'>-&gt;</span> <span class='ident'>bool</span> {<span class='boolval'>false</span>}
 
     }
 

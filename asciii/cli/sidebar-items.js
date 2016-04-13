@@ -1,1 +1,1 @@
-initSidebarItems({"enum":[["ListMode",""]],"mod":[["print","All the printing code lives here."],["subcommands","Contains concrete implementation of each subcommand"]],"struct":[["ListConfig","Configuration for this list output."]]});
+initSidebarItems({"enum":[["ListMode",""]],"fn":[["fail","prints a message and exist with code 1"]],"mod":[["print","All the printing code lives here."],["subcommands","Contains concrete implementation of each subcommand"]],"struct":[["ListConfig","Configuration for this list output."]]});

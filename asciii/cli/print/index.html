@@ -11,6 +11,7 @@
 
     <link rel="stylesheet" type="text/css" href="../../../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../../../main.css">
+    
 
     
     
@@ -46,7 +47,7 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-1801' class='srclink' href='../../../src/asciii/src/cli/print.rs.html#1-225' title='goto source code'>[src]</a></span></h1>
+               </span><a id='src-1814' class='srclink' href='../../../src/asciii/src/cli/print.rs.html#1-238' title='goto source code'>[src]</a></span></h1>
 <div class='docblock'><p>All the printing code lives here.</p>
 </div><h2 id='functions' class='section-header'><a href="#functions">Functions</a></h2>
 <table>
@@ -54,7 +55,7 @@
                            <td><a class='fn' href='fn.dynamic_rows.html'
                                   title='asciii::cli::print::dynamic_rows'>dynamic_rows</a></td>
                            <td class='docblock short'>
-                                <p>This prints nothing unless you tell it to with <code>--details</code></p>
+                                <p>Triggered by <code>list --nothing</code></p>
                            </td>
                        </tr>
                        <tr class=' module-item'>
@@ -75,7 +76,7 @@
                            <td><a class='fn' href='fn.print_projects.html'
                                   title='asciii::cli::print::print_projects'>print_projects</a></td>
                            <td class='docblock short'>
-                                <p>Prints Projects</p>
+                                <p>Prints Projects Rows</p>
                            </td>
                        </tr>
                        <tr class=' module-item'>
@@ -89,14 +90,14 @@
                            <td><a class='fn' href='fn.simple_rows.html'
                                   title='asciii::cli::print::simple_rows'>simple_rows</a></td>
                            <td class='docblock short'>
-                                
+                                <p>Triggered by <code>list --simple</code>, usually you set this in your config under <code>list/verbose</code>.</p>
                            </td>
                        </tr>
                        <tr class=' module-item'>
                            <td><a class='fn' href='fn.verbose_rows.html'
                                   title='asciii::cli::print::verbose_rows'>verbose_rows</a></td>
                            <td class='docblock short'>
-                                <p>produces the rows used in <code>print_projects()</code></p>
+                                <p>Triggered by <code>list --verbose</code>, usually you set this in your config under <code>list/verbose</code>.</p>
                            </td>
                        </tr></table></section>
     <section id='search' class="content hidden"></section>
