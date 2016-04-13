@@ -87,6 +87,7 @@ pub fn setup_app(){
      ("path",      Some(sub_m)) => path(&sub_m),
 
      ("term",      _          ) => term(),
+     ("doc",       _          ) => doc(),
 
      ("remote",    _          ) => git_remote(),
      ("pull",      _          ) => git_pull(),

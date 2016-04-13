@@ -3,6 +3,7 @@ use std::ffi::OsStr;
 use std::env;
 
 use clap::ArgMatches;
+use open;
 
 use config;
 use ::CONFIG;
@@ -363,6 +364,10 @@ fn config_show_default(){
     println!("{}", config::DEFAULT_CONFIG);
 }
 
+/// Command DOC
+pub fn doc(){
+    open::that("http://hoodie.github.io/asciii-rs/").unwrap();
+}
 
 /// Command TERM
 pub fn term(){

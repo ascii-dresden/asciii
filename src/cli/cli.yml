@@ -12,6 +12,8 @@ args:
   #    long: debug
 
 subcommands:
+  - doc:
+      about: Opens the online documentation, please read it
   - new:
       about: Create a new project
       args:
