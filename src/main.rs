@@ -29,7 +29,7 @@ use clap::App;
 #[macro_use]
 mod util;
 mod config;
-mod doc;
+mod manual;
 
 mod project;
 mod manager;

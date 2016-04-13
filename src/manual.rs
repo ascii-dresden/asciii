@@ -1,4 +1,4 @@
-//! **User Manual**
+//! The ascii invoicer handbook
 //!
 //! This user documentation has been ripped off straight from the [original
 //! README](https://github.com/ascii-dresden/ascii-invoicer/), so please forgive if you find any
