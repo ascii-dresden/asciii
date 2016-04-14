@@ -2,7 +2,9 @@
 #![cfg_attr(feature = "lints", feature(plugin))]
 #![cfg_attr(feature = "lints", plugin(clippy))]
 
-#![feature(alloc_system)]
+#![cfg_attr(feature = "nightly", feature(alloc_system))]
+
+#[cfg(feature = "nightly")]
 extern crate alloc_system;
 
 extern crate yaml_rust;

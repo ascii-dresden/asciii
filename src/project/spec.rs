@@ -1,10 +1,13 @@
 #![allow(dead_code)]
 #![allow(unused_imports)]
 
+use chrono::Datelike;
+
 use util::yaml;
 use util::yaml::Yaml;
 use currency::Currency;
 use super::Project;
+use ::manager::LuigiProject;
 
 pub type SpecResult<'a> = Result<(), Vec<&'a str>>;
 
@@ -31,7 +34,9 @@ custom_derive! {
         /// Pretty version of `invoice/number` including year: "`R2016-042`"
         InvoiceNumberLong,
         ///Overall Cost Project, including taxes
+        Name,
         Final,
+        Year,
         Caterers,
         ClientFullName,
         Invalid
@@ -50,7 +55,9 @@ impl VirtualField{
             VirtualField::Responsible       => project::manager(project.yaml()).map(|s|s.to_owned()),
             VirtualField::InvoiceNumber     => invoice::number_str(project.yaml()),
             VirtualField::InvoiceNumberLong => invoice::number_long_str(project.yaml()),
+            VirtualField::Name              => project::name(project.yaml()).map(|s|s.to_owned()),
             VirtualField::Final             => project.sum_sold().map(|c|c.to_string()),
+            VirtualField::Year              => project.date().map(|d|d.year().to_string()),
 
             VirtualField::Caterers       => hours::caterers_string(project.yaml()),
             VirtualField::ClientFullName => client::full_name(project.yaml()),
@@ -313,7 +320,7 @@ pub mod invoice{
     pub fn number_long_str(yaml:&Yaml) -> Option<String> {
         let year = try_some!(super::date::invoice(&yaml)).year();
         // TODO Length or format should be a setting
-        number(&yaml).map(|n| format!("R-{}{:03}", year, n))
+        number(&yaml).map(|n| format!("R{}-{:03}", year, n))
     }
 
     pub fn validate(yaml:&Yaml) -> super::SpecResult {

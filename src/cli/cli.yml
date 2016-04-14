@@ -64,10 +64,16 @@ subcommands:
               help: Use simple list
               long: simple
 
-        - "verbose" :
-            help: Opposite of "simple"
-            long: verbose
-            short: v
+        - "csv":
+              help: Print in csv form
+              long: csv
+              conflicts_with: [verbose, simple]
+
+        - "verbose":
+              help: Opposite of "simple"
+              long: verbose
+              short: v
+              conflicts_with: [csv, simple]
 
         - "sort":
               help: "sort by [date | index | name | manager]"

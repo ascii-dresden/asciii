@@ -52,10 +52,8 @@ pub struct ListConfig<'a>{
     details:      Option<Vec<&'a str>>,
 }
 
-#[derive(Debug)]
-pub enum ListMode{
-    Simple, Verbose, Nothing, Paths
-}
+#[derive(Debug, PartialEq)]
+pub enum ListMode{ Simple, Verbose, Nothing, Paths, Csv }
 
 impl<'a> Default for ListConfig<'a>{
     fn default() -> ListConfig<'a>{

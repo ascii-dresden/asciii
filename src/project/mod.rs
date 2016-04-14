@@ -143,6 +143,11 @@ impl Project{
         spec::project::canceled(self.yaml())
     }
 
+    pub fn canceled_string(&self) -> &'static str{
+        if spec::project::canceled(self.yaml()){"canceled"}
+        else {""}
+    }
+
     pub fn invoice_num(&self) -> Option<String>{
         spec::invoice::number_str(self.yaml())
     }

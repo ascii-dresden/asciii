@@ -39,10 +39,11 @@ fn new_project(project_name:&str, template_name:&str, editor:&Option<&str>, edit
     }
 }
 
-fn decide_mode(simple:bool, verbose:bool, paths:bool,nothing:bool) -> ListMode{
+fn decide_mode(simple:bool, verbose:bool, paths:bool,nothing:bool, csv:bool) -> ListMode{
+    if csv{     ListMode::Csv } else
     if nothing{ ListMode::Nothing } else
-    if paths{   ListMode::Paths }
-    else {
+    if paths{   ListMode::Paths } else
+    {
         match (simple, verbose, CONFIG.get_bool("list/verbose")){
             (false, true,  _   ) => {debugln!("-v overwrites config"); ListMode::Verbose },
             (false,    _, true ) => {debugln!("-v from config");ListMode::Verbose},
@@ -67,7 +68,8 @@ pub fn list(matches:&ArgMatches){
             matches.is_present("simple"),
             matches.is_present("verbose"),
             matches.is_present("paths"),
-            matches.is_present("nothing")
+            matches.is_present("nothing"),
+            matches.is_present("csv")
             );
 
         let mut list_config = ListConfig{
@@ -114,6 +116,10 @@ pub fn list(matches:&ArgMatches){
 ///
 /// which it prints with `print::print_projects()`
 fn list_projects(dir:LuigiDir, list_config:&ListConfig){
+    use super::print::{simple_rows, verbose_rows,
+                        path_rows, dynamic_rows,
+                       print_projects,print_csv};
+
     let luigi = if CONFIG.get_bool("list/gitstatus"){
         setup_luigi_with_git()
     } else {
@@ -136,12 +142,12 @@ fn list_projects(dir:LuigiDir, list_config:&ListConfig){
         _ => false
     };
 
-    use super::print::{simple_rows, verbose_rows, path_rows, dynamic_rows, print_projects};
-
-    if !wide_enough { // TODO room for improvement
+    if !wide_enough && list_config.mode != ListMode::Csv { // TODO room for improvement
         print_projects(simple_rows(&projects, &list_config));
     } else {
+        debugln!("list_mode: {:?}", list_config.mode );
         match list_config.mode{
+            ListMode::Csv     => print_csv(&projects),
             ListMode::Paths   => print_projects(path_rows(&projects, &list_config)),
             ListMode::Simple  => print_projects(simple_rows(&projects, &list_config)),
             ListMode::Verbose => print_projects(verbose_rows(&projects,&list_config,luigi.repository)),

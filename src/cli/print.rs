@@ -15,9 +15,11 @@ use repo::Repository;
 
 //TODO construct table rows way more dynamically
 
+#[allow(dead_code)]
 pub fn print_project(_project:&Project){
     unimplemented!();
 }
+
 fn result_to_cell(res:&Result<(), Vec<&str>>) -> Cell{
     match *res{
         Ok(_)           => Cell::new("✓").with_style(Attr::ForegroundColor(color::GREEN)), // ✗
@@ -69,7 +71,7 @@ pub fn path_rows(projects:&[Project], list_config:&ListConfig) -> Vec<Row>{
     .collect()
 }
 
-/// Triggered by `list --simple`, usually you set this in your config under `list/verbose`.
+/// Triggered by `list --simple`, usually you set this in your config under `list/verbose: false`.
 pub fn simple_rows(projects:&[Project], list_config:&ListConfig) -> Vec<Row>{
     projects
         .iter()
@@ -154,7 +156,7 @@ pub fn verbose_rows(projects:&[Project], list_config:&ListConfig, repo:Option<Re
             if let Some(ref details) = list_config.details{
                 cells.extend_from_slice(
                     &details.iter().map(|d|
-                                 cell!( project.get(&d).unwrap_or_else(||String::from(""))),
+                                 cell!( project.get(&d).unwrap_or_else(String::new)),
                                  ).collect::<Vec<Cell>>()
                     );
             }
@@ -192,7 +194,7 @@ pub fn dynamic_rows(projects:&[Project], list_config:&ListConfig, _repo:Option<R
             if let Some(ref details) = list_config.details{
                 cells.extend_from_slice(
                     &details.iter().map(|d|
-                                 cell!( project.get(&d).unwrap_or_else(||String::from(""))).style_spec(row_style),
+                                 cell!( project.get(&d).unwrap_or_else(String::new)).style_spec(row_style),
                                  ).collect::<Vec<Cell>>()
                     );
             }
@@ -202,7 +204,7 @@ pub fn dynamic_rows(projects:&[Project], list_config:&ListConfig, _repo:Option<R
 }
 
 /// Prints Projects Rows
-/// 
+///
 /// This doesn't do much, except taking a Vec of Rows and printing it,
 /// the interesting code is in dynamic_rows, verbose_rows, path_rows or simple_rows.
 /// This Documentations is redundant, infact, it is already longer than the function itself.
@@ -210,6 +212,39 @@ pub fn print_projects(rows:Vec<Row>){
     let mut table = Table::init(rows);
     table.set_format(FormatBuilder::new().column_separator(' ').padding(0,0).build());
     table.printstd();
+}
+
+/// Prints Projects as CSV
+///
+/// This doesn't do much, except taking a Vec of Rows and printing it,
+/// the interesting code is in dynamic_rows, verbose_rows, path_rows or simple_rows.
+/// This Documentations is redundant, infact, it is already longer than the function itself.
+pub fn print_csv(projects:&[Project]){
+    // TODO print head
+    let splitter = ";";
+        println!("{}", [
+                 "Rnum",
+                 "Bezeichnung",
+                 "Datum",
+                 "Rechnungs",
+                 "Betreuer",
+                 "Verantwortlich",
+                 "Bezahlt am",
+                 "Betrag",
+                 "Canceled"].join(splitter));
+    for project in projects{
+        println!("{}", [
+            &project.get("InvoiceNumber").unwrap_or_else(String::new),
+            &project.get("Name").unwrap_or_else(String::new),
+            &project.get("event/dates/0/begin").unwrap_or_else(String::new),
+            &project.get("invoice/date").unwrap_or_else(String::new),
+            &project.get("Caterers").unwrap_or_else(String::new),
+            &project.get("Responsible").unwrap_or_else(String::new),
+            &project.get("invoice/payed_date").unwrap_or_else(String::new),
+            &project.get("Final").unwrap_or_else(String::new),
+            project.canceled_string()
+        ].join(splitter));
+    }
 }
 
 pub fn show_items(project:&Project){

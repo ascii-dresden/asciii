@@ -84,3 +84,4 @@ These include:
 * [prettytables-rs](https://github.com/phsym/prettytable-rs/)
 * [yaml-rust](https://github.com/chyh1990/yaml-rust)
 * [currency](https://github.com/Tahler/rust-lang-currency)
+* [open-rs](https://github.com/byron/open-rs)
