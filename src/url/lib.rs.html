@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="rustdoc">
-    <meta name="description" content="Source to the Rust file `/home/hendrik/.multirust/toolchains/nightly/cargo/registry/src/github.com-88ac128001ac3a9a/url-0.5.8/src/lib.rs`.">
+    <meta name="description" content="Source to the Rust file `/home/hendrik/.multirust/toolchains/nightly/cargo/registry/src/github.com-88ac128001ac3a9a/url-0.5.9/src/lib.rs`.">
     <meta name="keywords" content="rust, rustlang, rust-lang">
 
     <title>lib.rs.html -- source</title>
@@ -1206,6 +1206,7 @@
 <span id="1162">1162</span>
 <span id="1163">1163</span>
 <span id="1164">1164</span>
+<span id="1165">1165</span>
 </pre><pre class='rust '>
 <span class='comment'>// Copyright 2013-2015 Simon Sapin.</span>
 <span class='comment'>//</span>
@@ -2293,6 +2294,7 @@ assert!(&amp;*css_url.serialize() == &quot;http://servo.github.io/rust-url/main.
     <span class='kw'>let</span> <span class='ident'>disk</span> <span class='op'>=</span> <span class='kw'>match</span> <span class='ident'>components</span>.<span class='ident'>next</span>() {
         <span class='prelude-val'>Some</span>(<span class='ident'>Component</span>::<span class='ident'>Prefix</span>(<span class='kw-2'>ref</span> <span class='ident'>p</span>)) <span class='op'>=&gt;</span> <span class='kw'>match</span> <span class='ident'>p</span>.<span class='ident'>kind</span>() {
             <span class='ident'>Prefix</span>::<span class='ident'>Disk</span>(<span class='ident'>byte</span>) <span class='op'>=&gt;</span> <span class='ident'>byte</span>,
+            <span class='ident'>Prefix</span>::<span class='ident'>VerbatimDisk</span>(<span class='ident'>byte</span>) <span class='op'>=&gt;</span> <span class='ident'>byte</span>,
             _ <span class='op'>=&gt;</span> <span class='kw'>return</span> <span class='prelude-val'>Err</span>(()),
         },
 

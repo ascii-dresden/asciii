@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="rustdoc">
-    <meta name="description" content="Source to the Rust file `/home/hendrik/.multirust/toolchains/nightly/cargo/registry/src/github.com-88ac128001ac3a9a/kernel32-sys-0.2.1/src/lib.rs`.">
+    <meta name="description" content="Source to the Rust file `/home/hendrik/.multirust/toolchains/nightly/cargo/registry/src/github.com-88ac128001ac3a9a/kernel32-sys-0.1.4/src/lib.rs`.">
     <meta name="keywords" content="rust, rustlang, rust-lang">
 
     <title>lib.rs.html -- source</title>
@@ -3449,7 +3449,7 @@
     <span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>target_arch</span> <span class='op'>=</span> <span class='string'>&quot;x86_64&quot;</span>)]</span>
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>ExecuteUmsThread</span>(<span class='ident'>UmsThread</span>: <span class='ident'>PUMS_CONTEXT</span>) <span class='op'>-&gt;</span> <span class='ident'>BOOL</span>;
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>ExitProcess</span>(<span class='ident'>uExitCode</span>: <span class='ident'>UINT</span>);
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>ExitThread</span>(<span class='ident'>dwExitCode</span>: <span class='ident'>DWORD</span>);
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>ExitThread</span>(<span class='ident'>hThread</span>: <span class='ident'>HANDLE</span>, <span class='ident'>lpExitCode</span>: <span class='ident'>LPDWORD</span>) <span class='op'>-&gt;</span> <span class='ident'>BOOL</span>;
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>ExpandEnvironmentStringsA</span>(<span class='ident'>lpSrc</span>: <span class='ident'>LPCSTR</span>, <span class='ident'>lpDst</span>: <span class='ident'>LPSTR</span>, <span class='ident'>nSize</span>: <span class='ident'>DWORD</span>) <span class='op'>-&gt;</span> <span class='ident'>DWORD</span>;
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>ExpandEnvironmentStringsW</span>(<span class='ident'>lpSrc</span>: <span class='ident'>LPCWSTR</span>, <span class='ident'>lpDst</span>: <span class='ident'>LPWSTR</span>, <span class='ident'>nSize</span>: <span class='ident'>DWORD</span>) <span class='op'>-&gt;</span> <span class='ident'>DWORD</span>;
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>FatalAppExitA</span>(<span class='ident'>uAction</span>: <span class='ident'>UINT</span>, <span class='ident'>lpMessageText</span>: <span class='ident'>LPCSTR</span>);
@@ -3848,7 +3848,7 @@
     ) <span class='op'>-&gt;</span> <span class='ident'>BOOL</span>;
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>GetFileMUIPath</span>(
         <span class='ident'>dwFlags</span>: <span class='ident'>DWORD</span>, <span class='ident'>pcwszFilePath</span>: <span class='ident'>PCWSTR</span>, <span class='ident'>pwszLanguage</span>: <span class='ident'>PWSTR</span>, <span class='ident'>pcchLanguage</span>: <span class='ident'>PULONG</span>,
-        <span class='ident'>pwszFileMUIPath</span>: <span class='ident'>PWSTR</span>, <span class='ident'>pcchFileMUIPath</span>: <span class='ident'>PULONG</span>, <span class='ident'>pululEnumerator</span>: <span class='ident'>PULONGLONG</span>,
+        <span class='ident'>pwszFileMUIPath</span>: <span class='ident'>PWSTR</span>, <span class='ident'>pcchFileMUIPath</span>: <span class='ident'>PULONG</span>, <span class='ident'>pululEnumerator</span>: <span class='ident'>ULONGLONG</span>,
     ) <span class='op'>-&gt;</span> <span class='ident'>BOOL</span>;
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>GetFileSize</span>(<span class='ident'>hFile</span>: <span class='ident'>HANDLE</span>, <span class='ident'>lpFileSizeHigh</span>: <span class='ident'>LPDWORD</span>) <span class='op'>-&gt;</span> <span class='ident'>DWORD</span>;
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>GetFileSizeEx</span>(<span class='ident'>hFile</span>: <span class='ident'>HANDLE</span>, <span class='ident'>lpFileSize</span>: <span class='ident'>PLARGE_INTEGER</span>) <span class='op'>-&gt;</span> <span class='ident'>BOOL</span>;
@@ -5172,7 +5172,7 @@
         <span class='ident'>hDevice</span>: <span class='ident'>HANDLE</span>, <span class='ident'>dwOperation</span>: <span class='ident'>DWORD</span>, <span class='ident'>lpTapeInformation</span>: <span class='ident'>LPVOID</span>,
     ) <span class='op'>-&gt;</span> <span class='ident'>DWORD</span>;
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>SetTapePosition</span>(
-        <span class='ident'>hDevice</span>: <span class='ident'>HANDLE</span>, <span class='ident'>dwPositionMethod</span>: <span class='ident'>DWORD</span>, <span class='ident'>dwPartition</span>: <span class='ident'>DWORD</span>,
+        <span class='ident'>hDevice</span>: <span class='ident'>HANDLE</span>, <span class='ident'>dwPositionMethod</span>: <span class='ident'>DWORD</span>, <span class='ident'>dwPartition</span>: <span class='ident'>DWORD</span>, 
         <span class='ident'>dwOffsetLow</span>: <span class='ident'>DWORD</span>, <span class='ident'>dwOffsetHigh</span>: <span class='ident'>DWORD</span>, <span class='ident'>bImmediate</span>: <span class='ident'>BOOL</span>
     ) <span class='op'>-&gt;</span> <span class='ident'>DWORD</span>;
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>SetThreadAffinityMask</span>(<span class='ident'>hThread</span>: <span class='ident'>HANDLE</span>, <span class='ident'>dwThreadAffinityMask</span>: <span class='ident'>DWORD</span>) <span class='op'>-&gt;</span> <span class='ident'>DWORD_PTR</span>;

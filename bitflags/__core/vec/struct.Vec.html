@@ -47,7 +47,7 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-3952' class='srclink' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html?gotosrc=3952' title='goto source code'>[src]</a></span></h1>
+               </span><a id='src-3956' class='srclink' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html?gotosrc=3956' title='goto source code'>[src]</a></span></h1>
 <pre class='rust struct'>pub struct Vec&lt;T&gt; {
     // some fields omitted
 }</pre><span class="since">1.0.0</span><div class='docblock'><p>A contiguous growable array type, written <code>Vec&lt;T&gt;</code> but pronounced &#39;vector.&#39;</p>
@@ -952,7 +952,7 @@ found; the fourth could match any position in <code>[1,4]</code>.</p>
 
 <span class='ident'>v</span>.<span class='ident'>sort</span>();
 <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>v</span> <span class='op'>==</span> [<span class='op'>-</span><span class='number'>5</span>, <span class='op'>-</span><span class='number'>3</span>, <span class='number'>1</span>, <span class='number'>2</span>, <span class='number'>4</span>]);</pre>
-</div><h4 id='method.sort_by_key' class='method'><span class="since">1.7.0</span><code>fn <a href='#method.sort_by_key' class='fnname'>sort_by_key</a>&lt;B, F&gt;(&amp;mut self, f: F) <span class='where'>where B: <a class='trait' href='../../../bitflags/__core/cmp/trait.Ord.html' title='bitflags::__core::cmp::Ord'>Ord</a>, F: <a class='trait' href='../../../bitflags/__core/ops/trait.FnMut.html' title='bitflags::__core::ops::FnMut'>FnMut</a>(&amp;T) -&gt; B</span></code></h4>
+</div><h4 id='method.sort_by_key' class='method'><span class="since">1.7.0</span><code>fn <a href='#method.sort_by_key' class='fnname'>sort_by_key</a>&lt;B, F&gt;(&amp;mut self, f: F) <span class='where'>where F: <a class='trait' href='../../../bitflags/__core/ops/trait.FnMut.html' title='bitflags::__core::ops::FnMut'>FnMut</a>(&amp;T) -&gt; B, B: <a class='trait' href='../../../bitflags/__core/cmp/trait.Ord.html' title='bitflags::__core::cmp::Ord'>Ord</a></span></code></h4>
 <div class='docblock'><p>Sorts the slice, in place, using <code>key</code> to extract a key by which to
 order the sort by.</p>
 
@@ -998,8 +998,8 @@ approximately <code>2 * n</code>, where <code>n</code> is the length of <code>se
 
 <span class='ident'>dst</span>.<span class='ident'>clone_from_slice</span>(<span class='kw-2'>&amp;</span><span class='ident'>src</span>);
 <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>dst</span> <span class='op'>==</span> [<span class='number'>1</span>, <span class='number'>2</span>, <span class='number'>3</span>]);</pre>
-</div><h4 id='method.copy_from_slice' class='method'><code>fn <a href='#method.copy_from_slice' class='fnname'>copy_from_slice</a>(&amp;mut self, src: <a class='primitive' href='https://doc.rust-lang.org/nightly/bitflags/primitive.slice.html'>&amp;[T]</a>) <span class='where'>where T: <a class='trait' href='../../../bitflags/__core/marker/trait.Copy.html' title='bitflags::__core::marker::Copy'>Copy</a></span></code></h4>
-<div class='stability'><em class='stab unstable'>Unstable (<code>copy_from_slice</code>)</em></div><div class='docblock'><p>Copies all elements from <code>src</code> into <code>self</code>, using a memcpy.</p>
+</div><h4 id='method.copy_from_slice' class='method'><span class="since">1.9.0</span><code>fn <a href='#method.copy_from_slice' class='fnname'>copy_from_slice</a>(&amp;mut self, src: <a class='primitive' href='https://doc.rust-lang.org/nightly/bitflags/primitive.slice.html'>&amp;[T]</a>) <span class='where'>where T: <a class='trait' href='../../../bitflags/__core/marker/trait.Copy.html' title='bitflags::__core::marker::Copy'>Copy</a></span></code></h4>
+<div class='docblock'><p>Copies all elements from <code>src</code> into <code>self</code>, using a memcpy.</p>
 
 <p>The length of <code>src</code> must be the same as <code>self</code>.</p>
 
@@ -1008,7 +1008,6 @@ approximately <code>2 * n</code>, where <code>n</code> is the length of <code>se
 
 <h1 id='example-10' class='section-header'><a href='#example-10'>Example</a></h1>
 <pre class='rust rust-example-rendered'>
-<span class='attribute'>#<span class='op'>!</span>[<span class='ident'>feature</span>(<span class='ident'>copy_from_slice</span>)]</span>
 <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>dst</span> <span class='op'>=</span> [<span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>0</span>];
 <span class='kw'>let</span> <span class='ident'>src</span> <span class='op'>=</span> [<span class='number'>1</span>, <span class='number'>2</span>, <span class='number'>3</span>];
 
