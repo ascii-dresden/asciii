@@ -34,6 +34,23 @@ Options:
   -v, [--verbose], [--no-verbose]  # Change default in $HOME/.asciii.yml
 ```
 
+## Build
+
+Just plain old `cargo build` will do.
+
+### Features
+
+Currently a few things are only build-features.
+Use `cargo build --features lints` to build with [clippy](https://github.com/Manishearth/rust-clippy).
+Use `cargo build --features nightly` to use nightly features:
+  * currently only system allocators
+
+Use `cargo build --features debug` to enable debug prints.
+
+### Release
+To build a release ready version use `cargo build --release`.
+
+
 ## Technical TODO
 
 * [ ] test on windows and mac
