@@ -10,7 +10,7 @@ use term::{Attr, color};
 use super::ListConfig;
 
 use project::Project;
-use manager::LuigiProject;
+use storage::Storable;
 use repo::Repository;
 
 //TODO construct table rows way more dynamically

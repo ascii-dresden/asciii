@@ -119,11 +119,9 @@ fn simple_reading(){
     assert_eq!(config.get("list/colors").unwrap().as_bool().unwrap(),
                config.get_bool("list/colors"));
 
-    assert!(config.get_path(&"defaults").is_some());
-    assert!(config.get_path(&"defaults/includes").is_some());
-    assert!(config.get_path(&"defaults/includes/name").is_some());
-    assert!(config.get_path(&"defaults/includes/name/foo").is_none());
+    assert!(config.get_path(&"dirs").is_some());
+    assert!(config.get_path(&"dirs/storage").is_some());
+    assert!(config.get_path(&"dirs/working").is_some());
+    assert!(config.get_path(&"dirs/storage").is_some());
 
-    println!("{:?}", config.get_path("defaults/includes/name"));
-    println!("{:?}", config.get_str("defaults/includes/name"));
 }

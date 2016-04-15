@@ -6,7 +6,7 @@
 
 use std::process::exit;
 use project::Project;
-use manager::{Luigi, LuigiProject, LuigiResult};
+use storage::{Storage, Storable, StorageResult};
 use util;
 use ::CONFIG;
 
@@ -14,29 +14,29 @@ use ::CONFIG;
 pub mod subcommands ;
 pub mod print;
 
-/// Execute a command returning a LuigiError
+/// Execute a command returning a StorageError
 /// TODO make this a `try!` like macro
-fn execute<F, S>(command:F) -> S where F: FnOnce() -> LuigiResult<S> {
+fn execute<F, S>(command:F) -> S where F: FnOnce() -> StorageResult<S> {
     match command(){
         Ok(s) => s,
         Err(lerr) => { println!("ERROR: {:?}", lerr); exit(1) }
     }
 }
 
-/// Sets up an instance of Luigi.
-fn setup_luigi() -> Luigi<Project> {
+/// Sets up an instance of Storage.
+fn setup_luigi() -> Storage<Project> {
     let working = CONFIG.get_str("dirs/working");
     let archive = CONFIG.get_str("dirs/archive");
     let templates = CONFIG.get_str("dirs/templates");
-    execute(|| Luigi::new(util::get_storage_path(), working, archive, templates))
+    execute(|| Storage::new(util::get_storage_path(), working, archive, templates))
 }
 
-/// Sets up an instance of Luigi, with git turned on.
-fn setup_luigi_with_git() -> Luigi<Project> {
+/// Sets up an instance of Storage, with git turned on.
+fn setup_luigi_with_git() -> Storage<Project> {
     let working = CONFIG.get_str("dirs/working");
     let archive = CONFIG.get_str("dirs/archive");
     let templates = CONFIG.get_str("dirs/templates");
-    execute(||Luigi::new_with_git(util::get_storage_path(), working, archive, templates))
+    execute(||Storage::new_with_git(util::get_storage_path(), working, archive, templates))
 }
 
 

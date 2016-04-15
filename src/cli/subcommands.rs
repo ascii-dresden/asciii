@@ -8,7 +8,7 @@ use open;
 use config;
 use ::CONFIG;
 use terminal_size::{Width, terminal_size }; // TODO replace with other lib
-use manager::{LuigiDir, LuigiProject, LuigiError};
+use storage::{StorageDir, Storable, StorageError};
 use project::Project;
 use util;
 use super::{print,setup_luigi, setup_luigi_with_git, fail};
@@ -86,17 +86,17 @@ pub fn list(matches:&ArgMatches){
         let dir =
             if let Some(archive_year) = matches.value_of("archive"){
                 let archive = archive_year.parse::<i32>().unwrap();
-                LuigiDir::Archive(archive)
+                StorageDir::Archive(archive)
             }
 
             // or list all, but sort by date
             else if matches.is_present("all"){
                 // sort by date on --all of not overriden
                 if !matches.is_present("sort"){ list_config.sort_by = "date" }
-                LuigiDir::All }
+                StorageDir::All }
 
             // or list normal
-            else { LuigiDir::Working };
+            else { StorageDir::Working };
 
         if matches.is_present("broken"){
             list_broken_projects(dir);
@@ -115,7 +115,7 @@ pub fn list(matches:&ArgMatches){
 /// * `print::verbose_rows()`
 ///
 /// which it prints with `print::print_projects()`
-fn list_projects(dir:LuigiDir, list_config:&ListConfig){
+fn list_projects(dir:StorageDir, list_config:&ListConfig){
     use super::print::{simple_rows, verbose_rows,
                         path_rows, dynamic_rows,
                        print_projects,print_csv};
@@ -157,13 +157,13 @@ fn list_projects(dir:LuigiDir, list_config:&ListConfig){
 }
 
 /// Command LIST --broken
-fn list_broken_projects(dir:LuigiDir){
+fn list_broken_projects(dir:StorageDir){
     let luigi = setup_luigi();
     let invalid_files = super::execute(||luigi.list_project_files(dir));
     let tups = invalid_files
         .iter()
         .filter_map(|dir| Project::open(dir).err().map(|e|(e, dir)) )
-        .collect::<Vec<(LuigiError,&PathBuf)>>();
+        .collect::<Vec<(StorageError,&PathBuf)>>();
 
     for (err,path) in tups{
         println!("{}: {:?}", path.display(), err);
@@ -215,14 +215,14 @@ pub fn edit(matches:&ArgMatches) {
         } else {
             if let Some(archive) = matches.value_of("archive"){
                 let archive = archive.parse::<i32>().unwrap();
-                edit_projects(LuigiDir::Archive(archive), &search_terms, &editor);
+                edit_projects(StorageDir::Archive(archive), &search_terms, &editor);
             } else {
-                edit_projects(LuigiDir::Working, &search_terms, &editor);
+                edit_projects(StorageDir::Working, &search_terms, &editor);
             }
         }
 }
 
-fn edit_projects(dir:LuigiDir, search_terms:&[&str], editor:&Option<&str>){
+fn edit_projects(dir:StorageDir, search_terms:&[&str], editor:&Option<&str>){
     let luigi = setup_luigi();
     let mut all_paths = Vec::new();
     for search_term in search_terms{
@@ -258,15 +258,15 @@ pub fn show(matches:&ArgMatches){
         let search_term = matches.value_of("search_term").unwrap();
         if let Some(year) = matches.value_of("archive"){
             let year = year.parse::<i32>().unwrap();
-            show_project(LuigiDir::Archive(year), &search_term);
+            show_project(StorageDir::Archive(year), &search_term);
         } else if  matches.is_present("template"){
             show_template(search_term);
         } else {
-            show_project(LuigiDir::Working, &search_term);
+            show_project(StorageDir::Working, &search_term);
         }
 }
 
-fn show_project(dir:LuigiDir, search_term:&str){
+fn show_project(dir:StorageDir, search_term:&str){
     let luigi = setup_luigi();
     for project in super::execute(||luigi.search_projects(dir, &search_term))
         .iter()
@@ -319,7 +319,7 @@ pub fn config(matches:&ArgMatches){
 fn archive_project(name:&str, manual_year:Option<i32>, force:bool){
     let luigi = setup_luigi();
     debugln!("using the force: {}", force);
-    if let Ok(projects) = luigi.search_projects(LuigiDir::Working, name){
+    if let Ok(projects) = luigi.search_projects(StorageDir::Working, name){
         if projects.is_empty(){ fail(format!("Nothing found for {:?}", name)); }
         for project in projects.iter().filter_map(|path| Project::open(path).ok()) {
             if project.valid_stage3().is_ok() || force{
@@ -342,7 +342,7 @@ fn archive_project(name:&str, manual_year:Option<i32>, force:bool){
 /// Command UNARCHIVW <YEAR> <NAME>
 fn unarchive_project(year:i32, name:&str){
     let luigi = setup_luigi();
-    if let Ok(projects) = luigi.search_projects(LuigiDir::Archive(year), name){
+    if let Ok(projects) = luigi.search_projects(StorageDir::Archive(year), name){
         if projects.len() == 1 {
             println!("{:?}", projects);
             luigi.unarchive_project_file(&projects[0]).unwrap();
@@ -455,7 +455,7 @@ pub fn git_add(matches:&ArgMatches){
 
     debugln!("adding {:?}", search_terms);
 
-    let projects = luigi.search_multiple_projects(LuigiDir::Working, &search_terms)
+    let projects = luigi.search_multiple_projects(StorageDir::Working, &search_terms)
         .unwrap()
         .iter()
         .filter_map(|path| match Project::open(path){ // TODO use ProjectList

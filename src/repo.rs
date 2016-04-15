@@ -129,7 +129,7 @@ impl Repository {
         let gitdir  = workdir.join(".git");
 
 
-        println!("running: {:#?}", Command::new("git")
+        debugln!("{:#?}", Command::new("git")
                  .args(&["--work-tree", workdir.to_str().unwrap()])
                  .args(&["--git-dir",   gitdir.to_str().unwrap()])
                  .arg(command).args(args));

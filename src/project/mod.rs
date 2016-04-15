@@ -12,7 +12,7 @@ use slug;
 use currency::Currency;
 
 use util::yaml;
-use manager::{LuigiProject, LuigiResult, LuigiError};
+use storage::{Storable, StorageResult, StorageError};
 use templater::Templater;
 
 pub mod product;
@@ -26,12 +26,12 @@ pub struct Project {
     yaml: Yaml
 }
 
-impl From<yaml::YamlError> for LuigiError {
-    fn from(yerror: yaml::YamlError) -> LuigiError{ LuigiError::ParseError(yerror) }
+impl From<yaml::YamlError> for StorageError {
+    fn from(yerror: yaml::YamlError) -> StorageError{ StorageError::ParseError(yerror) }
 }
 
-impl LuigiProject for Project{
-    fn from_template(project_name:&str,template:&Path) -> Result<Project,LuigiError> {
+impl Storable for Project{
+    fn from_template(project_name:&str,template:&Path) -> Result<Project,StorageError> {
         let template_name = template.file_stem().unwrap().to_str().unwrap();
 
         let event_date = (Local::today() + Duration::days(14)).format("%d.%m.%Y").to_string();
@@ -45,7 +45,7 @@ impl LuigiProject for Project{
             "DATE-EVENT"    => &event_date,
             "DATE-CREATED"  => &created_date,
             "SALARY"        => "8.0", //::CONFIG.get_as_str("defaults/salary"),
-            "MANAGER"       => ::CONFIG.get_str("manager_name")
+            "manager"       => ::CONFIG.get_str("manager_name")
         };
 
         // fills the template
@@ -96,7 +96,7 @@ impl LuigiProject for Project{
     fn set_file(&mut self, new_file:&Path){ self.file_path = new_file.to_owned(); }
 
     /// Opens a yaml and parses it.
-    fn open(file_path:&Path) -> LuigiResult<Project>{
+    fn open(file_path:&Path) -> StorageResult<Project>{
         let file_content = try!(File::open(&file_path)
                                 .and_then(|mut file| {
                                     let mut content = String::new();
@@ -226,7 +226,7 @@ mod test{
     use std::path::Path;
     use ::project::spec;
     use ::project::Project;
-    use ::manager::LuigiProject;
+    use ::storage::Storable;
 
     #[test]
     fn compare_basics(){
@@ -239,8 +239,8 @@ mod test{
 
         assert_eq!(spec::project::name(&old_yaml), spec::project::name(&new_yaml));
 
-        //assert_eq!(spec::project::manager(&old_yaml), //fails
-        //           spec::project::manager(&new_yaml));
+        //assert_eq!(spec::project::storage(&old_yaml), //fails
+        //           spec::project::storage(&new_yaml));
 
         assert_eq!(spec::offer::number(&old_yaml), spec::offer::number(&new_yaml));
 

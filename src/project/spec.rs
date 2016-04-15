@@ -7,7 +7,7 @@ use util::yaml;
 use util::yaml::Yaml;
 use currency::Currency;
 use super::Project;
-use ::manager::LuigiProject;
+use ::storage::Storable;
 
 pub type SpecResult<'a> = Result<(), Vec<&'a str>>;
 
@@ -27,7 +27,7 @@ custom_derive! {
              EnumFromStr
              )]
     pub enum VirtualField{
-        /// Usually `manager`, or in legacy part of `signature`
+        /// Usually `storage`, or in legacy part of `signature`
         Responsible,
         /// Pretty version of `invoice/number`: "`R042`"
         InvoiceNumber,

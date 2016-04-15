@@ -38,7 +38,7 @@ pub mod config;
 pub mod manual;
 
 pub mod project;
-pub mod manager;
+pub mod storage;
 pub mod repo;
 
 pub mod templater;

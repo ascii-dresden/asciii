@@ -34,7 +34,7 @@ mod config;
 mod manual;
 
 mod project;
-mod manager;
+mod storage;
 mod repo;
 
 mod templater;
@@ -84,7 +84,7 @@ pub fn setup_app(){
      ("archive",   Some(sub_m)) => archive(&sub_m),
      ("unarchive", Some(sub_m)) => unarchive(&sub_m),
      ("config",    Some(sub_m)) => config(&sub_m),
-     ("whoami",    _          ) => config_show("manager_name"),
+     ("whoami",    _          ) => config_show("storage_name"),
 
      ("path",      Some(sub_m)) => path(&sub_m, |path| println!("{:?}", path)),
      ("open",      Some(sub_m)) => path(&sub_m, |path| {open::that(path).unwrap();}),

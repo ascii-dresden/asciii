@@ -3,7 +3,7 @@ use std::path::Path;
 
 use asciii::project::spec;
 use asciii::project::Project;
-use asciii::manager::LuigiProject;
+use asciii::storage::Storable;
 
 fn main(){
     let config = &asciii::CONFIG;
