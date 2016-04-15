@@ -21,14 +21,15 @@
 //!
 
 #![allow(dead_code)]
-#![allow(unused_imports)]
 
 use std::fs;
 use std::io;
+use std::fmt;
 use std::path::{Path, PathBuf};
 use std::ffi::OsStr;
 use std::marker::PhantomData;
 use std::error::Error;
+use std::ops::{Deref, DerefMut};
 
 use slug;
 use chrono::{Date, UTC, Datelike};
@@ -133,7 +134,7 @@ pub struct Storage<L:Storable> {
 
     pub repository: Option<Repository>
 }
-use std::fmt;
+
 impl<P:Storable> fmt::Debug for Storage<P>{
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result
     {
@@ -351,6 +352,11 @@ impl<L:Storable> Storage<L> {
     }
 
     /// Moves a project folder from `/working` dir to `/archive/$year`.
+    pub fn unarchive_project(&self, project:&L) -> StorageResult<PathBuf> {
+        self.unarchive_project_file(&project.file())
+    }
+
+    /// Moves a project folder from `/working` dir to `/archive/$year`.
     pub fn unarchive_project_file(&self, archived_file:&Path) -> StorageResult<PathBuf> {
         let archived_dir = if archived_file.is_file() { try!(archived_file.parent().ok_or(StorageError::InvalidDirStructure)) } else {archived_file};
 
@@ -379,21 +385,6 @@ impl<L:Storable> Storage<L> {
         };
 
         Ok(target.to_owned())
-    }
-
-    /// Moves a project folder back from `/archive/$year` to `/working` dir.
-    // TODO pub fn unarchive_project<T:Storable>(&self, project:&T) {
-    pub fn unarchive_project_by_name(&self, name:&str, year:Year) -> StorageResult<PathBuf> {
-        let slugged_name = slugify(name);
-        if self.get_project_dir(&slugged_name, StorageDir::Working).is_ok(){
-            return Err(StorageError::ProjectFileExists);
-        }
-        let archive_dir = try!(self.get_project_dir(&slugged_name, StorageDir::Archive(year)));
-        let project_dir = self.working_dir.join(&slugged_name);
-        if project_dir.exists() { return Err(StorageError::ProjectFileExists); }
-
-        try!(fs::rename(&archive_dir, &project_dir));
-        Ok(project_dir)
     }
 
     /// Matches StorageDir's content against a term and returns matching project files.
@@ -539,7 +530,6 @@ impl<L:Storable> ProjectList<L>{
 
 }
 
-use std::ops::{Deref, DerefMut};
 impl<L:Storable> Deref for ProjectList<L>{
     type Target=Vec<L>;
     fn deref(&self) -> &Vec<L>{
@@ -848,29 +838,7 @@ mod test {
     }
 
     #[test]
-    fn unarchive_project(){
-        let (_dir , storage_path, storage) = setup();
-        assert!(storage.create_dirs().is_ok());
-        assert_existens(&storage_path);
-        copy_template(storage_path.join("templates"));
-
-        let templates = storage.list_template_names().unwrap();
-        for test_project in TEST_PROJECTS.iter() {
-            // tested above
-            let origin = storage.create_project( &test_project, &templates[0]).unwrap();
-            storage.archive_project_by_name(test_project, 2015, None).unwrap();
-
-            // similarly looking archive
-            storage.create_project( &test_project, &templates[0]).unwrap();
-            storage.archive_project_by_name(test_project, 2014, None).unwrap();
-
-            // the actual tests
-            assert_eq!(origin.dir(), storage.unarchive_project_by_name(test_project,2015).unwrap());
-            assert!(storage.unarchive_project_by_name(test_project,2014).is_err());
-        }
-    }
-    #[test]
-    fn unarchive_project2(){
+    fn unarchive_project_file(){
         let (_dir , storage_path, storage) = setup();
         assert!(storage.create_dirs().is_ok());
         assert_existens(&storage_path);

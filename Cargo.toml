@@ -41,3 +41,5 @@ lints = ["clippy"]
 test = false
 doc = false
 name = "asciii"
+
+# planned optional features: git, pdf output, termprint, term resize, xdg-open, web server :D
