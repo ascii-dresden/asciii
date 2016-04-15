@@ -234,15 +234,15 @@ pub fn print_csv(projects:&[Project]){
                  "Canceled"].join(splitter));
     for project in projects{
         println!("{}", [
-            &project.get("InvoiceNumber").unwrap_or_else(String::new),
-            &project.get("Name").unwrap_or_else(String::new),
-            &project.get("event/dates/0/begin").unwrap_or_else(String::new),
-            &project.get("invoice/date").unwrap_or_else(String::new),
-            &project.get("Caterers").unwrap_or_else(String::new),
-            &project.get("Responsible").unwrap_or_else(String::new),
-            &project.get("invoice/payed_date").unwrap_or_else(String::new),
-            &project.get("Final").unwrap_or_else(String::new),
-            project.canceled_string()
+            project.get("InvoiceNumber").unwrap_or_else(String::new),
+            project.get("Name").unwrap_or_else(String::new),
+            project.get("event/dates/0/begin").unwrap_or_else(String::new),
+            project.get("invoice/date").unwrap_or_else(String::new),
+            project.get("Caterers").unwrap_or_else(String::new),
+            project.get("Responsible").unwrap_or_else(String::new),
+            project.get("invoice/payed_date").unwrap_or_else(String::new),
+            project.get("Final").unwrap_or_else(String::new),
+            project.canceled_string().to_owned()
         ].join(splitter));
     }
 }

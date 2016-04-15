@@ -86,7 +86,8 @@ pub fn setup_app(){
      ("config",    Some(sub_m)) => config(&sub_m),
      ("whoami",    _          ) => config_show("manager_name"),
 
-     ("path",      Some(sub_m)) => path(&sub_m),
+     ("path",      Some(sub_m)) => path(&sub_m, |path| println!("{:?}", path)),
+     ("open",      Some(sub_m)) => path(&sub_m, |path| {open::that(path).unwrap();}),
 
      ("term",      _          ) => term(),
      ("doc",       _          ) => doc(),

@@ -385,23 +385,27 @@ pub fn term(){
     }
 }
 
-pub fn path(matches:&ArgMatches){
+pub fn path<F:Fn(&Path)>(matches:&ArgMatches, action:F){
         if matches.is_present("templates"){
-            println!("{}", PathBuf::from(CONFIG.get_str("path"))
+            action(&PathBuf::from(CONFIG.get_str("path"))
                      .join( CONFIG.get_str("dirs/storage"))
-                     .join( CONFIG.get_str("dirs/templates"))
-                     .display());
+                     .join( CONFIG.get_str("dirs/templates")));
         }
         else if matches.is_present("output"){
-            println!("{}", CONFIG.get_str("output_path"));
+            action(
+                    &util::replace_home_tilde(
+                Path::new(
+                    CONFIG.get_str("output_path")
+                    )
+                    ));
         }
         else if matches.is_present("bin"){
-            println!("{}", env::current_exe().unwrap().display());
+            action(&env::current_exe().unwrap());
         }
         else { // default case
             let path = util::replace_home_tilde(Path::new(CONFIG.get_str("path")))
                 .join( CONFIG.get_str("dirs/storage"));
-            println!("{}", path.display());
+            action(&path);
         }
 }
 
