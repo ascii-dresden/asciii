@@ -447,12 +447,13 @@ pub fn git_remote(){
 
 /// Command ADD
 pub fn git_add(matches:&ArgMatches){
-    let luigi = setup_luigi();
+    let luigi = setup_luigi_with_git();
     let search_terms = matches
         .values_of("search_term")
         .unwrap()
         .collect::<Vec<&str>>();
 
+    debugln!("adding {:?}", search_terms);
 
     let projects = luigi.search_multiple_projects(LuigiDir::Working, &search_terms)
         .unwrap()
