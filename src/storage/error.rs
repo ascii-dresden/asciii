@@ -1,3 +1,6 @@
+//! Error that may occur in Storage
+//!
+//!TODO implement Display for StorageError or use Quickerror
 use std::io;
 use std::fmt;
 use std::error::Error;
@@ -6,6 +9,7 @@ use git2::Error as GitError;
 
 use util::yaml::YamlError;
 
+/// Error that may occur in Storage
 #[derive(Debug)]
 pub enum StorageError {
     BadChoice,  // TODO this should be a compile error

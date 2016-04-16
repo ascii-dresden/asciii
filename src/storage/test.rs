@@ -6,6 +6,7 @@ use chrono::*;
 use tempdir::TempDir;
 use super::{Storage, Storable, StorageResult, StorageDir};
 
+#[allow(dead_code)]
 pub struct TestProject {
     file_path: PathBuf,
     temp_dir: Option<TempDir>

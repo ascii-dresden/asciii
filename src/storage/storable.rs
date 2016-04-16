@@ -1,3 +1,6 @@
+//! Contains the `Storable` trait that storable projects must implement.
+//!
+
 use std::path::{Path, PathBuf};
 
 use chrono::{Date, UTC, Datelike};

@@ -1,7 +1,6 @@
-//! Manages file structure of templates, working directory and archive.
+//! Manages file structure of templates, working directory and archives.
 //!
-//! This module takes care of all the plumbing underneath,
-//! that is why it's called *"Storage"*.
+//! This module takes care of project file management.
 //!
 //! Your ordinary file structure would look something like this:
 //!
@@ -20,76 +19,65 @@
 //! ```
 //!
 
-#![allow(dead_code)]
 
-use std::ops::{Deref, DerefMut};
+#![allow(unused_imports)]
 
+use std::path::{Path, PathBuf};
+use std::marker::PhantomData;
+use repo::Repository;
 
 static PROJECT_FILE_EXTENSION:&'static str = "yml";
 static TEMPLATE_FILE_EXTENSION:&'static str = "tyml";
 
+/// Year = `i32`
 pub type Year =  i32;
+
+/// Result returned by Storage
 pub type StorageResult<T> = Result<T, StorageError>;
 
-#[cfg(test)]
-mod test ;
+#[cfg(test)] mod test;
+#[cfg(test)] mod realworld;
 
-#[cfg(test)]
-mod realworld;
-
+mod storage;
+mod project_list;
 mod error;
+pub mod traits;
 pub use self::error::StorageError;
-
-pub mod storage;
-pub use self::storage::Storage;
-
 pub mod storable;
 pub use self::storable::Storable;
 
-//pub mod storable;
+// TODO rely more on IoError, it has most of what you need
+/// Manages project file storage.
+///
+/// This includes:
+///
+/// * keeping current projects in a working directory
+/// * listing project folders and files
+/// * listing templates
+/// * archiving and unarchiving projects
+/// * git interaction ( not yet )
+pub struct Storage<L:Storable> {
+    /// Root of the entire Structure.
+    root:  PathBuf,
+    /// Place for project directories.
+    working:  PathBuf,
+    /// Place for archive directories (*e.g. `2015/`*) each containing project directories.
+    archive:  PathBuf,
+    /// Place for template files.
+    templates: PathBuf,
 
+    project_type: PhantomData<L>,
+
+    pub repository: Option<Repository>
+}
 
 /// Used to identify what directory you are talking about.
 #[derive(Debug,Clone)]
-pub enum StorageDir { Working, Archive(Year), Storage, Templates, All }
-
-//TODO implement Display for StorageError or use Quickerror
-
-
+#[allow(dead_code)]
+pub enum StorageDir { Working, Archive(Year), Root, Templates, All }
 
 /// Wrapper around `Vec<Storable>`
 pub struct ProjectList<P:Storable+Sized>{
     pub projects: Vec<P>
 }
-
-impl<L:Storable> ProjectList<L>{
-
-    pub fn filter_by_all(&mut self, filters:&[&str]){
-        for filter in filters{
-            self.filter_by(filter);
-        }
-    }
-
-    pub fn filter_by(&mut self, filter:&str){
-        self.projects.retain(|p|{
-            let (key,val) = filter.split_at(filter.find(':').unwrap_or(0));
-            p.matches_filter(&key, &val[1..])
-        });
-    }
-
-}
-
-impl<L:Storable> Deref for ProjectList<L>{
-    type Target=Vec<L>;
-    fn deref(&self) -> &Vec<L>{
-        &self.projects
-    }
-}
-
-impl<L:Storable> DerefMut for ProjectList<L>{
-    fn deref_mut(&mut self) -> &mut Vec<L>{
-        &mut self.projects
-    }
-}
-
 
