@@ -4,6 +4,8 @@
 
 #![cfg_attr(feature = "nightly", feature(alloc_system))]
 
+#[feature(deprecated)]
+
 #[cfg(feature = "nightly")]
 extern crate alloc_system;
 

@@ -32,8 +32,10 @@ version = "2"
 features= ["yaml"]
 
 [features]
-default = []
+default = ["old_storage"]
 debug = []
+old_storage= []
+new_storage= []
 nightly = []
 lints = ["clippy"]
 

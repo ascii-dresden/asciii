@@ -4,7 +4,7 @@ use util;
 
 use chrono::*;
 use tempdir::TempDir;
-use super::{Storage, Storable, StorageResult, StorageDir};
+use super::*;
 
 #[allow(dead_code)]
 pub struct TestProject {

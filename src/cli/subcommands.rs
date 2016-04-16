@@ -8,7 +8,7 @@ use open;
 use config;
 use ::CONFIG;
 use terminal_size::{Width, terminal_size }; // TODO replace with other lib
-use storage::{StorageDir, Storable, StorageError};
+use storage::*;
 use project::Project;
 use util;
 use super::{print,setup_luigi, setup_luigi_with_git, fail};

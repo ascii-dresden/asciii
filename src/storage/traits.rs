@@ -1,4 +1,5 @@
 //! Reimplementing Storage as trait
+#![cfg(feature="new_storage")]
 
 #![allow(dead_code)]
 

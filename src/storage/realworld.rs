@@ -1,6 +1,6 @@
 use std::path::{Path,PathBuf};
 
-use super::{Storage,StorageDir};
+use super::*;
 use super::test::TestProject;
 
 const STORAGE:&'static str = "/home/hendrik/ascii/caterings";
