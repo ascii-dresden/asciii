@@ -25,6 +25,7 @@ use std::io::Read;
 use std::fs::File;
 use std::path::Path;
 use std::collections::BTreeMap;
+use std::error::Error;
 
 pub use yaml_rust::{Yaml};
 use yaml_rust::{YamlLoader};
@@ -36,6 +37,22 @@ use chrono::*;
 pub enum YamlError{
     Io(io::Error),
     Scan(ScanError)
+}
+
+impl Error for YamlError{
+    fn description(&self) -> &str{
+        match *self{
+            YamlError::Io(ref err) => err.description(),
+            YamlError::Scan(ref err) => err.description()
+        }
+    }
+
+    fn cause(&self) -> Option<&Error>{
+        match *self{
+            YamlError::Io(ref err) => err.cause(),
+            YamlError::Scan(ref err) => err.cause()
+        }
+    }
 }
 
 // All you need to make try!() fun again

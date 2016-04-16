@@ -61,9 +61,7 @@ pub enum StorageDir { Working, Archive(Year), Storage, Templates, All }
 
 #[derive(Debug)]
 pub enum StorageError {
-    DirectoryDoesNotExist(StorageDir),
-    BadChoice,
-    NoProject,
+    BadChoice,  // TODO this should be a compile error
     NoWorkingDir,
     ProjectFileExists,
     ProjectDirExists,
@@ -74,7 +72,39 @@ pub enum StorageError {
     TemplateNotFound,
     Git(GitError),
     Io(io::Error),
-    NotImplemented
+}
+
+impl fmt::Display for StorageError{
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result{
+        write!(f, "{:?}", self)
+    }
+}
+
+impl Error for StorageError{
+    fn description(&self) -> &str{
+        match *self{
+            StorageError::BadChoice                => "The directory you passed cannot be used in this context. You perhaps passed `Templates` instead of `Archive` or `Working`",
+            StorageError::NoWorkingDir             => "There is no working dir.",
+            StorageError::ProjectFileExists        => "Conflicting Name, you tried to create a project already exists.",
+            StorageError::ProjectDirExists         => "Conflicting Name, you tried to create a project for which the project dir already exists.",
+            StorageError::ProjectDoesNotExist      => "No project was found matching this description.",
+            StorageError::StoragePathNotAbsolute   => "Top Level storage path is not absolute.",
+            StorageError::InvalidDirStructure      => "The filestructure under storage path does not correspond with the configuration.",
+            StorageError::ParseError(ref inner)    => inner.description(),
+            StorageError::TemplateNotFound         => "The described template file does not exist.",
+            StorageError::Git(ref inner)           => inner.description(),
+            StorageError::Io(ref inner)            => inner.description(),
+        }
+    }
+
+    fn cause(&self) -> Option<&Error>{
+        match *self{
+            StorageError::ParseError(ref inner)          => Some(inner),
+            StorageError::Git(ref inner)                 => Some(inner),
+            StorageError::Io(ref inner)                  => Some(inner),
+            _                                            => None
+        }
+    }
 }
 
 //TODO implement Display for StorageError or use Quickerror
@@ -443,7 +473,7 @@ impl<L:Storable> Storage<L> {
     fn get_project_dir_from_archive(&self, name:&str, year:Year) -> StorageResult<PathBuf> {
         for project_file in &try!(self.list_project_files(StorageDir::Archive(year))){
             if project_file.ends_with(slugify(&name) + "."+ PROJECT_FILE_EXTENSION) {
-                return project_file.parent().map(|p|p.to_owned()).ok_or(StorageError::NoProject);
+                return project_file.parent().map(|p|p.to_owned()).ok_or(StorageError::ProjectDoesNotExist);
             }
         }
         Err(StorageError::ProjectDoesNotExist)
