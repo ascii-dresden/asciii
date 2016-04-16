@@ -5,6 +5,7 @@
 //! That makes it easier to derive a pure library version later.
 
 use std::process::exit;
+use std::error::Error;
 use project::Project;
 use storage::{Storage, Storable, StorageResult};
 use util;
@@ -19,7 +20,7 @@ pub mod print;
 fn execute<F, S>(command:F) -> S where F: FnOnce() -> StorageResult<S> {
     match command(){
         Ok(s) => s,
-        Err(lerr) => { println!("ERROR: {:?}", lerr); exit(1) }
+        Err(lerr) => { println!("ERROR: {}", lerr.description()); exit(1) }
     }
 }
 
