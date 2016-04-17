@@ -39,11 +39,12 @@ pub type StorageResult<T> = Result<T, StorageError>;
 #[cfg(test)] mod realworld;
 
 mod project_list;
+pub use self::project_list::ProjectList;
 mod error;
 pub mod traits;
 pub use self::error::StorageError;
 pub mod storable;
-pub use self::storable::Storable;
+pub use self::storable::*;
 
 
 #[cfg(feature = "new_storage")]
@@ -82,9 +83,4 @@ pub struct Storage<L:Storable> {
 #[derive(Debug,Clone)]
 #[allow(dead_code)]
 pub enum StorageDir { Working, Archive(Year), Root, Templates, All }
-
-/// Wrapper around `Vec<Storable>`
-pub struct ProjectList<P:Storable+Sized>{
-    pub projects: Vec<P>
-}
 

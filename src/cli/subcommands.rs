@@ -93,7 +93,8 @@ pub fn list(matches:&ArgMatches){
             else if matches.is_present("all"){
                 // sort by date on --all of not overriden
                 if !matches.is_present("sort"){ list_config.sort_by = "date" }
-                StorageDir::All }
+                StorageDir::All
+            }
 
             // or list normal
             else { StorageDir::Working };
@@ -173,14 +174,8 @@ fn list_broken_projects(dir:StorageDir){
 /// Command LIST --templates
 fn list_templates(){
     let luigi = setup_luigi();
-    let template_paths = super::execute(||luigi.list_template_files());
-
-    for path in template_paths{
-        if let Some(stem) = path.file_stem(){
-            println!("{}", stem.to_string_lossy());
-        } else {
-            println!("broken template: {}", path.display());
-        }
+    for name in super::execute(||luigi.list_template_names()){
+        println!("{}", name);
     }
 }
 

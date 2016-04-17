@@ -1,11 +1,10 @@
 //! Reimplementing Storage as trait
-#![cfg(feature="new_storage")]
-
 #![allow(dead_code)]
 
 use std::fs;
 use std::fmt;
 use std::ffi::OsStr;
+use std::ops::Deref;
 use std::path::{Path, PathBuf};
 use std::marker::PhantomData;
 
@@ -18,7 +17,14 @@ use super::Year;
 use super::StorageDir;
 use super::StorageResult;
 use super::ProjectList;
-use super::storable::Storable;
+//use super::storable::{Storable,GitStorable,GitStatus};
+use super::storable::*;
+
+/// You are dealing with a file
+pub type ProjectFile = PathBuf;
+
+/// You are dealing with a directory
+pub type ProjectDir = PathBuf;
 
 /// TODO rename this into Storage later
 pub struct Storage<L:Storable> {
@@ -31,13 +37,7 @@ pub struct Storage<L:Storable> {
   /// Place for template files.
   templates: PathBuf,
 
-  project_type: PhantomData<L>,
-}
-
-/// This will add git functionality on top of Storage
-pub struct GitStorage<L:Storable> {
-    storage: self::Storage<L>,
-    pub repository: Repository
+  project_type: PhantomData<L>
 }
 
 /// Base functionality for archiving and unarchiving etc
@@ -93,14 +93,14 @@ pub trait Storing<L:Storable>: Sized{
     ///        ├── 2001
     ///    ...
     ///</pre>
-    fn create_archive(&self, year:Year) -> StorageResult<PathBuf> {
+    fn create_archive(&self, year:Year) -> StorageResult<ProjectDir> {
         assert!(self.archive_dir().exists());
         let archive = &self.archive_dir().join(year.to_string());
 
         if self.archive_dir().exists() && !archive.exists() {
             try!(fs::create_dir(archive));
         }
-        Ok(archive.to_owned())
+        Ok(archive.to_owned() as ProjectDir)
     }
 
 
@@ -263,7 +263,7 @@ pub trait Storing<L:Storable>: Sized{
     }
 
     /// Matches StorageDir's content against a term and returns matching project files.
-    fn search_projects(&self, dir:StorageDir, search_term:&str) -> StorageResult<Vec<PathBuf>> {
+    fn search_projects(&self, dir:StorageDir, search_term:&str) -> StorageResult<Vec<ProjectFile>> {
         let project_paths: Vec<PathBuf> = try!(self.list_project_files(dir))
             .iter()
             // TODO use `Project::matches_search`
@@ -275,7 +275,7 @@ pub trait Storing<L:Storable>: Sized{
 
     /// Matches StorageDir's content against a term and returns matching project files.
     /// TODO add search_multiple_projects_deep
-    fn search_multiple_projects(&self, dir:StorageDir, search_terms:&[&str]) -> StorageResult<Vec<PathBuf>> {
+    fn search_multiple_projects(&self, dir:StorageDir, search_terms:&[&str]) -> StorageResult<Vec<ProjectFile>> {
         let mut all_paths = Vec::new();
         for search_term in search_terms{
             let mut paths = try!(self.search_projects(dir.clone(), &search_term));
@@ -303,7 +303,7 @@ pub trait Storing<L:Storable>: Sized{
     /// Locates the project file inside a folder.
     ///
     /// This is the first file with the `super::PROJECT_FILE_EXTENSION` in the folder
-    fn get_project_file(&self, directory:&Path) -> StorageResult<PathBuf> {
+    fn get_project_file(&self, directory:&Path) -> StorageResult<ProjectFile> {
         try!(self.list_path_content(directory)).iter()
             .filter(|f|f.extension().unwrap_or(&OsStr::new("")) == super::PROJECT_FILE_EXTENSION)
             .nth(0).map(|b|b.to_owned())
@@ -376,14 +376,13 @@ pub trait Storing<L:Storable>: Sized{
                  .filter_map(|path| match L::open(path){
                      Ok(project) => Some(project),
                      Err(err) => {
-                         println!("Erroneous Project: {}\n {:#?}", path.display(), err);
+                         println!("Erroneous Project: {}\n {}", path.display(), err);
                          None
                      }
                  }).collect::<Vec<L>>()}
                 )
     }
 }
-
 
 impl<L:Storable> Storing<L> for Storage<L> {
     fn new<P: AsRef<Path>>(root:P, working:&str, archive:&str, template:&str) -> StorageResult<Self> {
@@ -406,11 +405,30 @@ impl<L:Storable> Storing<L> for Storage<L> {
     fn templates_dir(&self) -> &Path{ self.templates.as_ref() }
 }
 
+
+
+
+
+
+use git2;
+
+/// This will add git functionality on top of Storage
+pub struct GitStorage<L:Storable> {
+    storage: self::Storage<L>,
+    pub repository: git2::Repository,
+
+    /// Maps GitStatus to each path
+    statuses: HashMap<PathBuf, git2::Status>
+}
+
 impl<L:Storable> Storing<L> for GitStorage<L> {
     fn new<P: AsRef<Path>>(root:P, working:&str, archive:&str, template:&str) -> StorageResult<Self> {
+        let repo = try!(git2::Repository::open(&root));
+        let statuses = try!(cache_statuses(&repo));
         Ok(GitStorage{
             storage:  try!{Storage::new(root.as_ref(),working,archive,template)},
-            repository: try!(Repository::new(&root.as_ref()))
+            repository: repo,
+            statuses: statuses
         })
     }
 
@@ -418,5 +436,85 @@ impl<L:Storable> Storing<L> for GitStorage<L> {
     fn working_dir(&self)   -> &Path{ self.storage.working_dir() }
     fn archive_dir(&self)   -> &Path{ self.storage.archive_dir() }
     fn templates_dir(&self) -> &Path{ self.storage.templates_dir() }
+
 }
 
+use std::collections::HashMap;
+impl<L:Storable> GitStorage<L> {
+
+
+    pub fn get_project_status(&self, project_file:&ProjectFile) -> GitStatus{
+        match
+            (self.statuses.get(project_file.parent().unwrap()),
+            self.statuses.get(project_file))
+        {
+
+            (Some(s),_) if s.contains(git2::STATUS_WT_NEW)      => GitStatus::ProjectAdded,   // + GREEN  
+            (_,Some(s)) if s.contains(git2::STATUS_INDEX_NEW)   => GitStatus::FileAdded,      // + BLUE   
+            (_,Some(s)) if s.contains(git2::STATUS_WT_MODIFIED) => GitStatus::FileChanged,    // ~ YELLOW 
+            (Some(s),_) if s.contains(git2::STATUS_WT_DELETED)  => GitStatus::ProjectRemoved, // - RED
+            (_,Some(s)) if s.contains(git2::STATUS_WT_DELETED)  => GitStatus::FileRemoved,    // - RED
+            (None,None)                                         => GitStatus::Unchanged,      // ""
+            _                                                   => GitStatus::Erroneous,      // X RED
+            // Some(_,s) if s.contains(git2::STATUS_CONFLICTED)
+
+        }
+    }
+
+    pub fn get_project_statuses(&self, dir:StorageDir, search_term:&str)
+        -> StorageResult<Vec<(ProjectFile, GitStatus)>>{
+            self.search_projects(dir, search_term)
+                .map(|list|
+                     list.iter()
+                     .map(|file| (file.clone(), self.get_project_status(file)))
+                     .collect()
+                    )
+        }
+
+
+}
+
+
+impl<L:Storable> Into<StorageResult<GitStorage<L>>> for Storage<L>{
+    fn into(self) -> StorageResult<GitStorage<L>>{
+      let repo = try!(git2::Repository::open(self.root_dir()));
+      Ok(GitStorage{
+          storage: self,
+          statuses: try!(cache_statuses(&repo)),
+          repository: repo
+      })
+    }
+}
+
+impl<L:Storable> Deref for GitStorage<L> {
+    type Target = Storage<L>;
+    fn deref(&self) -> &Storage<L>{
+        &self.storage
+    }
+}
+
+fn cache_statuses(repo:&git2::Repository) -> Result<HashMap<PathBuf, git2::Status>, git2::Error> {
+    let repo_path = repo.path().parent().unwrap().to_owned();
+
+    let git_statuses = try!(repo.statuses( Some( git2::StatusOptions::new()
+                                                 .include_ignored(false)
+                                                 .include_untracked(true) )));
+
+    let mut statuses:HashMap<PathBuf,git2::Status> = HashMap::new();
+
+    for entry in git_statuses.iter(){
+        let status = entry.status();
+
+        if let Some(path) = entry.path(){
+            let path = repo_path.join(PathBuf::from(path));
+            if path.is_file() {
+                if let Some(parent) = path.parent(){
+                    statuses.insert(parent.to_path_buf(), status.to_owned());
+                }
+            }
+            statuses.insert(path, status);
+        }
+    }
+
+    Ok(statuses)
+}

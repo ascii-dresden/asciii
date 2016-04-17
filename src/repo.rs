@@ -124,7 +124,6 @@ impl Repository {
     }
 
     fn execute_git(&self, command:&str, args:&[&str]) -> ExitStatus{
-
         let workdir = self.repo.workdir().unwrap();
         let gitdir  = workdir.join(".git");
 

@@ -88,7 +88,7 @@ pub fn setup_app(){
      ("config",    Some(sub_m)) => config(&sub_m),
      ("whoami",    _          ) => config_show("storage_name"),
 
-     ("path",      Some(sub_m)) => path(&sub_m, |path| println!("{:?}", path)),
+     ("path",      Some(sub_m)) => path(&sub_m, |path| println!("{}", path.display())),
      ("open",      Some(sub_m)) => path(&sub_m, |path| {open::that(path).unwrap();}),
 
      ("term",      _          ) => term(),
