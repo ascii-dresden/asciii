@@ -28,9 +28,9 @@ extern crate open;
 #[macro_use] extern crate prettytable;
 #[macro_use] extern crate lazy_static;
 #[macro_use] extern crate maplit;
-#[macro_use] extern crate clap;
 #[macro_use] extern crate custom_derive;
 #[macro_use] extern crate enum_derive;
+#[macro_use] extern crate clap;
 
 #[macro_use]
 pub mod util;

@@ -9,68 +9,31 @@
 #[cfg(feature = "nightly")]
 extern crate alloc_system;
 
-extern crate yaml_rust;
-extern crate chrono;
-extern crate regex;
-extern crate slug;
-extern crate tempdir;
-extern crate term; // TODO consolidate term, ansi_term and terminal_size
-extern crate terminal_size;
-//TODO make libgit2 optional
-extern crate git2;
-extern crate currency;
 extern crate open;
-#[macro_use] extern crate prettytable;
-#[macro_use] extern crate lazy_static;
-#[macro_use] extern crate maplit;
-#[macro_use] extern crate clap;
-#[macro_use] extern crate custom_derive;
-#[macro_use] extern crate enum_derive;
-
-use clap::App;
-
+extern crate yaml_rust;
 
 #[macro_use]
-mod util;
-mod config;
-mod manual;
+extern crate clap;
+use clap::App;
 
-mod project;
-mod storage;
-mod repo;
+extern crate asciii;
 
-mod templater;
-mod cli;
+use asciii::util;
+use asciii::config;
+use asciii::manual;
+use asciii::project;
+use asciii::storage;
+use asciii::repo;
+use asciii::templater;
+use asciii::cli;
 
-lazy_static!{
-    pub static ref CONFIG: config::ConfigReader = config::ConfigReader::new().unwrap();
-}
 
 // TODO: add logging
 // TODO: make better use of io::ErrorKind
 // TODO: remove: to_owned() and unwrap()s, stupid :D
 
-#[allow(dead_code)]
-fn init_matches() -> yaml_rust::yaml::Yaml
-{
-    use std::fs::File;
-    use std::io::Read;
-    use util::yaml;
-
-    // TODO replace this block with the line above
-    println!("loading cli config at runtime!");
-    let content = File::open("./src/cli/cli.yml")
-        .and_then(|mut file| {
-            let mut content = String::new();
-            file.read_to_string(&mut content)
-                .map(|_| content)
-        }).unwrap();
-    yaml::parse(&content).unwrap()
-}
-
 pub fn setup_app(){
-    use cli::subcommands::*;
-    //let cli_setup = init_matches(); //TODO Font forget this in production
+    use asciii::cli::subcommands::*;
     let cli_setup = load_yaml!("cli/cli.yml");
 
 
