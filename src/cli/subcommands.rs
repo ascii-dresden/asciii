@@ -385,6 +385,9 @@ pub fn term(){
     }
 }
 
+pub fn show_path(matches:&ArgMatches){path(matches, |path| println!("{:?}", path))}
+pub fn open_path(matches:&ArgMatches){path(matches, |path| {open::that(path).unwrap();})}
+
 pub fn path<F:Fn(&Path)>(matches:&ArgMatches, action:F){
         if matches.is_present("templates"){
             action(&PathBuf::from(CONFIG.get_str("path"))

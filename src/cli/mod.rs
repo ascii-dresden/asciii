@@ -12,7 +12,7 @@ use util;
 use ::CONFIG;
 
 /// Contains concrete implementation of each subcommand
-pub mod subcommands ;
+pub mod subcommands;
 pub mod print;
 
 /// Execute a command returning a StorageError

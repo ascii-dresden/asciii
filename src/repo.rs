@@ -25,7 +25,7 @@ impl GitStatus{
          GitStatus::Conflict        => color::RED,
          GitStatus::WorkingNew      => color::YELLOW,
          GitStatus::WorkingModified => color::YELLOW,
-         GitStatus::IndexNew        => color::GREEN,
+         GitStatus::IndexNew        => color::RED,
          //GitStatus::Unknown         => color::WHITE,
          _                          => color::WHITE
         }
