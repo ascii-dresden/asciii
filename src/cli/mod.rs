@@ -13,7 +13,7 @@ use util;
 use ::CONFIG;
 
 /// Contains concrete implementation of each subcommand
-pub mod subcommands ;
+pub mod subcommands;
 pub mod print;
 
 /// prints a message and exist with code 1
