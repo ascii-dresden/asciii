@@ -7,6 +7,8 @@ authors = ["Hendrik Sollich <hendrik@hoodie.de>"]
 [dependencies]
 
 #csv = "*"
+log = "*"
+env_logger = "*"
 yaml-rust = {git="https://github.com/hoodie/yaml-rust", branch="feature/to_string"}
 chrono = "*"
 regex = "*"
@@ -26,14 +28,11 @@ enum_derive = "*"
 custom_derive = "*"
 
 clippy = {version = "*", optional = true}
-
-[dependencies.clap]
-version = "2"
-features= ["yaml"]
+clap = { version = "2", features= ["yaml"]}
 
 [features]
 default = []
-debug = []
+debug_config = []
 nightly = []
 lints = ["clippy"]
 

@@ -45,9 +45,9 @@ fn decide_mode(simple:bool, verbose:bool, paths:bool,nothing:bool, csv:bool) -> 
     if paths{   ListMode::Paths } else
     {
         match (simple, verbose, CONFIG.get_bool("list/verbose")){
-            (false, true,  _   ) => {debugln!("-v overwrites config"); ListMode::Verbose },
-            (false,    _, true ) => {debugln!("-v from config");ListMode::Verbose},
-                          _      => {debugln!("simple mode");ListMode::Simple},
+            (false, true,  _   ) => {debug!("-v overwrites config"); ListMode::Verbose },
+            (false,    _, true ) => {debug!("-v from config");ListMode::Verbose},
+                          _      => {debug!("simple mode");ListMode::Simple},
         }
     }
 }
@@ -145,7 +145,7 @@ fn list_projects(dir:StorageDir, list_config:&ListConfig){
     if !wide_enough && list_config.mode != ListMode::Csv { // TODO room for improvement
         print_projects(simple_rows(&projects, &list_config));
     } else {
-        debugln!("list_mode: {:?}", list_config.mode );
+        debug!("list_mode: {:?}", list_config.mode );
         match list_config.mode{
             ListMode::Csv     => print_csv(&projects),
             ListMode::Paths   => print_projects(path_rows(&projects, &list_config)),
@@ -318,7 +318,7 @@ pub fn config(matches:&ArgMatches){
 // TODO perhaps move this code out of `::cli`
 fn archive_project(name:&str, manual_year:Option<i32>, force:bool){
     let luigi = setup_luigi();
-    debugln!("using the force: {}", force);
+    debug!("using the force: {}", force);
     if let Ok(projects) = luigi.search_projects(StorageDir::Working, name){
         if projects.is_empty(){ fail(format!("Nothing found for {:?}", name)); }
         for project in projects.iter().filter_map(|path| Project::open(path).ok()) {
@@ -456,7 +456,7 @@ pub fn git_add(matches:&ArgMatches){
         .unwrap()
         .collect::<Vec<&str>>();
 
-    debugln!("adding {:?}", search_terms);
+    debug!("adding {:?}", search_terms);
 
     let projects = luigi.search_multiple_projects(StorageDir::Working, &search_terms)
         .unwrap()

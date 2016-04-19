@@ -20,6 +20,7 @@ use util::yaml::{Yaml, YamlError};
 const DEFAULT_LOCATION: &'static str = ".asciii.yml";
 
 /// Looks for a configuration yaml in your HOME_DIR
+#[derive(Debug)]
 pub struct ConfigReader{
     /// Path of config file
     pub path: PathBuf,
@@ -36,8 +37,8 @@ impl ConfigReader{
         home.join(DEFAULT_LOCATION)
     }
 
-    /// DEBUG: Opens config from `self.path()` and parses Yaml right away.
-    #[cfg(feature = "debug")]
+    /// Opens config from `self.path()` and parses Yaml right away.
+    #[cfg(feature = "debug_config")]
     pub fn new () -> Result<ConfigReader, YamlError> {
         let path = ConfigReader::path_home();
         let config = Ok(ConfigReader{
@@ -46,13 +47,19 @@ impl ConfigReader{
             custom: yaml::open(&path).unwrap_or(Yaml::Null),
             local:  yaml::open(Path::new(&DEFAULT_LOCATION)).unwrap_or(Yaml::Null)
         });
-        println!("loading config from {default_path:?} or {local_path:?}", default_path = path, local_path = DEFAULT_LOCATION);
+
+        println!("CONFIG_DEBUG\n  {default_path:?} exists: {default_exists}\n  {local_path:?} exists: {local_exists}",
+                 default_path = path,
+                 default_exists= path.exists(),
+                 local_path = DEFAULT_LOCATION,
+                 local_exists = Path::new(&DEFAULT_LOCATION).exists(),
+                 );
 
         config
     }
 
     /// Opens config from `self.path()` and parses Yaml right away.
-    #[cfg(not(feature = "debug"))]
+    #[cfg(not(feature = "debug_config"))]
     pub fn new () -> Result<ConfigReader, YamlError> {
         let path = ConfigReader::path_home();
         Ok(ConfigReader{
@@ -62,6 +69,7 @@ impl ConfigReader{
             local:  yaml::open(Path::new(&DEFAULT_LOCATION)).unwrap_or(Yaml::Null)
         })
     }
+
 
 
     /// Returns whatever it finds in that position

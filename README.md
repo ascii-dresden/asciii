@@ -45,11 +45,19 @@ Use `cargo build --features lints` to build with [clippy](https://github.com/Man
 Use `cargo build --features nightly` to use nightly features:
   * currently only system allocators
 
-Use `cargo build --features debug` to enable debug prints.
+Use `cargo build --features debug` to enable debug prints, this is sorta deprecated, it is only necessary to debug config, because is initialized by lazy_static before even the logger is set up.
 
 ### Release
 To build a release ready version use `cargo build --release`.
 
+
+## Logging
+
+asciii uses rust [env_logger](http://doc.rust-lang.org/log/env_logger).
+To enable logging you have to set `ASCIII_LOG=debug`.
+Besides `debug`, you can also use `trace`, `warn` or `error`.
+You can enable logging per-module logging like this: `ASCIII_LOG=storage=debug`.
+Modules are all top-level files and folders in `src/`.
 
 ## Technical TODO
 

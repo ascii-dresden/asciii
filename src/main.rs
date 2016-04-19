@@ -9,18 +9,47 @@
 #[cfg(feature = "nightly")]
 extern crate alloc_system;
 
+#[macro_use] extern crate log;
+#[macro_use] extern crate clap;
+
+extern crate env_logger;
 extern crate open;
 extern crate yaml_rust;
+extern crate asciii;
 
-#[macro_use]
-extern crate clap;
+
+use std::env;
+
+use log::{LogRecord, LogLevelFilter};
+use env_logger::LogBuilder;
 use clap::App;
 
-extern crate asciii;
 use asciii::cli::subcommands;
 
 
-pub fn setup_app(){
+fn setup_log(){
+    let format = |record: &LogRecord| {
+        format!("{level}:  {args}    ({file}:{line})",
+        level = record.level(),
+        file  = record.location().file(),
+        line  = record.location().line(),
+        args  = record.args())
+    };
+
+    let mut builder = LogBuilder::new();
+    builder.format(format).filter(None, LogLevelFilter::Info);
+
+    let log_var ="ASCIII_LOG";
+    if env::var(log_var).is_ok() {
+       builder.parse(&env::var(log_var).unwrap());
+    }
+
+    builder.init().unwrap();
+}
+
+fn setup_app(){
+    trace!("setting up app");
+
     //let cli_setup = init_matches(); //TODO Font forget this in production
     let cli_setup = load_yaml!("cli/cli.yml");
 
@@ -53,11 +82,10 @@ pub fn setup_app(){
      ("push",      _          ) => subcommands::git_push(),
      _                       => ()
     }
-
-
 }
 
 fn main(){
+    setup_log();
     setup_app();
 }
 
