@@ -25,7 +25,6 @@ fn execute<F, S>(command:F) -> S where F: FnOnce() -> StorageResult<S> {
 }
 
 /// Sets up an instance of Storage.
-#[cfg(feature="old_storage")]
 fn setup_luigi() -> Storage<Project> {
     let working = CONFIG.get_str("dirs/working");
     let archive = CONFIG.get_str("dirs/archive");
@@ -34,22 +33,11 @@ fn setup_luigi() -> Storage<Project> {
 }
 
 /// Sets up an instance of Storage, with git turned on.
-#[cfg(feature="old_storage")]
 fn setup_luigi_with_git() -> Storage<Project> {
     let working = CONFIG.get_str("dirs/working");
     let archive = CONFIG.get_str("dirs/archive");
     let templates = CONFIG.get_str("dirs/templates");
     execute(||Storage::new_with_git(util::get_storage_path(), working, archive, templates))
-}
-
-
-/// Sets up an instance of Storage, with git turned on.
-#[cfg(feature="new_storage")]
-fn setup_luigi_with_git() -> GitStorage<Project> {
-    let working = CONFIG.get_str("dirs/working");
-    let archive = CONFIG.get_str("dirs/archive");
-    let templates = CONFIG.get_str("dirs/templates");
-    execute(||GitStorage::new(util::get_storage_path(), working, archive, templates))
 }
 
 

@@ -40,7 +40,6 @@ pub type StorageResult<T> = Result<T, StorageError>;
 
 mod project_list;
 mod error;
-pub mod traits;
 pub use self::error::StorageError;
 pub mod storable;
 pub use self::storable::Storable;
