@@ -194,7 +194,7 @@ fn list_years(){
 /// Command LIST --virt
 fn list_virtual_fields(){
     use ::project::spec::VirtualField;
-    println!("or {:?}", VirtualField::iter_variant_names().filter(|v|*v!="Invalid").collect::<Vec<&str>>());
+    println!("{:?}", VirtualField::iter_variant_names().filter(|v|*v!="Invalid").collect::<Vec<&str>>());
 }
 
 

@@ -29,10 +29,8 @@ use asciii::cli::subcommands;
 
 fn setup_log(){
     let format = |record: &LogRecord| {
-        format!("{level}:  {args}    ({file}:{line})",
+        format!("{level}:  {args}",
         level = record.level(),
-        file  = record.location().file(),
-        line  = record.location().line(),
         args  = record.args())
     };
 

@@ -47,6 +47,7 @@ pub use self::storable::Storable;
 
 
 mod storage;
+
 // TODO rely more on IoError, it has most of what you need
 /// Manages project file storage.
 ///

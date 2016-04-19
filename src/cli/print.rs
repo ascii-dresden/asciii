@@ -20,6 +20,7 @@ pub fn print_project(_project:&Project){
     unimplemented!();
 }
 
+#[inline]
 fn result_to_cell(res:&Result<(), Vec<&str>>) -> Cell{
     match *res{
         Ok(_)           => Cell::new("✓").with_style(Attr::ForegroundColor(color::GREEN)), // ✗
@@ -99,9 +100,11 @@ pub fn simple_rows(projects:&[Project], list_config:&ListConfig) -> Vec<Row>{
 /// Triggered by `list --verbose`, usually you set this in your config under `list/verbose`.
 ///
 /// produces the rows used in `print_projects()`
+#[inline]
 pub fn verbose_rows(projects:&[Project], list_config:&ListConfig, repo:Option<Repository>) -> Vec<Row>{
     projects.iter().enumerate()
         .map(|(i, project)| {
+            trace!("configuring row: {:?}", project.name());
             let row_style = if list_config.use_colors {project_to_style(&project)}else{""};
             let mut cells = Vec::new();
 
@@ -152,6 +155,7 @@ pub fn verbose_rows(projects:&[Project], list_config:&ListConfig, repo:Option<Re
                 cell!(project.sum_sold_and_wages().map(|i|i.to_string()).unwrap_or(String::from("none"))),
 
             ]);
+
 
             if let Some(ref details) = list_config.details{
                 cells.extend_from_slice(
@@ -209,9 +213,13 @@ pub fn dynamic_rows(projects:&[Project], list_config:&ListConfig, _repo:Option<R
 /// the interesting code is in dynamic_rows, verbose_rows, path_rows or simple_rows.
 /// This Documentations is redundant, infact, it is already longer than the function itself.
 pub fn print_projects(rows:Vec<Row>){
+    trace!("starting table print");
     let mut table = Table::init(rows);
+    trace!("setting table format");
     table.set_format(FormatBuilder::new().column_separator(' ').padding(0,0).build());
+    trace!("calling table print");
     table.printstd();
+    trace!("done printing table.");
 }
 
 /// Prints Projects as CSV
