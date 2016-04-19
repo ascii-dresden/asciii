@@ -120,8 +120,7 @@ impl Storable for Project{
     ///
     /// TODO compare agains InvoiceNumber, ClientFullName, Email, event/name, invoice/official Etc
     fn matches_search(&self, term: &str) -> bool{
-        // may use matches_filter internally
-        unimplemented!()
+        self.name().to_lowercase().contains(&term.to_lowercase())
     }
 }
 

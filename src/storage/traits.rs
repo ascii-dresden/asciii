@@ -263,12 +263,14 @@ pub trait Storing<L:Storable>: Sized{
     }
 
     /// Matches StorageDir's content against a term and returns matching project files.
-    fn search_projects(&self, dir:StorageDir, search_term:&str) -> StorageResult<Vec<PathBuf>> {
-        let project_paths: Vec<PathBuf> = try!(self.list_project_files(dir))
-            .iter()
-            // TODO use `Project::matches_search`
-            .filter(|path| path.to_str().unwrap_or("??").to_lowercase().contains(&search_term.to_lowercase()))
-            .cloned()
+    ///
+    /// This only searches by name
+    /// TODO return opened `Project`, no need to reopen
+    /// TODO rename `to search_by_name`
+    pub fn search_projects(&self, dir:StorageDir, search_term:&str) -> StorageResult<Vec<PathBuf>> {
+        let project_paths = try!(self.open_project_files(dir)).iter()
+            .filter(|project| project.matches_search(&search_term.to_lowercase()))
+            .map(|project| project.file())
             .collect();
         Ok(project_paths)
     }

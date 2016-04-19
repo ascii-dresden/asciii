@@ -277,17 +277,18 @@ impl<L:Storable> Storage<L> {
     }
 
     /// Matches StorageDir's content against a term and returns matching project files.
+    ///
+    /// This only searches by name
+    /// TODO return opened `Project`, no need to reopen
     pub fn search_projects(&self, dir:StorageDir, search_term:&str) -> StorageResult<Vec<PathBuf>> {
-        let project_paths: Vec<PathBuf> = try!(self.list_project_files(dir))
-            .iter()
-            // TODO use `Project::matches_search`
-            .filter(|path| path.to_str().unwrap_or("??").to_lowercase().contains(&search_term.to_lowercase()))
-            .cloned()
+        let project_paths = try!(self.open_project_files(dir)).iter()
+            .filter(|project| project.matches_search(&search_term.to_lowercase()))
+            .map(|project| project.file())
             .collect();
         Ok(project_paths)
     }
 
-    /// Matches StorageDir's content against a term and returns matching project files.
+    /// Matches StorageDir's content against multiple terms and returns matching project files.
     /// TODO add search_multiple_projects_deep
     pub fn search_multiple_projects(&self, dir:StorageDir, search_terms:&[&str]) -> StorageResult<Vec<PathBuf>> {
         let mut all_paths = Vec::new();
