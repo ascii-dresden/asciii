@@ -43,7 +43,7 @@ fn project_to_style(project:&Project) -> &str{
         return match age{
             _ if age > 28  => "Fm",
               1 ... 28     => "Fc",
-                    0      => "Fy",
+                    0      => "Fyb",
              -7 ... 0      => "Fr",
             -14 ... -7     => "Fy",
             _ if age < -14 => "Fg",
