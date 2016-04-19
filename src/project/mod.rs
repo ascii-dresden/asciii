@@ -39,13 +39,13 @@ impl Storable for Project{
 
         // fill template with this data
         let data = &hashmap!{
-            "VERSION"       => "3.0.0-alpha",
-            "TEMPLATE"      => template_name,
-            "PROJECT-NAME"  => project_name,
-            "DATE-EVENT"    => &event_date,
-            "DATE-CREATED"  => &created_date,
-            "SALARY"        => "8.0", //::CONFIG.get_as_str("defaults/salary"),
-            "manager"       => ::CONFIG.get_str("manager_name")
+            "VERSION"       => crate_version!().to_owned(),
+            "TEMPLATE"      => template_name.to_owned(),
+            "PROJECT-NAME"  => project_name.to_owned(),
+            "DATE-EVENT"    => event_date,
+            "DATE-CREATED"  => created_date,
+            "SALARY"        => ::CONFIG.get_as_string("defaults/salary"),
+            "manager"       => ::CONFIG.get_str("manager_name").to_owned() 
         };
 
         // fills the template

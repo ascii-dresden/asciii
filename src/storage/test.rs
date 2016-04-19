@@ -6,6 +6,8 @@ use chrono::*;
 use tempdir::TempDir;
 use super::*;
 
+// TODO add tests for file or directories in return values
+
 #[allow(dead_code)]
 pub struct TestProject {
     file_path: PathBuf,

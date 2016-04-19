@@ -122,9 +122,9 @@ impl Templater{
         self.to_owned()
     }
 
-    pub fn fill_in_data(&mut self, data: &HashMap<&str,&str>) -> &mut Templater {
+    pub fn fill_in_data(&mut self, data: &HashMap<&str,String>) -> &mut Templater {
         self.fill_template(|keyword| match data.get(keyword){
-            Some(content) => String::from(*content),
+            Some(content) => content.clone(),
             None => format!("__{}__", keyword)
         })
     }

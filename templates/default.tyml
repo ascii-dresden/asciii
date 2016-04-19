@@ -71,7 +71,7 @@ manager: __MANAGER__
 
 #messages: # read default-settings.yml on how to overwrite
 
-invoicer_version: 3.0.0-dev (__VERSION__)
+invoicer_version: __VERSION__
 template: __TEMPLATE__
 format: 2.4.0
 created: __DATE-CREATED__

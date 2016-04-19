@@ -39,17 +39,13 @@ pub type StorageResult<T> = Result<T, StorageError>;
 #[cfg(test)] mod realworld;
 
 mod project_list;
+pub use self::project_list::ProjectList;
 mod error;
 pub use self::error::StorageError;
 pub mod storable;
 pub use self::storable::Storable;
 
 
-#[cfg(feature = "new_storage")]
-pub use self::traits::{Storing,Storage,GitStorage};
-
-
-#[cfg(feature = "old_storage")]
 mod storage;
 // TODO rely more on IoError, it has most of what you need
 /// Manages project file storage.
@@ -61,7 +57,6 @@ mod storage;
 /// * listing templates
 /// * archiving and unarchiving projects
 /// * git interaction ( not yet )
-#[cfg(feature = "old_storage")]
 pub struct Storage<L:Storable> {
     /// Root of the entire Structure.
     root:  PathBuf,
@@ -81,9 +76,3 @@ pub struct Storage<L:Storable> {
 #[derive(Debug,Clone)]
 #[allow(dead_code)]
 pub enum StorageDir { Working, Archive(Year), Root, Templates, All }
-
-/// Wrapper around `Vec<Storable>`
-pub struct ProjectList<P:Storable+Sized>{
-    pub projects: Vec<P>
-}
-

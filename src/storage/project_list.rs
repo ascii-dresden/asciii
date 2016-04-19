@@ -3,7 +3,11 @@
 use std::ops::{Deref, DerefMut};
 
 use super::Storable;
-use super::ProjectList;
+
+/// Wrapper around `Vec<Storable>`
+pub struct ProjectList<P:Storable+Sized>{
+    pub projects: Vec<P>
+}
 
 impl<L:Storable> ProjectList<L>{
 

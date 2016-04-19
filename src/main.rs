@@ -20,11 +20,8 @@ extern crate asciii;
 use asciii::cli::subcommands;
 
 
-// TODO: add logging
-// TODO: make better use of io::ErrorKind
-// TODO: remove: to_owned() and unwrap()s, stupid :D
-
 pub fn setup_app(){
+    //let cli_setup = init_matches(); //TODO Font forget this in production
     let cli_setup = load_yaml!("cli/cli.yml");
 
 

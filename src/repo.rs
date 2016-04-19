@@ -23,7 +23,7 @@ impl GitStatus{
         // => write!(f, "{:?}", self)
          GitStatus::Current         => color::BLUE,
          GitStatus::Conflict        => color::RED,
-         GitStatus::WorkingNew      => color::YELLOW,
+         GitStatus::WorkingNew      => color::GREEN,
          GitStatus::WorkingModified => color::YELLOW,
          GitStatus::IndexNew        => color::RED,
          //GitStatus::Unknown         => color::WHITE,

@@ -92,6 +92,18 @@ impl ConfigReader{
             .expect(&format!("Config file {} in field {} does not contain a string value", DEFAULT_LOCATION, key))
     }
 
+    /// Returns the string in the position or an empty string
+    ///
+    /// # Panics
+    /// This panics if nothing is found.
+    /// You should have a default config for everything that you use.
+    pub fn get_as_string(&self, key:&str) -> String{
+        yaml::get_as_string(&self.local, &key)
+            .or_else(||yaml::get_as_string(&self.custom, &key))
+            .or_else(||yaml::get_as_string(&self.defaults, &key))
+            .expect(&format!("Config file {} in field {} does not contain a string value", DEFAULT_LOCATION, key))
+    }
+
     /// Returns the boolean in the position or `false`
     ///
     /// # Panics
