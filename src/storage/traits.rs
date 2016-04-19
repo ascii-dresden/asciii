@@ -27,7 +27,7 @@ pub type ProjectFile = PathBuf;
 pub type ProjectDir = PathBuf;
 
 /// TODO rename this into Storage later
-pub struct Storage<L:Storable> {
+pub struct Storage {
   /// Root of the entire Structure.
   root:  PathBuf,
   /// Place for project directories.
@@ -36,12 +36,14 @@ pub struct Storage<L:Storable> {
   archive:  PathBuf,
   /// Place for template files.
   templates: PathBuf,
-
-  project_type: PhantomData<L>
 }
 
 /// Base functionality for archiving and unarchiving etc
-pub trait Storing<L:Storable>: Sized{
+pub trait Storing: Sized{
+
+    type L:Storable;
+
+
     fn new<P: AsRef<Path>>(root:P, working:&str, archive:&str, template:&str) -> StorageResult<Self>;
     /// Getter path to root directory.
     fn root_dir(&self) -> &Path;
@@ -164,7 +166,7 @@ pub trait Storing<L:Storable>: Sized{
 
     /// Takes a template file and stores it in the working directory,
     /// in a new project directory according to it's name.
-    fn create_project(&self, project_name:&str, template_name:&str) -> StorageResult<L> {
+    fn create_project(&self, project_name:&str, template_name:&str) -> StorageResult<Self::L> {
         if !self.working_dir().exists(){ return Err(StorageError::NoWorkingDir)}; // funny syntax
         let slugged_name = slug::slugify(&project_name);
         let project_dir  = self.working_dir().join(&slugged_name);
@@ -174,7 +176,7 @@ pub trait Storing<L:Storable>: Sized{
             .join(&(slugged_name + "." + super::PROJECT_FILE_EXTENSION));
 
         let template_path = try!(self.get_template_file(template_name));
-        let mut project = try!(L::from_template(&project_name, &template_path));
+        let mut project = try!(Self::L::from_template(&project_name, &template_path));
 
         // TODO test for unreplaced template keywords
         try!(fs::create_dir(&project_dir));
@@ -211,7 +213,7 @@ pub trait Storing<L:Storable>: Sized{
     ///    ...
     ///</pre>
     // TODO write extra tests
-    fn archive_project(&self, project:&L, year:Year) -> StorageResult<PathBuf> {
+    fn archive_project(&self, project:&Self::L, year:Year) -> StorageResult<PathBuf> {
         let name_in_archive = match project.prefix(){
             Some(prefix) => format!("{}_{}", prefix, project.ident()),
                     None =>  project.ident()
@@ -227,7 +229,7 @@ pub trait Storing<L:Storable>: Sized{
     }
 
     /// Moves a project folder from `/working` dir to `/archive/$year`.
-    fn unarchive_project(&self, project:&L) -> StorageResult<PathBuf> {
+    fn unarchive_project(&self, project:&Self::L) -> StorageResult<PathBuf> {
         self.unarchive_project_file(&project.file())
     }
 
@@ -370,21 +372,23 @@ pub trait Storing<L:Storable>: Sized{
     }
 
     /// Behaves like `list_project_files()` but also opens projects directly.
-    fn open_project_files(&self, dir:StorageDir) -> StorageResult<ProjectList<L>>{
+    fn open_project_files(&self, dir:StorageDir) -> StorageResult<ProjectList<Self::L>>{
         self.list_project_files(dir)
             .map(|paths| ProjectList{projects:paths.iter()
-                 .filter_map(|path| match L::open(path){
+                 .filter_map(|path| match Self::L::open(path){
                      Ok(project) => Some(project),
                      Err(err) => {
                          println!("Erroneous Project: {}\n {}", path.display(), err);
                          None
                      }
-                 }).collect::<Vec<L>>()}
+                 }).collect::<Vec<Self::L>>()}
                 )
     }
 }
 
-impl<L:Storable> Storing<L> for Storage<L> {
+impl Storing for Storage {
+    type L = ::project::Project;
+
     fn new<P: AsRef<Path>>(root:P, working:&str, archive:&str, template:&str) -> StorageResult<Self> {
         let root = root.as_ref();
         if root.is_absolute(){
@@ -393,7 +397,7 @@ impl<L:Storable> Storing<L> for Storage<L> {
                 working:   root.join(working),
                 archive:   root.join(archive),
                 templates: root.join(template),
-                project_type: PhantomData,
+                //project_type: PhantomData,
             })
         } else {
             Err(StorageError::StoragePathNotAbsolute)
@@ -413,15 +417,17 @@ impl<L:Storable> Storing<L> for Storage<L> {
 use git2;
 
 /// This will add git functionality on top of Storage
-pub struct GitStorage<L:Storable> {
-    storage: self::Storage<L>,
+pub struct GitStorage {
+    storage: self::Storage,
     pub repository: git2::Repository,
 
     /// Maps GitStatus to each path
     statuses: HashMap<PathBuf, git2::Status>
 }
 
-impl<L:Storable> Storing<L> for GitStorage<L> {
+impl Storing for GitStorage {
+    type L = GitStorable<::project::Project>;
+
     fn new<P: AsRef<Path>>(root:P, working:&str, archive:&str, template:&str) -> StorageResult<Self> {
         let repo = try!(git2::Repository::open(&root));
         let statuses = try!(cache_statuses(&repo));
@@ -440,7 +446,7 @@ impl<L:Storable> Storing<L> for GitStorage<L> {
 }
 
 use std::collections::HashMap;
-impl<L:Storable> GitStorage<L> {
+impl GitStorage {
 
 
     pub fn get_project_status(&self, project_file:&ProjectFile) -> GitStatus{
@@ -449,9 +455,9 @@ impl<L:Storable> GitStorage<L> {
             self.statuses.get(project_file))
         {
 
-            (Some(s),_) if s.contains(git2::STATUS_WT_NEW)      => GitStatus::ProjectAdded,   // + GREEN  
-            (_,Some(s)) if s.contains(git2::STATUS_INDEX_NEW)   => GitStatus::FileAdded,      // + BLUE   
-            (_,Some(s)) if s.contains(git2::STATUS_WT_MODIFIED) => GitStatus::FileChanged,    // ~ YELLOW 
+            (Some(s),_) if s.contains(git2::STATUS_WT_NEW)      => GitStatus::ProjectAdded,   // + GREEN
+            (_,Some(s)) if s.contains(git2::STATUS_INDEX_NEW)   => GitStatus::FileAdded,      // + BLUE
+            (_,Some(s)) if s.contains(git2::STATUS_WT_MODIFIED) => GitStatus::FileChanged,    // ~ YELLOW
             (Some(s),_) if s.contains(git2::STATUS_WT_DELETED)  => GitStatus::ProjectRemoved, // - RED
             (_,Some(s)) if s.contains(git2::STATUS_WT_DELETED)  => GitStatus::FileRemoved,    // - RED
             (None,None)                                         => GitStatus::Unchanged,      // ""
@@ -475,8 +481,8 @@ impl<L:Storable> GitStorage<L> {
 }
 
 
-impl<L:Storable> Into<StorageResult<GitStorage<L>>> for Storage<L>{
-    fn into(self) -> StorageResult<GitStorage<L>>{
+impl Into<StorageResult<GitStorage>> for Storage{
+    fn into(self) -> StorageResult<GitStorage>{
       let repo = try!(git2::Repository::open(self.root_dir()));
       Ok(GitStorage{
           storage: self,
@@ -486,9 +492,9 @@ impl<L:Storable> Into<StorageResult<GitStorage<L>>> for Storage<L>{
     }
 }
 
-impl<L:Storable> Deref for GitStorage<L> {
-    type Target = Storage<L>;
-    fn deref(&self) -> &Storage<L>{
+impl Deref for GitStorage {
+    type Target = Storage;
+    fn deref(&self) -> &Storage{
         &self.storage
     }
 }
