@@ -275,10 +275,14 @@ pub fn show_items(project:&Project){
         ]));
     }
     table.printstd();
-    println!("{}", project.sum_sold().unwrap());
-    println!("{}", project.tax_sold().unwrap());
-    println!("{}", project.sum_sold_and_taxes().unwrap());
-    println!("{}", project.sum_sold_and_wages().unwrap());
+    let mut table = table!{
+        ["sold ", project.sum_sold().unwrap() ],
+        ["tax", project.tax_sold().unwrap() ],
+        ["sum+tax", project.sum_sold_and_taxes().unwrap()],
+        ["sum+wages", project.sum_sold_and_wages().unwrap()]
+    };
+    table.set_format(TableFormat::new());
+    table.printstd();
 
     //println!("{}", project.sum_offered().unwrap());
     //println!("{}", project.tax_offered().unwrap());

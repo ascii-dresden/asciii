@@ -20,6 +20,9 @@ pub mod spec;
 use self::spec::{SpecResult, VirtualField};
 use self::spec::products::{ProductResult};
 
+/// Represents a Project.
+///
+/// A project is storable, contains products, and you can create an offer or invoice from it.
 pub struct Project {
     file_path: PathBuf,
     temp_dir: Option<TempDir>,
@@ -45,7 +48,7 @@ impl Storable for Project{
             "DATE-EVENT"    => event_date,
             "DATE-CREATED"  => created_date,
             "SALARY"        => ::CONFIG.get_as_string("defaults/salary"),
-            "manager"       => ::CONFIG.get_str("manager_name").to_owned() 
+            "manager"       => ::CONFIG.get_str("manager_name").to_owned()
         };
 
         // fills the template
@@ -125,6 +128,8 @@ impl Storable for Project{
 }
 
 impl Project{
+
+    /// Access to inner data
     pub fn yaml(&self) -> &Yaml{ &self.yaml }
 
     /// wrapper around yaml::get() with replacement
