@@ -416,9 +416,9 @@ pub fn path<F:Fn(&Path)>(matches:&ArgMatches, action:F){
 
 /// Command STATUS
 pub fn git_status(){
-    //let luigi = setup_luigi_with_git();
-    //let repo = luigi.repository.unwrap();
-    //util::exit(repo.status()) // FIXME this does not behave right
+    let luigi = setup_luigi_with_git();
+    let repo = luigi.repository.unwrap();
+    util::exit(repo.status()) // FIXME this does not behave right
 }
 
 /// Command COMMIT

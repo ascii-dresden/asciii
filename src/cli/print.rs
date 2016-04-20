@@ -114,7 +114,12 @@ pub fn verbose_rows(projects:&[Project], list_config:&ListConfig, repo:Option<Re
                 // Or just git-add them when archiving automatically, that is what ascii2 would
                 // have done
                 let status = repo.get_status(&project.dir());
-                cells.push( Cell::new( &status.to_string() ).with_style( Attr::ForegroundColor(status.to_color()) ));
+                let (color, style) = status.to_style();
+
+                cells.push( Cell::new( &status.to_string() )
+                            .with_style( Attr::ForegroundColor(color) )
+                            .with_style( style.unwrap_or(Attr::Standout(false)) )
+                            );
             };
 
             let validation1 = project.valid_stage1();

@@ -52,7 +52,7 @@ pub fn open_in_editor(editor:&Option<&str>, paths:&[PathBuf]){
 
         let (editor_command,args) = editor_config.split_first().unwrap() ;
 
-        println!("launching {:?} with {:?} and {:?}",
+        info!("launching {:?} with {:?} and {:?}",
                  editor_command,
                  args.join(" "),
                  paths);

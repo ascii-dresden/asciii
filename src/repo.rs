@@ -6,7 +6,7 @@ use std::io::Write;
 use std::process::{Command,ExitStatus};
 
 use git2;
-use term::color;
+use term::{color,Attr};
 use term::color::Color;
 
 /// More Rustacious way of representing a git status
@@ -18,23 +18,39 @@ pub enum GitStatus{
 }
 
 impl GitStatus{
-    pub fn to_color(&self) -> Color {
+
+    pub fn to_format(&self) -> Attr{
+        //Bold,
+        //Dim,
+        //Italic(bool),
+        //Underline(bool),
+        //Blink,
+        //Standout(bool),
+        //Reverse,
+        //Secure,
+        //ForegroundColor(Color),
+        //BackgroundColor(Color),
+
+        Attr::Reverse
+    }
+
+    pub fn to_style(&self) -> (Color,Option<Attr>) {
         match *self{
-        // => write!(f, "{:?}", self)
-         GitStatus::Current         => color::BLUE,
-         GitStatus::Conflict        => color::RED,
-         GitStatus::WorkingNew      => color::GREEN,
-         GitStatus::WorkingModified => color::YELLOW,
-         GitStatus::IndexNew        => color::RED,
-         //GitStatus::Unknown         => color::WHITE,
-         _                          => color::WHITE
+        // => write!(f, "{:?}",  self)
+         GitStatus::Current         => (color::BLUE,    None),
+         GitStatus::Conflict        => (color::RED,     None),
+         GitStatus::WorkingNew      => (color::GREEN,   None),
+         GitStatus::WorkingModified => (color::YELLOW,  None),
+         GitStatus::IndexNew        => (color::RED,     Some(Attr::Bold)),
+         GitStatus::IndexModified   => (color::BLUE,    Some(Attr::Bold)),
+         _                          => (color::WHITE,   None)
         }
     }
 }
 
 impl fmt::Display for GitStatus{
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-
+// X ✘ ✓
         match *self{
         // => write!(f, "{:?}", self)
          GitStatus::Conflict        => write!(f, "X"),
@@ -42,7 +58,8 @@ impl fmt::Display for GitStatus{
          GitStatus::WorkingNew      => write!(f, "+"),
          GitStatus::WorkingModified => write!(f, "~"),
          GitStatus::IndexNew        => write!(f, "+"),
-         GitStatus::Unknown         => write!(f, ""),
+         GitStatus::IndexModified   => write!(f, "✓"),
+         GitStatus::Unknown         => write!(f, "" ),
          _                          => write!(f, "{:?}", self),
 
         }
@@ -155,7 +172,7 @@ impl Repository {
     }
 
     pub fn status(&self) -> ExitStatus{
-        self.execute_git("status", &["origin", "master"])
+        self.execute_git("status", &[])
     }
 
     pub fn push(&self) -> ExitStatus{
