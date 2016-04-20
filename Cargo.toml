@@ -28,7 +28,7 @@ enum_derive = "*"
 custom_derive = "*"
 
 clippy = {version = "*", optional = true}
-clap = { version = "2", features= ["yaml"]}
+clap = "2"
 
 [features]
 default = []
