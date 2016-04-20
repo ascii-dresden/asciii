@@ -13,8 +13,11 @@ use util;
 use ::CONFIG;
 
 /// Contains concrete implementation of each subcommand
+pub mod app;
 pub mod subcommands;
 pub mod print;
+
+pub use self::app::setup;
 
 /// prints a message and exist with code 1
 pub fn fail<T:Display>(message:T) -> !{

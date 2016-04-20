@@ -22,10 +22,9 @@ use std::env;
 
 use log::{LogRecord, LogLevelFilter};
 use env_logger::LogBuilder;
-use clap::App;
 
+use asciii::cli;
 use asciii::cli::subcommands;
-
 
 fn setup_log(){
     let format = |record: &LogRecord| {
@@ -48,13 +47,7 @@ fn setup_log(){
 fn setup_app(){
     trace!("setting up app");
 
-    //let cli_setup = init_matches(); //TODO Font forget this in production
-    let cli_setup = load_yaml!("cli/cli.yml");
-
-
-    let matches = App::from_yaml(&cli_setup)
-        .version(&crate_version!()[..])
-        .get_matches();
+    let matches = cli::setup();
 
     match matches.subcommand() {
      ("list",      Some(sub_m)) => subcommands::list(&sub_m),

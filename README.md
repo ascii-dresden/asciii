@@ -4,35 +4,13 @@ The advanced but simple commandline interface to invoice invocation.
 
 Here I rewrite the original [ascii-invoicer](http://github.com/ascii-dresden/ascii-invoicer) in Rust. Why? Because!
 
-Next steps: finish [3.0.0](https://github.com/hoodie/asciii-rs/milestones/3.0.0) and release a beta for testing.
+## Status
 
-```
-  DOCUMENTS:
-  asciii display NAMES                 # Shows information about a project in different ways
-  asciii help [COMMAND]                # Describe available commands or one specific command
-  asciii invoice NAMES                 # Create an invoice from project
-  asciii offer NAMES                   # Create an offer from project
-  asciii open NAMES                    # Open created documents
+This has evolved from a technical experiment into a full blown rewrite,
+I'm currently working on restoring full functionality and release the first version with the number [3.0.0](https://github.com/hoodie/asciii-rs/milestones/3.0.0).
 
-  SUGAR:
-  asciii csv                           # Equal to: ascii list --all --csv --sort=index --filter event/date:2015
-  asciii calendar                      # Create a calendar file from all caterings named "invoicer.ics"
+This should hopefully run smoothly on the same platforms that ascii2 currently runs on.
 
-  GIT INTEGRATION:
-  asciii add NAMES                     # Git Integration
-  asciii pull                          # Git Integration
-  asciii push                          # Git Integration
-  asciii status                        # Git Integration
-  asciii log                           # Git Integration
-  asciii commit -m, --message=MESSAGE  # Git Integration
-
-  asciii search QUERY                  # Search everything, only one query currently
-
-  asciii version                       # Display version
-
-Options:
-  -v, [--verbose], [--no-verbose]  # Change default in $HOME/.asciii.yml
-```
 
 ## Build
 
@@ -61,12 +39,12 @@ Modules are all top-level files and folders in `src/`.
 
 ## Technical TODO
 
-* [ ] test on windows and mac
-* [ ] build on raspberry py
+* [ ] test on windows and mac (https://github.com/japaric/rust-everywhere)
+* [x] build on Raspberry Pi
 * [ ] see if you can `#[inline]` to improve perfomance
 * [ ] break up code into crates
   * [ ] config
-  * [ ] yaml helpers
+  * [ ] yaml helpers macro-DSL
   * [ ] templating
   * [ ] utilities etc
 

@@ -19,7 +19,7 @@ prettytable-rs = "*"
 currency = {git="https://github.com/hoodie/rust-lang-currency"}
 #currency = {path="../currency"}
 lazy_static = "*"
-git2 = "*"
+git2 = {version = "*", default-features=false}
 maplit = "*"
 tempdir = "*"
 open = "*"
