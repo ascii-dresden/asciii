@@ -385,7 +385,7 @@ pub fn term(){
     }
 }
 
-pub fn show_path(matches:&ArgMatches){path(matches, |path| println!("{:?}", path))}
+pub fn show_path(matches:&ArgMatches){path(matches, |path| println!("{}", path.display()))}
 pub fn open_path(matches:&ArgMatches){path(matches, |path| {open::that(path).unwrap();})}
 
 pub fn path<F:Fn(&Path)>(matches:&ArgMatches, action:F){
