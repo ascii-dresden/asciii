@@ -11,7 +11,6 @@
 
     <link rel="stylesheet" type="text/css" href="../../../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../../../main.css">
-    
 
     
     
@@ -210,6 +209,23 @@
 <span id="166">166</span>
 <span id="167">167</span>
 <span id="168">168</span>
+<span id="169">169</span>
+<span id="170">170</span>
+<span id="171">171</span>
+<span id="172">172</span>
+<span id="173">173</span>
+<span id="174">174</span>
+<span id="175">175</span>
+<span id="176">176</span>
+<span id="177">177</span>
+<span id="178">178</span>
+<span id="179">179</span>
+<span id="180">180</span>
+<span id="181">181</span>
+<span id="182">182</span>
+<span id="183">183</span>
+<span id="184">184</span>
+<span id="185">185</span>
 </pre><pre class='rust '>
 <span class='attribute'>#<span class='op'>!</span>[<span class='ident'>allow</span>(<span class='ident'>dead_code</span>, <span class='ident'>unused_variables</span>)]</span>
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>fmt</span>;
@@ -219,7 +235,7 @@
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>process</span>::{<span class='ident'>Command</span>,<span class='ident'>ExitStatus</span>};
 
 <span class='kw'>use</span> <span class='ident'>git2</span>;
-<span class='kw'>use</span> <span class='ident'>term</span>::<span class='ident'>color</span>;
+<span class='kw'>use</span> <span class='ident'>term</span>::{<span class='ident'>color</span>,<span class='ident'>Attr</span>};
 <span class='kw'>use</span> <span class='ident'>term</span>::<span class='ident'>color</span>::<span class='ident'>Color</span>;
 
 <span class='doccomment'>/// More Rustacious way of representing a git status</span>
@@ -231,23 +247,39 @@
 }
 
 <span class='kw'>impl</span> <span class='ident'>GitStatus</span>{
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>to_color</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>Color</span> {
+
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>to_format</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>Attr</span>{
+        <span class='comment'>//Bold,</span>
+        <span class='comment'>//Dim,</span>
+        <span class='comment'>//Italic(bool),</span>
+        <span class='comment'>//Underline(bool),</span>
+        <span class='comment'>//Blink,</span>
+        <span class='comment'>//Standout(bool),</span>
+        <span class='comment'>//Reverse,</span>
+        <span class='comment'>//Secure,</span>
+        <span class='comment'>//ForegroundColor(Color),</span>
+        <span class='comment'>//BackgroundColor(Color),</span>
+
+        <span class='ident'>Attr</span>::<span class='ident'>Reverse</span>
+    }
+
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>to_style</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> (<span class='ident'>Color</span>,<span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Attr</span><span class='op'>&gt;</span>) {
         <span class='kw'>match</span> <span class='op'>*</span><span class='self'>self</span>{
-        <span class='comment'>// =&gt; write!(f, &quot;{:?}&quot;, self)</span>
-         <span class='ident'>GitStatus</span>::<span class='ident'>Current</span>         <span class='op'>=&gt;</span> <span class='ident'>color</span>::<span class='ident'>BLUE</span>,
-         <span class='ident'>GitStatus</span>::<span class='ident'>Conflict</span>        <span class='op'>=&gt;</span> <span class='ident'>color</span>::<span class='ident'>RED</span>,
-         <span class='ident'>GitStatus</span>::<span class='ident'>WorkingNew</span>      <span class='op'>=&gt;</span> <span class='ident'>color</span>::<span class='ident'>YELLOW</span>,
-         <span class='ident'>GitStatus</span>::<span class='ident'>WorkingModified</span> <span class='op'>=&gt;</span> <span class='ident'>color</span>::<span class='ident'>YELLOW</span>,
-         <span class='ident'>GitStatus</span>::<span class='ident'>IndexNew</span>        <span class='op'>=&gt;</span> <span class='ident'>color</span>::<span class='ident'>GREEN</span>,
-         <span class='comment'>//GitStatus::Unknown         =&gt; color::WHITE,</span>
-         _                          <span class='op'>=&gt;</span> <span class='ident'>color</span>::<span class='ident'>WHITE</span>
+        <span class='comment'>// =&gt; write!(f, &quot;{:?}&quot;,  self)</span>
+         <span class='ident'>GitStatus</span>::<span class='ident'>Current</span>         <span class='op'>=&gt;</span> (<span class='ident'>color</span>::<span class='ident'>BLUE</span>,    <span class='prelude-val'>None</span>),
+         <span class='ident'>GitStatus</span>::<span class='ident'>Conflict</span>        <span class='op'>=&gt;</span> (<span class='ident'>color</span>::<span class='ident'>RED</span>,     <span class='prelude-val'>None</span>),
+         <span class='ident'>GitStatus</span>::<span class='ident'>WorkingNew</span>      <span class='op'>=&gt;</span> (<span class='ident'>color</span>::<span class='ident'>GREEN</span>,   <span class='prelude-val'>None</span>),
+         <span class='ident'>GitStatus</span>::<span class='ident'>WorkingModified</span> <span class='op'>=&gt;</span> (<span class='ident'>color</span>::<span class='ident'>YELLOW</span>,  <span class='prelude-val'>None</span>),
+         <span class='ident'>GitStatus</span>::<span class='ident'>IndexNew</span>        <span class='op'>=&gt;</span> (<span class='ident'>color</span>::<span class='ident'>RED</span>,     <span class='prelude-val'>Some</span>(<span class='ident'>Attr</span>::<span class='ident'>Bold</span>)),
+         <span class='ident'>GitStatus</span>::<span class='ident'>IndexModified</span>   <span class='op'>=&gt;</span> (<span class='ident'>color</span>::<span class='ident'>BLUE</span>,    <span class='prelude-val'>Some</span>(<span class='ident'>Attr</span>::<span class='ident'>Bold</span>)),
+         _                          <span class='op'>=&gt;</span> (<span class='ident'>color</span>::<span class='ident'>WHITE</span>,   <span class='prelude-val'>None</span>)
         }
     }
 }
 
 <span class='kw'>impl</span> <span class='ident'>fmt</span>::<span class='ident'>Display</span> <span class='kw'>for</span> <span class='ident'>GitStatus</span>{
     <span class='kw'>fn</span> <span class='ident'>fmt</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>f</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>fmt</span>::<span class='ident'>Formatter</span>) <span class='op'>-&gt;</span> <span class='ident'>fmt</span>::<span class='prelude-ty'>Result</span> {
-
+<span class='comment'>// X ✘ ✓</span>
         <span class='kw'>match</span> <span class='op'>*</span><span class='self'>self</span>{
         <span class='comment'>// =&gt; write!(f, &quot;{:?}&quot;, self)</span>
          <span class='ident'>GitStatus</span>::<span class='ident'>Conflict</span>        <span class='op'>=&gt;</span> <span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;X&quot;</span>),
@@ -255,7 +287,8 @@
          <span class='ident'>GitStatus</span>::<span class='ident'>WorkingNew</span>      <span class='op'>=&gt;</span> <span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;+&quot;</span>),
          <span class='ident'>GitStatus</span>::<span class='ident'>WorkingModified</span> <span class='op'>=&gt;</span> <span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;~&quot;</span>),
          <span class='ident'>GitStatus</span>::<span class='ident'>IndexNew</span>        <span class='op'>=&gt;</span> <span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;+&quot;</span>),
-         <span class='ident'>GitStatus</span>::<span class='ident'>Unknown</span>         <span class='op'>=&gt;</span> <span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;&quot;</span>),
+         <span class='ident'>GitStatus</span>::<span class='ident'>IndexModified</span>   <span class='op'>=&gt;</span> <span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;✓&quot;</span>),
+         <span class='ident'>GitStatus</span>::<span class='ident'>Unknown</span>         <span class='op'>=&gt;</span> <span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;&quot;</span> ),
          _                          <span class='op'>=&gt;</span> <span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;{:?}&quot;</span>, <span class='self'>self</span>),
 
         }
@@ -342,7 +375,7 @@
         <span class='kw'>let</span> <span class='ident'>gitdir</span>  <span class='op'>=</span> <span class='ident'>workdir</span>.<span class='ident'>join</span>(<span class='string'>&quot;.git&quot;</span>);
 
 
-        <span class='macro'>println</span><span class='macro'>!</span>(<span class='string'>&quot;running: {:#?}&quot;</span>, <span class='ident'>Command</span>::<span class='ident'>new</span>(<span class='string'>&quot;git&quot;</span>)
+        <span class='macro'>debug</span><span class='macro'>!</span>(<span class='string'>&quot;{:#?}&quot;</span>, <span class='ident'>Command</span>::<span class='ident'>new</span>(<span class='string'>&quot;git&quot;</span>)
                  .<span class='ident'>args</span>(<span class='kw-2'>&amp;</span>[<span class='string'>&quot;--work-tree&quot;</span>, <span class='ident'>workdir</span>.<span class='ident'>to_str</span>().<span class='ident'>unwrap</span>()])
                  .<span class='ident'>args</span>(<span class='kw-2'>&amp;</span>[<span class='string'>&quot;--git-dir&quot;</span>,   <span class='ident'>gitdir</span>.<span class='ident'>to_str</span>().<span class='ident'>unwrap</span>()])
                  .<span class='ident'>arg</span>(<span class='ident'>command</span>).<span class='ident'>args</span>(<span class='ident'>args</span>));
@@ -368,7 +401,7 @@
     }
 
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>status</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>ExitStatus</span>{
-        <span class='self'>self</span>.<span class='ident'>execute_git</span>(<span class='string'>&quot;status&quot;</span>, <span class='kw-2'>&amp;</span>[<span class='string'>&quot;origin&quot;</span>, <span class='string'>&quot;master&quot;</span>])
+        <span class='self'>self</span>.<span class='ident'>execute_git</span>(<span class='string'>&quot;status&quot;</span>, <span class='kw-2'>&amp;</span>[])
     }
 
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>push</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>ExitStatus</span>{

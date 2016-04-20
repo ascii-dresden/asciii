@@ -11,7 +11,6 @@
 
     <link rel="stylesheet" type="text/css" href="../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../main.css">
-    
 
     
     
@@ -44,10 +43,10 @@
 
     <section id='main' class="content struct">
 <h1 class='fqn'><span class='in-band'>Struct <a href='index.html'>asciii</a>::<wbr><a class='struct' href=''>CONFIG</a></span><span class='out-of-band'><span id='render-detail'>
-                   <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
-                       [<span class='inner'>&#x2212;</span>]
-                   </a>
-               </span></span></h1>
+            <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                [<span class='inner'>&#x2212;</span>]
+            </a>
+        </span></span></h1>
 <pre class='rust struct'>pub struct CONFIG {
     // some fields omitted
 }</pre><h2 id='deref-methods'>Methods from <a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.Deref.html' title='core::ops::Deref'>Deref</a>&lt;Target=<a class='struct' href='../asciii/config/struct.ConfigReader.html' title='asciii::config::ConfigReader'>ConfigReader</a>&gt;</h2><div class='impl-items'><h4 id='method.get' class='method'><code>fn <a href='#method.get' class='fnname'>get</a>(&amp;self, key: &amp;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;&amp;<a class='enum' href='../asciii/util/yaml/enum.Yaml.html' title='asciii::util::yaml::Yaml'>Yaml</a>&gt;</code></h4>
@@ -62,14 +61,20 @@
 <h1 id='panics' class='section-header'><a href='#panics'>Panics</a></h1>
 <p>This panics if nothing is found.
 You should have a default config for everything that you use.</p>
-</div><h4 id='method.get_bool' class='method'><code>fn <a href='#method.get_bool' class='fnname'>get_bool</a>(&amp;self, key: &amp;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></code></h4>
-<div class='docblock'><p>Returns the boolean in the position or <code>false</code></p>
+</div><h4 id='method.get_as_string' class='method'><code>fn <a href='#method.get_as_string' class='fnname'>get_as_string</a>(&amp;self, key: &amp;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>) -&gt; <a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a></code></h4>
+<div class='docblock'><p>Returns the string in the position or an empty string</p>
 
 <h1 id='panics-1' class='section-header'><a href='#panics-1'>Panics</a></h1>
 <p>This panics if nothing is found.
 You should have a default config for everything that you use.</p>
-</div></div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.Deref.html' title='core::ops::Deref'>Deref</a> for <a class='struct' href='../asciii/struct.CONFIG.html' title='asciii::CONFIG'>CONFIG</a></code></h3><div class='impl-items'><h4 id='associatedtype.Target' class='type'><code>type <a href='https://doc.rust-lang.org/nightly/core/ops/trait.Deref.html#associatedtype.Target' class='type'>Target</a> = <a class='struct' href='../asciii/config/struct.ConfigReader.html' title='asciii::config::ConfigReader'>ConfigReader</a></code></h4>
-<h4 id='method.deref' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/ops/trait.Deref.html#tymethod.deref' class='fnname'>deref</a>&lt;'a&gt;(&amp;'a self) -&gt; &amp;'a <a class='struct' href='../asciii/config/struct.ConfigReader.html' title='asciii::config::ConfigReader'>ConfigReader</a></code></h4>
+</div><h4 id='method.get_bool' class='method'><code>fn <a href='#method.get_bool' class='fnname'>get_bool</a>(&amp;self, key: &amp;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></code></h4>
+<div class='docblock'><p>Returns the boolean in the position or <code>false</code></p>
+
+<h1 id='panics-2' class='section-header'><a href='#panics-2'>Panics</a></h1>
+<p>This panics if nothing is found.
+You should have a default config for everything that you use.</p>
+</div></div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.Deref.html' title='core::ops::Deref'>Deref</a> for <a class='struct' href='../asciii/struct.CONFIG.html' title='asciii::CONFIG'>CONFIG</a></code></h3><div class='impl-items'><h4 id='associatedtype.Target' class='type'><code>type Target = <a class='struct' href='../asciii/config/struct.ConfigReader.html' title='asciii::config::ConfigReader'>ConfigReader</a></code></h4>
+<h4 id='method.deref' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/ops/trait.Deref.html#method.deref' class='fnname'>deref</a>&lt;'a&gt;(&amp;'a self) -&gt; &amp;'a <a class='struct' href='../asciii/config/struct.ConfigReader.html' title='asciii::config::ConfigReader'>ConfigReader</a></code></h4>
 </div></section>
     <section id='search' class="content hidden"></section>
 

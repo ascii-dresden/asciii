@@ -11,7 +11,6 @@
 
     <link rel="stylesheet" type="text/css" href="../../../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../../../main.css">
-    
 
     
     
@@ -91,6 +90,7 @@
 <span id="47">47</span>
 <span id="48">48</span>
 <span id="49">49</span>
+<span id="50">50</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! Thank you for choosing `asciii`, the new and improved `ascii`.</span>
 <span class='doccomment'>//!</span>
@@ -119,12 +119,13 @@
 <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>git2</span>;
 <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>currency</span>;
 <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>open</span>;
+<span class='attribute'>#[<span class='ident'>macro_use</span>]</span> <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>log</span>;
 <span class='attribute'>#[<span class='ident'>macro_use</span>]</span> <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>prettytable</span>;
 <span class='attribute'>#[<span class='ident'>macro_use</span>]</span> <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>lazy_static</span>;
 <span class='attribute'>#[<span class='ident'>macro_use</span>]</span> <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>maplit</span>;
-<span class='attribute'>#[<span class='ident'>macro_use</span>]</span> <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>clap</span>;
 <span class='attribute'>#[<span class='ident'>macro_use</span>]</span> <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>custom_derive</span>;
 <span class='attribute'>#[<span class='ident'>macro_use</span>]</span> <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>enum_derive</span>;
+<span class='attribute'>#[<span class='ident'>macro_use</span>]</span> <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>clap</span>;
 
 <span class='attribute'>#[<span class='ident'>macro_use</span>]</span>
 <span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>util</span>;
@@ -132,7 +133,7 @@
 <span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>manual</span>;
 
 <span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>project</span>;
-<span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>manager</span>;
+<span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>storage</span>;
 <span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>repo</span>;
 
 <span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>templater</span>;

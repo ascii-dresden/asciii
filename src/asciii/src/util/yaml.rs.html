@@ -11,7 +11,6 @@
 
     <link rel="stylesheet" type="text/css" href="../../../../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../../../../main.css">
-    
 
     
     
@@ -242,6 +241,23 @@
 <span id="198">198</span>
 <span id="199">199</span>
 <span id="200">200</span>
+<span id="201">201</span>
+<span id="202">202</span>
+<span id="203">203</span>
+<span id="204">204</span>
+<span id="205">205</span>
+<span id="206">206</span>
+<span id="207">207</span>
+<span id="208">208</span>
+<span id="209">209</span>
+<span id="210">210</span>
+<span id="211">211</span>
+<span id="212">212</span>
+<span id="213">213</span>
+<span id="214">214</span>
+<span id="215">215</span>
+<span id="216">216</span>
+<span id="217">217</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! Yaml Utility functions.</span>
 <span class='doccomment'>//!</span>
@@ -270,6 +286,7 @@
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>fs</span>::<span class='ident'>File</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>path</span>::<span class='ident'>Path</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>collections</span>::<span class='ident'>BTreeMap</span>;
+<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>error</span>::<span class='ident'>Error</span>;
 
 <span class='kw'>pub</span> <span class='kw'>use</span> <span class='ident'>yaml_rust</span>::{<span class='ident'>Yaml</span>};
 <span class='kw'>use</span> <span class='ident'>yaml_rust</span>::{<span class='ident'>YamlLoader</span>};
@@ -281,6 +298,22 @@
 <span class='kw'>pub</span> <span class='kw'>enum</span> <span class='ident'>YamlError</span>{
     <span class='ident'>Io</span>(<span class='ident'>io</span>::<span class='ident'>Error</span>),
     <span class='ident'>Scan</span>(<span class='ident'>ScanError</span>)
+}
+
+<span class='kw'>impl</span> <span class='ident'>Error</span> <span class='kw'>for</span> <span class='ident'>YamlError</span>{
+    <span class='kw'>fn</span> <span class='ident'>description</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='kw-2'>&amp;</span><span class='ident'>str</span>{
+        <span class='kw'>match</span> <span class='op'>*</span><span class='self'>self</span>{
+            <span class='ident'>YamlError</span>::<span class='ident'>Io</span>(<span class='kw-2'>ref</span> <span class='ident'>err</span>) <span class='op'>=&gt;</span> <span class='ident'>err</span>.<span class='ident'>description</span>(),
+            <span class='ident'>YamlError</span>::<span class='ident'>Scan</span>(<span class='kw-2'>ref</span> <span class='ident'>err</span>) <span class='op'>=&gt;</span> <span class='ident'>err</span>.<span class='ident'>description</span>()
+        }
+    }
+
+    <span class='kw'>fn</span> <span class='ident'>cause</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='ident'>Error</span><span class='op'>&gt;</span>{
+        <span class='kw'>match</span> <span class='op'>*</span><span class='self'>self</span>{
+            <span class='ident'>YamlError</span>::<span class='ident'>Io</span>(<span class='kw-2'>ref</span> <span class='ident'>err</span>) <span class='op'>=&gt;</span> <span class='ident'>err</span>.<span class='ident'>cause</span>(),
+            <span class='ident'>YamlError</span>::<span class='ident'>Scan</span>(<span class='kw-2'>ref</span> <span class='ident'>err</span>) <span class='op'>=&gt;</span> <span class='ident'>err</span>.<span class='ident'>cause</span>()
+        }
+    }
 }
 
 <span class='comment'>// All you need to make try!() fun again</span>

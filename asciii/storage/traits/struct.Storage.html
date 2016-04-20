@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="rustdoc">
+    <meta name="description" content="API documentation for the Rust `Storage` struct in crate `asciii`.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, Storage">
+
+    <title>asciii::storage::traits::Storage - Rust</title>
+
+    <link rel="stylesheet" type="text/css" href="../../../rustdoc.css">
+    <link rel="stylesheet" type="text/css" href="../../../main.css">
+
+    
+    
+</head>
+<body class="rustdoc">
+    <!--[if lte IE 8]>
+    <div class="warning">
+        This old browser is unsupported and will most likely display funky
+        things.
+    </div>
+    <![endif]-->
+
+    
+
+    <nav class="sidebar">
+        
+        <p class='location'><a href='../../index.html'>asciii</a>::<wbr><a href='../index.html'>storage</a>::<wbr><a href='index.html'>traits</a></p><script>window.sidebarCurrent = {name: 'Storage', ty: 'struct', relpath: ''};</script><script defer src="sidebar-items.js"></script>
+    </nav>
+
+    <nav class="sub">
+        <form class="search-form js-only">
+            <div class="search-container">
+                <input class="search-input" name="search"
+                       autocomplete="off"
+                       placeholder="Click or press ‘S’ to search, ‘?’ for more options…"
+                       type="search">
+            </div>
+        </form>
+    </nav>
+
+    <section id='main' class="content struct">
+<h1 class='fqn'><span class='in-band'>Struct <a href='../../index.html'>asciii</a>::<wbr><a href='../index.html'>storage</a>::<wbr><a href='index.html'>traits</a>::<wbr><a class='struct' href=''>Storage</a></span><span class='out-of-band'><span id='render-detail'>
+            <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                [<span class='inner'>&#x2212;</span>]
+            </a>
+        </span><a id='src-1296' class='srclink' href='../../../src/asciii/src/storage/traits.rs.html#23-34' title='goto source code'>[src]</a></span></h1>
+<pre class='rust struct'>pub struct Storage&lt;L: <a class='trait' href='../../../asciii/storage/storable/trait.Storable.html' title='asciii::storage::storable::Storable'>Storable</a>&gt; {
+    // some fields omitted
+}</pre><div class='docblock'><p>TODO rename this into Storage later</p>
+</div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><code>impl&lt;L: <a class='trait' href='../../../asciii/storage/storable/trait.Storable.html' title='asciii::storage::storable::Storable'>Storable</a>&gt; <a class='trait' href='../../../asciii/storage/traits/trait.Storing.html' title='asciii::storage::traits::Storing'>Storing</a>&lt;L&gt; for <a class='struct' href='../../../asciii/storage/traits/struct.Storage.html' title='asciii::storage::traits::Storage'>Storage</a>&lt;L&gt;</code></h3><div class='impl-items'><h4 id='method.new' class='method'><code>fn <a href='../../../asciii/storage/traits/trait.Storing.html#method.new' class='fnname'>new</a>&lt;P: <a class='trait' href='https://doc.rust-lang.org/nightly/core/convert/trait.AsRef.html' title='core::convert::AsRef'>AsRef</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/std/path/struct.Path.html' title='std::path::Path'>Path</a>&gt;&gt;(root: P, working: &amp;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>, archive: &amp;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>, template: &amp;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>) -&gt; <a class='type' href='../../../asciii/storage/type.StorageResult.html' title='asciii::storage::StorageResult'>StorageResult</a>&lt;Self&gt;</code></h4>
+<h4 id='method.root_dir' class='method'><code>fn <a href='../../../asciii/storage/traits/trait.Storing.html#method.root_dir' class='fnname'>root_dir</a>(&amp;self) -&gt; &amp;<a class='struct' href='https://doc.rust-lang.org/nightly/std/path/struct.Path.html' title='std::path::Path'>Path</a></code></h4>
+<h4 id='method.working_dir' class='method'><code>fn <a href='../../../asciii/storage/traits/trait.Storing.html#method.working_dir' class='fnname'>working_dir</a>(&amp;self) -&gt; &amp;<a class='struct' href='https://doc.rust-lang.org/nightly/std/path/struct.Path.html' title='std::path::Path'>Path</a></code></h4>
+<h4 id='method.archive_dir' class='method'><code>fn <a href='../../../asciii/storage/traits/trait.Storing.html#method.archive_dir' class='fnname'>archive_dir</a>(&amp;self) -&gt; &amp;<a class='struct' href='https://doc.rust-lang.org/nightly/std/path/struct.Path.html' title='std::path::Path'>Path</a></code></h4>
+<h4 id='method.templates_dir' class='method'><code>fn <a href='../../../asciii/storage/traits/trait.Storing.html#method.templates_dir' class='fnname'>templates_dir</a>(&amp;self) -&gt; &amp;<a class='struct' href='https://doc.rust-lang.org/nightly/std/path/struct.Path.html' title='std::path::Path'>Path</a></code></h4>
+<h4 id='method.list_path_content' class='method'><code>fn <a href='../../../asciii/storage/traits/trait.Storing.html#method.list_path_content' class='fnname'>list_path_content</a>(&amp;self, path: &amp;<a class='struct' href='https://doc.rust-lang.org/nightly/std/path/struct.Path.html' title='std::path::Path'>Path</a>) -&gt; <a class='type' href='../../../asciii/storage/type.StorageResult.html' title='asciii::storage::StorageResult'>StorageResult</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/std/path/struct.PathBuf.html' title='std::path::PathBuf'>PathBuf</a>&gt;&gt;</code></h4>
+<h4 id='method.create_dirs' class='method'><code>fn <a href='../../../asciii/storage/traits/trait.Storing.html#method.create_dirs' class='fnname'>create_dirs</a>(&amp;self) -&gt; <a class='type' href='../../../asciii/storage/type.StorageResult.html' title='asciii::storage::StorageResult'>StorageResult</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>()</a>&gt;</code></h4>
+<h4 id='method.create_archive' class='method'><code>fn <a href='../../../asciii/storage/traits/trait.Storing.html#method.create_archive' class='fnname'>create_archive</a>(&amp;self, year: <a class='type' href='../../../asciii/storage/type.Year.html' title='asciii::storage::Year'>Year</a>) -&gt; <a class='type' href='../../../asciii/storage/type.StorageResult.html' title='asciii::storage::StorageResult'>StorageResult</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/std/path/struct.PathBuf.html' title='std::path::PathBuf'>PathBuf</a>&gt;</code></h4>
+<h4 id='method.list_template_files' class='method'><code>fn <a href='../../../asciii/storage/traits/trait.Storing.html#method.list_template_files' class='fnname'>list_template_files</a>(&amp;self) -&gt; <a class='type' href='../../../asciii/storage/type.StorageResult.html' title='asciii::storage::StorageResult'>StorageResult</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/std/path/struct.PathBuf.html' title='std::path::PathBuf'>PathBuf</a>&gt;&gt;</code></h4>
+<h4 id='method.list_template_names' class='method'><code>fn <a href='../../../asciii/storage/traits/trait.Storing.html#method.list_template_names' class='fnname'>list_template_names</a>(&amp;self) -&gt; <a class='type' href='../../../asciii/storage/type.StorageResult.html' title='asciii::storage::StorageResult'>StorageResult</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>&gt;&gt;</code></h4>
+<h4 id='method.get_template_file' class='method'><code>fn <a href='../../../asciii/storage/traits/trait.Storing.html#method.get_template_file' class='fnname'>get_template_file</a>(&amp;self, name: &amp;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>) -&gt; <a class='type' href='../../../asciii/storage/type.StorageResult.html' title='asciii::storage::StorageResult'>StorageResult</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/std/path/struct.PathBuf.html' title='std::path::PathBuf'>PathBuf</a>&gt;</code></h4>
+<h4 id='method.list_archives' class='method'><code>fn <a href='../../../asciii/storage/traits/trait.Storing.html#method.list_archives' class='fnname'>list_archives</a>(&amp;self) -&gt; <a class='type' href='../../../asciii/storage/type.StorageResult.html' title='asciii::storage::StorageResult'>StorageResult</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/std/path/struct.PathBuf.html' title='std::path::PathBuf'>PathBuf</a>&gt;&gt;</code></h4>
+<h4 id='method.list_years' class='method'><code>fn <a href='../../../asciii/storage/traits/trait.Storing.html#method.list_years' class='fnname'>list_years</a>(&amp;self) -&gt; <a class='type' href='../../../asciii/storage/type.StorageResult.html' title='asciii::storage::StorageResult'>StorageResult</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='type' href='../../../asciii/storage/type.Year.html' title='asciii::storage::Year'>Year</a>&gt;&gt;</code></h4>
+<h4 id='method.create_project' class='method'><code>fn <a href='../../../asciii/storage/traits/trait.Storing.html#method.create_project' class='fnname'>create_project</a>(&amp;self, project_name: &amp;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>, template_name: &amp;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>) -&gt; <a class='type' href='../../../asciii/storage/type.StorageResult.html' title='asciii::storage::StorageResult'>StorageResult</a>&lt;L&gt;</code></h4>
+<h4 id='method.archive_project_by_name' class='method'><code>fn <a href='../../../asciii/storage/traits/trait.Storing.html#method.archive_project_by_name' class='fnname'>archive_project_by_name</a>(&amp;self, name: &amp;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>, year: <a class='type' href='../../../asciii/storage/type.Year.html' title='asciii::storage::Year'>Year</a>, prefix: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>&gt;) -&gt; <a class='type' href='../../../asciii/storage/type.StorageResult.html' title='asciii::storage::StorageResult'>StorageResult</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/std/path/struct.PathBuf.html' title='std::path::PathBuf'>PathBuf</a>&gt;</code></h4>
+<h4 id='method.archive_project' class='method'><code>fn <a href='../../../asciii/storage/traits/trait.Storing.html#method.archive_project' class='fnname'>archive_project</a>(&amp;self, project: &amp;L, year: <a class='type' href='../../../asciii/storage/type.Year.html' title='asciii::storage::Year'>Year</a>) -&gt; <a class='type' href='../../../asciii/storage/type.StorageResult.html' title='asciii::storage::StorageResult'>StorageResult</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/std/path/struct.PathBuf.html' title='std::path::PathBuf'>PathBuf</a>&gt;</code></h4>
+<h4 id='method.unarchive_project' class='method'><code>fn <a href='../../../asciii/storage/traits/trait.Storing.html#method.unarchive_project' class='fnname'>unarchive_project</a>(&amp;self, project: &amp;L) -&gt; <a class='type' href='../../../asciii/storage/type.StorageResult.html' title='asciii::storage::StorageResult'>StorageResult</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/std/path/struct.PathBuf.html' title='std::path::PathBuf'>PathBuf</a>&gt;</code></h4>
+<h4 id='method.unarchive_project_file' class='method'><code>fn <a href='../../../asciii/storage/traits/trait.Storing.html#method.unarchive_project_file' class='fnname'>unarchive_project_file</a>(&amp;self, archived_file: &amp;<a class='struct' href='https://doc.rust-lang.org/nightly/std/path/struct.Path.html' title='std::path::Path'>Path</a>) -&gt; <a class='type' href='../../../asciii/storage/type.StorageResult.html' title='asciii::storage::StorageResult'>StorageResult</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/std/path/struct.PathBuf.html' title='std::path::PathBuf'>PathBuf</a>&gt;</code></h4>
+<h4 id='method.search_projects' class='method'><code>fn <a href='../../../asciii/storage/traits/trait.Storing.html#method.search_projects' class='fnname'>search_projects</a>(&amp;self, dir: <a class='enum' href='../../../asciii/storage/enum.StorageDir.html' title='asciii::storage::StorageDir'>StorageDir</a>, search_term: &amp;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>) -&gt; <a class='type' href='../../../asciii/storage/type.StorageResult.html' title='asciii::storage::StorageResult'>StorageResult</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/std/path/struct.PathBuf.html' title='std::path::PathBuf'>PathBuf</a>&gt;&gt;</code></h4>
+<h4 id='method.search_multiple_projects' class='method'><code>fn <a href='../../../asciii/storage/traits/trait.Storing.html#method.search_multiple_projects' class='fnname'>search_multiple_projects</a>(&amp;self, dir: <a class='enum' href='../../../asciii/storage/enum.StorageDir.html' title='asciii::storage::StorageDir'>StorageDir</a>, search_terms: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>&amp;[</a>&amp;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>]</a>) -&gt; <a class='type' href='../../../asciii/storage/type.StorageResult.html' title='asciii::storage::StorageResult'>StorageResult</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/std/path/struct.PathBuf.html' title='std::path::PathBuf'>PathBuf</a>&gt;&gt;</code></h4>
+<h4 id='method.get_project_dir' class='method'><code>fn <a href='../../../asciii/storage/traits/trait.Storing.html#method.get_project_dir' class='fnname'>get_project_dir</a>(&amp;self, name: &amp;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>, directory: <a class='enum' href='../../../asciii/storage/enum.StorageDir.html' title='asciii::storage::StorageDir'>StorageDir</a>) -&gt; <a class='type' href='../../../asciii/storage/type.StorageResult.html' title='asciii::storage::StorageResult'>StorageResult</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/std/path/struct.PathBuf.html' title='std::path::PathBuf'>PathBuf</a>&gt;</code></h4>
+<h4 id='method.get_project_file' class='method'><code>fn <a href='../../../asciii/storage/traits/trait.Storing.html#method.get_project_file' class='fnname'>get_project_file</a>(&amp;self, directory: &amp;<a class='struct' href='https://doc.rust-lang.org/nightly/std/path/struct.Path.html' title='std::path::Path'>Path</a>) -&gt; <a class='type' href='../../../asciii/storage/type.StorageResult.html' title='asciii::storage::StorageResult'>StorageResult</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/std/path/struct.PathBuf.html' title='std::path::PathBuf'>PathBuf</a>&gt;</code></h4>
+<h4 id='method.get_project_name' class='method'><code>fn <a href='../../../asciii/storage/traits/trait.Storing.html#method.get_project_name' class='fnname'>get_project_name</a>(&amp;self, directory: &amp;<a class='struct' href='https://doc.rust-lang.org/nightly/std/path/struct.Path.html' title='std::path::Path'>Path</a>) -&gt; <a class='type' href='../../../asciii/storage/type.StorageResult.html' title='asciii::storage::StorageResult'>StorageResult</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>&gt;</code></h4>
+<h4 id='method.get_project_dir_from_archive' class='method'><code>fn <a href='../../../asciii/storage/traits/trait.Storing.html#method.get_project_dir_from_archive' class='fnname'>get_project_dir_from_archive</a>(&amp;self, name: &amp;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>, year: <a class='type' href='../../../asciii/storage/type.Year.html' title='asciii::storage::Year'>Year</a>) -&gt; <a class='type' href='../../../asciii/storage/type.StorageResult.html' title='asciii::storage::StorageResult'>StorageResult</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/std/path/struct.PathBuf.html' title='std::path::PathBuf'>PathBuf</a>&gt;</code></h4>
+<h4 id='method.list_project_folders' class='method'><code>fn <a href='../../../asciii/storage/traits/trait.Storing.html#method.list_project_folders' class='fnname'>list_project_folders</a>(&amp;self, directory: <a class='enum' href='../../../asciii/storage/enum.StorageDir.html' title='asciii::storage::StorageDir'>StorageDir</a>) -&gt; <a class='type' href='../../../asciii/storage/type.StorageResult.html' title='asciii::storage::StorageResult'>StorageResult</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/std/path/struct.PathBuf.html' title='std::path::PathBuf'>PathBuf</a>&gt;&gt;</code></h4>
+<h4 id='method.list_empty_project_dirs' class='method'><code>fn <a href='../../../asciii/storage/traits/trait.Storing.html#method.list_empty_project_dirs' class='fnname'>list_empty_project_dirs</a>(&amp;self, directory: <a class='enum' href='../../../asciii/storage/enum.StorageDir.html' title='asciii::storage::StorageDir'>StorageDir</a>) -&gt; <a class='type' href='../../../asciii/storage/type.StorageResult.html' title='asciii::storage::StorageResult'>StorageResult</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/std/path/struct.PathBuf.html' title='std::path::PathBuf'>PathBuf</a>&gt;&gt;</code></h4>
+<h4 id='method.list_project_files' class='method'><code>fn <a href='../../../asciii/storage/traits/trait.Storing.html#method.list_project_files' class='fnname'>list_project_files</a>(&amp;self, directory: <a class='enum' href='../../../asciii/storage/enum.StorageDir.html' title='asciii::storage::StorageDir'>StorageDir</a>) -&gt; <a class='type' href='../../../asciii/storage/type.StorageResult.html' title='asciii::storage::StorageResult'>StorageResult</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/std/path/struct.PathBuf.html' title='std::path::PathBuf'>PathBuf</a>&gt;&gt;</code></h4>
+<h4 id='method.filter_project_files' class='method'><code>fn <a href='../../../asciii/storage/traits/trait.Storing.html#method.filter_project_files' class='fnname'>filter_project_files</a>&lt;F&gt;(&amp;self, directory: <a class='enum' href='../../../asciii/storage/enum.StorageDir.html' title='asciii::storage::StorageDir'>StorageDir</a>, filter: F) -&gt; <a class='type' href='../../../asciii/storage/type.StorageResult.html' title='asciii::storage::StorageResult'>StorageResult</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/std/path/struct.PathBuf.html' title='std::path::PathBuf'>PathBuf</a>&gt;&gt; <span class='where'>where F: <a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.FnMut.html' title='core::ops::FnMut'>FnMut</a>(&amp;<a class='struct' href='https://doc.rust-lang.org/nightly/std/path/struct.PathBuf.html' title='std::path::PathBuf'>PathBuf</a>) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></span></code></h4>
+<h4 id='method.open_project_files' class='method'><code>fn <a href='../../../asciii/storage/traits/trait.Storing.html#method.open_project_files' class='fnname'>open_project_files</a>(&amp;self, dir: <a class='enum' href='../../../asciii/storage/enum.StorageDir.html' title='asciii::storage::StorageDir'>StorageDir</a>) -&gt; <a class='type' href='../../../asciii/storage/type.StorageResult.html' title='asciii::storage::StorageResult'>StorageResult</a>&lt;<a class='struct' href='../../../asciii/storage/struct.ProjectList.html' title='asciii::storage::ProjectList'>ProjectList</a>&lt;L&gt;&gt;</code></h4>
+</div></section>
+    <section id='search' class="content hidden"></section>
+
+    <section class="footer"></section>
+
+    <aside id="help" class="hidden">
+        <div>
+            <h1 class="hidden">Help</h1>
+
+            <div class="shortcuts">
+                <h2>Keyboard Shortcuts</h2>
+
+                <dl>
+                    <dt>?</dt>
+                    <dd>Show this help dialog</dd>
+                    <dt>S</dt>
+                    <dd>Focus the search field</dd>
+                    <dt>&larrb;</dt>
+                    <dd>Move up in search results</dd>
+                    <dt>&rarrb;</dt>
+                    <dd>Move down in search results</dd>
+                    <dt>&#9166;</dt>
+                    <dd>Go to active search result</dd>
+                </dl>
+            </div>
+
+            <div class="infos">
+                <h2>Search Tricks</h2>
+
+                <p>
+                    Prefix searches with a type followed by a colon (e.g.
+                    <code>fn:</code>) to restrict the search to a given type.
+                </p>
+
+                <p>
+                    Accepted types are: <code>fn</code>, <code>mod</code>,
+                    <code>struct</code>, <code>enum</code>,
+                    <code>trait</code>, <code>type</code>, <code>macro</code>,
+                    and <code>const</code>.
+                </p>
+
+                <p>
+                    Search functions by type signature (e.g.
+                    <code>vec -> usize</code> or <code>* -> vec</code>)
+                </p>
+            </div>
+        </div>
+    </aside>
+
+    
+
+    <script>
+        window.rootPath = "../../../";
+        window.currentCrate = "asciii";
+        window.playgroundUrl = "";
+    </script>
+    <script src="../../../jquery.js"></script>
+    <script src="../../../main.js"></script>
+    
+    <script defer src="../../../search-index.js"></script>
+</body>
+</html>

@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["ProjectList","Wrapper around `Vec<Storable>`"]]});

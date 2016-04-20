@@ -11,7 +11,6 @@
 
     <link rel="stylesheet" type="text/css" href="../../../../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../../../../main.css">
-    
 
     
     
@@ -706,7 +705,7 @@
 <span class='kw'>use</span> <span class='ident'>util</span>::<span class='ident'>yaml</span>::<span class='ident'>Yaml</span>;
 <span class='kw'>use</span> <span class='ident'>currency</span>::<span class='ident'>Currency</span>;
 <span class='kw'>use</span> <span class='ident'>super</span>::<span class='ident'>Project</span>;
-<span class='kw'>use</span> ::<span class='ident'>manager</span>::<span class='ident'>LuigiProject</span>;
+<span class='kw'>use</span> ::<span class='ident'>storage</span>::<span class='ident'>Storable</span>;
 
 <span class='kw'>pub</span> <span class='kw'>type</span> <span class='ident'>SpecResult</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span> <span class='op'>=</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span>(), <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>str</span><span class='op'>&gt;&gt;</span>;
 
@@ -726,7 +725,7 @@
              <span class='ident'>EnumFromStr</span>
              )]</span>
     <span class='kw'>pub</span> <span class='kw'>enum</span> <span class='ident'>VirtualField</span>{
-        <span class='doccomment'>/// Usually `manager`, or in legacy part of `signature`</span>
+        <span class='doccomment'>/// Usually `storage`, or in legacy part of `signature`</span>
         <span class='ident'>Responsible</span>,
         <span class='doccomment'>/// Pretty version of `invoice/number`: &quot;`R042`&quot;</span>
         <span class='ident'>InvoiceNumber</span>,

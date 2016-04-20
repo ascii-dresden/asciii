@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["StorageError","Error that may occur in Storage"]]});

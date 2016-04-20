@@ -11,7 +11,6 @@
 
     <link rel="stylesheet" type="text/css" href="../../../../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../../../../main.css">
-    
 
     
     
@@ -524,6 +523,14 @@
 <span id="480">480</span>
 <span id="481">481</span>
 <span id="482">482</span>
+<span id="483">483</span>
+<span id="484">484</span>
+<span id="485">485</span>
+<span id="486">486</span>
+<span id="487">487</span>
+<span id="488">488</span>
+<span id="489">489</span>
+<span id="490">490</span>
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>path</span>::{<span class='ident'>Path</span>,<span class='ident'>PathBuf</span>};
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>ffi</span>::<span class='ident'>OsStr</span>;
@@ -535,7 +542,7 @@
 <span class='kw'>use</span> <span class='ident'>config</span>;
 <span class='kw'>use</span> ::<span class='ident'>CONFIG</span>;
 <span class='kw'>use</span> <span class='ident'>terminal_size</span>::{<span class='ident'>Width</span>, <span class='ident'>terminal_size</span> }; <span class='comment'>// TODO replace with other lib</span>
-<span class='kw'>use</span> <span class='ident'>manager</span>::{<span class='ident'>LuigiDir</span>, <span class='ident'>LuigiProject</span>, <span class='ident'>LuigiError</span>};
+<span class='kw'>use</span> <span class='ident'>storage</span>::<span class='op'>*</span>;
 <span class='kw'>use</span> <span class='ident'>project</span>::<span class='ident'>Project</span>;
 <span class='kw'>use</span> <span class='ident'>util</span>;
 <span class='kw'>use</span> <span class='ident'>super</span>::{<span class='ident'>print</span>,<span class='ident'>setup_luigi</span>, <span class='ident'>setup_luigi_with_git</span>, <span class='ident'>fail</span>};
@@ -572,9 +579,9 @@
     <span class='kw'>if</span> <span class='ident'>paths</span>{   <span class='ident'>ListMode</span>::<span class='ident'>Paths</span> } <span class='kw'>else</span>
     {
         <span class='kw'>match</span> (<span class='ident'>simple</span>, <span class='ident'>verbose</span>, <span class='ident'>CONFIG</span>.<span class='ident'>get_bool</span>(<span class='string'>&quot;list/verbose&quot;</span>)){
-            (<span class='boolval'>false</span>, <span class='boolval'>true</span>,  _   ) <span class='op'>=&gt;</span> {<span class='macro'>debugln</span><span class='macro'>!</span>(<span class='string'>&quot;-v overwrites config&quot;</span>); <span class='ident'>ListMode</span>::<span class='ident'>Verbose</span> },
-            (<span class='boolval'>false</span>,    _, <span class='boolval'>true</span> ) <span class='op'>=&gt;</span> {<span class='macro'>debugln</span><span class='macro'>!</span>(<span class='string'>&quot;-v from config&quot;</span>);<span class='ident'>ListMode</span>::<span class='ident'>Verbose</span>},
-                          _      <span class='op'>=&gt;</span> {<span class='macro'>debugln</span><span class='macro'>!</span>(<span class='string'>&quot;simple mode&quot;</span>);<span class='ident'>ListMode</span>::<span class='ident'>Simple</span>},
+            (<span class='boolval'>false</span>, <span class='boolval'>true</span>,  _   ) <span class='op'>=&gt;</span> {<span class='macro'>debug</span><span class='macro'>!</span>(<span class='string'>&quot;-v overwrites config&quot;</span>); <span class='ident'>ListMode</span>::<span class='ident'>Verbose</span> },
+            (<span class='boolval'>false</span>,    _, <span class='boolval'>true</span> ) <span class='op'>=&gt;</span> {<span class='macro'>debug</span><span class='macro'>!</span>(<span class='string'>&quot;-v from config&quot;</span>);<span class='ident'>ListMode</span>::<span class='ident'>Verbose</span>},
+                          _      <span class='op'>=&gt;</span> {<span class='macro'>debug</span><span class='macro'>!</span>(<span class='string'>&quot;simple mode&quot;</span>);<span class='ident'>ListMode</span>::<span class='ident'>Simple</span>},
         }
     }
 }
@@ -613,17 +620,17 @@
         <span class='kw'>let</span> <span class='ident'>dir</span> <span class='op'>=</span>
             <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Some</span>(<span class='ident'>archive_year</span>) <span class='op'>=</span> <span class='ident'>matches</span>.<span class='ident'>value_of</span>(<span class='string'>&quot;archive&quot;</span>){
                 <span class='kw'>let</span> <span class='ident'>archive</span> <span class='op'>=</span> <span class='ident'>archive_year</span>.<span class='ident'>parse</span>::<span class='op'>&lt;</span><span class='ident'>i32</span><span class='op'>&gt;</span>().<span class='ident'>unwrap</span>();
-                <span class='ident'>LuigiDir</span>::<span class='ident'>Archive</span>(<span class='ident'>archive</span>)
+                <span class='ident'>StorageDir</span>::<span class='ident'>Archive</span>(<span class='ident'>archive</span>)
             }
 
             <span class='comment'>// or list all, but sort by date</span>
             <span class='kw'>else</span> <span class='kw'>if</span> <span class='ident'>matches</span>.<span class='ident'>is_present</span>(<span class='string'>&quot;all&quot;</span>){
                 <span class='comment'>// sort by date on --all of not overriden</span>
                 <span class='kw'>if</span> <span class='op'>!</span><span class='ident'>matches</span>.<span class='ident'>is_present</span>(<span class='string'>&quot;sort&quot;</span>){ <span class='ident'>list_config</span>.<span class='ident'>sort_by</span> <span class='op'>=</span> <span class='string'>&quot;date&quot;</span> }
-                <span class='ident'>LuigiDir</span>::<span class='ident'>All</span> }
+                <span class='ident'>StorageDir</span>::<span class='ident'>All</span> }
 
             <span class='comment'>// or list normal</span>
-            <span class='kw'>else</span> { <span class='ident'>LuigiDir</span>::<span class='ident'>Working</span> };
+            <span class='kw'>else</span> { <span class='ident'>StorageDir</span>::<span class='ident'>Working</span> };
 
         <span class='kw'>if</span> <span class='ident'>matches</span>.<span class='ident'>is_present</span>(<span class='string'>&quot;broken&quot;</span>){
             <span class='ident'>list_broken_projects</span>(<span class='ident'>dir</span>);
@@ -642,7 +649,7 @@
 <span class='doccomment'>/// * `print::verbose_rows()`</span>
 <span class='doccomment'>///</span>
 <span class='doccomment'>/// which it prints with `print::print_projects()`</span>
-<span class='kw'>fn</span> <span class='ident'>list_projects</span>(<span class='ident'>dir</span>:<span class='ident'>LuigiDir</span>, <span class='ident'>list_config</span>:<span class='kw-2'>&amp;</span><span class='ident'>ListConfig</span>){
+<span class='kw'>fn</span> <span class='ident'>list_projects</span>(<span class='ident'>dir</span>:<span class='ident'>StorageDir</span>, <span class='ident'>list_config</span>:<span class='kw-2'>&amp;</span><span class='ident'>ListConfig</span>){
     <span class='kw'>use</span> <span class='ident'>super</span>::<span class='ident'>print</span>::{<span class='ident'>simple_rows</span>, <span class='ident'>verbose_rows</span>,
                         <span class='ident'>path_rows</span>, <span class='ident'>dynamic_rows</span>,
                        <span class='ident'>print_projects</span>,<span class='ident'>print_csv</span>};
@@ -672,7 +679,7 @@
     <span class='kw'>if</span> <span class='op'>!</span><span class='ident'>wide_enough</span> <span class='op'>&amp;&amp;</span> <span class='ident'>list_config</span>.<span class='ident'>mode</span> <span class='op'>!=</span> <span class='ident'>ListMode</span>::<span class='ident'>Csv</span> { <span class='comment'>// TODO room for improvement</span>
         <span class='ident'>print_projects</span>(<span class='ident'>simple_rows</span>(<span class='kw-2'>&amp;</span><span class='ident'>projects</span>, <span class='kw-2'>&amp;</span><span class='ident'>list_config</span>));
     } <span class='kw'>else</span> {
-        <span class='macro'>debugln</span><span class='macro'>!</span>(<span class='string'>&quot;list_mode: {:?}&quot;</span>, <span class='ident'>list_config</span>.<span class='ident'>mode</span> );
+        <span class='macro'>debug</span><span class='macro'>!</span>(<span class='string'>&quot;list_mode: {:?}&quot;</span>, <span class='ident'>list_config</span>.<span class='ident'>mode</span> );
         <span class='kw'>match</span> <span class='ident'>list_config</span>.<span class='ident'>mode</span>{
             <span class='ident'>ListMode</span>::<span class='ident'>Csv</span>     <span class='op'>=&gt;</span> <span class='ident'>print_csv</span>(<span class='kw-2'>&amp;</span><span class='ident'>projects</span>),
             <span class='ident'>ListMode</span>::<span class='ident'>Paths</span>   <span class='op'>=&gt;</span> <span class='ident'>print_projects</span>(<span class='ident'>path_rows</span>(<span class='kw-2'>&amp;</span><span class='ident'>projects</span>, <span class='kw-2'>&amp;</span><span class='ident'>list_config</span>)),
@@ -684,13 +691,13 @@
 }
 
 <span class='doccomment'>/// Command LIST --broken</span>
-<span class='kw'>fn</span> <span class='ident'>list_broken_projects</span>(<span class='ident'>dir</span>:<span class='ident'>LuigiDir</span>){
+<span class='kw'>fn</span> <span class='ident'>list_broken_projects</span>(<span class='ident'>dir</span>:<span class='ident'>StorageDir</span>){
     <span class='kw'>let</span> <span class='ident'>luigi</span> <span class='op'>=</span> <span class='ident'>setup_luigi</span>();
     <span class='kw'>let</span> <span class='ident'>invalid_files</span> <span class='op'>=</span> <span class='ident'>super</span>::<span class='ident'>execute</span>(<span class='op'>||</span><span class='ident'>luigi</span>.<span class='ident'>list_project_files</span>(<span class='ident'>dir</span>));
     <span class='kw'>let</span> <span class='ident'>tups</span> <span class='op'>=</span> <span class='ident'>invalid_files</span>
         .<span class='ident'>iter</span>()
         .<span class='ident'>filter_map</span>(<span class='op'>|</span><span class='ident'>dir</span><span class='op'>|</span> <span class='ident'>Project</span>::<span class='ident'>open</span>(<span class='ident'>dir</span>).<span class='ident'>err</span>().<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>e</span><span class='op'>|</span>(<span class='ident'>e</span>, <span class='ident'>dir</span>)) )
-        .<span class='ident'>collect</span>::<span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span>(<span class='ident'>LuigiError</span>,<span class='kw-2'>&amp;</span><span class='ident'>PathBuf</span>)<span class='op'>&gt;&gt;</span>();
+        .<span class='ident'>collect</span>::<span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span>(<span class='ident'>StorageError</span>,<span class='kw-2'>&amp;</span><span class='ident'>PathBuf</span>)<span class='op'>&gt;&gt;</span>();
 
     <span class='kw'>for</span> (<span class='ident'>err</span>,<span class='ident'>path</span>) <span class='kw'>in</span> <span class='ident'>tups</span>{
         <span class='macro'>println</span><span class='macro'>!</span>(<span class='string'>&quot;{}: {:?}&quot;</span>, <span class='ident'>path</span>.<span class='ident'>display</span>(), <span class='ident'>err</span>);
@@ -721,7 +728,7 @@
 <span class='doccomment'>/// Command LIST --virt</span>
 <span class='kw'>fn</span> <span class='ident'>list_virtual_fields</span>(){
     <span class='kw'>use</span> ::<span class='ident'>project</span>::<span class='ident'>spec</span>::<span class='ident'>VirtualField</span>;
-    <span class='macro'>println</span><span class='macro'>!</span>(<span class='string'>&quot;or {:?}&quot;</span>, <span class='ident'>VirtualField</span>::<span class='ident'>iter_variant_names</span>().<span class='ident'>filter</span>(<span class='op'>|</span><span class='ident'>v</span><span class='op'>|</span><span class='op'>*</span><span class='ident'>v</span><span class='op'>!=</span><span class='string'>&quot;Invalid&quot;</span>).<span class='ident'>collect</span>::<span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='ident'>str</span><span class='op'>&gt;&gt;</span>());
+    <span class='macro'>println</span><span class='macro'>!</span>(<span class='string'>&quot;{:?}&quot;</span>, <span class='ident'>VirtualField</span>::<span class='ident'>iter_variant_names</span>().<span class='ident'>filter</span>(<span class='op'>|</span><span class='ident'>v</span><span class='op'>|</span><span class='op'>*</span><span class='ident'>v</span><span class='op'>!=</span><span class='string'>&quot;Invalid&quot;</span>).<span class='ident'>collect</span>::<span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='ident'>str</span><span class='op'>&gt;&gt;</span>());
 }
 
 
@@ -742,14 +749,14 @@
         } <span class='kw'>else</span> {
             <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Some</span>(<span class='ident'>archive</span>) <span class='op'>=</span> <span class='ident'>matches</span>.<span class='ident'>value_of</span>(<span class='string'>&quot;archive&quot;</span>){
                 <span class='kw'>let</span> <span class='ident'>archive</span> <span class='op'>=</span> <span class='ident'>archive</span>.<span class='ident'>parse</span>::<span class='op'>&lt;</span><span class='ident'>i32</span><span class='op'>&gt;</span>().<span class='ident'>unwrap</span>();
-                <span class='ident'>edit_projects</span>(<span class='ident'>LuigiDir</span>::<span class='ident'>Archive</span>(<span class='ident'>archive</span>), <span class='kw-2'>&amp;</span><span class='ident'>search_terms</span>, <span class='kw-2'>&amp;</span><span class='ident'>editor</span>);
+                <span class='ident'>edit_projects</span>(<span class='ident'>StorageDir</span>::<span class='ident'>Archive</span>(<span class='ident'>archive</span>), <span class='kw-2'>&amp;</span><span class='ident'>search_terms</span>, <span class='kw-2'>&amp;</span><span class='ident'>editor</span>);
             } <span class='kw'>else</span> {
-                <span class='ident'>edit_projects</span>(<span class='ident'>LuigiDir</span>::<span class='ident'>Working</span>, <span class='kw-2'>&amp;</span><span class='ident'>search_terms</span>, <span class='kw-2'>&amp;</span><span class='ident'>editor</span>);
+                <span class='ident'>edit_projects</span>(<span class='ident'>StorageDir</span>::<span class='ident'>Working</span>, <span class='kw-2'>&amp;</span><span class='ident'>search_terms</span>, <span class='kw-2'>&amp;</span><span class='ident'>editor</span>);
             }
         }
 }
 
-<span class='kw'>fn</span> <span class='ident'>edit_projects</span>(<span class='ident'>dir</span>:<span class='ident'>LuigiDir</span>, <span class='ident'>search_terms</span>:<span class='kw-2'>&amp;</span>[<span class='kw-2'>&amp;</span><span class='ident'>str</span>], <span class='ident'>editor</span>:<span class='kw-2'>&amp;</span><span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='ident'>str</span><span class='op'>&gt;</span>){
+<span class='kw'>fn</span> <span class='ident'>edit_projects</span>(<span class='ident'>dir</span>:<span class='ident'>StorageDir</span>, <span class='ident'>search_terms</span>:<span class='kw-2'>&amp;</span>[<span class='kw-2'>&amp;</span><span class='ident'>str</span>], <span class='ident'>editor</span>:<span class='kw-2'>&amp;</span><span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='ident'>str</span><span class='op'>&gt;</span>){
     <span class='kw'>let</span> <span class='ident'>luigi</span> <span class='op'>=</span> <span class='ident'>setup_luigi</span>();
     <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>all_paths</span> <span class='op'>=</span> <span class='ident'>Vec</span>::<span class='ident'>new</span>();
     <span class='kw'>for</span> <span class='ident'>search_term</span> <span class='kw'>in</span> <span class='ident'>search_terms</span>{
@@ -785,15 +792,15 @@
         <span class='kw'>let</span> <span class='ident'>search_term</span> <span class='op'>=</span> <span class='ident'>matches</span>.<span class='ident'>value_of</span>(<span class='string'>&quot;search_term&quot;</span>).<span class='ident'>unwrap</span>();
         <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Some</span>(<span class='ident'>year</span>) <span class='op'>=</span> <span class='ident'>matches</span>.<span class='ident'>value_of</span>(<span class='string'>&quot;archive&quot;</span>){
             <span class='kw'>let</span> <span class='ident'>year</span> <span class='op'>=</span> <span class='ident'>year</span>.<span class='ident'>parse</span>::<span class='op'>&lt;</span><span class='ident'>i32</span><span class='op'>&gt;</span>().<span class='ident'>unwrap</span>();
-            <span class='ident'>show_project</span>(<span class='ident'>LuigiDir</span>::<span class='ident'>Archive</span>(<span class='ident'>year</span>), <span class='kw-2'>&amp;</span><span class='ident'>search_term</span>);
+            <span class='ident'>show_project</span>(<span class='ident'>StorageDir</span>::<span class='ident'>Archive</span>(<span class='ident'>year</span>), <span class='kw-2'>&amp;</span><span class='ident'>search_term</span>);
         } <span class='kw'>else</span> <span class='kw'>if</span>  <span class='ident'>matches</span>.<span class='ident'>is_present</span>(<span class='string'>&quot;template&quot;</span>){
             <span class='ident'>show_template</span>(<span class='ident'>search_term</span>);
         } <span class='kw'>else</span> {
-            <span class='ident'>show_project</span>(<span class='ident'>LuigiDir</span>::<span class='ident'>Working</span>, <span class='kw-2'>&amp;</span><span class='ident'>search_term</span>);
+            <span class='ident'>show_project</span>(<span class='ident'>StorageDir</span>::<span class='ident'>Working</span>, <span class='kw-2'>&amp;</span><span class='ident'>search_term</span>);
         }
 }
 
-<span class='kw'>fn</span> <span class='ident'>show_project</span>(<span class='ident'>dir</span>:<span class='ident'>LuigiDir</span>, <span class='ident'>search_term</span>:<span class='kw-2'>&amp;</span><span class='ident'>str</span>){
+<span class='kw'>fn</span> <span class='ident'>show_project</span>(<span class='ident'>dir</span>:<span class='ident'>StorageDir</span>, <span class='ident'>search_term</span>:<span class='kw-2'>&amp;</span><span class='ident'>str</span>){
     <span class='kw'>let</span> <span class='ident'>luigi</span> <span class='op'>=</span> <span class='ident'>setup_luigi</span>();
     <span class='kw'>for</span> <span class='ident'>project</span> <span class='kw'>in</span> <span class='ident'>super</span>::<span class='ident'>execute</span>(<span class='op'>||</span><span class='ident'>luigi</span>.<span class='ident'>search_projects</span>(<span class='ident'>dir</span>, <span class='kw-2'>&amp;</span><span class='ident'>search_term</span>))
         .<span class='ident'>iter</span>()
@@ -845,8 +852,8 @@
 <span class='comment'>// TODO perhaps move this code out of `::cli`</span>
 <span class='kw'>fn</span> <span class='ident'>archive_project</span>(<span class='ident'>name</span>:<span class='kw-2'>&amp;</span><span class='ident'>str</span>, <span class='ident'>manual_year</span>:<span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>i32</span><span class='op'>&gt;</span>, <span class='ident'>force</span>:<span class='ident'>bool</span>){
     <span class='kw'>let</span> <span class='ident'>luigi</span> <span class='op'>=</span> <span class='ident'>setup_luigi</span>();
-    <span class='macro'>debugln</span><span class='macro'>!</span>(<span class='string'>&quot;using the force: {}&quot;</span>, <span class='ident'>force</span>);
-    <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Ok</span>(<span class='ident'>projects</span>) <span class='op'>=</span> <span class='ident'>luigi</span>.<span class='ident'>search_projects</span>(<span class='ident'>LuigiDir</span>::<span class='ident'>Working</span>, <span class='ident'>name</span>){
+    <span class='macro'>debug</span><span class='macro'>!</span>(<span class='string'>&quot;using the force: {}&quot;</span>, <span class='ident'>force</span>);
+    <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Ok</span>(<span class='ident'>projects</span>) <span class='op'>=</span> <span class='ident'>luigi</span>.<span class='ident'>search_projects</span>(<span class='ident'>StorageDir</span>::<span class='ident'>Working</span>, <span class='ident'>name</span>){
         <span class='kw'>if</span> <span class='ident'>projects</span>.<span class='ident'>is_empty</span>(){ <span class='ident'>fail</span>(<span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;Nothing found for {:?}&quot;</span>, <span class='ident'>name</span>)); }
         <span class='kw'>for</span> <span class='ident'>project</span> <span class='kw'>in</span> <span class='ident'>projects</span>.<span class='ident'>iter</span>().<span class='ident'>filter_map</span>(<span class='op'>|</span><span class='ident'>path</span><span class='op'>|</span> <span class='ident'>Project</span>::<span class='ident'>open</span>(<span class='ident'>path</span>).<span class='ident'>ok</span>()) {
             <span class='kw'>if</span> <span class='ident'>project</span>.<span class='ident'>valid_stage3</span>().<span class='ident'>is_ok</span>() <span class='op'>||</span> <span class='ident'>force</span>{
@@ -869,7 +876,7 @@
 <span class='doccomment'>/// Command UNARCHIVW &lt;YEAR&gt; &lt;NAME&gt;</span>
 <span class='kw'>fn</span> <span class='ident'>unarchive_project</span>(<span class='ident'>year</span>:<span class='ident'>i32</span>, <span class='ident'>name</span>:<span class='kw-2'>&amp;</span><span class='ident'>str</span>){
     <span class='kw'>let</span> <span class='ident'>luigi</span> <span class='op'>=</span> <span class='ident'>setup_luigi</span>();
-    <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Ok</span>(<span class='ident'>projects</span>) <span class='op'>=</span> <span class='ident'>luigi</span>.<span class='ident'>search_projects</span>(<span class='ident'>LuigiDir</span>::<span class='ident'>Archive</span>(<span class='ident'>year</span>), <span class='ident'>name</span>){
+    <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Ok</span>(<span class='ident'>projects</span>) <span class='op'>=</span> <span class='ident'>luigi</span>.<span class='ident'>search_projects</span>(<span class='ident'>StorageDir</span>::<span class='ident'>Archive</span>(<span class='ident'>year</span>), <span class='ident'>name</span>){
         <span class='kw'>if</span> <span class='ident'>projects</span>.<span class='ident'>len</span>() <span class='op'>==</span> <span class='number'>1</span> {
             <span class='macro'>println</span><span class='macro'>!</span>(<span class='string'>&quot;{:?}&quot;</span>, <span class='ident'>projects</span>);
             <span class='ident'>luigi</span>.<span class='ident'>unarchive_project_file</span>(<span class='kw-2'>&amp;</span><span class='ident'>projects</span>[<span class='number'>0</span>]).<span class='ident'>unwrap</span>();
@@ -912,23 +919,30 @@
     }
 }
 
-<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>path</span>(<span class='ident'>matches</span>:<span class='kw-2'>&amp;</span><span class='ident'>ArgMatches</span>){
+<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>show_path</span>(<span class='ident'>matches</span>:<span class='kw-2'>&amp;</span><span class='ident'>ArgMatches</span>){<span class='ident'>path</span>(<span class='ident'>matches</span>, <span class='op'>|</span><span class='ident'>path</span><span class='op'>|</span> <span class='macro'>println</span><span class='macro'>!</span>(<span class='string'>&quot;{}&quot;</span>, <span class='ident'>path</span>.<span class='ident'>display</span>()))}
+<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>open_path</span>(<span class='ident'>matches</span>:<span class='kw-2'>&amp;</span><span class='ident'>ArgMatches</span>){<span class='ident'>path</span>(<span class='ident'>matches</span>, <span class='op'>|</span><span class='ident'>path</span><span class='op'>|</span> {<span class='ident'>open</span>::<span class='ident'>that</span>(<span class='ident'>path</span>).<span class='ident'>unwrap</span>();})}
+
+<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>path</span><span class='op'>&lt;</span><span class='ident'>F</span>:<span class='ident'>Fn</span>(<span class='kw-2'>&amp;</span><span class='ident'>Path</span>)<span class='op'>&gt;</span>(<span class='ident'>matches</span>:<span class='kw-2'>&amp;</span><span class='ident'>ArgMatches</span>, <span class='ident'>action</span>:<span class='ident'>F</span>){
         <span class='kw'>if</span> <span class='ident'>matches</span>.<span class='ident'>is_present</span>(<span class='string'>&quot;templates&quot;</span>){
-            <span class='macro'>println</span><span class='macro'>!</span>(<span class='string'>&quot;{}&quot;</span>, <span class='ident'>PathBuf</span>::<span class='ident'>from</span>(<span class='ident'>CONFIG</span>.<span class='ident'>get_str</span>(<span class='string'>&quot;path&quot;</span>))
+            <span class='ident'>action</span>(<span class='kw-2'>&amp;</span><span class='ident'>PathBuf</span>::<span class='ident'>from</span>(<span class='ident'>CONFIG</span>.<span class='ident'>get_str</span>(<span class='string'>&quot;path&quot;</span>))
                      .<span class='ident'>join</span>( <span class='ident'>CONFIG</span>.<span class='ident'>get_str</span>(<span class='string'>&quot;dirs/storage&quot;</span>))
-                     .<span class='ident'>join</span>( <span class='ident'>CONFIG</span>.<span class='ident'>get_str</span>(<span class='string'>&quot;dirs/templates&quot;</span>))
-                     .<span class='ident'>display</span>());
+                     .<span class='ident'>join</span>( <span class='ident'>CONFIG</span>.<span class='ident'>get_str</span>(<span class='string'>&quot;dirs/templates&quot;</span>)));
         }
         <span class='kw'>else</span> <span class='kw'>if</span> <span class='ident'>matches</span>.<span class='ident'>is_present</span>(<span class='string'>&quot;output&quot;</span>){
-            <span class='macro'>println</span><span class='macro'>!</span>(<span class='string'>&quot;{}&quot;</span>, <span class='ident'>CONFIG</span>.<span class='ident'>get_str</span>(<span class='string'>&quot;output_path&quot;</span>));
+            <span class='ident'>action</span>(
+                    <span class='kw-2'>&amp;</span><span class='ident'>util</span>::<span class='ident'>replace_home_tilde</span>(
+                <span class='ident'>Path</span>::<span class='ident'>new</span>(
+                    <span class='ident'>CONFIG</span>.<span class='ident'>get_str</span>(<span class='string'>&quot;output_path&quot;</span>)
+                    )
+                    ));
         }
         <span class='kw'>else</span> <span class='kw'>if</span> <span class='ident'>matches</span>.<span class='ident'>is_present</span>(<span class='string'>&quot;bin&quot;</span>){
-            <span class='macro'>println</span><span class='macro'>!</span>(<span class='string'>&quot;{}&quot;</span>, <span class='ident'>env</span>::<span class='ident'>current_exe</span>().<span class='ident'>unwrap</span>().<span class='ident'>display</span>());
+            <span class='ident'>action</span>(<span class='kw-2'>&amp;</span><span class='ident'>env</span>::<span class='ident'>current_exe</span>().<span class='ident'>unwrap</span>());
         }
         <span class='kw'>else</span> { <span class='comment'>// default case</span>
             <span class='kw'>let</span> <span class='ident'>path</span> <span class='op'>=</span> <span class='ident'>util</span>::<span class='ident'>replace_home_tilde</span>(<span class='ident'>Path</span>::<span class='ident'>new</span>(<span class='ident'>CONFIG</span>.<span class='ident'>get_str</span>(<span class='string'>&quot;path&quot;</span>)))
                 .<span class='ident'>join</span>( <span class='ident'>CONFIG</span>.<span class='ident'>get_str</span>(<span class='string'>&quot;dirs/storage&quot;</span>));
-            <span class='macro'>println</span><span class='macro'>!</span>(<span class='string'>&quot;{}&quot;</span>, <span class='ident'>path</span>.<span class='ident'>display</span>());
+            <span class='ident'>action</span>(<span class='kw-2'>&amp;</span><span class='ident'>path</span>);
         }
 }
 
@@ -936,9 +950,9 @@
 
 <span class='doccomment'>/// Command STATUS</span>
 <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>git_status</span>(){
-    <span class='comment'>//let luigi = setup_luigi_with_git();</span>
-    <span class='comment'>//let repo = luigi.repository.unwrap();</span>
-    <span class='comment'>//util::exit(repo.status()) // FIXME this does not behave right</span>
+    <span class='kw'>let</span> <span class='ident'>luigi</span> <span class='op'>=</span> <span class='ident'>setup_luigi_with_git</span>();
+    <span class='kw'>let</span> <span class='ident'>repo</span> <span class='op'>=</span> <span class='ident'>luigi</span>.<span class='ident'>repository</span>.<span class='ident'>unwrap</span>();
+    <span class='ident'>util</span>::<span class='ident'>exit</span>(<span class='ident'>repo</span>.<span class='ident'>status</span>()) <span class='comment'>// FIXME this does not behave right</span>
 }
 
 <span class='doccomment'>/// Command COMMIT</span>
@@ -970,14 +984,15 @@
 
 <span class='doccomment'>/// Command ADD</span>
 <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>git_add</span>(<span class='ident'>matches</span>:<span class='kw-2'>&amp;</span><span class='ident'>ArgMatches</span>){
-    <span class='kw'>let</span> <span class='ident'>luigi</span> <span class='op'>=</span> <span class='ident'>setup_luigi</span>();
+    <span class='kw'>let</span> <span class='ident'>luigi</span> <span class='op'>=</span> <span class='ident'>setup_luigi_with_git</span>();
     <span class='kw'>let</span> <span class='ident'>search_terms</span> <span class='op'>=</span> <span class='ident'>matches</span>
         .<span class='ident'>values_of</span>(<span class='string'>&quot;search_term&quot;</span>)
         .<span class='ident'>unwrap</span>()
         .<span class='ident'>collect</span>::<span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='ident'>str</span><span class='op'>&gt;&gt;</span>();
 
+    <span class='macro'>debug</span><span class='macro'>!</span>(<span class='string'>&quot;adding {:?}&quot;</span>, <span class='ident'>search_terms</span>);
 
-    <span class='kw'>let</span> <span class='ident'>projects</span> <span class='op'>=</span> <span class='ident'>luigi</span>.<span class='ident'>search_multiple_projects</span>(<span class='ident'>LuigiDir</span>::<span class='ident'>Working</span>, <span class='kw-2'>&amp;</span><span class='ident'>search_terms</span>)
+    <span class='kw'>let</span> <span class='ident'>projects</span> <span class='op'>=</span> <span class='ident'>luigi</span>.<span class='ident'>search_multiple_projects</span>(<span class='ident'>StorageDir</span>::<span class='ident'>Working</span>, <span class='kw-2'>&amp;</span><span class='ident'>search_terms</span>)
         .<span class='ident'>unwrap</span>()
         .<span class='ident'>iter</span>()
         .<span class='ident'>filter_map</span>(<span class='op'>|</span><span class='ident'>path</span><span class='op'>|</span> <span class='kw'>match</span> <span class='ident'>Project</span>::<span class='ident'>open</span>(<span class='ident'>path</span>){ <span class='comment'>// TODO use ProjectList</span>

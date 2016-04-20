@@ -11,7 +11,6 @@
 
     <link rel="stylesheet" type="text/css" href="../../../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../../../main.css">
-    
 
     
     
@@ -44,10 +43,10 @@
 
     <section id='main' class="content mod">
 <h1 class='fqn'><span class='in-band'>Module <a href='../../index.html'>asciii</a>::<wbr><a href='../index.html'>util</a>::<wbr><a class='mod' href=''>yaml</a></span><span class='out-of-band'><span id='render-detail'>
-                   <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
-                       [<span class='inner'>&#x2212;</span>]
-                   </a>
-               </span><a id='src-28' class='srclink' href='../../../src/asciii/src/util/yaml.rs.html#1-200' title='goto source code'>[src]</a></span></h1>
+            <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                [<span class='inner'>&#x2212;</span>]
+            </a>
+        </span><a id='src-29' class='srclink' href='../../../src/asciii/src/util/yaml.rs.html#1-217' title='goto source code'>[src]</a></span></h1>
 <div class='docblock'><p>Yaml Utility functions.</p>
 
 <p>Here are some missing batteries form the <code>yaml-rust</code> crate.
@@ -67,113 +66,128 @@ if the yaml looks like this:</p>
 Leading <code>/</code> will not be regarded.</p>
 </div><h2 id='enums' class='section-header'><a href="#enums">Enums</a></h2>
 <table>
-                       <tr class=' module-item'>
-                           <td><a class='enum' href='enum.Yaml.html'
-                                  title='asciii::util::yaml::Yaml'>Yaml</a></td>
-                           <td class='docblock short'>
-                                <p>A YAML node is stored as this <code>Yaml</code> enumeration, which provides an easy way to
+                    <tr class=' module-item'>
+                        <td><a class='enum' href='enum.Yaml.html'
+                               title='asciii::util::yaml::Yaml'>Yaml</a></td>
+                        <td class='docblock short'>
+                             <p>A YAML node is stored as this <code>Yaml</code> enumeration, which provides an easy way to
 access your YAML document.</p>
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class='enum' href='enum.YamlError.html'
-                                  title='asciii::util::yaml::YamlError'>YamlError</a></td>
-                           <td class='docblock short'>
-                                <p>Wrapper around <code>io::Error</code> and <code>yaml_rust::scanner::ScanError</code>.</p>
-                           </td>
-                       </tr></table><h2 id='functions' class='section-header'><a href="#functions">Functions</a></h2>
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='enum' href='enum.YamlError.html'
+                               title='asciii::util::yaml::YamlError'>YamlError</a></td>
+                        <td class='docblock short'>
+                             <p>Wrapper around <code>io::Error</code> and <code>yaml_rust::scanner::ScanError</code>.</p>
+                        </td>
+                    </tr>
+                </table><h2 id='functions' class='section-header'><a href="#functions">Functions</a></h2>
 <table>
-                       <tr class=' module-item'>
-                           <td><a class='fn' href='fn.get.html'
-                                  title='asciii::util::yaml::get'>get</a></td>
-                           <td class='docblock short'>
-                                <p>Wrapper around <code>get_path()</code>.</p>
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class='fn' href='fn.get_as_string.html'
-                                  title='asciii::util::yaml::get_as_string'>get_as_string</a></td>
-                           <td class='docblock short'>
-                                <p>Gets anything <strong>as</strong> <code>String</code>.</p>
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class='fn' href='fn.get_bool.html'
-                                  title='asciii::util::yaml::get_bool'>get_bool</a></td>
-                           <td class='docblock short'>
-                                <p>Gets a <code>Bool</code> value.</p>
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class='fn' href='fn.get_dmy.html'
-                                  title='asciii::util::yaml::get_dmy'>get_dmy</a></td>
-                           <td class='docblock short'>
-                                <p>Gets a Date in <code>dd.mm.YYYY</code> format.</p>
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class='fn' href='fn.get_f64.html'
-                                  title='asciii::util::yaml::get_f64'>get_f64</a></td>
-                           <td class='docblock short'>
-                                <p>Gets a <code>Float</code> value.</p>
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class='fn' href='fn.get_hash.html'
-                                  title='asciii::util::yaml::get_hash'>get_hash</a></td>
-                           <td class='docblock short'>
-                                <p>Gets <code>Some(Yaml::Hash)</code> or <code>None</code>.</p>
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class='fn' href='fn.get_int.html'
-                                  title='asciii::util::yaml::get_int'>get_int</a></td>
-                           <td class='docblock short'>
-                                <p>Gets an <code>Int</code> value.</p>
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class='fn' href='fn.get_str.html'
-                                  title='asciii::util::yaml::get_str'>get_str</a></td>
-                           <td class='docblock short'>
-                                <p>Gets a <code>&amp;str</code> value.</p>
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class='fn' href='fn.get_string.html'
-                                  title='asciii::util::yaml::get_string'>get_string</a></td>
-                           <td class='docblock short'>
-                                <p>same as get_str(), but owned.</p>
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class='fn' href='fn.open.html'
-                                  title='asciii::util::yaml::open'>open</a></td>
-                           <td class='docblock short'>
-                                <p>Wrapper that opens and parses a <code>.yml</code> file.</p>
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class='fn' href='fn.parse.html'
-                                  title='asciii::util::yaml::parse'>parse</a></td>
-                           <td class='docblock short'>
-                                <p>Ruby like API to yaml-rust.</p>
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class='fn' href='fn.parse_dmy_date.html'
-                                  title='asciii::util::yaml::parse_dmy_date'>parse_dmy_date</a></td>
-                           <td class='docblock short'>
-                                <p>Interprets <code>&quot;25.12.2016&quot;</code> as date.</p>
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class='fn' href='fn.parse_dmy_date_range.html'
-                                  title='asciii::util::yaml::parse_dmy_date_range'>parse_dmy_date_range</a></td>
-                           <td class='docblock short'>
-                                <p>Interprets <code>&quot;24-25.12.2016&quot;</code> as date.</p>
-                           </td>
-                       </tr></table></section>
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.get.html'
+                               title='asciii::util::yaml::get'>get</a></td>
+                        <td class='docblock short'>
+                             <p>Wrapper around <code>get_path()</code>.</p>
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.get_as_string.html'
+                               title='asciii::util::yaml::get_as_string'>get_as_string</a></td>
+                        <td class='docblock short'>
+                             <p>Gets anything <strong>as</strong> <code>String</code>.</p>
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.get_bool.html'
+                               title='asciii::util::yaml::get_bool'>get_bool</a></td>
+                        <td class='docblock short'>
+                             <p>Gets a <code>Bool</code> value.</p>
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.get_dmy.html'
+                               title='asciii::util::yaml::get_dmy'>get_dmy</a></td>
+                        <td class='docblock short'>
+                             <p>Gets a Date in <code>dd.mm.YYYY</code> format.</p>
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.get_f64.html'
+                               title='asciii::util::yaml::get_f64'>get_f64</a></td>
+                        <td class='docblock short'>
+                             <p>Gets a <code>Float</code> value.</p>
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.get_hash.html'
+                               title='asciii::util::yaml::get_hash'>get_hash</a></td>
+                        <td class='docblock short'>
+                             <p>Gets <code>Some(Yaml::Hash)</code> or <code>None</code>.</p>
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.get_int.html'
+                               title='asciii::util::yaml::get_int'>get_int</a></td>
+                        <td class='docblock short'>
+                             <p>Gets an <code>Int</code> value.</p>
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.get_str.html'
+                               title='asciii::util::yaml::get_str'>get_str</a></td>
+                        <td class='docblock short'>
+                             <p>Gets a <code>&amp;str</code> value.</p>
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.get_string.html'
+                               title='asciii::util::yaml::get_string'>get_string</a></td>
+                        <td class='docblock short'>
+                             <p>same as get_str(), but owned.</p>
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.open.html'
+                               title='asciii::util::yaml::open'>open</a></td>
+                        <td class='docblock short'>
+                             <p>Wrapper that opens and parses a <code>.yml</code> file.</p>
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.parse.html'
+                               title='asciii::util::yaml::parse'>parse</a></td>
+                        <td class='docblock short'>
+                             <p>Ruby like API to yaml-rust.</p>
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.parse_dmy_date.html'
+                               title='asciii::util::yaml::parse_dmy_date'>parse_dmy_date</a></td>
+                        <td class='docblock short'>
+                             <p>Interprets <code>&quot;25.12.2016&quot;</code> as date.</p>
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.parse_dmy_date_range.html'
+                               title='asciii::util::yaml::parse_dmy_date_range'>parse_dmy_date_range</a></td>
+                        <td class='docblock short'>
+                             <p>Interprets <code>&quot;24-25.12.2016&quot;</code> as date.</p>
+                        </td>
+                    </tr>
+                </table></section>
     <section id='search' class="content hidden"></section>
 
     <section class="footer"></section>
