@@ -4,15 +4,24 @@
 //! For pure user documentation please refer to the [user manual](manual/index.html).
 //!
 
+//#![warn(missing_docs,
+//        missing_copy_implementations,
+//        missing_debug_implementations
+//        unstable_features,
+//        unused_import_braces,
+//        unused_qualifications
+//        )]
+
+#![warn(
+    trivial_casts,
+    trivial_numeric_casts,
+    unstable_features,
+    unused_qualifications
+    )]
+
 #![cfg_attr(feature = "lints", allow(unstable_features))]
 #![cfg_attr(feature = "lints", feature(plugin))]
 #![cfg_attr(feature = "lints", plugin(clippy))]
-
-
-#[cfg(feature = "debug")]
-pub mod a_debug_doc_warning{
-//! **If you can read this, than you accidentally build the doc with `--features debug`**
-}
 
 extern crate yaml_rust;
 extern crate chrono;

@@ -262,13 +262,16 @@ pub fn show(matches:&ArgMatches){
 }
 
 fn show_project(dir:StorageDir, search_term:&str){
+    // TODO make this use ProjectList
     let luigi = setup_luigi();
-    for project in super::execute(||luigi.search_projects(dir, &search_term))
-        .iter()
-            .filter_map(|path| Project::open(path).ok())
-            {
-                print::show_items(&project);
-            }
+    let projects = super::execute(||luigi.search_projects(dir, &search_term));
+    if !projects.is_empty(){
+        for project in projects.iter().filter_map(|path| Project::open(path).ok()){
+            print::show_items(&project);
+        }
+    } else{
+        fail(format!("Nothing found for {:?}", search_term));
+    }
 }
 
 

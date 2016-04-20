@@ -1,6 +1,6 @@
 //! Handles config files and default config.
 //!
-//! Looks for `~/.ascii-invoicer.yml` and patches unset fields from `DEFAULT_CONFIG`
+//! Looks for `DEFAULT_LOCATION` and patches unset fields from `DEFAULT_CONFIG`
 //!
 
 #![warn(missing_docs,
@@ -17,7 +17,8 @@ use std::env::home_dir;
 use util::yaml;
 use util::yaml::{Yaml, YamlError};
 
-const DEFAULT_LOCATION: &'static str = ".asciii.yml";
+/// Name of the configfile
+pub const DEFAULT_LOCATION: &'static str = ".asciii.yml";
 
 /// Looks for a configuration yaml in your HOME_DIR
 #[derive(Debug)]

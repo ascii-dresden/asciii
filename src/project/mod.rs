@@ -258,5 +258,4 @@ mod test{
         assert_eq!(spec::client::last_name(&old_yaml), spec::client::last_name(&new_yaml));
         assert_eq!(spec::client::addressing(&old_yaml, &config), spec::client::addressing(&new_yaml, &config));
     }
-
 }
