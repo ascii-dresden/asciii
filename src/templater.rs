@@ -4,7 +4,7 @@
 use std::io;
 use std::io::Read;
 use std::fs::File;
-use std::path::{Path,PathBuf};
+use std::path::Path;
 use std::collections::HashMap;
 
 use regex::{Regex,Captures};
@@ -93,9 +93,6 @@ impl<U:Deref<Target=str>> IsKeyword for U {
 /// Simple templating module
 #[derive(Debug)]
 pub struct Templater{
-    /// path to used template file
-    pub path: PathBuf,
-
     /// content of template file after reading
     pub original: String,
 
@@ -104,22 +101,39 @@ pub struct Templater{
 }
 
 impl Templater{
-    pub fn new (path:&Path) -> Result<Templater, io::Error> {
+
+    pub fn new(template:&str) -> Templater{
+        Templater{
+            original:template.to_owned(),
+            filled: String::new(),
+        }
+    }
+
+    pub fn from_file(path:&Path) -> Result<Templater, io::Error> {
         let template = try!(File::open(&path)
             .and_then(|mut file| {
                 let mut content = String::new();
                 file.read_to_string(&mut content).map(|_| content)
             }));
 
-        Ok(Templater{
-            path:PathBuf::from(path),
-            original:template,
-            filled: String::new()
-        })
+        Ok(Templater::new(&template))
     }
 
     pub fn finalize(&mut self) -> Templater {
         self.to_owned()
+    }
+
+    /// Creates a finished version of the output.
+    ///
+    /// If any keywords remain unfilled, `Err` contains a list of left overs.
+    pub fn complete(&mut self) -> Result<Templater,Vec<String>> {
+        let left_overs = self.filled.list_keywords();
+
+        if left_overs.is_empty(){
+            Ok(self.to_owned())
+        } else {
+            Err(left_overs)
+        }
     }
 
     pub fn fill_in_data(&mut self, data: &HashMap<&str,String>) -> &mut Templater {
@@ -145,9 +159,37 @@ impl ToOwned for Templater{
     type Owned = Templater;
     fn to_owned(&self) -> Templater {
         Templater{
-            path :    self.path.to_owned(),
+            //path :    self.path.to_owned(),
             original: self.original.to_owned(),
             filled:   self.filled.to_owned()
         }
     }
+}
+
+#[cfg(test)]
+mod test{
+    use super::Templater;
+    const TEMPLATE:&'static str = r##"This tests __TEST__ for __ATTR__ __SUBJ__."##;
+
+   #[test]
+   fn complete(){
+       let filled_in = Templater::new(TEMPLATE)
+           .fill_in_data(&hashmap!{
+               "TEST" => String::from("templates"),
+               "ATTR" => String::from("complete"),
+               "SUBJ" => String::from("replacements"),
+           }).complete().unwrap();
+       assert_eq!(filled_in.filled, "This tests templates for complete replacements.")
+   }
+
+   #[test]
+   fn not_complete(){
+       let filled_in = Templater::new(TEMPLATE)
+           .fill_in_data(&hashmap!{
+               "TEST" => String::from("templates"),
+           }).complete();
+       assert!(filled_in.is_err());
+       assert_eq!(&filled_in.unwrap_err(), &["ATTR","SUBJ"])
+   }
+
 }
