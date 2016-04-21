@@ -1,37 +1,37 @@
 [package]
 name = "asciii"
-version = "3.0.0-alpha"
+version = "2.9.9-dev"
 authors = ["Hendrik Sollich <hendrik@hoodie.de>"]
 
 
 [dependencies]
 
-#csv = "*"
 log = "*"
 env_logger = "*"
 yaml-rust = {git="https://github.com/hoodie/yaml-rust", branch="feature/to_string"}
 chrono = "*"
 regex = "*"
+lazy_static = "*"
+maplit = "*"
+clap = "2"
+enum_derive = "*"
+custom_derive = "*"
+clippy = {version = "*", optional = true}
+
 slug = "*"
+tempdir = "*"
+
 term = "*"
 terminal_size = "0.1.1" # TODO consider termsize or others
 prettytable-rs = "*"
+
 currency = {git="https://github.com/hoodie/rust-lang-currency"}
-#currency = {path="../currency"}
-lazy_static = "*"
 git2 = {version = "*", default-features=false}
-maplit = "*"
-tempdir = "*"
 open = "*"
 
-enum_derive = "*"
-custom_derive = "*"
-
-clippy = {version = "*", optional = true}
-clap = "2"
-
 [features]
-default = []
+default = ["document_export"]
+document_export = []
 debug_config = []
 nightly = []
 lints = ["clippy"]

@@ -9,13 +9,15 @@
 //        missing_debug_implementations
 //        unstable_features,
 //        unused_import_braces,
-//        unused_qualifications
 //        )]
 
-#![warn(
+#![deny(
     trivial_casts,
     trivial_numeric_casts,
+    )]
+#![warn(
     unstable_features,
+    unused_import_braces,
     unused_qualifications
     )]
 
@@ -30,7 +32,6 @@ extern crate slug;
 extern crate tempdir;
 extern crate term; // TODO consolidate term, ansi_term and terminal_size
 extern crate terminal_size;
-//TODO make libgit2 optional
 extern crate git2;
 extern crate currency;
 extern crate open;
@@ -53,6 +54,9 @@ pub mod repo;
 
 pub mod templater;
 pub mod cli;
+
+#[cfg(feature="document_export")]
+pub mod fill_docs;
 
 lazy_static!{
     pub static ref CONFIG: config::ConfigReader = config::ConfigReader::new().unwrap();

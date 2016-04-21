@@ -18,7 +18,7 @@ use templater::Templater;
 pub mod product;
 pub mod spec;
 use self::spec::{SpecResult, VirtualField};
-use self::spec::products::{ProductResult};
+use self::spec::products::ProductResult;
 
 /// Represents a Project.
 ///

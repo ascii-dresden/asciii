@@ -27,8 +27,8 @@ use std::path::Path;
 use std::collections::BTreeMap;
 use std::error::Error;
 
-pub use yaml_rust::{Yaml};
-use yaml_rust::{YamlLoader};
+pub use yaml_rust::Yaml;
+use yaml_rust::YamlLoader;
 use yaml_rust::scanner::ScanError;
 use chrono::*;
 
