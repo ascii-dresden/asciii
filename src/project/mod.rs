@@ -48,11 +48,11 @@ impl Storable for Project{
             "DATE-EVENT"    => event_date,
             "DATE-CREATED"  => created_date,
             "SALARY"        => ::CONFIG.get_as_string("defaults/salary"),
-            "manager"       => ::CONFIG.get_str("manager_name").to_owned()
+            "MANAGER"       => ::CONFIG.get_str("manager_name").to_owned()
         };
 
         // fills the template
-        let templater = Templater::new(template)
+        let templater = Templater::from_file(template)
             .unwrap()
             .fill_in_data(data)
             .finalize();

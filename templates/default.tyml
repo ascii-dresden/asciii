@@ -19,10 +19,11 @@ event:
   - begin: __DATE-EVENT__
     #end:
     times:
-    -  begin: "9:00"
-       end:   "17:00"
+    -  begin: "__TIME-START__"
+       end:   "__TIME-END__"
 
   description: |
+    __DESCRIPTION__
 
 offer:
   date: __DATE-CREATED__

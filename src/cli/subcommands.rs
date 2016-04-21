@@ -281,7 +281,7 @@ fn show_project(dir:StorageDir, search_term:&str){
 use templater::Templater;
 fn show_template(name:&str){
     let luigi = setup_luigi();
-    let templater = Templater::new(&luigi.get_template_file(name).unwrap()).unwrap();
+    let templater = Templater::from_file(&luigi.get_template_file(name).unwrap()).unwrap();
     println!("{:#?}", templater.list_keywords());
 }
 
