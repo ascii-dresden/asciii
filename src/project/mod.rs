@@ -4,6 +4,7 @@
 use std::fs::File;
 use std::io::prelude::*;
 use std::path::{Path, PathBuf};
+use std::collections::HashMap;
 
 use chrono::*;
 use yaml_rust::Yaml;
@@ -34,28 +35,33 @@ impl From<yaml::YamlError> for StorageError {
 }
 
 impl Storable for Project{
-    fn from_template(project_name:&str,template:&Path) -> Result<Project,StorageError> {
+    fn from_template(project_name:&str,template:&Path, fill: &HashMap<&str,String>) -> Result<Project, StorageError> {
         let template_name = template.file_stem().unwrap().to_str().unwrap();
 
         let event_date = (Local::today() + Duration::days(14)).format("%d.%m.%Y").to_string();
         let created_date = Local::today().format("%d.%m.%Y").to_string();
 
-        // fill template with this data
-        let data = &hashmap!{
+        // fill template with these values
+        let default_fill = hashmap!{
             "VERSION"       => crate_version!().to_owned(),
             "TEMPLATE"      => template_name.to_owned(),
             "PROJECT-NAME"  => project_name.to_owned(),
             "DATE-EVENT"    => event_date,
             "DATE-CREATED"  => created_date,
             "SALARY"        => ::CONFIG.get_as_string("defaults/salary"),
-            "MANAGER"       => ::CONFIG.get_str("manager_name").to_owned()
+            "MANAGER"       => ::CONFIG.get_as_string("manager_name"),
+            "DESCRIPTION"   => String::new(),
+            "TIME-START"    => String::new(),
+            "TIME-END"      => String::new(),
         };
 
         // fills the template
-        let templater = Templater::from_file(template)
-            .unwrap()
-            .fill_in_data(data)
-            .finalize();
+        let filled = try!(
+            try!(Templater::from_file(template))
+            .fill_in_data(&fill).fix()
+            .fill_in_data(&default_fill)
+            .complete()
+            ).filled;
 
         // generates a temp file
         let temp_dir  = TempDir::new(&project_name).unwrap();
@@ -63,14 +69,14 @@ impl Storable for Project{
 
         // write into a file
         let mut file = try!( File::create(&temp_file) );
-        try!(file.write_all(templater.filled.as_bytes()));
+        try!(file.write_all(filled.as_bytes()));
         try!(file.sync_all());
 
         // project now lives in the temp_file
         Ok(Project{
             file_path: temp_file,
             temp_dir: Some(temp_dir), // needs to be kept alive to avoid deletion TODO: try something manually
-            yaml: try!(yaml::parse(&templater.filled))
+            yaml: try!(yaml::parse(&filled))
         })
     }
 

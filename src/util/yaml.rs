@@ -89,7 +89,7 @@ pub fn parse_dmy_date(date_str:&str) -> Option<Date<UTC>>{
         .collect::<Vec<i32>>();
     if date[0] > 0 {
         // XXX this neglects the old "01-05.12.2015" format
-        return Some(UTC.ymd(date[2], date[1] as u32, date[0] as u32))
+        return UTC.ymd_opt(date[2], date[1] as u32, date[0] as u32).single()
     }
     None
 }

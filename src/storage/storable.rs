@@ -2,6 +2,7 @@
 //!
 
 use std::path::{Path, PathBuf};
+use std::collections::HashMap;
 
 use chrono::{Date, UTC, Datelike};
 
@@ -12,7 +13,7 @@ pub trait Storable{
     fn open(&Path) -> StorageResult<Self> where Self: Sized;
 
     /// creates in tempfile
-    fn from_template(project_name:&str,template:&Path) -> StorageResult<Self> where Self: Sized;
+    fn from_template(project_name:&str,template:&Path, data:&HashMap<&str, String>) -> StorageResult<Self> where Self: Sized;
 
     /// For file names
     fn ident(&self) -> String{ self.dir().file_stem().and_then(|s|s.to_str()).unwrap().to_owned() }

@@ -1,5 +1,3 @@
-//! Implementations of `Storage`
-//!
 
 #![allow(dead_code)]
 
@@ -8,6 +6,7 @@ use std::fmt;
 use std::ffi::OsStr;
 use std::path::{Path, PathBuf};
 use std::marker::PhantomData;
+use std::collections::HashMap;
 
 use slug;
 
@@ -27,7 +26,7 @@ fn slugify(string:&str) -> String{ slug::slugify(string) }
 impl<L:Storable> Storage<L> {
     /// Inits storage, does not check existence, yet. TODO
     pub fn new<P: AsRef<Path>>(root:P, working:&str, archive:&str, template:&str) -> StorageResult<Self> {
-        trace!("initializing storage");
+        trace!("initializing storage, root: {}", root.as_ref().display());
         let root = root.as_ref();
         if root.is_absolute(){
             Ok( Storage{
@@ -185,19 +184,19 @@ impl<L:Storable> Storage<L> {
 
     /// Takes a template file and stores it in the working directory,
     /// in a new project directory according to it's name.
-    pub fn create_project(&self, project_name:&str, template_name:&str) -> StorageResult<L> {
-        trace!("creating a project\n name: {name}\n template: {tmpl}",
+    pub fn create_project(&self, project_name:&str, template_name:&str, fill_data:&HashMap<&str, String>) -> StorageResult<L> {
+        debug!("creating a project\n name: {name}\n template: {tmpl}",
                name = project_name,
                tmpl = template_name
                );
         if !self.working_dir().exists(){
-            error!("working directory does not exist");
+            debug!("working directory does not exist");
             return Err(StorageError::NoWorkingDir)
-        }; // funny syntax
+        };
         let slugged_name = slugify(&project_name);
         let project_dir  = self.working_dir().join(&slugged_name);
         if project_dir.exists() {
-            error!("project directory already exists");
+            debug!("project directory already exists");
             return Err(StorageError::ProjectDirExists);
         }
 
@@ -207,7 +206,8 @@ impl<L:Storable> Storage<L> {
             .join(&(slugged_name + "." + super::PROJECT_FILE_EXTENSION));
 
         let template_path = try!(self.get_template_file(template_name));
-        let mut project = try!(L::from_template(&project_name, &template_path));
+
+        let mut project = try!(L::from_template(&project_name, &template_path, &fill_data));
 
         // TODO test for unreplaced template keywords
         try!(fs::create_dir(&project_dir));

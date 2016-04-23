@@ -104,7 +104,7 @@ pub fn simple_rows(projects:&[Project], list_config:&ListConfig) -> Vec<Row>{
 pub fn verbose_rows(projects:&[Project], list_config:&ListConfig, repo:Option<Repository>) -> Vec<Row>{
     projects.iter().enumerate()
         .map(|(i, project)| {
-            trace!("configuring row: {:?}", project.name());
+            //trace!("configuring row: {:?}", project.name());
             let row_style = if list_config.use_colors {project_to_style(&project)}else{""};
             let mut cells = Vec::new();
 

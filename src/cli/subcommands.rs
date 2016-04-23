@@ -1,6 +1,7 @@
 use std::path::{Path,PathBuf};
 use std::ffi::OsStr;
 use std::env;
+use std::collections::HashMap;
 
 use clap::ArgMatches;
 use open;
@@ -19,20 +20,40 @@ const STATUS_ROWS_WIDTH:u16 = 96;
 
 /// Create NEW Project
 pub fn new(matches:&ArgMatches){
-        let name     = matches.value_of("name").expect("You did not pass a \"Name\"!");
-        let editor   = CONFIG.get_path("editor").and_then(|e|e.as_str());
+    #![allow(unreachable_code,unused_variables)]
+    let project_name     = matches.value_of("name").expect("You did not pass a \"Name\"!");
+    let editor   = CONFIG.get_path("editor").and_then(|e|e.as_str());
 
-        let template = matches.value_of("template")
-            .or( CONFIG.get_path("template").unwrap().as_str())
-            .unwrap();
+    let template_name = matches.value_of("template")
+        .or( CONFIG.get_path("template").unwrap().as_str())
+        .unwrap();
 
-        new_project(&name, &template, &editor, !matches.is_present("don't edit"));
-}
-
-fn new_project(project_name:&str, template_name:&str, editor:&Option<&str>, edit:bool){
+    let edit = !matches.is_present("don't edit");
     let luigi = setup_luigi();
-    //let project = execute(|| luigi.create_project::<Project>(&project_name, &template_name));
-    let project = luigi.create_project(&project_name, &template_name).unwrap();
+
+    let mut fill_data:HashMap<&str, String> = HashMap::new();
+
+    if let Some(description) = matches.value_of("description"){
+        fill_data.insert("DESCRIPTION", description.to_owned());
+    }
+
+    if let Some(date) = matches.value_of("date"){
+        fill_data.insert("DATE-EVENT", date.to_owned());
+    }
+
+    if let Some(time) = matches.value_of("time"){
+        fill_data.insert("TIME-START", time.to_owned());
+    }
+
+    if let Some(time_end) = matches.value_of("time_end"){
+        fill_data.insert("TIME-END", time_end.to_owned());
+    }
+
+    if let Some(manager) = matches.value_of("manager"){
+        fill_data.insert("MANAGER", manager.to_owned());
+    }
+
+    let project = super::execute(|| luigi.create_project(&project_name, &template_name, &fill_data));
     let project_file = project.file();
     if edit {
         util::open_in_editor(&editor, &[project_file]);

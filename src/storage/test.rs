@@ -1,9 +1,11 @@
 use std::path::{Path,PathBuf};
 use std::fs;
-use util;
+use std::collections::HashMap;
 
 use chrono::*;
 use tempdir::TempDir;
+
+use util;
 use super::*;
 
 // TODO add tests for file or directories in return values
@@ -16,7 +18,7 @@ pub struct TestProject {
 
 impl Storable for TestProject{
     // creates in tempfile
-    fn from_template(project_name:&str,template:&Path) -> StorageResult<Self> where Self: Sized {
+    fn from_template(project_name:&str,template:&Path, _fill:&HashMap<&str, String>) -> StorageResult<Self> where Self: Sized{
         // generates a temp file
         let temp_dir  = TempDir::new_in(".",&project_name).unwrap();
         let temp_file = temp_dir.path().join(project_name);
@@ -155,7 +157,7 @@ fn create_project(){
     let templates = storage.list_template_names().unwrap();
 
     for test_project in TEST_PROJECTS.iter() {
-        let project     = storage.create_project(&test_project, &templates[0]).unwrap();
+        let project     = storage.create_project(&test_project, &templates[0], &hashmap!()).unwrap();
         let target_file = project.file();
         let target_path = target_file.parent().unwrap();
         assert!(target_path.exists());
@@ -181,7 +183,7 @@ fn archive_project_by_name(){
     let templates = storage.list_template_names().unwrap();
     for test_project in TEST_PROJECTS.iter() {
         // tested above
-        let origin = storage.create_project( &test_project, &templates[0]).unwrap();
+        let origin = storage.create_project( &test_project, &templates[0], &hashmap!{}).unwrap();
 
         // the actual tests
         assert!(storage.archive_project_by_name(&test_project, 2015, None).is_ok());
@@ -207,7 +209,7 @@ fn archive_project(){
     let templates = storage.list_template_names().unwrap();
     for test_project_name in TEST_PROJECTS.iter() {
         // tested above
-        let project = storage.create_project( &test_project_name, &templates[0]).unwrap();
+        let project = storage.create_project( &test_project_name, &templates[0], &hashmap!{}).unwrap();
 
         // Before archiving
         assert!(project.file().exists());
@@ -234,7 +236,7 @@ fn unarchive_project_file(){
 
     let templates = storage.list_template_names().unwrap();
     for test_project in TEST_PROJECTS.iter() {
-        let _origin = storage.create_project( &test_project, &templates[0]).unwrap();
+        let _origin = storage.create_project( &test_project, &templates[0], &hashmap!{}).unwrap();
         storage.archive_project_by_name(test_project, 2015, None).unwrap();
     }
 

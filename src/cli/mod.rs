@@ -5,7 +5,6 @@
 //! That makes it easier to derive a pure library version later.
 
 use std::process::exit;
-use std::error::Error;
 use std::fmt::Display;
 use project::Project;
 use storage::*;
@@ -30,7 +29,7 @@ pub fn fail<T:Display>(message:T) -> !{
 fn execute<F, S>(command:F) -> S where F: FnOnce() -> StorageResult<S> {
     match command(){
         Ok(s) => s,
-        Err(lerr) => { println!("ERROR: {}", lerr.description()); exit(1) }
+        Err(lerr) => { println!("ERROR: {}", lerr); exit(1) }
     }
 }
 
@@ -89,5 +88,14 @@ fn sort_by(projects:&mut Vec<Project>, option:&str){
         "name"    => projects.sort_by(|pa,pb| pa.name().cmp( &pb.name())),
         "index"   => projects.sort_by(|pa,pb| pa.index().unwrap_or("zzzz".to_owned()).cmp( &pb.index().unwrap_or("zzzz".to_owned()))), // TODO rename to indent
         _         => projects.sort_by(|pa,pb| pa.index().unwrap_or("zzzz".to_owned()).cmp( &pb.index().unwrap_or("zzzz".to_owned()))),
+    }
+}
+
+pub mod validators{
+    pub fn is_dmy(val: String) -> Result<(),String>{
+        match ::util::yaml::parse_dmy_date(&val){
+            Some(_) => Ok(()),
+            None => Err(String::from("Date Format must be DD.MM.YYYY")),
+        }
     }
 }

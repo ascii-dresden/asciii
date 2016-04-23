@@ -1,3 +1,4 @@
+use super::validators;
 use clap::{App, AppSettings, Arg, ArgMatches, SubCommand};
 
 pub fn setup() -> ArgMatches<'static>{
@@ -13,38 +14,55 @@ pub fn setup() -> ArgMatches<'static>{
 
         .subcommand(SubCommand::with_name("new")
                     .about("Create a new project")
+
                     .arg(Arg::with_name("name")
                          .help("Project name")
-                         .required(true)
-                        )
-                    .arg(Arg::with_name("template")
-                         .help("Use a specific template.")
-                         .short("t")
-                         .long("template")
-                        )
-                    .arg(Arg::with_name("editor")
-                         .help("Override the configured editor")
-                         .short("e")
-                         .long("editor")
-                        )
+                         .required(true))
+
                     .arg(Arg::with_name("date")
                          .help("Manually set the date of the project")
-                         .long("date")
-                         .short("d")
-                        )
+                         .validator(validators::is_dmy)
+                         .takes_value(true))
+
+                    .arg(Arg::with_name("description")
+                         .help("Override the description of the project")
+                         .takes_value(true))
+
+                    .arg(Arg::with_name("template")
+                         .help("Use a specific template.")
+                         .long("template")
+                         .short("t"))
+
+                    .arg(Arg::with_name("editor")
+                         .help("Override the configured editor")
+                         .long("editor")
+                         .short("e"))
+
                     .arg(Arg::with_name("manager")
                          .help("Override the manager of the project")
                          .long("manager")
                          .short("m")
-                        )
+                         .takes_value(true))
+
                     .arg(Arg::with_name("time")
-                         .help("Manually set the date of the project")
+                         .help("Manually set the start time of the project")
                          .long("time")
-                        )
+                         .takes_value(true))
+
+                    .arg(Arg::with_name("time_end")
+                         .help("Manually set the end time of the project")
+                         .long("time_end")
+                         .takes_value(true))
+
+                    .arg(Arg::with_name("length")
+                         .help("Overrides the duration of the event")
+                         .long("length")
+                         .takes_value(true))
+
                     .arg(Arg::with_name("don't edit")
                          .help("Do not edit the file after creation")
-                         .long("dont")
-                        )
+                         .long("dont"))
+
                     )
 
         .subcommand(SubCommand::with_name("list")
@@ -304,10 +322,10 @@ pub fn setup() -> ArgMatches<'static>{
                          .long("markdown")
                          .short("m")
                         )
+                )
 
-                    .arg(Arg::with_name("config")
-                         .help("Show and edit your config")
-                        )
+        .subcommand(SubCommand::with_name("config")
+                    .about("Show and edit your config")
                     .arg(Arg::with_name("edit")
                          .help("Edit your config")
                          .short("e")
@@ -327,8 +345,8 @@ pub fn setup() -> ArgMatches<'static>{
                          .short("d")
                          .long("default")
                         )
-
                     )
+
 
         .subcommand(SubCommand::with_name("whoami")
                     .about("Show your name from config")
@@ -337,9 +355,9 @@ pub fn setup() -> ArgMatches<'static>{
         //# GIT STUFF
         .subcommand(SubCommand::with_name("status")
                     .about("Show the working tree status")
-                    .arg(Arg::with_name("pull")
-                         .help("Pull and merge new commits from remote")
-                        )
+                   )
+        .subcommand(SubCommand::with_name("pull")
+                    .help("Pull and merge new commits from remote")
                    )
         .subcommand(SubCommand::with_name("add")
                     .help("Add file contents to the index")

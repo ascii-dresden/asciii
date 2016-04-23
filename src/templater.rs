@@ -1,10 +1,11 @@
 //! Simple templating functionality through keyword replacement.
 //!
 //! Replaces `__KEYWORDS__` in Strings.
-use std::io;
+use std::{io,fmt};
 use std::io::Read;
 use std::fs::File;
 use std::path::Path;
+use std::error::Error;
 use std::collections::HashMap;
 
 use regex::{Regex,Captures};
@@ -126,13 +127,20 @@ impl Templater{
     /// Creates a finished version of the output.
     ///
     /// If any keywords remain unfilled, `Err` contains a list of left overs.
-    pub fn complete(&mut self) -> Result<Templater,Vec<String>> {
+    pub fn complete(&mut self) -> TemplateResult<Templater>{
         let left_overs = self.filled.list_keywords();
 
         if left_overs.is_empty(){
             Ok(self.to_owned())
         } else {
-            Err(left_overs)
+            Err(TemplateError::Incomplete(left_overs))
+        }
+    }
+
+    pub fn fix(&self) -> Self{
+        Templater{
+            original: self.filled.to_owned(),
+            filled: String::new()
         }
     }
 
@@ -152,6 +160,26 @@ impl Templater{
         self.filled = self.original.map_keywords(closure);
         self
     }
+}
+
+pub type TemplateResult<T> = Result<T, TemplateError>;
+
+#[derive(Debug,PartialEq)]
+pub enum TemplateError{
+    Incomplete(Vec<String>)
+}
+
+impl fmt::Display for TemplateError{
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result{
+        match *self {
+            TemplateError::Incomplete(ref list) => write!(f, "{} ({:?})", self.description(), list),
+        }
+    }
+}
+
+impl Error for TemplateError{
+    fn description(&self) -> &str{ "The template was not filled completely." }
+    fn cause(&self) -> Option<&Error>{None}
 }
 
 use std::borrow::ToOwned;
@@ -183,13 +211,29 @@ mod test{
    }
 
    #[test]
+   fn chain(){
+       let filled_in = Templater::new(TEMPLATE)
+           .fill_in_data(&hashmap!{
+               "TEST" => String::from("templates")}).fix()
+           .fill_in_data(&hashmap!{
+               "ATTR" => String::from("complete"),
+               "SUBJ" => String::from("replacements") })
+       .complete().unwrap();
+       assert_eq!(filled_in.filled, "This tests templates for complete replacements.")
+   }
+
+   #[test]
    fn not_complete(){
        let filled_in = Templater::new(TEMPLATE)
            .fill_in_data(&hashmap!{
                "TEST" => String::from("templates"),
            }).complete();
        assert!(filled_in.is_err());
-       assert_eq!(&filled_in.unwrap_err(), &["ATTR","SUBJ"])
+       assert_eq!(filled_in.unwrap_err(), super::TemplateError::Incomplete(
+               vec![
+               String::from("ATTR"),
+               String::from("SUBJ")]
+               ))
    }
 
 }

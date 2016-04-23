@@ -28,7 +28,7 @@ defaults:
   tax: 0.19
   lang: de
   canceled: false
-  salery: 8.0
+  salary: 8.0
   includes:
     logopath:
     name:
