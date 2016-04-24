@@ -32,7 +32,6 @@ extern crate slug;
 extern crate tempdir;
 extern crate term; // TODO consolidate term, ansi_term and terminal_size
 extern crate terminal_size;
-extern crate git2;
 extern crate currency;
 extern crate open;
 #[macro_use] extern crate log;
@@ -42,6 +41,9 @@ extern crate open;
 #[macro_use] extern crate custom_derive;
 #[macro_use] extern crate enum_derive;
 #[macro_use] extern crate clap;
+
+#[cfg(feature="git_statuses")] extern crate git2;
+#[cfg(feature="document_export")] extern crate handlebars;
 
 #[macro_use]
 pub mod util;

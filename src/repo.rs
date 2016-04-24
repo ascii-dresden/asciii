@@ -1,10 +1,15 @@
 #![allow(dead_code, unused_variables)]
 use std::fmt;
 use std::path::{Path, PathBuf};
+#[cfg(feature="git_statuses")]
 use std::collections::HashMap;
 use std::io::Write;
 use std::process::{Command,ExitStatus};
 
+#[cfg(not(feature="git_statuses"))]
+use std::error::Error;
+
+#[cfg(feature="git_statuses")]
 use git2;
 use term::{color,Attr};
 use term::color::Color;
@@ -18,7 +23,6 @@ pub enum GitStatus{
 }
 
 impl GitStatus{
-
     pub fn to_format(&self) -> Attr{
         //Bold,
         //Dim,
@@ -66,6 +70,7 @@ impl fmt::Display for GitStatus{
     }
 }
 
+#[cfg(feature="git_statuses")]
 impl From<git2::Status> for GitStatus{
     fn from(status:git2::Status) -> Self{
         match status{
@@ -88,6 +93,7 @@ impl From<git2::Status> for GitStatus{
 }
 
 /// Convenience Wrapper for `git2::Repository`
+#[cfg(feature="git_statuses")]
 pub struct Repository{
     /// Git Repository for StorageDir
     pub repo: git2::Repository,
@@ -96,7 +102,16 @@ pub struct Repository{
     pub statuses: HashMap<PathBuf, GitStatus>
 }
 
+/// Convenience Wrapper for `git2::Repository`
+#[cfg(not(feature="git_statuses"))]
+pub struct Repository{
+    /// Git Repository for StorageDir
+    pub workdir: PathBuf,
+}
+
 impl Repository {
+
+    #[cfg(feature="git_statuses")]
     pub fn new(path:&Path) -> Result<Self, git2::Error>{
         let repo = try!(git2::Repository::open(path));
         let statuses = try!(Self::cache_statuses(&repo));
@@ -109,6 +124,12 @@ impl Repository {
           )
     }
 
+    #[cfg(not(feature="git_statuses"))]
+    pub fn new(path:&Path) -> Result<Self, GitError>{
+        Ok( Repository{ workdir: path.to_owned()})
+    }
+
+    #[cfg(feature="git_statuses")]
     fn cache_statuses(repo:&git2::Repository) -> Result<HashMap<PathBuf, GitStatus>, git2::Error>{
         let repo_path = repo.path().parent().unwrap().to_owned();
 
@@ -136,23 +157,28 @@ impl Repository {
     }
 
     /// Returns the status to a given path
+    #[cfg(feature="git_statuses")]
     pub fn get_status(&self,path:&Path) -> GitStatus{
         self.statuses.get(path).unwrap_or(&GitStatus::Unknown).to_owned()
+    }
+    /// INERT: Returns the status to a given path
+    #[cfg(not(feature="git_statuses"))]
+    pub fn get_status(&self,path:&Path) -> GitStatus{
+        GitStatus::Unknown
     }
 
     fn execute_git(&self, command:&str, args:&[&str]) -> ExitStatus{
 
-        let workdir = self.repo.workdir().unwrap();
-        let gitdir  = workdir.join(".git");
+        let gitdir  = self.workdir.join(".git");
 
 
         debug!("{:#?}", Command::new("git")
-                 .args(&["--work-tree", workdir.to_str().unwrap()])
+                 .args(&["--work-tree", self.workdir.to_str().unwrap()])
                  .args(&["--git-dir",   gitdir.to_str().unwrap()])
                  .arg(command).args(args));
 
         Command::new("git")
-            .args(&["--work-tree", workdir.to_str().unwrap()])
+            .args(&["--work-tree", self.workdir.to_str().unwrap()])
             .args(&["--git-dir",   gitdir.to_str().unwrap()])
             .arg(command)
             .args(args)
@@ -181,5 +207,26 @@ impl Repository {
 
     pub fn pull(&self) -> ExitStatus{
         self.execute_git("pull", &["origin", "master"])
+    }
+
+    pub fn remote(&self) -> ExitStatus{
+        self.execute_git("remote", &[])
+    }
+}
+
+#[cfg(not(feature="git_statuses"))]
+#[derive(Debug)]
+pub struct GitError;
+
+
+#[cfg(not(feature="git_statuses"))]
+impl Error for GitError{
+    fn description(&self) -> &str{"git statuses is not a features of this build"}
+}
+
+#[cfg(not(feature="git_statuses"))]
+impl fmt::Display for GitError{
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result{
+            write!(f, "{}", self.description())
     }
 }

@@ -449,6 +449,15 @@ pub fn git_commit(){
 
 /// Command REMOTE
 /// exact replica of `git remote -v`
+#[cfg(not(feature="git_statuses"))]
+pub fn git_remote(){
+    let luigi = setup_luigi_with_git();
+    luigi.repository.unwrap().remote();
+}
+
+/// Command REMOTE
+/// exact replica of `git remote -v`
+#[cfg(feature="git_statuses")]
 pub fn git_remote(){
     let luigi = setup_luigi_with_git();
     let repo = luigi.repository.unwrap().repo;

@@ -24,15 +24,17 @@ tempdir = "*"
 term = "*"
 terminal_size = "0.1.1" # TODO consider termsize or others
 prettytable-rs = "*"
+handlebars = {version = "*", optional = true}
 
 currency = {git="https://github.com/hoodie/rust-lang-currency"}
-git2 = {version = "*", default-features=false}
+git2 = {version = "*", default-features= false, optional = true}
 open = "*"
 
 [features]
-default = ["document_export"]
-document_export = []
+default = []
+document_export = ["handlebars"]
 debug_config = []
+git_statuses = ["git2"]
 nightly = []
 lints = ["clippy"]
 

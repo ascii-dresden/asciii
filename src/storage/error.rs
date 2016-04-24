@@ -5,10 +5,15 @@ use std::io;
 use std::fmt;
 use std::error::Error;
 
-use git2::Error as GitError;
-use ::templater::TemplateError;
 
+#[cfg(feature="git_statuses")]
+use git2::Error as GitError;
+
+use ::templater::TemplateError;
 use util::yaml::YamlError;
+
+#[cfg(not(feature="git_statuses"))]
+use ::repo::GitError;
 
 /// Error that may occur in Storage
 #[derive(Debug)]
