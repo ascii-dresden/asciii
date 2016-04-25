@@ -71,6 +71,7 @@ fn setup_app(){
      ("add",       Some(sub_m)) => subcommands::git_add(&sub_m),
      ("commit",    _          ) => subcommands::git_commit(),
      ("push",      _          ) => subcommands::git_push(),
+     ("log",       _          ) => subcommands::git_log(),
      _                       => ()
     }
 }

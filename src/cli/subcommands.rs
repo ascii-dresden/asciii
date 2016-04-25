@@ -446,6 +446,13 @@ pub fn path<F:Fn(&Path)>(matches:&ArgMatches, action:F){
 
 
 
+/// Command LOG
+pub fn git_log(){
+    let luigi = setup_luigi_with_git();
+    let repo = luigi.repository.unwrap();
+    util::exit(repo.log()) // FIXME this does not behave right
+}
+
 /// Command STATUS
 pub fn git_status(){
     let luigi = setup_luigi_with_git();

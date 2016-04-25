@@ -161,6 +161,7 @@ impl Repository {
     pub fn get_status(&self,path:&Path) -> GitStatus{
         self.statuses.get(path).unwrap_or(&GitStatus::Unknown).to_owned()
     }
+
     /// INERT: Returns the status to a given path
     #[cfg(not(feature="git_statuses"))]
     pub fn get_status(&self,path:&Path) -> GitStatus{
@@ -208,6 +209,10 @@ impl Repository {
 
     pub fn remote(&self) -> ExitStatus{
         self.execute_git("remote", &[])
+    }
+
+    pub fn log(&self) -> ExitStatus{
+        self.execute_git("log", &[])
     }
 }
 

@@ -392,6 +392,9 @@ pub fn setup() -> ArgMatches<'static>{
         .subcommand(SubCommand::with_name("push")
                     .help("Upload locally saved changes to the remote")
                    )
+        .subcommand(SubCommand::with_name("log")
+                    .help("Show commit logs")
+                   )
 
         .subcommand(SubCommand::with_name("term")
                     .help("terminal info")
