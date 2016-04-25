@@ -74,6 +74,6 @@ pub struct Storage<L:Storable> {
 }
 
 /// Used to identify what directory you are talking about.
-#[derive(Debug,Clone)]
+#[derive(Debug,Clone,Copy)]
 #[allow(dead_code)]
 pub enum StorageDir { Working, Archive(Year), Root, Templates, All }

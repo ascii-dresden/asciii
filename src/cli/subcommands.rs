@@ -15,6 +15,8 @@ use util;
 use super::{print,setup_luigi, setup_luigi_with_git, fail};
 use super::{ListConfig, ListMode};
 
+// TODO refactor this into actions module and actual, short subcommands
+
 // TODO keep this up to date or find a way to make this dynamic
 const STATUS_ROWS_WIDTH:u16 = 96;
 
@@ -240,19 +242,20 @@ pub fn edit(matches:&ArgMatches) {
 
 fn edit_projects(dir:StorageDir, search_terms:&[&str], editor:&Option<&str>){
     let luigi = setup_luigi();
-    let mut all_paths = Vec::new();
+    let mut all_projects= Vec::new();
     for search_term in search_terms{
         let mut paths = super::execute(||luigi.search_projects(dir.clone(), &search_term));
         if paths.is_empty(){
             //println!{"Nothing found for {:?}", search_term}
         } else {
-            all_paths.append(&mut paths);
+            all_projects.append(&mut paths);
         }
     }
 
-    if all_paths.is_empty(){
+    if all_projects.is_empty(){
         fail(format!("Nothing found for {:?}", search_terms));
     } else {
+        let all_paths = all_projects.iter().map(|p|p.dir()).collect::<Vec<PathBuf>>();
         util::open_in_editor(&editor, all_paths.as_slice());
     }
 }
@@ -287,7 +290,7 @@ fn show_project(dir:StorageDir, search_term:&str){
     let luigi = setup_luigi();
     let projects = super::execute(||luigi.search_projects(dir, &search_term));
     if !projects.is_empty(){
-        for project in projects.iter().filter_map(|path| Project::open(path).ok()){
+        for project in &projects{
             print::show_items(&project);
         }
     } else{
@@ -341,14 +344,14 @@ fn archive_project(name:&str, manual_year:Option<i32>, force:bool){
     debug!("using the force: {}", force);
     if let Ok(projects) = luigi.search_projects(StorageDir::Working, name){
         if projects.is_empty(){ fail(format!("Nothing found for {:?}", name)); }
-        for project in projects.iter().filter_map(|path| Project::open(path).ok()) {
+        for project in &projects {
             if project.valid_stage3().is_ok() || force{
                 let year = manual_year.or(project.year()).unwrap();
                 println!("archiving {} ({})",  project.ident(), project.year().unwrap());
                 let archive_target = super::execute(||luigi.archive_project(&project, year));
 
                 if let Some(repo) = luigi.repository{
-                    util::exit(repo.add(&[archive_target]));
+                    util::exit(repo.add(&[project.dir(),archive_target]));
                 };
 
             }
@@ -366,13 +369,17 @@ fn archive_project(name:&str, manual_year:Option<i32>, force:bool){
 
 /// Command UNARCHIVW <YEAR> <NAME>
 fn unarchive_project(year:i32, name:&str){
-    let luigi = setup_luigi();
+    let luigi = setup_luigi_with_git();
     if let Ok(projects) = luigi.search_projects(StorageDir::Archive(year), name){
         if projects.len() == 1 {
-            println!("{:?}", projects);
-            luigi.unarchive_project_file(&projects[0]).unwrap();
+            let project = projects.get(0).unwrap();
+            println!("{:?}", project.name());
+            let unarchive_target = luigi.unarchive_project(&projects[0]).unwrap();
+            if let Some(repo) = luigi.repository{
+                util::exit(repo.add(&[project.dir(),unarchive_target]));
+            };
         } else{
-            fail(format!("Ambiguous: multiple matches: {:#?}", projects ));
+            fail(format!("Ambiguous: multiple matches: {:#?}", projects.iter().map(|p|p.dir()).collect::<Vec<PathBuf>>() ));
         }
     }
 }
@@ -502,13 +509,6 @@ pub fn git_add(matches:&ArgMatches){
     let projects = luigi.search_multiple_projects(dir, &search_terms)
         .unwrap()
         .iter()
-        .filter_map(|path| match Project::open(path){ // TODO use ProjectList
-            Ok(project) => Some(project),
-            Err(err) => {
-                println!("Erroneous Project: {}\n {:#?}", path.display(), err);
-                None
-            }
-        })
         .map(|project|project.dir())
         .collect::<Vec<PathBuf>>();
     let repo = luigi.repository.unwrap();

@@ -219,6 +219,8 @@ impl<L:Storable> Storage<L> {
     }
 
     /// Moves a project folder from `/working` dir to `/archive/$year`.
+    ///
+    /// Returns path to new storage dir in archive.
     pub fn archive_project_by_name(&self, name:&str, year:Year, prefix:Option<String>) -> StorageResult<PathBuf> {
         info!("archiving project by name {:?} into archive for {}", name, year);
         trace!("prefix {:?}", prefix);
@@ -253,7 +255,7 @@ impl<L:Storable> Storage<L> {
         debug!("trying archiving {:?} into {:?}", project.name(), year);
         let name_in_archive = match project.prefix(){
             Some(prefix) => format!("{}_{}", prefix, project.ident()),
-                    None =>  project.ident()
+            None =>  project.ident()
         };
 
         let archive = try!(self.create_archive(year));
@@ -308,21 +310,22 @@ impl<L:Storable> Storage<L> {
     ///
     /// This only searches by name
     /// TODO return opened `Project`, no need to reopen
-    pub fn search_projects(&self, directory:StorageDir, search_term:&str) -> StorageResult<Vec<PathBuf>> {
+    pub fn search_projects(&self, directory:StorageDir, search_term:&str) -> StorageResult<Vec<L>> {
         trace!("searching for projects by {:?} in {:?}", search_term, directory);
-        let project_paths = try!(self.open_project_files(directory)).iter()
+        let mut project_paths = try!(self.open_project_files(directory));
+        let projects = project_paths
+            .drain(..)
             .filter(|project| project.matches_search(&search_term.to_lowercase()))
-            .map(|project| project.file())
             .collect();
-        Ok(project_paths)
+        Ok(projects)
     }
 
     /// Matches StorageDir's content against multiple terms and returns matching project files.
     /// TODO add search_multiple_projects_deep
-    pub fn search_multiple_projects(&self, dir:StorageDir, search_terms:&[&str]) -> StorageResult<Vec<PathBuf>> {
+    pub fn search_multiple_projects(&self, dir:StorageDir, search_terms:&[&str]) -> StorageResult<Vec<L>> {
         let mut all_paths = Vec::new();
         for search_term in search_terms{
-            let mut paths = try!(self.search_projects(dir.clone(), &search_term));
+            let mut paths = try!(self.search_projects(dir, &search_term));
             all_paths.append(&mut paths);
         }
 

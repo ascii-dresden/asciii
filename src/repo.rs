@@ -168,10 +168,7 @@ impl Repository {
     }
 
     fn execute_git(&self, command:&str, args:&[&str]) -> ExitStatus{
-
         let gitdir  = self.workdir.join(".git");
-
-
         debug!("{:#?}", Command::new("git")
                  .args(&["--work-tree", self.workdir.to_str().unwrap()])
                  .args(&["--git-dir",   gitdir.to_str().unwrap()])
