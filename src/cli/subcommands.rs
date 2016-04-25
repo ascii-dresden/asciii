@@ -486,7 +486,14 @@ pub fn git_add(matches:&ArgMatches){
 
     debug!("adding {:?}", search_terms);
 
-    let projects = luigi.search_multiple_projects(StorageDir::Working, &search_terms)
+
+    let dir = if let Some(archive) = matches.value_of("archive"){
+        StorageDir::Archive(archive.parse::<i32>().unwrap())
+    } else {
+        StorageDir::Working
+    };
+
+    let projects = luigi.search_multiple_projects(dir, &search_terms)
         .unwrap()
         .iter()
         .filter_map(|path| match Project::open(path){ // TODO use ProjectList
