@@ -336,7 +336,8 @@ pub fn config(matches:&ArgMatches){
 /// Command ARCHIVE <NAME>
 // TODO perhaps move this code out of `::cli`
 fn archive_project(name:&str, manual_year:Option<i32>, force:bool){
-    let luigi = setup_luigi();
+    let luigi = setup_luigi_with_git();
+
     debug!("using the force: {}", force);
     if let Ok(projects) = luigi.search_projects(StorageDir::Working, name){
         if projects.is_empty(){ fail(format!("Nothing found for {:?}", name)); }
@@ -344,7 +345,12 @@ fn archive_project(name:&str, manual_year:Option<i32>, force:bool){
             if project.valid_stage3().is_ok() || force{
                 let year = manual_year.or(project.year()).unwrap();
                 println!("archiving {} ({})",  project.ident(), project.year().unwrap());
-                super::execute(||luigi.archive_project(&project, year));
+                let archive_target = super::execute(||luigi.archive_project(&project, year));
+
+                if let Some(repo) = luigi.repository{
+                    util::exit(repo.add(&[archive_target]));
+                };
+
             }
             else {
                 println!("CANNOT archive {} ({})",
