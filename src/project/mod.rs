@@ -5,7 +5,6 @@ use std::fs::File;
 use std::io::prelude::*;
 use std::path::{Path, PathBuf};
 use std::collections::HashMap;
-
 use chrono::*;
 use yaml_rust::Yaml;
 use tempdir::TempDir;
@@ -20,6 +19,9 @@ pub mod product;
 pub mod spec;
 use self::spec::{SpecResult, VirtualField};
 use self::spec::products::ProductResult;
+
+//#[cfg(feature="document_export")]
+//pub mod export;
 
 /// Represents a Project.
 ///
@@ -134,7 +136,6 @@ impl Storable for Project{
 }
 
 impl Project{
-
     /// Access to inner data
     pub fn yaml(&self) -> &Yaml{ &self.yaml }
 
@@ -180,7 +181,11 @@ impl Project{
     ///
     /// Ready to be **archived**.
     pub fn valid_stage3(&self) -> SpecResult{
-        spec::archive::validate(&self.yaml)
+        if self.canceled(){
+            Ok(())
+        } else {
+            spec::archive::validate(&self.yaml)
+        }
     }
 
     pub fn age(&self) -> Option<i64> {
@@ -230,6 +235,7 @@ impl Project{
         } else{ None }
     }
 }
+
 
 #[cfg(test)]
 mod test{
