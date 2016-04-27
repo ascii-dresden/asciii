@@ -100,6 +100,7 @@ pub fn list(matches:&ArgMatches){
             mode:      list_mode,
             details:   matches.values_of("details").map(|v|v.collect::<Vec<&str>>()),
             filter_by: matches.values_of("filter").map(|v|v.collect::<Vec<&str>>()),
+            show_errors: matches.is_present("errors"),
 
             ..Default::default()
         };
@@ -255,7 +256,7 @@ fn edit_projects(dir:StorageDir, search_terms:&[&str], editor:&Option<&str>){
     if all_projects.is_empty(){
         fail(format!("Nothing found for {:?}", search_terms));
     } else {
-        let all_paths = all_projects.iter().map(|p|p.dir()).collect::<Vec<PathBuf>>();
+        let all_paths = all_projects.iter().map(|p|p.file()).collect::<Vec<PathBuf>>();
         util::open_in_editor(&editor, all_paths.as_slice());
     }
 }
@@ -309,6 +310,7 @@ fn show_template(name:&str){
     println!("{:#?}", templater.list_keywords());
 }
 
+/// TODO make this be have like `edit`, taking multiple names
 pub fn archive(matches:&ArgMatches){
         let name = matches.value_of("NAME").unwrap();
         let year = matches.value_of("year")

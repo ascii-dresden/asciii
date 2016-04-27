@@ -203,9 +203,21 @@ pub fn dynamic_rows(projects:&[Project], list_config:&ListConfig, _repo:Option<R
             if let Some(ref details) = list_config.details{
                 cells.extend_from_slice(
                     &details.iter().map(|d|
-                                 cell!( project.get(&d).unwrap_or_else(String::new)).style_spec(row_style),
-                                 ).collect::<Vec<Cell>>()
+                                        cell!( project.get(&d).unwrap_or_else(String::new)).style_spec(row_style),
+                                        ).collect::<Vec<Cell>>()
                     );
+                if list_config.show_errors{
+                    let validation = (project.valid_stage1(),
+                    project.valid_stage2(),
+                    project.valid_stage3());
+
+                    cells.extend_from_slice( &[
+                                             // Errors
+                                             cell!(validation.0.err().map(|errs| errs.join(", ")).unwrap_or("".to_owned())),
+                                             cell!(validation.1.err().map(|errs| errs.join(", ")).unwrap_or("".to_owned())),
+                                             cell!(validation.2.err().map(|errs| errs.join(", ")).unwrap_or("".to_owned())),
+                    ]);
+                }
             }
             Row::new(cells)
         })

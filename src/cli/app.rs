@@ -161,6 +161,7 @@ pub fn setup() -> ArgMatches<'static>{
                     .arg(Arg::with_name("NAME")
                          .help("The name of the project, duh!")
                          .required(true)
+                         .multiple(true)
                         )
 
                     .arg(Arg::with_name("force")
