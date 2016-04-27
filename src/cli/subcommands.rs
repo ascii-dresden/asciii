@@ -96,7 +96,9 @@ pub fn list(matches:&ArgMatches){
             );
 
         let mut list_config = ListConfig{
-            sort_by:   matches.value_of("sort") .unwrap_or_else(||CONFIG.get_str("list/sort")),
+            sort_by:   matches.value_of("sort") .unwrap_or_else(||CONFIG.get_str("list/sort")
+            .expect("Faulty config: field list/sort does not contain a string value")
+                                                                ),
             mode:      list_mode,
             details:   matches.values_of("details").map(|v|v.collect::<Vec<&str>>()),
             filter_by: matches.values_of("filter").map(|v|v.collect::<Vec<&str>>()),
@@ -423,27 +425,31 @@ pub fn show_path(matches:&ArgMatches){path(matches, |path| println!("{}", path.d
 pub fn open_path(matches:&ArgMatches){path(matches, |path| {open::that(path).unwrap();})}
 
 pub fn path<F:Fn(&Path)>(matches:&ArgMatches, action:F){
-        if matches.is_present("templates"){
-            action(&PathBuf::from(CONFIG.get_str("path"))
-                     .join( CONFIG.get_str("dirs/storage"))
-                     .join( CONFIG.get_str("dirs/templates")));
-        }
-        else if matches.is_present("output"){
-            action(
-                    &util::replace_home_tilde(
-                Path::new(
-                    CONFIG.get_str("output_path")
-                    )
+    let path = CONFIG.get_str("path").expect("Faulty config: field output_path does not contain a string value");
+    let storage_path = CONFIG.get_str("dirs/storage").expect("Faulty config: field output_path does not contain a string value");
+    let templates_path = CONFIG.get_str("dirs/templates").expect("Faulty config: field output_path does not contain a string value");
+    let output_path = CONFIG.get_str("output_path").expect("Faulty config: field output_path does not contain a string value");
+
+    if matches.is_present("templates"){
+        action(&PathBuf::from(path)
+               .join(storage_path)
+               .join(templates_path
                     ));
-        }
-        else if matches.is_present("bin"){
-            action(&env::current_exe().unwrap());
-        }
-        else { // default case
-            let path = util::replace_home_tilde(Path::new(CONFIG.get_str("path")))
-                .join( CONFIG.get_str("dirs/storage"));
-            action(&path);
-        }
+    }
+    else if matches.is_present("output"){
+        action(
+            &util::replace_home_tilde(
+                Path::new(output_path)
+                ));
+    }
+    else if matches.is_present("bin"){
+        action(&env::current_exe().unwrap());
+    }
+    else { // default case
+        let path = util::replace_home_tilde(Path::new(path))
+            .join( storage_path );
+        action(&path);
+    }
 }
 
 

@@ -50,8 +50,9 @@ impl Storable for Project{
             "PROJECT-NAME"  => project_name.to_owned(),
             "DATE-EVENT"    => event_date,
             "DATE-CREATED"  => created_date,
-            "SALARY"        => ::CONFIG.get_as_string("defaults/salary"),
-            "MANAGER"       => ::CONFIG.get_as_string("manager_name"),
+            "SALARY"        => ::CONFIG.get_as_string("defaults/salary")
+                .expect("Faulty config: field defaults/salary does not contain a string value"),
+            "MANAGER"       => ::CONFIG.get_str("manager_name").unwrap_or("").to_string(),
             "DESCRIPTION"   => String::new(),
             "TIME-START"    => String::new(),
             "TIME-END"      => String::new(),

@@ -81,8 +81,10 @@ pub fn open_in_editor(editor:&Option<&str>, paths:&[PathBuf]){
 /// This is by far the most important function of all utility functions.
 pub fn get_storage_path() -> PathBuf
 {
-    let storage_path = PathBuf::from(::CONFIG.get_str("path"))
-        .join( ::CONFIG.get_str("dirs/storage"));
+    let storage_path = PathBuf::from(::CONFIG.get_str("path")
+            .expect("Faulty config: field path does not contain a string value"))
+        .join( ::CONFIG.get_str("dirs/storage")
+            .expect("Faulty config: field dirs/storage does not contain a string value"));
 
     // TODO make replace tilde a Trait function
     let mut storage_path = replace_home_tilde(&storage_path);

@@ -185,7 +185,7 @@ impl Repository {
     }
 
     pub fn add(&self, paths:&[PathBuf]) -> ExitStatus{
-        println!("adding to git {:?}", paths);
+        info!("adding to git\n {:#?}", paths);
         let paths:Vec<&str> = paths.iter().filter_map(|p|p.to_str()).collect();
         self.execute_git("add", &paths)
     }

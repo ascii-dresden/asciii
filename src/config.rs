@@ -94,11 +94,11 @@ impl ConfigReader{
     /// # Panics
     /// This panics if nothing is found.
     /// You should have a default config for everything that you use.
-    pub fn get_str(&self, key:&str) -> &str {
+    pub fn get_str(&self, key:&str) -> Option<&str> {
         yaml::get_str(&self.local, &key)
             .or_else(||yaml::get_str(&self.custom, &key))
             .or_else(||yaml::get_str(&self.defaults, &key))
-            .expect(&format!("Config file {} in field {} does not contain a string value", DEFAULT_LOCATION, key))
+            //.expect(&format!("Config file {} in field {} does not contain a string value", DEFAULT_LOCATION, key))
     }
 
     /// Returns the string in the position or an empty string
@@ -106,12 +106,11 @@ impl ConfigReader{
     /// # Panics
     /// This panics if nothing is found.
     /// You should have a default config for everything that you use.
-    pub fn get_as_string(&self, key:&str) -> String{
+    pub fn get_as_string(&self, key:&str) -> Option<String>{
         yaml::get_as_string(&self.local, &key)
             .or_else(||yaml::get_as_string(&self.custom, &key))
             .or_else(||yaml::get_as_string(&self.defaults, &key))
-            .expect(&format!("Config file {} in field {} does not contain a value",
-                             DEFAULT_LOCATION, key))
+            //.expect(&format!("Config file {} in field {} does not contain a value", DEFAULT_LOCATION, key))
     }
 
     /// Returns the boolean in the position or `false`

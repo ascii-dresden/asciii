@@ -430,7 +430,7 @@ impl<L:Storable> Storage<L> {
                  .filter_map(|path| match L::open(path){
                      Ok(project) => Some(project),
                      Err(err) => {
-                         println!("Erroneous Project: {}\n {:#?}", path.display(), err);
+                         info!("Erroneous Project: {}\n {:#?}", path.display(), err);
                          None
                      }
                  }).collect::<Vec<L>>()}

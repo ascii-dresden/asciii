@@ -35,17 +35,23 @@ fn execute<F, S>(command:F) -> S where F: FnOnce() -> StorageResult<S> {
 
 /// Sets up an instance of Storage.
 fn setup_luigi() -> Storage<Project> {
-    let working = CONFIG.get_str("dirs/working");
-    let archive = CONFIG.get_str("dirs/archive");
-    let templates = CONFIG.get_str("dirs/templates");
+    let working = CONFIG.get_str("dirs/working")
+                .expect("Faulty config: dirs/working does not contain a value");
+    let archive = CONFIG.get_str("dirs/archive")
+                .expect("Faulty config: dirs/archive does not contain a value");
+    let templates = CONFIG.get_str("dirs/templates")
+                .expect("Faulty config: dirs/templates does not contain a value");
     execute(|| Storage::new(util::get_storage_path(), working, archive, templates))
 }
 
 /// Sets up an instance of Storage, with git turned on.
 fn setup_luigi_with_git() -> Storage<Project> {
-    let working = CONFIG.get_str("dirs/working");
-    let archive = CONFIG.get_str("dirs/archive");
-    let templates = CONFIG.get_str("dirs/templates");
+    let working = CONFIG.get_str("dirs/working")
+                .expect("Faulty config: dirs/working does not contain a value");
+    let archive = CONFIG.get_str("dirs/archive")
+                .expect("Faulty config: dirs/archive does not contain a value");
+    let templates = CONFIG.get_str("dirs/templates")
+                .expect("Faulty config: dirs/templates does not contain a value");
     execute(||Storage::new_with_git(util::get_storage_path(), working, archive, templates))
 }
 
@@ -72,7 +78,8 @@ impl<'a> Default for ListConfig<'a>{
                           else{ ListMode::Simple },
             git_status:   CONFIG.get_bool("list/gitstatus"),
             show_errors:  false,
-            sort_by:      CONFIG.get_str("list/sort"),
+            sort_by:      CONFIG.get_str("list/sort")
+                .expect("Faulty config: list/sort does not contain a value"),
             filter_by:    None,
             use_colors:   CONFIG.get_bool("list/colors"),
             details:      None,
