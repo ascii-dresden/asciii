@@ -288,6 +288,7 @@ pub mod offer{
         let mut errors = super::field_exists(&yaml, &[
                  "offer/date",
                  "offer/appendix",
+                 "manager",
         ]);
         if super::date::offer(&yaml).is_none(){
             errors.push("offer_date_format");}
