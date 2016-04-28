@@ -171,10 +171,11 @@ pub mod client{
             let lang = config.get_str("defaults/lang")
                 .expect("Faulty config: defaults/lang does not contain a value");
 
-            let gend = config.get_str(&(
-                    "gender_matches/".to_owned() + &title.to_lowercase()));
+            let gend_path = "gender_matches/".to_owned() + &title.to_lowercase();
+            let gend = config.get_str(&gend_path)
+                .expect(&format!("Faulty config: {} does not contain a value",gend_path));
 
-            let addr_path = "lang_addressing/".to_owned() + &lang.to_lowercase() + "/";
+            let addr_path = "lang_addressing/".to_owned() + &lang.to_lowercase() + "/" + gend;
             let addr = config.get_str(&addr_path)
                 .expect(&format!("Faulty config: {} does not contain a value",addr_path));
 
