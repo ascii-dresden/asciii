@@ -44,6 +44,7 @@ extern crate open;
 
 #[cfg(feature="git_statuses")] extern crate git2;
 #[cfg(feature="document_export")] extern crate handlebars;
+#[cfg(feature="document_export")] extern crate serde_json;
 
 #[macro_use]
 pub mod util;
@@ -62,4 +63,11 @@ pub mod fill_docs;
 
 lazy_static!{
     pub static ref CONFIG: config::ConfigReader = config::ConfigReader::new().unwrap();
+}
+
+/// Returns library version
+///
+/// Human readable, no semantic versioning.
+pub fn version() -> String{
+    format!("{} - {}", crate_version!(), include_str!("../.most_recent_commit"))
 }

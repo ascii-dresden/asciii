@@ -64,6 +64,7 @@ fn setup_app(){
 
      ("term",      _          ) => subcommands::term(),
      ("doc",       _          ) => subcommands::doc(),
+     ("version",   _          ) => subcommands::version(),
 
      ("remote",    _          ) => subcommands::git_remote(),
      ("pull",      _          ) => subcommands::git_pull(),

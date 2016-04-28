@@ -411,6 +411,11 @@ pub fn doc(){
     open::that("http://hoodie.github.io/asciii-rs/").unwrap();
 }
 
+/// Command VERSION
+pub fn version(){
+    println!("{}", ::version());
+}
+
 /// Command TERM
 pub fn term(){
     use terminal_size::{Width, Height, terminal_size };

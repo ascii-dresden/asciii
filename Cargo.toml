@@ -3,6 +3,8 @@ name = "asciii"
 version = "2.9.9-dev"
 authors = ["Hendrik Sollich <hendrik@hoodie.de>"]
 
+build = "build.rs"
+
 
 [dependencies]
 
@@ -17,6 +19,8 @@ clap = "2"
 enum_derive = "*"
 custom_derive = "*"
 clippy = {version = "*", optional = true}
+currency = {git="https://github.com/hoodie/rust-lang-currency"}
+open = "*"
 
 slug = "*"
 tempdir = "*"
@@ -24,15 +28,19 @@ tempdir = "*"
 term = "*"
 terminal_size = "0.1.1" # TODO consider termsize or others
 prettytable-rs = "*"
-handlebars = {version = "*", optional = true}
 
-currency = {git="https://github.com/hoodie/rust-lang-currency"}
+# feature: document_export
+handlebars = {version = "*", optional = true}
+serde_json = { version = "^0.7.0", optional = true }
+
+# feature: git_statuses
 git2 = {version = "*", default-features= false, optional = true}
-open = "*"
+
+# planned optional features: termprint, term resize, xdg-open, web server :D
 
 [features]
-default = []
-document_export = ["handlebars"]
+default = ["git_statuses"]
+document_export = ["handlebars","serde_json"]
 debug_config = []
 git_statuses = ["git2"]
 nightly = []
@@ -43,4 +51,3 @@ test = false
 doc = false
 name = "asciii"
 
-# planned optional features: git, pdf output, termprint, term resize, xdg-open, web server :D

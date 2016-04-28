@@ -1,15 +1,20 @@
+use ::version;
 use super::validators;
 use clap::{App, AppSettings, Arg, ArgMatches, SubCommand};
 
 pub fn setup() -> ArgMatches<'static>{
     App::new("asciii")
         .author("Hendrik Sollich <hendrik@hoodie.de>")
-        .version(&crate_version!()[..])
+        .version(version().as_ref())
         .about("The ascii invoicer III")
         .setting(AppSettings::SubcommandRequiredElseHelp)
 
         .subcommand(SubCommand::with_name("doc")
             .about("Opens the online documentation, please read it")
+        )
+
+        .subcommand(SubCommand::with_name("version")
+            .about("Prints version of this tool")
         )
 
         .subcommand(SubCommand::with_name("new")
