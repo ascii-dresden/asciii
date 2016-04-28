@@ -57,7 +57,7 @@ fn setup_app(){
      ("archive",   Some(sub_m)) => subcommands::archive(&sub_m),
      ("unarchive", Some(sub_m)) => subcommands::unarchive(&sub_m),
      ("config",    Some(sub_m)) => subcommands::config(&sub_m),
-     ("whoami",    _          ) => subcommands::config_show("storage_name"),
+     ("whoami",    _          ) => subcommands::config_show("manager_name"),
 
      ("path",      Some(sub_m)) => subcommands::show_path(sub_m),
      ("open",      Some(sub_m)) => subcommands::open_path(sub_m),
