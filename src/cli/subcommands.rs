@@ -151,6 +151,7 @@ fn list_projects(dir:StorageDir, list_config:&ListConfig){
     } else {
         setup_luigi()
     };
+    debug!("listing projects: {}", luigi.working_dir().display());
 
     let mut projects = super::execute(||luigi.open_project_files(dir));
 

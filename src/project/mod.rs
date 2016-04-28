@@ -3,6 +3,7 @@
 
 use std::fs::File;
 use std::io::prelude::*;
+use std::ffi::OsStr;
 use std::path::{Path, PathBuf};
 use std::collections::HashMap;
 use chrono::*;
@@ -12,7 +13,7 @@ use slug;
 use currency::Currency;
 
 use util::yaml;
-use storage::{Storable, StorageResult, StorageError};
+use storage::*;
 use templater::Templater;
 
 pub mod product;
@@ -22,6 +23,8 @@ use self::spec::products::ProductResult;
 
 //#[cfg(feature="document_export")]
 //pub mod export;
+
+static PROJECT_FILE_EXTENSION:&'static str = "yml";
 
 /// Represents a Project.
 ///
@@ -37,6 +40,7 @@ impl From<yaml::YamlError> for StorageError {
 }
 
 impl Storable for Project{
+    fn file_extension() -> &'static str {PROJECT_FILE_EXTENSION}
     fn from_template(project_name:&str,template:&Path, fill: &HashMap<&str,String>) -> Result<Project, StorageError> {
         let template_name = template.file_stem().unwrap().to_str().unwrap();
 
@@ -108,7 +112,15 @@ impl Storable for Project{
     fn set_file(&mut self, new_file:&Path){ self.file_path = new_file.to_owned(); }
 
     /// Opens a yaml and parses it.
-    fn open(file_path:&Path) -> StorageResult<Project>{
+    fn open(folder_path:&Path) -> StorageResult<Project>{
+        let file_path = try!(try!(list_path_content(folder_path)).iter()
+            .filter(|f|f.extension().unwrap_or(&OsStr::new("")) == PROJECT_FILE_EXTENSION)
+            .nth(0).map(|b|b.to_owned())
+            .ok_or(StorageError::ProjectDoesNotExist));
+        Self::open_file(&file_path)
+    }
+
+    fn open_file(file_path:&Path) -> StorageResult<Project>{
         let file_content = try!(File::open(&file_path)
                                 .and_then(|mut file| {
                                     let mut content = String::new();
@@ -248,8 +260,8 @@ mod test{
     #[test]
     fn compare_basics(){
         println!("{:?}", ::std::env::current_dir());
-        let new_project = Project::open(Path::new("./tests/current.yml")).unwrap();
-        let old_project = Project::open(Path::new("./tests/old.yml")).unwrap();
+        let new_project = Project::open_file(Path::new("./tests/current.yml")).unwrap();
+        let old_project = Project::open_file(Path::new("./tests/old.yml")).unwrap();
         let new_yaml = new_project.yaml();
         let old_yaml = old_project.yaml();
         let config = &::CONFIG;

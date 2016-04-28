@@ -22,11 +22,11 @@
 
 #![allow(unused_imports)]
 
+use std::{fs,io};
 use std::path::{Path, PathBuf};
 use std::marker::PhantomData;
 use repo::Repository;
 
-static PROJECT_FILE_EXTENSION:&'static str = "yml";
 static TEMPLATE_FILE_EXTENSION:&'static str = "tyml";
 
 /// Year = `i32`
@@ -77,3 +77,14 @@ pub struct Storage<L:Storable> {
 #[derive(Debug,Clone,Copy)]
 #[allow(dead_code)]
 pub enum StorageDir { Working, Archive(Year), Root, Templates, All }
+
+/// Generic Filesystem wrapper.
+pub fn list_path_content(path:&Path) -> StorageResult<Vec<PathBuf>> {
+    let entries = try!(fs::read_dir(path))
+        .filter_map(|entry| entry.ok())
+        .map(|entry| entry.path())
+        .collect::<Vec<PathBuf>>();
+    Ok(entries)
+}
+
+

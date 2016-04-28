@@ -168,7 +168,7 @@ pub mod client{
         if let Some(title) = title(&yaml){
             let last_name = last_name(&yaml);
 
-            let lang = config.get_str("defaults/lang") 
+            let lang = config.get_str("defaults/lang")
                 .expect("Faulty config: defaults/lang does not contain a value");
 
             let gend = config.get_str(&(
@@ -536,6 +536,7 @@ r#"
 offer:
   date: 07.11.2014
   appendix: 1
+manager: somebody
 "#;
 
 static INVOICE_TEST_DOC:&'static str =

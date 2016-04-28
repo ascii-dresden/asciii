@@ -40,6 +40,10 @@ impl Storable for TestProject{
     fn prefix(&self) -> Option<String>{ self.index() }
 
     fn open(path:&Path) -> StorageResult<Self>{
+        Self::open_file(path)
+    }
+
+    fn open_file(path:&Path) -> StorageResult<Self>{
         Ok(TestProject{
             file_path: PathBuf::from(path),
             temp_dir: None
@@ -228,7 +232,7 @@ fn archive_project(){
 }
 
 #[test]
-fn unarchive_project_file(){
+fn unarchive_project_dir(){
     let (_dir , storage_path, storage) = setup();
     assert!(storage.create_dirs().is_ok());
     assert_existens(&storage_path);
@@ -242,9 +246,9 @@ fn unarchive_project_file(){
 
     for year in storage.list_years().unwrap(){
         println!("{:?}", year);
-        for proj in storage.list_project_files(StorageDir::Archive(year)).unwrap() {
-            assert!(storage.unarchive_project_file(&proj).is_ok());
-            assert!(storage.unarchive_project_file(&proj).is_err());
+        for proj in storage.list_project_folders(StorageDir::Archive(year)).unwrap() {
+            assert!(storage.unarchive_project_dir(&proj).is_ok());
+            assert!(storage.unarchive_project_dir(&proj).is_err());
         }
     }
 }

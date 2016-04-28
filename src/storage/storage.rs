@@ -13,6 +13,7 @@ use slug;
 use repo::Repository;
 
 use super::error::StorageError;
+use super::list_path_content;
 use super::Storage;
 use super::Year;
 use super::StorageDir;
@@ -71,15 +72,6 @@ impl<L:Storable> Storage<L> {
         self.templates.as_ref()
     }
 
-    /// Generic Filesystem wrapper.
-    fn list_path_content(&self, path:&Path) -> StorageResult<Vec<PathBuf>> {
-        let entries = try!(fs::read_dir(path))
-            .filter_map(|entry| entry.ok())
-            .map(|entry| entry.path())
-            .collect::<Vec<PathBuf>>();
-        Ok(entries)
-    }
-
     /// Creates the basic dir structure inside the storage directory.
     ///
     ///<pre>
@@ -126,7 +118,7 @@ impl<L:Storable> Storage<L> {
     pub fn list_template_files(&self) -> StorageResult<Vec<PathBuf>> {
         trace!("listing template files");
         let template_files :Vec<PathBuf>=
-        try!(self.list_path_content(&self.templates_dir()))
+        try!(list_path_content(&self.templates_dir()))
             .iter()
             .filter(|p|p.extension()
                         .unwrap_or_else(|| OsStr::new("")) == OsStr::new(super::TEMPLATE_FILE_EXTENSION)
@@ -165,7 +157,7 @@ impl<L:Storable> Storage<L> {
     /// with the difference, that the project folders may be prefixed with the projects index, e.g.
     /// an invoice number etc.
     pub fn list_archives(&self) -> StorageResult<Vec<PathBuf>> {
-        self.list_path_content(&self.archive_dir())
+        list_path_content(&self.archive_dir())
     }
 
     /// Produces a list of years for which there is an archive.
@@ -203,13 +195,14 @@ impl<L:Storable> Storage<L> {
         trace!("created project will be called {:?}", slugged_name);
 
         let target_file  = project_dir
-            .join(&(slugged_name + "." + super::PROJECT_FILE_EXTENSION));
+            .join(&(slugged_name + "." + L::file_extension()));
 
         let template_path = try!(self.get_template_file(template_name));
 
         let mut project = try!(L::from_template(&project_name, &template_path, &fill_data));
 
-        // TODO test for unreplaced template keywords
+        // TODO Hand of creation entirely to Storable implementation
+        //      Storage it self should only concern itself with Project folders!
         try!(fs::create_dir(&project_dir));
         try!(fs::copy(project.file(), &target_file));
         trace!("copied project file succesfully");
@@ -270,16 +263,15 @@ impl<L:Storable> Storage<L> {
 
     /// Moves a project folder from `/working` dir to `/archive/$year`.
     pub fn unarchive_project(&self, project:&L) -> StorageResult<PathBuf> {
-        self.unarchive_project_file(&project.file())
+        self.unarchive_project_dir(&project.dir())
     }
 
     /// Moves a project folder from `/working` dir to `/archive/$year`.
-    pub fn unarchive_project_file(&self, archived_file:&Path) -> StorageResult<PathBuf> {
-        debug!("trying unarchiving {:?}", archived_file);
-        let archived_dir = if archived_file.is_file() { try!(archived_file.parent().ok_or(StorageError::InvalidDirStructure)) } else {archived_file};
+    pub fn unarchive_project_dir(&self, archived_dir:&Path) -> StorageResult<PathBuf> {
+        debug!("trying unarchiving {:?}", archived_dir);
 
         // has to be in archive_dir
-        let child_of_archive = archived_file.starts_with(&self.archive_dir());
+        let child_of_archive = archived_dir.starts_with(&self.archive_dir());
 
         // must not be the archive_dir
         let archive_itself =  archived_dir == self.archive_dir();
@@ -294,7 +286,7 @@ impl<L:Storable> Storage<L> {
         let name = try!(self.get_project_name(archived_dir));
         let target = self.working_dir().join(&name);
         if target.exists() { return Err(StorageError::ProjectFileExists); }
-        info!("unarchiving project from {:?} to {:?}", archived_file, target);
+        info!("unarchiving project from {:?} to {:?}", archived_dir, target);
 
         if child_of_archive && !archive_itself && parent_is_num{
             try!(fs::rename(&archived_dir, &target));
@@ -353,8 +345,8 @@ impl<L:Storable> Storage<L> {
     /// This is the first file with the `super::PROJECT_FILE_EXTENSION` in the folder
     pub fn get_project_file(&self, directory:&Path) -> StorageResult<PathBuf> {
         trace!("getting project file from {:?}", directory);
-        try!(self.list_path_content(directory)).iter()
-            .filter(|f|f.extension().unwrap_or(&OsStr::new("")) == super::PROJECT_FILE_EXTENSION)
+        try!(list_path_content(directory)).iter()
+            .filter(|f|f.extension().unwrap_or(&OsStr::new("")) == L::file_extension())
             .nth(0).map(|b|b.to_owned())
             .ok_or(StorageError::ProjectDoesNotExist)
     }
@@ -367,7 +359,7 @@ impl<L:Storable> Storage<L> {
 
     fn get_project_dir_from_archive(&self, name:&str, year:Year) -> StorageResult<PathBuf> {
         for project_file in &try!(self.list_project_files(StorageDir::Archive(year))){
-            if project_file.ends_with(slugify(&name) + "."+ super::PROJECT_FILE_EXTENSION) {
+            if project_file.ends_with(slugify(&name) + "."+ L::file_extension()) {
                 return project_file.parent().map(|p|p.to_owned()).ok_or(StorageError::ProjectDoesNotExist);
             }
         }
@@ -378,14 +370,14 @@ impl<L:Storable> Storage<L> {
     pub fn list_project_folders(&self, directory:StorageDir) -> StorageResult<Vec<PathBuf>> {
         trace!("listing project folders in {:?}-directory", directory);
         match directory{
-            StorageDir::Working       => self.list_path_content(&self.working_dir()),
-            StorageDir::Archive(year) => self.list_path_content(&self.archive_dir().join(year.to_string())),
+            StorageDir::Working       => list_path_content(&self.working_dir()),
+            StorageDir::Archive(year) => list_path_content(&self.archive_dir().join(year.to_string())),
             StorageDir::All           => {
                 let mut all:Vec<PathBuf> = Vec::new();
                 for year in try!(self.list_years()){
-                    all.append(&mut try!(self.list_path_content(&self.archive_dir().join(year.to_string()))));
+                    all.append(&mut try!(list_path_content(&self.archive_dir().join(year.to_string()))));
                 }
-                all.append(&mut try!(self.list_path_content(&self.working_dir())));
+                all.append(&mut try!(list_path_content(&self.working_dir())));
                 Ok(all)
             },
             _ => Err(StorageError::BadChoice)
@@ -425,7 +417,7 @@ impl<L:Storable> Storage<L> {
     /// Behaves like `list_project_files()` but also opens projects directly.
     pub fn open_project_files(&self, directory:StorageDir) -> StorageResult<ProjectList<L>>{
         trace!("OPENING ALL PROJECTS in {:?}-directory", directory);
-        self.list_project_files(directory)
+        self.list_project_folders(directory)
             .map(|paths| ProjectList{projects:paths.iter()
                  .filter_map(|path| match L::open(path){
                      Ok(project) => Some(project),
