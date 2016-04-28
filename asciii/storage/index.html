@@ -46,7 +46,7 @@
             <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                 [<span class='inner'>&#x2212;</span>]
             </a>
-        </span><a id='src-888' class='srclink' href='../../src/asciii/src/storage/mod.rs.html#1-79' title='goto source code'>[src]</a></span></h1>
+        </span><a id='src-908' class='srclink' href='../../src/asciii/src/storage/mod.rs.html#1-88' title='goto source code'>[src]</a></span></h1>
 <div class='docblock'><p>Manages file structure of templates, working directory and archives.</p>
 
 <p>This module takes care of project file management.</p>
@@ -67,8 +67,17 @@
 </code></pre>
 </div><h2 id='reexports' class='section-header'><a href="#reexports">Reexports</a></h2>
 <table><tr><td><code>pub use self::<a class='mod'
+                                            href='./error/index.html'>error</a>::<a class='enum' href='../../asciii/storage/error/enum.StorageError.html' title='asciii::storage::error::StorageError'>StorageError</a>;</code></td></tr><tr><td><code>pub use self::<a class='mod'
                                             href='./storable/index.html'>storable</a>::<a class='trait' href='../../asciii/storage/storable/trait.Storable.html' title='asciii::storage::storable::Storable'>Storable</a>;</code></td></tr></table><h2 id='modules' class='section-header'><a href="#modules">Modules</a></h2>
 <table>
+                    <tr class=' module-item'>
+                        <td><a class='mod' href='error/index.html'
+                               title='asciii::storage::error'>error</a></td>
+                        <td class='docblock short'>
+                             <p>Error that may occur in Storage</p>
+                        </td>
+                    </tr>
+                
                     <tr class=' module-item'>
                         <td><a class='mod' href='storable/index.html'
                                title='asciii::storage::storable'>storable</a></td>
@@ -102,12 +111,13 @@
                              <p>Used to identify what directory you are talking about.</p>
                         </td>
                     </tr>
-                
+                </table><h2 id='functions' class='section-header'><a href="#functions">Functions</a></h2>
+<table>
                     <tr class=' module-item'>
-                        <td><a class='enum' href='enum.StorageError.html'
-                               title='asciii::storage::StorageError'>StorageError</a></td>
+                        <td><a class='fn' href='fn.list_path_content.html'
+                               title='asciii::storage::list_path_content'>list_path_content</a></td>
                         <td class='docblock short'>
-                             <p>Error that may occur in Storage</p>
+                             <p>Generic Filesystem wrapper.</p>
                         </td>
                     </tr>
                 </table><h2 id='types' class='section-header'><a href="#types">Type Definitions</a></h2>

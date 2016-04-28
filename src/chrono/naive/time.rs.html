@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="rustdoc">
-    <meta name="description" content="Source to the Rust file `/home/hendrik/.multirust/toolchains/stable/cargo/registry/src/github.com-88ac128001ac3a9a/chrono-0.2.21/src/naive/time.rs`.">
+    <meta name="description" content="Source to the Rust file `/home/hendrik/.multirust/toolchains/stable/cargo/registry/src/github.com-88ac128001ac3a9a/chrono-0.2.22/src/naive/time.rs`.">
     <meta name="keywords" content="rust, rustlang, rust-lang">
 
     <title>time.rs.html -- source</title>
@@ -868,6 +868,19 @@
 <span id="825">825</span>
 <span id="826">826</span>
 <span id="827">827</span>
+<span id="828">828</span>
+<span id="829">829</span>
+<span id="830">830</span>
+<span id="831">831</span>
+<span id="832">832</span>
+<span id="833">833</span>
+<span id="834">834</span>
+<span id="835">835</span>
+<span id="836">836</span>
+<span id="837">837</span>
+<span id="838">838</span>
+<span id="839">839</span>
+<span id="840">840</span>
 </pre><pre class='rust '>
 <span class='comment'>// This is a part of rust-chrono.</span>
 <span class='comment'>// Copyright (c) 2014-2015, Kang Seonghoon.</span>
@@ -1658,11 +1671,24 @@
         <span class='kw'>let</span> <span class='ident'>t</span> <span class='op'>=</span> <span class='ident'>NaiveTime</span>::<span class='ident'>from_hms_nano</span>(<span class='number'>3</span>, <span class='number'>5</span>, <span class='number'>7</span>, <span class='number'>98765432</span>);
         <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>t</span>.<span class='ident'>format</span>(<span class='string'>&quot;%H,%k,%I,%l,%P,%p&quot;</span>).<span class='ident'>to_string</span>(), <span class='string'>&quot;03, 3,03, 3,am,AM&quot;</span>);
         <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>t</span>.<span class='ident'>format</span>(<span class='string'>&quot;%M&quot;</span>).<span class='ident'>to_string</span>(), <span class='string'>&quot;05&quot;</span>);
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>t</span>.<span class='ident'>format</span>(<span class='string'>&quot;%S,%f&quot;</span>).<span class='ident'>to_string</span>(), <span class='string'>&quot;07,098765432&quot;</span>);
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>t</span>.<span class='ident'>format</span>(<span class='string'>&quot;%S,%f,%.f&quot;</span>).<span class='ident'>to_string</span>(), <span class='string'>&quot;07,098765432,.098765432&quot;</span>);
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>t</span>.<span class='ident'>format</span>(<span class='string'>&quot;%.3f,%.6f,%.9f&quot;</span>).<span class='ident'>to_string</span>(), <span class='string'>&quot;.098,.098765,.098765432&quot;</span>);
         <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>t</span>.<span class='ident'>format</span>(<span class='string'>&quot;%R&quot;</span>).<span class='ident'>to_string</span>(), <span class='string'>&quot;03:05&quot;</span>);
         <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>t</span>.<span class='ident'>format</span>(<span class='string'>&quot;%T,%X&quot;</span>).<span class='ident'>to_string</span>(), <span class='string'>&quot;03:05:07,03:05:07&quot;</span>);
         <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>t</span>.<span class='ident'>format</span>(<span class='string'>&quot;%r&quot;</span>).<span class='ident'>to_string</span>(), <span class='string'>&quot;03:05:07 AM&quot;</span>);
         <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>t</span>.<span class='ident'>format</span>(<span class='string'>&quot;%t%n%%%n%t&quot;</span>).<span class='ident'>to_string</span>(), <span class='string'>&quot;\t\n%\n\t&quot;</span>);
+
+        <span class='kw'>let</span> <span class='ident'>t</span> <span class='op'>=</span> <span class='ident'>NaiveTime</span>::<span class='ident'>from_hms_micro</span>(<span class='number'>3</span>, <span class='number'>5</span>, <span class='number'>7</span>, <span class='number'>432100</span>);
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>t</span>.<span class='ident'>format</span>(<span class='string'>&quot;%S,%f,%.f&quot;</span>).<span class='ident'>to_string</span>(), <span class='string'>&quot;07,432100000,.432100&quot;</span>);
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>t</span>.<span class='ident'>format</span>(<span class='string'>&quot;%.3f,%.6f,%.9f&quot;</span>).<span class='ident'>to_string</span>(), <span class='string'>&quot;.432,.432100,.432100000&quot;</span>);
+
+        <span class='kw'>let</span> <span class='ident'>t</span> <span class='op'>=</span> <span class='ident'>NaiveTime</span>::<span class='ident'>from_hms_milli</span>(<span class='number'>3</span>, <span class='number'>5</span>, <span class='number'>7</span>, <span class='number'>210</span>);
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>t</span>.<span class='ident'>format</span>(<span class='string'>&quot;%S,%f,%.f&quot;</span>).<span class='ident'>to_string</span>(), <span class='string'>&quot;07,210000000,.210&quot;</span>);
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>t</span>.<span class='ident'>format</span>(<span class='string'>&quot;%.3f,%.6f,%.9f&quot;</span>).<span class='ident'>to_string</span>(), <span class='string'>&quot;.210,.210000,.210000000&quot;</span>);
+
+        <span class='kw'>let</span> <span class='ident'>t</span> <span class='op'>=</span> <span class='ident'>NaiveTime</span>::<span class='ident'>from_hms</span>(<span class='number'>3</span>, <span class='number'>5</span>, <span class='number'>7</span>);
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>t</span>.<span class='ident'>format</span>(<span class='string'>&quot;%S,%f,%.f&quot;</span>).<span class='ident'>to_string</span>(), <span class='string'>&quot;07,000000000,&quot;</span>);
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>t</span>.<span class='ident'>format</span>(<span class='string'>&quot;%.3f,%.6f,%.9f&quot;</span>).<span class='ident'>to_string</span>(), <span class='string'>&quot;.000,.000000,.000000000&quot;</span>);
 
         <span class='comment'>// corner cases</span>
         <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>NaiveTime</span>::<span class='ident'>from_hms</span>(<span class='number'>13</span>, <span class='number'>57</span>, <span class='number'>9</span>).<span class='ident'>format</span>(<span class='string'>&quot;%r&quot;</span>).<span class='ident'>to_string</span>(), <span class='string'>&quot;01:57:09 PM&quot;</span>);

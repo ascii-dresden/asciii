@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="rustdoc">
-    <meta name="description" content="Source to the Rust file `/home/hendrik/.multirust/toolchains/stable/cargo/registry/src/github.com-88ac128001ac3a9a/chrono-0.2.21/src/format/mod.rs`.">
+    <meta name="description" content="Source to the Rust file `/home/hendrik/.multirust/toolchains/stable/cargo/registry/src/github.com-88ac128001ac3a9a/chrono-0.2.22/src/format/mod.rs`.">
     <meta name="keywords" content="rust, rustlang, rust-lang">
 
     <title>mod.rs.html -- source</title>
@@ -518,18 +518,6 @@
 <span id="475">475</span>
 <span id="476">476</span>
 <span id="477">477</span>
-<span id="478">478</span>
-<span id="479">479</span>
-<span id="480">480</span>
-<span id="481">481</span>
-<span id="482">482</span>
-<span id="483">483</span>
-<span id="484">484</span>
-<span id="485">485</span>
-<span id="486">486</span>
-<span id="487">487</span>
-<span id="488">488</span>
-<span id="489">489</span>
 </pre><pre class='rust '>
 <span class='comment'>// This is a part of rust-chrono.</span>
 <span class='comment'>// Copyright (c) 2014-2015, Kang Seonghoon.</span>
@@ -908,29 +896,17 @@
                     <span class='ident'>Nanosecond3</span> <span class='op'>=&gt;</span>
                         <span class='ident'>time</span>.<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>t</span><span class='op'>|</span> {
                             <span class='kw'>let</span> <span class='ident'>nano</span> <span class='op'>=</span> <span class='ident'>t</span>.<span class='ident'>nanosecond</span>() <span class='op'>%</span> <span class='number'>1_000_000_000</span>;
-                            <span class='kw'>if</span> <span class='ident'>nano</span> <span class='op'>==</span> <span class='number'>0</span> {
-                                <span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>w</span>, <span class='string'>&quot;.000&quot;</span>)
-                            } <span class='kw'>else</span> {
-                                <span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>w</span>, <span class='string'>&quot;.{:03}&quot;</span>, <span class='ident'>nano</span> <span class='op'>/</span> <span class='number'>1_000_000</span>)
-                            }
+                            <span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>w</span>, <span class='string'>&quot;.{:03}&quot;</span>, <span class='ident'>nano</span> <span class='op'>/</span> <span class='number'>1_000_000</span>)
                         }),
                     <span class='ident'>Nanosecond6</span> <span class='op'>=&gt;</span>
                         <span class='ident'>time</span>.<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>t</span><span class='op'>|</span> {
                             <span class='kw'>let</span> <span class='ident'>nano</span> <span class='op'>=</span> <span class='ident'>t</span>.<span class='ident'>nanosecond</span>() <span class='op'>%</span> <span class='number'>1_000_000_000</span>;
-                            <span class='kw'>if</span> <span class='ident'>nano</span> <span class='op'>==</span> <span class='number'>0</span> {
-                                <span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>w</span>, <span class='string'>&quot;.000&quot;</span>)
-                            } <span class='kw'>else</span> {
-                                <span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>w</span>, <span class='string'>&quot;.{:06}&quot;</span>, <span class='ident'>nano</span> <span class='op'>/</span> <span class='number'>1_000</span>)
-                            }
+                            <span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>w</span>, <span class='string'>&quot;.{:06}&quot;</span>, <span class='ident'>nano</span> <span class='op'>/</span> <span class='number'>1_000</span>)
                         }),
                     <span class='ident'>Nanosecond9</span> <span class='op'>=&gt;</span>
                         <span class='ident'>time</span>.<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>t</span><span class='op'>|</span> {
                             <span class='kw'>let</span> <span class='ident'>nano</span> <span class='op'>=</span> <span class='ident'>t</span>.<span class='ident'>nanosecond</span>() <span class='op'>%</span> <span class='number'>1_000_000_000</span>;
-                            <span class='kw'>if</span> <span class='ident'>nano</span> <span class='op'>==</span> <span class='number'>0</span> {
-                                <span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>w</span>, <span class='string'>&quot;.000&quot;</span>)
-                            } <span class='kw'>else</span> {
-                                <span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>w</span>, <span class='string'>&quot;.{:09}&quot;</span>, <span class='ident'>nano</span>)
-                            }
+                            <span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>w</span>, <span class='string'>&quot;.{:09}&quot;</span>, <span class='ident'>nano</span>)
                         }),
                     <span class='ident'>TimezoneName</span> <span class='op'>=&gt;</span>
                         <span class='ident'>off</span>.<span class='ident'>map</span>(<span class='op'>|</span><span class='kw-2'>&amp;</span>(<span class='kw-2'>ref</span> <span class='ident'>name</span>, _)<span class='op'>|</span> <span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>w</span>, <span class='string'>&quot;{}&quot;</span>, <span class='op'>*</span><span class='ident'>name</span>)),
@@ -953,7 +929,7 @@
                         } <span class='kw'>else</span> {
                             <span class='prelude-val'>None</span>
                         },
-                    <span class='ident'>RFC3339</span> <span class='op'>=&gt;</span> <span class='comment'>// (almost) same to `%Y-%m-%dT%H:%M:%S.%f%z`</span>
+                    <span class='ident'>RFC3339</span> <span class='op'>=&gt;</span> <span class='comment'>// same to `%Y-%m-%dT%H:%M:%S%.f%:z`</span>
                         <span class='kw'>if</span> <span class='kw'>let</span> (<span class='prelude-val'>Some</span>(<span class='ident'>d</span>), <span class='prelude-val'>Some</span>(<span class='ident'>t</span>), <span class='prelude-val'>Some</span>(<span class='kw-2'>&amp;</span>(_, <span class='ident'>off</span>))) <span class='op'>=</span> (<span class='ident'>date</span>, <span class='ident'>time</span>, <span class='ident'>off</span>) {
                             <span class='comment'>// reuse `Debug` impls which already print ISO 8601 format.</span>
                             <span class='comment'>// this is faster in this way.</span>

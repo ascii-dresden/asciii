@@ -11,6 +11,7 @@
 
     <link rel="stylesheet" type="text/css" href="../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../main.css">
+    
 
     
     
@@ -43,10 +44,10 @@
 
     <section id='main' class="content mod">
 <h1 class='fqn'><span class='in-band'>Crate <a class='mod' href=''>enum_derive</a></span><span class='out-of-band'><span id='render-detail'>
-            <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
-                [<span class='inner'>&#x2212;</span>]
-            </a>
-        </span><a id='src-0' class='srclink' href='../src/enum_derive/lib.rs.html#1-735' title='goto source code'>[src]</a></span></h1>
+                   <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                       [<span class='inner'>&#x2212;</span>]
+                   </a>
+               </span><a id='src-0' class='srclink' href='../src/enum_derive/lib.rs.html#1-735' title='goto source code'>[src]</a></span></h1>
 <div class='docblock'><p>This crate provides several macros for deriving some useful methods for unitary enums (<em>i.e.</em> enums where variants do not have payloads).</p>
 
 <p>All of these macros are designed to be used with the <a href="https://crates.io/crates/custom_derive"><code>custom_derive</code></a> crate, though they can be used independent of it.</p>
@@ -201,63 +202,56 @@
 <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>from_troll</span>(<span class='kw-2'>&amp;</span><span class='ident'>troll_number</span>), <span class='prelude-val'>Ok</span>(<span class='ident'>number</span>));</pre>
 </div><h2 id='macros' class='section-header'><a href="#macros">Macros</a></h2>
 <table>
-                    <tr class=' module-item'>
-                        <td><a class='macro' href='macro.EnumDisplay!.html'
-                               title='enum_derive::EnumDisplay!'>EnumDisplay!</a></td>
-                        <td class='docblock short'>
-                             
-                        </td>
-                    </tr>
-                
-                    <tr class=' module-item'>
-                        <td><a class='macro' href='macro.EnumFromStr!.html'
-                               title='enum_derive::EnumFromStr!'>EnumFromStr!</a></td>
-                        <td class='docblock short'>
-                             
-                        </td>
-                    </tr>
-                
-                    <tr class=' module-item'>
-                        <td><a class='macro' href='macro.IterVariantNames!.html'
-                               title='enum_derive::IterVariantNames!'>IterVariantNames!</a></td>
-                        <td class='docblock short'>
-                             
-                        </td>
-                    </tr>
-                
-                    <tr class=' module-item'>
-                        <td><a class='macro' href='macro.IterVariants!.html'
-                               title='enum_derive::IterVariants!'>IterVariants!</a></td>
-                        <td class='docblock short'>
-                             
-                        </td>
-                    </tr>
-                
-                    <tr class=' module-item'>
-                        <td><a class='macro' href='macro.NextVariant!.html'
-                               title='enum_derive::NextVariant!'>NextVariant!</a></td>
-                        <td class='docblock short'>
-                             
-                        </td>
-                    </tr>
-                
-                    <tr class=' module-item'>
-                        <td><a class='macro' href='macro.PrevVariant!.html'
-                               title='enum_derive::PrevVariant!'>PrevVariant!</a></td>
-                        <td class='docblock short'>
-                             
-                        </td>
-                    </tr>
-                </table><h2 id='structs' class='section-header'><a href="#structs">Structs</a></h2>
+                       <tr class=' module-item'>
+                           <td><a class='macro' href='macro.EnumDisplay!.html'
+                                  title='enum_derive::EnumDisplay!'>EnumDisplay!</a></td>
+                           <td class='docblock short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class='macro' href='macro.EnumFromStr!.html'
+                                  title='enum_derive::EnumFromStr!'>EnumFromStr!</a></td>
+                           <td class='docblock short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class='macro' href='macro.IterVariantNames!.html'
+                                  title='enum_derive::IterVariantNames!'>IterVariantNames!</a></td>
+                           <td class='docblock short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class='macro' href='macro.IterVariants!.html'
+                                  title='enum_derive::IterVariants!'>IterVariants!</a></td>
+                           <td class='docblock short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class='macro' href='macro.NextVariant!.html'
+                                  title='enum_derive::NextVariant!'>NextVariant!</a></td>
+                           <td class='docblock short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class='macro' href='macro.PrevVariant!.html'
+                                  title='enum_derive::PrevVariant!'>PrevVariant!</a></td>
+                           <td class='docblock short'>
+                                
+                           </td>
+                       </tr></table><h2 id='structs' class='section-header'><a href="#structs">Structs</a></h2>
 <table>
-                    <tr class=' module-item'>
-                        <td><a class='struct' href='struct.ParseEnumError.html'
-                               title='enum_derive::ParseEnumError'>ParseEnumError</a></td>
-                        <td class='docblock short'>
-                             <p>This is the error type used for derived implementations of <code>FromStr</code> for unitary enums.</p>
-                        </td>
-                    </tr>
-                </table></section>
+                       <tr class=' module-item'>
+                           <td><a class='struct' href='struct.ParseEnumError.html'
+                                  title='enum_derive::ParseEnumError'>ParseEnumError</a></td>
+                           <td class='docblock short'>
+                                <p>This is the error type used for derived implementations of <code>FromStr</code> for unitary enums.</p>
+                           </td>
+                       </tr></table></section>
     <section id='search' class="content hidden"></section>
 
     <section class="footer"></section>

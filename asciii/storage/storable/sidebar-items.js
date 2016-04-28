@@ -1,1 +1,1 @@
-initSidebarItems({"trait":[["Storable",""]]});
+initSidebarItems({"trait":[["Storable",""]],"type":[["FilePath",""],["FilePathBuf",""],["FolderPath",""],["FolderPathBuf",""]]});

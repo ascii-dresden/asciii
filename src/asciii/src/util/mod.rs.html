@@ -141,6 +141,8 @@
 <span id="98"> 98</span>
 <span id="99"> 99</span>
 <span id="100">100</span>
+<span id="101">101</span>
+<span id="102">102</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! Utility functions that are needed all over the places.</span>
 <span class='attribute'>#<span class='op'>!</span>[<span class='ident'>allow</span>(<span class='ident'>dead_code</span>)]</span>
@@ -225,8 +227,10 @@
 <span class='doccomment'>/// This is by far the most important function of all utility functions.</span>
 <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>get_storage_path</span>() <span class='op'>-&gt;</span> <span class='ident'>PathBuf</span>
 {
-    <span class='kw'>let</span> <span class='ident'>storage_path</span> <span class='op'>=</span> <span class='ident'>PathBuf</span>::<span class='ident'>from</span>(::<span class='ident'>CONFIG</span>.<span class='ident'>get_str</span>(<span class='string'>&quot;path&quot;</span>))
-        .<span class='ident'>join</span>( ::<span class='ident'>CONFIG</span>.<span class='ident'>get_str</span>(<span class='string'>&quot;dirs/storage&quot;</span>));
+    <span class='kw'>let</span> <span class='ident'>storage_path</span> <span class='op'>=</span> <span class='ident'>PathBuf</span>::<span class='ident'>from</span>(::<span class='ident'>CONFIG</span>.<span class='ident'>get_str</span>(<span class='string'>&quot;path&quot;</span>)
+            .<span class='ident'>expect</span>(<span class='string'>&quot;Faulty config: field path does not contain a string value&quot;</span>))
+        .<span class='ident'>join</span>( ::<span class='ident'>CONFIG</span>.<span class='ident'>get_str</span>(<span class='string'>&quot;dirs/storage&quot;</span>)
+            .<span class='ident'>expect</span>(<span class='string'>&quot;Faulty config: field dirs/storage does not contain a string value&quot;</span>));
 
     <span class='comment'>// TODO make replace tilde a Trait function</span>
     <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>storage_path</span> <span class='op'>=</span> <span class='ident'>replace_home_tilde</span>(<span class='kw-2'>&amp;</span><span class='ident'>storage_path</span>);

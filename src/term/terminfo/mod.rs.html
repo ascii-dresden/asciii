@@ -4,13 +4,14 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="rustdoc">
-    <meta name="description" content="Source to the Rust file `/home/hendrik/.multirust/toolchains/stable/cargo/registry/src/github.com-88ac128001ac3a9a/term-0.4.4/src/terminfo/mod.rs`.">
+    <meta name="description" content="Source to the Rust file `/home/hendrik/.multirust/toolchains/nightly/cargo/registry/src/github.com-88ac128001ac3a9a/term-0.4.4/src/terminfo/mod.rs`.">
     <meta name="keywords" content="rust, rustlang, rust-lang">
 
     <title>mod.rs.html -- source</title>
 
     <link rel="stylesheet" type="text/css" href="../../../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../../../main.css">
+    
 
     <link rel="shortcut icon" href="https://doc.rust-lang.org/favicon.ico">
     
@@ -449,7 +450,7 @@
 
     <span class='doccomment'>/// Parse the given TermInfo.</span>
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>from_path</span><span class='op'>&lt;</span><span class='ident'>P</span>: <span class='ident'>AsRef</span><span class='op'>&lt;</span><span class='ident'>Path</span><span class='op'>&gt;&gt;</span>(<span class='ident'>path</span>: <span class='ident'>P</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>TermInfo</span><span class='op'>&gt;</span> {
-        <span class='ident'>Self</span>::<span class='ident'>_from_path</span>(<span class='ident'>path</span>.<span class='ident'>as_ref</span>())
+        <span class='kw'>Self</span>::<span class='ident'>_from_path</span>(<span class='ident'>path</span>.<span class='ident'>as_ref</span>())
     }
     <span class='comment'>// Keep the metadata small</span>
     <span class='comment'>// (That is, this uses a &amp;Path so that this function need not be instantiated</span>

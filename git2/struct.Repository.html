@@ -46,7 +46,7 @@
             <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                 [<span class='inner'>&#x2212;</span>]
             </a>
-        </span><a id='src-4618' class='srclink' href='../src/git2/repo.rs.html#29-31' title='goto source code'>[src]</a></span></h1>
+        </span><a id='src-4794' class='srclink' href='../src/git2/repo.rs.html#30-32' title='goto source code'>[src]</a></span></h1>
 <pre class='rust struct'>pub struct Repository {
     // some fields omitted
 }</pre><div class='docblock'><p>An owned git repository, representing all state associated with the
@@ -62,6 +62,25 @@ from the filesystem.</p>
 <div class='docblock'><p>Attempt to open an already-existing repository at <code>path</code>.</p>
 
 <p>The path can point to either a normal or bare repository.</p>
+</div><h4 id='method.open_ext' class='method'><code>fn <a href='#method.open_ext' class='fnname'>open_ext</a>&lt;P, O, I&gt;(path: P, flags: <a class='struct' href='../git2/struct.RepositoryOpenFlags.html' title='git2::RepositoryOpenFlags'>RepositoryOpenFlags</a>, ceiling_dirs: I) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='struct' href='../git2/struct.Repository.html' title='git2::Repository'>Repository</a>, <a class='struct' href='../git2/struct.Error.html' title='git2::Error'>Error</a>&gt; <span class='where'>where P: <a class='trait' href='https://doc.rust-lang.org/nightly/core/convert/trait.AsRef.html' title='core::convert::AsRef'>AsRef</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/std/path/struct.Path.html' title='std::path::Path'>Path</a>&gt;, O: <a class='trait' href='https://doc.rust-lang.org/nightly/core/convert/trait.AsRef.html' title='core::convert::AsRef'>AsRef</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/std/ffi/os_str/struct.OsStr.html' title='std::ffi::os_str::OsStr'>OsStr</a>&gt;, I: <a class='trait' href='https://doc.rust-lang.org/nightly/core/iter/trait.IntoIterator.html' title='core::iter::IntoIterator'>IntoIterator</a>&lt;Item=O&gt;</span></code></h4>
+<div class='docblock'><p>Find and open an existing repository, with additional options.</p>
+
+<p>If flags contains REPOSITORY_OPEN_NO_SEARCH, the path must point
+directly to a repository; otherwise, this may point to a subdirectory
+of a repository, and <code>open_ext</code> will search up through parent
+directories.</p>
+
+<p>If flags contains REPOSITORY_OPEN_CROSS_FS, the search through parent
+directories will not cross a filesystem boundary (detected when the
+stat st_dev field changes).</p>
+
+<p>If flags contains REPOSITORY_OPEN_BARE, force opening the repository as
+bare even if it isn&#39;t, ignoring any working directory, and defer
+loading the repository configuration for performance.</p>
+
+<p>ceiling_dirs specifies a list of paths that the search through parent
+directories will stop before entering.  Use the functions in std::env
+to construct or manipulate such a path list.</p>
 </div><h4 id='method.discover' class='method'><code>fn <a href='#method.discover' class='fnname'>discover</a>&lt;P: <a class='trait' href='https://doc.rust-lang.org/nightly/core/convert/trait.AsRef.html' title='core::convert::AsRef'>AsRef</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/std/path/struct.Path.html' title='std::path::Path'>Path</a>&gt;&gt;(path: P) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='struct' href='../git2/struct.Repository.html' title='git2::Repository'>Repository</a>, <a class='struct' href='../git2/struct.Error.html' title='git2::Error'>Error</a>&gt;</code></h4>
 <div class='docblock'><p>Attempt to open an already-existing repository at or above <code>path</code></p>
 

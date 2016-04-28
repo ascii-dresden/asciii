@@ -4,13 +4,14 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="rustdoc">
-    <meta name="description" content="Source to the Rust file `/home/hendrik/.multirust/toolchains/stable/cargo/registry/src/github.com-88ac128001ac3a9a/unicode-normalization-0.1.2/src/decompose.rs`.">
+    <meta name="description" content="Source to the Rust file `/home/hendrik/.multirust/toolchains/nightly/cargo/registry/src/github.com-88ac128001ac3a9a/unicode-normalization-0.1.2/src/decompose.rs`.">
     <meta name="keywords" content="rust, rustlang, rust-lang">
 
     <title>decompose.rs.html -- source</title>
 
     <link rel="stylesheet" type="text/css" href="../../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../../main.css">
+    
 
     <link rel="shortcut icon" href="https://unicode-rs.github.io/unicode-rs_sm.png">
     
@@ -267,7 +268,7 @@
                 {
                     <span class='kw'>let</span> <span class='ident'>callback</span> <span class='op'>=</span> <span class='op'>|</span><span class='ident'>d</span><span class='op'>|</span> {
                         <span class='kw'>let</span> <span class='ident'>class</span> <span class='op'>=</span>
-                            <span class='ident'>super</span>::<span class='ident'>char</span>::<span class='ident'>canonical_combining_class</span>(<span class='ident'>d</span>);
+                            <span class='kw'>super</span>::<span class='ident'>char</span>::<span class='ident'>canonical_combining_class</span>(<span class='ident'>d</span>);
                         <span class='kw'>if</span> <span class='ident'>class</span> <span class='op'>==</span> <span class='number'>0</span> <span class='op'>&amp;&amp;</span> <span class='op'>!</span><span class='op'>*</span><span class='ident'>sorted</span> {
                             <span class='ident'>canonical_sort</span>(<span class='ident'>buffer</span>);
                             <span class='op'>*</span><span class='ident'>sorted</span> <span class='op'>=</span> <span class='boolval'>true</span>;
@@ -276,10 +277,10 @@
                     };
                     <span class='kw'>match</span> <span class='self'>self</span>.<span class='ident'>kind</span> {
                         <span class='ident'>Canonical</span> <span class='op'>=&gt;</span> {
-                            <span class='ident'>super</span>::<span class='ident'>char</span>::<span class='ident'>decompose_canonical</span>(<span class='ident'>ch</span>, <span class='ident'>callback</span>)
+                            <span class='kw'>super</span>::<span class='ident'>char</span>::<span class='ident'>decompose_canonical</span>(<span class='ident'>ch</span>, <span class='ident'>callback</span>)
                         }
                         <span class='ident'>Compatible</span> <span class='op'>=&gt;</span> {
-                            <span class='ident'>super</span>::<span class='ident'>char</span>::<span class='ident'>decompose_compatible</span>(<span class='ident'>ch</span>, <span class='ident'>callback</span>)
+                            <span class='kw'>super</span>::<span class='ident'>char</span>::<span class='ident'>decompose_compatible</span>(<span class='ident'>ch</span>, <span class='ident'>callback</span>)
                         }
                     }
                 }

@@ -46,7 +46,7 @@
             <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                 [<span class='inner'>&#x2212;</span>]
             </a>
-        </span><a id='src-6124' class='srclink' href='../src/git2/tree.rs.html#16-19' title='goto source code'>[src]</a></span></h1>
+        </span><a id='src-6328' class='srclink' href='../src/git2/tree.rs.html#16-19' title='goto source code'>[src]</a></span></h1>
 <pre class='rust struct'>pub struct Tree&lt;'repo&gt; {
     // some fields omitted
 }</pre><div class='docblock'><p>A structure to represent a git <a href="http://git-scm.com/book/en/Git-Internals-Git-Objects">tree</a></p>
@@ -67,7 +67,12 @@
 given its relative path.</p>
 </div><h4 id='method.as_object' class='method'><code>fn <a href='#method.as_object' class='fnname'>as_object</a>(&amp;self) -&gt; &amp;<a class='struct' href='../git2/struct.Object.html' title='git2::Object'>Object</a>&lt;'repo&gt;</code></h4>
 <div class='docblock'><p>Casts this Tree to be usable as an <code>Object</code></p>
+</div><h4 id='method.into_object' class='method'><code>fn <a href='#method.into_object' class='fnname'>into_object</a>(self) -&gt; <a class='struct' href='../git2/struct.Object.html' title='git2::Object'>Object</a>&lt;'repo&gt;</code></h4>
+<div class='docblock'><p>Consumes Commit to be returned as an <code>Object</code></p>
 </div></div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><code>impl&lt;'repo&gt; <a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.Drop.html' title='core::ops::Drop'>Drop</a> for <a class='struct' href='../git2/struct.Tree.html' title='git2::Tree'>Tree</a>&lt;'repo&gt;</code></h3><div class='impl-items'><h4 id='method.drop' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/ops/trait.Drop.html#method.drop' class='fnname'>drop</a>(&amp;mut self)</code></h4>
+</div><h3 class='impl'><code>impl&lt;'repo, 'iter&gt; <a class='trait' href='https://doc.rust-lang.org/nightly/core/iter/trait.IntoIterator.html' title='core::iter::IntoIterator'>IntoIterator</a> for &amp;'iter <a class='struct' href='../git2/struct.Tree.html' title='git2::Tree'>Tree</a>&lt;'repo&gt;</code></h3><div class='impl-items'><h4 id='associatedtype.Item' class='type'><code>type Item = <a class='struct' href='../git2/struct.TreeEntry.html' title='git2::TreeEntry'>TreeEntry</a>&lt;'iter&gt;</code></h4>
+<h4 id='associatedtype.IntoIter' class='type'><code>type IntoIter = <a class='struct' href='../git2/struct.TreeIter.html' title='git2::TreeIter'>TreeIter</a>&lt;'iter&gt;</code></h4>
+<h4 id='method.into_iter' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/iter/trait.IntoIterator.html#method.into_iter' class='fnname'>into_iter</a>(self) -&gt; Self::<a class='trait' href='https://doc.rust-lang.org/nightly/core/iter/trait.IntoIterator.html' title='core::iter::IntoIterator'>IntoIter</a></code></h4>
 </div></section>
     <section id='search' class="content hidden"></section>
 

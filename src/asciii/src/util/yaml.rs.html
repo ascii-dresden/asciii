@@ -288,8 +288,8 @@
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>collections</span>::<span class='ident'>BTreeMap</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>error</span>::<span class='ident'>Error</span>;
 
-<span class='kw'>pub</span> <span class='kw'>use</span> <span class='ident'>yaml_rust</span>::{<span class='ident'>Yaml</span>};
-<span class='kw'>use</span> <span class='ident'>yaml_rust</span>::{<span class='ident'>YamlLoader</span>};
+<span class='kw'>pub</span> <span class='kw'>use</span> <span class='ident'>yaml_rust</span>::<span class='ident'>Yaml</span>;
+<span class='kw'>use</span> <span class='ident'>yaml_rust</span>::<span class='ident'>YamlLoader</span>;
 <span class='kw'>use</span> <span class='ident'>yaml_rust</span>::<span class='ident'>scanner</span>::<span class='ident'>ScanError</span>;
 <span class='kw'>use</span> <span class='ident'>chrono</span>::<span class='op'>*</span>;
 
@@ -350,7 +350,7 @@
         .<span class='ident'>collect</span>::<span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>i32</span><span class='op'>&gt;&gt;</span>();
     <span class='kw'>if</span> <span class='ident'>date</span>[<span class='number'>0</span>] <span class='op'>&gt;</span> <span class='number'>0</span> {
         <span class='comment'>// XXX this neglects the old &quot;01-05.12.2015&quot; format</span>
-        <span class='kw'>return</span> <span class='prelude-val'>Some</span>(<span class='ident'>UTC</span>.<span class='ident'>ymd</span>(<span class='ident'>date</span>[<span class='number'>2</span>], <span class='ident'>date</span>[<span class='number'>1</span>] <span class='kw'>as</span> <span class='ident'>u32</span>, <span class='ident'>date</span>[<span class='number'>0</span>] <span class='kw'>as</span> <span class='ident'>u32</span>))
+        <span class='kw'>return</span> <span class='ident'>UTC</span>.<span class='ident'>ymd_opt</span>(<span class='ident'>date</span>[<span class='number'>2</span>], <span class='ident'>date</span>[<span class='number'>1</span>] <span class='kw'>as</span> <span class='ident'>u32</span>, <span class='ident'>date</span>[<span class='number'>0</span>] <span class='kw'>as</span> <span class='ident'>u32</span>).<span class='ident'>single</span>()
     }
     <span class='prelude-val'>None</span>
 }

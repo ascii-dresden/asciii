@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="rustdoc">
-    <meta name="description" content="Source to the Rust file `/home/hendrik/.multirust/toolchains/stable/cargo/registry/src/github.com-88ac128001ac3a9a/libgit2-sys-0.4.2/lib.rs`.">
+    <meta name="description" content="Source to the Rust file `/home/hendrik/.multirust/toolchains/stable/cargo/registry/src/github.com-88ac128001ac3a9a/libgit2-sys-0.4.3/lib.rs`.">
     <meta name="keywords" content="rust, rustlang, rust-lang">
 
     <title>lib.rs.html -- source</title>
@@ -2473,6 +2473,24 @@
 <span id="2430">2430</span>
 <span id="2431">2431</span>
 <span id="2432">2432</span>
+<span id="2433">2433</span>
+<span id="2434">2434</span>
+<span id="2435">2435</span>
+<span id="2436">2436</span>
+<span id="2437">2437</span>
+<span id="2438">2438</span>
+<span id="2439">2439</span>
+<span id="2440">2440</span>
+<span id="2441">2441</span>
+<span id="2442">2442</span>
+<span id="2443">2443</span>
+<span id="2444">2444</span>
+<span id="2445">2445</span>
+<span id="2446">2446</span>
+<span id="2447">2447</span>
+<span id="2448">2448</span>
+<span id="2449">2449</span>
+<span id="2450">2450</span>
 </pre><pre class='rust '>
 <span class='attribute'>#<span class='op'>!</span>[<span class='ident'>doc</span>(<span class='ident'>html_root_url</span> <span class='op'>=</span> <span class='string'>&quot;http://alexcrichton.com/git2-rs&quot;</span>)]</span>
 <span class='attribute'>#<span class='op'>!</span>[<span class='ident'>allow</span>(<span class='ident'>non_camel_case_types</span>)]</span>
@@ -3296,6 +3314,14 @@
     }
 }
 
+<span class='macro'>git_enum</span><span class='macro'>!</span> {
+    <span class='kw'>pub</span> <span class='kw'>enum</span> <span class='ident'>git_repository_open_flag_t</span> {
+        <span class='ident'>GIT_REPOSITORY_OPEN_NO_SEARCH</span> <span class='op'>=</span> (<span class='number'>1</span> <span class='op'>&lt;&lt;</span> <span class='number'>0</span>),
+        <span class='ident'>GIT_REPOSITORY_OPEN_CROSS_FS</span> <span class='op'>=</span> (<span class='number'>1</span> <span class='op'>&lt;&lt;</span> <span class='number'>1</span>),
+        <span class='ident'>GIT_REPOSITORY_OPEN_BARE</span> <span class='op'>=</span> (<span class='number'>1</span> <span class='op'>&lt;&lt;</span> <span class='number'>2</span>),
+    }
+}
+
 <span class='attribute'>#[<span class='ident'>repr</span>(<span class='ident'>C</span>)]</span>
 <span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>git_repository_init_options</span> {
     <span class='kw'>pub</span> <span class='ident'>version</span>: <span class='ident'>c_uint</span>,
@@ -3858,6 +3884,10 @@
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>git_repository_free</span>(<span class='ident'>repo</span>: <span class='op'>*</span><span class='kw-2'>mut</span> <span class='ident'>git_repository</span>);
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>git_repository_open</span>(<span class='ident'>repo</span>: <span class='op'>*</span><span class='kw-2'>mut</span> <span class='op'>*</span><span class='kw-2'>mut</span> <span class='ident'>git_repository</span>,
                                <span class='ident'>path</span>: <span class='op'>*</span><span class='kw'>const</span> <span class='ident'>c_char</span>) <span class='op'>-&gt;</span> <span class='ident'>c_int</span>;
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>git_repository_open_ext</span>(<span class='ident'>repo</span>: <span class='op'>*</span><span class='kw-2'>mut</span> <span class='op'>*</span><span class='kw-2'>mut</span> <span class='ident'>git_repository</span>,
+                                   <span class='ident'>path</span>: <span class='op'>*</span><span class='kw'>const</span> <span class='ident'>c_char</span>,
+                                   <span class='ident'>flags</span>: <span class='ident'>c_uint</span>,
+                                   <span class='ident'>ceiling_dirs</span>: <span class='op'>*</span><span class='kw'>const</span> <span class='ident'>c_char</span>) <span class='op'>-&gt;</span> <span class='ident'>c_int</span>;
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>git_repository_init</span>(<span class='ident'>repo</span>: <span class='op'>*</span><span class='kw-2'>mut</span> <span class='op'>*</span><span class='kw-2'>mut</span> <span class='ident'>git_repository</span>,
                                <span class='ident'>path</span>: <span class='op'>*</span><span class='kw'>const</span> <span class='ident'>c_char</span>,
                                <span class='ident'>is_bare</span>: <span class='ident'>c_uint</span>) <span class='op'>-&gt;</span> <span class='ident'>c_int</span>;
@@ -4900,6 +4930,12 @@
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>git_describe_workdir</span>(<span class='ident'>out</span>: <span class='op'>*</span><span class='kw-2'>mut</span> <span class='op'>*</span><span class='kw-2'>mut</span> <span class='ident'>git_describe_result</span>,
                                 <span class='ident'>repo</span>: <span class='op'>*</span><span class='kw-2'>mut</span> <span class='ident'>git_repository</span>,
                                 <span class='ident'>opts</span>: <span class='op'>*</span><span class='kw-2'>mut</span> <span class='ident'>git_describe_options</span>) <span class='op'>-&gt;</span> <span class='ident'>c_int</span>;
+
+    <span class='comment'>// message</span>
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>git_message_prettify</span>(<span class='ident'>out</span>: <span class='op'>*</span><span class='kw-2'>mut</span> <span class='ident'>git_buf</span>,
+                                <span class='ident'>message</span>: <span class='op'>*</span><span class='kw'>const</span> <span class='ident'>c_char</span>,
+                                <span class='ident'>strip_comments</span>: <span class='ident'>c_int</span>,
+                                <span class='ident'>comment_char</span>: <span class='ident'>c_char</span>) <span class='op'>-&gt;</span> <span class='ident'>c_int</span>;
 }
 
 <span class='attribute'>#[<span class='ident'>test</span>]</span>

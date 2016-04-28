@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="rustdoc">
-    <meta name="description" content="Source to the Rust file `/home/hendrik/.multirust/toolchains/stable/cargo/registry/src/github.com-88ac128001ac3a9a/git2-0.4.2/src/tag.rs`.">
+    <meta name="description" content="Source to the Rust file `/home/hendrik/.multirust/toolchains/stable/cargo/registry/src/github.com-88ac128001ac3a9a/git2-0.4.3/src/tag.rs`.">
     <meta name="keywords" content="rust, rustlang, rust-lang">
 
     <title>tag.rs.html -- source</title>
@@ -203,8 +203,20 @@
 <span id="160">160</span>
 <span id="161">161</span>
 <span id="162">162</span>
+<span id="163">163</span>
+<span id="164">164</span>
+<span id="165">165</span>
+<span id="166">166</span>
+<span id="167">167</span>
+<span id="168">168</span>
+<span id="169">169</span>
+<span id="170">170</span>
+<span id="171">171</span>
+<span id="172">172</span>
+<span id="173">173</span>
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>marker</span>;
+<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>mem</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>str</span>;
 
 <span class='kw'>use</span> {<span class='ident'>raw</span>, <span class='ident'>signature</span>, <span class='ident'>Error</span>, <span class='ident'>Oid</span>, <span class='ident'>Object</span>, <span class='ident'>Signature</span>, <span class='ident'>ObjectType</span>};
@@ -301,6 +313,14 @@
             <span class='kw-2'>&amp;</span><span class='op'>*</span>(<span class='self'>self</span> <span class='kw'>as</span> <span class='op'>*</span><span class='kw'>const</span> _ <span class='kw'>as</span> <span class='op'>*</span><span class='kw'>const</span> <span class='ident'>Object</span><span class='op'>&lt;</span><span class='lifetime'>&#39;repo</span><span class='op'>&gt;</span>)
         }
     }
+
+    <span class='doccomment'>/// Consumes Tag to be returned as an `Object`</span>
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>into_object</span>(<span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>Object</span><span class='op'>&lt;</span><span class='lifetime'>&#39;repo</span><span class='op'>&gt;</span> {
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>mem</span>::<span class='ident'>size_of_val</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>), <span class='ident'>mem</span>::<span class='ident'>size_of</span>::<span class='op'>&lt;</span><span class='ident'>Object</span><span class='op'>&gt;</span>());
+        <span class='kw'>unsafe</span> {
+            <span class='ident'>mem</span>::<span class='ident'>transmute</span>(<span class='self'>self</span>)
+        }
+    }
 }
 
 <span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;repo</span><span class='op'>&gt;</span> <span class='ident'>Binding</span> <span class='kw'>for</span> <span class='ident'>Tag</span><span class='op'>&lt;</span><span class='lifetime'>&#39;repo</span><span class='op'>&gt;</span> {
@@ -344,8 +364,10 @@
 
         <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>tag</span>.<span class='ident'>tagger</span>().<span class='ident'>unwrap</span>().<span class='ident'>name</span>(), <span class='ident'>sig</span>.<span class='ident'>name</span>());
         <span class='ident'>tag</span>.<span class='ident'>target</span>().<span class='ident'>unwrap</span>();
+        <span class='ident'>tag</span>.<span class='ident'>into_object</span>();
 
         <span class='ident'>repo</span>.<span class='ident'>find_object</span>(<span class='ident'>tag_id</span>, <span class='prelude-val'>None</span>).<span class='ident'>unwrap</span>().<span class='ident'>as_tag</span>().<span class='ident'>unwrap</span>();
+        <span class='ident'>repo</span>.<span class='ident'>find_object</span>(<span class='ident'>tag_id</span>, <span class='prelude-val'>None</span>).<span class='ident'>unwrap</span>().<span class='ident'>into_tag</span>().<span class='ident'>ok</span>().<span class='ident'>unwrap</span>();
 
         <span class='ident'>repo</span>.<span class='ident'>tag_delete</span>(<span class='string'>&quot;foo&quot;</span>).<span class='ident'>unwrap</span>();
     }

@@ -1,1 +1,1 @@
-initSidebarItems({"mod":[["product",""],["spec",""]],"struct":[["Project",""]]});
+initSidebarItems({"mod":[["product",""],["spec",""]],"struct":[["Project","Represents a Project."]]});

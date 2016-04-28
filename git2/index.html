@@ -46,7 +46,7 @@
             <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                 [<span class='inner'>&#x2212;</span>]
             </a>
-        </span><a id='src-0' class='srclink' href='../src/git2/lib.rs.html#1-851' title='goto source code'>[src]</a></span></h1>
+        </span><a id='src-0' class='srclink' href='../src/git2/lib.rs.html#1-867' title='goto source code'>[src]</a></span></h1>
 <div class='docblock'>
 <h1 id='libgit2-bindings-for-rust' class='section-header'><a href='#libgit2-bindings-for-rust'>libgit2 bindings for Rust</a></h1>
 <p>This library contains bindings to the <a href="https://libgit2.github.com/">libgit2</a> C library which is used
@@ -676,6 +676,14 @@ underlying filesystem.</p>
                     </tr>
                 
                     <tr class=' module-item'>
+                        <td><a class='struct' href='struct.RepositoryOpenFlags.html'
+                               title='git2::RepositoryOpenFlags'>RepositoryOpenFlags</a></td>
+                        <td class='docblock short'>
+                             <p>Flags for <code>Repository::open_ext</code></p>
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
                         <td><a class='struct' href='struct.RevparseMode.html'
                                title='git2::RevparseMode'>RevparseMode</a></td>
                         <td class='docblock short'>
@@ -1002,6 +1010,14 @@ operation.</p>
                     </tr>
                 
                     <tr class=' module-item'>
+                        <td><a class='constant' href='constant.DEFAULT_COMMENT_CHAR.html'
+                               title='git2::DEFAULT_COMMENT_CHAR'>DEFAULT_COMMENT_CHAR</a></td>
+                        <td class='docblock short'>
+                             <p>The default comment character for message_prettify (&#39;#&#39;)</p>
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
                         <td><a class='constant' href='constant.DIFF_STATS_FULL.html'
                                title='git2::DIFF_STATS_FULL'>DIFF_STATS_FULL</a></td>
                         <td class='docblock short'>
@@ -1129,6 +1145,30 @@ group writable and &quot;g+sx&quot; for sticky group assignment</p>
                                title='git2::REPOSITORY_INIT_SHARED_UMASK'>REPOSITORY_INIT_SHARED_UMASK</a></td>
                         <td class='docblock short'>
                              <p>Use permissions configured by umask - the default</p>
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='constant' href='constant.REPOSITORY_OPEN_BARE.html'
+                               title='git2::REPOSITORY_OPEN_BARE'>REPOSITORY_OPEN_BARE</a></td>
+                        <td class='docblock short'>
+                             <p>Force opening as bare repository, and defer loading its config.</p>
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='constant' href='constant.REPOSITORY_OPEN_CROSS_FS.html'
+                               title='git2::REPOSITORY_OPEN_CROSS_FS'>REPOSITORY_OPEN_CROSS_FS</a></td>
+                        <td class='docblock short'>
+                             <p>Search across filesystem boundaries.</p>
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='constant' href='constant.REPOSITORY_OPEN_NO_SEARCH.html'
+                               title='git2::REPOSITORY_OPEN_NO_SEARCH'>REPOSITORY_OPEN_NO_SEARCH</a></td>
+                        <td class='docblock short'>
+                             <p>Only open the specified path; don&#39;t walk upward searching.</p>
                         </td>
                     </tr>
                 
@@ -1459,6 +1499,17 @@ children).</p>
                                title='git2::IntoCString'>IntoCString</a></td>
                         <td class='docblock short'>
                              <p>A class of types that can be converted to C strings.</p>
+                        </td>
+                    </tr>
+                </table><h2 id='functions' class='section-header'><a href="#functions">Functions</a></h2>
+<table>
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.message_prettify.html'
+                               title='git2::message_prettify'>message_prettify</a></td>
+                        <td class='docblock short'>
+                             <p>Clean up a message, removing extraneous whitespace, and ensure that the
+message ends with a newline. If comment_char is Some, also remove comment
+lines starting with that character.</p>
                         </td>
                     </tr>
                 </table><h2 id='types' class='section-header'><a href="#types">Type Definitions</a></h2>

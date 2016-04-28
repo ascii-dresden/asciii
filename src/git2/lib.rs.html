@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="rustdoc">
-    <meta name="description" content="Source to the Rust file `/home/hendrik/.multirust/toolchains/stable/cargo/registry/src/github.com-88ac128001ac3a9a/git2-0.4.2/src/lib.rs`.">
+    <meta name="description" content="Source to the Rust file `/home/hendrik/.multirust/toolchains/stable/cargo/registry/src/github.com-88ac128001ac3a9a/git2-0.4.3/src/lib.rs`.">
     <meta name="keywords" content="rust, rustlang, rust-lang">
 
     <title>lib.rs.html -- source</title>
@@ -892,6 +892,22 @@
 <span id="849">849</span>
 <span id="850">850</span>
 <span id="851">851</span>
+<span id="852">852</span>
+<span id="853">853</span>
+<span id="854">854</span>
+<span id="855">855</span>
+<span id="856">856</span>
+<span id="857">857</span>
+<span id="858">858</span>
+<span id="859">859</span>
+<span id="860">860</span>
+<span id="861">861</span>
+<span id="862">862</span>
+<span id="863">863</span>
+<span id="864">864</span>
+<span id="865">865</span>
+<span id="866">866</span>
+<span id="867">867</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! # libgit2 bindings for Rust</span>
 <span class='doccomment'>//!</span>
@@ -989,6 +1005,7 @@
 <span class='kw'>pub</span> <span class='kw'>use</span> <span class='ident'>merge</span>::{<span class='ident'>AnnotatedCommit</span>, <span class='ident'>MergeOptions</span>};
 <span class='kw'>pub</span> <span class='kw'>use</span> <span class='ident'>error</span>::<span class='ident'>Error</span>;
 <span class='kw'>pub</span> <span class='kw'>use</span> <span class='ident'>index</span>::{<span class='ident'>Index</span>, <span class='ident'>IndexEntry</span>, <span class='ident'>IndexEntries</span>, <span class='ident'>IndexMatchedPath</span>};
+<span class='kw'>pub</span> <span class='kw'>use</span> <span class='ident'>message</span>::{<span class='ident'>message_prettify</span>, <span class='ident'>DEFAULT_COMMENT_CHAR</span>};
 <span class='kw'>pub</span> <span class='kw'>use</span> <span class='ident'>note</span>::{<span class='ident'>Note</span>, <span class='ident'>Notes</span>};
 <span class='kw'>pub</span> <span class='kw'>use</span> <span class='ident'>object</span>::<span class='ident'>Object</span>;
 <span class='kw'>pub</span> <span class='kw'>use</span> <span class='ident'>oid</span>::<span class='ident'>Oid</span>;
@@ -1172,7 +1189,7 @@
 <span class='doccomment'>/// An enumeration all possible kinds objects may have.</span>
 <span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>PartialEq</span>, <span class='ident'>Eq</span>, <span class='ident'>Copy</span>, <span class='ident'>Clone</span>, <span class='ident'>Debug</span>)]</span>
 <span class='kw'>pub</span> <span class='kw'>enum</span> <span class='ident'>ObjectType</span> {
-    <span class='doccomment'>/// An object which corresponds to a any git object</span>
+    <span class='doccomment'>/// Any kind of git object</span>
     <span class='ident'>Any</span>,
     <span class='doccomment'>/// An object which corresponds to a git commit</span>
     <span class='ident'>Commit</span>,
@@ -1307,6 +1324,20 @@ Flags for APIs that add files matching pathspec
 
 <span class='macro'>bitflags</span><span class='macro'>!</span> {
     <span class='attribute'>#[<span class='ident'>doc</span> <span class='op'>=</span> <span class='string'>&quot;
+Flags for `Repository::open_ext`
+&quot;</span>]</span>
+    <span class='ident'>flags</span> <span class='ident'>RepositoryOpenFlags</span>: <span class='ident'>u32</span> {
+        <span class='doccomment'>/// Only open the specified path; don&#39;t walk upward searching.</span>
+        <span class='kw'>const</span> <span class='ident'>REPOSITORY_OPEN_NO_SEARCH</span> <span class='op'>=</span> <span class='ident'>raw</span>::<span class='ident'>GIT_REPOSITORY_OPEN_NO_SEARCH</span> <span class='kw'>as</span> <span class='ident'>u32</span>,
+        <span class='doccomment'>/// Search across filesystem boundaries.</span>
+        <span class='kw'>const</span> <span class='ident'>REPOSITORY_OPEN_CROSS_FS</span> <span class='op'>=</span> <span class='ident'>raw</span>::<span class='ident'>GIT_REPOSITORY_OPEN_CROSS_FS</span> <span class='kw'>as</span> <span class='ident'>u32</span>,
+        <span class='doccomment'>/// Force opening as bare repository, and defer loading its config.</span>
+        <span class='kw'>const</span> <span class='ident'>REPOSITORY_OPEN_BARE</span> <span class='op'>=</span> <span class='ident'>raw</span>::<span class='ident'>GIT_REPOSITORY_OPEN_BARE</span> <span class='kw'>as</span> <span class='ident'>u32</span>,
+    }
+}
+
+<span class='macro'>bitflags</span><span class='macro'>!</span> {
+    <span class='attribute'>#[<span class='ident'>doc</span> <span class='op'>=</span> <span class='string'>&quot;
 Flags for the return value of `Repository::revparse`
 &quot;</span>]</span>
     <span class='ident'>flags</span> <span class='ident'>RevparseMode</span>: <span class='ident'>u32</span> {
@@ -1342,6 +1373,7 @@ Flags for the return value of `Repository::revparse`
 <span class='kw'>mod</span> <span class='ident'>merge</span>;
 <span class='kw'>mod</span> <span class='ident'>error</span>;
 <span class='kw'>mod</span> <span class='ident'>index</span>;
+<span class='kw'>mod</span> <span class='ident'>message</span>;
 <span class='kw'>mod</span> <span class='ident'>note</span>;
 <span class='kw'>mod</span> <span class='ident'>object</span>;
 <span class='kw'>mod</span> <span class='ident'>oid</span>;

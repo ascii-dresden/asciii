@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="rustdoc">
-    <meta name="description" content="Source to the Rust file `/home/hendrik/.multirust/toolchains/stable/cargo/registry/src/github.com-88ac128001ac3a9a/git2-0.4.2/src/commit.rs`.">
+    <meta name="description" content="Source to the Rust file `/home/hendrik/.multirust/toolchains/stable/cargo/registry/src/github.com-88ac128001ac3a9a/git2-0.4.3/src/commit.rs`.">
     <meta name="keywords" content="rust, rustlang, rust-lang">
 
     <title>commit.rs.html -- source</title>
@@ -370,8 +370,20 @@
 <span id="327">327</span>
 <span id="328">328</span>
 <span id="329">329</span>
+<span id="330">330</span>
+<span id="331">331</span>
+<span id="332">332</span>
+<span id="333">333</span>
+<span id="334">334</span>
+<span id="335">335</span>
+<span id="336">336</span>
+<span id="337">337</span>
+<span id="338">338</span>
+<span id="339">339</span>
+<span id="340">340</span>
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>marker</span>;
+<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>mem</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>ops</span>::<span class='ident'>Range</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>str</span>;
 <span class='kw'>use</span> <span class='ident'>libc</span>;
@@ -610,6 +622,14 @@
             <span class='kw-2'>&amp;</span><span class='op'>*</span>(<span class='self'>self</span> <span class='kw'>as</span> <span class='op'>*</span><span class='kw'>const</span> _ <span class='kw'>as</span> <span class='op'>*</span><span class='kw'>const</span> <span class='ident'>Object</span><span class='op'>&lt;</span><span class='lifetime'>&#39;repo</span><span class='op'>&gt;</span>)
         }
     }
+
+    <span class='doccomment'>/// Consumes Commit to be returned as an `Object`</span>
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>into_object</span>(<span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>Object</span><span class='op'>&lt;</span><span class='lifetime'>&#39;repo</span><span class='op'>&gt;</span> {
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>mem</span>::<span class='ident'>size_of_val</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>), <span class='ident'>mem</span>::<span class='ident'>size_of</span>::<span class='op'>&lt;</span><span class='ident'>Object</span><span class='op'>&gt;</span>());
+        <span class='kw'>unsafe</span> {
+            <span class='ident'>mem</span>::<span class='ident'>transmute</span>(<span class='self'>self</span>)
+        }
+    }
 }
 
 <span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;repo</span><span class='op'>&gt;</span> <span class='ident'>Binding</span> <span class='kw'>for</span> <span class='ident'>Commit</span><span class='op'>&lt;</span><span class='lifetime'>&#39;repo</span><span class='op'>&gt;</span> {
@@ -695,8 +715,10 @@
                                   <span class='prelude-val'>Some</span>(<span class='string'>&quot;new message&quot;</span>), <span class='prelude-val'>None</span>).<span class='ident'>unwrap</span>();
         <span class='kw'>let</span> <span class='ident'>new_head</span> <span class='op'>=</span> <span class='ident'>repo</span>.<span class='ident'>find_commit</span>(<span class='ident'>new_head</span>).<span class='ident'>unwrap</span>();
         <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>new_head</span>.<span class='ident'>message</span>(), <span class='prelude-val'>Some</span>(<span class='string'>&quot;new message&quot;</span>));
+        <span class='ident'>new_head</span>.<span class='ident'>into_object</span>();
 
         <span class='ident'>repo</span>.<span class='ident'>find_object</span>(<span class='ident'>target</span>, <span class='prelude-val'>None</span>).<span class='ident'>unwrap</span>().<span class='ident'>as_commit</span>().<span class='ident'>unwrap</span>();
+        <span class='ident'>repo</span>.<span class='ident'>find_object</span>(<span class='ident'>target</span>, <span class='prelude-val'>None</span>).<span class='ident'>unwrap</span>().<span class='ident'>into_commit</span>().<span class='ident'>ok</span>().<span class='ident'>unwrap</span>();
     }
 }
 

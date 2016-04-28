@@ -1,1 +1,1 @@
-initSidebarItems({"mod":[["cmp","Functionality for ordering and comparison."],["fmt","Utilities for formatting and printing strings"]]});
+initSidebarItems({"mod":[["cmp","Functionality for ordering and comparison."],["fmt","Utilities for formatting and printing strings."]]});

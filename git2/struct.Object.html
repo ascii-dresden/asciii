@@ -46,7 +46,7 @@
             <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                 [<span class='inner'>&#x2212;</span>]
             </a>
-        </span><a id='src-3550' class='srclink' href='../src/git2/object.rs.html#11-14' title='goto source code'>[src]</a></span></h1>
+        </span><a id='src-3706' class='srclink' href='../src/git2/object.rs.html#12-15' title='goto source code'>[src]</a></span></h1>
 <pre class='rust struct'>pub struct Object&lt;'repo&gt; {
     // some fields omitted
 }</pre><div class='docblock'><p>A structure to represent a git <a href="http://git-scm.com/book/en/Git-Internals-Git-Objects">object</a></p>
@@ -73,18 +73,34 @@ repository).</p>
 <div class='docblock'><p>Attempt to view this object as a commit.</p>
 
 <p>Returns <code>None</code> if the object is not actually a commit.</p>
+</div><h4 id='method.into_commit' class='method'><code>fn <a href='#method.into_commit' class='fnname'>into_commit</a>(self) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='struct' href='../git2/struct.Commit.html' title='git2::Commit'>Commit</a>&lt;'repo&gt;, <a class='struct' href='../git2/struct.Object.html' title='git2::Object'>Object</a>&lt;'repo&gt;&gt;</code></h4>
+<div class='docblock'><p>Attempt to consume this object and return a commit.</p>
+
+<p>Returns <code>Err(self)</code> if this object is not actually a commit.</p>
 </div><h4 id='method.as_tag' class='method'><code>fn <a href='#method.as_tag' class='fnname'>as_tag</a>(&amp;self) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;&amp;<a class='struct' href='../git2/struct.Tag.html' title='git2::Tag'>Tag</a>&lt;'repo&gt;&gt;</code></h4>
 <div class='docblock'><p>Attempt to view this object as a tag.</p>
 
 <p>Returns <code>None</code> if the object is not actually a tag.</p>
+</div><h4 id='method.into_tag' class='method'><code>fn <a href='#method.into_tag' class='fnname'>into_tag</a>(self) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='struct' href='../git2/struct.Tag.html' title='git2::Tag'>Tag</a>&lt;'repo&gt;, <a class='struct' href='../git2/struct.Object.html' title='git2::Object'>Object</a>&lt;'repo&gt;&gt;</code></h4>
+<div class='docblock'><p>Attempt to consume this object and return a tag.</p>
+
+<p>Returns <code>Err(self)</code> if this object is not actually a tag.</p>
 </div><h4 id='method.as_tree' class='method'><code>fn <a href='#method.as_tree' class='fnname'>as_tree</a>(&amp;self) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;&amp;<a class='struct' href='../git2/struct.Tree.html' title='git2::Tree'>Tree</a>&lt;'repo&gt;&gt;</code></h4>
 <div class='docblock'><p>Attempt to view this object as a tree.</p>
 
 <p>Returns <code>None</code> if the object is not actually a tree.</p>
+</div><h4 id='method.into_tree' class='method'><code>fn <a href='#method.into_tree' class='fnname'>into_tree</a>(self) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='struct' href='../git2/struct.Tree.html' title='git2::Tree'>Tree</a>&lt;'repo&gt;, <a class='struct' href='../git2/struct.Object.html' title='git2::Object'>Object</a>&lt;'repo&gt;&gt;</code></h4>
+<div class='docblock'><p>Attempt to consume this object and return a tree.</p>
+
+<p>Returns <code>Err(self)</code> if this object is not actually a tree.</p>
 </div><h4 id='method.as_blob' class='method'><code>fn <a href='#method.as_blob' class='fnname'>as_blob</a>(&amp;self) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;&amp;<a class='struct' href='../git2/struct.Blob.html' title='git2::Blob'>Blob</a>&lt;'repo&gt;&gt;</code></h4>
 <div class='docblock'><p>Attempt to view this object as a blob.</p>
 
 <p>Returns <code>None</code> if the object is not actually a blob.</p>
+</div><h4 id='method.into_blob' class='method'><code>fn <a href='#method.into_blob' class='fnname'>into_blob</a>(self) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='struct' href='../git2/struct.Blob.html' title='git2::Blob'>Blob</a>&lt;'repo&gt;, <a class='struct' href='../git2/struct.Object.html' title='git2::Object'>Object</a>&lt;'repo&gt;&gt;</code></h4>
+<div class='docblock'><p>Attempt to consume this object and return a blob.</p>
+
+<p>Returns <code>Err(self)</code> if this object is not actually a blob.</p>
 </div><h4 id='method.describe' class='method'><code>fn <a href='#method.describe' class='fnname'>describe</a>(&amp;self, opts: &amp;<a class='struct' href='../git2/struct.DescribeOptions.html' title='git2::DescribeOptions'>DescribeOptions</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='struct' href='../git2/struct.Describe.html' title='git2::Describe'>Describe</a>, <a class='struct' href='../git2/struct.Error.html' title='git2::Error'>Error</a>&gt;</code></h4>
 <div class='docblock'><p>Describes a commit</p>
 
