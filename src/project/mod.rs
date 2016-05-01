@@ -144,7 +144,10 @@ impl Storable for Project{
     ///
     /// TODO compare agains InvoiceNumber, ClientFullName, Email, event/name, invoice/official Etc
     fn matches_search(&self, term: &str) -> bool{
-        self.name().to_lowercase().contains(&term.to_lowercase())
+        let search = term.to_lowercase();
+        self.invoice_num().map(|num|num.to_lowercase().contains(&search)).unwrap_or(false)
+        ||
+        self.name().to_lowercase().contains(&search)
     }
 }
 
