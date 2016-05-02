@@ -36,6 +36,7 @@ custom_derive! {
         ///Overall Cost Project, including taxes
         Name,
         Final,
+        Age,
         Year,
         Caterers,
         ClientFullName,
@@ -57,6 +58,7 @@ impl VirtualField{
             VirtualField::InvoiceNumberLong => invoice::number_long_str(project.yaml()),
             VirtualField::Name              => project::name(project.yaml()).map(|s|s.to_owned()),
             VirtualField::Final             => project.sum_sold().map(|c|c.to_string()),
+            VirtualField::Age               => project.age().map(|a|format!("{} days", a)),
             VirtualField::Year              => project.date().map(|d|d.year().to_string()),
 
             VirtualField::Caterers       => hours::caterers_string(project.yaml()),
