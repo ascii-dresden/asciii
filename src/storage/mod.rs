@@ -5,7 +5,7 @@
 //! Your ordinary file structure would look something like this:
 //!
 //! ```bash
-//! PROJECTS  # storage dir
+//! # root dir
 //! ├── working
 //! │   └── Project1
 //! │       └── Project1.yml
@@ -57,7 +57,7 @@ mod storage;
 /// * listing project folders and files
 /// * listing templates
 /// * archiving and unarchiving projects
-/// * git interaction ( not yet )
+/// * git interaction
 pub struct Storage<L:Storable> {
     /// Root of the entire Structure.
     root:  PathBuf,
@@ -76,15 +76,28 @@ pub struct Storage<L:Storable> {
 /// Used to identify what directory you are talking about.
 #[derive(Debug,Clone,Copy)]
 #[allow(dead_code)]
-pub enum StorageDir { Working, Archive(Year), Root, Templates, All }
+pub enum StorageDir {
+    /// Describes exclusively the working directory.
+    Working,
+    /// Describes exclusively one year's archive.
+    Archive(Year),
+    /// Describes archive of year and working directory,
+    /// if this year is still current.
+    Year(Year),
+    /// Parent of `Working`, `Archive` and `Templates`. 
+    Root,
+    /// Place to store templates.
+    Templates,
+    /// `Archive` and `Working` directory, not `Templates`.
+    All
+}
 
-/// Generic Filesystem wrapper.
+/// Basically `ls`, returns a list of paths.
 pub fn list_path_content(path:&Path) -> StorageResult<Vec<PathBuf>> {
-    let entries = try!(fs::read_dir(path))
+    Ok(try!(fs::read_dir(path))
         .filter_map(|entry| entry.ok())
         .map(|entry| entry.path())
-        .collect::<Vec<PathBuf>>();
-    Ok(entries)
+        .collect::<Vec<PathBuf>>())
 }
 
 

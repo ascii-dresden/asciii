@@ -24,6 +24,7 @@
 #![cfg_attr(feature = "lints", allow(unstable_features))]
 #![cfg_attr(feature = "lints", feature(plugin))]
 #![cfg_attr(feature = "lints", plugin(clippy))]
+#![cfg_attr(feature = "document_export", feature(custom_derive))]
 
 extern crate yaml_rust;
 extern crate chrono;
@@ -44,7 +45,9 @@ extern crate open;
 
 #[cfg(feature="git_statuses")] extern crate git2;
 #[cfg(feature="document_export")] extern crate handlebars;
+#[cfg(feature="document_export")] extern crate serde;
 #[cfg(feature="document_export")] extern crate serde_json;
+#[cfg(feature="document_export")] extern crate rustc_serialize;
 
 #[macro_use]
 pub mod util;

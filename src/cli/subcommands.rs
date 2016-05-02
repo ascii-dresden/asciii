@@ -24,10 +24,10 @@ const STATUS_ROWS_WIDTH:u16 = 96;
 pub fn new(matches:&ArgMatches){
     #![allow(unreachable_code,unused_variables)]
     let project_name     = matches.value_of("name").expect("You did not pass a \"Name\"!");
-    let editor   = CONFIG.get_path("editor").and_then(|e|e.as_str());
+    let editor           = CONFIG.get("editor").and_then(|e|e.as_str());
 
     let template_name = matches.value_of("template")
-        .or( CONFIG.get_path("template").unwrap().as_str())
+        .or( CONFIG.get("template").unwrap().as_str())
         .unwrap();
 
     let edit = !matches.is_present("don't edit");
@@ -115,6 +115,11 @@ pub fn list(matches:&ArgMatches){
                 StorageDir::Archive(archive)
             }
 
+            else if let Some(archive_year) = matches.value_of("year"){
+                let archive = archive_year.parse::<i32>().unwrap();
+                StorageDir::Year(archive)
+            }
+
             // or list all, but sort by date
             else if matches.is_present("all"){
                 // sort by date on --all of not overriden
@@ -153,7 +158,7 @@ fn list_projects(dir:StorageDir, list_config:&ListConfig){
     };
     debug!("listing projects: {}", luigi.working_dir().display());
 
-    let mut projects = super::execute(||luigi.open_project_files(dir));
+    let mut projects = super::execute(||luigi.open_projects(dir));
 
     // filtering, can you read this
     if let Some(ref filters) = list_config.filter_by{
@@ -229,7 +234,7 @@ pub fn edit(matches:&ArgMatches) {
         let search_terms = matches.values_of("search_term").unwrap().collect::<Vec<&str>>();
 
         let editor = matches.value_of("editor")
-            .or( CONFIG.get_path("editor").and_then(|e|e.as_str()));
+            .or( CONFIG.get("editor").and_then(|e|e.as_str()));
 
         if matches.is_present("template"){
             edit_template(search_term, &editor);
@@ -304,6 +309,22 @@ fn show_project(dir:StorageDir, search_term:&str){
 
 
 
+//use fill_docs::{Exportable, fill_template};
+//fn make_project(dir:StorageDir, search_term:&str){
+//    // TODO make this use ProjectList
+//    let luigi = setup_luigi();
+//    let projects = super::execute(||luigi.search_projects(dir, &search_term));
+//    if !projects.is_empty(){
+//        for project in &projects{
+//            fill_template(project);
+//        }
+//    } else{
+//        fail(format!("Nothing found for {:?}", search_term));
+//    }
+//}
+
+
+
 
 /// Command SHOW --template
 use templater::Templater;
@@ -335,7 +356,7 @@ pub fn config(matches:&ArgMatches){
 
         else if matches.is_present("edit"){
             let editor = matches.value_of("editor")
-                .or( CONFIG.get_path("editor").and_then(|e|e.as_str()));
+                .or( CONFIG.get("editor").and_then(|e|e.as_str()));
             config_edit(&editor); }
 
         else if matches.is_present("default"){ config_show_default(); }
@@ -392,7 +413,7 @@ fn unarchive_project(year:i32, name:&str){
 
 /// Command CONFIG --show
 pub fn config_show(path:&str){
-    println!("{}: {:#?}", path, CONFIG.get_path(&path)
+    println!("{}: {:#?}", path, CONFIG.get(&path)
              .map(|v|v.to_string())
              .unwrap_or_else(||format!("{} not set", path)));
 }

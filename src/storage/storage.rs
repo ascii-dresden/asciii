@@ -4,6 +4,7 @@
 use std::fs;
 use std::fmt;
 use std::ffi::OsStr;
+use std::ops::{Deref, DerefMut};
 use std::path::{Path, PathBuf};
 use std::marker::PhantomData;
 use std::collections::HashMap;
@@ -304,7 +305,7 @@ impl<L:Storable> Storage<L> {
     /// TODO return opened `Project`, no need to reopen
     pub fn search_projects(&self, directory:StorageDir, search_term:&str) -> StorageResult<Vec<L>> {
         trace!("searching for projects by {:?} in {:?}", search_term, directory);
-        let mut project_paths = try!(self.open_project_files(directory));
+        let mut project_paths = try!(self.open_projects(directory));
         let projects = project_paths
             .drain(..)
             .filter(|project| project.matches_search(&search_term.to_lowercase()))
@@ -397,10 +398,9 @@ impl<L:Storable> Storage<L> {
     /// Produces a list of project files.
     pub fn list_project_files(&self, directory:StorageDir) -> StorageResult<Vec<PathBuf>> {
         trace!("listing project files in {:?}-directory", directory);
-        let projects = try!(self.list_project_folders(directory)).iter()
-            .filter_map(|dir| self.get_project_file(dir).ok())
-            .collect();
-        Ok(projects)
+        try!(self.list_project_folders(directory)).iter()
+            .map(|dir| self.get_project_file(dir))
+            .collect()
     }
 
     pub fn filter_project_files<F>(&self, directory:StorageDir, filter:F) -> StorageResult<Vec<PathBuf>>
@@ -415,18 +415,29 @@ impl<L:Storable> Storage<L> {
     }
 
     /// Behaves like `list_project_files()` but also opens projects directly.
-    pub fn open_project_files(&self, directory:StorageDir) -> StorageResult<ProjectList<L>>{
+    pub fn open_projects(&self, directory:StorageDir) -> StorageResult<ProjectList<L>>{
         trace!("OPENING ALL PROJECTS in {:?}-directory", directory);
-        self.list_project_folders(directory)
-            .map(|paths| ProjectList{projects:paths.iter()
-                 .filter_map(|path| match L::open(path){
-                     Ok(project) => Some(project),
-                     Err(err) => {
-                         info!("Erroneous Project: {}\n {:#?}", path.display(), err);
-                         None
-                     }
-                 }).collect::<Vec<L>>()}
-                )
+        match directory {
+            //StorageDir::Year(_) => unimplemented!(),
+            StorageDir::Year(year) => {
+                let mut archived = try!(self.open_projects(StorageDir::Archive(year)));
+                let mut working = try!(self.open_projects(StorageDir::Working));
+                archived.append(working.deref_mut());
+                archived.filter_by_key_val("Year", year.to_string().as_ref());
+                Ok(archived)
+            },
+            _ =>
+                self.list_project_folders(directory)
+                .map(|paths| ProjectList{projects:paths.iter()
+                    .filter_map(|path| match L::open(path){
+                        Ok(project) => Some(project),
+                        Err(err) => {
+                            info!("Erroneous Project: {}\n {:#?}", path.display(), err);
+                            None
+                        }
+                    }).collect::<Vec<L>>()}
+                    )
+        }
     }
 }
 

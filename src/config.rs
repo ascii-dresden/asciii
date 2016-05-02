@@ -74,16 +74,9 @@ impl ConfigReader{
 
 
     /// Returns whatever it finds in that position
-    pub fn get(&self, key:&str) -> Option<&Yaml>{
-        yaml::get(&self.local, &key)
-            .or_else(||yaml::get(&self.custom, &key))
-            .or_else(||yaml::get(&self.defaults, &key))
-    }
-
-    /// Returns whatever it finds in that position
     ///
     /// Supports simple path syntax: `top/middle/child/node`
-    pub fn get_path(&self, path:&str) -> Option<&Yaml>{
+    pub fn get(&self, path:&str) -> Option<&Yaml>{
         yaml::get(&self.local, &path)
             .or_else(||yaml::get(&self.custom, &path))
             .or_else(||yaml::get(&self.defaults, &path))
@@ -119,7 +112,7 @@ impl ConfigReader{
     /// This panics if nothing is found.
     /// You should have a default config for everything that you use.
     pub fn get_bool(&self, key:&str) -> bool {
-        self.get_path(key)
+        self.get(key)
             .and_then(|y|y.as_bool())
             .expect(&format!("Config file {} in field {} does not contain a boolean value", DEFAULT_LOCATION, key))
     }
@@ -140,9 +133,9 @@ fn simple_reading(){
     assert_eq!(config.get("list/colors").unwrap().as_bool().unwrap(),
                config.get_bool("list/colors"));
 
-    assert!(config.get_path(&"dirs").is_some());
-    assert!(config.get_path(&"dirs/storage").is_some());
-    assert!(config.get_path(&"dirs/working").is_some());
-    assert!(config.get_path(&"dirs/storage").is_some());
+    assert!(config.get(&"dirs").is_some());
+    assert!(config.get(&"dirs/storage").is_some());
+    assert!(config.get(&"dirs/working").is_some());
+    assert!(config.get(&"dirs/storage").is_some());
 
 }
