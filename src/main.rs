@@ -62,12 +62,15 @@ fn setup_app(){
      ("path",      Some(sub_m)) => subcommands::show_path(sub_m),
      ("open",      Some(sub_m)) => subcommands::open_path(sub_m),
 
+     //("make",      Some(sub_m)) => subcommands::make_project(sub_m),
+
      ("term",      _          ) => subcommands::term(),
      ("doc",       _          ) => subcommands::doc(),
      ("version",   _          ) => subcommands::version(),
 
      ("remote",    _          ) => subcommands::git_remote(),
      ("pull",      _          ) => subcommands::git_pull(),
+     ("diff",      _          ) => subcommands::git_diff(),
      ("status",    _          ) => subcommands::git_status(),
      ("add",       Some(sub_m)) => subcommands::git_add(&sub_m),
      ("commit",    _          ) => subcommands::git_commit(),

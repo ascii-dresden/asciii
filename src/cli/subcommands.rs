@@ -557,6 +557,14 @@ pub fn git_add(matches:&ArgMatches){
     util::exit(repo.add(&projects));
 }
 
+/// Command DIFF
+pub fn git_diff(){
+    // TODO this doesn't need _with_git
+    let luigi = setup_luigi_with_git();
+    let repo = luigi.repository.unwrap();
+    util::exit(repo.diff())
+}
+
 /// Command PULL
 pub fn git_pull(){
     // TODO this doesn't need _with_git

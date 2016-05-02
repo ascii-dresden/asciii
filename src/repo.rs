@@ -203,6 +203,10 @@ impl Repository {
         self.execute_git("push", &["origin", "master"])
     }
 
+    pub fn diff(&self) -> ExitStatus{
+        self.execute_git("diff", &[])
+    }
+
     pub fn pull(&self) -> ExitStatus{
         self.execute_git("pull", &["origin", "master"])
     }

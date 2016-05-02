@@ -84,7 +84,6 @@ impl<'a> Default for ListConfig<'a>{
             use_colors:   CONFIG.get_bool("list/colors"),
             details:      None,
         }
-
     }
 }
 
