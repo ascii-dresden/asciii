@@ -169,10 +169,11 @@ fn list_projects(dir:StorageDir, list_config:&ListConfig){
     super::sort_by(&mut projects,list_config.sort_by);
 
     // fit screen
-    let wide_enough = match terminal_size() {
-        Some((Width(w), _)) if w >= STATUS_ROWS_WIDTH => true,
-        _ => false
-    };
+    let wide_enough = true;
+    //match terminal_size() {
+    //    Some((Width(w), _)) if w >= STATUS_ROWS_WIDTH => true,
+    //    _ => false
+    //};
 
     if !wide_enough && list_config.mode != ListMode::Csv { // TODO room for improvement
         print_projects(simple_rows(&projects, &list_config));
