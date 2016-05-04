@@ -170,6 +170,7 @@ pub fn setup() -> ArgMatches<'static>{
                          .help("List projects from that year, archived or not")
                          .short("y")
                          .long("year")
+                         .validator(|y| y.parse::<i32>().map(|ok|()).map_err(|e|e.to_string()))
                          .takes_value(true)
                         )
                     )
