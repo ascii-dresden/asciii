@@ -226,6 +226,14 @@ fn list_virtual_fields(){
 }
 
 
+/// Command CSV
+pub fn csv(matches:&ArgMatches){
+    let luigi = setup_luigi();
+    let mut projects = super::execute(||luigi.open_projects(StorageDir::Year(2016)));
+//    projects.sort_by(|pa,pb| pa.date().cmp( &pb.date()));
+    projects.sort_by(|pa,pb| pa.index().unwrap_or("zzzz".to_owned()).cmp( &pb.index().unwrap_or("zzzz".to_owned())));
+    super::print::print_csv(&projects);
+}
 
 
 /// Command EDIT

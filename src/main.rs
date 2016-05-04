@@ -51,6 +51,7 @@ fn setup_app(){
 
     match matches.subcommand() {
      ("list",      Some(sub_m)) => subcommands::list(&sub_m),
+     ("csv",       Some(sub_m)) => subcommands::csv(&sub_m),
      ("new",       Some(sub_m)) => subcommands::new(&sub_m),
      ("edit",      Some(sub_m)) => subcommands::edit(&sub_m),
      ("show",      Some(sub_m)) => subcommands::show(&sub_m),

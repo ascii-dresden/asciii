@@ -92,7 +92,7 @@ fn sort_by(projects:&mut Vec<Project>, option:&str){
         "manager" => projects.sort_by(|pa,pb| pa.manager().cmp( &pb.manager())),
         "date"    => projects.sort_by(|pa,pb| pa.date().cmp( &pb.date())),
         "name"    => projects.sort_by(|pa,pb| pa.name().cmp( &pb.name())),
-        "index"   => projects.sort_by(|pa,pb| pa.index().unwrap_or("zzzz".to_owned()).cmp( &pb.index().unwrap_or("zzzz".to_owned()))), // TODO rename to indent
+        "index"   => projects.sort_by(|pa,pb| pa.index().unwrap_or("zzzz".to_owned()).cmp( &pb.index().unwrap_or("zzzz".to_owned()))), // TODO rename to ident
         _         => projects.sort_by(|pa,pb| pa.index().unwrap_or("zzzz".to_owned()).cmp( &pb.index().unwrap_or("zzzz".to_owned()))),
     }
 }
