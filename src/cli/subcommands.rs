@@ -365,16 +365,19 @@ pub fn unarchive(matches:&ArgMatches){
 }
 
 pub fn config(matches:&ArgMatches){
-        if let Some(path) = matches.value_of("show"){
-            config_show(&path);
-        }
+    if let Some(path) = matches.value_of("show"){
+        config_show(&path);
+    }
+    if matches.is_present("location"){
+        println!("config location: {:?}", config::ConfigReader::path_home())
+    }
 
-        else if matches.is_present("edit"){
-            let editor = matches.value_of("editor")
-                .or( CONFIG.get("editor").and_then(|e|e.as_str()));
-            config_edit(&editor); }
+    else if matches.is_present("edit"){
+        let editor = matches.value_of("editor")
+            .or( CONFIG.get("editor").and_then(|e|e.as_str()));
+        config_edit(&editor); }
 
-        else if matches.is_present("default"){ config_show_default(); }
+    else if matches.is_present("default"){ config_show_default(); }
 }
 
 /// Command ARCHIVE <NAME>
@@ -442,6 +445,7 @@ fn config_edit(editor:&Option<&str>){
 fn config_show_default(){
     println!("{}", config::DEFAULT_CONFIG);
 }
+
 
 /// Command DOC
 pub fn doc(){

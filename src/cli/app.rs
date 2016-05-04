@@ -362,7 +362,6 @@ pub fn setup() -> ArgMatches<'static>{
                          .long("edit")
                         )
 
-
                     .arg(Arg::with_name("show")
                          .help("Show a specific config value")
                          .short("s")
@@ -375,6 +374,13 @@ pub fn setup() -> ArgMatches<'static>{
                          .short("d")
                          .long("default")
                         )
+
+                    .arg(Arg::with_name("location")
+                         .help("Show default config")
+                         .short("l")
+                         .long("location")
+                        )
+
                     )
 
 
