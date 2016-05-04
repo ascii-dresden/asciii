@@ -2,18 +2,24 @@
 //!
 //! This user documentation has been ripped off straight from the [original
 //! README](https://github.com/ascii-dresden/ascii-invoicer/), so please forgive if you find any
-//! mistakes or unimplemented material, please **[write an issue
-//! immediately](https://github.com/hoodie/asciii-rs/issues/new)**.
+//! mistakes or unimplemented material,
+//! please **[file an issue immediately](https://github.com/hoodie/asciii-rs/issues/new)**.
 //!
 //! # ascii invoicer
 //!
 //! ## Introduction
 //!
-//! The ascii-invoicer is a command-line tool that manages projects and stores them not in a database but in a folder structure. New projects can be created from templates and are stored in a working directory. Projects can be archived, each year will have its own archive. A project consists of a folder containing a yaml file describing it and a number of attached files, such tex files. Projects can contain products and personal. You can create preliminary offers and invoices from your projects.
+//! The ascii-invoicer is a command-line tool that manages projects and stores them not in a database but in folders.
+//! New projects can be created from templates and are stored in the working directory.
+//! Projects can be archived, each year will have its own archive.
+//! A project consists of a folder containing a yaml file describing it and a number of attached files,
+//! such tex files.
+//! Projects can contain products and personal.
+//! You can create preliminary offers and invoices from your projects.
 //!
 //! ## Installation
 //!
-//! ...
+//! Get a current binary from github (TODO) or [build](#building) it for your platform.
 //!
 //! ## Usage
 //!
@@ -25,7 +31,7 @@
 //! ```bash
 //! asciii help [COMMAND]                # Describe available commands or one specific command
 //! asciii list                          # List current Projects
-//! asciii display NAMES                 # Shows information about a project in different ways
+//! asciii show NAMES                    # Shows information about a project in different ways
 //! ```
 //!
 //! ### Project Life-Cycle
@@ -33,8 +39,8 @@
 //! ```bash
 //! asciii new NAME                      # Creating a new project
 //! asciii edit NAMES                    # Edit project
-//! asciii offer NAMES                   # Create an offer from project
-//! asciii invoice NAMES                 # Create an invoice from project
+// asciii offer NAMES                   # Create an offer from project
+// asciii invoice NAMES                 # Create an invoice from project
 //! asciii archive NAME                  # Move project to archive
 //! asciii unarchive YEAR NAME           # reopen an archived project
 //! ```
@@ -43,11 +49,10 @@
 //!
 //! ```bash
 //! asciii add NAMES
-//! asciii commit -m, --message=MESSAGE
-//! asciii log
+//! asciii commit
 //! asciii pull
 //! asciii push
-//! asciii status
+//! asciii status, log, diff
 //! ```
 //!
 //! These commands behave similar to the original git commands.
@@ -147,12 +152,12 @@
 //!
 //! ## Pro tips
 //!
-// 1. Check out `repl ascii`!
-// You should copy [repl-file](src/repl/ascii) into ~/.repl/ascii and install rlwrap to take advantage of all the repl goodness such as autocompletion and history.
-//
-// 2. Check out `xclip`!
-// You can pipe the output of `ascii show` or `ascii show --csv` to xclip and paste to your email program or into a spreadsheet tool like libreoffice calc.
-//
+//! 1. Check out `repl asciii`!
+//! You should copy [repl-file](src/repl/ascii) into ~/.repl/ascii and install rlwrap to take advantage of all the repl goodness such as autocompletion and history.
+//!
+//! 2. Check out `xclip`!
+//! You can pipe the output of `ascii show` or `ascii show --csv` to xclip and paste to your email program or into a spreadsheet tool like libreoffice calc.
+//!
 //!
 //! ## Known Issues
 //!
@@ -161,23 +166,16 @@
 //! The `"&"` causes latex to fail, `\&"` bugs the yaml parser but `"\\&"` will do the trick.
 //!
 //!
-//! # Building
+//! # Installation
 //!
-// ```bash
-// # lets install building dependencies
-// cd src
-// gem install bundler # if you don't already have it
-// bundle install # pulls all building dependencies
-// # actually now you're done
-//
-// # after you made your own changes
-// rake install # installs the gem
-// rake gem # builds the gem
-//
-// # that's it
-// ```
-//
 //! ## Dependencies
 //!
-// * rvm works best, otherwise I have not tested installing it anywhere else
-// * a lot of latex packages to run the offer/invoice export
+//! * rustc ≥ 1.5.0 
+//! * cargo
+//! * linux, mac osx, windows7+
+//!
+//! # Building
+//! Just run `cargo build --release`, and copy the resulting `target/release/asciii` binary into your $PATH somewhere .
+//!
+//! 
+//!
