@@ -411,6 +411,12 @@ pub fn setup() -> ArgMatches<'static>{
                          .long("archive")
                          .takes_value(true)
                         )
+                    .arg(Arg::with_name("template")
+                         .help("A a template")
+                         .short("t")
+                         .long("template")
+                        )
+
                    )
         .subcommand(SubCommand::with_name("commit")
                     .help("Save changes locally")

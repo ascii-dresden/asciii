@@ -561,19 +561,38 @@ pub fn git_add(matches:&ArgMatches){
     debug!("adding {:?}", search_terms);
 
 
-    let dir = if let Some(archive) = matches.value_of("archive"){
-        StorageDir::Archive(archive.parse::<i32>().unwrap())
-    } else {
-        StorageDir::Working
-    };
+    if matches.is_present("template"){
+        let template_paths = super::execute(||luigi.list_template_files())
+            .iter()
+            .filter(|f|{
+                let stem = f.file_stem()
+                    .and_then(OsStr::to_str)
+                    .unwrap_or("");
+                search_terms.contains(&stem)
+            })
+        .cloned()
+            .collect::<Vec<PathBuf>>();
+        let repo = luigi.repository.unwrap();
+        util::exit(repo.add(&template_paths));
+    }
 
-    let projects = luigi.search_multiple_projects(dir, &search_terms)
-        .unwrap()
-        .iter()
-        .map(|project|project.dir())
-        .collect::<Vec<PathBuf>>();
-    let repo = luigi.repository.unwrap();
-    util::exit(repo.add(&projects));
+    else {
+
+        let dir = if let Some(archive) = matches.value_of("archive"){
+            StorageDir::Archive(archive.parse::<i32>().unwrap())
+        } else {
+            StorageDir::Working
+        };
+
+        let projects = luigi.search_multiple_projects(dir, &search_terms)
+            .unwrap()
+            .iter()
+            .map(|project|project.dir())
+            .collect::<Vec<PathBuf>>();
+
+        let repo = luigi.repository.unwrap();
+        util::exit(repo.add(&projects));
+    }
 }
 
 /// Command DIFF
