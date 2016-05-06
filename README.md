@@ -28,6 +28,11 @@ Use `cargo build --features debug` to enable debug prints, this is sorta depreca
 ### Release
 To build a release ready version use `cargo build --release`.
 
+### Chores
+
+* `cargo build` and `cargo test` against every new rustc
+* run `cargo outdated` regurlarly
+
 
 ## Logging
 
@@ -39,14 +44,15 @@ Modules are all top-level files and folders in `src/`.
 
 ## Technical TODO
 
-* [ ] test on windows and mac (https://github.com/japaric/rust-everywhere)
+* [ ] setup CI
+    * [ ] test on windows and mac (https://github.com/japaric/rust-everywhere)
 * [x] build on Raspberry Pi
 * [ ] see if you can `#[inline]` to improve perfomance
 * [ ] break up code into crates
-  * [ ] config
-  * [ ] yaml helpers macro-DSL
-  * [ ] templating
-  * [ ] utilities etc
+    * [ ] config
+    * [ ] yaml helpers macro-DSL
+    * [ ] templating
+    * [ ] utilities etc
 
 ### make use if these crates (optional)
 
@@ -61,6 +67,8 @@ Modules are all top-level files and folders in `src/`.
 * open
 * notify-rust
 * colored
+* strsim
+
 
 ## Side Effects
 

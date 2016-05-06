@@ -8,30 +8,34 @@ build = "build.rs"
 
 [dependencies]
 
-log = "*"
-env_logger = "*"
+log = "0.3"
+env_logger = "0.3"
 yaml-rust = {git="https://github.com/hoodie/yaml-rust", branch="feature/to_string"}
-chrono = "*"
-regex = "*"
-lazy_static = "*"
-maplit = "*"
+chrono = "0.2"
+regex = "0.1"
+lazy_static = "0.2"
+maplit = "0.1"
 clap = "2"
-enum_derive = "*"
-custom_derive = "*"
-clippy = {version = "*", optional = true}
+enum_derive = "0.1"
+custom_derive = "0.1"
 currency = {git="https://github.com/hoodie/rust-lang-currency"}
-open = "*"
+open = "1.1"
 
-slug = "*"
-tempdir = "*"
+slug = "0.1"
+tempdir = "0.3"
 
-term = "*"
+term = "0.4"
 terminal_size = "0.1.1" # TODO consider termsize or others
-prettytable-rs = "*"
+prettytable-rs = "0.6"
+
+# feature: lints
+clippy = {version = "*", optional = true}
 
 # feature: document_export
 handlebars = {version = "*", optional = true}
+serde = { version = "*", optional = true }
 serde_json = { version = "^0.7.0", optional = true }
+rustc-serialize = {version = "*", optional = true }
 
 # feature: git_statuses
 git2 = {version = "*", default-features= false, optional = true}
@@ -40,7 +44,7 @@ git2 = {version = "*", default-features= false, optional = true}
 
 [features]
 default = ["git_statuses"]
-document_export = ["handlebars","serde_json"]
+document_export = ["handlebars","serde","serde_json","rustc-serialize"]
 debug_config = []
 git_statuses = ["git2"]
 nightly = []
