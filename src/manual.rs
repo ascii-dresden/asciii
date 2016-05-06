@@ -66,7 +66,7 @@
 //!
 //! Personal advice N°1: use `git pull --rebase`
 //!
-//! Personal advice N°2: add this to your .bash_aliases:
+//! Personal advice N°2: add this to your `.bash_aliases`:
 //! `alias agit="git --git-dir=$(ascii path)/.git --work-tree=$(ascii path)"`
 //!
 //! ### More Details

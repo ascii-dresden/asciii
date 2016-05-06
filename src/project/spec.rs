@@ -1,3 +1,5 @@
+//! Implements the ascii invoicer project file specification.
+
 #![allow(dead_code)]
 #![allow(unused_imports)]
 

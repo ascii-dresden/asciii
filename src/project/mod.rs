@@ -1,3 +1,7 @@
+//! Project file parsing and evaluation.
+//!
+//! This module implements all functionality of a project.
+
 #![allow(unused_variables)]
 #![allow(dead_code)]
 
@@ -135,9 +139,7 @@ impl Storable for Project{
 
     /// Checks against a certain key-val pair.
     fn matches_filter(&self, key: &str, val: &str) -> bool{
-        self.get(key).map(|c|{
-            c.to_lowercase().contains(&val.to_lowercase())
-        }).unwrap_or(false)
+        self.get(key).map_or(false, |c| c.to_lowercase().contains(&val.to_lowercase()))
     }
 
     /// UNIMPLEMENTED: Checks against a certain search term.
@@ -145,7 +147,7 @@ impl Storable for Project{
     /// TODO compare agains InvoiceNumber, ClientFullName, Email, event/name, invoice/official Etc
     fn matches_search(&self, term: &str) -> bool{
         let search = term.to_lowercase();
-        self.invoice_num().map(|num|num.to_lowercase().contains(&search)).unwrap_or(false)
+        self.invoice_num().map_or(false, |num|num.to_lowercase().contains(&search))
         ||
         self.name().to_lowercase().contains(&search)
     }
@@ -156,7 +158,7 @@ impl Project{
     pub fn yaml(&self) -> &Yaml{ &self.yaml }
 
     /// wrapper around yaml::get() with replacement
-    pub fn get<'a>(&self, path:&str) -> Option<String>{
+    pub fn get(&self, path:&str) -> Option<String>{
         VirtualField::from(path).get(self).or_else(||
             yaml::get_as_string(self.yaml(),path)
         )

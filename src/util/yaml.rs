@@ -138,7 +138,7 @@ pub fn get_bool(yaml:&Yaml, key:&str) -> Option<bool> {
 
 /// Gets a `Float` value.
 ///
-/// Also takes a Yaml::I64 and reinterprets it.
+/// Also takes a `Yaml::I64` and reinterprets it.
 pub fn get_f64(yaml:&Yaml, key:&str) -> Option<f64> {
     get(&yaml,&key).and_then(|y| y.as_f64().or( y.as_i64().map(|y|y as f64)))
 }
@@ -157,14 +157,14 @@ pub fn get_str<'a>(yaml:&'a Yaml, key:&str) -> Option<&'a str> {
     get(&yaml,&key).and_then(|y|y.as_str())
 }
 
-/// same as get_str(), but owned.
+/// same as `get_str()`, but owned.
 pub fn get_string(yaml:&Yaml, key:&str) -> Option<String> {
-    get_str(&yaml,&key).map(|s|s.to_owned())
+    get_str(&yaml,&key).map(ToOwned::to_owned)
 }
 
 /// Gets anything **as** `String`.
 pub fn get_as_string(yaml:&Yaml, key:&str) -> Option<String> {
-    get(&yaml,&key).map(|y|y.to_string())
+    get(&yaml,&key).map(ToString::to_string)
 }
 
 /// Gets a Date in `dd.mm.YYYY` format.
@@ -178,7 +178,7 @@ pub fn get_dmy(yaml:&Yaml, key:&str) -> Option<Date<UTC>> {
 /// and replaces `Yaml::Null` and `Yaml::BadValue`.
 pub fn get<'a>(yaml:&'a Yaml, key:&str) -> Option<&'a Yaml>{
     match get_path(&yaml, &key.split('/').filter(|k|!k.is_empty()).collect::<Vec<&str>>()) {
-        Some(&Yaml::Null) => None,
+        Some(&Yaml::Null) |
         Some(&Yaml::BadValue) => None,
         content => content
     }

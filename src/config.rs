@@ -20,7 +20,7 @@ use util::yaml::{Yaml, YamlError};
 /// Name of the configfile
 pub const DEFAULT_LOCATION: &'static str = ".asciii.yml";
 
-/// Looks for a configuration yaml in your HOME_DIR
+/// Looks for a configuration yaml in your `HOME_DIR`
 #[derive(Debug)]
 pub struct ConfigReader{
     /// Path of config file
@@ -119,7 +119,7 @@ impl ConfigReader{
 
 }
 
-/// Default configuration that will be used if a value is not set in yaml file at DEFAULT_LOCATION
+/// Default configuration that will be used if a value is not set in yaml file at `DEFAULT_LOCATION`
 pub const DEFAULT_CONFIG: &'static str = include_str!("./default_config.yml");
 
 #[test]

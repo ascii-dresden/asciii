@@ -45,7 +45,7 @@ pub fn open_in_editor(editor:&Option<&str>, paths:&[PathBuf]){
         assert!(Path::new(&path).exists());
     }
 
-    if let &Some(ref editor) = editor{
+    if let Some(ref editor) = *editor{
         let editor_config = editor
             .split_whitespace()
             .collect::<Vec<&str>>();

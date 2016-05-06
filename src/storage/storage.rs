@@ -135,11 +135,10 @@ impl<L:Storable> Storage<L> {
     /// Produces a list of names of all template filess in the `templates_dir()`
     pub fn list_template_names(&self) -> StorageResult<Vec<String>> {
         trace!("listing template names");
-        let template_names =
-        try!(self.list_template_files()).iter()
+        let template_names = try!(self.list_template_files()).iter()
             .filter_map(|p|p.file_stem())
-            .filter_map(|n|n.to_str())
-            .map(|s|s.to_owned())
+            .filter_map(OsStr::to_str)
+            .map(ToOwned::to_owned)
             .collect();
         Ok(template_names)
     }
@@ -168,7 +167,7 @@ impl<L:Storable> Storage<L> {
             try!(self.list_archives())
             .iter()
             .filter_map(|p| p.file_stem())
-            .filter_map(|p| p.to_str())
+            .filter_map(OsStr::to_str)
             .filter_map(|year_str| year_str.parse::<Year>().ok())
             .collect();
         years.sort();
@@ -280,9 +279,8 @@ impl<L:Storable> Storage<L> {
         // must be in a dir that parses into a year
         let parent_is_num =  archived_dir.parent()
             .and_then(|p| p.file_stem())
-            .and_then(|p| p.to_str())
-            .map(|s| s.parse::<i32>().is_ok() )
-            .unwrap_or(false);
+            .and_then(OsStr::to_str)
+            .map_or(false, |s| s.parse::<i32>().is_ok());
 
         let name = try!(self.get_project_name(archived_dir));
         let target = self.working_dir().join(&name);
@@ -348,7 +346,7 @@ impl<L:Storable> Storage<L> {
         trace!("getting project file from {:?}", directory);
         try!(list_path_content(directory)).iter()
             .filter(|f|f.extension().unwrap_or(&OsStr::new("")) == L::file_extension())
-            .nth(0).map(|b|b.to_owned())
+            .nth(0).map(ToOwned::to_owned)
             .ok_or(StorageError::ProjectDoesNotExist)
     }
 

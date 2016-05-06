@@ -227,7 +227,7 @@ pub fn dynamic_rows(projects:&[Project], list_config:&ListConfig, _repo:Option<R
 /// Prints Projects Rows
 ///
 /// This doesn't do much, except taking a Vec of Rows and printing it,
-/// the interesting code is in dynamic_rows, verbose_rows, path_rows or simple_rows.
+/// the interesting code is in `dynamic_rows()`, `verbose_rows()`, `path_rows()` or `simple_rows()`.
 /// This Documentations is redundant, infact, it is already longer than the function itself.
 pub fn print_projects(rows:Vec<Row>){
     trace!("starting table print");
@@ -240,10 +240,6 @@ pub fn print_projects(rows:Vec<Row>){
 }
 
 /// Prints Projects as CSV
-///
-/// This doesn't do much, except taking a Vec of Rows and printing it,
-/// the interesting code is in dynamic_rows, verbose_rows, path_rows or simple_rows.
-/// This Documentations is redundant, infact, it is already longer than the function itself.
 pub fn print_csv(projects:&[Project]){
     // TODO print head
     let splitter = ";";

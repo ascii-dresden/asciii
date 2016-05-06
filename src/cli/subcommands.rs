@@ -63,10 +63,10 @@ pub fn new(matches:&ArgMatches){
 }
 
 fn decide_mode(simple:bool, verbose:bool, paths:bool,nothing:bool, csv:bool) -> ListMode{
-    if csv{     ListMode::Csv } else
-    if nothing{ ListMode::Nothing } else
-    if paths{   ListMode::Paths } else
-    {
+    if csv{     ListMode::Csv }
+    else if nothing{ ListMode::Nothing }
+    else if paths{   ListMode::Paths }
+    else {
         match (simple, verbose, CONFIG.get_bool("list/verbose")){
             (false, true,  _   ) => {debug!("-v overwrites config"); ListMode::Verbose },
             (false,    _, true ) => {debug!("-v from config");ListMode::Verbose},

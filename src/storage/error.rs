@@ -1,6 +1,6 @@
 //! Error that may occur in Storage
 //!
-//!TODO implement Display for StorageError or use Quickerror
+//TODO implement Display for StorageError or use Quickerror
 use std::io;
 use std::fmt;
 use std::error::Error;

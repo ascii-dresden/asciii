@@ -24,7 +24,7 @@ pub fn fail<T:Display>(message:T) -> !{
     exit(1);
 }
 
-/// Execute a command returning a StorageError
+/// Execute a command returning a `StorageError`
 /// TODO make this a `try!` like macro
 fn execute<F, S>(command:F) -> S where F: FnOnce() -> StorageResult<S> {
     match command(){
@@ -33,7 +33,7 @@ fn execute<F, S>(command:F) -> S where F: FnOnce() -> StorageResult<S> {
     }
 }
 
-/// Sets up an instance of Storage.
+/// Sets up an instance of `Storage`.
 fn setup_luigi() -> Storage<Project> {
     let working = CONFIG.get_str("dirs/working")
                 .expect("Faulty config: dirs/working does not contain a value");
@@ -44,7 +44,7 @@ fn setup_luigi() -> Storage<Project> {
     execute(|| Storage::new(util::get_storage_path(), working, archive, templates))
 }
 
-/// Sets up an instance of Storage, with git turned on.
+/// Sets up an instance of `Storage`, with git turned on.
 fn setup_luigi_with_git() -> Storage<Project> {
     let working = CONFIG.get_str("dirs/working")
                 .expect("Faulty config: dirs/working does not contain a value");
