@@ -73,14 +73,8 @@ impl VirtualField{
 }
 
 //TODO there may be cases where an f64 can't be converted into Currency
-fn to_currency(f:f64) -> Currency {
-    Currency::from_string(&format!("{:.*}", 2, f))
-        .map_or( Currency(Some('€'), 0),
-        |mut cur| {
-            cur.0 = Some('€');
-            cur
-        }
-        )
+fn to_currency(f:f64) -> Option<Currency> {
+    Currency::new().symbol('€').coin(f)
 }
 
 fn field_exists<'a>(yaml:&Yaml, paths:&[&'a str]) -> Vec<&'a str>{
@@ -371,7 +365,7 @@ pub mod hours {
     use super::to_currency;
 
     pub fn salary(yaml:&Yaml) -> Option<Currency>{
-        yaml::get_f64(yaml, "hours/salary").map(to_currency)
+        yaml::get_f64(yaml, "hours/salary").and_then(to_currency)
     }
 
     pub fn total(yaml:&Yaml) -> Option<f64> {
@@ -426,8 +420,7 @@ pub mod products{
                 Ok(Product{
                     name:  yaml::get_str(desc, "name").unwrap_or("unnamed"),
                     unit:  yaml::get_str(desc, "unit"),
-                    price: yaml::get_f64(desc, "price")
-                        .map(to_currency).unwrap(),
+                    price: yaml::get_f64(desc, "price").and_then(to_currency).unwrap(),
                     tax:   yaml::get_f64(desc, "tax").unwrap_or(default_tax),
                 })
             },
@@ -436,7 +429,7 @@ pub mod products{
                     name:  name,
                     unit:  yaml::get_str(values, "unit"),
                     price: yaml::get_f64(values, "price")
-                        .map(to_currency).unwrap(),
+                        .and_then(to_currency).unwrap(),
                     tax:   yaml::get_f64(values, "tax").unwrap_or(default_tax),
                 })
             }
@@ -501,14 +494,14 @@ pub mod products{
 
     pub fn sum_offered(items:&[InvoiceItem]) -> Currency{
         items.iter()
-             .fold(Currency(Some('€'), 0),
-             |acc, item| acc + item.item.price * item.amount_offered)
+             .fold(Currency::from_str("1.00€").unwrap(),
+             |acc, item| acc + &item.item.price * item.amount_offered)
     }
 
     pub fn sum_sold(items:&[InvoiceItem]) -> Currency{
         items.iter()
-             .fold(Currency(Some('€'), 0),
-             |acc, item| acc + item.item.price * item.amount_sold)
+             .fold(Currency::from_str("1.00€").unwrap(),
+             |acc, item| acc + &item.item.price * item.amount_sold)
     }
 
 }
