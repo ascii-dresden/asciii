@@ -8,23 +8,25 @@
 
 #[cfg(feature = "nightly")]
 extern crate alloc_system;
-
-#[macro_use] extern crate log;
-#[macro_use] extern crate clap;
+extern crate chrono;
+extern crate term; // TODO consolidate term, ansi_term and terminal_size
+extern crate terminal_size;
+extern crate open;
 
 extern crate env_logger;
-extern crate open;
-extern crate yaml_rust;
-extern crate asciii;
+#[macro_use] extern crate log;
+#[macro_use] extern crate clap;
+#[macro_use] extern crate prettytable;
 
+extern crate asciii;
 
 use std::env;
 
 use log::{LogRecord, LogLevelFilter};
 use env_logger::LogBuilder;
 
-use asciii::cli;
-use asciii::cli::subcommands;
+mod cli;
+use cli::subcommands;
 
 fn setup_log(){
     let format = |record: &LogRecord| {

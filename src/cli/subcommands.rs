@@ -6,12 +6,17 @@ use std::collections::HashMap;
 use clap::ArgMatches;
 use open;
 
-use config;
-use ::CONFIG;
 use terminal_size::{Width, terminal_size }; // TODO replace with other lib
-use storage::*;
-use project::Project;
-use util;
+
+use asciii::CONFIG;
+use asciii::config;
+use asciii::util;
+use asciii::version as asciii_version;
+use asciii::storage::*;
+use asciii::templater::Templater;
+use asciii::project::Project;
+use asciii::project::spec::VirtualField;
+
 use super::{print,setup_luigi, setup_luigi_with_git, fail};
 use super::{ListConfig, ListMode};
 
@@ -221,7 +226,6 @@ fn list_years(){
 
 /// Command LIST --virt
 fn list_virtual_fields(){
-    use ::project::spec::VirtualField;
     println!("{:?}", VirtualField::iter_variant_names().filter(|v|*v!="Invalid").collect::<Vec<&str>>());
 }
 
@@ -244,24 +248,23 @@ pub fn csv(matches:&ArgMatches){
 
 /// Command EDIT
 pub fn edit(matches:&ArgMatches) {
+    let search_term = matches.value_of("search_term").unwrap();
+    let search_terms = matches.values_of("search_term").unwrap().collect::<Vec<&str>>();
 
-        let search_term = matches.value_of("search_term").unwrap();
-        let search_terms = matches.values_of("search_term").unwrap().collect::<Vec<&str>>();
+    let editor = matches.value_of("editor")
+        .or( CONFIG.get("editor").and_then(|e|e.as_str()));
 
-        let editor = matches.value_of("editor")
-            .or( CONFIG.get("editor").and_then(|e|e.as_str()));
+    if matches.is_present("template"){
+        edit_template(search_term, &editor);
 
-        if matches.is_present("template"){
-            edit_template(search_term, &editor);
-
+    } else {
+        if let Some(archive) = matches.value_of("archive"){
+            let archive = archive.parse::<i32>().unwrap();
+            edit_projects(StorageDir::Archive(archive), &search_terms, &editor);
         } else {
-            if let Some(archive) = matches.value_of("archive"){
-                let archive = archive.parse::<i32>().unwrap();
-                edit_projects(StorageDir::Archive(archive), &search_terms, &editor);
-            } else {
-                edit_projects(StorageDir::Working, &search_terms, &editor);
-            }
+            edit_projects(StorageDir::Working, &search_terms, &editor);
         }
+    }
 }
 
 fn edit_projects(dir:StorageDir, search_terms:&[&str], editor:&Option<&str>){
@@ -342,7 +345,6 @@ fn show_project(dir:StorageDir, search_term:&str){
 
 
 /// Command SHOW --template
-use templater::Templater;
 fn show_template(name:&str){
     let luigi = setup_luigi();
     let templater = Templater::from_file(&luigi.get_template_file(name).unwrap()).unwrap();
@@ -454,7 +456,7 @@ pub fn doc(){
 
 /// Command VERSION
 pub fn version(){
-    println!("{}", ::version());
+    println!("{}", asciii_version());
 }
 
 /// Command TERM

@@ -19,7 +19,23 @@
 //!
 //! ## Installation
 //!
-//! Get a current binary from github (TODO) or [build](#building) it for your platform.
+//! Get a current binary from github (TODO) or build it for your platform.
+//!
+//! ### DIY Building
+//!
+//! * rustc ≥ 1.5.0
+//! * cargo
+//! * optionally: for full feature completeness you also need everything to build libgit2 and libssl2
+//!
+//! ### Requirements
+//!
+//! * linux, mac osx, windows7+
+//! * git for sync
+//! * pdflatex/xelatex to produce documents
+//! * an editor that can highlight yaml
+//!
+//! Just run `cargo build --release`, and copy the resulting `target/release/asciii` binary into your $PATH somewhere .
+//!
 //!
 //! ## Usage
 //!
@@ -166,16 +182,6 @@
 //! The `"&"` causes latex to fail, `\&"` bugs the yaml parser but `"\\&"` will do the trick.
 //!
 //!
-//! # Installation
 //!
-//! ## Dependencies
 //!
-//! * rustc ≥ 1.5.0 
-//! * cargo
-//! * linux, mac osx, windows7+
-//!
-//! # Building
-//! Just run `cargo build --release`, and copy the resulting `target/release/asciii` binary into your $PATH somewhere .
-//!
-//! 
 //!

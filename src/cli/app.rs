@@ -1,4 +1,4 @@
-use ::version;
+use asciii::version;
 use super::validators;
 use clap::{App, AppSettings, Arg, ArgMatches, SubCommand};
 

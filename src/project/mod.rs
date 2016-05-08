@@ -53,7 +53,7 @@ impl Storable for Project{
 
         // fill template with these values
         let default_fill = hashmap!{
-            "VERSION"       => crate_version!().to_owned(),
+            "VERSION"       => ::version(),
             "TEMPLATE"      => template_name.to_owned(),
             "PROJECT-NAME"  => project_name.to_owned(),
             "DATE-EVENT"    => event_date,

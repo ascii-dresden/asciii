@@ -9,9 +9,9 @@ use term::{Attr, color};
 
 use super::ListConfig;
 
-use project::Project;
-use storage::Storable;
-use repo::Repository;
+use asciii::project::Project;
+use asciii::storage::Storable;
+use asciii::repo::Repository;
 
 //TODO construct table rows way more dynamically
 

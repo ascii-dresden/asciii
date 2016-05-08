@@ -6,10 +6,11 @@
 
 use std::process::exit;
 use std::fmt::Display;
-use project::Project;
-use storage::*;
-use util;
-use ::CONFIG;
+
+use asciii::project::Project;
+use asciii::storage::*;
+use asciii::util;
+use asciii::CONFIG;
 
 /// Contains concrete implementation of each subcommand
 pub mod app;
@@ -98,8 +99,10 @@ fn sort_by(projects:&mut Vec<Project>, option:&str){
 }
 
 pub mod validators{
+    use asciii::util::yaml::parse_dmy_date;
+
     pub fn is_dmy(val: String) -> Result<(),String>{
-        match ::util::yaml::parse_dmy_date(&val){
+        match parse_dmy_date(&val){
             Some(_) => Ok(()),
             None => Err(String::from("Date Format must be DD.MM.YYYY")),
         }

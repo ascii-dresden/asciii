@@ -31,7 +31,7 @@ To build a release ready version use `cargo build --release`.
 ### Chores
 
 * `cargo build` and `cargo test` against every new rustc
-* run `cargo outdated` regurlarly
+* run `cargo outdated` regularly
 
 
 ## Logging
