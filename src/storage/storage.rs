@@ -417,6 +417,7 @@ impl<L:Storable> Storage<L> {
         match directory {
             //StorageDir::Year(_) => unimplemented!(),
             StorageDir::Year(year) => {
+                // recursive :D
                 let mut archived = try!(self.open_projects(StorageDir::Archive(year)));
                 let mut working = try!(self.open_projects(StorageDir::Working));
                 archived.append(working.deref_mut());
@@ -425,17 +426,44 @@ impl<L:Storable> Storage<L> {
             },
             _ =>
                 self.list_project_folders(directory)
-                .map(|paths| ProjectList{projects:paths.iter()
-                    .filter_map(|path| match L::open(path){
-                        Ok(project) => Some(project),
-                        Err(err) => {
-                            info!("Erroneous Project: {}\n {:#?}", path.display(), err);
-                            None
-                        }
-                    }).collect::<Vec<L>>()}
-                    )
+                .map(|paths| ProjectList{
+                    projects:paths.iter()
+                        .filter_map(|path|self.open_project(path))
+                        .collect::<Vec<L>>()
+                }
+                )
         }
     }
+
+    #[cfg(not(feature="git_statuses"))]
+    fn open_project(&self, path:&PathBuf) -> Option<L>{
+        match L::open(path) {
+            Ok(project) => Some(project) ,
+            Err(err) => {
+                warn!("Erroneous Project: {}\n {:#?}", path.display(), err);
+                None
+            }
+        }
+    }
+
+
+    #[cfg(feature="git_statuses")]
+    fn open_project(&self, path:&PathBuf) -> Option<L>{
+        match L::open(path) {
+            Ok(mut project) => {
+                if let Some(ref repo) = self.repository{
+                    project.set_git_status(repo.get_status(path));
+                }
+                Some(project) // "return"
+            },
+            Err(err) => {
+                warn!("Erroneous Project: {}\n {:#?}", path.display(), err);
+                None
+            }
+        }
+    }
+
+
 }
 
 impl<P:Storable> fmt::Debug for Storage<P>{

@@ -7,6 +7,7 @@ use std::collections::HashMap;
 use chrono::{Date, UTC, Datelike};
 
 use super::StorageResult;
+use super::repo::GitStatus;
 
 pub type FilePath = Path;
 pub type FolderPath = Path;
@@ -37,6 +38,16 @@ pub trait Storable{
 
     /// Sets the project File
     fn set_file(&mut self, new_file:&Path);
+
+    /// Tell a project its own git status after opening
+    ///
+    /// This depoends on the feature `git_statuses`
+    fn set_git_status(&mut self, GitStatus){}
+
+    /// Ask a project for its gitstatus
+    ///
+    /// This depoends on the feature `git_statuses`
+    fn get_git_status(&self) -> GitStatus{GitStatus::Unknown}
 
     /// Main Projectfile extension
     fn file_extension() -> &'static str {"PROJECT"}

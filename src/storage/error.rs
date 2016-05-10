@@ -13,7 +13,7 @@ use templater::TemplateError;
 use util::yaml::YamlError;
 
 #[cfg(not(feature="git_statuses"))]
-use repo::GitError;
+use super::repo::GitError;
 
 /// Error that may occur in Storage
 #[derive(Debug)]

@@ -9,7 +9,6 @@ use term::{Attr, color};
 
 use project::Project;
 use storage::Storable;
-use storage::repo::Repository;
 
 //TODO construct table rows way more dynamically
 
@@ -130,26 +129,25 @@ pub fn simple_rows(projects:&[Project], list_config:&ListConfig) -> Vec<Row>{
 ///
 /// produces the rows used in `print_projects()`
 #[inline]
-pub fn verbose_rows(projects:&[Project], list_config:&ListConfig, repo:Option<Repository>) -> Vec<Row>{
+pub fn verbose_rows(projects:&[Project], list_config:&ListConfig) -> Vec<Row>{
     projects.iter().enumerate()
         .map(|(i, project)| {
             //trace!("configuring row: {:?}", project.name());
             let row_style = if list_config.use_colors {project_to_style(&project)}else{""};
             let mut cells = Vec::new();
 
-            if let Some(ref repo) = repo{
-                // TODO how can we illustrate that a project has been removed? what about a red x
-                // for every project that was just moved to the archive?
-                // Or just git-add them when archiving automatically, that is what ascii2 would
-                // have done
-                let status = repo.get_status(&project.dir());
-                let (color, style) = status.to_style();
+            // TODO how can we illustrate that a project has been removed? what about a red x
+            // for every project that was just moved to the archive?
+            // Or just git-add them when archiving automatically, that is what ascii2 would
+            // have done
+            let status = project.get_git_status();
+            let (color, style) = status.to_style();
 
-                cells.push( Cell::new( &status.to_string() )
-                            .with_style( Attr::ForegroundColor(color) )
-                            .with_style( style.unwrap_or(Attr::Standout(false)) )
-                            );
-            };
+            cells.push( Cell::new( &status.to_string() )
+                        .with_style( Attr::ForegroundColor(color) )
+                        .with_style( style.unwrap_or(Attr::Standout(false)) )
+                      );
+
 
             let validation1 = project.valid_stage1();
             let validation2 = project.valid_stage2();
@@ -221,7 +219,7 @@ pub fn verbose_rows(projects:&[Project], list_config:&ListConfig, repo:Option<Re
 /// Triggered by `list --nothing`
 ///
 /// This prints nothing unless you tell it to with `--details`
-pub fn dynamic_rows(projects:&[Project], list_config:&ListConfig, _repo:Option<Repository>) -> Vec<Row>{
+pub fn dynamic_rows(projects:&[Project], list_config:&ListConfig) -> Vec<Row>{
     projects
         .iter()
         .map(|project| {

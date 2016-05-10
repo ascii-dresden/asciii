@@ -6,8 +6,6 @@ use std::collections::HashMap;
 use clap::ArgMatches;
 use open;
 
-use terminal_size::{Width, terminal_size }; // TODO replace with other lib
-
 use asciii::CONFIG;
 use asciii::config;
 use asciii::util;
@@ -25,9 +23,6 @@ use asciii::print::{ListConfig, ListMode};
 //print_projects,print_csv};
 
 // TODO refactor this into actions module and actual, short subcommands
-
-// TODO keep this up to date or find a way to make this dynamic
-const STATUS_ROWS_WIDTH:u16 = 96;
 
 /// Create NEW Project
 pub fn new(matches:&ArgMatches){
@@ -195,8 +190,8 @@ fn list_projects(dir:StorageDir, list_config:&ListConfig){
             ListMode::Csv     => print::print_csv(&projects),
             ListMode::Paths   => print::print_projects(print::path_rows(&projects, &list_config)),
             ListMode::Simple  => print::print_projects(print::simple_rows(&projects, &list_config)),
-            ListMode::Verbose => print::print_projects(print::verbose_rows(&projects,&list_config,luigi.repository)),
-            ListMode::Nothing => print::print_projects(print::dynamic_rows(&projects,&list_config,luigi.repository)),
+            ListMode::Verbose => print::print_projects(print::verbose_rows(&projects,&list_config)),
+            ListMode::Nothing => print::print_projects(print::dynamic_rows(&projects,&list_config)),
         }
     }
 }

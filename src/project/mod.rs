@@ -18,6 +18,7 @@ use currency::Currency;
 
 use util::yaml;
 use storage::*;
+use storage::repo::GitStatus;
 use templater::Templater;
 
 pub mod product;
@@ -36,6 +37,7 @@ static PROJECT_FILE_EXTENSION:&'static str = "yml";
 pub struct Project {
     file_path: PathBuf,
     temp_dir: Option<TempDir>,
+    git_status: Option<GitStatus>,
     yaml: Yaml
 }
 
@@ -87,6 +89,7 @@ impl Storable for Project{
         Ok(Project{
             file_path: temp_file,
             temp_dir: Some(temp_dir), // needs to be kept alive to avoid deletion TODO: try something manually
+            git_status: None,
             yaml: try!(yaml::parse(&filled))
         })
     }
@@ -115,6 +118,20 @@ impl Storable for Project{
     fn file(&self) -> PathBuf{ self.file_path.to_owned() } // TODO reconsider returning PathBuf at all
     fn set_file(&mut self, new_file:&Path){ self.file_path = new_file.to_owned(); }
 
+    fn set_git_status(&mut self, status:GitStatus){
+        self.git_status = Some(status);
+    }
+
+    /// Ask a project for its gitstatus
+    #[cfg(feature="git_statuses")]
+    fn get_git_status(&self) -> GitStatus{
+        if let Some(ref status) = self.git_status{
+            status.to_owned()
+        } else {
+            GitStatus::Unknown
+        }
+    }
+
     /// Opens a yaml and parses it.
     fn open(folder_path:&Path) -> StorageResult<Project>{
         let file_path = try!(try!(list_path_content(folder_path)).iter()
@@ -133,6 +150,7 @@ impl Storable for Project{
         Ok(Project{
             file_path: file_path.to_owned(),
             temp_dir: None,
+            git_status: None,
             yaml: try!(yaml::parse(&file_content))
         })
     }
