@@ -1,7 +1,7 @@
 //! Thank you for choosing `asciii`, the new and improved `ascii`.
 //!
+//! **For pure user documentation please refer to the [user manual](manual/index.html).**
 //! This contains user and developer documentation together.
-//! For pure user documentation please refer to the [user manual](manual/index.html).
 //!
 
 //#![warn(missing_docs,
@@ -54,7 +54,6 @@ pub mod manual;
 
 pub mod project;
 pub mod storage;
-pub mod repo;
 pub mod print;
 
 pub mod templater;

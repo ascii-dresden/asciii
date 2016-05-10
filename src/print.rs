@@ -9,7 +9,7 @@ use term::{Attr, color};
 
 use project::Project;
 use storage::Storable;
-use repo::Repository;
+use storage::repo::Repository;
 
 //TODO construct table rows way more dynamically
 

@@ -31,10 +31,14 @@ pub trait Storable{
 
     /// For sorting
     fn index(&self) -> Option<String>;
+
     /// For archiving
     fn prefix(&self) -> Option<String>;
 
+    /// Sets the project File
     fn set_file(&mut self, new_file:&Path);
+
+    /// Main Projectfile extension
     fn file_extension() -> &'static str {"PROJECT"}
 
     /// Path to project file

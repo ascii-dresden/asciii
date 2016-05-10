@@ -25,7 +25,6 @@
 use std::{fs,io};
 use std::path::{Path, PathBuf};
 use std::marker::PhantomData;
-use repo::Repository;
 
 static TEMPLATE_FILE_EXTENSION:&'static str = "tyml";
 
@@ -40,11 +39,11 @@ pub type StorageResult<T> = Result<T, StorageError>;
 
 mod project_list;
 pub use self::project_list::ProjectList;
+pub mod repo;
 pub mod error;
 pub use self::error::StorageError;
 pub mod storable;
 pub use self::storable::Storable;
-
 
 mod storage;
 
@@ -70,7 +69,7 @@ pub struct Storage<L:Storable> {
 
     project_type: PhantomData<L>,
 
-    pub repository: Option<Repository>
+    pub repository: Option<repo::Repository>
 }
 
 /// Used to identify what directory you are talking about.
@@ -84,7 +83,7 @@ pub enum StorageDir {
     /// Describes archive of year and working directory,
     /// if this year is still current.
     Year(Year),
-    /// Parent of `Working`, `Archive` and `Templates`. 
+    /// Parent of `Working`, `Archive` and `Templates`.
     Root,
     /// Place to store templates.
     Templates,

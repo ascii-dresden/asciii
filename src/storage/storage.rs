@@ -11,8 +11,6 @@ use std::collections::HashMap;
 
 use slug;
 
-use repo::Repository;
-
 use super::error::StorageError;
 use super::list_path_content;
 use super::Storage;
@@ -21,6 +19,7 @@ use super::StorageDir;
 use super::StorageResult;
 use super::ProjectList;
 use super::storable::Storable;
+use super::repo::Repository;
 
 fn slugify(string:&str) -> String{ slug::slugify(string) }
 
