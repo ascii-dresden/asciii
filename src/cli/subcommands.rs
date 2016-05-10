@@ -17,8 +17,12 @@ use asciii::templater::Templater;
 use asciii::project::Project;
 use asciii::project::spec::VirtualField;
 
-use super::{print,setup_luigi, setup_luigi_with_git, fail};
-use super::{ListConfig, ListMode};
+use super::{setup_luigi, setup_luigi_with_git, fail};
+use asciii::print;
+use asciii::print::{ListConfig, ListMode};
+//simple_rows, verbose_rows,
+//path_rows, dynamic_rows,
+//print_projects,print_csv};
 
 // TODO refactor this into actions module and actual, short subcommands
 
@@ -152,9 +156,6 @@ pub fn list(matches:&ArgMatches){
 ///
 /// which it prints with `print::print_projects()`
 fn list_projects(dir:StorageDir, list_config:&ListConfig){
-    use super::print::{simple_rows, verbose_rows,
-                        path_rows, dynamic_rows,
-                       print_projects,print_csv};
 
     let luigi = if CONFIG.get_bool("list/gitstatus"){
         setup_luigi_with_git()
@@ -171,7 +172,13 @@ fn list_projects(dir:StorageDir, list_config:&ListConfig){
     }
 
     // sorting
-    super::sort_by(&mut projects,list_config.sort_by);
+    match list_config.sort_by {
+        "manager" => projects.sort_by(|pa,pb| pa.manager().cmp( &pb.manager())),
+        "date"    => projects.sort_by(|pa,pb| pa.date().cmp( &pb.date())),
+        "name"    => projects.sort_by(|pa,pb| pa.name().cmp( &pb.name())),
+        "index"   => projects.sort_by(|pa,pb| pa.index().unwrap_or("zzzz".to_owned()).cmp( &pb.index().unwrap_or("zzzz".to_owned()))), // TODO rename to ident
+        _         => projects.sort_by(|pa,pb| pa.index().unwrap_or("zzzz".to_owned()).cmp( &pb.index().unwrap_or("zzzz".to_owned()))),
+    }
 
     // fit screen
     let wide_enough = true;
@@ -181,15 +188,15 @@ fn list_projects(dir:StorageDir, list_config:&ListConfig){
     //};
 
     if !wide_enough && list_config.mode != ListMode::Csv { // TODO room for improvement
-        print_projects(simple_rows(&projects, &list_config));
+        print::print_projects(print::simple_rows(&projects, &list_config));
     } else {
         debug!("list_mode: {:?}", list_config.mode );
         match list_config.mode{
-            ListMode::Csv     => print_csv(&projects),
-            ListMode::Paths   => print_projects(path_rows(&projects, &list_config)),
-            ListMode::Simple  => print_projects(simple_rows(&projects, &list_config)),
-            ListMode::Verbose => print_projects(verbose_rows(&projects,&list_config,luigi.repository)),
-            ListMode::Nothing => print_projects(dynamic_rows(&projects,&list_config,luigi.repository)),
+            ListMode::Csv     => print::print_csv(&projects),
+            ListMode::Paths   => print::print_projects(print::path_rows(&projects, &list_config)),
+            ListMode::Simple  => print::print_projects(print::simple_rows(&projects, &list_config)),
+            ListMode::Verbose => print::print_projects(print::verbose_rows(&projects,&list_config,luigi.repository)),
+            ListMode::Nothing => print::print_projects(print::dynamic_rows(&projects,&list_config,luigi.repository)),
         }
     }
 }
@@ -242,7 +249,7 @@ pub fn csv(matches:&ArgMatches){
     let mut projects = super::execute(||luigi.open_projects(StorageDir::Year(year)));
 //    projects.sort_by(|pa,pb| pa.date().cmp( &pb.date()));
     projects.sort_by(|pa,pb| pa.index().unwrap_or("zzzz".to_owned()).cmp( &pb.index().unwrap_or("zzzz".to_owned())));
-    super::print::print_csv(&projects);
+    print::print_csv(&projects);
 }
 
 

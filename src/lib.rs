@@ -55,6 +55,7 @@ pub mod manual;
 pub mod project;
 pub mod storage;
 pub mod repo;
+pub mod print;
 
 pub mod templater;
 

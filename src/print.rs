@@ -7,17 +7,46 @@ use prettytable::cell::Cell;
 use prettytable::format::{TableFormat,FormatBuilder};
 use term::{Attr, color};
 
-use super::ListConfig;
-
-use asciii::project::Project;
-use asciii::storage::Storable;
-use asciii::repo::Repository;
+use project::Project;
+use storage::Storable;
+use repo::Repository;
 
 //TODO construct table rows way more dynamically
 
 #[allow(dead_code)]
 pub fn print_project(_project:&Project){
     unimplemented!();
+}
+
+/// Configuration for this list output.
+#[derive(Debug)]
+pub struct ListConfig<'a>{
+    pub mode:         ListMode,
+    pub show_errors:  bool,
+    pub git_status:   bool,
+    pub sort_by:      &'a str,
+    pub filter_by:    Option<Vec<&'a str>>,
+    pub use_colors:   bool,
+    pub details:      Option<Vec<&'a str>>,
+}
+
+#[derive(Debug, PartialEq)]
+pub enum ListMode{ Simple, Verbose, Nothing, Paths, Csv }
+
+impl<'a> Default for ListConfig<'a>{
+    fn default() -> ListConfig<'a>{
+        ListConfig{
+            mode:         if ::CONFIG.get_bool("list/verbose"){ ListMode::Verbose }
+                          else{ ListMode::Simple },
+            git_status:   ::CONFIG.get_bool("list/gitstatus"),
+            show_errors:  false,
+            sort_by:      ::CONFIG.get_str("list/sort")
+                .expect("Faulty config: list/sort does not contain a value"),
+            filter_by:    None,
+            use_colors:   ::CONFIG.get_bool("list/colors"),
+            details:      None,
+        }
+    }
 }
 
 #[inline]

@@ -9,16 +9,16 @@ use std::error::Error;
 #[cfg(feature="git_statuses")]
 use git2::Error as GitError;
 
-use ::templater::TemplateError;
+use templater::TemplateError;
 use util::yaml::YamlError;
 
 #[cfg(not(feature="git_statuses"))]
-use ::repo::GitError;
+use repo::GitError;
 
 /// Error that may occur in Storage
 #[derive(Debug)]
 pub enum StorageError {
-    BadChoice,  // TODO this should be a compile error
+    BadChoice, // TODO: this should be a compile error
     NoWorkingDir,
     ProjectFileExists,
     ProjectDirExists,
