@@ -11,6 +11,7 @@
 
     <link rel="stylesheet" type="text/css" href="../../../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../../../main.css">
+    
 
     
     
@@ -695,7 +696,11 @@
 <span id="652">652</span>
 <span id="653">653</span>
 <span id="654">654</span>
+<span id="655">655</span>
+<span id="656">656</span>
 </pre><pre class='rust '>
+<span class='doccomment'>//! Implements the ascii invoicer project file specification.</span>
+
 <span class='attribute'>#<span class='op'>!</span>[<span class='ident'>allow</span>(<span class='ident'>dead_code</span>)]</span>
 <span class='attribute'>#<span class='op'>!</span>[<span class='ident'>allow</span>(<span class='ident'>unused_imports</span>)]</span>
 
@@ -704,7 +709,7 @@
 <span class='kw'>use</span> <span class='ident'>util</span>::<span class='ident'>yaml</span>;
 <span class='kw'>use</span> <span class='ident'>util</span>::<span class='ident'>yaml</span>::<span class='ident'>Yaml</span>;
 <span class='kw'>use</span> <span class='ident'>currency</span>::<span class='ident'>Currency</span>;
-<span class='kw'>use</span> <span class='ident'>super</span>::<span class='ident'>Project</span>;
+<span class='kw'>use</span> <span class='kw'>super</span>::<span class='ident'>Project</span>;
 <span class='kw'>use</span> ::<span class='ident'>storage</span>::<span class='ident'>Storable</span>;
 
 <span class='kw'>pub</span> <span class='kw'>type</span> <span class='ident'>SpecResult</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span> <span class='op'>=</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span>(), <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>str</span><span class='op'>&gt;&gt;</span>;
@@ -734,6 +739,7 @@
         <span class='doccomment'>///Overall Cost Project, including taxes</span>
         <span class='ident'>Name</span>,
         <span class='ident'>Final</span>,
+        <span class='ident'>Age</span>,
         <span class='ident'>Year</span>,
         <span class='ident'>Caterers</span>,
         <span class='ident'>ClientFullName</span>,
@@ -755,6 +761,7 @@
             <span class='ident'>VirtualField</span>::<span class='ident'>InvoiceNumberLong</span> <span class='op'>=&gt;</span> <span class='ident'>invoice</span>::<span class='ident'>number_long_str</span>(<span class='ident'>project</span>.<span class='ident'>yaml</span>()),
             <span class='ident'>VirtualField</span>::<span class='ident'>Name</span>              <span class='op'>=&gt;</span> <span class='ident'>project</span>::<span class='ident'>name</span>(<span class='ident'>project</span>.<span class='ident'>yaml</span>()).<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>s</span><span class='op'>|</span><span class='ident'>s</span>.<span class='ident'>to_owned</span>()),
             <span class='ident'>VirtualField</span>::<span class='ident'>Final</span>             <span class='op'>=&gt;</span> <span class='ident'>project</span>.<span class='ident'>sum_sold</span>().<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>c</span><span class='op'>|</span><span class='ident'>c</span>.<span class='ident'>to_string</span>()),
+            <span class='ident'>VirtualField</span>::<span class='ident'>Age</span>               <span class='op'>=&gt;</span> <span class='ident'>project</span>.<span class='ident'>age</span>().<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>a</span><span class='op'>|</span><span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;{} days&quot;</span>, <span class='ident'>a</span>)),
             <span class='ident'>VirtualField</span>::<span class='ident'>Year</span>              <span class='op'>=&gt;</span> <span class='ident'>project</span>.<span class='ident'>date</span>().<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>d</span><span class='op'>|</span><span class='ident'>d</span>.<span class='ident'>year</span>().<span class='ident'>to_string</span>()),
 
             <span class='ident'>VirtualField</span>::<span class='ident'>Caterers</span>       <span class='op'>=&gt;</span> <span class='ident'>hours</span>::<span class='ident'>caterers_string</span>(<span class='ident'>project</span>.<span class='ident'>yaml</span>()),
@@ -767,14 +774,8 @@
 }
 
 <span class='comment'>//TODO there may be cases where an f64 can&#39;t be converted into Currency</span>
-<span class='kw'>fn</span> <span class='ident'>to_currency</span>(<span class='ident'>f</span>:<span class='ident'>f64</span>) <span class='op'>-&gt;</span> <span class='ident'>Currency</span> {
-    <span class='ident'>Currency</span>::<span class='ident'>from_string</span>(<span class='kw-2'>&amp;</span><span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;{:.*}&quot;</span>, <span class='number'>2</span>, <span class='ident'>f</span>))
-        .<span class='ident'>map_or</span>( <span class='ident'>Currency</span>(<span class='prelude-val'>Some</span>(<span class='string'>&#39;€&#39;</span>), <span class='number'>0</span>),
-        <span class='op'>|</span><span class='kw-2'>mut</span> <span class='ident'>cur</span><span class='op'>|</span> {
-            <span class='ident'>cur</span>.<span class='number'>0</span> <span class='op'>=</span> <span class='prelude-val'>Some</span>(<span class='string'>&#39;€&#39;</span>);
-            <span class='ident'>cur</span>
-        }
-        )
+<span class='kw'>fn</span> <span class='ident'>to_currency</span>(<span class='ident'>f</span>:<span class='ident'>f64</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Currency</span><span class='op'>&gt;</span> {
+    <span class='ident'>Currency</span>::<span class='ident'>new</span>().<span class='ident'>symbol</span>(<span class='string'>&#39;€&#39;</span>).<span class='ident'>coin</span>(<span class='ident'>f</span>)
 }
 
 <span class='kw'>fn</span> <span class='ident'>field_exists</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span>(<span class='ident'>yaml</span>:<span class='kw-2'>&amp;</span><span class='ident'>Yaml</span>, <span class='ident'>paths</span>:<span class='kw-2'>&amp;</span>[<span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>str</span>]) <span class='op'>-&gt;</span> <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>str</span><span class='op'>&gt;</span>{
@@ -789,7 +790,7 @@
     <span class='kw'>use</span> <span class='ident'>util</span>::<span class='ident'>yaml</span>;
     <span class='kw'>use</span> <span class='ident'>util</span>::<span class='ident'>yaml</span>::<span class='ident'>Yaml</span>;
     <span class='kw'>use</span> <span class='ident'>chrono</span>::{<span class='ident'>Date</span>,<span class='ident'>UTC</span>};
-    <span class='kw'>use</span> <span class='ident'>super</span>::<span class='ident'>hours</span>;
+    <span class='kw'>use</span> <span class='kw'>super</span>::<span class='ident'>hours</span>;
 
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>name</span>(<span class='ident'>yaml</span>:<span class='kw-2'>&amp;</span><span class='ident'>Yaml</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='ident'>str</span><span class='op'>&gt;</span>{
         <span class='ident'>yaml</span>::<span class='ident'>get_str</span>(<span class='ident'>yaml</span>, <span class='string'>&quot;event/name&quot;</span>)
@@ -798,7 +799,7 @@
     }
 
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>date</span>(<span class='ident'>yaml</span>:<span class='kw-2'>&amp;</span><span class='ident'>Yaml</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Date</span><span class='op'>&lt;</span><span class='ident'>UTC</span><span class='op'>&gt;&gt;</span>{
-        <span class='ident'>super</span>::<span class='ident'>date</span>::<span class='ident'>date</span>(<span class='kw-2'>&amp;</span><span class='ident'>yaml</span>)
+        <span class='kw'>super</span>::<span class='ident'>date</span>::<span class='ident'>date</span>(<span class='kw-2'>&amp;</span><span class='ident'>yaml</span>)
     }
 
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>manager</span>(<span class='ident'>yaml</span>:<span class='kw-2'>&amp;</span><span class='ident'>Yaml</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='ident'>str</span><span class='op'>&gt;</span>{
@@ -812,7 +813,7 @@
     }
 
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>canceled</span>(<span class='ident'>yaml</span>:<span class='kw-2'>&amp;</span><span class='ident'>Yaml</span>) <span class='op'>-&gt;</span> <span class='ident'>bool</span>{
-        <span class='ident'>yaml</span>::<span class='ident'>get_bool</span>(<span class='ident'>yaml</span>, <span class='string'>&quot;canceled&quot;</span>).<span class='ident'>unwrap_or</span>(<span class='boolval'>false</span>)
+        <span class='ident'>yaml</span>::<span class='ident'>get_bool</span>(<span class='ident'>yaml</span>, <span class='string'>&quot;canceled&quot;</span>).<span class='ident'>unwrap_or</span>(<span class='boolvalue'>false</span>)
     }
 
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>validate</span>(<span class='ident'>yaml</span>:<span class='kw-2'>&amp;</span><span class='ident'>Yaml</span>) <span class='op'>-&gt;</span> <span class='ident'>bool</span>{
@@ -866,22 +867,24 @@
         <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Some</span>(<span class='ident'>title</span>) <span class='op'>=</span> <span class='ident'>title</span>(<span class='kw-2'>&amp;</span><span class='ident'>yaml</span>){
             <span class='kw'>let</span> <span class='ident'>last_name</span> <span class='op'>=</span> <span class='ident'>last_name</span>(<span class='kw-2'>&amp;</span><span class='ident'>yaml</span>);
 
-            <span class='kw'>let</span> <span class='ident'>lang</span> <span class='op'>=</span> <span class='ident'>config</span>.<span class='ident'>get_str</span>(<span class='string'>&quot;defaults/lang&quot;</span>);
+            <span class='kw'>let</span> <span class='ident'>lang</span> <span class='op'>=</span> <span class='ident'>config</span>.<span class='ident'>get_str</span>(<span class='string'>&quot;defaults/lang&quot;</span>)
+                .<span class='ident'>expect</span>(<span class='string'>&quot;Faulty config: defaults/lang does not contain a value&quot;</span>);
 
-            <span class='kw'>let</span> <span class='ident'>gend</span> <span class='op'>=</span> <span class='ident'>config</span>.<span class='ident'>get_str</span>(<span class='kw-2'>&amp;</span>(
-                    <span class='string'>&quot;gender_matches/&quot;</span>.<span class='ident'>to_owned</span>() <span class='op'>+</span> <span class='kw-2'>&amp;</span><span class='ident'>title</span>.<span class='ident'>to_lowercase</span>()));
+            <span class='kw'>let</span> <span class='ident'>gend_path</span> <span class='op'>=</span> <span class='string'>&quot;gender_matches/&quot;</span>.<span class='ident'>to_owned</span>() <span class='op'>+</span> <span class='kw-2'>&amp;</span><span class='ident'>title</span>.<span class='ident'>to_lowercase</span>();
+            <span class='kw'>let</span> <span class='ident'>gend</span> <span class='op'>=</span> <span class='ident'>config</span>.<span class='ident'>get_str</span>(<span class='kw-2'>&amp;</span><span class='ident'>gend_path</span>)
+                .<span class='ident'>expect</span>(<span class='kw-2'>&amp;</span><span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;Faulty config: {} does not contain a value&quot;</span>,<span class='ident'>gend_path</span>));
 
-            <span class='kw'>let</span> <span class='ident'>addr</span> <span class='op'>=</span> <span class='ident'>config</span>.<span class='ident'>get_str</span>(<span class='kw-2'>&amp;</span>(
-                    <span class='string'>&quot;lang_addressing/&quot;</span>.<span class='ident'>to_owned</span>() <span class='op'>+</span> <span class='kw-2'>&amp;</span><span class='ident'>lang</span>.<span class='ident'>to_lowercase</span>() <span class='op'>+</span> <span class='string'>&quot;/&quot;</span>
-                    <span class='op'>+</span> <span class='kw-2'>&amp;</span><span class='ident'>gend</span>.<span class='ident'>to_lowercase</span>()));
+            <span class='kw'>let</span> <span class='ident'>addr_path</span> <span class='op'>=</span> <span class='string'>&quot;lang_addressing/&quot;</span>.<span class='ident'>to_owned</span>() <span class='op'>+</span> <span class='kw-2'>&amp;</span><span class='ident'>lang</span>.<span class='ident'>to_lowercase</span>() <span class='op'>+</span> <span class='string'>&quot;/&quot;</span> <span class='op'>+</span> <span class='ident'>gend</span>;
+            <span class='kw'>let</span> <span class='ident'>addr</span> <span class='op'>=</span> <span class='ident'>config</span>.<span class='ident'>get_str</span>(<span class='kw-2'>&amp;</span><span class='ident'>addr_path</span>)
+                .<span class='ident'>expect</span>(<span class='kw-2'>&amp;</span><span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;Faulty config: {} does not contain a value&quot;</span>,<span class='ident'>addr_path</span>));
 
             <span class='ident'>last_name</span>.<span class='ident'>and</span>(
                 <span class='prelude-val'>Some</span>(<span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;{} {} {}&quot;</span>, <span class='ident'>addr</span>, <span class='ident'>title</span>, <span class='ident'>last_name</span>.<span class='ident'>unwrap_or</span>(<span class='string'>&quot;&quot;</span>))))
         } <span class='kw'>else</span> { <span class='prelude-val'>None</span> }
     }
 
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>validate</span>(<span class='ident'>yaml</span>:<span class='kw-2'>&amp;</span><span class='ident'>Yaml</span>) <span class='op'>-&gt;</span> <span class='ident'>super</span>::<span class='ident'>SpecResult</span> {
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>errors</span> <span class='op'>=</span> <span class='ident'>super</span>::<span class='ident'>field_exists</span>(<span class='kw-2'>&amp;</span><span class='ident'>yaml</span>, <span class='kw-2'>&amp;</span>[
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>validate</span>(<span class='ident'>yaml</span>:<span class='kw-2'>&amp;</span><span class='ident'>Yaml</span>) <span class='op'>-&gt;</span> <span class='kw'>super</span>::<span class='ident'>SpecResult</span> {
+        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>errors</span> <span class='op'>=</span> <span class='kw'>super</span>::<span class='ident'>field_exists</span>(<span class='kw-2'>&amp;</span><span class='ident'>yaml</span>, <span class='kw-2'>&amp;</span>[
                  <span class='string'>&quot;client/email&quot;</span>,
                  <span class='string'>&quot;client/address&quot;</span>,
                  <span class='string'>&quot;client/last_name&quot;</span>,
@@ -966,7 +969,7 @@
 
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>number</span>(<span class='ident'>yaml</span>:<span class='kw-2'>&amp;</span><span class='ident'>Yaml</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>String</span><span class='op'>&gt;</span> {
         <span class='kw'>let</span> <span class='ident'>num</span> <span class='op'>=</span> <span class='ident'>appendix</span>(<span class='kw-2'>&amp;</span><span class='ident'>yaml</span>).<span class='ident'>unwrap_or</span>(<span class='number'>1</span>);
-        <span class='ident'>super</span>::<span class='ident'>date</span>::<span class='ident'>offer</span>(<span class='kw-2'>&amp;</span><span class='ident'>yaml</span>)
+        <span class='kw'>super</span>::<span class='ident'>date</span>::<span class='ident'>offer</span>(<span class='kw-2'>&amp;</span><span class='ident'>yaml</span>)
             .<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>d</span><span class='op'>|</span> <span class='ident'>d</span>.<span class='ident'>format</span>(<span class='string'>&quot;A%Y%m%d&quot;</span>).<span class='ident'>to_string</span>())
             .<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>s</span><span class='op'>|</span> <span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;{}-{}&quot;</span>, <span class='ident'>s</span>, <span class='ident'>num</span>))
 
@@ -978,16 +981,17 @@
         <span class='ident'>yaml</span>::<span class='ident'>get_int</span>(<span class='kw-2'>&amp;</span><span class='ident'>yaml</span>, <span class='string'>&quot;offer/appendix&quot;</span>)
     }
 
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>validate</span>(<span class='ident'>yaml</span>:<span class='kw-2'>&amp;</span><span class='ident'>Yaml</span>) <span class='op'>-&gt;</span> <span class='ident'>super</span>::<span class='ident'>SpecResult</span> {
-        <span class='kw'>if</span> <span class='ident'>super</span>::<span class='ident'>project</span>::<span class='ident'>canceled</span>(<span class='ident'>yaml</span>){
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>validate</span>(<span class='ident'>yaml</span>:<span class='kw-2'>&amp;</span><span class='ident'>Yaml</span>) <span class='op'>-&gt;</span> <span class='kw'>super</span>::<span class='ident'>SpecResult</span> {
+        <span class='kw'>if</span> <span class='kw'>super</span>::<span class='ident'>project</span>::<span class='ident'>canceled</span>(<span class='ident'>yaml</span>){
             <span class='kw'>return</span> <span class='prelude-val'>Err</span>(<span class='macro'>vec</span><span class='macro'>!</span>[<span class='string'>&quot;canceled&quot;</span>])
         }
 
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>errors</span> <span class='op'>=</span> <span class='ident'>super</span>::<span class='ident'>field_exists</span>(<span class='kw-2'>&amp;</span><span class='ident'>yaml</span>, <span class='kw-2'>&amp;</span>[
+        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>errors</span> <span class='op'>=</span> <span class='kw'>super</span>::<span class='ident'>field_exists</span>(<span class='kw-2'>&amp;</span><span class='ident'>yaml</span>, <span class='kw-2'>&amp;</span>[
                  <span class='string'>&quot;offer/date&quot;</span>,
                  <span class='string'>&quot;offer/appendix&quot;</span>,
+                 <span class='string'>&quot;manager&quot;</span>,
         ]);
-        <span class='kw'>if</span> <span class='ident'>super</span>::<span class='ident'>date</span>::<span class='ident'>offer</span>(<span class='kw-2'>&amp;</span><span class='ident'>yaml</span>).<span class='ident'>is_none</span>(){
+        <span class='kw'>if</span> <span class='kw'>super</span>::<span class='ident'>date</span>::<span class='ident'>offer</span>(<span class='kw-2'>&amp;</span><span class='ident'>yaml</span>).<span class='ident'>is_none</span>(){
             <span class='ident'>errors</span>.<span class='ident'>push</span>(<span class='string'>&quot;offer_date_format&quot;</span>);}
 
         <span class='kw'>if</span> <span class='op'>!</span><span class='ident'>errors</span>.<span class='ident'>is_empty</span>(){
@@ -1016,19 +1020,19 @@
     }
 
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>number_long_str</span>(<span class='ident'>yaml</span>:<span class='kw-2'>&amp;</span><span class='ident'>Yaml</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>String</span><span class='op'>&gt;</span> {
-        <span class='kw'>let</span> <span class='ident'>year</span> <span class='op'>=</span> <span class='macro'>try_some</span><span class='macro'>!</span>(<span class='ident'>super</span>::<span class='ident'>date</span>::<span class='ident'>invoice</span>(<span class='kw-2'>&amp;</span><span class='ident'>yaml</span>)).<span class='ident'>year</span>();
+        <span class='kw'>let</span> <span class='ident'>year</span> <span class='op'>=</span> <span class='macro'>try_some</span><span class='macro'>!</span>(<span class='kw'>super</span>::<span class='ident'>date</span>::<span class='ident'>invoice</span>(<span class='kw-2'>&amp;</span><span class='ident'>yaml</span>)).<span class='ident'>year</span>();
         <span class='comment'>// TODO Length or format should be a setting</span>
         <span class='ident'>number</span>(<span class='kw-2'>&amp;</span><span class='ident'>yaml</span>).<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>n</span><span class='op'>|</span> <span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;R{}-{:03}&quot;</span>, <span class='ident'>year</span>, <span class='ident'>n</span>))
     }
 
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>validate</span>(<span class='ident'>yaml</span>:<span class='kw-2'>&amp;</span><span class='ident'>Yaml</span>) <span class='op'>-&gt;</span> <span class='ident'>super</span>::<span class='ident'>SpecResult</span> {
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>errors</span> <span class='op'>=</span> <span class='ident'>super</span>::<span class='ident'>field_exists</span>(<span class='kw-2'>&amp;</span><span class='ident'>yaml</span>,<span class='kw-2'>&amp;</span>[
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>validate</span>(<span class='ident'>yaml</span>:<span class='kw-2'>&amp;</span><span class='ident'>Yaml</span>) <span class='op'>-&gt;</span> <span class='kw'>super</span>::<span class='ident'>SpecResult</span> {
+        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>errors</span> <span class='op'>=</span> <span class='kw'>super</span>::<span class='ident'>field_exists</span>(<span class='kw-2'>&amp;</span><span class='ident'>yaml</span>,<span class='kw-2'>&amp;</span>[
                                    <span class='string'>&quot;invoice/number&quot;</span>,
                                    <span class='string'>&quot;invoice/date&quot;</span>,
         ]);
 
         <span class='comment'>//if super::offer::validate(&amp;yaml).is_err() {errors.push(&quot;offer&quot;)}</span>
-        <span class='kw'>if</span> <span class='ident'>super</span>::<span class='ident'>date</span>::<span class='ident'>invoice</span>(<span class='kw-2'>&amp;</span><span class='ident'>yaml</span>).<span class='ident'>is_none</span>(){ <span class='ident'>errors</span>.<span class='ident'>push</span>(<span class='string'>&quot;invoice_date_format&quot;</span>);}
+        <span class='kw'>if</span> <span class='kw'>super</span>::<span class='ident'>date</span>::<span class='ident'>invoice</span>(<span class='kw-2'>&amp;</span><span class='ident'>yaml</span>).<span class='ident'>is_none</span>(){ <span class='ident'>errors</span>.<span class='ident'>push</span>(<span class='string'>&quot;invoice_date_format&quot;</span>);}
 
         <span class='kw'>if</span> <span class='op'>!</span><span class='ident'>errors</span>.<span class='ident'>is_empty</span>(){
             <span class='kw'>return</span> <span class='prelude-val'>Err</span>(<span class='ident'>errors</span>);
@@ -1043,9 +1047,9 @@
     <span class='kw'>use</span> <span class='ident'>util</span>::<span class='ident'>yaml</span>;
     <span class='kw'>use</span> <span class='ident'>util</span>::<span class='ident'>yaml</span>::<span class='ident'>Yaml</span>;
 
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>validate</span>(<span class='ident'>yaml</span>:<span class='kw-2'>&amp;</span><span class='ident'>Yaml</span>) <span class='op'>-&gt;</span> <span class='ident'>super</span>::<span class='ident'>SpecResult</span> {
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>validate</span>(<span class='ident'>yaml</span>:<span class='kw-2'>&amp;</span><span class='ident'>Yaml</span>) <span class='op'>-&gt;</span> <span class='kw'>super</span>::<span class='ident'>SpecResult</span> {
         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>errors</span> <span class='op'>=</span> <span class='ident'>Vec</span>::<span class='ident'>new</span>();
-        <span class='kw'>if</span> <span class='ident'>super</span>::<span class='ident'>date</span>::<span class='ident'>payed</span>(<span class='kw-2'>&amp;</span><span class='ident'>yaml</span>).<span class='ident'>is_none</span>(){ <span class='ident'>errors</span>.<span class='ident'>push</span>(<span class='string'>&quot;payed_date&quot;</span>);}
+        <span class='kw'>if</span> <span class='kw'>super</span>::<span class='ident'>date</span>::<span class='ident'>payed</span>(<span class='kw-2'>&amp;</span><span class='ident'>yaml</span>).<span class='ident'>is_none</span>(){ <span class='ident'>errors</span>.<span class='ident'>push</span>(<span class='string'>&quot;payed_date&quot;</span>);}
         <span class='comment'>//if super::date::wages(&amp;yaml).is_none(){ errors.push(&quot;wages_date&quot;);} // TODO validate WAGES_DATE also</span>
         <span class='kw'>if</span> <span class='op'>!</span><span class='ident'>errors</span>.<span class='ident'>is_empty</span>(){
             <span class='kw'>return</span> <span class='prelude-val'>Err</span>(<span class='ident'>errors</span>);
@@ -1059,10 +1063,10 @@
     <span class='kw'>use</span> <span class='ident'>currency</span>::<span class='ident'>Currency</span>;
     <span class='kw'>use</span> <span class='ident'>util</span>::<span class='ident'>yaml</span>;
     <span class='kw'>use</span> <span class='ident'>util</span>::<span class='ident'>yaml</span>::<span class='ident'>Yaml</span>;
-    <span class='kw'>use</span> <span class='ident'>super</span>::<span class='ident'>to_currency</span>;
+    <span class='kw'>use</span> <span class='kw'>super</span>::<span class='ident'>to_currency</span>;
 
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>salary</span>(<span class='ident'>yaml</span>:<span class='kw-2'>&amp;</span><span class='ident'>Yaml</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Currency</span><span class='op'>&gt;</span>{
-        <span class='ident'>yaml</span>::<span class='ident'>get_f64</span>(<span class='ident'>yaml</span>, <span class='string'>&quot;hours/salary&quot;</span>).<span class='ident'>map</span>(<span class='ident'>to_currency</span>)
+        <span class='ident'>yaml</span>::<span class='ident'>get_f64</span>(<span class='ident'>yaml</span>, <span class='string'>&quot;hours/salary&quot;</span>).<span class='ident'>and_then</span>(<span class='ident'>to_currency</span>)
     }
 
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>total</span>(<span class='ident'>yaml</span>:<span class='kw-2'>&amp;</span><span class='ident'>Yaml</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span> {
@@ -1097,7 +1101,7 @@
     <span class='kw'>use</span> <span class='ident'>util</span>::<span class='ident'>yaml</span>;
     <span class='kw'>use</span> <span class='ident'>util</span>::<span class='ident'>yaml</span>::<span class='ident'>Yaml</span>;
     <span class='kw'>use</span> <span class='ident'>project</span>::<span class='ident'>product</span>::{<span class='ident'>Product</span>, <span class='ident'>InvoiceItem</span>, <span class='ident'>ProductUnit</span>};
-    <span class='kw'>use</span> <span class='ident'>super</span>::<span class='ident'>to_currency</span>;
+    <span class='kw'>use</span> <span class='kw'>super</span>::<span class='ident'>to_currency</span>;
 
     <span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Debug</span>, <span class='ident'>PartialEq</span>, <span class='ident'>Eq</span>)]</span>
     <span class='kw'>pub</span> <span class='kw'>enum</span> <span class='ident'>ProductError</span>{
@@ -1117,8 +1121,7 @@
                 <span class='prelude-val'>Ok</span>(<span class='ident'>Product</span>{
                     <span class='ident'>name</span>:  <span class='ident'>yaml</span>::<span class='ident'>get_str</span>(<span class='ident'>desc</span>, <span class='string'>&quot;name&quot;</span>).<span class='ident'>unwrap_or</span>(<span class='string'>&quot;unnamed&quot;</span>),
                     <span class='ident'>unit</span>:  <span class='ident'>yaml</span>::<span class='ident'>get_str</span>(<span class='ident'>desc</span>, <span class='string'>&quot;unit&quot;</span>),
-                    <span class='ident'>price</span>: <span class='ident'>yaml</span>::<span class='ident'>get_f64</span>(<span class='ident'>desc</span>, <span class='string'>&quot;price&quot;</span>)
-                        .<span class='ident'>map</span>(<span class='ident'>to_currency</span>).<span class='ident'>unwrap</span>(),
+                    <span class='ident'>price</span>: <span class='ident'>yaml</span>::<span class='ident'>get_f64</span>(<span class='ident'>desc</span>, <span class='string'>&quot;price&quot;</span>).<span class='ident'>and_then</span>(<span class='ident'>to_currency</span>).<span class='ident'>unwrap</span>(),
                     <span class='ident'>tax</span>:   <span class='ident'>yaml</span>::<span class='ident'>get_f64</span>(<span class='ident'>desc</span>, <span class='string'>&quot;tax&quot;</span>).<span class='ident'>unwrap_or</span>(<span class='ident'>default_tax</span>),
                 })
             },
@@ -1127,7 +1130,7 @@
                     <span class='ident'>name</span>:  <span class='ident'>name</span>,
                     <span class='ident'>unit</span>:  <span class='ident'>yaml</span>::<span class='ident'>get_str</span>(<span class='ident'>values</span>, <span class='string'>&quot;unit&quot;</span>),
                     <span class='ident'>price</span>: <span class='ident'>yaml</span>::<span class='ident'>get_f64</span>(<span class='ident'>values</span>, <span class='string'>&quot;price&quot;</span>)
-                        .<span class='ident'>map</span>(<span class='ident'>to_currency</span>).<span class='ident'>unwrap</span>(),
+                        .<span class='ident'>and_then</span>(<span class='ident'>to_currency</span>).<span class='ident'>unwrap</span>(),
                     <span class='ident'>tax</span>:   <span class='ident'>yaml</span>::<span class='ident'>get_f64</span>(<span class='ident'>values</span>, <span class='string'>&quot;tax&quot;</span>).<span class='ident'>unwrap_or</span>(<span class='ident'>default_tax</span>),
                 })
             }
@@ -1192,14 +1195,14 @@
 
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>sum_offered</span>(<span class='ident'>items</span>:<span class='kw-2'>&amp;</span>[<span class='ident'>InvoiceItem</span>]) <span class='op'>-&gt;</span> <span class='ident'>Currency</span>{
         <span class='ident'>items</span>.<span class='ident'>iter</span>()
-             .<span class='ident'>fold</span>(<span class='ident'>Currency</span>(<span class='prelude-val'>Some</span>(<span class='string'>&#39;€&#39;</span>), <span class='number'>0</span>),
-             <span class='op'>|</span><span class='ident'>acc</span>, <span class='ident'>item</span><span class='op'>|</span> <span class='ident'>acc</span> <span class='op'>+</span> <span class='ident'>item</span>.<span class='ident'>item</span>.<span class='ident'>price</span> <span class='op'>*</span> <span class='ident'>item</span>.<span class='ident'>amount_offered</span>)
+             .<span class='ident'>fold</span>(<span class='ident'>Currency</span>::<span class='ident'>from_str</span>(<span class='string'>&quot;1.00€&quot;</span>).<span class='ident'>unwrap</span>(),
+             <span class='op'>|</span><span class='ident'>acc</span>, <span class='ident'>item</span><span class='op'>|</span> <span class='ident'>acc</span> <span class='op'>+</span> <span class='kw-2'>&amp;</span><span class='ident'>item</span>.<span class='ident'>item</span>.<span class='ident'>price</span> <span class='op'>*</span> <span class='ident'>item</span>.<span class='ident'>amount_offered</span>)
     }
 
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>sum_sold</span>(<span class='ident'>items</span>:<span class='kw-2'>&amp;</span>[<span class='ident'>InvoiceItem</span>]) <span class='op'>-&gt;</span> <span class='ident'>Currency</span>{
         <span class='ident'>items</span>.<span class='ident'>iter</span>()
-             .<span class='ident'>fold</span>(<span class='ident'>Currency</span>(<span class='prelude-val'>Some</span>(<span class='string'>&#39;€&#39;</span>), <span class='number'>0</span>),
-             <span class='op'>|</span><span class='ident'>acc</span>, <span class='ident'>item</span><span class='op'>|</span> <span class='ident'>acc</span> <span class='op'>+</span> <span class='ident'>item</span>.<span class='ident'>item</span>.<span class='ident'>price</span> <span class='op'>*</span> <span class='ident'>item</span>.<span class='ident'>amount_sold</span>)
+             .<span class='ident'>fold</span>(<span class='ident'>Currency</span>::<span class='ident'>from_str</span>(<span class='string'>&quot;1.00€&quot;</span>).<span class='ident'>unwrap</span>(),
+             <span class='op'>|</span><span class='ident'>acc</span>, <span class='ident'>item</span><span class='op'>|</span> <span class='ident'>acc</span> <span class='op'>+</span> <span class='kw-2'>&amp;</span><span class='ident'>item</span>.<span class='ident'>item</span>.<span class='ident'>price</span> <span class='op'>*</span> <span class='ident'>item</span>.<span class='ident'>amount_sold</span>)
     }
 
 }
@@ -1210,8 +1213,8 @@
     <span class='kw'>use</span> <span class='ident'>util</span>::<span class='ident'>yaml</span>::<span class='ident'>YamlError</span>;
     <span class='kw'>use</span> <span class='ident'>currency</span>::<span class='ident'>Currency</span>;
 
-    <span class='kw'>use</span> <span class='ident'>super</span>::<span class='ident'>products</span>::<span class='ident'>ProductResult</span>;
-    <span class='kw'>use</span> <span class='ident'>super</span>::<span class='ident'>products</span>::<span class='ident'>ProductError</span>;
+    <span class='kw'>use</span> <span class='kw'>super</span>::<span class='ident'>products</span>::<span class='ident'>ProductResult</span>;
+    <span class='kw'>use</span> <span class='kw'>super</span>::<span class='ident'>products</span>::<span class='ident'>ProductError</span>;
 
 <span class='kw'>static</span> <span class='ident'>CLIENT_TEST_DOC</span>:<span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='ident'>str</span> <span class='op'>=</span>
 <span class='string'>r#&quot;
@@ -1232,6 +1235,7 @@ client:
 offer:
   date: 07.11.2014
   appendix: 1
+manager: somebody
 &quot;#</span>;
 
 <span class='kw'>static</span> <span class='ident'>INVOICE_TEST_DOC</span>:<span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='ident'>str</span> <span class='op'>=</span>
@@ -1245,13 +1249,13 @@ invoice:
     <span class='attribute'>#[<span class='ident'>test</span>]</span>
     <span class='kw'>fn</span> <span class='ident'>validate_stage1</span>(){
         <span class='kw'>let</span> <span class='ident'>doc</span> <span class='op'>=</span> <span class='ident'>yaml</span>::<span class='ident'>parse</span>(<span class='ident'>CLIENT_TEST_DOC</span>).<span class='ident'>unwrap</span>();
-        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>super</span>::<span class='ident'>client</span>::<span class='ident'>validate</span>(<span class='kw-2'>&amp;</span><span class='ident'>doc</span>).<span class='ident'>is_ok</span>());
+        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='kw'>super</span>::<span class='ident'>client</span>::<span class='ident'>validate</span>(<span class='kw-2'>&amp;</span><span class='ident'>doc</span>).<span class='ident'>is_ok</span>());
     }
 
     <span class='attribute'>#[<span class='ident'>test</span>]</span>
     <span class='kw'>fn</span> <span class='ident'>validate_stage2</span>(){
         <span class='kw'>let</span> <span class='ident'>doc</span> <span class='op'>=</span> <span class='ident'>yaml</span>::<span class='ident'>parse</span>(<span class='ident'>OFFER_TEST_DOC</span>).<span class='ident'>unwrap</span>();
-        <span class='kw'>let</span> <span class='ident'>errors</span> <span class='op'>=</span> <span class='ident'>super</span>::<span class='ident'>offer</span>::<span class='ident'>validate</span>(<span class='kw-2'>&amp;</span><span class='ident'>doc</span>);
+        <span class='kw'>let</span> <span class='ident'>errors</span> <span class='op'>=</span> <span class='kw'>super</span>::<span class='ident'>offer</span>::<span class='ident'>validate</span>(<span class='kw-2'>&amp;</span><span class='ident'>doc</span>);
         <span class='macro'>println</span><span class='macro'>!</span>(<span class='string'>&quot;{:#?}&quot;</span>, <span class='ident'>errors</span>);
         <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>errors</span>.<span class='ident'>is_ok</span>());
     }
@@ -1259,7 +1263,7 @@ invoice:
     <span class='attribute'>#[<span class='ident'>test</span>]</span>
     <span class='kw'>fn</span> <span class='ident'>validate_stage3</span>(){
         <span class='kw'>let</span> <span class='ident'>doc</span> <span class='op'>=</span> <span class='ident'>yaml</span>::<span class='ident'>parse</span>(<span class='ident'>INVOICE_TEST_DOC</span>).<span class='ident'>unwrap</span>();
-        <span class='kw'>let</span> <span class='ident'>errors</span> <span class='op'>=</span> <span class='ident'>super</span>::<span class='ident'>invoice</span>::<span class='ident'>validate</span>(<span class='kw-2'>&amp;</span><span class='ident'>doc</span>);
+        <span class='kw'>let</span> <span class='ident'>errors</span> <span class='op'>=</span> <span class='kw'>super</span>::<span class='ident'>invoice</span>::<span class='ident'>validate</span>(<span class='kw-2'>&amp;</span><span class='ident'>doc</span>);
         <span class='macro'>println</span><span class='macro'>!</span>(<span class='string'>&quot;{:#?}&quot;</span>, <span class='ident'>errors</span>);
         <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>errors</span>.<span class='ident'>is_ok</span>());
     }
@@ -1312,17 +1316,18 @@ products:
 &quot;#</span>;
 
 <span class='attribute'>#[<span class='ident'>test</span>]</span>
+<span class='attribute'>#[<span class='ident'>ignore</span>]</span>
 <span class='kw'>fn</span> <span class='ident'>validate_products</span>(){
     <span class='kw'>let</span> <span class='ident'>doc</span> <span class='op'>=</span> <span class='ident'>yaml</span>::<span class='ident'>parse</span>(<span class='ident'>PRODUCT_TEST_DOC_VALID</span>).<span class='ident'>unwrap</span>();
 
     <span class='macro'>println</span><span class='macro'>!</span>(<span class='string'>&quot;{:#?}&quot;</span>,<span class='ident'>doc</span>);
-    <span class='kw'>let</span> <span class='ident'>products</span> <span class='op'>=</span> <span class='ident'>super</span>::<span class='ident'>products</span>::<span class='ident'>all</span>(<span class='kw-2'>&amp;</span><span class='ident'>doc</span>).<span class='ident'>unwrap</span>();
+    <span class='kw'>let</span> <span class='ident'>products</span> <span class='op'>=</span> <span class='kw'>super</span>::<span class='ident'>products</span>::<span class='ident'>all</span>(<span class='kw-2'>&amp;</span><span class='ident'>doc</span>).<span class='ident'>unwrap</span>();
     <span class='macro'>println</span><span class='macro'>!</span>(<span class='string'>&quot;Products {:#?}&quot;</span>,<span class='ident'>products</span>);
     <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>products</span>[<span class='number'>0</span>].<span class='ident'>item</span>.<span class='ident'>name</span>, <span class='string'>&quot;Kaffee&quot;</span>);
     <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>products</span>[<span class='number'>0</span>].<span class='ident'>amount_offered</span>, <span class='number'>5f64</span>);
     <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>products</span>[<span class='number'>0</span>].<span class='ident'>amount_sold</span>, <span class='number'>5f64</span>);
-    <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>products</span>[<span class='number'>0</span>].<span class='ident'>cost_before_tax</span>(), <span class='ident'>Currency</span>(<span class='prelude-val'>Some</span>(<span class='string'>&#39;€&#39;</span>), <span class='number'>1250</span>));
-    <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>products</span>[<span class='number'>0</span>].<span class='ident'>cost_after_tax</span>(), <span class='ident'>Currency</span>(<span class='prelude-val'>Some</span>(<span class='string'>&#39;€&#39;</span>), <span class='number'>1488</span>));
+    <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>products</span>[<span class='number'>0</span>].<span class='ident'>cost_before_tax</span>(), <span class='ident'>Currency</span>::<span class='ident'>from_str</span>(<span class='string'>&quot;1250€&quot;</span>).<span class='ident'>unwrap</span>());
+    <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>products</span>[<span class='number'>0</span>].<span class='ident'>cost_after_tax</span>(), <span class='ident'>Currency</span>::<span class='ident'>from_str</span>(<span class='string'>&quot;1488€&quot;</span>).<span class='ident'>unwrap</span>());
 
     <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>products</span>[<span class='number'>1</span>].<span class='ident'>item</span>.<span class='ident'>name</span>, <span class='string'>&quot;Tee&quot;</span>);
     <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>products</span>[<span class='number'>1</span>].<span class='ident'>amount_offered</span>, <span class='number'>6f64</span>);
@@ -1338,9 +1343,9 @@ products:
     <span class='kw'>let</span> <span class='ident'>invalid1</span><span class='op'>=</span> <span class='ident'>yaml</span>::<span class='ident'>parse</span>(<span class='ident'>PRODUCT_TEST_DOC_INVALID1</span>).<span class='ident'>unwrap</span>();
     <span class='kw'>let</span> <span class='ident'>invalid2</span><span class='op'>=</span> <span class='ident'>yaml</span>::<span class='ident'>parse</span>(<span class='ident'>PRODUCT_TEST_DOC_INVALID2</span>).<span class='ident'>unwrap</span>();
     <span class='kw'>let</span> <span class='ident'>invalid3</span><span class='op'>=</span> <span class='ident'>yaml</span>::<span class='ident'>parse</span>(<span class='ident'>PRODUCT_TEST_DOC_INVALID3</span>).<span class='ident'>unwrap</span>();
-    <span class='macro'>assert_eq</span><span class='macro'>!</span>( <span class='ident'>super</span>::<span class='ident'>products</span>::<span class='ident'>all</span>(<span class='kw-2'>&amp;</span><span class='ident'>invalid1</span>).<span class='ident'>unwrap_err</span>(), <span class='ident'>ProductError</span>::<span class='ident'>AmbiguousAmounts</span>(<span class='string'>&quot;Tee&quot;</span>.<span class='ident'>to_owned</span>()));
-    <span class='macro'>assert_eq</span><span class='macro'>!</span>( <span class='ident'>super</span>::<span class='ident'>products</span>::<span class='ident'>all</span>(<span class='kw-2'>&amp;</span><span class='ident'>invalid2</span>).<span class='ident'>unwrap_err</span>(), <span class='ident'>ProductError</span>::<span class='ident'>TooMuchReturned</span>(<span class='string'>&quot;Tee&quot;</span>.<span class='ident'>to_owned</span>()));
-    <span class='macro'>assert_eq</span><span class='macro'>!</span>( <span class='ident'>super</span>::<span class='ident'>products</span>::<span class='ident'>all</span>(<span class='kw-2'>&amp;</span><span class='ident'>invalid3</span>).<span class='ident'>unwrap_err</span>(), <span class='ident'>ProductError</span>::<span class='ident'>MissingAmount</span>(<span class='string'>&quot;Tee&quot;</span>.<span class='ident'>to_owned</span>()));
+    <span class='macro'>assert_eq</span><span class='macro'>!</span>( <span class='kw'>super</span>::<span class='ident'>products</span>::<span class='ident'>all</span>(<span class='kw-2'>&amp;</span><span class='ident'>invalid1</span>).<span class='ident'>unwrap_err</span>(), <span class='ident'>ProductError</span>::<span class='ident'>AmbiguousAmounts</span>(<span class='string'>&quot;Tee&quot;</span>.<span class='ident'>to_owned</span>()));
+    <span class='macro'>assert_eq</span><span class='macro'>!</span>( <span class='kw'>super</span>::<span class='ident'>products</span>::<span class='ident'>all</span>(<span class='kw-2'>&amp;</span><span class='ident'>invalid2</span>).<span class='ident'>unwrap_err</span>(), <span class='ident'>ProductError</span>::<span class='ident'>TooMuchReturned</span>(<span class='string'>&quot;Tee&quot;</span>.<span class='ident'>to_owned</span>()));
+    <span class='macro'>assert_eq</span><span class='macro'>!</span>( <span class='kw'>super</span>::<span class='ident'>products</span>::<span class='ident'>all</span>(<span class='kw-2'>&amp;</span><span class='ident'>invalid3</span>).<span class='ident'>unwrap_err</span>(), <span class='ident'>ProductError</span>::<span class='ident'>MissingAmount</span>(<span class='string'>&quot;Tee&quot;</span>.<span class='ident'>to_owned</span>()));
 }
 
     <span class='comment'>//#[test]</span>

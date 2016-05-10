@@ -11,6 +11,7 @@
 
     <link rel="stylesheet" type="text/css" href="../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../main.css">
+    
 
     
     
@@ -43,14 +44,15 @@
 
     <section id='main' class="content struct">
 <h1 class='fqn'><span class='in-band'>Struct <a href='index.html'>git2</a>::<wbr><a class='struct' href=''>Reflog</a></span><span class='out-of-band'><span id='render-detail'>
-            <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
-                [<span class='inner'>&#x2212;</span>]
-            </a>
-        </span><a id='src-4204' class='srclink' href='../src/git2/reflog.rs.html#10-12' title='goto source code'>[src]</a></span></h1>
+                   <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                       [<span class='inner'>&#x2212;</span>]
+                   </a>
+               </span><a id='src-4172' class='srclink' href='../src/git2/reflog.rs.html#10-12' title='goto source code'>[src]</a></span></h1>
 <pre class='rust struct'>pub struct Reflog {
     // some fields omitted
 }</pre><div class='docblock'><p>A reference log of a git repository.</p>
-</div><h2 id='methods'>Methods</h2><h3 class='impl'><code>impl <a class='struct' href='../git2/struct.Reflog.html' title='git2::Reflog'>Reflog</a></code></h3><div class='impl-items'><h4 id='method.append' class='method'><code>fn <a href='#method.append' class='fnname'>append</a>(&amp;mut self, new_oid: <a class='struct' href='../git2/struct.Oid.html' title='git2::Oid'>Oid</a>, committer: &amp;<a class='struct' href='../git2/struct.Signature.html' title='git2::Signature'>Signature</a>, msg: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;&amp;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>&gt;) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>()</a>, <a class='struct' href='../git2/struct.Error.html' title='git2::Error'>Error</a>&gt;</code></h4>
+</div><h2 id='methods'>Methods</h2><h3 class='impl'><span class='in-band'><code>impl <a class='struct' href='../git2/struct.Reflog.html' title='git2::Reflog'>Reflog</a></code></span><span class='out-of-band'><a id='src-4182' class='srclink' href='../src/git2/reflog.rs.html#26-80' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.append' class='method'><code>fn <a href='#method.append' class='fnname'>append</a>(&amp;mut self, new_oid: <a class='struct' href='../git2/struct.Oid.html' title='git2::Oid'>Oid</a>, committer: &amp;<a class='struct' href='../git2/struct.Signature.html' title='git2::Signature'>Signature</a>, msg: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;&amp;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>&gt;) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>()</a>, <a class='struct' href='../git2/struct.Error.html' title='git2::Error'>Error</a>&gt;</code></h4>
 <div class='docblock'><p>Add a new entry to the in-memory reflog.</p>
 </div><h4 id='method.remove' class='method'><code>fn <a href='#method.remove' class='fnname'>remove</a>(&amp;mut self, i: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a>, rewrite_previous_entry: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>()</a>, <a class='struct' href='../git2/struct.Error.html' title='git2::Error'>Error</a>&gt;</code></h4>
 <div class='docblock'><p>Remove an entry from the reflog by its index</p>
@@ -71,7 +73,8 @@ most recently created entry.</p>
 </div><h4 id='method.write' class='method'><code>fn <a href='#method.write' class='fnname'>write</a>(&amp;mut self) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>()</a>, <a class='struct' href='../git2/struct.Error.html' title='git2::Error'>Error</a>&gt;</code></h4>
 <div class='docblock'><p>Write an existing in-memory reflog object back to disk using an atomic
 file lock.</p>
-</div></div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.Drop.html' title='core::ops::Drop'>Drop</a> for <a class='struct' href='../git2/struct.Reflog.html' title='git2::Reflog'>Reflog</a></code></h3><div class='impl-items'><h4 id='method.drop' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/ops/trait.Drop.html#method.drop' class='fnname'>drop</a>(&amp;mut self)</code></h4>
+</div></div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><span class='in-band'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.Drop.html' title='core::ops::Drop'>Drop</a> for <a class='struct' href='../git2/struct.Reflog.html' title='git2::Reflog'>Reflog</a></code></span><span class='out-of-band'><a id='src-4217' class='srclink' href='../src/git2/reflog.rs.html#91-95' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.drop' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/ops/trait.Drop.html#tymethod.drop' class='fnname'>drop</a>(&amp;mut self)</code></h4>
 </div></section>
     <section id='search' class="content hidden"></section>
 

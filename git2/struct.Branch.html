@@ -11,6 +11,7 @@
 
     <link rel="stylesheet" type="text/css" href="../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../main.css">
+    
 
     
     
@@ -43,17 +44,18 @@
 
     <section id='main' class="content struct">
 <h1 class='fqn'><span class='in-band'>Struct <a href='index.html'>git2</a>::<wbr><a class='struct' href=''>Branch</a></span><span class='out-of-band'><span id='render-detail'>
-            <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
-                [<span class='inner'>&#x2212;</span>]
-            </a>
-        </span><a id='src-1870' class='srclink' href='../src/git2/branch.rs.html#15-17' title='goto source code'>[src]</a></span></h1>
+                   <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                       [<span class='inner'>&#x2212;</span>]
+                   </a>
+               </span><a id='src-1837' class='srclink' href='../src/git2/branch.rs.html#15-17' title='goto source code'>[src]</a></span></h1>
 <pre class='rust struct'>pub struct Branch&lt;'repo&gt; {
     // some fields omitted
 }</pre><div class='docblock'><p>A structure to represent a git <a href="http://git-scm.com/book/en/Git-Branching-What-a-Branch-Is">branch</a></p>
 
 <p>A branch is currently just a wrapper to an underlying <code>Reference</code>. The
 reference can be accessed through the <code>get</code> and <code>unwrap</code> methods.</p>
-</div><h2 id='methods'>Methods</h2><h3 class='impl'><code>impl&lt;'repo&gt; <a class='struct' href='../git2/struct.Branch.html' title='git2::Branch'>Branch</a>&lt;'repo&gt;</code></h3><div class='impl-items'><h4 id='method.wrap' class='method'><code>fn <a href='#method.wrap' class='fnname'>wrap</a>(reference: <a class='struct' href='../git2/struct.Reference.html' title='git2::Reference'>Reference</a>) -&gt; <a class='struct' href='../git2/struct.Branch.html' title='git2::Branch'>Branch</a></code></h4>
+</div><h2 id='methods'>Methods</h2><h3 class='impl'><span class='in-band'><code>impl&lt;'repo&gt; <a class='struct' href='../git2/struct.Branch.html' title='git2::Branch'>Branch</a>&lt;'repo&gt;</code></span><span class='out-of-band'><a id='src-1844' class='srclink' href='../src/git2/branch.rs.html#25-97' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.wrap' class='method'><code>fn <a href='#method.wrap' class='fnname'>wrap</a>(reference: <a class='struct' href='../git2/struct.Reference.html' title='git2::Reference'>Reference</a>) -&gt; <a class='struct' href='../git2/struct.Branch.html' title='git2::Branch'>Branch</a></code></h4>
 <div class='docblock'><p>Creates a new branch from a reference</p>
 </div><h4 id='method.get' class='method'><code>fn <a href='#method.get' class='fnname'>get</a>(&amp;self) -&gt; &amp;<a class='struct' href='../git2/struct.Reference.html' title='git2::Reference'>Reference</a>&lt;'repo&gt;</code></h4>
 <div class='docblock'><p>Gain access to the reference that is this branch</p>

@@ -11,6 +11,7 @@
 
     <link rel="stylesheet" type="text/css" href="../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../main.css">
+    
 
     
     
@@ -43,10 +44,10 @@
 
     <section id='main' class="content struct">
 <h1 class='fqn'><span class='in-band'>Struct <a href='index.html'>git2</a>::<wbr><a class='struct' href=''>Diff</a></span><span class='out-of-band'><span id='render-detail'>
-            <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
-                [<span class='inner'>&#x2212;</span>]
-            </a>
-        </span><a id='src-2697' class='srclink' href='../src/git2/diff.rs.html#18-21' title='goto source code'>[src]</a></span></h1>
+                   <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                       [<span class='inner'>&#x2212;</span>]
+                   </a>
+               </span><a id='src-2661' class='srclink' href='../src/git2/diff.rs.html#18-21' title='goto source code'>[src]</a></span></h1>
 <pre class='rust struct'>pub struct Diff&lt;'repo&gt; {
     // some fields omitted
 }</pre><div class='docblock'><p>The diff object that contains all individual file deltas.</p>
@@ -54,7 +55,8 @@
 <p>This is an opaque structure which will be allocated by one of the diff
 generator functions on the <code>Repository</code> structure (e.g. <code>diff_tree_to_tree</code>
 or other <code>diff_*</code> functions).</p>
-</div><h2 id='methods'>Methods</h2><h3 class='impl'><code>impl&lt;'repo&gt; <a class='struct' href='../git2/struct.Diff.html' title='git2::Diff'>Diff</a>&lt;'repo&gt;</code></h3><div class='impl-items'><h4 id='method.merge' class='method'><code>fn <a href='#method.merge' class='fnname'>merge</a>(&amp;mut self, from: &amp;<a class='struct' href='../git2/struct.Diff.html' title='git2::Diff'>Diff</a>&lt;'repo&gt;) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>()</a>, <a class='struct' href='../git2/struct.Error.html' title='git2::Error'>Error</a>&gt;</code></h4>
+</div><h2 id='methods'>Methods</h2><h3 class='impl'><span class='in-band'><code>impl&lt;'repo&gt; <a class='struct' href='../git2/struct.Diff.html' title='git2::Diff'>Diff</a>&lt;'repo&gt;</code></span><span class='out-of-band'><a id='src-2743' class='srclink' href='../src/git2/diff.rs.html#118-230' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.merge' class='method'><code>fn <a href='#method.merge' class='fnname'>merge</a>(&amp;mut self, from: &amp;<a class='struct' href='../git2/struct.Diff.html' title='git2::Diff'>Diff</a>&lt;'repo&gt;) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>()</a>, <a class='struct' href='../git2/struct.Error.html' title='git2::Error'>Error</a>&gt;</code></h4>
 <div class='docblock'><p>Merge one diff into another.</p>
 
 <p>This merges items from the &quot;from&quot; list into the &quot;self&quot; list.  The
@@ -88,7 +90,9 @@ return an error from this function.</p>
 renames or copies with new entries reflecting those changes. This also
 will, if requested, break modified files into add/remove pairs if the
 amount of change is above a threshold.</p>
-</div></div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><code>impl&lt;'repo&gt; <a class='trait' href='https://doc.rust-lang.org/nightly/core/marker/trait.Send.html' title='core::marker::Send'>Send</a> for <a class='struct' href='../git2/struct.Diff.html' title='git2::Diff'>Diff</a>&lt;'repo&gt;</code></h3><div class='impl-items'></div><h3 class='impl'><code>impl&lt;'repo&gt; <a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.Drop.html' title='core::ops::Drop'>Drop</a> for <a class='struct' href='../git2/struct.Diff.html' title='git2::Diff'>Diff</a>&lt;'repo&gt;</code></h3><div class='impl-items'><h4 id='method.drop' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/ops/trait.Drop.html#method.drop' class='fnname'>drop</a>(&amp;mut self)</code></h4>
+</div></div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><span class='in-band'><code>impl&lt;'repo&gt; <a class='trait' href='https://doc.rust-lang.org/nightly/core/marker/trait.Send.html' title='core::marker::Send'>Send</a> for <a class='struct' href='../git2/struct.Diff.html' title='git2::Diff'>Diff</a>&lt;'repo&gt;</code></span><span class='out-of-band'><a id='src-2665' class='srclink' href='../src/git2/diff.rs.html#23' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'></div><h3 class='impl'><span class='in-band'><code>impl&lt;'repo&gt; <a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.Drop.html' title='core::ops::Drop'>Drop</a> for <a class='struct' href='../git2/struct.Diff.html' title='git2::Diff'>Diff</a>&lt;'repo&gt;</code></span><span class='out-of-band'><a id='src-2855' class='srclink' href='../src/git2/diff.rs.html#331-335' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.drop' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/ops/trait.Drop.html#tymethod.drop' class='fnname'>drop</a>(&amp;mut self)</code></h4>
 </div></section>
     <section id='search' class="content hidden"></section>
 

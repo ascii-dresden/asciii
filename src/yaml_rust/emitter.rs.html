@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="rustdoc">
-    <meta name="description" content="Source to the Rust file `/home/hendrik/.multirust/toolchains/nightly/cargo/git/checkouts/yaml-rust-cd4372d92c348ba0/.cargo-lock-yaml-rust-cd4372d92c348ba0-feature/feature/to_string/src/emitter.rs`.">
+    <meta name="description" content="Source to the Rust file `/home/hendrik/.multirust/toolchains/nightly/cargo/git/checkouts/yaml-rust-7ea78ddceaf4cc2e/.cargo-lock-yaml-rust-7ea78ddceaf4cc2e-feature/feature/to_string/src/emitter.rs`.">
     <meta name="keywords" content="rust, rustlang, rust-lang">
 
     <title>emitter.rs.html -- source</title>
@@ -290,7 +290,7 @@
 }
 
 <span class='kw'>impl</span> <span class='ident'>From</span><span class='op'>&lt;</span><span class='ident'>fmt</span>::<span class='ident'>Error</span><span class='op'>&gt;</span> <span class='kw'>for</span> <span class='ident'>EmitError</span> {
-    <span class='kw'>fn</span> <span class='ident'>from</span>(<span class='ident'>f</span>: <span class='ident'>fmt</span>::<span class='ident'>Error</span>) <span class='op'>-&gt;</span> <span class='kw'>Self</span> {
+    <span class='kw'>fn</span> <span class='ident'>from</span>(<span class='ident'>f</span>: <span class='ident'>fmt</span>::<span class='ident'>Error</span>) <span class='op'>-&gt;</span> <span class='self'>Self</span> {
         <span class='ident'>EmitError</span>::<span class='ident'>FmtError</span>(<span class='ident'>f</span>)
     }
 }

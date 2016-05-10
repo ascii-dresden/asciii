@@ -11,6 +11,7 @@
 
     <link rel="stylesheet" type="text/css" href="../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../main.css">
+    
 
     
     
@@ -43,14 +44,15 @@
 
     <section id='main' class="content struct">
 <h1 class='fqn'><span class='in-band'>Struct <a href='index.html'>git2</a>::<wbr><a class='struct' href=''>Index</a></span><span class='out-of-band'><span id='render-detail'>
-            <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
-                [<span class='inner'>&#x2212;</span>]
-            </a>
-        </span><a id='src-3402' class='srclink' href='../src/git2/index.rs.html#15-17' title='goto source code'>[src]</a></span></h1>
+                   <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                       [<span class='inner'>&#x2212;</span>]
+                   </a>
+               </span><a id='src-3366' class='srclink' href='../src/git2/index.rs.html#15-17' title='goto source code'>[src]</a></span></h1>
 <pre class='rust struct'>pub struct Index {
     // some fields omitted
 }</pre><div class='docblock'><p>A structure to represent a git <a href="http://git-scm.com/book/en/Git-Internals-Git-Objects">index</a></p>
-</div><h2 id='methods'>Methods</h2><h3 class='impl'><code>impl <a class='struct' href='../git2/struct.Index.html' title='git2::Index'>Index</a></code></h3><div class='impl-items'><h4 id='method.new' class='method'><code>fn <a href='#method.new' class='fnname'>new</a>() -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='struct' href='../git2/struct.Index.html' title='git2::Index'>Index</a>, <a class='struct' href='../git2/struct.Error.html' title='git2::Error'>Error</a>&gt;</code></h4>
+</div><h2 id='methods'>Methods</h2><h3 class='impl'><span class='in-band'><code>impl <a class='struct' href='../git2/struct.Index.html' title='git2::Index'>Index</a></code></span><span class='out-of-band'><a id='src-3387' class='srclink' href='../src/git2/index.rs.html#52-386' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.new' class='method'><code>fn <a href='#method.new' class='fnname'>new</a>() -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='struct' href='../git2/struct.Index.html' title='git2::Index'>Index</a>, <a class='struct' href='../git2/struct.Error.html' title='git2::Error'>Error</a>&gt;</code></h4>
 <div class='docblock'><p>Creates a new in-memory index.</p>
 
 <p>This index object cannot be read/written to the filesystem, but may be
@@ -84,7 +86,7 @@ rules.</p>
 <p>If this file currently is the result of a merge conflict, this file will
 no longer be marked as conflicting. The data about the conflict will be
 moved to the &quot;resolve undo&quot; (REUC) section.</p>
-</div><h4 id='method.add_all' class='method'><code>fn <a href='#method.add_all' class='fnname'>add_all</a>&lt;T, I&gt;(&amp;mut self, pathspecs: I, flag: <a class='struct' href='../git2/struct.IndexAddOption.html' title='git2::IndexAddOption'>IndexAddOption</a>, cb: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;&amp;mut <a class='type' href='../git2/type.IndexMatchedPath.html' title='git2::IndexMatchedPath'>IndexMatchedPath</a>&gt;) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>()</a>, <a class='struct' href='../git2/struct.Error.html' title='git2::Error'>Error</a>&gt; <span class='where'>where T: <a class='trait' href='../git2/trait.IntoCString.html' title='git2::IntoCString'>IntoCString</a>, I: <a class='trait' href='https://doc.rust-lang.org/nightly/core/iter/trait.IntoIterator.html' title='core::iter::IntoIterator'>IntoIterator</a>&lt;Item=T&gt;</span></code></h4>
+</div><h4 id='method.add_all' class='method'><code>fn <a href='#method.add_all' class='fnname'>add_all</a>&lt;T, I&gt;(&amp;mut self, pathspecs: I, flag: <a class='struct' href='../git2/struct.IndexAddOption.html' title='git2::IndexAddOption'>IndexAddOption</a>, cb: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;&amp;mut <a class='type' href='../git2/type.IndexMatchedPath.html' title='git2::IndexMatchedPath'>IndexMatchedPath</a>&gt;) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>()</a>, <a class='struct' href='../git2/struct.Error.html' title='git2::Error'>Error</a>&gt; <span class='where'>where T: <a class='trait' href='../git2/trait.IntoCString.html' title='git2::IntoCString'>IntoCString</a>, I: <a class='trait' href='https://doc.rust-lang.org/nightly/core/iter/traits/trait.IntoIterator.html' title='core::iter::traits::IntoIterator'>IntoIterator</a>&lt;Item=T&gt;</span></code></h4>
 <div class='docblock'><p>Add or update index entries matching files in the working directory.</p>
 
 <p>This method will fail in bare index instances.</p>
@@ -164,13 +166,13 @@ no longer be marked as conflicting. The data about the conflict will be
 moved to the &quot;resolve undo&quot; (REUC) section.</p>
 </div><h4 id='method.remove_dir' class='method'><code>fn <a href='#method.remove_dir' class='fnname'>remove_dir</a>(&amp;mut self, path: &amp;<a class='struct' href='https://doc.rust-lang.org/nightly/std/path/struct.Path.html' title='std::path::Path'>Path</a>, stage: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i32.html'>i32</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>()</a>, <a class='struct' href='../git2/struct.Error.html' title='git2::Error'>Error</a>&gt;</code></h4>
 <div class='docblock'><p>Remove all entries from the index under a given directory.</p>
-</div><h4 id='method.remove_all' class='method'><code>fn <a href='#method.remove_all' class='fnname'>remove_all</a>&lt;T, I&gt;(&amp;mut self, pathspecs: I, cb: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;&amp;mut <a class='type' href='../git2/type.IndexMatchedPath.html' title='git2::IndexMatchedPath'>IndexMatchedPath</a>&gt;) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>()</a>, <a class='struct' href='../git2/struct.Error.html' title='git2::Error'>Error</a>&gt; <span class='where'>where T: <a class='trait' href='../git2/trait.IntoCString.html' title='git2::IntoCString'>IntoCString</a>, I: <a class='trait' href='https://doc.rust-lang.org/nightly/core/iter/trait.IntoIterator.html' title='core::iter::IntoIterator'>IntoIterator</a>&lt;Item=T&gt;</span></code></h4>
+</div><h4 id='method.remove_all' class='method'><code>fn <a href='#method.remove_all' class='fnname'>remove_all</a>&lt;T, I&gt;(&amp;mut self, pathspecs: I, cb: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;&amp;mut <a class='type' href='../git2/type.IndexMatchedPath.html' title='git2::IndexMatchedPath'>IndexMatchedPath</a>&gt;) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>()</a>, <a class='struct' href='../git2/struct.Error.html' title='git2::Error'>Error</a>&gt; <span class='where'>where T: <a class='trait' href='../git2/trait.IntoCString.html' title='git2::IntoCString'>IntoCString</a>, I: <a class='trait' href='https://doc.rust-lang.org/nightly/core/iter/traits/trait.IntoIterator.html' title='core::iter::traits::IntoIterator'>IntoIterator</a>&lt;Item=T&gt;</span></code></h4>
 <div class='docblock'><p>Remove all matching index entries.</p>
 
 <p>If you provide a callback function, it will be invoked on each matching
 item in the index immediately before it is removed. Return 0 to remove
 the item, &gt; 0 to skip the item, and &lt; 0 to abort the scan.</p>
-</div><h4 id='method.update_all' class='method'><code>fn <a href='#method.update_all' class='fnname'>update_all</a>&lt;T, I&gt;(&amp;mut self, pathspecs: I, cb: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;&amp;mut <a class='type' href='../git2/type.IndexMatchedPath.html' title='git2::IndexMatchedPath'>IndexMatchedPath</a>&gt;) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>()</a>, <a class='struct' href='../git2/struct.Error.html' title='git2::Error'>Error</a>&gt; <span class='where'>where T: <a class='trait' href='../git2/trait.IntoCString.html' title='git2::IntoCString'>IntoCString</a>, I: <a class='trait' href='https://doc.rust-lang.org/nightly/core/iter/trait.IntoIterator.html' title='core::iter::IntoIterator'>IntoIterator</a>&lt;Item=T&gt;</span></code></h4>
+</div><h4 id='method.update_all' class='method'><code>fn <a href='#method.update_all' class='fnname'>update_all</a>&lt;T, I&gt;(&amp;mut self, pathspecs: I, cb: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;&amp;mut <a class='type' href='../git2/type.IndexMatchedPath.html' title='git2::IndexMatchedPath'>IndexMatchedPath</a>&gt;) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>()</a>, <a class='struct' href='../git2/struct.Error.html' title='git2::Error'>Error</a>&gt; <span class='where'>where T: <a class='trait' href='../git2/trait.IntoCString.html' title='git2::IntoCString'>IntoCString</a>, I: <a class='trait' href='https://doc.rust-lang.org/nightly/core/iter/traits/trait.IntoIterator.html' title='core::iter::traits::IntoIterator'>IntoIterator</a>&lt;Item=T&gt;</span></code></h4>
 <div class='docblock'><p>Update all index entries to match the working directory</p>
 
 <p>This method will fail in bare index instances.</p>
@@ -204,7 +206,8 @@ existing repository.</p>
 
 <p>This is the same as <code>write_tree</code> except that the destination repository
 can be chosen.</p>
-</div></div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.Drop.html' title='core::ops::Drop'>Drop</a> for <a class='struct' href='../git2/struct.Index.html' title='git2::Index'>Index</a></code></h3><div class='impl-items'><h4 id='method.drop' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/ops/trait.Drop.html#method.drop' class='fnname'>drop</a>(&amp;mut self)</code></h4>
+</div></div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><span class='in-band'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.Drop.html' title='core::ops::Drop'>Drop</a> for <a class='struct' href='../git2/struct.Index.html' title='git2::Index'>Index</a></code></span><span class='out-of-band'><a id='src-3559' class='srclink' href='../src/git2/index.rs.html#410-414' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.drop' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/ops/trait.Drop.html#tymethod.drop' class='fnname'>drop</a>(&amp;mut self)</code></h4>
 </div></section>
     <section id='search' class="content hidden"></section>
 

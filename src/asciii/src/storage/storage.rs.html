@@ -11,6 +11,7 @@
 
     <link rel="stylesheet" type="text/css" href="../../../../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../../../../main.css">
+    
 
     
     
@@ -488,6 +489,42 @@
 <span id="445">445</span>
 <span id="446">446</span>
 <span id="447">447</span>
+<span id="448">448</span>
+<span id="449">449</span>
+<span id="450">450</span>
+<span id="451">451</span>
+<span id="452">452</span>
+<span id="453">453</span>
+<span id="454">454</span>
+<span id="455">455</span>
+<span id="456">456</span>
+<span id="457">457</span>
+<span id="458">458</span>
+<span id="459">459</span>
+<span id="460">460</span>
+<span id="461">461</span>
+<span id="462">462</span>
+<span id="463">463</span>
+<span id="464">464</span>
+<span id="465">465</span>
+<span id="466">466</span>
+<span id="467">467</span>
+<span id="468">468</span>
+<span id="469">469</span>
+<span id="470">470</span>
+<span id="471">471</span>
+<span id="472">472</span>
+<span id="473">473</span>
+<span id="474">474</span>
+<span id="475">475</span>
+<span id="476">476</span>
+<span id="477">477</span>
+<span id="478">478</span>
+<span id="479">479</span>
+<span id="480">480</span>
+<span id="481">481</span>
+<span id="482">482</span>
+<span id="483">483</span>
 </pre><pre class='rust '>
 
 <span class='attribute'>#<span class='op'>!</span>[<span class='ident'>allow</span>(<span class='ident'>dead_code</span>)]</span>
@@ -495,29 +532,29 @@
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>fs</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>fmt</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>ffi</span>::<span class='ident'>OsStr</span>;
+<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>ops</span>::{<span class='ident'>Deref</span>, <span class='ident'>DerefMut</span>};
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>path</span>::{<span class='ident'>Path</span>, <span class='ident'>PathBuf</span>};
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>marker</span>::<span class='ident'>PhantomData</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>collections</span>::<span class='ident'>HashMap</span>;
 
 <span class='kw'>use</span> <span class='ident'>slug</span>;
 
-<span class='kw'>use</span> <span class='ident'>repo</span>::<span class='ident'>Repository</span>;
-
-<span class='kw'>use</span> <span class='ident'>super</span>::<span class='ident'>error</span>::<span class='ident'>StorageError</span>;
-<span class='kw'>use</span> <span class='ident'>super</span>::<span class='ident'>list_path_content</span>;
-<span class='kw'>use</span> <span class='ident'>super</span>::<span class='ident'>Storage</span>;
-<span class='kw'>use</span> <span class='ident'>super</span>::<span class='ident'>Year</span>;
-<span class='kw'>use</span> <span class='ident'>super</span>::<span class='ident'>StorageDir</span>;
-<span class='kw'>use</span> <span class='ident'>super</span>::<span class='ident'>StorageResult</span>;
-<span class='kw'>use</span> <span class='ident'>super</span>::<span class='ident'>ProjectList</span>;
-<span class='kw'>use</span> <span class='ident'>super</span>::<span class='ident'>storable</span>::<span class='ident'>Storable</span>;
+<span class='kw'>use</span> <span class='kw'>super</span>::<span class='ident'>error</span>::<span class='ident'>StorageError</span>;
+<span class='kw'>use</span> <span class='kw'>super</span>::<span class='ident'>list_path_content</span>;
+<span class='kw'>use</span> <span class='kw'>super</span>::<span class='ident'>Storage</span>;
+<span class='kw'>use</span> <span class='kw'>super</span>::<span class='ident'>Year</span>;
+<span class='kw'>use</span> <span class='kw'>super</span>::<span class='ident'>StorageDir</span>;
+<span class='kw'>use</span> <span class='kw'>super</span>::<span class='ident'>StorageResult</span>;
+<span class='kw'>use</span> <span class='kw'>super</span>::<span class='ident'>ProjectList</span>;
+<span class='kw'>use</span> <span class='kw'>super</span>::<span class='ident'>storable</span>::<span class='ident'>Storable</span>;
+<span class='kw'>use</span> <span class='kw'>super</span>::<span class='ident'>repo</span>::<span class='ident'>Repository</span>;
 
 <span class='kw'>fn</span> <span class='ident'>slugify</span>(<span class='ident'>string</span>:<span class='kw-2'>&amp;</span><span class='ident'>str</span>) <span class='op'>-&gt;</span> <span class='ident'>String</span>{ <span class='ident'>slug</span>::<span class='ident'>slugify</span>(<span class='ident'>string</span>) }
 
 
 <span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>L</span>:<span class='ident'>Storable</span><span class='op'>&gt;</span> <span class='ident'>Storage</span><span class='op'>&lt;</span><span class='ident'>L</span><span class='op'>&gt;</span> {
     <span class='doccomment'>/// Inits storage, does not check existence, yet. TODO</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>new</span><span class='op'>&lt;</span><span class='ident'>P</span>: <span class='ident'>AsRef</span><span class='op'>&lt;</span><span class='ident'>Path</span><span class='op'>&gt;&gt;</span>(<span class='ident'>root</span>:<span class='ident'>P</span>, <span class='ident'>working</span>:<span class='kw-2'>&amp;</span><span class='ident'>str</span>, <span class='ident'>archive</span>:<span class='kw-2'>&amp;</span><span class='ident'>str</span>, <span class='ident'>template</span>:<span class='kw-2'>&amp;</span><span class='ident'>str</span>) <span class='op'>-&gt;</span> <span class='ident'>StorageResult</span><span class='op'>&lt;</span><span class='kw'>Self</span><span class='op'>&gt;</span> {
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>new</span><span class='op'>&lt;</span><span class='ident'>P</span>: <span class='ident'>AsRef</span><span class='op'>&lt;</span><span class='ident'>Path</span><span class='op'>&gt;&gt;</span>(<span class='ident'>root</span>:<span class='ident'>P</span>, <span class='ident'>working</span>:<span class='kw-2'>&amp;</span><span class='ident'>str</span>, <span class='ident'>archive</span>:<span class='kw-2'>&amp;</span><span class='ident'>str</span>, <span class='ident'>template</span>:<span class='kw-2'>&amp;</span><span class='ident'>str</span>) <span class='op'>-&gt;</span> <span class='ident'>StorageResult</span><span class='op'>&lt;</span><span class='self'>Self</span><span class='op'>&gt;</span> {
         <span class='macro'>trace</span><span class='macro'>!</span>(<span class='string'>&quot;initializing storage, root: {}&quot;</span>, <span class='ident'>root</span>.<span class='ident'>as_ref</span>().<span class='ident'>display</span>());
         <span class='kw'>let</span> <span class='ident'>root</span> <span class='op'>=</span> <span class='ident'>root</span>.<span class='ident'>as_ref</span>();
         <span class='kw'>if</span> <span class='ident'>root</span>.<span class='ident'>is_absolute</span>(){
@@ -535,11 +572,11 @@
     }
 
     <span class='doccomment'>/// Inits storage with git capabilities.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>new_with_git</span><span class='op'>&lt;</span><span class='ident'>P</span>: <span class='ident'>AsRef</span><span class='op'>&lt;</span><span class='ident'>Path</span><span class='op'>&gt;&gt;</span>(<span class='ident'>root</span>:<span class='ident'>P</span>, <span class='ident'>working</span>:<span class='kw-2'>&amp;</span><span class='ident'>str</span>, <span class='ident'>archive</span>:<span class='kw-2'>&amp;</span><span class='ident'>str</span>, <span class='ident'>template</span>:<span class='kw-2'>&amp;</span><span class='ident'>str</span>) <span class='op'>-&gt;</span> <span class='ident'>StorageResult</span><span class='op'>&lt;</span><span class='kw'>Self</span><span class='op'>&gt;</span> {
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>new_with_git</span><span class='op'>&lt;</span><span class='ident'>P</span>: <span class='ident'>AsRef</span><span class='op'>&lt;</span><span class='ident'>Path</span><span class='op'>&gt;&gt;</span>(<span class='ident'>root</span>:<span class='ident'>P</span>, <span class='ident'>working</span>:<span class='kw-2'>&amp;</span><span class='ident'>str</span>, <span class='ident'>archive</span>:<span class='kw-2'>&amp;</span><span class='ident'>str</span>, <span class='ident'>template</span>:<span class='kw-2'>&amp;</span><span class='ident'>str</span>) <span class='op'>-&gt;</span> <span class='ident'>StorageResult</span><span class='op'>&lt;</span><span class='self'>Self</span><span class='op'>&gt;</span> {
         <span class='macro'>trace</span><span class='macro'>!</span>(<span class='string'>&quot;initializing storage, with git&quot;</span>);
         <span class='prelude-val'>Ok</span>( <span class='ident'>Storage</span>{
             <span class='ident'>repository</span>: <span class='prelude-val'>Some</span>(<span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>Repository</span>::<span class='ident'>new</span>(<span class='ident'>root</span>.<span class='ident'>as_ref</span>()))),
-            .. <span class='macro'>try</span><span class='macro'>!</span>{<span class='ident'>Self</span>::<span class='ident'>new</span>(<span class='ident'>root</span>,<span class='ident'>working</span>,<span class='ident'>archive</span>,<span class='ident'>template</span>)}
+            .. <span class='macro'>try</span><span class='macro'>!</span>{<span class='self'>Self</span>::<span class='ident'>new</span>(<span class='ident'>root</span>,<span class='ident'>working</span>,<span class='ident'>archive</span>,<span class='ident'>template</span>)}
         })
     }
 
@@ -612,7 +649,7 @@
         <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>list_path_content</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>templates_dir</span>()))
             .<span class='ident'>iter</span>()
             .<span class='ident'>filter</span>(<span class='op'>|</span><span class='ident'>p</span><span class='op'>|</span><span class='ident'>p</span>.<span class='ident'>extension</span>()
-                        .<span class='ident'>unwrap_or_else</span>(<span class='op'>||</span> <span class='ident'>OsStr</span>::<span class='ident'>new</span>(<span class='string'>&quot;&quot;</span>)) <span class='op'>==</span> <span class='ident'>OsStr</span>::<span class='ident'>new</span>(<span class='ident'>super</span>::<span class='ident'>TEMPLATE_FILE_EXTENSION</span>)
+                        .<span class='ident'>unwrap_or_else</span>(<span class='op'>||</span> <span class='ident'>OsStr</span>::<span class='ident'>new</span>(<span class='string'>&quot;&quot;</span>)) <span class='op'>==</span> <span class='ident'>OsStr</span>::<span class='ident'>new</span>(<span class='kw'>super</span>::<span class='ident'>TEMPLATE_FILE_EXTENSION</span>)
                         )
             .<span class='ident'>cloned</span>().<span class='ident'>collect</span>();
         <span class='kw'>if</span> <span class='ident'>template_files</span>.<span class='ident'>is_empty</span>(){
@@ -625,11 +662,10 @@
     <span class='doccomment'>/// Produces a list of names of all template filess in the `templates_dir()`</span>
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>list_template_names</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>StorageResult</span><span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>String</span><span class='op'>&gt;&gt;</span> {
         <span class='macro'>trace</span><span class='macro'>!</span>(<span class='string'>&quot;listing template names&quot;</span>);
-        <span class='kw'>let</span> <span class='ident'>template_names</span> <span class='op'>=</span>
-        <span class='macro'>try</span><span class='macro'>!</span>(<span class='self'>self</span>.<span class='ident'>list_template_files</span>()).<span class='ident'>iter</span>()
+        <span class='kw'>let</span> <span class='ident'>template_names</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='self'>self</span>.<span class='ident'>list_template_files</span>()).<span class='ident'>iter</span>()
             .<span class='ident'>filter_map</span>(<span class='op'>|</span><span class='ident'>p</span><span class='op'>|</span><span class='ident'>p</span>.<span class='ident'>file_stem</span>())
-            .<span class='ident'>filter_map</span>(<span class='op'>|</span><span class='ident'>n</span><span class='op'>|</span><span class='ident'>n</span>.<span class='ident'>to_str</span>())
-            .<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>s</span><span class='op'>|</span><span class='ident'>s</span>.<span class='ident'>to_owned</span>())
+            .<span class='ident'>filter_map</span>(<span class='ident'>OsStr</span>::<span class='ident'>to_str</span>)
+            .<span class='ident'>map</span>(<span class='ident'>ToOwned</span>::<span class='ident'>to_owned</span>)
             .<span class='ident'>collect</span>();
         <span class='prelude-val'>Ok</span>(<span class='ident'>template_names</span>)
     }
@@ -658,7 +694,7 @@
             <span class='macro'>try</span><span class='macro'>!</span>(<span class='self'>self</span>.<span class='ident'>list_archives</span>())
             .<span class='ident'>iter</span>()
             .<span class='ident'>filter_map</span>(<span class='op'>|</span><span class='ident'>p</span><span class='op'>|</span> <span class='ident'>p</span>.<span class='ident'>file_stem</span>())
-            .<span class='ident'>filter_map</span>(<span class='op'>|</span><span class='ident'>p</span><span class='op'>|</span> <span class='ident'>p</span>.<span class='ident'>to_str</span>())
+            .<span class='ident'>filter_map</span>(<span class='ident'>OsStr</span>::<span class='ident'>to_str</span>)
             .<span class='ident'>filter_map</span>(<span class='op'>|</span><span class='ident'>year_str</span><span class='op'>|</span> <span class='ident'>year_str</span>.<span class='ident'>parse</span>::<span class='op'>&lt;</span><span class='ident'>Year</span><span class='op'>&gt;</span>().<span class='ident'>ok</span>())
             .<span class='ident'>collect</span>();
         <span class='ident'>years</span>.<span class='ident'>sort</span>();
@@ -770,9 +806,8 @@
         <span class='comment'>// must be in a dir that parses into a year</span>
         <span class='kw'>let</span> <span class='ident'>parent_is_num</span> <span class='op'>=</span>  <span class='ident'>archived_dir</span>.<span class='ident'>parent</span>()
             .<span class='ident'>and_then</span>(<span class='op'>|</span><span class='ident'>p</span><span class='op'>|</span> <span class='ident'>p</span>.<span class='ident'>file_stem</span>())
-            .<span class='ident'>and_then</span>(<span class='op'>|</span><span class='ident'>p</span><span class='op'>|</span> <span class='ident'>p</span>.<span class='ident'>to_str</span>())
-            .<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>s</span><span class='op'>|</span> <span class='ident'>s</span>.<span class='ident'>parse</span>::<span class='op'>&lt;</span><span class='ident'>i32</span><span class='op'>&gt;</span>().<span class='ident'>is_ok</span>() )
-            .<span class='ident'>unwrap_or</span>(<span class='boolval'>false</span>);
+            .<span class='ident'>and_then</span>(<span class='ident'>OsStr</span>::<span class='ident'>to_str</span>)
+            .<span class='ident'>map_or</span>(<span class='boolvalue'>false</span>, <span class='op'>|</span><span class='ident'>s</span><span class='op'>|</span> <span class='ident'>s</span>.<span class='ident'>parse</span>::<span class='op'>&lt;</span><span class='ident'>i32</span><span class='op'>&gt;</span>().<span class='ident'>is_ok</span>());
 
         <span class='kw'>let</span> <span class='ident'>name</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='self'>self</span>.<span class='ident'>get_project_name</span>(<span class='ident'>archived_dir</span>));
         <span class='kw'>let</span> <span class='ident'>target</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>working_dir</span>().<span class='ident'>join</span>(<span class='kw-2'>&amp;</span><span class='ident'>name</span>);
@@ -795,7 +830,7 @@
     <span class='doccomment'>/// TODO return opened `Project`, no need to reopen</span>
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>search_projects</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>directory</span>:<span class='ident'>StorageDir</span>, <span class='ident'>search_term</span>:<span class='kw-2'>&amp;</span><span class='ident'>str</span>) <span class='op'>-&gt;</span> <span class='ident'>StorageResult</span><span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>L</span><span class='op'>&gt;&gt;</span> {
         <span class='macro'>trace</span><span class='macro'>!</span>(<span class='string'>&quot;searching for projects by {:?} in {:?}&quot;</span>, <span class='ident'>search_term</span>, <span class='ident'>directory</span>);
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>project_paths</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='self'>self</span>.<span class='ident'>open_project_files</span>(<span class='ident'>directory</span>));
+        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>project_paths</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='self'>self</span>.<span class='ident'>open_projects</span>(<span class='ident'>directory</span>));
         <span class='kw'>let</span> <span class='ident'>projects</span> <span class='op'>=</span> <span class='ident'>project_paths</span>
             .<span class='ident'>drain</span>(..)
             .<span class='ident'>filter</span>(<span class='op'>|</span><span class='ident'>project</span><span class='op'>|</span> <span class='ident'>project</span>.<span class='ident'>matches_search</span>(<span class='kw-2'>&amp;</span><span class='ident'>search_term</span>.<span class='ident'>to_lowercase</span>()))
@@ -838,7 +873,7 @@
         <span class='macro'>trace</span><span class='macro'>!</span>(<span class='string'>&quot;getting project file from {:?}&quot;</span>, <span class='ident'>directory</span>);
         <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>list_path_content</span>(<span class='ident'>directory</span>)).<span class='ident'>iter</span>()
             .<span class='ident'>filter</span>(<span class='op'>|</span><span class='ident'>f</span><span class='op'>|</span><span class='ident'>f</span>.<span class='ident'>extension</span>().<span class='ident'>unwrap_or</span>(<span class='kw-2'>&amp;</span><span class='ident'>OsStr</span>::<span class='ident'>new</span>(<span class='string'>&quot;&quot;</span>)) <span class='op'>==</span> <span class='ident'>L</span>::<span class='ident'>file_extension</span>())
-            .<span class='ident'>nth</span>(<span class='number'>0</span>).<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>b</span><span class='op'>|</span><span class='ident'>b</span>.<span class='ident'>to_owned</span>())
+            .<span class='ident'>nth</span>(<span class='number'>0</span>).<span class='ident'>map</span>(<span class='ident'>ToOwned</span>::<span class='ident'>to_owned</span>)
             .<span class='ident'>ok_or</span>(<span class='ident'>StorageError</span>::<span class='ident'>ProjectDoesNotExist</span>)
     }
 
@@ -888,10 +923,9 @@
     <span class='doccomment'>/// Produces a list of project files.</span>
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>list_project_files</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>directory</span>:<span class='ident'>StorageDir</span>) <span class='op'>-&gt;</span> <span class='ident'>StorageResult</span><span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>PathBuf</span><span class='op'>&gt;&gt;</span> {
         <span class='macro'>trace</span><span class='macro'>!</span>(<span class='string'>&quot;listing project files in {:?}-directory&quot;</span>, <span class='ident'>directory</span>);
-        <span class='kw'>let</span> <span class='ident'>projects</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='self'>self</span>.<span class='ident'>list_project_folders</span>(<span class='ident'>directory</span>)).<span class='ident'>iter</span>()
-            .<span class='ident'>filter_map</span>(<span class='op'>|</span><span class='ident'>dir</span><span class='op'>|</span> <span class='self'>self</span>.<span class='ident'>get_project_file</span>(<span class='ident'>dir</span>).<span class='ident'>ok</span>())
-            .<span class='ident'>collect</span>();
-        <span class='prelude-val'>Ok</span>(<span class='ident'>projects</span>)
+        <span class='macro'>try</span><span class='macro'>!</span>(<span class='self'>self</span>.<span class='ident'>list_project_folders</span>(<span class='ident'>directory</span>)).<span class='ident'>iter</span>()
+            .<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>dir</span><span class='op'>|</span> <span class='self'>self</span>.<span class='ident'>get_project_file</span>(<span class='ident'>dir</span>))
+            .<span class='ident'>collect</span>()
     }
 
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>filter_project_files</span><span class='op'>&lt;</span><span class='ident'>F</span><span class='op'>&gt;</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>directory</span>:<span class='ident'>StorageDir</span>, <span class='ident'>filter</span>:<span class='ident'>F</span>) <span class='op'>-&gt;</span> <span class='ident'>StorageResult</span><span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>PathBuf</span><span class='op'>&gt;&gt;</span>
@@ -906,19 +940,58 @@
     }
 
     <span class='doccomment'>/// Behaves like `list_project_files()` but also opens projects directly.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>open_project_files</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>directory</span>:<span class='ident'>StorageDir</span>) <span class='op'>-&gt;</span> <span class='ident'>StorageResult</span><span class='op'>&lt;</span><span class='ident'>ProjectList</span><span class='op'>&lt;</span><span class='ident'>L</span><span class='op'>&gt;&gt;</span>{
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>open_projects</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>directory</span>:<span class='ident'>StorageDir</span>) <span class='op'>-&gt;</span> <span class='ident'>StorageResult</span><span class='op'>&lt;</span><span class='ident'>ProjectList</span><span class='op'>&lt;</span><span class='ident'>L</span><span class='op'>&gt;&gt;</span>{
         <span class='macro'>trace</span><span class='macro'>!</span>(<span class='string'>&quot;OPENING ALL PROJECTS in {:?}-directory&quot;</span>, <span class='ident'>directory</span>);
-        <span class='self'>self</span>.<span class='ident'>list_project_folders</span>(<span class='ident'>directory</span>)
-            .<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>paths</span><span class='op'>|</span> <span class='ident'>ProjectList</span>{<span class='ident'>projects</span>:<span class='ident'>paths</span>.<span class='ident'>iter</span>()
-                 .<span class='ident'>filter_map</span>(<span class='op'>|</span><span class='ident'>path</span><span class='op'>|</span> <span class='kw'>match</span> <span class='ident'>L</span>::<span class='ident'>open</span>(<span class='ident'>path</span>){
-                     <span class='prelude-val'>Ok</span>(<span class='ident'>project</span>) <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='ident'>project</span>),
-                     <span class='prelude-val'>Err</span>(<span class='ident'>err</span>) <span class='op'>=&gt;</span> {
-                         <span class='macro'>info</span><span class='macro'>!</span>(<span class='string'>&quot;Erroneous Project: {}\n {:#?}&quot;</span>, <span class='ident'>path</span>.<span class='ident'>display</span>(), <span class='ident'>err</span>);
-                         <span class='prelude-val'>None</span>
-                     }
-                 }).<span class='ident'>collect</span>::<span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>L</span><span class='op'>&gt;&gt;</span>()}
+        <span class='kw'>match</span> <span class='ident'>directory</span> {
+            <span class='comment'>//StorageDir::Year(_) =&gt; unimplemented!(),</span>
+            <span class='ident'>StorageDir</span>::<span class='ident'>Year</span>(<span class='ident'>year</span>) <span class='op'>=&gt;</span> {
+                <span class='comment'>// recursive :D</span>
+                <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>archived</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='self'>self</span>.<span class='ident'>open_projects</span>(<span class='ident'>StorageDir</span>::<span class='ident'>Archive</span>(<span class='ident'>year</span>)));
+                <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>working</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='self'>self</span>.<span class='ident'>open_projects</span>(<span class='ident'>StorageDir</span>::<span class='ident'>Working</span>));
+                <span class='ident'>archived</span>.<span class='ident'>append</span>(<span class='ident'>working</span>.<span class='ident'>deref_mut</span>());
+                <span class='ident'>archived</span>.<span class='ident'>filter_by_key_val</span>(<span class='string'>&quot;Year&quot;</span>, <span class='ident'>year</span>.<span class='ident'>to_string</span>().<span class='ident'>as_ref</span>());
+                <span class='prelude-val'>Ok</span>(<span class='ident'>archived</span>)
+            },
+            _ <span class='op'>=&gt;</span>
+                <span class='self'>self</span>.<span class='ident'>list_project_folders</span>(<span class='ident'>directory</span>)
+                .<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>paths</span><span class='op'>|</span> <span class='ident'>ProjectList</span>{
+                    <span class='ident'>projects</span>:<span class='ident'>paths</span>.<span class='ident'>iter</span>()
+                        .<span class='ident'>filter_map</span>(<span class='op'>|</span><span class='ident'>path</span><span class='op'>|</span><span class='self'>self</span>.<span class='ident'>open_project</span>(<span class='ident'>path</span>))
+                        .<span class='ident'>collect</span>::<span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>L</span><span class='op'>&gt;&gt;</span>()
+                }
                 )
+        }
     }
+
+    <span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>not</span>(<span class='ident'>feature</span><span class='op'>=</span><span class='string'>&quot;git_statuses&quot;</span>))]</span>
+    <span class='kw'>fn</span> <span class='ident'>open_project</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>path</span>:<span class='kw-2'>&amp;</span><span class='ident'>PathBuf</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>L</span><span class='op'>&gt;</span>{
+        <span class='kw'>match</span> <span class='ident'>L</span>::<span class='ident'>open</span>(<span class='ident'>path</span>) {
+            <span class='prelude-val'>Ok</span>(<span class='ident'>project</span>) <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='ident'>project</span>) ,
+            <span class='prelude-val'>Err</span>(<span class='ident'>err</span>) <span class='op'>=&gt;</span> {
+                <span class='macro'>warn</span><span class='macro'>!</span>(<span class='string'>&quot;Erroneous Project: {}\n {:#?}&quot;</span>, <span class='ident'>path</span>.<span class='ident'>display</span>(), <span class='ident'>err</span>);
+                <span class='prelude-val'>None</span>
+            }
+        }
+    }
+
+
+    <span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>feature</span><span class='op'>=</span><span class='string'>&quot;git_statuses&quot;</span>)]</span>
+    <span class='kw'>fn</span> <span class='ident'>open_project</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>path</span>:<span class='kw-2'>&amp;</span><span class='ident'>PathBuf</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>L</span><span class='op'>&gt;</span>{
+        <span class='kw'>match</span> <span class='ident'>L</span>::<span class='ident'>open</span>(<span class='ident'>path</span>) {
+            <span class='prelude-val'>Ok</span>(<span class='kw-2'>mut</span> <span class='ident'>project</span>) <span class='op'>=&gt;</span> {
+                <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Some</span>(<span class='kw-2'>ref</span> <span class='ident'>repo</span>) <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>repository</span>{
+                    <span class='ident'>project</span>.<span class='ident'>set_git_status</span>(<span class='ident'>repo</span>.<span class='ident'>get_status</span>(<span class='ident'>path</span>));
+                }
+                <span class='prelude-val'>Some</span>(<span class='ident'>project</span>) <span class='comment'>// &quot;return&quot;</span>
+            },
+            <span class='prelude-val'>Err</span>(<span class='ident'>err</span>) <span class='op'>=&gt;</span> {
+                <span class='macro'>warn</span><span class='macro'>!</span>(<span class='string'>&quot;Erroneous Project: {}\n {:#?}&quot;</span>, <span class='ident'>path</span>.<span class='ident'>display</span>(), <span class='ident'>err</span>);
+                <span class='prelude-val'>None</span>
+            }
+        }
+    }
+
+
 }
 
 <span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>P</span>:<span class='ident'>Storable</span><span class='op'>&gt;</span> <span class='ident'>fmt</span>::<span class='ident'>Debug</span> <span class='kw'>for</span> <span class='ident'>Storage</span><span class='op'>&lt;</span><span class='ident'>P</span><span class='op'>&gt;</span>{

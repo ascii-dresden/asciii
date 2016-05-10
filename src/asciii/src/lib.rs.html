@@ -11,6 +11,7 @@
 
     <link rel="stylesheet" type="text/css" href="../../../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../../../main.css">
+    
 
     
     
@@ -117,8 +118,8 @@
 </pre><pre class='rust '>
 <span class='doccomment'>//! Thank you for choosing `asciii`, the new and improved `ascii`.</span>
 <span class='doccomment'>//!</span>
+<span class='doccomment'>//! **For pure user documentation please refer to the [user manual](manual/index.html).**</span>
 <span class='doccomment'>//! This contains user and developer documentation together.</span>
-<span class='doccomment'>//! For pure user documentation please refer to the [user manual](manual/index.html).</span>
 <span class='doccomment'>//!</span>
 
 <span class='comment'>//#![warn(missing_docs,</span>
@@ -141,6 +142,7 @@
 <span class='attribute'>#<span class='op'>!</span>[<span class='ident'>cfg_attr</span>(<span class='ident'>feature</span> <span class='op'>=</span> <span class='string'>&quot;lints&quot;</span>, <span class='ident'>allow</span>(<span class='ident'>unstable_features</span>))]</span>
 <span class='attribute'>#<span class='op'>!</span>[<span class='ident'>cfg_attr</span>(<span class='ident'>feature</span> <span class='op'>=</span> <span class='string'>&quot;lints&quot;</span>, <span class='ident'>feature</span>(<span class='ident'>plugin</span>))]</span>
 <span class='attribute'>#<span class='op'>!</span>[<span class='ident'>cfg_attr</span>(<span class='ident'>feature</span> <span class='op'>=</span> <span class='string'>&quot;lints&quot;</span>, <span class='ident'>plugin</span>(<span class='ident'>clippy</span>))]</span>
+<span class='attribute'>#<span class='op'>!</span>[<span class='ident'>cfg_attr</span>(<span class='ident'>feature</span> <span class='op'>=</span> <span class='string'>&quot;document_export&quot;</span>, <span class='ident'>feature</span>(<span class='ident'>custom_derive</span>))]</span>
 
 <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>yaml_rust</span>;
 <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>chrono</span>;
@@ -148,7 +150,6 @@
 <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>slug</span>;
 <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>tempdir</span>;
 <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>term</span>; <span class='comment'>// TODO consolidate term, ansi_term and terminal_size</span>
-<span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>terminal_size</span>;
 <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>currency</span>;
 <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>open</span>;
 <span class='attribute'>#[<span class='ident'>macro_use</span>]</span> <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>log</span>;
@@ -157,11 +158,12 @@
 <span class='attribute'>#[<span class='ident'>macro_use</span>]</span> <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>maplit</span>;
 <span class='attribute'>#[<span class='ident'>macro_use</span>]</span> <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>custom_derive</span>;
 <span class='attribute'>#[<span class='ident'>macro_use</span>]</span> <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>enum_derive</span>;
-<span class='attribute'>#[<span class='ident'>macro_use</span>]</span> <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>clap</span>;
 
 <span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>feature</span><span class='op'>=</span><span class='string'>&quot;git_statuses&quot;</span>)]</span> <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>git2</span>;
 <span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>feature</span><span class='op'>=</span><span class='string'>&quot;document_export&quot;</span>)]</span> <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>handlebars</span>;
+<span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>feature</span><span class='op'>=</span><span class='string'>&quot;document_export&quot;</span>)]</span> <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>serde</span>;
 <span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>feature</span><span class='op'>=</span><span class='string'>&quot;document_export&quot;</span>)]</span> <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>serde_json</span>;
+<span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>feature</span><span class='op'>=</span><span class='string'>&quot;document_export&quot;</span>)]</span> <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>rustc_serialize</span>;
 
 <span class='attribute'>#[<span class='ident'>macro_use</span>]</span>
 <span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>util</span>;
@@ -170,10 +172,9 @@
 
 <span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>project</span>;
 <span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>storage</span>;
-<span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>repo</span>;
+<span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>print</span>;
 
 <span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>templater</span>;
-<span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>cli</span>;
 
 <span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>feature</span><span class='op'>=</span><span class='string'>&quot;document_export&quot;</span>)]</span>
 <span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>fill_docs</span>;
@@ -186,7 +187,7 @@
 <span class='doccomment'>///</span>
 <span class='doccomment'>/// Human readable, no semantic versioning.</span>
 <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>version</span>() <span class='op'>-&gt;</span> <span class='ident'>String</span>{
-    <span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;{} - {}&quot;</span>, <span class='macro'>crate_version</span><span class='macro'>!</span>(), <span class='macro'>include_str</span><span class='macro'>!</span>(<span class='string'>&quot;../.most_recent_commit&quot;</span>))
+    <span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;{} - {}&quot;</span>, <span class='macro'>env</span><span class='macro'>!</span>(<span class='string'>&quot;CARGO_PKG_VERSION&quot;</span>), <span class='macro'>include_str</span><span class='macro'>!</span>(<span class='string'>&quot;../.most_recent_commit&quot;</span>))
 }
 </pre>
 </section>

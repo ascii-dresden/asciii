@@ -11,6 +11,7 @@
 
     <link rel="stylesheet" type="text/css" href="../../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../../main.css">
+    
 
     
     
@@ -43,17 +44,17 @@
 
     <section id='main' class="content mod">
 <h1 class='fqn'><span class='in-band'>Module <a href='../index.html'>asciii</a>::<wbr><a class='mod' href=''>storage</a></span><span class='out-of-band'><span id='render-detail'>
-            <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
-                [<span class='inner'>&#x2212;</span>]
-            </a>
-        </span><a id='src-908' class='srclink' href='../../src/asciii/src/storage/mod.rs.html#1-88' title='goto source code'>[src]</a></span></h1>
+                   <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                       [<span class='inner'>&#x2212;</span>]
+                   </a>
+               </span><a id='src-901' class='srclink' href='../../src/asciii/src/storage/mod.rs.html#1-100' title='goto source code'>[src]</a></span></h1>
 <div class='docblock'><p>Manages file structure of templates, working directory and archives.</p>
 
 <p>This module takes care of project file management.</p>
 
 <p>Your ordinary file structure would look something like this:</p>
 
-<pre><code class="language-bash">PROJECTS  # storage dir
+<pre><code class="language-bash"># root dir
 ├── working
 │   └── Project1
 │       └── Project1.yml
@@ -67,77 +68,76 @@
 </code></pre>
 </div><h2 id='reexports' class='section-header'><a href="#reexports">Reexports</a></h2>
 <table><tr><td><code>pub use self::<a class='mod'
-                                            href='./error/index.html'>error</a>::<a class='enum' href='../../asciii/storage/error/enum.StorageError.html' title='asciii::storage::error::StorageError'>StorageError</a>;</code></td></tr><tr><td><code>pub use self::<a class='mod'
-                                            href='./storable/index.html'>storable</a>::<a class='trait' href='../../asciii/storage/storable/trait.Storable.html' title='asciii::storage::storable::Storable'>Storable</a>;</code></td></tr></table><h2 id='modules' class='section-header'><a href="#modules">Modules</a></h2>
+                                       href='./error/index.html'>error</a>::<a class='enum' href='../../asciii/storage/error/enum.StorageError.html' title='asciii::storage::error::StorageError'>StorageError</a>;</code></td></tr><tr><td><code>pub use self::<a class='mod'
+                                       href='./storable/index.html'>storable</a>::<a class='trait' href='../../asciii/storage/storable/trait.Storable.html' title='asciii::storage::storable::Storable'>Storable</a>;</code></td></tr></table><h2 id='modules' class='section-header'><a href="#modules">Modules</a></h2>
 <table>
-                    <tr class=' module-item'>
-                        <td><a class='mod' href='error/index.html'
-                               title='asciii::storage::error'>error</a></td>
-                        <td class='docblock short'>
-                             <p>Error that may occur in Storage</p>
-                        </td>
-                    </tr>
-                
-                    <tr class=' module-item'>
-                        <td><a class='mod' href='storable/index.html'
-                               title='asciii::storage::storable'>storable</a></td>
-                        <td class='docblock short'>
-                             <p>Contains the <code>Storable</code> trait that storable projects must implement.</p>
-                        </td>
-                    </tr>
-                </table><h2 id='structs' class='section-header'><a href="#structs">Structs</a></h2>
+                       <tr class=' module-item'>
+                           <td><a class='mod' href='error/index.html'
+                                  title='asciii::storage::error'>error</a></td>
+                           <td class='docblock short'>
+                                <p>Error that may occur in Storage</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class='mod' href='repo/index.html'
+                                  title='asciii::storage::repo'>repo</a></td>
+                           <td class='docblock short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class='mod' href='storable/index.html'
+                                  title='asciii::storage::storable'>storable</a></td>
+                           <td class='docblock short'>
+                                <p>Contains the <code>Storable</code> trait that storable projects must implement.</p>
+                           </td>
+                       </tr></table><h2 id='structs' class='section-header'><a href="#structs">Structs</a></h2>
 <table>
-                    <tr class=' module-item'>
-                        <td><a class='struct' href='struct.ProjectList.html'
-                               title='asciii::storage::ProjectList'>ProjectList</a></td>
-                        <td class='docblock short'>
-                             <p>Wrapper around <code>Vec&lt;Storable&gt;</code></p>
-                        </td>
-                    </tr>
-                
-                    <tr class=' module-item'>
-                        <td><a class='struct' href='struct.Storage.html'
-                               title='asciii::storage::Storage'>Storage</a></td>
-                        <td class='docblock short'>
-                             <p>Manages project file storage.</p>
-                        </td>
-                    </tr>
-                </table><h2 id='enums' class='section-header'><a href="#enums">Enums</a></h2>
+                       <tr class=' module-item'>
+                           <td><a class='struct' href='struct.ProjectList.html'
+                                  title='asciii::storage::ProjectList'>ProjectList</a></td>
+                           <td class='docblock short'>
+                                <p>Wrapper around <code>Vec&lt;Storable&gt;</code></p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class='struct' href='struct.Storage.html'
+                                  title='asciii::storage::Storage'>Storage</a></td>
+                           <td class='docblock short'>
+                                <p>Manages project file storage.</p>
+                           </td>
+                       </tr></table><h2 id='enums' class='section-header'><a href="#enums">Enums</a></h2>
 <table>
-                    <tr class=' module-item'>
-                        <td><a class='enum' href='enum.StorageDir.html'
-                               title='asciii::storage::StorageDir'>StorageDir</a></td>
-                        <td class='docblock short'>
-                             <p>Used to identify what directory you are talking about.</p>
-                        </td>
-                    </tr>
-                </table><h2 id='functions' class='section-header'><a href="#functions">Functions</a></h2>
+                       <tr class=' module-item'>
+                           <td><a class='enum' href='enum.StorageDir.html'
+                                  title='asciii::storage::StorageDir'>StorageDir</a></td>
+                           <td class='docblock short'>
+                                <p>Used to identify what directory you are talking about.</p>
+                           </td>
+                       </tr></table><h2 id='functions' class='section-header'><a href="#functions">Functions</a></h2>
 <table>
-                    <tr class=' module-item'>
-                        <td><a class='fn' href='fn.list_path_content.html'
-                               title='asciii::storage::list_path_content'>list_path_content</a></td>
-                        <td class='docblock short'>
-                             <p>Generic Filesystem wrapper.</p>
-                        </td>
-                    </tr>
-                </table><h2 id='types' class='section-header'><a href="#types">Type Definitions</a></h2>
+                       <tr class=' module-item'>
+                           <td><a class='fn' href='fn.list_path_content.html'
+                                  title='asciii::storage::list_path_content'>list_path_content</a></td>
+                           <td class='docblock short'>
+                                <p>Basically <code>ls</code>, returns a list of paths.</p>
+                           </td>
+                       </tr></table><h2 id='types' class='section-header'><a href="#types">Type Definitions</a></h2>
 <table>
-                    <tr class=' module-item'>
-                        <td><a class='type' href='type.StorageResult.html'
-                               title='asciii::storage::StorageResult'>StorageResult</a></td>
-                        <td class='docblock short'>
-                             <p>Result returned by Storage</p>
-                        </td>
-                    </tr>
-                
-                    <tr class=' module-item'>
-                        <td><a class='type' href='type.Year.html'
-                               title='asciii::storage::Year'>Year</a></td>
-                        <td class='docblock short'>
-                             <p>Year = <code>i32</code></p>
-                        </td>
-                    </tr>
-                </table></section>
+                       <tr class=' module-item'>
+                           <td><a class='type' href='type.StorageResult.html'
+                                  title='asciii::storage::StorageResult'>StorageResult</a></td>
+                           <td class='docblock short'>
+                                <p>Result returned by Storage</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class='type' href='type.Year.html'
+                                  title='asciii::storage::Year'>Year</a></td>
+                           <td class='docblock short'>
+                                <p>Year = <code>i32</code></p>
+                           </td>
+                       </tr></table></section>
     <section id='search' class="content hidden"></section>
 
     <section class="footer"></section>

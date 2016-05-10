@@ -11,6 +11,7 @@
 
     <link rel="stylesheet" type="text/css" href="../../../../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../../../../main.css">
+    
 
     
     
@@ -131,7 +132,7 @@
 </pre><pre class='rust '>
 <span class='doccomment'>//! Error that may occur in Storage</span>
 <span class='doccomment'>//!</span>
-<span class='doccomment'>//!TODO implement Display for StorageError or use Quickerror</span>
+<span class='comment'>//TODO implement Display for StorageError or use Quickerror</span>
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>io</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>fmt</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>error</span>::<span class='ident'>Error</span>;
@@ -140,16 +141,16 @@
 <span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>feature</span><span class='op'>=</span><span class='string'>&quot;git_statuses&quot;</span>)]</span>
 <span class='kw'>use</span> <span class='ident'>git2</span>::<span class='ident'>Error</span> <span class='kw'>as</span> <span class='ident'>GitError</span>;
 
-<span class='kw'>use</span> ::<span class='ident'>templater</span>::<span class='ident'>TemplateError</span>;
+<span class='kw'>use</span> <span class='ident'>templater</span>::<span class='ident'>TemplateError</span>;
 <span class='kw'>use</span> <span class='ident'>util</span>::<span class='ident'>yaml</span>::<span class='ident'>YamlError</span>;
 
 <span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>not</span>(<span class='ident'>feature</span><span class='op'>=</span><span class='string'>&quot;git_statuses&quot;</span>))]</span>
-<span class='kw'>use</span> ::<span class='ident'>repo</span>::<span class='ident'>GitError</span>;
+<span class='kw'>use</span> <span class='kw'>super</span>::<span class='ident'>repo</span>::<span class='ident'>GitError</span>;
 
 <span class='doccomment'>/// Error that may occur in Storage</span>
 <span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Debug</span>)]</span>
 <span class='kw'>pub</span> <span class='kw'>enum</span> <span class='ident'>StorageError</span> {
-    <span class='ident'>BadChoice</span>,  <span class='comment'>// TODO this should be a compile error</span>
+    <span class='ident'>BadChoice</span>, <span class='comment'>// TODO: this should be a compile error</span>
     <span class='ident'>NoWorkingDir</span>,
     <span class='ident'>ProjectFileExists</span>,
     <span class='ident'>ProjectDirExists</span>,

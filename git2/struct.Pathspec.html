@@ -11,6 +11,7 @@
 
     <link rel="stylesheet" type="text/css" href="../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../main.css">
+    
 
     
     
@@ -43,15 +44,16 @@
 
     <section id='main' class="content struct">
 <h1 class='fqn'><span class='in-band'>Struct <a href='index.html'>git2</a>::<wbr><a class='struct' href=''>Pathspec</a></span><span class='out-of-band'><span id='render-detail'>
-            <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
-                [<span class='inner'>&#x2212;</span>]
-            </a>
-        </span><a id='src-3874' class='srclink' href='../src/git2/pathspec.rs.html#12-14' title='goto source code'>[src]</a></span></h1>
+                   <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                       [<span class='inner'>&#x2212;</span>]
+                   </a>
+               </span><a id='src-3842' class='srclink' href='../src/git2/pathspec.rs.html#12-14' title='goto source code'>[src]</a></span></h1>
 <pre class='rust struct'>pub struct Pathspec {
     // some fields omitted
 }</pre><div class='docblock'><p>Structure representing a compiled pathspec used for matching against various
 structures.</p>
-</div><h2 id='methods'>Methods</h2><h3 class='impl'><code>impl <a class='struct' href='../git2/struct.Pathspec.html' title='git2::Pathspec'>Pathspec</a></code></h3><div class='impl-items'><h4 id='method.new' class='method'><code>fn <a href='#method.new' class='fnname'>new</a>&lt;I, T&gt;(specs: I) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='struct' href='../git2/struct.Pathspec.html' title='git2::Pathspec'>Pathspec</a>, <a class='struct' href='../git2/struct.Error.html' title='git2::Error'>Error</a>&gt; <span class='where'>where T: <a class='trait' href='../git2/trait.IntoCString.html' title='git2::IntoCString'>IntoCString</a>, I: <a class='trait' href='https://doc.rust-lang.org/nightly/core/iter/trait.IntoIterator.html' title='core::iter::IntoIterator'>IntoIterator</a>&lt;Item=T&gt;</span></code></h4>
+</div><h2 id='methods'>Methods</h2><h3 class='impl'><span class='in-band'><code>impl <a class='struct' href='../git2/struct.Pathspec.html' title='git2::Pathspec'>Pathspec</a></code></span><span class='out-of-band'><a id='src-3860' class='srclink' href='../src/git2/pathspec.rs.html#40-135' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.new' class='method'><code>fn <a href='#method.new' class='fnname'>new</a>&lt;I, T&gt;(specs: I) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='struct' href='../git2/struct.Pathspec.html' title='git2::Pathspec'>Pathspec</a>, <a class='struct' href='../git2/struct.Error.html' title='git2::Error'>Error</a>&gt; <span class='where'>where T: <a class='trait' href='../git2/trait.IntoCString.html' title='git2::IntoCString'>IntoCString</a>, I: <a class='trait' href='https://doc.rust-lang.org/nightly/core/iter/traits/trait.IntoIterator.html' title='core::iter::traits::IntoIterator'>IntoIterator</a>&lt;Item=T&gt;</span></code></h4>
 <div class='docblock'><p>Creates a new pathspec from a list of specs to match against.</p>
 </div><h4 id='method.match_diff' class='method'><code>fn <a href='#method.match_diff' class='fnname'>match_diff</a>(&amp;self, diff: &amp;<a class='struct' href='../git2/struct.Diff.html' title='git2::Diff'>Diff</a>, flags: <a class='struct' href='../git2/struct.PathspecFlags.html' title='git2::PathspecFlags'>PathspecFlags</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='struct' href='../git2/struct.PathspecMatchList.html' title='git2::PathspecMatchList'>PathspecMatchList</a>, <a class='struct' href='../git2/struct.Error.html' title='git2::Error'>Error</a>&gt;</code></h4>
 <div class='docblock'><p>Match a pathspec against files in a diff.</p>
@@ -94,7 +96,8 @@ specified.</p>
 back on the native case-sensitivity for your platform. You must
 explicitly pass flags to control case sensitivity or else this will fall
 back on being case sensitive.</p>
-</div></div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.Drop.html' title='core::ops::Drop'>Drop</a> for <a class='struct' href='../git2/struct.Pathspec.html' title='git2::Pathspec'>Pathspec</a></code></h3><div class='impl-items'><h4 id='method.drop' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/ops/trait.Drop.html#method.drop' class='fnname'>drop</a>(&amp;mut self)</code></h4>
+</div></div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><span class='in-band'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.Drop.html' title='core::ops::Drop'>Drop</a> for <a class='struct' href='../git2/struct.Pathspec.html' title='git2::Pathspec'>Pathspec</a></code></span><span class='out-of-band'><a id='src-3912' class='srclink' href='../src/git2/pathspec.rs.html#146-150' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.drop' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/ops/trait.Drop.html#tymethod.drop' class='fnname'>drop</a>(&amp;mut self)</code></h4>
 </div></section>
     <section id='search' class="content hidden"></section>
 

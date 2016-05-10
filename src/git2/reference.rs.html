@@ -4,13 +4,14 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="rustdoc">
-    <meta name="description" content="Source to the Rust file `/home/hendrik/.multirust/toolchains/stable/cargo/registry/src/github.com-88ac128001ac3a9a/git2-0.4.3/src/reference.rs`.">
+    <meta name="description" content="Source to the Rust file `/home/hendrik/.multirust/toolchains/nightly/cargo/registry/src/github.com-1ecc6299db9ec823/git2-0.4.3/src/reference.rs`.">
     <meta name="keywords" content="rust, rustlang, rust-lang">
 
     <title>reference.rs.html -- source</title>
 
     <link rel="stylesheet" type="text/css" href="../../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../../main.css">
+    
 
     
     
@@ -721,7 +722,7 @@
 
         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>tag1</span> <span class='op'>=</span> <span class='ident'>repo</span>.<span class='ident'>reference</span>(<span class='string'>&quot;refs/tags/tag1&quot;</span>,
                                       <span class='ident'>head</span>.<span class='ident'>target</span>().<span class='ident'>unwrap</span>(),
-                                      <span class='boolval'>false</span>, <span class='string'>&quot;test&quot;</span>).<span class='ident'>unwrap</span>();
+                                      <span class='boolvalue'>false</span>, <span class='string'>&quot;test&quot;</span>).<span class='ident'>unwrap</span>();
         <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>tag1</span>.<span class='ident'>is_tag</span>());
 
         <span class='kw'>let</span> <span class='ident'>peeled_commit</span> <span class='op'>=</span> <span class='ident'>tag1</span>.<span class='ident'>peel</span>(<span class='ident'>ObjectType</span>::<span class='ident'>Commit</span>).<span class='ident'>unwrap</span>();
@@ -731,7 +732,7 @@
         <span class='ident'>tag1</span>.<span class='ident'>delete</span>().<span class='ident'>unwrap</span>();
 
         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>sym1</span> <span class='op'>=</span> <span class='ident'>repo</span>.<span class='ident'>reference_symbolic</span>(<span class='string'>&quot;refs/tags/tag1&quot;</span>,
-                                               <span class='string'>&quot;refs/heads/master&quot;</span>, <span class='boolval'>false</span>,
+                                               <span class='string'>&quot;refs/heads/master&quot;</span>, <span class='boolvalue'>false</span>,
                                                <span class='string'>&quot;test&quot;</span>).<span class='ident'>unwrap</span>();
         <span class='ident'>sym1</span>.<span class='ident'>delete</span>().<span class='ident'>unwrap</span>();
 
@@ -745,7 +746,7 @@
             <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>repo</span>.<span class='ident'>references_glob</span>(<span class='string'>&quot;refs/heads/*&quot;</span>).<span class='ident'>unwrap</span>().<span class='ident'>count</span>() <span class='op'>==</span> <span class='number'>1</span>);
         }
 
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>head</span> <span class='op'>=</span> <span class='ident'>head</span>.<span class='ident'>rename</span>(<span class='string'>&quot;refs/foo&quot;</span>, <span class='boolval'>true</span>, <span class='string'>&quot;test&quot;</span>).<span class='ident'>unwrap</span>();
+        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>head</span> <span class='op'>=</span> <span class='ident'>head</span>.<span class='ident'>rename</span>(<span class='string'>&quot;refs/foo&quot;</span>, <span class='boolvalue'>true</span>, <span class='string'>&quot;test&quot;</span>).<span class='ident'>unwrap</span>();
         <span class='ident'>head</span>.<span class='ident'>delete</span>().<span class='ident'>unwrap</span>();
 
     }

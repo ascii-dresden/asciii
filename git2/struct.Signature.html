@@ -11,6 +11,7 @@
 
     <link rel="stylesheet" type="text/css" href="../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../main.css">
+    
 
     
     
@@ -43,10 +44,10 @@
 
     <section id='main' class="content struct">
 <h1 class='fqn'><span class='in-band'>Struct <a href='index.html'>git2</a>::<wbr><a class='struct' href=''>Signature</a></span><span class='out-of-band'><span id='render-detail'>
-            <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
-                [<span class='inner'>&#x2212;</span>]
-            </a>
-        </span><a id='src-5840' class='srclink' href='../src/git2/signature.rs.html#20-24' title='goto source code'>[src]</a></span></h1>
+                   <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                       [<span class='inner'>&#x2212;</span>]
+                   </a>
+               </span><a id='src-5817' class='srclink' href='../src/git2/signature.rs.html#20-24' title='goto source code'>[src]</a></span></h1>
 <pre class='rust struct'>pub struct Signature&lt;'a&gt; {
     // some fields omitted
 }</pre><div class='docblock'><p>A Signature is used to indicate authorship of various actions throughout the
@@ -56,7 +57,8 @@ library.</p>
 with <code>new</code> while the <code>now</code> constructor omits the timestamp. The
 <a href="struct.Repository.html#method.signature"><code>Repository::signature</code></a> method can be used to create a default signature
 with name and email values read from the configuration.</p>
-</div><h2 id='methods'>Methods</h2><h3 class='impl'><code>impl&lt;'a&gt; <a class='struct' href='../git2/struct.Signature.html' title='git2::Signature'>Signature</a>&lt;'a&gt;</code></h3><div class='impl-items'><h4 id='method.now' class='method'><code>fn <a href='#method.now' class='fnname'>now</a>(name: &amp;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>, email: &amp;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='struct' href='../git2/struct.Signature.html' title='git2::Signature'>Signature</a>&lt;'static&gt;, <a class='struct' href='../git2/struct.Error.html' title='git2::Error'>Error</a>&gt;</code></h4>
+</div><h2 id='methods'>Methods</h2><h3 class='impl'><span class='in-band'><code>impl&lt;'a&gt; <a class='struct' href='../git2/struct.Signature.html' title='git2::Signature'>Signature</a>&lt;'a&gt;</code></span><span class='out-of-band'><a id='src-5822' class='srclink' href='../src/git2/signature.rs.html#26-98' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.now' class='method'><code>fn <a href='#method.now' class='fnname'>now</a>(name: &amp;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>, email: &amp;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='struct' href='../git2/struct.Signature.html' title='git2::Signature'>Signature</a>&lt;'static&gt;, <a class='struct' href='../git2/struct.Error.html' title='git2::Error'>Error</a>&gt;</code></h4>
 <div class='docblock'><p>Create a new action signature with a timestamp of &#39;now&#39;.</p>
 
 <p>See <code>new</code> for more information</p>
@@ -84,10 +86,13 @@ the time zone offset in minutes.</p>
 </div><h4 id='method.to_owned' class='method'><code>fn <a href='#method.to_owned' class='fnname'>to_owned</a>(&amp;self) -&gt; <a class='struct' href='../git2/struct.Signature.html' title='git2::Signature'>Signature</a>&lt;'static&gt;</code></h4>
 <div class='docblock'><p>Convert a signature of any lifetime into an owned signature with a
 static lifetime.</p>
-</div></div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html' title='core::clone::Clone'>Clone</a> for <a class='struct' href='../git2/struct.Signature.html' title='git2::Signature'>Signature</a>&lt;'static&gt;</code></h3><div class='impl-items'><h4 id='method.clone' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#method.clone' class='fnname'>clone</a>(&amp;self) -&gt; <a class='struct' href='../git2/struct.Signature.html' title='git2::Signature'>Signature</a>&lt;'static&gt;</code></h4>
-<h4 id='method.clone_from' class='method'><span class="since">1.0.0</span><code>fn <a href='https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#method.clone_from' class='fnname'>clone_from</a>(&amp;mut self, source: &amp;Self)</code></h4>
-</div><h3 class='impl'><code>impl&lt;'a&gt; <a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.Drop.html' title='core::ops::Drop'>Drop</a> for <a class='struct' href='../git2/struct.Signature.html' title='git2::Signature'>Signature</a>&lt;'a&gt;</code></h3><div class='impl-items'><h4 id='method.drop' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/ops/trait.Drop.html#method.drop' class='fnname'>drop</a>(&amp;mut self)</code></h4>
-</div><h3 class='impl'><code>impl&lt;'a&gt; <a class='trait' href='https://doc.rust-lang.org/nightly/core/fmt/trait.Display.html' title='core::fmt::Display'>Display</a> for <a class='struct' href='../git2/struct.Signature.html' title='git2::Signature'>Signature</a>&lt;'a&gt;</code></h3><div class='impl-items'><h4 id='method.fmt' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/fmt/trait.Display.html#method.fmt' class='fnname'>fmt</a>(&amp;self, f: &amp;mut <a class='struct' href='https://doc.rust-lang.org/nightly/core/fmt/struct.Formatter.html' title='core::fmt::Formatter'>Formatter</a>) -&gt; <a class='type' href='https://doc.rust-lang.org/nightly/core/fmt/type.Result.html' title='core::fmt::Result'>Result</a></code></h4>
+</div></div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><span class='in-band'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html' title='core::clone::Clone'>Clone</a> for <a class='struct' href='../git2/struct.Signature.html' title='git2::Signature'>Signature</a>&lt;'static&gt;</code></span><span class='out-of-band'><a id='src-5874' class='srclink' href='../src/git2/signature.rs.html#127-136' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.clone' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#tymethod.clone' class='fnname'>clone</a>(&amp;self) -&gt; <a class='struct' href='../git2/struct.Signature.html' title='git2::Signature'>Signature</a>&lt;'static&gt;</code></h4>
+<h4 id='method.clone_from' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#method.clone_from' class='fnname'>clone_from</a>(&amp;mut self, source: &amp;Self)</code><span class="since">1.0.0</span></h4>
+</div><h3 class='impl'><span class='in-band'><code>impl&lt;'a&gt; <a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.Drop.html' title='core::ops::Drop'>Drop</a> for <a class='struct' href='../git2/struct.Signature.html' title='git2::Signature'>Signature</a>&lt;'a&gt;</code></span><span class='out-of-band'><a id='src-5885' class='srclink' href='../src/git2/signature.rs.html#138-144' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.drop' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/ops/trait.Drop.html#tymethod.drop' class='fnname'>drop</a>(&amp;mut self)</code></h4>
+</div><h3 class='impl'><span class='in-band'><code>impl&lt;'a&gt; <a class='trait' href='https://doc.rust-lang.org/nightly/core/fmt/trait.Display.html' title='core::fmt::Display'>Display</a> for <a class='struct' href='../git2/struct.Signature.html' title='git2::Signature'>Signature</a>&lt;'a&gt;</code></span><span class='out-of-band'><a id='src-5889' class='srclink' href='../src/git2/signature.rs.html#146-154' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.fmt' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/fmt/trait.Display.html#tymethod.fmt' class='fnname'>fmt</a>(&amp;self, f: &amp;mut <a class='struct' href='https://doc.rust-lang.org/nightly/core/fmt/struct.Formatter.html' title='core::fmt::Formatter'>Formatter</a>) -&gt; <a class='type' href='https://doc.rust-lang.org/nightly/core/fmt/type.Result.html' title='core::fmt::Result'>Result</a></code></h4>
 </div></section>
     <section id='search' class="content hidden"></section>
 

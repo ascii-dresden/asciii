@@ -11,6 +11,7 @@
 
     <link rel="stylesheet" type="text/css" href="../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../main.css">
+    
 
     
     
@@ -43,14 +44,15 @@
 
     <section id='main' class="content struct">
 <h1 class='fqn'><span class='in-band'>Struct <a href='index.html'>git2</a>::<wbr><a class='struct' href=''>Blame</a></span><span class='out-of-band'><span id='render-detail'>
-            <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
-                [<span class='inner'>&#x2212;</span>]
-            </a>
-        </span><a id='src-1694' class='srclink' href='../src/git2/blame.rs.html#9-12' title='goto source code'>[src]</a></span></h1>
+                   <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                       [<span class='inner'>&#x2212;</span>]
+                   </a>
+               </span><a id='src-1661' class='srclink' href='../src/git2/blame.rs.html#9-12' title='goto source code'>[src]</a></span></h1>
 <pre class='rust struct'>pub struct Blame&lt;'repo&gt; {
     // some fields omitted
 }</pre><div class='docblock'><p>Opaque structure to hold blame results.</p>
-</div><h2 id='methods'>Methods</h2><h3 class='impl'><code>impl&lt;'repo&gt; <a class='struct' href='../git2/struct.Blame.html' title='git2::Blame'>Blame</a>&lt;'repo&gt;</code></h3><div class='impl-items'><h4 id='method.len' class='method'><code>fn <a href='#method.len' class='fnname'>len</a>(&amp;self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a></code></h4>
+</div><h2 id='methods'>Methods</h2><h3 class='impl'><span class='in-band'><code>impl&lt;'repo&gt; <a class='struct' href='../git2/struct.Blame.html' title='git2::Blame'>Blame</a>&lt;'repo&gt;</code></span><span class='out-of-band'><a id='src-1675' class='srclink' href='../src/git2/blame.rs.html#31-68' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.len' class='method'><code>fn <a href='#method.len' class='fnname'>len</a>(&amp;self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a></code></h4>
 <div class='docblock'><p>Gets the number of hunks that exist in the blame structure.</p>
 </div><h4 id='method.get_index' class='method'><code>fn <a href='#method.get_index' class='fnname'>get_index</a>(&amp;self, index: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='struct' href='../git2/struct.BlameHunk.html' title='git2::BlameHunk'>BlameHunk</a>&gt;</code></h4>
 <div class='docblock'><p>Gets the blame hunk at the given index.</p>
@@ -59,7 +61,8 @@
 commit.</p>
 </div><h4 id='method.iter' class='method'><code>fn <a href='#method.iter' class='fnname'>iter</a>(&amp;self) -&gt; <a class='struct' href='../git2/struct.BlameIter.html' title='git2::BlameIter'>BlameIter</a></code></h4>
 <div class='docblock'><p>Returns an iterator over the hunks in this blame.</p>
-</div></div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><code>impl&lt;'repo&gt; <a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.Drop.html' title='core::ops::Drop'>Drop</a> for <a class='struct' href='../git2/struct.Blame.html' title='git2::Blame'>Blame</a>&lt;'repo&gt;</code></h3><div class='impl-items'><h4 id='method.drop' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/ops/trait.Drop.html#method.drop' class='fnname'>drop</a>(&amp;mut self)</code></h4>
+</div></div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><span class='in-band'><code>impl&lt;'repo&gt; <a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.Drop.html' title='core::ops::Drop'>Drop</a> for <a class='struct' href='../git2/struct.Blame.html' title='git2::Blame'>Blame</a>&lt;'repo&gt;</code></span><span class='out-of-band'><a id='src-1753' class='srclink' href='../src/git2/blame.rs.html#219-223' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.drop' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/ops/trait.Drop.html#tymethod.drop' class='fnname'>drop</a>(&amp;mut self)</code></h4>
 </div></section>
     <section id='search' class="content hidden"></section>
 

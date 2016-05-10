@@ -11,6 +11,7 @@
 
     <link rel="stylesheet" type="text/css" href="../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../main.css">
+    
 
     
     
@@ -43,14 +44,15 @@
 
     <section id='main' class="content struct">
 <h1 class='fqn'><span class='in-band'>Struct <a href='index.html'>git2</a>::<wbr><a class='struct' href=''>Cred</a></span><span class='out-of-band'><span id='render-detail'>
-            <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
-                [<span class='inner'>&#x2212;</span>]
-            </a>
-        </span><a id='src-2410' class='srclink' href='../src/git2/cred.rs.html#12-14' title='goto source code'>[src]</a></span></h1>
+                   <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                       [<span class='inner'>&#x2212;</span>]
+                   </a>
+               </span><a id='src-2378' class='srclink' href='../src/git2/cred.rs.html#12-14' title='goto source code'>[src]</a></span></h1>
 <pre class='rust struct'>pub struct Cred {
     // some fields omitted
 }</pre><div class='docblock'><p>A structure to represent git credentials in libgit2.</p>
-</div><h2 id='methods'>Methods</h2><h3 class='impl'><code>impl <a class='struct' href='../git2/struct.Cred.html' title='git2::Cred'>Cred</a></code></h3><div class='impl-items'><h4 id='method.default' class='method'><code>fn <a href='#method.default' class='fnname'>default</a>() -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='struct' href='../git2/struct.Cred.html' title='git2::Cred'>Cred</a>, <a class='struct' href='../git2/struct.Error.html' title='git2::Error'>Error</a>&gt;</code></h4>
+</div><h2 id='methods'>Methods</h2><h3 class='impl'><span class='in-band'><code>impl <a class='struct' href='../git2/struct.Cred.html' title='git2::Cred'>Cred</a></code></span><span class='out-of-band'><a id='src-2386' class='srclink' href='../src/git2/cred.rs.html#27-136' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.default' class='method'><code>fn <a href='#method.default' class='fnname'>default</a>() -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='struct' href='../git2/struct.Cred.html' title='git2::Cred'>Cred</a>, <a class='struct' href='../git2/struct.Error.html' title='git2::Error'>Error</a>&gt;</code></h4>
 <div class='docblock'><p>Create a &quot;default&quot; credential usable for Negotiate mechanisms like NTLM
 or Kerberos authentication.</p>
 </div><h4 id='method.ssh_key_from_agent' class='method'><code>fn <a href='#method.ssh_key_from_agent' class='fnname'>ssh_key_from_agent</a>(username: &amp;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='struct' href='../git2/struct.Cred.html' title='git2::Cred'>Cred</a>, <a class='struct' href='../git2/struct.Error.html' title='git2::Error'>Error</a>&gt;</code></h4>
@@ -81,7 +83,8 @@ specified in the url.</p>
 <div class='docblock'><p>Return the type of credentials that this object represents.</p>
 </div><h4 id='method.unwrap' class='method'><code>unsafe fn <a href='#method.unwrap' class='fnname'>unwrap</a>(self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.pointer.html'>*mut </a><a class='struct' href='../libgit2_sys/struct.git_cred.html' title='libgit2_sys::git_cred'>git_cred</a></code></h4>
 <div class='docblock'><p>Unwrap access to the underlying raw pointer, canceling the destructor</p>
-</div></div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.Drop.html' title='core::ops::Drop'>Drop</a> for <a class='struct' href='../git2/struct.Cred.html' title='git2::Cred'>Cred</a></code></h3><div class='impl-items'><h4 id='method.drop' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/ops/trait.Drop.html#method.drop' class='fnname'>drop</a>(&amp;mut self)</code></h4>
+</div></div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><span class='in-band'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.Drop.html' title='core::ops::Drop'>Drop</a> for <a class='struct' href='../git2/struct.Cred.html' title='git2::Cred'>Cred</a></code></span><span class='out-of-band'><a id='src-2458' class='srclink' href='../src/git2/cred.rs.html#147-153' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.drop' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/ops/trait.Drop.html#tymethod.drop' class='fnname'>drop</a>(&amp;mut self)</code></h4>
 </div></section>
     <section id='search' class="content hidden"></section>
 

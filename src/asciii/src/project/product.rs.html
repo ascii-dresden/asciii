@@ -11,6 +11,7 @@
 
     <link rel="stylesheet" type="text/css" href="../../../../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../../../../main.css">
+    
 
     
     
@@ -83,6 +84,7 @@
 <span id="40">40</span>
 <span id="41">41</span>
 <span id="42">42</span>
+<span id="43">43</span>
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>fmt</span>;
 <span class='kw'>use</span> <span class='ident'>currency</span>::<span class='ident'>Currency</span>;
@@ -99,23 +101,6 @@
     <span class='kw'>pub</span> <span class='ident'>price</span>: <span class='ident'>Currency</span>
 }
 
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span> <span class='ident'>InvoiceItem</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span> {
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>cost_before_tax</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>Currency</span> {
-        <span class='self'>self</span>.<span class='ident'>amount_sold</span> <span class='op'>*</span> <span class='self'>self</span>.<span class='ident'>item</span>.<span class='ident'>price</span>
-    }
-
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>cost_after_tax</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>Currency</span> {
-        <span class='self'>self</span>.<span class='ident'>amount_sold</span> <span class='op'>*</span> <span class='self'>self</span>.<span class='ident'>item</span>.<span class='ident'>price</span> <span class='op'>*</span> (<span class='number'>1.0</span> <span class='op'>+</span> <span class='self'>self</span>.<span class='ident'>item</span>.<span class='ident'>tax</span>)
-    }
-}
-
-<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Debug</span>)]</span>
-<span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>InvoiceItem</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span> {
-    <span class='kw'>pub</span> <span class='ident'>amount_offered</span>: <span class='ident'>f64</span>,
-    <span class='kw'>pub</span> <span class='ident'>amount_sold</span>: <span class='ident'>f64</span>,
-    <span class='kw'>pub</span> <span class='ident'>item</span>: <span class='ident'>Product</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span>
-}
-
 <span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span> <span class='ident'>fmt</span>::<span class='ident'>Debug</span> <span class='kw'>for</span> <span class='ident'>Product</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span>{
     <span class='kw'>fn</span> <span class='ident'>fmt</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>f</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>fmt</span>::<span class='ident'>Formatter</span>) <span class='op'>-&gt;</span> <span class='ident'>fmt</span>::<span class='prelude-ty'>Result</span> {
         <span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;{} ({})&quot;</span>, <span class='self'>self</span>.<span class='ident'>name</span>, <span class='self'>self</span>.<span class='ident'>price</span>)
@@ -126,6 +111,24 @@
         <span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;{} ({}), tax: {} unit: {:?}&quot;</span>, <span class='self'>self</span>.<span class='ident'>name</span>, <span class='self'>self</span>.<span class='ident'>price</span>, <span class='self'>self</span>.<span class='ident'>tax</span>, <span class='self'>self</span>.<span class='ident'>unit</span>)
     }
 }
+
+<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Debug</span>)]</span>
+<span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>InvoiceItem</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span> {
+    <span class='kw'>pub</span> <span class='ident'>amount_offered</span>: <span class='ident'>f64</span>,
+    <span class='kw'>pub</span> <span class='ident'>amount_sold</span>: <span class='ident'>f64</span>,
+    <span class='kw'>pub</span> <span class='ident'>item</span>: <span class='ident'>Product</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span>
+}
+
+<span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span> <span class='ident'>InvoiceItem</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span> {
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>cost_before_tax</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>Currency</span> {
+        <span class='self'>self</span>.<span class='ident'>amount_sold</span> <span class='op'>*</span> <span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>item</span>.<span class='ident'>price</span>
+    }
+
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>cost_after_tax</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>Currency</span> {
+        <span class='self'>self</span>.<span class='ident'>amount_sold</span> <span class='op'>*</span> <span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>item</span>.<span class='ident'>price</span> <span class='op'>*</span> (<span class='number'>1.0</span> <span class='op'>+</span> <span class='self'>self</span>.<span class='ident'>item</span>.<span class='ident'>tax</span>)
+    }
+}
+
 </pre>
 </section>
     <section id='search' class="content hidden"></section>

@@ -1,1 +1,0 @@
-initSidebarItems({"struct":[["GitStorage","This will add git functionality on top of Storage"],["Storage","TODO rename this into Storage later"]],"trait":[["Storing","Base functionality for archiving and unarchiving etc"]]});

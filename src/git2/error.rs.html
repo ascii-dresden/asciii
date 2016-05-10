@@ -4,13 +4,14 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="rustdoc">
-    <meta name="description" content="Source to the Rust file `/home/hendrik/.multirust/toolchains/stable/cargo/registry/src/github.com-88ac128001ac3a9a/git2-0.4.3/src/error.rs`.">
+    <meta name="description" content="Source to the Rust file `/home/hendrik/.multirust/toolchains/nightly/cargo/registry/src/github.com-1ecc6299db9ec823/git2-0.4.3/src/error.rs`.">
     <meta name="keywords" content="rust, rustlang, rust-lang">
 
     <title>error.rs.html -- source</title>
 
     <link rel="stylesheet" type="text/css" href="../../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../../main.css">
+    
 
     
     
@@ -328,70 +329,70 @@
     <span class='doccomment'>/// Return the error code associated with this error.</span>
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>code</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>ErrorCode</span> {
         <span class='kw'>match</span> <span class='self'>self</span>.<span class='ident'>raw_code</span>() {
-            <span class='ident'>raw</span>::<span class='ident'>GIT_OK</span> <span class='op'>=&gt;</span> <span class='ident'>super</span>::<span class='ident'>ErrorCode</span>::<span class='ident'>GenericError</span>,
-            <span class='ident'>raw</span>::<span class='ident'>GIT_ERROR</span> <span class='op'>=&gt;</span> <span class='ident'>super</span>::<span class='ident'>ErrorCode</span>::<span class='ident'>GenericError</span>,
-            <span class='ident'>raw</span>::<span class='ident'>GIT_ENOTFOUND</span> <span class='op'>=&gt;</span> <span class='ident'>super</span>::<span class='ident'>ErrorCode</span>::<span class='ident'>NotFound</span>,
-            <span class='ident'>raw</span>::<span class='ident'>GIT_EEXISTS</span> <span class='op'>=&gt;</span> <span class='ident'>super</span>::<span class='ident'>ErrorCode</span>::<span class='ident'>Exists</span>,
-            <span class='ident'>raw</span>::<span class='ident'>GIT_EAMBIGUOUS</span> <span class='op'>=&gt;</span> <span class='ident'>super</span>::<span class='ident'>ErrorCode</span>::<span class='ident'>Ambiguous</span>,
-            <span class='ident'>raw</span>::<span class='ident'>GIT_EBUFS</span> <span class='op'>=&gt;</span> <span class='ident'>super</span>::<span class='ident'>ErrorCode</span>::<span class='ident'>BufSize</span>,
-            <span class='ident'>raw</span>::<span class='ident'>GIT_EUSER</span> <span class='op'>=&gt;</span> <span class='ident'>super</span>::<span class='ident'>ErrorCode</span>::<span class='ident'>User</span>,
-            <span class='ident'>raw</span>::<span class='ident'>GIT_EBAREREPO</span> <span class='op'>=&gt;</span> <span class='ident'>super</span>::<span class='ident'>ErrorCode</span>::<span class='ident'>BareRepo</span>,
-            <span class='ident'>raw</span>::<span class='ident'>GIT_EUNBORNBRANCH</span> <span class='op'>=&gt;</span> <span class='ident'>super</span>::<span class='ident'>ErrorCode</span>::<span class='ident'>UnbornBranch</span>,
-            <span class='ident'>raw</span>::<span class='ident'>GIT_EUNMERGED</span> <span class='op'>=&gt;</span> <span class='ident'>super</span>::<span class='ident'>ErrorCode</span>::<span class='ident'>Unmerged</span>,
-            <span class='ident'>raw</span>::<span class='ident'>GIT_ENONFASTFORWARD</span> <span class='op'>=&gt;</span> <span class='ident'>super</span>::<span class='ident'>ErrorCode</span>::<span class='ident'>NotFastForward</span>,
-            <span class='ident'>raw</span>::<span class='ident'>GIT_EINVALIDSPEC</span> <span class='op'>=&gt;</span> <span class='ident'>super</span>::<span class='ident'>ErrorCode</span>::<span class='ident'>InvalidSpec</span>,
-            <span class='ident'>raw</span>::<span class='ident'>GIT_ECONFLICT</span> <span class='op'>=&gt;</span> <span class='ident'>super</span>::<span class='ident'>ErrorCode</span>::<span class='ident'>Conflict</span>,
-            <span class='ident'>raw</span>::<span class='ident'>GIT_ELOCKED</span> <span class='op'>=&gt;</span> <span class='ident'>super</span>::<span class='ident'>ErrorCode</span>::<span class='ident'>Locked</span>,
-            <span class='ident'>raw</span>::<span class='ident'>GIT_EMODIFIED</span> <span class='op'>=&gt;</span> <span class='ident'>super</span>::<span class='ident'>ErrorCode</span>::<span class='ident'>Modified</span>,
-            <span class='ident'>raw</span>::<span class='ident'>GIT_PASSTHROUGH</span> <span class='op'>=&gt;</span> <span class='ident'>super</span>::<span class='ident'>ErrorCode</span>::<span class='ident'>GenericError</span>,
-            <span class='ident'>raw</span>::<span class='ident'>GIT_ITEROVER</span> <span class='op'>=&gt;</span> <span class='ident'>super</span>::<span class='ident'>ErrorCode</span>::<span class='ident'>GenericError</span>,
-            <span class='ident'>raw</span>::<span class='ident'>GIT_EAUTH</span> <span class='op'>=&gt;</span> <span class='ident'>super</span>::<span class='ident'>ErrorCode</span>::<span class='ident'>Auth</span>,
-            <span class='ident'>raw</span>::<span class='ident'>GIT_ECERTIFICATE</span> <span class='op'>=&gt;</span> <span class='ident'>super</span>::<span class='ident'>ErrorCode</span>::<span class='ident'>Certificate</span>,
-            <span class='ident'>raw</span>::<span class='ident'>GIT_EAPPLIED</span> <span class='op'>=&gt;</span> <span class='ident'>super</span>::<span class='ident'>ErrorCode</span>::<span class='ident'>Applied</span>,
-            <span class='ident'>raw</span>::<span class='ident'>GIT_EPEEL</span> <span class='op'>=&gt;</span> <span class='ident'>super</span>::<span class='ident'>ErrorCode</span>::<span class='ident'>Peel</span>,
-            <span class='ident'>raw</span>::<span class='ident'>GIT_EEOF</span> <span class='op'>=&gt;</span> <span class='ident'>super</span>::<span class='ident'>ErrorCode</span>::<span class='ident'>Eof</span>,
-            <span class='ident'>raw</span>::<span class='ident'>GIT_EINVALID</span> <span class='op'>=&gt;</span> <span class='ident'>super</span>::<span class='ident'>ErrorCode</span>::<span class='ident'>Invalid</span>,
-            <span class='ident'>raw</span>::<span class='ident'>GIT_EUNCOMMITTED</span> <span class='op'>=&gt;</span> <span class='ident'>super</span>::<span class='ident'>ErrorCode</span>::<span class='ident'>Uncommitted</span>,
-            <span class='ident'>raw</span>::<span class='ident'>GIT_EDIRECTORY</span> <span class='op'>=&gt;</span> <span class='ident'>super</span>::<span class='ident'>ErrorCode</span>::<span class='ident'>Directory</span>,
-            _ <span class='op'>=&gt;</span> <span class='ident'>super</span>::<span class='ident'>ErrorCode</span>::<span class='ident'>GenericError</span>,
+            <span class='ident'>raw</span>::<span class='ident'>GIT_OK</span> <span class='op'>=&gt;</span> <span class='kw'>super</span>::<span class='ident'>ErrorCode</span>::<span class='ident'>GenericError</span>,
+            <span class='ident'>raw</span>::<span class='ident'>GIT_ERROR</span> <span class='op'>=&gt;</span> <span class='kw'>super</span>::<span class='ident'>ErrorCode</span>::<span class='ident'>GenericError</span>,
+            <span class='ident'>raw</span>::<span class='ident'>GIT_ENOTFOUND</span> <span class='op'>=&gt;</span> <span class='kw'>super</span>::<span class='ident'>ErrorCode</span>::<span class='ident'>NotFound</span>,
+            <span class='ident'>raw</span>::<span class='ident'>GIT_EEXISTS</span> <span class='op'>=&gt;</span> <span class='kw'>super</span>::<span class='ident'>ErrorCode</span>::<span class='ident'>Exists</span>,
+            <span class='ident'>raw</span>::<span class='ident'>GIT_EAMBIGUOUS</span> <span class='op'>=&gt;</span> <span class='kw'>super</span>::<span class='ident'>ErrorCode</span>::<span class='ident'>Ambiguous</span>,
+            <span class='ident'>raw</span>::<span class='ident'>GIT_EBUFS</span> <span class='op'>=&gt;</span> <span class='kw'>super</span>::<span class='ident'>ErrorCode</span>::<span class='ident'>BufSize</span>,
+            <span class='ident'>raw</span>::<span class='ident'>GIT_EUSER</span> <span class='op'>=&gt;</span> <span class='kw'>super</span>::<span class='ident'>ErrorCode</span>::<span class='ident'>User</span>,
+            <span class='ident'>raw</span>::<span class='ident'>GIT_EBAREREPO</span> <span class='op'>=&gt;</span> <span class='kw'>super</span>::<span class='ident'>ErrorCode</span>::<span class='ident'>BareRepo</span>,
+            <span class='ident'>raw</span>::<span class='ident'>GIT_EUNBORNBRANCH</span> <span class='op'>=&gt;</span> <span class='kw'>super</span>::<span class='ident'>ErrorCode</span>::<span class='ident'>UnbornBranch</span>,
+            <span class='ident'>raw</span>::<span class='ident'>GIT_EUNMERGED</span> <span class='op'>=&gt;</span> <span class='kw'>super</span>::<span class='ident'>ErrorCode</span>::<span class='ident'>Unmerged</span>,
+            <span class='ident'>raw</span>::<span class='ident'>GIT_ENONFASTFORWARD</span> <span class='op'>=&gt;</span> <span class='kw'>super</span>::<span class='ident'>ErrorCode</span>::<span class='ident'>NotFastForward</span>,
+            <span class='ident'>raw</span>::<span class='ident'>GIT_EINVALIDSPEC</span> <span class='op'>=&gt;</span> <span class='kw'>super</span>::<span class='ident'>ErrorCode</span>::<span class='ident'>InvalidSpec</span>,
+            <span class='ident'>raw</span>::<span class='ident'>GIT_ECONFLICT</span> <span class='op'>=&gt;</span> <span class='kw'>super</span>::<span class='ident'>ErrorCode</span>::<span class='ident'>Conflict</span>,
+            <span class='ident'>raw</span>::<span class='ident'>GIT_ELOCKED</span> <span class='op'>=&gt;</span> <span class='kw'>super</span>::<span class='ident'>ErrorCode</span>::<span class='ident'>Locked</span>,
+            <span class='ident'>raw</span>::<span class='ident'>GIT_EMODIFIED</span> <span class='op'>=&gt;</span> <span class='kw'>super</span>::<span class='ident'>ErrorCode</span>::<span class='ident'>Modified</span>,
+            <span class='ident'>raw</span>::<span class='ident'>GIT_PASSTHROUGH</span> <span class='op'>=&gt;</span> <span class='kw'>super</span>::<span class='ident'>ErrorCode</span>::<span class='ident'>GenericError</span>,
+            <span class='ident'>raw</span>::<span class='ident'>GIT_ITEROVER</span> <span class='op'>=&gt;</span> <span class='kw'>super</span>::<span class='ident'>ErrorCode</span>::<span class='ident'>GenericError</span>,
+            <span class='ident'>raw</span>::<span class='ident'>GIT_EAUTH</span> <span class='op'>=&gt;</span> <span class='kw'>super</span>::<span class='ident'>ErrorCode</span>::<span class='ident'>Auth</span>,
+            <span class='ident'>raw</span>::<span class='ident'>GIT_ECERTIFICATE</span> <span class='op'>=&gt;</span> <span class='kw'>super</span>::<span class='ident'>ErrorCode</span>::<span class='ident'>Certificate</span>,
+            <span class='ident'>raw</span>::<span class='ident'>GIT_EAPPLIED</span> <span class='op'>=&gt;</span> <span class='kw'>super</span>::<span class='ident'>ErrorCode</span>::<span class='ident'>Applied</span>,
+            <span class='ident'>raw</span>::<span class='ident'>GIT_EPEEL</span> <span class='op'>=&gt;</span> <span class='kw'>super</span>::<span class='ident'>ErrorCode</span>::<span class='ident'>Peel</span>,
+            <span class='ident'>raw</span>::<span class='ident'>GIT_EEOF</span> <span class='op'>=&gt;</span> <span class='kw'>super</span>::<span class='ident'>ErrorCode</span>::<span class='ident'>Eof</span>,
+            <span class='ident'>raw</span>::<span class='ident'>GIT_EINVALID</span> <span class='op'>=&gt;</span> <span class='kw'>super</span>::<span class='ident'>ErrorCode</span>::<span class='ident'>Invalid</span>,
+            <span class='ident'>raw</span>::<span class='ident'>GIT_EUNCOMMITTED</span> <span class='op'>=&gt;</span> <span class='kw'>super</span>::<span class='ident'>ErrorCode</span>::<span class='ident'>Uncommitted</span>,
+            <span class='ident'>raw</span>::<span class='ident'>GIT_EDIRECTORY</span> <span class='op'>=&gt;</span> <span class='kw'>super</span>::<span class='ident'>ErrorCode</span>::<span class='ident'>Directory</span>,
+            _ <span class='op'>=&gt;</span> <span class='kw'>super</span>::<span class='ident'>ErrorCode</span>::<span class='ident'>GenericError</span>,
         }
     }
 
     <span class='doccomment'>/// Return the error class associated with this error.</span>
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>class</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>ErrorClass</span> {
         <span class='kw'>match</span> <span class='self'>self</span>.<span class='ident'>raw_class</span>() {
-            <span class='ident'>raw</span>::<span class='ident'>GITERR_NONE</span> <span class='op'>=&gt;</span> <span class='ident'>super</span>::<span class='ident'>ErrorClass</span>::<span class='prelude-val'>None</span>,
-            <span class='ident'>raw</span>::<span class='ident'>GITERR_NOMEMORY</span> <span class='op'>=&gt;</span> <span class='ident'>super</span>::<span class='ident'>ErrorClass</span>::<span class='ident'>NoMemory</span>,
-            <span class='ident'>raw</span>::<span class='ident'>GITERR_OS</span> <span class='op'>=&gt;</span> <span class='ident'>super</span>::<span class='ident'>ErrorClass</span>::<span class='ident'>Os</span>,
-            <span class='ident'>raw</span>::<span class='ident'>GITERR_INVALID</span> <span class='op'>=&gt;</span> <span class='ident'>super</span>::<span class='ident'>ErrorClass</span>::<span class='ident'>Invalid</span>,
-            <span class='ident'>raw</span>::<span class='ident'>GITERR_REFERENCE</span> <span class='op'>=&gt;</span> <span class='ident'>super</span>::<span class='ident'>ErrorClass</span>::<span class='ident'>Reference</span>,
-            <span class='ident'>raw</span>::<span class='ident'>GITERR_ZLIB</span> <span class='op'>=&gt;</span> <span class='ident'>super</span>::<span class='ident'>ErrorClass</span>::<span class='ident'>Zlib</span>,
-            <span class='ident'>raw</span>::<span class='ident'>GITERR_REPOSITORY</span> <span class='op'>=&gt;</span> <span class='ident'>super</span>::<span class='ident'>ErrorClass</span>::<span class='ident'>Repository</span>,
-            <span class='ident'>raw</span>::<span class='ident'>GITERR_CONFIG</span> <span class='op'>=&gt;</span> <span class='ident'>super</span>::<span class='ident'>ErrorClass</span>::<span class='ident'>Config</span>,
-            <span class='ident'>raw</span>::<span class='ident'>GITERR_REGEX</span> <span class='op'>=&gt;</span> <span class='ident'>super</span>::<span class='ident'>ErrorClass</span>::<span class='ident'>Regex</span>,
-            <span class='ident'>raw</span>::<span class='ident'>GITERR_ODB</span> <span class='op'>=&gt;</span> <span class='ident'>super</span>::<span class='ident'>ErrorClass</span>::<span class='ident'>Odb</span>,
-            <span class='ident'>raw</span>::<span class='ident'>GITERR_INDEX</span> <span class='op'>=&gt;</span> <span class='ident'>super</span>::<span class='ident'>ErrorClass</span>::<span class='ident'>Index</span>,
-            <span class='ident'>raw</span>::<span class='ident'>GITERR_OBJECT</span> <span class='op'>=&gt;</span> <span class='ident'>super</span>::<span class='ident'>ErrorClass</span>::<span class='ident'>Object</span>,
-            <span class='ident'>raw</span>::<span class='ident'>GITERR_NET</span> <span class='op'>=&gt;</span> <span class='ident'>super</span>::<span class='ident'>ErrorClass</span>::<span class='ident'>Net</span>,
-            <span class='ident'>raw</span>::<span class='ident'>GITERR_TAG</span> <span class='op'>=&gt;</span> <span class='ident'>super</span>::<span class='ident'>ErrorClass</span>::<span class='ident'>Tag</span>,
-            <span class='ident'>raw</span>::<span class='ident'>GITERR_TREE</span> <span class='op'>=&gt;</span> <span class='ident'>super</span>::<span class='ident'>ErrorClass</span>::<span class='ident'>Tree</span>,
-            <span class='ident'>raw</span>::<span class='ident'>GITERR_INDEXER</span> <span class='op'>=&gt;</span> <span class='ident'>super</span>::<span class='ident'>ErrorClass</span>::<span class='ident'>Indexer</span>,
-            <span class='ident'>raw</span>::<span class='ident'>GITERR_SSL</span> <span class='op'>=&gt;</span> <span class='ident'>super</span>::<span class='ident'>ErrorClass</span>::<span class='ident'>Ssl</span>,
-            <span class='ident'>raw</span>::<span class='ident'>GITERR_SUBMODULE</span> <span class='op'>=&gt;</span> <span class='ident'>super</span>::<span class='ident'>ErrorClass</span>::<span class='ident'>Submodule</span>,
-            <span class='ident'>raw</span>::<span class='ident'>GITERR_THREAD</span> <span class='op'>=&gt;</span> <span class='ident'>super</span>::<span class='ident'>ErrorClass</span>::<span class='ident'>Thread</span>,
-            <span class='ident'>raw</span>::<span class='ident'>GITERR_STASH</span> <span class='op'>=&gt;</span> <span class='ident'>super</span>::<span class='ident'>ErrorClass</span>::<span class='ident'>Stash</span>,
-            <span class='ident'>raw</span>::<span class='ident'>GITERR_CHECKOUT</span> <span class='op'>=&gt;</span> <span class='ident'>super</span>::<span class='ident'>ErrorClass</span>::<span class='ident'>Checkout</span>,
-            <span class='ident'>raw</span>::<span class='ident'>GITERR_FETCHHEAD</span> <span class='op'>=&gt;</span> <span class='ident'>super</span>::<span class='ident'>ErrorClass</span>::<span class='ident'>FetchHead</span>,
-            <span class='ident'>raw</span>::<span class='ident'>GITERR_MERGE</span> <span class='op'>=&gt;</span> <span class='ident'>super</span>::<span class='ident'>ErrorClass</span>::<span class='ident'>Merge</span>,
-            <span class='ident'>raw</span>::<span class='ident'>GITERR_SSH</span> <span class='op'>=&gt;</span> <span class='ident'>super</span>::<span class='ident'>ErrorClass</span>::<span class='ident'>Ssh</span>,
-            <span class='ident'>raw</span>::<span class='ident'>GITERR_FILTER</span> <span class='op'>=&gt;</span> <span class='ident'>super</span>::<span class='ident'>ErrorClass</span>::<span class='ident'>Filter</span>,
-            <span class='ident'>raw</span>::<span class='ident'>GITERR_REVERT</span> <span class='op'>=&gt;</span> <span class='ident'>super</span>::<span class='ident'>ErrorClass</span>::<span class='ident'>Revert</span>,
-            <span class='ident'>raw</span>::<span class='ident'>GITERR_CALLBACK</span> <span class='op'>=&gt;</span> <span class='ident'>super</span>::<span class='ident'>ErrorClass</span>::<span class='ident'>Callback</span>,
-            <span class='ident'>raw</span>::<span class='ident'>GITERR_CHERRYPICK</span> <span class='op'>=&gt;</span> <span class='ident'>super</span>::<span class='ident'>ErrorClass</span>::<span class='ident'>CherryPick</span>,
-            <span class='ident'>raw</span>::<span class='ident'>GITERR_DESCRIBE</span> <span class='op'>=&gt;</span> <span class='ident'>super</span>::<span class='ident'>ErrorClass</span>::<span class='ident'>Describe</span>,
-            <span class='ident'>raw</span>::<span class='ident'>GITERR_REBASE</span> <span class='op'>=&gt;</span> <span class='ident'>super</span>::<span class='ident'>ErrorClass</span>::<span class='ident'>Rebase</span>,
-            <span class='ident'>raw</span>::<span class='ident'>GITERR_FILESYSTEM</span> <span class='op'>=&gt;</span> <span class='ident'>super</span>::<span class='ident'>ErrorClass</span>::<span class='ident'>Filesystem</span>,
-            _ <span class='op'>=&gt;</span> <span class='ident'>super</span>::<span class='ident'>ErrorClass</span>::<span class='prelude-val'>None</span>,
+            <span class='ident'>raw</span>::<span class='ident'>GITERR_NONE</span> <span class='op'>=&gt;</span> <span class='kw'>super</span>::<span class='ident'>ErrorClass</span>::<span class='prelude-val'>None</span>,
+            <span class='ident'>raw</span>::<span class='ident'>GITERR_NOMEMORY</span> <span class='op'>=&gt;</span> <span class='kw'>super</span>::<span class='ident'>ErrorClass</span>::<span class='ident'>NoMemory</span>,
+            <span class='ident'>raw</span>::<span class='ident'>GITERR_OS</span> <span class='op'>=&gt;</span> <span class='kw'>super</span>::<span class='ident'>ErrorClass</span>::<span class='ident'>Os</span>,
+            <span class='ident'>raw</span>::<span class='ident'>GITERR_INVALID</span> <span class='op'>=&gt;</span> <span class='kw'>super</span>::<span class='ident'>ErrorClass</span>::<span class='ident'>Invalid</span>,
+            <span class='ident'>raw</span>::<span class='ident'>GITERR_REFERENCE</span> <span class='op'>=&gt;</span> <span class='kw'>super</span>::<span class='ident'>ErrorClass</span>::<span class='ident'>Reference</span>,
+            <span class='ident'>raw</span>::<span class='ident'>GITERR_ZLIB</span> <span class='op'>=&gt;</span> <span class='kw'>super</span>::<span class='ident'>ErrorClass</span>::<span class='ident'>Zlib</span>,
+            <span class='ident'>raw</span>::<span class='ident'>GITERR_REPOSITORY</span> <span class='op'>=&gt;</span> <span class='kw'>super</span>::<span class='ident'>ErrorClass</span>::<span class='ident'>Repository</span>,
+            <span class='ident'>raw</span>::<span class='ident'>GITERR_CONFIG</span> <span class='op'>=&gt;</span> <span class='kw'>super</span>::<span class='ident'>ErrorClass</span>::<span class='ident'>Config</span>,
+            <span class='ident'>raw</span>::<span class='ident'>GITERR_REGEX</span> <span class='op'>=&gt;</span> <span class='kw'>super</span>::<span class='ident'>ErrorClass</span>::<span class='ident'>Regex</span>,
+            <span class='ident'>raw</span>::<span class='ident'>GITERR_ODB</span> <span class='op'>=&gt;</span> <span class='kw'>super</span>::<span class='ident'>ErrorClass</span>::<span class='ident'>Odb</span>,
+            <span class='ident'>raw</span>::<span class='ident'>GITERR_INDEX</span> <span class='op'>=&gt;</span> <span class='kw'>super</span>::<span class='ident'>ErrorClass</span>::<span class='ident'>Index</span>,
+            <span class='ident'>raw</span>::<span class='ident'>GITERR_OBJECT</span> <span class='op'>=&gt;</span> <span class='kw'>super</span>::<span class='ident'>ErrorClass</span>::<span class='ident'>Object</span>,
+            <span class='ident'>raw</span>::<span class='ident'>GITERR_NET</span> <span class='op'>=&gt;</span> <span class='kw'>super</span>::<span class='ident'>ErrorClass</span>::<span class='ident'>Net</span>,
+            <span class='ident'>raw</span>::<span class='ident'>GITERR_TAG</span> <span class='op'>=&gt;</span> <span class='kw'>super</span>::<span class='ident'>ErrorClass</span>::<span class='ident'>Tag</span>,
+            <span class='ident'>raw</span>::<span class='ident'>GITERR_TREE</span> <span class='op'>=&gt;</span> <span class='kw'>super</span>::<span class='ident'>ErrorClass</span>::<span class='ident'>Tree</span>,
+            <span class='ident'>raw</span>::<span class='ident'>GITERR_INDEXER</span> <span class='op'>=&gt;</span> <span class='kw'>super</span>::<span class='ident'>ErrorClass</span>::<span class='ident'>Indexer</span>,
+            <span class='ident'>raw</span>::<span class='ident'>GITERR_SSL</span> <span class='op'>=&gt;</span> <span class='kw'>super</span>::<span class='ident'>ErrorClass</span>::<span class='ident'>Ssl</span>,
+            <span class='ident'>raw</span>::<span class='ident'>GITERR_SUBMODULE</span> <span class='op'>=&gt;</span> <span class='kw'>super</span>::<span class='ident'>ErrorClass</span>::<span class='ident'>Submodule</span>,
+            <span class='ident'>raw</span>::<span class='ident'>GITERR_THREAD</span> <span class='op'>=&gt;</span> <span class='kw'>super</span>::<span class='ident'>ErrorClass</span>::<span class='ident'>Thread</span>,
+            <span class='ident'>raw</span>::<span class='ident'>GITERR_STASH</span> <span class='op'>=&gt;</span> <span class='kw'>super</span>::<span class='ident'>ErrorClass</span>::<span class='ident'>Stash</span>,
+            <span class='ident'>raw</span>::<span class='ident'>GITERR_CHECKOUT</span> <span class='op'>=&gt;</span> <span class='kw'>super</span>::<span class='ident'>ErrorClass</span>::<span class='ident'>Checkout</span>,
+            <span class='ident'>raw</span>::<span class='ident'>GITERR_FETCHHEAD</span> <span class='op'>=&gt;</span> <span class='kw'>super</span>::<span class='ident'>ErrorClass</span>::<span class='ident'>FetchHead</span>,
+            <span class='ident'>raw</span>::<span class='ident'>GITERR_MERGE</span> <span class='op'>=&gt;</span> <span class='kw'>super</span>::<span class='ident'>ErrorClass</span>::<span class='ident'>Merge</span>,
+            <span class='ident'>raw</span>::<span class='ident'>GITERR_SSH</span> <span class='op'>=&gt;</span> <span class='kw'>super</span>::<span class='ident'>ErrorClass</span>::<span class='ident'>Ssh</span>,
+            <span class='ident'>raw</span>::<span class='ident'>GITERR_FILTER</span> <span class='op'>=&gt;</span> <span class='kw'>super</span>::<span class='ident'>ErrorClass</span>::<span class='ident'>Filter</span>,
+            <span class='ident'>raw</span>::<span class='ident'>GITERR_REVERT</span> <span class='op'>=&gt;</span> <span class='kw'>super</span>::<span class='ident'>ErrorClass</span>::<span class='ident'>Revert</span>,
+            <span class='ident'>raw</span>::<span class='ident'>GITERR_CALLBACK</span> <span class='op'>=&gt;</span> <span class='kw'>super</span>::<span class='ident'>ErrorClass</span>::<span class='ident'>Callback</span>,
+            <span class='ident'>raw</span>::<span class='ident'>GITERR_CHERRYPICK</span> <span class='op'>=&gt;</span> <span class='kw'>super</span>::<span class='ident'>ErrorClass</span>::<span class='ident'>CherryPick</span>,
+            <span class='ident'>raw</span>::<span class='ident'>GITERR_DESCRIBE</span> <span class='op'>=&gt;</span> <span class='kw'>super</span>::<span class='ident'>ErrorClass</span>::<span class='ident'>Describe</span>,
+            <span class='ident'>raw</span>::<span class='ident'>GITERR_REBASE</span> <span class='op'>=&gt;</span> <span class='kw'>super</span>::<span class='ident'>ErrorClass</span>::<span class='ident'>Rebase</span>,
+            <span class='ident'>raw</span>::<span class='ident'>GITERR_FILESYSTEM</span> <span class='op'>=&gt;</span> <span class='kw'>super</span>::<span class='ident'>ErrorClass</span>::<span class='ident'>Filesystem</span>,
+            _ <span class='op'>=&gt;</span> <span class='kw'>super</span>::<span class='ident'>ErrorClass</span>::<span class='prelude-val'>None</span>,
         }
     }
 

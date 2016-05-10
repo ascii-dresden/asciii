@@ -11,6 +11,7 @@
 
     <link rel="stylesheet" type="text/css" href="../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../main.css">
+    
 
     
     
@@ -43,10 +44,10 @@
 
     <section id='main' class="content struct">
 <h1 class='fqn'><span class='in-band'>Struct <a href='index.html'>git2</a>::<wbr><a class='struct' href=''>Repository</a></span><span class='out-of-band'><span id='render-detail'>
-            <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
-                [<span class='inner'>&#x2212;</span>]
-            </a>
-        </span><a id='src-4794' class='srclink' href='../src/git2/repo.rs.html#30-32' title='goto source code'>[src]</a></span></h1>
+                   <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                       [<span class='inner'>&#x2212;</span>]
+                   </a>
+               </span><a id='src-4762' class='srclink' href='../src/git2/repo.rs.html#30-32' title='goto source code'>[src]</a></span></h1>
 <pre class='rust struct'>pub struct Repository {
     // some fields omitted
 }</pre><div class='docblock'><p>An owned git repository, representing all state associated with the
@@ -58,11 +59,12 @@ lifetime.</p>
 
 <p>When a repository goes out of scope it is freed in memory but not deleted
 from the filesystem.</p>
-</div><h2 id='methods'>Methods</h2><h3 class='impl'><code>impl <a class='struct' href='../git2/struct.Repository.html' title='git2::Repository'>Repository</a></code></h3><div class='impl-items'><h4 id='method.open' class='method'><code>fn <a href='#method.open' class='fnname'>open</a>&lt;P: <a class='trait' href='https://doc.rust-lang.org/nightly/core/convert/trait.AsRef.html' title='core::convert::AsRef'>AsRef</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/std/path/struct.Path.html' title='std::path::Path'>Path</a>&gt;&gt;(path: P) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='struct' href='../git2/struct.Repository.html' title='git2::Repository'>Repository</a>, <a class='struct' href='../git2/struct.Error.html' title='git2::Error'>Error</a>&gt;</code></h4>
+</div><h2 id='methods'>Methods</h2><h3 class='impl'><span class='in-band'><code>impl <a class='struct' href='../git2/struct.Repository.html' title='git2::Repository'>Repository</a></code></span><span class='out-of-band'><a id='src-4773' class='srclink' href='../src/git2/repo.rs.html#49-1534' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.open' class='method'><code>fn <a href='#method.open' class='fnname'>open</a>&lt;P: <a class='trait' href='https://doc.rust-lang.org/nightly/core/convert/trait.AsRef.html' title='core::convert::AsRef'>AsRef</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/std/path/struct.Path.html' title='std::path::Path'>Path</a>&gt;&gt;(path: P) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='struct' href='../git2/struct.Repository.html' title='git2::Repository'>Repository</a>, <a class='struct' href='../git2/struct.Error.html' title='git2::Error'>Error</a>&gt;</code></h4>
 <div class='docblock'><p>Attempt to open an already-existing repository at <code>path</code>.</p>
 
 <p>The path can point to either a normal or bare repository.</p>
-</div><h4 id='method.open_ext' class='method'><code>fn <a href='#method.open_ext' class='fnname'>open_ext</a>&lt;P, O, I&gt;(path: P, flags: <a class='struct' href='../git2/struct.RepositoryOpenFlags.html' title='git2::RepositoryOpenFlags'>RepositoryOpenFlags</a>, ceiling_dirs: I) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='struct' href='../git2/struct.Repository.html' title='git2::Repository'>Repository</a>, <a class='struct' href='../git2/struct.Error.html' title='git2::Error'>Error</a>&gt; <span class='where'>where P: <a class='trait' href='https://doc.rust-lang.org/nightly/core/convert/trait.AsRef.html' title='core::convert::AsRef'>AsRef</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/std/path/struct.Path.html' title='std::path::Path'>Path</a>&gt;, O: <a class='trait' href='https://doc.rust-lang.org/nightly/core/convert/trait.AsRef.html' title='core::convert::AsRef'>AsRef</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/std/ffi/os_str/struct.OsStr.html' title='std::ffi::os_str::OsStr'>OsStr</a>&gt;, I: <a class='trait' href='https://doc.rust-lang.org/nightly/core/iter/trait.IntoIterator.html' title='core::iter::IntoIterator'>IntoIterator</a>&lt;Item=O&gt;</span></code></h4>
+</div><h4 id='method.open_ext' class='method'><code>fn <a href='#method.open_ext' class='fnname'>open_ext</a>&lt;P, O, I&gt;(path: P, flags: <a class='struct' href='../git2/struct.RepositoryOpenFlags.html' title='git2::RepositoryOpenFlags'>RepositoryOpenFlags</a>, ceiling_dirs: I) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='struct' href='../git2/struct.Repository.html' title='git2::Repository'>Repository</a>, <a class='struct' href='../git2/struct.Error.html' title='git2::Error'>Error</a>&gt; <span class='where'>where P: <a class='trait' href='https://doc.rust-lang.org/nightly/core/convert/trait.AsRef.html' title='core::convert::AsRef'>AsRef</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/std/path/struct.Path.html' title='std::path::Path'>Path</a>&gt;, O: <a class='trait' href='https://doc.rust-lang.org/nightly/core/convert/trait.AsRef.html' title='core::convert::AsRef'>AsRef</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/std/ffi/os_str/struct.OsStr.html' title='std::ffi::os_str::OsStr'>OsStr</a>&gt;, I: <a class='trait' href='https://doc.rust-lang.org/nightly/core/iter/traits/trait.IntoIterator.html' title='core::iter::traits::IntoIterator'>IntoIterator</a>&lt;Item=O&gt;</span></code></h4>
 <div class='docblock'><p>Find and open an existing repository, with additional options.</p>
 
 <p>If flags contains REPOSITORY_OPEN_NO_SEARCH, the path must point
@@ -220,7 +222,7 @@ object can either be a commit or a tag, but tags must be derefernceable
 to a commit.</p>
 
 <p>The <code>checkout</code> options will only be used for a hard reset.</p>
-</div><h4 id='method.reset_default' class='method'><code>fn <a href='#method.reset_default' class='fnname'>reset_default</a>&lt;T, I&gt;(&amp;self, target: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;&amp;<a class='struct' href='../git2/struct.Object.html' title='git2::Object'>Object</a>&gt;, paths: I) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>()</a>, <a class='struct' href='../git2/struct.Error.html' title='git2::Error'>Error</a>&gt; <span class='where'>where T: <a class='trait' href='../git2/trait.IntoCString.html' title='git2::IntoCString'>IntoCString</a>, I: <a class='trait' href='https://doc.rust-lang.org/nightly/core/iter/trait.IntoIterator.html' title='core::iter::IntoIterator'>IntoIterator</a>&lt;Item=T&gt;</span></code></h4>
+</div><h4 id='method.reset_default' class='method'><code>fn <a href='#method.reset_default' class='fnname'>reset_default</a>&lt;T, I&gt;(&amp;self, target: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;&amp;<a class='struct' href='../git2/struct.Object.html' title='git2::Object'>Object</a>&gt;, paths: I) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>()</a>, <a class='struct' href='../git2/struct.Error.html' title='git2::Error'>Error</a>&gt; <span class='where'>where T: <a class='trait' href='../git2/trait.IntoCString.html' title='git2::IntoCString'>IntoCString</a>, I: <a class='trait' href='https://doc.rust-lang.org/nightly/core/iter/traits/trait.IntoIterator.html' title='core::iter::traits::IntoIterator'>IntoIterator</a>&lt;Item=T&gt;</span></code></h4>
 <div class='docblock'><p>Updates some entries in the index from the target commit tree.</p>
 
 <p>The scope of the updated entries is determined by the paths being
@@ -584,7 +586,9 @@ to account for staged deletes, tracked files, etc.</p>
 <p>This emulates <code>git diff &lt;tree&gt;</code> by diffing the tree to the index and
 the index to the working directory and blending the results into a
 single diff that includes staged deleted, etc.</p>
-</div></div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/marker/trait.Send.html' title='core::marker::Send'>Send</a> for <a class='struct' href='../git2/struct.Repository.html' title='git2::Repository'>Repository</a></code></h3><div class='impl-items'></div><h3 class='impl'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.Drop.html' title='core::ops::Drop'>Drop</a> for <a class='struct' href='../git2/struct.Repository.html' title='git2::Repository'>Repository</a></code></h3><div class='impl-items'><h4 id='method.drop' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/ops/trait.Drop.html#method.drop' class='fnname'>drop</a>(&amp;mut self)</code></h4>
+</div></div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><span class='in-band'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/marker/trait.Send.html' title='core::marker::Send'>Send</a> for <a class='struct' href='../git2/struct.Repository.html' title='git2::Repository'>Repository</a></code></span><span class='out-of-band'><a id='src-4764' class='srclink' href='../src/git2/repo.rs.html#36' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'></div><h3 class='impl'><span class='in-band'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.Drop.html' title='core::ops::Drop'>Drop</a> for <a class='struct' href='../git2/struct.Repository.html' title='git2::Repository'>Repository</a></code></span><span class='out-of-band'><a id='src-5636' class='srclink' href='../src/git2/repo.rs.html#1544-1548' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.drop' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/ops/trait.Drop.html#tymethod.drop' class='fnname'>drop</a>(&amp;mut self)</code></h4>
 </div></section>
     <section id='search' class="content hidden"></section>
 

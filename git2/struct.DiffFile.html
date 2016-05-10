@@ -11,6 +11,7 @@
 
     <link rel="stylesheet" type="text/css" href="../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../main.css">
+    
 
     
     
@@ -43,10 +44,10 @@
 
     <section id='main' class="content struct">
 <h1 class='fqn'><span class='in-band'>Struct <a href='index.html'>git2</a>::<wbr><a class='struct' href=''>DiffFile</a></span><span class='out-of-band'><span id='render-detail'>
-            <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
-                [<span class='inner'>&#x2212;</span>]
-            </a>
-        </span><a id='src-2707' class='srclink' href='../src/git2/diff.rs.html#36-39' title='goto source code'>[src]</a></span></h1>
+                   <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                       [<span class='inner'>&#x2212;</span>]
+                   </a>
+               </span><a id='src-2671' class='srclink' href='../src/git2/diff.rs.html#36-39' title='goto source code'>[src]</a></span></h1>
 <pre class='rust struct'>pub struct DiffFile&lt;'a&gt; {
     // some fields omitted
 }</pre><div class='docblock'><p>Description of one side of a delta.</p>
@@ -54,7 +55,8 @@
 <p>Although this is called a &quot;file&quot; it could represent a file, a symbolic
 link, a submodule commit id, or even a tree (although that only happens if
 you are tracking type changes or ignored/untracked directories).</p>
-</div><h2 id='methods'>Methods</h2><h3 class='impl'><code>impl&lt;'a&gt; <a class='struct' href='../git2/struct.DiffFile.html' title='git2::DiffFile'>DiffFile</a>&lt;'a&gt;</code></h3><div class='impl-items'><h4 id='method.id' class='method'><code>fn <a href='#method.id' class='fnname'>id</a>(&amp;self) -&gt; <a class='struct' href='../git2/struct.Oid.html' title='git2::Oid'>Oid</a></code></h4>
+</div><h2 id='methods'>Methods</h2><h3 class='impl'><span class='in-band'><code>impl&lt;'a&gt; <a class='struct' href='../git2/struct.DiffFile.html' title='git2::DiffFile'>DiffFile</a>&lt;'a&gt;</code></span><span class='out-of-band'><a id='src-2880' class='srclink' href='../src/git2/diff.rs.html#396-422' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.id' class='method'><code>fn <a href='#method.id' class='fnname'>id</a>(&amp;self) -&gt; <a class='struct' href='../git2/struct.Oid.html' title='git2::Oid'>Oid</a></code></h4>
 <div class='docblock'><p>Returns the Oid of this item.</p>
 
 <p>If this entry represents an absent side of a diff (e.g. the <code>old_file</code>

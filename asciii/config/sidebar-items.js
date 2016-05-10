@@ -1,1 +1,1 @@
-initSidebarItems({"constant":[["DEFAULT_CONFIG","Default configuration that will be used if a value is not set in yaml file at DEFAULT_LOCATION"],["DEFAULT_LOCATION","Name of the configfile"]],"struct":[["ConfigReader","Looks for a configuration yaml in your HOME_DIR"]]});
+initSidebarItems({"constant":[["DEFAULT_CONFIG","Default configuration that will be used if a value is not set in yaml file at `DEFAULT_LOCATION`"],["DEFAULT_LOCATION","Name of the configfile"]],"struct":[["ConfigReader","Looks for a configuration yaml in your `HOME_DIR`"]]});

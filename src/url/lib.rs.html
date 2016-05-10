@@ -4,13 +4,14 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="rustdoc">
-    <meta name="description" content="Source to the Rust file `/home/hendrik/.multirust/toolchains/stable/cargo/registry/src/github.com-88ac128001ac3a9a/url-1.0.0/src/lib.rs`.">
+    <meta name="description" content="Source to the Rust file `/home/hendrik/.multirust/toolchains/nightly/cargo/registry/src/github.com-1ecc6299db9ec823/url-1.1.0/src/lib.rs`.">
     <meta name="keywords" content="rust, rustlang, rust-lang">
 
     <title>lib.rs.html -- source</title>
 
     <link rel="stylesheet" type="text/css" href="../../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../../main.css">
+    
 
     
     
@@ -1396,27 +1397,6 @@
 <span id="1353">1353</span>
 <span id="1354">1354</span>
 <span id="1355">1355</span>
-<span id="1356">1356</span>
-<span id="1357">1357</span>
-<span id="1358">1358</span>
-<span id="1359">1359</span>
-<span id="1360">1360</span>
-<span id="1361">1361</span>
-<span id="1362">1362</span>
-<span id="1363">1363</span>
-<span id="1364">1364</span>
-<span id="1365">1365</span>
-<span id="1366">1366</span>
-<span id="1367">1367</span>
-<span id="1368">1368</span>
-<span id="1369">1369</span>
-<span id="1370">1370</span>
-<span id="1371">1371</span>
-<span id="1372">1372</span>
-<span id="1373">1373</span>
-<span id="1374">1374</span>
-<span id="1375">1375</span>
-<span id="1376">1376</span>
 </pre><pre class='rust '>
 <span class='comment'>// Copyright 2013-2015 The rust-url developers.</span>
 <span class='comment'>//</span>
@@ -1562,12 +1542,14 @@ assert_eq!(css_url.as_str(), &quot;http://servo.github.io/rust-url/main.css&quot
 
 <span class='kw'>pub</span> <span class='kw'>use</span> <span class='ident'>origin</span>::{<span class='ident'>Origin</span>, <span class='ident'>OpaqueOrigin</span>};
 <span class='kw'>pub</span> <span class='kw'>use</span> <span class='ident'>host</span>::{<span class='ident'>Host</span>, <span class='ident'>HostAndPort</span>, <span class='ident'>SocketAddrs</span>};
+<span class='kw'>pub</span> <span class='kw'>use</span> <span class='ident'>path_segments</span>::<span class='ident'>PathSegmentsMut</span>;
 <span class='kw'>pub</span> <span class='kw'>use</span> <span class='ident'>parser</span>::<span class='ident'>ParseError</span>;
 <span class='kw'>pub</span> <span class='kw'>use</span> <span class='ident'>slicing</span>::<span class='ident'>Position</span>;
 
 <span class='kw'>mod</span> <span class='ident'>encoding</span>;
 <span class='kw'>mod</span> <span class='ident'>host</span>;
 <span class='kw'>mod</span> <span class='ident'>origin</span>;
+<span class='kw'>mod</span> <span class='ident'>path_segments</span>;
 <span class='kw'>mod</span> <span class='ident'>parser</span>;
 <span class='kw'>mod</span> <span class='ident'>slicing</span>;
 
@@ -1612,7 +1594,7 @@ assert_eq!(css_url.as_str(), &quot;http://servo.github.io/rust-url/main.css&quot
 
 <span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span> <span class='ident'>ParseOptions</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span> {
     <span class='doccomment'>/// Change the base URL</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>base_url</span>(<span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>new</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>Url</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='kw'>Self</span> {
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>base_url</span>(<span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>new</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>Url</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='self'>Self</span> {
         <span class='self'>self</span>.<span class='ident'>base_url</span> <span class='op'>=</span> <span class='ident'>new</span>;
         <span class='self'>self</span>
     }
@@ -1620,13 +1602,13 @@ assert_eq!(css_url.as_str(), &quot;http://servo.github.io/rust-url/main.css&quot
     <span class='doccomment'>/// Override the character encoding of query strings.</span>
     <span class='doccomment'>/// This is a legacy concept only relevant for HTML.</span>
     <span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>feature</span> <span class='op'>=</span> <span class='string'>&quot;query_encoding&quot;</span>)]</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>encoding_override</span>(<span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>new</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>encoding</span>::<span class='ident'>EncodingRef</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='kw'>Self</span> {
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>encoding_override</span>(<span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>new</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>encoding</span>::<span class='ident'>EncodingRef</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='self'>Self</span> {
         <span class='self'>self</span>.<span class='ident'>encoding_override</span> <span class='op'>=</span> <span class='ident'>EncodingOverride</span>::<span class='ident'>from_opt_encoding</span>(<span class='ident'>new</span>).<span class='ident'>to_output_encoding</span>();
         <span class='self'>self</span>
     }
 
     <span class='doccomment'>/// Call the provided function or closure on non-fatal parse errors.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>log_syntax_violation</span>(<span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>new</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>Fn</span>(<span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='ident'>str</span>)<span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='kw'>Self</span> {
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>log_syntax_violation</span>(<span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>new</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>Fn</span>(<span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='ident'>str</span>)<span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='self'>Self</span> {
         <span class='self'>self</span>.<span class='ident'>log_syntax_violation</span> <span class='op'>=</span> <span class='ident'>new</span>;
         <span class='self'>self</span>
     }
@@ -1681,7 +1663,7 @@ assert_eq!(css_url.as_str(), &quot;http://servo.github.io/rust-url/main.css&quot
         <span class='self'>self</span>.<span class='ident'>serialization</span>
     }
 
-    <span class='doccomment'>/// For internal testing.</span>
+    <span class='doccomment'>/// For internal testing, not part of the public API.</span>
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// Methods of the `Url` struct assume a number of invariants.</span>
     <span class='doccomment'>/// This checks each of these invariants and panic if one is not met.</span>
@@ -1766,6 +1748,21 @@ assert_eq!(css_url.as_str(), &quot;http://servo.github.io/rust-url/main.css&quot
         <span class='kw'>if</span> <span class='kw'>let</span> (<span class='prelude-val'>Some</span>(<span class='ident'>query_start</span>), <span class='prelude-val'>Some</span>(<span class='ident'>fragment_start</span>)) <span class='op'>=</span> (<span class='self'>self</span>.<span class='ident'>query_start</span>, <span class='self'>self</span>.<span class='ident'>fragment_start</span>) {
             <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>fragment_start</span> <span class='op'>&gt;</span> <span class='ident'>query_start</span>);
         }
+
+        <span class='kw'>let</span> <span class='ident'>other</span> <span class='op'>=</span> <span class='ident'>Url</span>::<span class='ident'>parse</span>(<span class='self'>self</span>.<span class='ident'>as_str</span>()).<span class='ident'>unwrap</span>();
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>serialization</span>, <span class='kw-2'>&amp;</span><span class='ident'>other</span>.<span class='ident'>serialization</span>);
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='self'>self</span>.<span class='ident'>scheme_end</span>, <span class='ident'>other</span>.<span class='ident'>scheme_end</span>);
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='self'>self</span>.<span class='ident'>username_end</span>, <span class='ident'>other</span>.<span class='ident'>username_end</span>);
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='self'>self</span>.<span class='ident'>host_start</span>, <span class='ident'>other</span>.<span class='ident'>host_start</span>);
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='self'>self</span>.<span class='ident'>host_end</span>, <span class='ident'>other</span>.<span class='ident'>host_end</span>);
+        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='self'>self</span>.<span class='ident'>host</span> <span class='op'>==</span> <span class='ident'>other</span>.<span class='ident'>host</span> <span class='op'>||</span>
+                <span class='comment'>// XXX No host round-trips to empty host.</span>
+                <span class='comment'>// See https://github.com/whatwg/url/issues/79</span>
+                (<span class='self'>self</span>.<span class='ident'>host_str</span>(), <span class='ident'>other</span>.<span class='ident'>host_str</span>()) <span class='op'>==</span> (<span class='prelude-val'>None</span>, <span class='prelude-val'>Some</span>(<span class='string'>&quot;&quot;</span>)));
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='self'>self</span>.<span class='ident'>port</span>, <span class='ident'>other</span>.<span class='ident'>port</span>);
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='self'>self</span>.<span class='ident'>path_start</span>, <span class='ident'>other</span>.<span class='ident'>path_start</span>);
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='self'>self</span>.<span class='ident'>query_start</span>, <span class='ident'>other</span>.<span class='ident'>query_start</span>);
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='self'>self</span>.<span class='ident'>fragment_start</span>, <span class='ident'>other</span>.<span class='ident'>fragment_start</span>);
     }
 
     <span class='doccomment'>/// Return the origin of this URL (https://url.spec.whatwg.org/#origin)</span>
@@ -1950,7 +1947,10 @@ assert_eq!(css_url.as_str(), &quot;http://servo.github.io/rust-url/main.css&quot
     <span class='doccomment'>/// return an iterator of &#39;/&#39; slash-separated path segments,</span>
     <span class='doccomment'>/// each as a percent-encoded ASCII string.</span>
     <span class='doccomment'>///</span>
-    <span class='doccomment'>/// Return `None` for cannot-be-a-base URLs, or an iterator of at least one string.</span>
+    <span class='doccomment'>/// Return `None` for cannot-be-a-base URLs.</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// When `Some` is returned, the iterator always contains at least one string</span>
+    <span class='doccomment'>/// (which may be empty).</span>
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>path_segments</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>str</span>::<span class='ident'>Split</span><span class='op'>&lt;</span><span class='ident'>char</span><span class='op'>&gt;&gt;</span> {
         <span class='kw'>let</span> <span class='ident'>path</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>path</span>();
         <span class='kw'>if</span> <span class='ident'>path</span>.<span class='ident'>starts_with</span>(<span class='string'>&#39;/&#39;</span>) {
@@ -2011,7 +2011,7 @@ assert_eq!(css_url.as_str(), &quot;http://servo.github.io/rust-url/main.css&quot
         <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Some</span>(<span class='ident'>input</span>) <span class='op'>=</span> <span class='ident'>fragment</span> {
             <span class='self'>self</span>.<span class='ident'>fragment_start</span> <span class='op'>=</span> <span class='prelude-val'>Some</span>(<span class='ident'>to_u32</span>(<span class='self'>self</span>.<span class='ident'>serialization</span>.<span class='ident'>len</span>()).<span class='ident'>unwrap</span>());
             <span class='self'>self</span>.<span class='ident'>serialization</span>.<span class='ident'>push</span>(<span class='string'>&#39;#&#39;</span>);
-            <span class='self'>self</span>.<span class='ident'>mutate</span>(<span class='op'>|</span><span class='ident'>parser</span><span class='op'>|</span> <span class='ident'>parser</span>.<span class='ident'>parse_fragment</span>(<span class='ident'>input</span>))
+            <span class='self'>self</span>.<span class='ident'>mutate</span>(<span class='op'>|</span><span class='ident'>parser</span><span class='op'>|</span> <span class='ident'>parser</span>.<span class='ident'>parse_fragment</span>(<span class='ident'>parser</span>::<span class='ident'>Input</span>::<span class='ident'>new</span>(<span class='ident'>input</span>)))
         } <span class='kw'>else</span> {
             <span class='self'>self</span>.<span class='ident'>fragment_start</span> <span class='op'>=</span> <span class='prelude-val'>None</span>
         }
@@ -2049,7 +2049,7 @@ assert_eq!(css_url.as_str(), &quot;http://servo.github.io/rust-url/main.css&quot
             <span class='self'>self</span>.<span class='ident'>query_start</span> <span class='op'>=</span> <span class='prelude-val'>Some</span>(<span class='ident'>to_u32</span>(<span class='self'>self</span>.<span class='ident'>serialization</span>.<span class='ident'>len</span>()).<span class='ident'>unwrap</span>());
             <span class='self'>self</span>.<span class='ident'>serialization</span>.<span class='ident'>push</span>(<span class='string'>&#39;?&#39;</span>);
             <span class='kw'>let</span> <span class='ident'>scheme_end</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>scheme_end</span>;
-            <span class='self'>self</span>.<span class='ident'>mutate</span>(<span class='op'>|</span><span class='ident'>parser</span><span class='op'>|</span> <span class='ident'>parser</span>.<span class='ident'>parse_query</span>(<span class='ident'>scheme_end</span>, <span class='ident'>input</span>));
+            <span class='self'>self</span>.<span class='ident'>mutate</span>(<span class='op'>|</span><span class='ident'>parser</span><span class='op'>|</span> <span class='ident'>parser</span>.<span class='ident'>parse_query</span>(<span class='ident'>scheme_end</span>, <span class='ident'>parser</span>::<span class='ident'>Input</span>::<span class='ident'>new</span>(<span class='ident'>input</span>)));
         }
 
         <span class='self'>self</span>.<span class='ident'>restore_already_parsed_fragment</span>(<span class='ident'>fragment</span>);
@@ -2099,12 +2099,16 @@ assert_eq!(css_url.as_str(), &quot;http://servo.github.io/rust-url/main.css&quot
         <span class='ident'>form_urlencoded</span>::<span class='ident'>Serializer</span>::<span class='ident'>for_suffix</span>(<span class='ident'>query</span>, <span class='ident'>query_start</span> <span class='op'>+</span> <span class='string'>&quot;?&quot;</span>.<span class='ident'>len</span>())
     }
 
-    <span class='doccomment'>/// Change this URL’s path.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>set_path</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>path</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>) {
-        <span class='kw'>let</span> (<span class='ident'>old_after_path_pos</span>, <span class='ident'>after_path</span>) <span class='op'>=</span> <span class='kw'>match</span> (<span class='self'>self</span>.<span class='ident'>query_start</span>, <span class='self'>self</span>.<span class='ident'>fragment_start</span>) {
+    <span class='kw'>fn</span> <span class='ident'>take_after_path</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> (<span class='ident'>u32</span>, <span class='ident'>String</span>) {
+        <span class='kw'>match</span> (<span class='self'>self</span>.<span class='ident'>query_start</span>, <span class='self'>self</span>.<span class='ident'>fragment_start</span>) {
             (<span class='prelude-val'>Some</span>(<span class='ident'>i</span>), _) <span class='op'>|</span> (<span class='prelude-val'>None</span>, <span class='prelude-val'>Some</span>(<span class='ident'>i</span>)) <span class='op'>=&gt;</span> (<span class='ident'>i</span>, <span class='self'>self</span>.<span class='ident'>slice</span>(<span class='ident'>i</span>..).<span class='ident'>to_owned</span>()),
             (<span class='prelude-val'>None</span>, <span class='prelude-val'>None</span>) <span class='op'>=&gt;</span> (<span class='ident'>to_u32</span>(<span class='self'>self</span>.<span class='ident'>serialization</span>.<span class='ident'>len</span>()).<span class='ident'>unwrap</span>(), <span class='ident'>String</span>::<span class='ident'>new</span>())
-        };
+        }
+    }
+
+    <span class='doccomment'>/// Change this URL’s path.</span>
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>set_path</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='kw-2'>mut</span> <span class='ident'>path</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>) {
+        <span class='kw'>let</span> (<span class='ident'>old_after_path_pos</span>, <span class='ident'>after_path</span>) <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>take_after_path</span>();
         <span class='kw'>let</span> <span class='ident'>cannot_be_a_base</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>cannot_be_a_base</span>();
         <span class='kw'>let</span> <span class='ident'>scheme_type</span> <span class='op'>=</span> <span class='ident'>SchemeType</span>::<span class='ident'>from</span>(<span class='self'>self</span>.<span class='ident'>scheme</span>());
         <span class='self'>self</span>.<span class='ident'>serialization</span>.<span class='ident'>truncate</span>(<span class='self'>self</span>.<span class='ident'>path_start</span> <span class='kw'>as</span> <span class='ident'>usize</span>);
@@ -2112,82 +2116,37 @@ assert_eq!(css_url.as_str(), &quot;http://servo.github.io/rust-url/main.css&quot
             <span class='kw'>if</span> <span class='ident'>cannot_be_a_base</span> {
                 <span class='kw'>if</span> <span class='ident'>path</span>.<span class='ident'>starts_with</span>(<span class='string'>&#39;/&#39;</span>) {
                     <span class='ident'>parser</span>.<span class='ident'>serialization</span>.<span class='ident'>push_str</span>(<span class='string'>&quot;%2F&quot;</span>);
-                    <span class='ident'>parser</span>.<span class='ident'>parse_cannot_be_a_base_path</span>(<span class='kw-2'>&amp;</span><span class='ident'>path</span>[<span class='number'>1</span>..]);
-                } <span class='kw'>else</span> {
-                    <span class='ident'>parser</span>.<span class='ident'>parse_cannot_be_a_base_path</span>(<span class='ident'>path</span>);
+                    <span class='ident'>path</span> <span class='op'>=</span> <span class='kw-2'>&amp;</span><span class='ident'>path</span>[<span class='number'>1</span>..];
                 }
+                <span class='ident'>parser</span>.<span class='ident'>parse_cannot_be_a_base_path</span>(<span class='ident'>parser</span>::<span class='ident'>Input</span>::<span class='ident'>new</span>(<span class='ident'>path</span>));
             } <span class='kw'>else</span> {
-                <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>has_host</span> <span class='op'>=</span> <span class='boolval'>true</span>;  <span class='comment'>// FIXME</span>
-                <span class='ident'>parser</span>.<span class='ident'>parse_path_start</span>(<span class='ident'>scheme_type</span>, <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>has_host</span>, <span class='ident'>path</span>);
+                <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>has_host</span> <span class='op'>=</span> <span class='boolvalue'>true</span>;  <span class='comment'>// FIXME</span>
+                <span class='ident'>parser</span>.<span class='ident'>parse_path_start</span>(<span class='ident'>scheme_type</span>, <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>has_host</span>, <span class='ident'>parser</span>::<span class='ident'>Input</span>::<span class='ident'>new</span>(<span class='ident'>path</span>));
             }
         });
-        <span class='kw'>let</span> <span class='ident'>new_after_path_pos</span> <span class='op'>=</span> <span class='ident'>to_u32</span>(<span class='self'>self</span>.<span class='ident'>serialization</span>.<span class='ident'>len</span>()).<span class='ident'>unwrap</span>();
+        <span class='self'>self</span>.<span class='ident'>restore_after_path</span>(<span class='ident'>old_after_path_pos</span>, <span class='kw-2'>&amp;</span><span class='ident'>after_path</span>);
+    }
+
+    <span class='doccomment'>/// Return an object with methods to manipulate this URL’s path segments.</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// Return `Err(())` if this URl is cannot-be-a-base.</span>
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>path_segments_mut</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>PathSegmentsMut</span>, ()<span class='op'>&gt;</span> {
+        <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>cannot_be_a_base</span>() {
+            <span class='prelude-val'>Err</span>(())
+        } <span class='kw'>else</span> {
+            <span class='prelude-val'>Ok</span>(<span class='ident'>path_segments</span>::<span class='ident'>new</span>(<span class='self'>self</span>))
+        }
+    }
+
+    <span class='kw'>fn</span> <span class='ident'>restore_after_path</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>old_after_path_position</span>: <span class='ident'>u32</span>, <span class='ident'>after_path</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>) {
+        <span class='kw'>let</span> <span class='ident'>new_after_path_position</span> <span class='op'>=</span> <span class='ident'>to_u32</span>(<span class='self'>self</span>.<span class='ident'>serialization</span>.<span class='ident'>len</span>()).<span class='ident'>unwrap</span>();
         <span class='kw'>let</span> <span class='ident'>adjust</span> <span class='op'>=</span> <span class='op'>|</span><span class='ident'>index</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>u32</span><span class='op'>|</span> {
-            <span class='op'>*</span><span class='ident'>index</span> <span class='op'>-=</span> <span class='ident'>old_after_path_pos</span>;
-            <span class='op'>*</span><span class='ident'>index</span> <span class='op'>+=</span> <span class='ident'>new_after_path_pos</span>;
+            <span class='op'>*</span><span class='ident'>index</span> <span class='op'>-=</span> <span class='ident'>old_after_path_position</span>;
+            <span class='op'>*</span><span class='ident'>index</span> <span class='op'>+=</span> <span class='ident'>new_after_path_position</span>;
         };
         <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Some</span>(<span class='kw-2'>ref</span> <span class='kw-2'>mut</span> <span class='ident'>index</span>) <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>query_start</span> { <span class='ident'>adjust</span>(<span class='ident'>index</span>) }
         <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Some</span>(<span class='kw-2'>ref</span> <span class='kw-2'>mut</span> <span class='ident'>index</span>) <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>fragment_start</span> { <span class='ident'>adjust</span>(<span class='ident'>index</span>) }
-        <span class='self'>self</span>.<span class='ident'>serialization</span>.<span class='ident'>push_str</span>(<span class='kw-2'>&amp;</span><span class='ident'>after_path</span>)
-    }
-
-    <span class='doccomment'>/// Remove the last segment of this URL’s path.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// If this URL is cannot-be-a-base, do nothing and return `Err`.</span>
-    <span class='doccomment'>/// If this URL is not cannot-be-a-base and its path is `/`, do nothing and return `Ok`.</span>
-    <span class='comment'>// Temporarily private: https://github.com/servo/rust-url/issues/188</span>
-    <span class='comment'>/*pub*/</span> <span class='kw'>fn</span> <span class='ident'>pop_path_segment</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span>(), ()<span class='op'>&gt;</span> {
-        <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>cannot_be_a_base</span>() {
-            <span class='kw'>return</span> <span class='prelude-val'>Err</span>(())
-        }
-        <span class='kw'>let</span> <span class='ident'>last_slash</span>;
-        <span class='kw'>let</span> <span class='ident'>path_len</span>;
-        {
-            <span class='kw'>let</span> <span class='ident'>path</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>path</span>();
-            <span class='ident'>last_slash</span> <span class='op'>=</span> <span class='ident'>path</span>.<span class='ident'>rfind</span>(<span class='string'>&#39;/&#39;</span>).<span class='ident'>unwrap</span>();
-            <span class='ident'>path_len</span> <span class='op'>=</span> <span class='ident'>path</span>.<span class='ident'>len</span>();
-        };
-        <span class='kw'>if</span> <span class='ident'>last_slash</span> <span class='op'>&gt;</span> <span class='number'>0</span> {
-            <span class='comment'>// Found a slash other than the initial one</span>
-            <span class='kw'>let</span> <span class='ident'>last_slash</span> <span class='op'>=</span> <span class='ident'>last_slash</span> <span class='op'>+</span> <span class='self'>self</span>.<span class='ident'>path_start</span> <span class='kw'>as</span> <span class='ident'>usize</span>;
-            <span class='kw'>let</span> <span class='ident'>path_end</span> <span class='op'>=</span> <span class='ident'>path_len</span> <span class='op'>+</span> <span class='self'>self</span>.<span class='ident'>path_start</span> <span class='kw'>as</span> <span class='ident'>usize</span>;
-            <span class='self'>self</span>.<span class='ident'>serialization</span>.<span class='ident'>drain</span>(<span class='ident'>last_slash</span>..<span class='ident'>path_end</span>);
-            <span class='kw'>let</span> <span class='ident'>offset</span> <span class='op'>=</span> (<span class='ident'>path_end</span> <span class='op'>-</span> <span class='ident'>last_slash</span>) <span class='kw'>as</span> <span class='ident'>u32</span>;
-            <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Some</span>(<span class='kw-2'>ref</span> <span class='kw-2'>mut</span> <span class='ident'>index</span>) <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>query_start</span> { <span class='op'>*</span><span class='ident'>index</span> <span class='op'>-=</span> <span class='ident'>offset</span> }
-            <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Some</span>(<span class='kw-2'>ref</span> <span class='kw-2'>mut</span> <span class='ident'>index</span>) <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>fragment_start</span> { <span class='op'>*</span><span class='ident'>index</span> <span class='op'>-=</span> <span class='ident'>offset</span> }
-        }
-        <span class='prelude-val'>Ok</span>(())
-    }
-
-    <span class='doccomment'>/// Add a segment at the end of this URL’s path.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// If this URL is cannot-be-a-base, do nothing and return `Err`.</span>
-    <span class='comment'>// Temporarily private: https://github.com/servo/rust-url/issues/188</span>
-    <span class='comment'>/*pub*/</span> <span class='kw'>fn</span> <span class='ident'>push_path_segment</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>segment</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span>(), ()<span class='op'>&gt;</span> {
-        <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>cannot_be_a_base</span>() {
-            <span class='kw'>return</span> <span class='prelude-val'>Err</span>(())
-        }
-        <span class='kw'>let</span> <span class='ident'>after_path</span> <span class='op'>=</span> <span class='kw'>match</span> (<span class='self'>self</span>.<span class='ident'>query_start</span>, <span class='self'>self</span>.<span class='ident'>fragment_start</span>) {
-            (<span class='prelude-val'>Some</span>(<span class='ident'>i</span>), _) <span class='op'>|</span> (<span class='prelude-val'>None</span>, <span class='prelude-val'>Some</span>(<span class='ident'>i</span>)) <span class='op'>=&gt;</span> {
-                <span class='kw'>let</span> <span class='ident'>s</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>slice</span>(<span class='ident'>i</span>..).<span class='ident'>to_owned</span>();
-                <span class='self'>self</span>.<span class='ident'>serialization</span>.<span class='ident'>truncate</span>(<span class='ident'>i</span> <span class='kw'>as</span> <span class='ident'>usize</span>);
-                <span class='ident'>s</span>
-            },
-            (<span class='prelude-val'>None</span>, <span class='prelude-val'>None</span>) <span class='op'>=&gt;</span> <span class='ident'>String</span>::<span class='ident'>new</span>()
-        };
-        <span class='kw'>let</span> <span class='ident'>scheme_type</span> <span class='op'>=</span> <span class='ident'>SchemeType</span>::<span class='ident'>from</span>(<span class='self'>self</span>.<span class='ident'>scheme</span>());
-        <span class='kw'>let</span> <span class='ident'>path_start</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>path_start</span> <span class='kw'>as</span> <span class='ident'>usize</span>;
-        <span class='self'>self</span>.<span class='ident'>serialization</span>.<span class='ident'>push</span>(<span class='string'>&#39;/&#39;</span>);
-        <span class='self'>self</span>.<span class='ident'>mutate</span>(<span class='op'>|</span><span class='ident'>parser</span><span class='op'>|</span> {
-            <span class='ident'>parser</span>.<span class='ident'>context</span> <span class='op'>=</span> <span class='ident'>parser</span>::<span class='ident'>Context</span>::<span class='ident'>PathSegmentSetter</span>;
-            <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>has_host</span> <span class='op'>=</span> <span class='boolval'>true</span>;  <span class='comment'>// FIXME account for this?</span>
-            <span class='ident'>parser</span>.<span class='ident'>parse_path</span>(<span class='ident'>scheme_type</span>, <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>has_host</span>, <span class='ident'>path_start</span>, <span class='ident'>segment</span>)
-        });
-        <span class='kw'>let</span> <span class='ident'>offset</span> <span class='op'>=</span> <span class='ident'>to_u32</span>(<span class='self'>self</span>.<span class='ident'>serialization</span>.<span class='ident'>len</span>()).<span class='ident'>unwrap</span>() <span class='op'>-</span> <span class='self'>self</span>.<span class='ident'>path_start</span>;
-        <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Some</span>(<span class='kw-2'>ref</span> <span class='kw-2'>mut</span> <span class='ident'>index</span>) <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>query_start</span> { <span class='op'>*</span><span class='ident'>index</span> <span class='op'>+=</span> <span class='ident'>offset</span> }
-        <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Some</span>(<span class='kw-2'>ref</span> <span class='kw-2'>mut</span> <span class='ident'>index</span>) <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>fragment_start</span> { <span class='op'>*</span><span class='ident'>index</span> <span class='op'>+=</span> <span class='ident'>offset</span> }
-        <span class='self'>self</span>.<span class='ident'>serialization</span>.<span class='ident'>push_str</span>(<span class='kw-2'>&amp;</span><span class='ident'>after_path</span>);
-        <span class='prelude-val'>Ok</span>(())
+        <span class='self'>self</span>.<span class='ident'>serialization</span>.<span class='ident'>push_str</span>(<span class='ident'>after_path</span>)
     }
 
     <span class='doccomment'>/// Change this URL’s port number.</span>
@@ -2390,14 +2349,14 @@ assert_eq!(css_url.as_str(), &quot;http://servo.github.io/rust-url/main.css&quot
 
         <span class='kw'>let</span> <span class='ident'>new_username_is_empty</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>username_end</span> <span class='op'>==</span> <span class='ident'>username_start</span>;
         <span class='kw'>match</span> (<span class='ident'>new_username_is_empty</span>, <span class='ident'>after_username</span>.<span class='ident'>chars</span>().<span class='ident'>next</span>()) {
-            (<span class='boolval'>true</span>, <span class='prelude-val'>Some</span>(<span class='string'>&#39;@&#39;</span>)) <span class='op'>=&gt;</span> {
+            (<span class='boolvalue'>true</span>, <span class='prelude-val'>Some</span>(<span class='string'>&#39;@&#39;</span>)) <span class='op'>=&gt;</span> {
                 <span class='ident'>removed_bytes</span> <span class='op'>+=</span> <span class='number'>1</span>;
                 <span class='self'>self</span>.<span class='ident'>serialization</span>.<span class='ident'>push_str</span>(<span class='kw-2'>&amp;</span><span class='ident'>after_username</span>[<span class='number'>1</span>..]);
             }
-            (<span class='boolval'>false</span>, <span class='prelude-val'>Some</span>(<span class='string'>&#39;@&#39;</span>)) <span class='op'>|</span> (_, <span class='prelude-val'>Some</span>(<span class='string'>&#39;:&#39;</span>)) <span class='op'>|</span> (<span class='boolval'>true</span>, _) <span class='op'>=&gt;</span> {
+            (<span class='boolvalue'>false</span>, <span class='prelude-val'>Some</span>(<span class='string'>&#39;@&#39;</span>)) <span class='op'>|</span> (_, <span class='prelude-val'>Some</span>(<span class='string'>&#39;:&#39;</span>)) <span class='op'>|</span> (<span class='boolvalue'>true</span>, _) <span class='op'>=&gt;</span> {
                 <span class='self'>self</span>.<span class='ident'>serialization</span>.<span class='ident'>push_str</span>(<span class='kw-2'>&amp;</span><span class='ident'>after_username</span>);
             }
-            (<span class='boolval'>false</span>, _) <span class='op'>=&gt;</span> {
+            (<span class='boolvalue'>false</span>, _) <span class='op'>=&gt;</span> {
                 <span class='ident'>added_bytes</span> <span class='op'>+=</span> <span class='number'>1</span>;
                 <span class='self'>self</span>.<span class='ident'>serialization</span>.<span class='ident'>push</span>(<span class='string'>&#39;@&#39;</span>);
                 <span class='self'>self</span>.<span class='ident'>serialization</span>.<span class='ident'>push_str</span>(<span class='kw-2'>&amp;</span><span class='ident'>after_username</span>);
@@ -2424,7 +2383,7 @@ assert_eq!(css_url.as_str(), &quot;http://servo.github.io/rust-url/main.css&quot
     <span class='doccomment'>///   `http`, `https`, `ws`, `wss`, `ftp`, or `gopher`</span>
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>set_scheme</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>scheme</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span>(), ()<span class='op'>&gt;</span> {
         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>parser</span> <span class='op'>=</span> <span class='ident'>Parser</span>::<span class='ident'>for_setter</span>(<span class='ident'>String</span>::<span class='ident'>new</span>());
-        <span class='kw'>let</span> <span class='ident'>remaining</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>parser</span>.<span class='ident'>parse_scheme</span>(<span class='ident'>scheme</span>));
+        <span class='kw'>let</span> <span class='ident'>remaining</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>parser</span>.<span class='ident'>parse_scheme</span>(<span class='ident'>parser</span>::<span class='ident'>Input</span>::<span class='ident'>new</span>(<span class='ident'>scheme</span>)));
         <span class='kw'>if</span> <span class='op'>!</span><span class='ident'>remaining</span>.<span class='ident'>is_empty</span>() <span class='op'>||</span>
                 (<span class='op'>!</span><span class='self'>self</span>.<span class='ident'>has_host</span>() <span class='op'>&amp;&amp;</span> <span class='ident'>SchemeType</span>::<span class='ident'>from</span>(<span class='kw-2'>&amp;</span><span class='ident'>parser</span>.<span class='ident'>serialization</span>).<span class='ident'>is_special</span>()) {
             <span class='kw'>return</span> <span class='prelude-val'>Err</span>(())
@@ -2541,7 +2500,7 @@ assert_eq!(css_url.as_str(), &quot;http://servo.github.io/rust-url/main.css&quot
 <span class='kw'>impl</span> <span class='ident'>ToSocketAddrs</span> <span class='kw'>for</span> <span class='ident'>Url</span> {
     <span class='kw'>type</span> <span class='ident'>Iter</span> <span class='op'>=</span> <span class='ident'>SocketAddrs</span>;
 
-    <span class='kw'>fn</span> <span class='ident'>to_socket_addrs</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>io</span>::<span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>Self</span>::<span class='ident'>Iter</span><span class='op'>&gt;</span> {
+    <span class='kw'>fn</span> <span class='ident'>to_socket_addrs</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>io</span>::<span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='self'>Self</span>::<span class='ident'>Iter</span><span class='op'>&gt;</span> {
         <span class='macro'>try</span><span class='macro'>!</span>(<span class='self'>self</span>.<span class='ident'>with_default_port</span>(<span class='op'>|</span>_<span class='op'>|</span> <span class='prelude-val'>Err</span>(()))).<span class='ident'>to_socket_addrs</span>()
     }
 }
@@ -2578,7 +2537,7 @@ assert_eq!(css_url.as_str(), &quot;http://servo.github.io/rust-url/main.css&quot
 <span class='doccomment'>/// URLs compare like their serialization.</span>
 <span class='kw'>impl</span> <span class='ident'>PartialEq</span> <span class='kw'>for</span> <span class='ident'>Url</span> {
     <span class='attribute'>#[<span class='ident'>inline</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>eq</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>other</span>: <span class='kw-2'>&amp;</span><span class='kw'>Self</span>) <span class='op'>-&gt;</span> <span class='ident'>bool</span> {
+    <span class='kw'>fn</span> <span class='ident'>eq</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>other</span>: <span class='kw-2'>&amp;</span><span class='self'>Self</span>) <span class='op'>-&gt;</span> <span class='ident'>bool</span> {
         <span class='self'>self</span>.<span class='ident'>serialization</span> <span class='op'>==</span> <span class='ident'>other</span>.<span class='ident'>serialization</span>
     }
 }
@@ -2586,7 +2545,7 @@ assert_eq!(css_url.as_str(), &quot;http://servo.github.io/rust-url/main.css&quot
 <span class='doccomment'>/// URLs compare like their serialization.</span>
 <span class='kw'>impl</span> <span class='ident'>Ord</span> <span class='kw'>for</span> <span class='ident'>Url</span> {
     <span class='attribute'>#[<span class='ident'>inline</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>cmp</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>other</span>: <span class='kw-2'>&amp;</span><span class='kw'>Self</span>) <span class='op'>-&gt;</span> <span class='ident'>cmp</span>::<span class='ident'>Ordering</span> {
+    <span class='kw'>fn</span> <span class='ident'>cmp</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>other</span>: <span class='kw-2'>&amp;</span><span class='self'>Self</span>) <span class='op'>-&gt;</span> <span class='ident'>cmp</span>::<span class='ident'>Ordering</span> {
         <span class='self'>self</span>.<span class='ident'>serialization</span>.<span class='ident'>cmp</span>(<span class='kw-2'>&amp;</span><span class='ident'>other</span>.<span class='ident'>serialization</span>)
     }
 }
@@ -2594,7 +2553,7 @@ assert_eq!(css_url.as_str(), &quot;http://servo.github.io/rust-url/main.css&quot
 <span class='doccomment'>/// URLs compare like their serialization.</span>
 <span class='kw'>impl</span> <span class='ident'>PartialOrd</span> <span class='kw'>for</span> <span class='ident'>Url</span> {
     <span class='attribute'>#[<span class='ident'>inline</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>partial_cmp</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>other</span>: <span class='kw-2'>&amp;</span><span class='kw'>Self</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>cmp</span>::<span class='ident'>Ordering</span><span class='op'>&gt;</span> {
+    <span class='kw'>fn</span> <span class='ident'>partial_cmp</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>other</span>: <span class='kw-2'>&amp;</span><span class='self'>Self</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>cmp</span>::<span class='ident'>Ordering</span><span class='op'>&gt;</span> {
         <span class='self'>self</span>.<span class='ident'>serialization</span>.<span class='ident'>partial_cmp</span>(<span class='kw-2'>&amp;</span><span class='ident'>other</span>.<span class='ident'>serialization</span>)
     }
 }

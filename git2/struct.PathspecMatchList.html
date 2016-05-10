@@ -11,6 +11,7 @@
 
     <link rel="stylesheet" type="text/css" href="../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../main.css">
+    
 
     
     
@@ -43,14 +44,15 @@
 
     <section id='main' class="content struct">
 <h1 class='fqn'><span class='in-band'>Struct <a href='index.html'>git2</a>::<wbr><a class='struct' href=''>PathspecMatchList</a></span><span class='out-of-band'><span id='render-detail'>
-            <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
-                [<span class='inner'>&#x2212;</span>]
-            </a>
-        </span><a id='src-3876' class='srclink' href='../src/git2/pathspec.rs.html#17-20' title='goto source code'>[src]</a></span></h1>
+                   <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                       [<span class='inner'>&#x2212;</span>]
+                   </a>
+               </span><a id='src-3844' class='srclink' href='../src/git2/pathspec.rs.html#17-20' title='goto source code'>[src]</a></span></h1>
 <pre class='rust struct'>pub struct PathspecMatchList&lt;'ps&gt; {
     // some fields omitted
 }</pre><div class='docblock'><p>List of filenames matching a pathspec.</p>
-</div><h2 id='methods'>Methods</h2><h3 class='impl'><code>impl&lt;'ps&gt; <a class='struct' href='../git2/struct.PathspecMatchList.html' title='git2::PathspecMatchList'>PathspecMatchList</a>&lt;'ps&gt;</code></h3><div class='impl-items'><h4 id='method.entries' class='method'><code>fn <a href='#method.entries' class='fnname'>entries</a>(&amp;self) -&gt; <a class='struct' href='../git2/struct.PathspecEntries.html' title='git2::PathspecEntries'>PathspecEntries</a></code></h4>
+</div><h2 id='methods'>Methods</h2><h3 class='impl'><span class='in-band'><code>impl&lt;'ps&gt; <a class='struct' href='../git2/struct.PathspecMatchList.html' title='git2::PathspecMatchList'>PathspecMatchList</a>&lt;'ps&gt;</code></span><span class='out-of-band'><a id='src-3915' class='srclink' href='../src/git2/pathspec.rs.html#152-213' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.entries' class='method'><code>fn <a href='#method.entries' class='fnname'>entries</a>(&amp;self) -&gt; <a class='struct' href='../git2/struct.PathspecEntries.html' title='git2::PathspecEntries'>PathspecEntries</a></code></h4>
 <div class='docblock'><p>Returns an iterator over the matching filenames in this list.</p>
 </div><h4 id='method.entry' class='method'><code>fn <a href='#method.entry' class='fnname'>entry</a>(&amp;self, i: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>&amp;[</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u8.html'>u8</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>]</a>&gt;</code></h4>
 <div class='docblock'><p>Get a matching filename by position.</p>
@@ -68,7 +70,8 @@ always be <code>None</code>.</p>
 <div class='docblock'><p>Returns an iterator over the non-matching entries in this list.</p>
 </div><h4 id='method.failed_entry' class='method'><code>fn <a href='#method.failed_entry' class='fnname'>failed_entry</a>(&amp;self, i: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>&amp;[</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u8.html'>u8</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>]</a>&gt;</code></h4>
 <div class='docblock'><p>Get an original pathspec string that had no matches.</p>
-</div></div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><code>impl&lt;'ps&gt; <a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.Drop.html' title='core::ops::Drop'>Drop</a> for <a class='struct' href='../git2/struct.PathspecMatchList.html' title='git2::PathspecMatchList'>PathspecMatchList</a>&lt;'ps&gt;</code></h3><div class='impl-items'><h4 id='method.drop' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/ops/trait.Drop.html#method.drop' class='fnname'>drop</a>(&amp;mut self)</code></h4>
+</div></div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><span class='in-band'><code>impl&lt;'ps&gt; <a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.Drop.html' title='core::ops::Drop'>Drop</a> for <a class='struct' href='../git2/struct.PathspecMatchList.html' title='git2::PathspecMatchList'>PathspecMatchList</a>&lt;'ps&gt;</code></span><span class='out-of-band'><a id='src-3952' class='srclink' href='../src/git2/pathspec.rs.html#225-229' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.drop' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/ops/trait.Drop.html#tymethod.drop' class='fnname'>drop</a>(&amp;mut self)</code></h4>
 </div></section>
     <section id='search' class="content hidden"></section>
 

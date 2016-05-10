@@ -11,6 +11,7 @@
 
     <link rel="stylesheet" type="text/css" href="../../../../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../../../../main.css">
+    
 
     
     
@@ -81,51 +82,47 @@
 <span id="38">38</span>
 <span id="39">39</span>
 <span id="40">40</span>
-<span id="41">41</span>
-<span id="42">42</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! Implementations of `ProjectList`</span>
 
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>ops</span>::{<span class='ident'>Deref</span>, <span class='ident'>DerefMut</span>};
 
-<span class='kw'>use</span> <span class='ident'>super</span>::<span class='ident'>Storable</span>;
+<span class='kw'>use</span> <span class='kw'>super</span>::<span class='ident'>Storable</span>;
 
 <span class='doccomment'>/// Wrapper around `Vec&lt;Storable&gt;`</span>
-<span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>ProjectList</span><span class='op'>&lt;</span><span class='ident'>P</span>:<span class='ident'>Storable</span><span class='op'>+</span><span class='ident'>Sized</span><span class='op'>&gt;</span>{
-    <span class='kw'>pub</span> <span class='ident'>projects</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>P</span><span class='op'>&gt;</span>
+<span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>ProjectList</span><span class='op'>&lt;</span><span class='ident'>P</span>: <span class='ident'>Storable</span> <span class='op'>+</span> <span class='ident'>Sized</span><span class='op'>&gt;</span> {
+    <span class='kw'>pub</span> <span class='ident'>projects</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>P</span><span class='op'>&gt;</span>,
 }
 
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>L</span>:<span class='ident'>Storable</span><span class='op'>&gt;</span> <span class='ident'>ProjectList</span><span class='op'>&lt;</span><span class='ident'>L</span><span class='op'>&gt;</span>{
-
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>filter_by_all</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>filters</span>:<span class='kw-2'>&amp;</span>[<span class='kw-2'>&amp;</span><span class='ident'>str</span>]){
-        <span class='kw'>for</span> <span class='ident'>filter</span> <span class='kw'>in</span> <span class='ident'>filters</span>{
+<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>L</span>: <span class='ident'>Storable</span><span class='op'>&gt;</span> <span class='ident'>ProjectList</span><span class='op'>&lt;</span><span class='ident'>L</span><span class='op'>&gt;</span> {
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>filter_by_all</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>filters</span>: <span class='kw-2'>&amp;</span>[<span class='kw-2'>&amp;</span><span class='ident'>str</span>]) {
+        <span class='kw'>for</span> <span class='ident'>filter</span> <span class='kw'>in</span> <span class='ident'>filters</span> {
             <span class='self'>self</span>.<span class='ident'>filter_by</span>(<span class='ident'>filter</span>);
         }
     }
 
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>filter_by</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>filter</span>:<span class='kw-2'>&amp;</span><span class='ident'>str</span>){
-        <span class='self'>self</span>.<span class='ident'>projects</span>.<span class='ident'>retain</span>(<span class='op'>|</span><span class='ident'>p</span><span class='op'>|</span>{
-            <span class='kw'>let</span> (<span class='ident'>key</span>,<span class='ident'>val</span>) <span class='op'>=</span> <span class='ident'>filter</span>.<span class='ident'>split_at</span>(<span class='ident'>filter</span>.<span class='ident'>find</span>(<span class='string'>&#39;:&#39;</span>).<span class='ident'>unwrap_or</span>(<span class='number'>0</span>));
-            <span class='ident'>p</span>.<span class='ident'>matches_filter</span>(<span class='kw-2'>&amp;</span><span class='ident'>key</span>, <span class='kw-2'>&amp;</span><span class='ident'>val</span>[<span class='number'>1</span>..])
-        });
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>filter_by_key_val</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>key</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>, <span class='ident'>val</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>) {
+        <span class='self'>self</span>.<span class='ident'>projects</span>.<span class='ident'>retain</span>(<span class='op'>|</span><span class='ident'>p</span><span class='op'>|</span> <span class='ident'>p</span>.<span class='ident'>matches_filter</span>(<span class='kw-2'>&amp;</span><span class='ident'>key</span>, <span class='kw-2'>&amp;</span><span class='ident'>val</span>));
     }
 
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>filter_by</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>filter</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>) {
+        <span class='kw'>let</span> (<span class='ident'>key</span>, <span class='ident'>val</span>) <span class='op'>=</span> <span class='ident'>filter</span>.<span class='ident'>split_at</span>(<span class='ident'>filter</span>.<span class='ident'>find</span>(<span class='string'>&#39;:&#39;</span>).<span class='ident'>unwrap_or</span>(<span class='number'>0</span>));
+        <span class='self'>self</span>.<span class='ident'>filter_by_key_val</span>(<span class='kw-2'>&amp;</span><span class='ident'>key</span>, <span class='kw-2'>&amp;</span><span class='ident'>val</span>[<span class='number'>1</span>..]);
+    }
 }
 
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>L</span>:<span class='ident'>Storable</span><span class='op'>&gt;</span> <span class='ident'>Deref</span> <span class='kw'>for</span> <span class='ident'>ProjectList</span><span class='op'>&lt;</span><span class='ident'>L</span><span class='op'>&gt;</span>{
-    <span class='kw'>type</span> <span class='ident'>Target</span><span class='op'>=</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>L</span><span class='op'>&gt;</span>;
-    <span class='kw'>fn</span> <span class='ident'>deref</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='kw-2'>&amp;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>L</span><span class='op'>&gt;</span>{
+<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>L</span>: <span class='ident'>Storable</span><span class='op'>&gt;</span> <span class='ident'>Deref</span> <span class='kw'>for</span> <span class='ident'>ProjectList</span><span class='op'>&lt;</span><span class='ident'>L</span><span class='op'>&gt;</span> {
+    <span class='kw'>type</span> <span class='ident'>Target</span> <span class='op'>=</span> <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>L</span><span class='op'>&gt;</span>;
+    <span class='kw'>fn</span> <span class='ident'>deref</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='kw-2'>&amp;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>L</span><span class='op'>&gt;</span> {
         <span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>projects</span>
     }
 }
 
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>L</span>:<span class='ident'>Storable</span><span class='op'>&gt;</span> <span class='ident'>DerefMut</span> <span class='kw'>for</span> <span class='ident'>ProjectList</span><span class='op'>&lt;</span><span class='ident'>L</span><span class='op'>&gt;</span>{
-    <span class='kw'>fn</span> <span class='ident'>deref_mut</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>L</span><span class='op'>&gt;</span>{
+<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>L</span>: <span class='ident'>Storable</span><span class='op'>&gt;</span> <span class='ident'>DerefMut</span> <span class='kw'>for</span> <span class='ident'>ProjectList</span><span class='op'>&lt;</span><span class='ident'>L</span><span class='op'>&gt;</span> {
+    <span class='kw'>fn</span> <span class='ident'>deref_mut</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>L</span><span class='op'>&gt;</span> {
         <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>.<span class='ident'>projects</span>
     }
 }
-
-
 </pre>
 </section>
     <section id='search' class="content hidden"></section>

@@ -11,6 +11,7 @@
 
     <link rel="stylesheet" type="text/css" href="../../../../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../../../../main.css">
+    
 
     
     
@@ -327,7 +328,34 @@
 <span id="284">284</span>
 <span id="285">285</span>
 <span id="286">286</span>
+<span id="287">287</span>
+<span id="288">288</span>
+<span id="289">289</span>
+<span id="290">290</span>
+<span id="291">291</span>
+<span id="292">292</span>
+<span id="293">293</span>
+<span id="294">294</span>
+<span id="295">295</span>
+<span id="296">296</span>
+<span id="297">297</span>
+<span id="298">298</span>
+<span id="299">299</span>
+<span id="300">300</span>
+<span id="301">301</span>
+<span id="302">302</span>
+<span id="303">303</span>
+<span id="304">304</span>
+<span id="305">305</span>
+<span id="306">306</span>
+<span id="307">307</span>
+<span id="308">308</span>
+<span id="309">309</span>
 </pre><pre class='rust '>
+<span class='doccomment'>//! Project file parsing and evaluation.</span>
+<span class='doccomment'>//!</span>
+<span class='doccomment'>//! This module implements all functionality of a project.</span>
+
 <span class='attribute'>#<span class='op'>!</span>[<span class='ident'>allow</span>(<span class='ident'>unused_variables</span>)]</span>
 <span class='attribute'>#<span class='op'>!</span>[<span class='ident'>allow</span>(<span class='ident'>dead_code</span>)]</span>
 
@@ -344,6 +372,7 @@
 
 <span class='kw'>use</span> <span class='ident'>util</span>::<span class='ident'>yaml</span>;
 <span class='kw'>use</span> <span class='ident'>storage</span>::<span class='op'>*</span>;
+<span class='kw'>use</span> <span class='ident'>storage</span>::<span class='ident'>repo</span>::<span class='ident'>GitStatus</span>;
 <span class='kw'>use</span> <span class='ident'>templater</span>::<span class='ident'>Templater</span>;
 
 <span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>product</span>;
@@ -362,6 +391,7 @@
 <span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>Project</span> {
     <span class='ident'>file_path</span>: <span class='ident'>PathBuf</span>,
     <span class='ident'>temp_dir</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>TempDir</span><span class='op'>&gt;</span>,
+    <span class='ident'>git_status</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>GitStatus</span><span class='op'>&gt;</span>,
     <span class='ident'>yaml</span>: <span class='ident'>Yaml</span>
 }
 
@@ -379,7 +409,7 @@
 
         <span class='comment'>// fill template with these values</span>
         <span class='kw'>let</span> <span class='ident'>default_fill</span> <span class='op'>=</span> <span class='macro'>hashmap</span><span class='macro'>!</span>{
-            <span class='string'>&quot;VERSION&quot;</span>       <span class='op'>=&gt;</span> <span class='macro'>crate_version</span><span class='macro'>!</span>().<span class='ident'>to_owned</span>(),
+            <span class='string'>&quot;VERSION&quot;</span>       <span class='op'>=&gt;</span> ::<span class='ident'>version</span>(),
             <span class='string'>&quot;TEMPLATE&quot;</span>      <span class='op'>=&gt;</span> <span class='ident'>template_name</span>.<span class='ident'>to_owned</span>(),
             <span class='string'>&quot;PROJECT-NAME&quot;</span>  <span class='op'>=&gt;</span> <span class='ident'>project_name</span>.<span class='ident'>to_owned</span>(),
             <span class='string'>&quot;DATE-EVENT&quot;</span>    <span class='op'>=&gt;</span> <span class='ident'>event_date</span>,
@@ -402,7 +432,7 @@
 
         <span class='comment'>// generates a temp file</span>
         <span class='kw'>let</span> <span class='ident'>temp_dir</span>  <span class='op'>=</span> <span class='ident'>TempDir</span>::<span class='ident'>new</span>(<span class='kw-2'>&amp;</span><span class='ident'>project_name</span>).<span class='ident'>unwrap</span>();
-        <span class='kw'>let</span> <span class='ident'>temp_file</span> <span class='op'>=</span> <span class='ident'>temp_dir</span>.<span class='ident'>path</span>().<span class='ident'>join</span>(<span class='ident'>slug</span>::<span class='ident'>slugify</span>(<span class='ident'>project_name</span>) <span class='op'>+</span> <span class='string'>&quot;.&quot;</span> <span class='op'>+</span> <span class='ident'>Self</span>::<span class='ident'>file_extension</span>());
+        <span class='kw'>let</span> <span class='ident'>temp_file</span> <span class='op'>=</span> <span class='ident'>temp_dir</span>.<span class='ident'>path</span>().<span class='ident'>join</span>(<span class='ident'>slug</span>::<span class='ident'>slugify</span>(<span class='ident'>project_name</span>) <span class='op'>+</span> <span class='string'>&quot;.&quot;</span> <span class='op'>+</span> <span class='self'>Self</span>::<span class='ident'>file_extension</span>());
 
         <span class='comment'>// write into a file</span>
         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>file</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>( <span class='ident'>File</span>::<span class='ident'>create</span>(<span class='kw-2'>&amp;</span><span class='ident'>temp_file</span>) );
@@ -413,6 +443,7 @@
         <span class='prelude-val'>Ok</span>(<span class='ident'>Project</span>{
             <span class='ident'>file_path</span>: <span class='ident'>temp_file</span>,
             <span class='ident'>temp_dir</span>: <span class='prelude-val'>Some</span>(<span class='ident'>temp_dir</span>), <span class='comment'>// needs to be kept alive to avoid deletion TODO: try something manually</span>
+            <span class='ident'>git_status</span>: <span class='prelude-val'>None</span>,
             <span class='ident'>yaml</span>: <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>yaml</span>::<span class='ident'>parse</span>(<span class='kw-2'>&amp;</span><span class='ident'>filled</span>))
         })
     }
@@ -441,13 +472,27 @@
     <span class='kw'>fn</span> <span class='ident'>file</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>PathBuf</span>{ <span class='self'>self</span>.<span class='ident'>file_path</span>.<span class='ident'>to_owned</span>() } <span class='comment'>// TODO reconsider returning PathBuf at all</span>
     <span class='kw'>fn</span> <span class='ident'>set_file</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>new_file</span>:<span class='kw-2'>&amp;</span><span class='ident'>Path</span>){ <span class='self'>self</span>.<span class='ident'>file_path</span> <span class='op'>=</span> <span class='ident'>new_file</span>.<span class='ident'>to_owned</span>(); }
 
+    <span class='kw'>fn</span> <span class='ident'>set_git_status</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>status</span>:<span class='ident'>GitStatus</span>){
+        <span class='self'>self</span>.<span class='ident'>git_status</span> <span class='op'>=</span> <span class='prelude-val'>Some</span>(<span class='ident'>status</span>);
+    }
+
+    <span class='doccomment'>/// Ask a project for its gitstatus</span>
+    <span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>feature</span><span class='op'>=</span><span class='string'>&quot;git_statuses&quot;</span>)]</span>
+    <span class='kw'>fn</span> <span class='ident'>get_git_status</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>GitStatus</span>{
+        <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Some</span>(<span class='kw-2'>ref</span> <span class='ident'>status</span>) <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>git_status</span>{
+            <span class='ident'>status</span>.<span class='ident'>to_owned</span>()
+        } <span class='kw'>else</span> {
+            <span class='ident'>GitStatus</span>::<span class='ident'>Unknown</span>
+        }
+    }
+
     <span class='doccomment'>/// Opens a yaml and parses it.</span>
     <span class='kw'>fn</span> <span class='ident'>open</span>(<span class='ident'>folder_path</span>:<span class='kw-2'>&amp;</span><span class='ident'>Path</span>) <span class='op'>-&gt;</span> <span class='ident'>StorageResult</span><span class='op'>&lt;</span><span class='ident'>Project</span><span class='op'>&gt;</span>{
         <span class='kw'>let</span> <span class='ident'>file_path</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>list_path_content</span>(<span class='ident'>folder_path</span>)).<span class='ident'>iter</span>()
             .<span class='ident'>filter</span>(<span class='op'>|</span><span class='ident'>f</span><span class='op'>|</span><span class='ident'>f</span>.<span class='ident'>extension</span>().<span class='ident'>unwrap_or</span>(<span class='kw-2'>&amp;</span><span class='ident'>OsStr</span>::<span class='ident'>new</span>(<span class='string'>&quot;&quot;</span>)) <span class='op'>==</span> <span class='ident'>PROJECT_FILE_EXTENSION</span>)
             .<span class='ident'>nth</span>(<span class='number'>0</span>).<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>b</span><span class='op'>|</span><span class='ident'>b</span>.<span class='ident'>to_owned</span>())
             .<span class='ident'>ok_or</span>(<span class='ident'>StorageError</span>::<span class='ident'>ProjectDoesNotExist</span>));
-        <span class='ident'>Self</span>::<span class='ident'>open_file</span>(<span class='kw-2'>&amp;</span><span class='ident'>file_path</span>)
+        <span class='self'>Self</span>::<span class='ident'>open_file</span>(<span class='kw-2'>&amp;</span><span class='ident'>file_path</span>)
     }
 
     <span class='kw'>fn</span> <span class='ident'>open_file</span>(<span class='ident'>file_path</span>:<span class='kw-2'>&amp;</span><span class='ident'>Path</span>) <span class='op'>-&gt;</span> <span class='ident'>StorageResult</span><span class='op'>&lt;</span><span class='ident'>Project</span><span class='op'>&gt;</span>{
@@ -459,22 +504,24 @@
         <span class='prelude-val'>Ok</span>(<span class='ident'>Project</span>{
             <span class='ident'>file_path</span>: <span class='ident'>file_path</span>.<span class='ident'>to_owned</span>(),
             <span class='ident'>temp_dir</span>: <span class='prelude-val'>None</span>,
+            <span class='ident'>git_status</span>: <span class='prelude-val'>None</span>,
             <span class='ident'>yaml</span>: <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>yaml</span>::<span class='ident'>parse</span>(<span class='kw-2'>&amp;</span><span class='ident'>file_content</span>))
         })
     }
 
     <span class='doccomment'>/// Checks against a certain key-val pair.</span>
     <span class='kw'>fn</span> <span class='ident'>matches_filter</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>key</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>, <span class='ident'>val</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>) <span class='op'>-&gt;</span> <span class='ident'>bool</span>{
-        <span class='self'>self</span>.<span class='ident'>get</span>(<span class='ident'>key</span>).<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>c</span><span class='op'>|</span>{
-            <span class='ident'>c</span>.<span class='ident'>to_lowercase</span>().<span class='ident'>contains</span>(<span class='kw-2'>&amp;</span><span class='ident'>val</span>.<span class='ident'>to_lowercase</span>())
-        }).<span class='ident'>unwrap_or</span>(<span class='boolval'>false</span>)
+        <span class='self'>self</span>.<span class='ident'>get</span>(<span class='ident'>key</span>).<span class='ident'>map_or</span>(<span class='boolvalue'>false</span>, <span class='op'>|</span><span class='ident'>c</span><span class='op'>|</span> <span class='ident'>c</span>.<span class='ident'>to_lowercase</span>().<span class='ident'>contains</span>(<span class='kw-2'>&amp;</span><span class='ident'>val</span>.<span class='ident'>to_lowercase</span>()))
     }
 
     <span class='doccomment'>/// UNIMPLEMENTED: Checks against a certain search term.</span>
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// TODO compare agains InvoiceNumber, ClientFullName, Email, event/name, invoice/official Etc</span>
     <span class='kw'>fn</span> <span class='ident'>matches_search</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>term</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>) <span class='op'>-&gt;</span> <span class='ident'>bool</span>{
-        <span class='self'>self</span>.<span class='ident'>name</span>().<span class='ident'>to_lowercase</span>().<span class='ident'>contains</span>(<span class='kw-2'>&amp;</span><span class='ident'>term</span>.<span class='ident'>to_lowercase</span>())
+        <span class='kw'>let</span> <span class='ident'>search</span> <span class='op'>=</span> <span class='ident'>term</span>.<span class='ident'>to_lowercase</span>();
+        <span class='self'>self</span>.<span class='ident'>invoice_num</span>().<span class='ident'>map_or</span>(<span class='boolvalue'>false</span>, <span class='op'>|</span><span class='ident'>num</span><span class='op'>|</span><span class='ident'>num</span>.<span class='ident'>to_lowercase</span>().<span class='ident'>contains</span>(<span class='kw-2'>&amp;</span><span class='ident'>search</span>))
+        <span class='op'>||</span>
+        <span class='self'>self</span>.<span class='ident'>name</span>().<span class='ident'>to_lowercase</span>().<span class='ident'>contains</span>(<span class='kw-2'>&amp;</span><span class='ident'>search</span>)
     }
 }
 
@@ -483,7 +530,7 @@
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>yaml</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='kw-2'>&amp;</span><span class='ident'>Yaml</span>{ <span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>yaml</span> }
 
     <span class='doccomment'>/// wrapper around yaml::get() with replacement</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>get</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>path</span>:<span class='kw-2'>&amp;</span><span class='ident'>str</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>String</span><span class='op'>&gt;</span>{
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>get</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>path</span>:<span class='kw-2'>&amp;</span><span class='ident'>str</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>String</span><span class='op'>&gt;</span>{
         <span class='ident'>VirtualField</span>::<span class='ident'>from</span>(<span class='ident'>path</span>).<span class='ident'>get</span>(<span class='self'>self</span>).<span class='ident'>or_else</span>(<span class='op'>||</span>
             <span class='ident'>yaml</span>::<span class='ident'>get_as_string</span>(<span class='self'>self</span>.<span class='ident'>yaml</span>(),<span class='ident'>path</span>)
         )

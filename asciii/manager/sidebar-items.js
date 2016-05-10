@@ -1,1 +1,0 @@
-initSidebarItems({"enum":[["LuigiDir","Used to identify what directory you are talking about."],["LuigiError",""]],"struct":[["Luigi","Does all the internal plumbing."],["ProjectList","Wrapper around `Vec<LuigiProject>`"]],"trait":[["LuigiProject",""]],"type":[["LuigiResult",""],["Year",""]]});

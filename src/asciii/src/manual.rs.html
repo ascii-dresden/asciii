@@ -11,6 +11,7 @@
 
     <link rel="stylesheet" type="text/css" href="../../../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../../../main.css">
+    
 
     
     
@@ -224,23 +225,49 @@
 <span id="181">181</span>
 <span id="182">182</span>
 <span id="183">183</span>
+<span id="184">184</span>
+<span id="185">185</span>
+<span id="186">186</span>
+<span id="187">187</span>
 </pre><pre class='rust '>
-<span class='doccomment'>//! The ascii invoicer handbook</span>
+<span class='doccomment'>//! The **official asciii Handbook**.</span>
 <span class='doccomment'>//!</span>
 <span class='doccomment'>//! This user documentation has been ripped off straight from the [original</span>
 <span class='doccomment'>//! README](https://github.com/ascii-dresden/ascii-invoicer/), so please forgive if you find any</span>
-<span class='doccomment'>//! mistakes or unimplemented material, please **[write an issue</span>
-<span class='doccomment'>//! immediately](https://github.com/hoodie/asciii-rs/issues/new)**.</span>
+<span class='doccomment'>//! mistakes or unimplemented material,</span>
+<span class='doccomment'>//! please **[file an issue immediately](https://github.com/hoodie/asciii-rs/issues/new)**.</span>
 <span class='doccomment'>//!</span>
 <span class='doccomment'>//! # ascii invoicer</span>
 <span class='doccomment'>//!</span>
 <span class='doccomment'>//! ## Introduction</span>
 <span class='doccomment'>//!</span>
-<span class='doccomment'>//! The ascii-invoicer is a command-line tool that manages projects and stores them not in a database but in a folder structure. New projects can be created from templates and are stored in a working directory. Projects can be archived, each year will have its own archive. A project consists of a folder containing a yaml file describing it and a number of attached files, such tex files. Projects can contain products and personal. You can create preliminary offers and invoices from your projects.</span>
+<span class='doccomment'>//! The ascii-invoicer is a command-line tool that manages projects and stores them not in a database but in folders.</span>
+<span class='doccomment'>//! New projects can be created from templates and are stored in the working directory.</span>
+<span class='doccomment'>//! Projects can be archived, each year will have its own archive.</span>
+<span class='doccomment'>//! A project consists of a folder containing a yaml file describing it and a number of attached files,</span>
+<span class='doccomment'>//! such tex files.</span>
+<span class='doccomment'>//! Projects can contain products and personal.</span>
+<span class='doccomment'>//! You can create preliminary offers and invoices from your projects.</span>
 <span class='doccomment'>//!</span>
 <span class='doccomment'>//! ## Installation</span>
 <span class='doccomment'>//!</span>
-<span class='doccomment'>//! ...</span>
+<span class='doccomment'>//! Get a current binary from github (TODO) or build it for your platform.</span>
+<span class='doccomment'>//!</span>
+<span class='doccomment'>//! ### DIY Building</span>
+<span class='doccomment'>//!</span>
+<span class='doccomment'>//! * rustc ≥ 1.5.0</span>
+<span class='doccomment'>//! * cargo</span>
+<span class='doccomment'>//! * optionally: for full feature completeness you also need everything to build libgit2 and libssl2</span>
+<span class='doccomment'>//!</span>
+<span class='doccomment'>//! ### Requirements</span>
+<span class='doccomment'>//!</span>
+<span class='doccomment'>//! * linux, mac osx, windows7+</span>
+<span class='doccomment'>//! * git for sync</span>
+<span class='doccomment'>//! * pdflatex/xelatex to produce documents</span>
+<span class='doccomment'>//! * an editor that can highlight yaml</span>
+<span class='doccomment'>//!</span>
+<span class='doccomment'>//! Just run `cargo build --release`, and copy the resulting `target/release/asciii` binary into your $PATH somewhere .</span>
+<span class='doccomment'>//!</span>
 <span class='doccomment'>//!</span>
 <span class='doccomment'>//! ## Usage</span>
 <span class='doccomment'>//!</span>
@@ -252,7 +279,7 @@
 <span class='doccomment'>//! ```bash</span>
 <span class='doccomment'>//! asciii help [COMMAND]                # Describe available commands or one specific command</span>
 <span class='doccomment'>//! asciii list                          # List current Projects</span>
-<span class='doccomment'>//! asciii display NAMES                 # Shows information about a project in different ways</span>
+<span class='doccomment'>//! asciii show NAMES                    # Shows information about a project in different ways</span>
 <span class='doccomment'>//! ```</span>
 <span class='doccomment'>//!</span>
 <span class='doccomment'>//! ### Project Life-Cycle</span>
@@ -260,8 +287,8 @@
 <span class='doccomment'>//! ```bash</span>
 <span class='doccomment'>//! asciii new NAME                      # Creating a new project</span>
 <span class='doccomment'>//! asciii edit NAMES                    # Edit project</span>
-<span class='doccomment'>//! asciii offer NAMES                   # Create an offer from project</span>
-<span class='doccomment'>//! asciii invoice NAMES                 # Create an invoice from project</span>
+<span class='comment'>// asciii offer NAMES                   # Create an offer from project</span>
+<span class='comment'>// asciii invoice NAMES                 # Create an invoice from project</span>
 <span class='doccomment'>//! asciii archive NAME                  # Move project to archive</span>
 <span class='doccomment'>//! asciii unarchive YEAR NAME           # reopen an archived project</span>
 <span class='doccomment'>//! ```</span>
@@ -270,11 +297,10 @@
 <span class='doccomment'>//!</span>
 <span class='doccomment'>//! ```bash</span>
 <span class='doccomment'>//! asciii add NAMES</span>
-<span class='doccomment'>//! asciii commit -m, --message=MESSAGE</span>
-<span class='doccomment'>//! asciii log</span>
+<span class='doccomment'>//! asciii commit</span>
 <span class='doccomment'>//! asciii pull</span>
 <span class='doccomment'>//! asciii push</span>
-<span class='doccomment'>//! asciii status</span>
+<span class='doccomment'>//! asciii status, log, diff</span>
 <span class='doccomment'>//! ```</span>
 <span class='doccomment'>//!</span>
 <span class='doccomment'>//! These commands behave similar to the original git commands.</span>
@@ -288,7 +314,7 @@
 <span class='doccomment'>//!</span>
 <span class='doccomment'>//! Personal advice N°1: use `git pull --rebase`</span>
 <span class='doccomment'>//!</span>
-<span class='doccomment'>//! Personal advice N°2: add this to your .bash_aliases:</span>
+<span class='doccomment'>//! Personal advice N°2: add this to your `.bash_aliases`:</span>
 <span class='doccomment'>//! `alias agit=&quot;git --git-dir=$(ascii path)/.git --work-tree=$(ascii path)&quot;`</span>
 <span class='doccomment'>//!</span>
 <span class='doccomment'>//! ### More Details</span>
@@ -374,12 +400,12 @@
 <span class='doccomment'>//!</span>
 <span class='doccomment'>//! ## Pro tips</span>
 <span class='doccomment'>//!</span>
-<span class='comment'>// 1. Check out `repl ascii`!</span>
-<span class='comment'>// You should copy [repl-file](src/repl/ascii) into ~/.repl/ascii and install rlwrap to take advantage of all the repl goodness such as autocompletion and history.</span>
-<span class='comment'>//</span>
-<span class='comment'>// 2. Check out `xclip`!</span>
-<span class='comment'>// You can pipe the output of `ascii show` or `ascii show --csv` to xclip and paste to your email program or into a spreadsheet tool like libreoffice calc.</span>
-<span class='comment'>//</span>
+<span class='doccomment'>//! 1. Check out `repl asciii`!</span>
+<span class='doccomment'>//! You should copy [repl-file](src/repl/ascii) into ~/.repl/ascii and install rlwrap to take advantage of all the repl goodness such as autocompletion and history.</span>
+<span class='doccomment'>//!</span>
+<span class='doccomment'>//! 2. Check out `xclip`!</span>
+<span class='doccomment'>//! You can pipe the output of `ascii show` or `ascii show --csv` to xclip and paste to your email program or into a spreadsheet tool like libreoffice calc.</span>
+<span class='doccomment'>//!</span>
 <span class='doccomment'>//!</span>
 <span class='doccomment'>//! ## Known Issues</span>
 <span class='doccomment'>//!</span>
@@ -388,26 +414,9 @@
 <span class='doccomment'>//! The `&quot;&amp;&quot;` causes latex to fail, `\&amp;&quot;` bugs the yaml parser but `&quot;\\&amp;&quot;` will do the trick.</span>
 <span class='doccomment'>//!</span>
 <span class='doccomment'>//!</span>
-<span class='doccomment'>//! # Building</span>
 <span class='doccomment'>//!</span>
-<span class='comment'>// ```bash</span>
-<span class='comment'>// # lets install building dependencies</span>
-<span class='comment'>// cd src</span>
-<span class='comment'>// gem install bundler # if you don&#39;t already have it</span>
-<span class='comment'>// bundle install # pulls all building dependencies</span>
-<span class='comment'>// # actually now you&#39;re done</span>
-<span class='comment'>//</span>
-<span class='comment'>// # after you made your own changes</span>
-<span class='comment'>// rake install # installs the gem</span>
-<span class='comment'>// rake gem # builds the gem</span>
-<span class='comment'>//</span>
-<span class='comment'>// # that&#39;s it</span>
-<span class='comment'>// ```</span>
-<span class='comment'>//</span>
-<span class='doccomment'>//! ## Dependencies</span>
 <span class='doccomment'>//!</span>
-<span class='comment'>// * rvm works best, otherwise I have not tested installing it anywhere else</span>
-<span class='comment'>// * a lot of latex packages to run the offer/invoice export</span>
+<span class='doccomment'>//!</span>
 </pre>
 </section>
     <section id='search' class="content hidden"></section>
