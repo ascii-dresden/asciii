@@ -7,7 +7,7 @@ pub fn setup() -> ArgMatches<'static>{
         .author("Hendrik Sollich <hendrik@hoodie.de>")
         .version(version().as_ref())
         .about("The ascii invoicer III")
-        .setting(AppSettings::SubcommandRequiredElseHelp)
+        .settings(&[AppSettings::SubcommandRequiredElseHelp,AppSettings::ColoredHelp])
 
         .subcommand(SubCommand::with_name("doc")
             .about("Opens the online documentation, please read it")
@@ -71,6 +71,7 @@ pub fn setup() -> ArgMatches<'static>{
                     )
 
         .subcommand(SubCommand::with_name("list")
+                    .aliases(&["ls", "dir"])
                     .about("List Projects")
                     .arg(Arg::with_name("archive")
                          .help("list archived projects")

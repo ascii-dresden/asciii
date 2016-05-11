@@ -15,7 +15,7 @@ chrono = "0.2"
 regex = "0.1"
 lazy_static = "0.2"
 maplit = "0.1"
-clap = "2"
+clap = {version = "2"}
 enum_derive = "0.1"
 custom_derive = "0.1"
 currency = {git="https://github.com/hoodie/rust-lang-currency"}
