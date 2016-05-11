@@ -261,6 +261,7 @@ pub fn setup() -> ArgMatches<'static>{
                     //# TODO add --invoice and --offer
 
         .subcommand(SubCommand::with_name("edit")
+                    .aliases(&["ed"])
                     .about("Edit a specific project")
                     .arg(Arg::with_name("search_term")
                          .help("Search term, possibly event name")
@@ -290,6 +291,7 @@ pub fn setup() -> ArgMatches<'static>{
                     )
 
         .subcommand(SubCommand::with_name("show")
+                    .aliases(&["display"])
                     .about("Display a specific project")
                     .arg(Arg::with_name("search_term")
                          .help("Search term, possibly event name")
@@ -357,6 +359,7 @@ pub fn setup() -> ArgMatches<'static>{
 
 
         .subcommand(SubCommand::with_name("config")
+                    .aliases(&["settings"])
                     .about("Show and edit your config")
                     .arg(Arg::with_name("edit")
                          .help("Edit your config")
@@ -392,6 +395,7 @@ pub fn setup() -> ArgMatches<'static>{
 
         //# GIT STUFF
         .subcommand(SubCommand::with_name("status")
+                    .aliases(&["st"])
                     .about("Show the working tree status")
                    )
         .subcommand(SubCommand::with_name("pull")
@@ -421,6 +425,7 @@ pub fn setup() -> ArgMatches<'static>{
 
                    )
         .subcommand(SubCommand::with_name("commit")
+                    .aliases(&["cm"])
                     .about("Save changes locally")
                    )
         .subcommand(SubCommand::with_name("remote")
