@@ -52,14 +52,14 @@ fn setup_app(){
     let matches = cli::setup();
 
     match matches.subcommand() {
-     ("list",      Some(sub_m)) => subcommands::list(&sub_m),
-     ("csv",       Some(sub_m)) => subcommands::csv(&sub_m),
-     ("new",       Some(sub_m)) => subcommands::new(&sub_m),
-     ("edit",      Some(sub_m)) => subcommands::edit(&sub_m),
-     ("show",      Some(sub_m)) => subcommands::show(&sub_m),
-     ("archive",   Some(sub_m)) => subcommands::archive(&sub_m),
-     ("unarchive", Some(sub_m)) => subcommands::unarchive(&sub_m),
-     ("config",    Some(sub_m)) => subcommands::config(&sub_m),
+     ("list",      Some(sub_m)) => subcommands::list(sub_m),
+     ("csv",       Some(sub_m)) => subcommands::csv(sub_m),
+     ("new",       Some(sub_m)) => subcommands::new(sub_m),
+     ("edit",      Some(sub_m)) => subcommands::edit(sub_m),
+     ("show",      Some(sub_m)) => subcommands::show(sub_m),
+     ("archive",   Some(sub_m)) => subcommands::archive(sub_m),
+     ("unarchive", Some(sub_m)) => subcommands::unarchive(sub_m),
+     ("config",    Some(sub_m)) => subcommands::config(sub_m),
      ("whoami",    _          ) => subcommands::config_show("manager_name"),
 
      ("path",      Some(sub_m)) => subcommands::show_path(sub_m),
@@ -75,7 +75,7 @@ fn setup_app(){
      ("pull",      _          ) => subcommands::git_pull(),
      ("diff",      _          ) => subcommands::git_diff(),
      ("status",    _          ) => subcommands::git_status(),
-     ("add",       Some(sub_m)) => subcommands::git_add(&sub_m),
+     ("add",       Some(sub_m)) => subcommands::git_add(sub_m),
      ("commit",    _          ) => subcommands::git_commit(),
      ("push",      _          ) => subcommands::git_push(),
      ("log",       _          ) => subcommands::git_log(),

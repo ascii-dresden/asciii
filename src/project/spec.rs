@@ -98,13 +98,13 @@ pub mod project{
     }
 
     pub fn date(yaml:&Yaml) -> Option<Date<UTC>>{
-        super::date::date(&yaml)
+        super::date::date(yaml)
     }
 
     pub fn manager(yaml:&Yaml) -> Option<&str>{
         yaml::get_str(yaml, "manager")
         // old spec
-        .or_else(|| yaml::get_str(&yaml, "signature").and_then(|c|c.lines().last()))
+        .or_else(|| yaml::get_str(yaml, "signature").and_then(|c|c.lines().last()))
     }
 
     pub fn format(yaml:&Yaml) -> Option<&str>{
@@ -116,11 +116,11 @@ pub mod project{
     }
 
     pub fn validate(yaml:&Yaml) -> bool{
-        name(&yaml).is_some() &&
-        date(&yaml).is_some() &&
-        manager(&yaml).is_some() &&
-        format(&yaml).is_some() &&
-        hours::salary(&yaml).is_some()
+        name(yaml).is_some() &&
+        date(yaml).is_some() &&
+        manager(yaml).is_some() &&
+        format(yaml).is_some() &&
+        hours::salary(yaml).is_some()
     }
 }
 
@@ -130,41 +130,41 @@ pub mod client{
     use config::ConfigReader;
 
     pub fn email(yaml:&Yaml) -> Option<&str> {
-        yaml::get_str(&yaml, "client/email")
+        yaml::get_str(yaml, "client/email")
     }
 
     pub fn address(yaml:&Yaml) -> Option<&str> {
-        yaml::get_str(&yaml, "client/address")
+        yaml::get_str(yaml, "client/address")
     }
 
     pub fn title(yaml:&Yaml) -> Option<&str>{
-        yaml::get_str(&yaml, "client/title")
+        yaml::get_str(yaml, "client/title")
         // old spec
-        .or_else(|| yaml::get_str(&yaml, "client").and_then(|c|c.lines().nth(0)))
+        .or_else(|| yaml::get_str(yaml, "client").and_then(|c|c.lines().nth(0)))
     }
 
     pub fn first_name(yaml:&Yaml) -> Option<&str>{
-        yaml::get_str(&yaml, "client/first_name")
+        yaml::get_str(yaml, "client/first_name")
         // old spec
         //.or_else(|| yaml::get_str(&yaml, "client").and_then(|c|c.lines().nth(0)))
     }
 
     pub fn last_name(yaml:&Yaml) -> Option<&str>{
-        yaml::get_str(&yaml, "client/last_name")
+        yaml::get_str(yaml, "client/last_name")
         // old spec
-        .or_else(|| yaml::get_str(&yaml, "client").and_then(|c|c.lines().nth(1)))
+        .or_else(|| yaml::get_str(yaml, "client").and_then(|c|c.lines().nth(1)))
     }
 
     pub fn full_name(yaml:&Yaml) -> Option<String>{
-        let first = yaml::get_str(&yaml, "client/first_name");
-        let last  = last_name(&yaml);
+        let first = yaml::get_str(yaml, "client/first_name");
+        let last  = last_name(yaml);
         first.and(last).and(
             Some(format!("{} {}", first.unwrap_or(""), last.unwrap_or(""))))
     }
 
     pub fn addressing(yaml:&Yaml, config:&ConfigReader) -> Option<String>{
-        if let Some(title) = title(&yaml){
-            let last_name = last_name(&yaml);
+        if let Some(title) = title(yaml){
+            let last_name = last_name(yaml);
 
             let lang = config.get_str("defaults/lang")
                 .expect("Faulty config: defaults/lang does not contain a value");
@@ -183,16 +183,16 @@ pub mod client{
     }
 
     pub fn validate(yaml:&Yaml) -> super::SpecResult {
-        let mut errors = super::field_exists(&yaml, &[
+        let mut errors = super::field_exists(yaml, &[
                  "client/email",
                  "client/address",
                  "client/last_name",
                  "client/first_name",
         ]);
 
-        if title(&yaml).is_none(){       errors.push("client_title");}
-        if first_name(&yaml).is_none(){  errors.push("client_first_name");}
-        if last_name(&yaml).is_none(){   errors.push("client_last_name");}
+        if title(yaml).is_none(){       errors.push("client_title");}
+        if first_name(yaml).is_none(){  errors.push("client_first_name");}
+        if last_name(yaml).is_none(){   errors.push("client_last_name");}
 
         if !errors.is_empty(){
             return Err(errors);
@@ -210,11 +210,11 @@ pub mod date {
     use util::yaml::Yaml;
 
     pub fn date(yaml:&Yaml) -> Option<Date<UTC>>{
-        yaml::get_dmy(&yaml, "event/dates/0/begin")
-        .or_else(||yaml::get_dmy(&yaml, "created"))
-        .or_else(||yaml::get_dmy(&yaml, "date"))
+        yaml::get_dmy(yaml, "event/dates/0/begin")
+        .or_else(||yaml::get_dmy(yaml, "created"))
+        .or_else(||yaml::get_dmy(yaml, "date"))
         // probably the dd-dd.mm.yyyy format
-        .or_else(||yaml::get_str(&yaml, "date").and_then(|s|util::yaml::parse_dmy_date_range(s)))
+        .or_else(||yaml::get_str(yaml, "date").and_then(|s|util::yaml::parse_dmy_date_range(s)))
     }
 
     pub fn payed(yaml:&Yaml) -> Option<Date<UTC>> {
@@ -267,17 +267,17 @@ pub mod offer{
     use util::yaml::Yaml;
 
     pub fn number(yaml:&Yaml) -> Option<String> {
-        let num = appendix(&yaml).unwrap_or(1);
-        super::date::offer(&yaml)
+        let num = appendix(yaml).unwrap_or(1);
+        super::date::offer(yaml)
             .map(|d| d.format("A%Y%m%d").to_string())
             .map(|s| format!("{}-{}", s, num))
 
         // old spec
-        .or_else(|| yaml::get_string(&yaml, "manumber"))
+        .or_else(|| yaml::get_string(yaml, "manumber"))
     }
 
     pub fn appendix(yaml:&Yaml) -> Option<i64> {
-        yaml::get_int(&yaml, "offer/appendix")
+        yaml::get_int(yaml, "offer/appendix")
     }
 
     pub fn validate(yaml:&Yaml) -> super::SpecResult {
@@ -285,12 +285,12 @@ pub mod offer{
             return Err(vec!["canceled"])
         }
 
-        let mut errors = super::field_exists(&yaml, &[
+        let mut errors = super::field_exists(yaml, &[
                  "offer/date",
                  "offer/appendix",
                  "manager",
         ]);
-        if super::date::offer(&yaml).is_none(){
+        if super::date::offer(yaml).is_none(){
             errors.push("offer_date_format");}
 
         if !errors.is_empty(){
@@ -309,29 +309,29 @@ pub mod invoice{
 
     /// plain access to `invoice/number`
     pub fn number(yaml:&Yaml) -> Option<i64> {
-        yaml::get_int(&yaml, "invoice/number")
+        yaml::get_int(yaml, "invoice/number")
         // old spec
-        .or_else(|| yaml::get_int(&yaml, "rnumber"))
+        .or_else(|| yaml::get_int(yaml, "rnumber"))
     }
 
     pub fn number_str(yaml:&Yaml) -> Option<String> {
-        number(&yaml).map(|n| format!("R{:03}", n))
+        number(yaml).map(|n| format!("R{:03}", n))
     }
 
     pub fn number_long_str(yaml:&Yaml) -> Option<String> {
-        let year = try_some!(super::date::invoice(&yaml)).year();
+        let year = try_some!(super::date::invoice(yaml)).year();
         // TODO Length or format should be a setting
-        number(&yaml).map(|n| format!("R{}-{:03}", year, n))
+        number(yaml).map(|n| format!("R{}-{:03}", year, n))
     }
 
     pub fn validate(yaml:&Yaml) -> super::SpecResult {
-        let mut errors = super::field_exists(&yaml,&[
+        let mut errors = super::field_exists(yaml,&[
                                    "invoice/number",
                                    "invoice/date",
         ]);
 
-        //if super::offer::validate(&yaml).is_err() {errors.push("offer")}
-        if super::date::invoice(&yaml).is_none(){ errors.push("invoice_date_format");}
+        //if super::offer::validate(yaml).is_err() {errors.push("offer")}
+        if super::date::invoice(yaml).is_none(){ errors.push("invoice_date_format");}
 
         if !errors.is_empty(){
             return Err(errors);
@@ -348,8 +348,8 @@ pub mod archive{
 
     pub fn validate(yaml:&Yaml) -> super::SpecResult {
         let mut errors = Vec::new();
-        if super::date::payed(&yaml).is_none(){ errors.push("payed_date");}
-        //if super::date::wages(&yaml).is_none(){ errors.push("wages_date");} // TODO validate WAGES_DATE also
+        if super::date::payed(yaml).is_none(){ errors.push("payed_date");}
+        //if super::date::wages(yaml).is_none(){ errors.push("wages_date");} // TODO validate WAGES_DATE also
         if !errors.is_empty(){
             return Err(errors);
         }
@@ -369,7 +369,7 @@ pub mod hours {
     }
 
     pub fn total(yaml:&Yaml) -> Option<f64> {
-        caterers(&yaml).map(|vec|vec.iter()
+        caterers(yaml).map(|vec|vec.iter()
             .map(|&(_,h)| h)
             .fold(0f64,|acc, h| acc + h)
             )
@@ -381,7 +381,7 @@ pub mod hours {
     }
 
     pub fn caterers(yaml:&Yaml) -> Option<Vec<(String, f64)>> {
-        yaml::get_hash(&yaml, "hours/caterers")
+        yaml::get_hash(yaml, "hours/caterers")
             .map(|h|h
                  .iter()
                  .map(|(c, h)| (// argh, those could be int or float, grrr
@@ -465,7 +465,7 @@ pub mod products{
         yaml::get_hash(yaml, "products")
             .map(|hmap| hmap.iter()
                  .map(|(desc,values)|{
-                     build_product(&desc, &values)
+                     build_product(desc, values)
                          .and_then(|product|
                               build_invoice_item(product, values))
                  }
@@ -477,8 +477,8 @@ pub mod products{
         let products = yaml::get_hash(yaml, "products").ok_or(ProductError::UnknownFormat).map(|products|
         products.iter()
                  .map(|(desc,values)|
-                     build_product(&desc, &values)
-                     .and_then(|product| build_invoice_item(product, &values))
+                     build_product(desc, values)
+                     .and_then(|product| build_invoice_item(product, values))
                  ).collect::<Vec< ProductResult<InvoiceItem> >>());
         let mut list = Vec::new();
 

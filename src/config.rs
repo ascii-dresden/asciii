@@ -77,9 +77,9 @@ impl ConfigReader{
     ///
     /// Supports simple path syntax: `top/middle/child/node`
     pub fn get(&self, path:&str) -> Option<&Yaml>{
-        yaml::get(&self.local, &path)
-            .or_else(||yaml::get(&self.custom, &path))
-            .or_else(||yaml::get(&self.defaults, &path))
+        yaml::get(&self.local, path)
+            .or_else(||yaml::get(&self.custom, path))
+            .or_else(||yaml::get(&self.defaults, path))
     }
 
     /// Returns the string in the position or an empty string
@@ -88,9 +88,9 @@ impl ConfigReader{
     /// This panics if nothing is found.
     /// You should have a default config for everything that you use.
     pub fn get_str(&self, key:&str) -> Option<&str> {
-        yaml::get_str(&self.local, &key)
-            .or_else(||yaml::get_str(&self.custom, &key))
-            .or_else(||yaml::get_str(&self.defaults, &key))
+        yaml::get_str(&self.local, key)
+            .or_else(||yaml::get_str(&self.custom, key))
+            .or_else(||yaml::get_str(&self.defaults, key))
             //.expect(&format!("Config file {} in field {} does not contain a string value", DEFAULT_LOCATION, key))
     }
 
@@ -100,9 +100,9 @@ impl ConfigReader{
     /// This panics if nothing is found.
     /// You should have a default config for everything that you use.
     pub fn get_as_string(&self, key:&str) -> Option<String>{
-        yaml::get_as_string(&self.local, &key)
-            .or_else(||yaml::get_as_string(&self.custom, &key))
-            .or_else(||yaml::get_as_string(&self.defaults, &key))
+        yaml::get_as_string(&self.local, key)
+            .or_else(||yaml::get_as_string(&self.custom, key))
+            .or_else(||yaml::get_as_string(&self.defaults, key))
             //.expect(&format!("Config file {} in field {} does not contain a value", DEFAULT_LOCATION, key))
     }
 

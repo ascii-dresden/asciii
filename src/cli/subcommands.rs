@@ -59,7 +59,7 @@ pub fn new(matches:&ArgMatches){
         fill_data.insert("MANAGER", manager.to_owned());
     }
 
-    let project = super::execute(|| luigi.create_project(&project_name, &template_name, &fill_data));
+    let project = super::execute(|| luigi.create_project(project_name, template_name, &fill_data));
     let project_file = project.file();
     if edit {
         util::open_in_editor(&editor, &[project_file]);
@@ -183,15 +183,15 @@ fn list_projects(dir:StorageDir, list_config:&ListConfig){
     //};
 
     if !wide_enough && list_config.mode != ListMode::Csv { // TODO room for improvement
-        print::print_projects(print::simple_rows(&projects, &list_config));
+        print::print_projects(print::simple_rows(&projects, list_config));
     } else {
         debug!("list_mode: {:?}", list_config.mode );
         match list_config.mode{
             ListMode::Csv     => print::print_csv(&projects),
-            ListMode::Paths   => print::print_projects(print::path_rows(&projects, &list_config)),
-            ListMode::Simple  => print::print_projects(print::simple_rows(&projects, &list_config)),
-            ListMode::Verbose => print::print_projects(print::verbose_rows(&projects,&list_config)),
-            ListMode::Nothing => print::print_projects(print::dynamic_rows(&projects,&list_config)),
+            ListMode::Paths   => print::print_projects(print::path_rows(&projects, list_config)),
+            ListMode::Simple  => print::print_projects(print::simple_rows(&projects, list_config)),
+            ListMode::Verbose => print::print_projects(print::verbose_rows(&projects,list_config)),
+            ListMode::Nothing => print::print_projects(print::dynamic_rows(&projects,list_config)),
         }
     }
 }
@@ -273,7 +273,7 @@ fn edit_projects(dir:StorageDir, search_terms:&[&str], editor:&Option<&str>){
     let luigi = setup_luigi();
     let mut all_projects= Vec::new();
     for search_term in search_terms{
-        let mut paths = super::execute(||luigi.search_projects(dir.clone(), &search_term));
+        let mut paths = super::execute(||luigi.search_projects(dir, search_term));
         if paths.is_empty(){
             //println!{"Nothing found for {:?}", search_term}
         } else {
@@ -285,7 +285,7 @@ fn edit_projects(dir:StorageDir, search_terms:&[&str], editor:&Option<&str>){
         fail(format!("Nothing found for {:?}", search_terms));
     } else {
         let all_paths = all_projects.iter().map(|p|p.file()).collect::<Vec<PathBuf>>();
-        util::open_in_editor(&editor, all_paths.as_slice());
+        util::open_in_editor(editor, all_paths.as_slice());
     }
 }
 
@@ -293,11 +293,11 @@ fn edit_projects(dir:StorageDir, search_terms:&[&str], editor:&Option<&str>){
 fn edit_template(name:&str, editor:&Option<&str>){
     let luigi = setup_luigi();
     let template_paths = super::execute(||luigi.list_template_files())
-        .iter()
-        .filter(|f|f.file_stem() .unwrap_or(&OsStr::new("")) == name)
+        .iter() // drain?
+        .filter(|f|f.file_stem() .unwrap_or_else(||OsStr::new("")) == name)
         .cloned()
         .collect::<Vec<PathBuf>>();
-    util::open_in_editor(&editor, &template_paths);
+    util::open_in_editor(editor, &template_paths);
 }
 
 
@@ -306,21 +306,21 @@ pub fn show(matches:&ArgMatches){
         let search_term = matches.value_of("search_term").unwrap();
         if let Some(year) = matches.value_of("archive"){
             let year = year.parse::<i32>().unwrap();
-            show_project(StorageDir::Archive(year), &search_term);
+            show_project(StorageDir::Archive(year), search_term);
         } else if  matches.is_present("template"){
             show_template(search_term);
         } else {
-            show_project(StorageDir::Working, &search_term);
+            show_project(StorageDir::Working, search_term);
         }
 }
 
 fn show_project(dir:StorageDir, search_term:&str){
     // TODO make this use ProjectList
     let luigi = setup_luigi();
-    let projects = super::execute(||luigi.search_projects(dir, &search_term));
+    let projects = super::execute(||luigi.search_projects(dir, search_term));
     if !projects.is_empty(){
         for project in &projects{
-            print::show_items(&project);
+            print::show_items(project);
         }
     } else{
         fail(format!("Nothing found for {:?}", search_term));
@@ -358,19 +358,19 @@ pub fn archive(matches:&ArgMatches){
         let name = matches.value_of("NAME").unwrap();
         let year = matches.value_of("year")
             .and_then(|s|s.parse::<i32>().ok());
-        archive_project(&name, year, matches.is_present("force"));
+        archive_project(name, year, matches.is_present("force"));
 }
 
 pub fn unarchive(matches:&ArgMatches){
         let year = matches.value_of("YEAR").unwrap();
         let name = matches.value_of("NAME").unwrap();
         let year = year.parse::<i32>().unwrap_or_else(|e|panic!("can't parse year {:?}, {:?}", year, e));
-        unarchive_project(year, &name);
+        unarchive_project(year, name);
 }
 
 pub fn config(matches:&ArgMatches){
     if let Some(path) = matches.value_of("show"){
-        config_show(&path);
+        config_show(path);
     }
     if matches.is_present("location"){
         println!("config location: {:?}", config::ConfigReader::path_home())
@@ -396,7 +396,7 @@ fn archive_project(name:&str, manual_year:Option<i32>, force:bool){
             if project.valid_stage3().is_ok() || force{
                 let year = manual_year.or(project.year()).unwrap();
                 println!("archiving {} ({})",  project.ident(), project.year().unwrap());
-                let archive_target = super::execute(||luigi.archive_project(&project, year));
+                let archive_target = super::execute(||luigi.archive_project(project, year));
 
                 if let Some(repo) = luigi.repository{
                     util::exit(repo.add(&[project.dir(),archive_target]));
@@ -442,7 +442,7 @@ pub fn config_show(path:&str){
 
 /// Command CONFIG --edit
 fn config_edit(editor:&Option<&str>){
-    util::open_in_editor(&editor, &[CONFIG.path.to_owned()]);
+    util::open_in_editor(editor, &[CONFIG.path.to_owned()]);
 }
 
 /// Command CONFIG --default

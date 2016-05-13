@@ -112,7 +112,7 @@ pub fn parse_dmy_date_range(date_str:&str) -> Option<Date<UTC>>{
 
 /// Gets `Some(Yaml::Hash)` or `None`.
 pub fn get_hash<'a>(yaml:&'a Yaml, key:&str) -> Option<&'a BTreeMap<Yaml,Yaml>> {
-    get(&yaml,&key).and_then(|y|y.as_hash())
+    get(yaml,key).and_then(|y|y.as_hash())
 }
 
 /// Gets a `Bool` value.
@@ -121,7 +121,7 @@ pub fn get_hash<'a>(yaml:&'a Yaml, key:&str) -> Option<&'a BTreeMap<Yaml,Yaml>> 
 /// this will interpret `"yes"` and `"no"` as booleans, similar to `YAML1.1`.
 /// Actually it will interpret any string but `"yes"` als `false`.
 pub fn get_bool(yaml:&Yaml, key:&str) -> Option<bool> {
-    get(&yaml,&key)
+    get(yaml,key)
         .and_then(|y| y
                   .as_bool()
                   // allowing it to be a str: "yes" or "no"
@@ -140,36 +140,36 @@ pub fn get_bool(yaml:&Yaml, key:&str) -> Option<bool> {
 ///
 /// Also takes a `Yaml::I64` and reinterprets it.
 pub fn get_f64(yaml:&Yaml, key:&str) -> Option<f64> {
-    get(&yaml,&key).and_then(|y| y.as_f64().or( y.as_i64().map(|y|y as f64)))
+    get(yaml,key).and_then(|y| y.as_f64().or( y.as_i64().map(|y|y as f64)))
 }
 
 /// Gets an `Int` value.
 ///
 /// Same mentality as `yaml_rust`, only returns `Some`, if it's a `Yaml::Int`.
 pub fn get_int(yaml:&Yaml, key:&str) -> Option<i64> {
-    get(&yaml,&key).and_then(|y|y.as_i64())
+    get(yaml,key).and_then(|y|y.as_i64())
 }
 
 /// Gets a `&str` value.
 ///
 /// Same mentality as `yaml_rust`, only returns `Some`, if it's a `Yaml::String`.
 pub fn get_str<'a>(yaml:&'a Yaml, key:&str) -> Option<&'a str> {
-    get(&yaml,&key).and_then(|y|y.as_str())
+    get(yaml,key).and_then(|y|y.as_str())
 }
 
 /// same as `get_str()`, but owned.
 pub fn get_string(yaml:&Yaml, key:&str) -> Option<String> {
-    get_str(&yaml,&key).map(ToOwned::to_owned)
+    get_str(yaml,key).map(ToOwned::to_owned)
 }
 
 /// Gets anything **as** `String`.
 pub fn get_as_string(yaml:&Yaml, key:&str) -> Option<String> {
-    get(&yaml,&key).map(ToString::to_string)
+    get(yaml,key).map(ToString::to_string)
 }
 
 /// Gets a Date in `dd.mm.YYYY` format.
 pub fn get_dmy(yaml:&Yaml, key:&str) -> Option<Date<UTC>> {
-    get(&yaml,&key).and_then(|y|y.as_str()).and_then(|d|parse_dmy_date(d))
+    get(yaml,key).and_then(|y|y.as_str()).and_then(|d|parse_dmy_date(d))
 }
 
 /// Wrapper around `get_path()`.
@@ -177,7 +177,7 @@ pub fn get_dmy(yaml:&Yaml, key:&str) -> Option<Date<UTC>> {
 /// Splits path string
 /// and replaces `Yaml::Null` and `Yaml::BadValue`.
 pub fn get<'a>(yaml:&'a Yaml, key:&str) -> Option<&'a Yaml>{
-    match get_path(&yaml, &key.split('/').filter(|k|!k.is_empty()).collect::<Vec<&str>>()) {
+    match get_path(yaml, &key.split('/').filter(|k|!k.is_empty()).collect::<Vec<&str>>()) {
         Some(&Yaml::Null) |
         Some(&Yaml::BadValue) => None,
         content => content

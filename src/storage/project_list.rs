@@ -17,12 +17,12 @@ impl<L: Storable> ProjectList<L> {
     }
 
     pub fn filter_by_key_val(&mut self, key: &str, val: &str) {
-        self.projects.retain(|p| p.matches_filter(&key, &val));
+        self.projects.retain(|p| p.matches_filter(key, val));
     }
 
     pub fn filter_by(&mut self, filter: &str) {
         let (key, val) = filter.split_at(filter.find(':').unwrap_or(0));
-        self.filter_by_key_val(&key, &val[1..]);
+        self.filter_by_key_val(key, &val[1..]);
     }
 }
 

@@ -20,6 +20,7 @@
     unused_import_braces,
     unused_qualifications
     )]
+#![allow(used_underscore_binding)]
 
 #![cfg_attr(feature = "lints", allow(unstable_features))]
 #![cfg_attr(feature = "lints", feature(plugin))]

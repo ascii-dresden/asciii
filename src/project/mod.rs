@@ -77,7 +77,7 @@ impl Storable for Project{
             ).filled;
 
         // generates a temp file
-        let temp_dir  = TempDir::new(&project_name).unwrap();
+        let temp_dir  = TempDir::new(project_name).unwrap();
         let temp_file = temp_dir.path().join(slug::slugify(project_name) + "." + Self::file_extension());
 
         // write into a file

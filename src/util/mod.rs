@@ -60,8 +60,8 @@ pub fn open_in_editor(editor:&Option<&str>, paths:&[PathBuf]){
         assert!(!paths.is_empty()); //TODO can I add a message to that?
 
         Command::new(editor_command)
-            .args(&args)
-            .args(&paths)
+            .args(args)
+            .args(paths)
             .status()
             .unwrap_or_else(|e| { panic!("failed to execute process: {}", e) });
     } else {

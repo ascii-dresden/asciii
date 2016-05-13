@@ -87,7 +87,7 @@ pub fn path_rows(projects:&[Project], list_config:&ListConfig) -> Vec<Row>{
     projects
         .iter()
         .map(|project| {
-            let row_style = if list_config.use_colors {project_to_style(&project)}else{""};
+            let row_style = if list_config.use_colors {project_to_style(project)}else{""};
             Row::new(vec![
                      cell!(project.invoice_num().unwrap_or("".into())),
                      cell!(project.name()).style_spec(row_style),
@@ -105,7 +105,7 @@ pub fn simple_rows(projects:&[Project], list_config:&ListConfig) -> Vec<Row>{
     projects
         .iter()
         .map(|project| {
-            let row_style = if list_config.use_colors {project_to_style(&project)}else{""};
+            let row_style = if list_config.use_colors {project_to_style(project)}else{""};
             Row::new(vec![
                      cell!(
                          if project.canceled() {
@@ -133,7 +133,7 @@ pub fn verbose_rows(projects:&[Project], list_config:&ListConfig) -> Vec<Row>{
     projects.iter().enumerate()
         .map(|(i, project)| {
             //trace!("configuring row: {:?}", project.name());
-            let row_style = if list_config.use_colors {project_to_style(&project)}else{""};
+            let row_style = if list_config.use_colors {project_to_style(project)}else{""};
             let mut cells = Vec::new();
 
             // TODO how can we illustrate that a project has been removed? what about a red x
@@ -145,7 +145,7 @@ pub fn verbose_rows(projects:&[Project], list_config:&ListConfig) -> Vec<Row>{
 
             cells.push( Cell::new( &status.to_string() )
                         .with_style( Attr::ForegroundColor(color) )
-                        .with_style( style.unwrap_or(Attr::Standout(false)) )
+                        .with_style( style.unwrap_or_else(||Attr::Standout(false)) )
                       );
 
 
@@ -223,7 +223,7 @@ pub fn dynamic_rows(projects:&[Project], list_config:&ListConfig) -> Vec<Row>{
     projects
         .iter()
         .map(|project| {
-            let row_style = if list_config.use_colors {project_to_style(&project)}else{""};
+            let row_style = if list_config.use_colors {project_to_style(project)}else{""};
 
             let mut cells = Vec::new();
 
