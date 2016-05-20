@@ -64,6 +64,8 @@ hours:
   caterers:
     "unknown" : 0
 
+  wages_date: # when where the wages payed
+
 manager: __MANAGER__
 
 #canceled: yes
