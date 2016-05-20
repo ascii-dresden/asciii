@@ -35,12 +35,10 @@ pub enum ListMode{ Simple, Verbose, Nothing, Paths, Csv }
 impl<'a> Default for ListConfig<'a>{
     fn default() -> ListConfig<'a>{
         ListConfig{
-            mode:         if ::CONFIG.get_bool("list/verbose"){ ListMode::Verbose }
-                          else{ ListMode::Simple },
+            mode:         if ::CONFIG.get_bool("list/verbose"){ ListMode::Verbose } else{ ListMode::Simple },
             git_status:   ::CONFIG.get_bool("list/gitstatus"),
             show_errors:  false,
-            sort_by:      ::CONFIG.get_str("list/sort")
-                .expect("Faulty config: list/sort does not contain a value"),
+            sort_by:      ::CONFIG.get_str("list/sort").expect("Faulty config: list/sort does not contain a value"),
             filter_by:    None,
             use_colors:   ::CONFIG.get_bool("list/colors"),
             details:      None,
@@ -48,7 +46,6 @@ impl<'a> Default for ListConfig<'a>{
     }
 }
 
-#[inline]
 fn result_to_cell(res:&Result<(), Vec<&str>>) -> Cell{
     match *res{
         Ok(_)           => Cell::new("✓").with_style(Attr::ForegroundColor(color::GREEN)), // ✗
@@ -259,9 +256,7 @@ pub fn dynamic_rows(projects:&[Project], list_config:&ListConfig) -> Vec<Row>{
 pub fn print_projects(rows:Vec<Row>){
     trace!("starting table print");
     let mut table = Table::init(rows);
-    trace!("setting table format");
     table.set_format(FormatBuilder::new().column_separator(' ').padding(0,0).build());
-    trace!("calling table print");
     table.printstd();
     trace!("done printing table.");
 }
@@ -300,9 +295,12 @@ pub fn show_items(project:&Project){
     println!("{}", project.name());
 
     let mut table = Table::new();
-    table.set_format(TableFormat::new());
-    for item in &project.invoice_items().unwrap(){
+    let items = project.invoice_items().expect("problem opening items");
+    //table.set_format(TableFormat::new());
+    table.add_row( Row::new(vec![cell!(""), cell!("name"), cell!( "amount"), cell!("price"), cell!("cost")]));
+    for (index,item) in items.iter().enumerate(){
         table.add_row( Row::new(vec![
+                                Cell::new(&index.to_string()),
                                 Cell::new(item.item.name),
                                 Cell::new(&item.amount_sold.to_string()),
                                 Cell::new(&item.item.price.to_string()),

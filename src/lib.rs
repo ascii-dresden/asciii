@@ -20,7 +20,10 @@
     unused_import_braces,
     unused_qualifications
     )]
+#![allow(unknown_lints)]
 #![allow(used_underscore_binding)]
+
+#![allow(deprecated)]
 
 #![cfg_attr(feature = "lints", allow(unstable_features))]
 #![cfg_attr(feature = "lints", feature(plugin))]

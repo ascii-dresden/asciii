@@ -23,13 +23,27 @@ use templater::Templater;
 
 pub mod product;
 pub mod spec;
+#[cfg(test)] mod tests;
+
 use self::spec::{SpecResult, VirtualField};
-use self::spec::products::ProductResult;
 
 //#[cfg(feature="document_export")]
 //pub mod export;
 
 static PROJECT_FILE_EXTENSION:&'static str = "yml";
+
+pub type ProductResult<T> = Result<T, ProductError>;
+#[derive(Debug, PartialEq, Eq)]
+pub enum ProductError{
+    //DuplicateProduct // not an error
+    AmbiguousAmounts(String),
+    MissingAmount(String),
+    TooMuchReturned(String),
+    InvalidPrice,
+    UnknownFormat
+}
+
+
 
 /// Represents a Project.
 ///
@@ -190,8 +204,9 @@ impl Project{
         spec::project::canceled(self.yaml())
     }
 
+    /// either `"canceled"` or `""`
     pub fn canceled_string(&self) -> &'static str{
-        if spec::project::canceled(self.yaml()){"canceled"}
+        if self.canceled(){"canceled"}
         else {""}
     }
 
@@ -229,7 +244,7 @@ impl Project{
     }
 
     pub fn invoice_items(&self) -> ProductResult<Vec<product::InvoiceItem>> {
-        spec::products::all(self.yaml())
+        spec::products::invoice_items(self.yaml())
     }
 
     pub fn wages(&self) -> Option<Currency> {
@@ -239,22 +254,22 @@ impl Project{
     }
 
     pub fn sum_offered(&self) -> Option<Currency> {
-        spec::products::all(self.yaml()).ok() .map(|products| spec::products::sum_offered(&products))
+        spec::products::invoice_items(self.yaml()).ok() .map(|products| spec::products::sum_offered(&products))
     }
 
     pub fn sum_sold(&self) -> Option<Currency> {
-        spec::products::all(self.yaml()).ok()
+        spec::products::invoice_items(self.yaml()).ok()
             .map(|products| spec::products::sum_sold(&products))
     }
 
     pub fn tax_offered(&self) -> Option<Currency> {
-        spec::products::all(self.yaml()).ok()
+        spec::products::invoice_items(self.yaml()).ok()
             .map(|products| spec::products::sum_offered(&products))
             .map(|sum| sum * 0.19)
     }
 
     pub fn tax_sold(&self) -> Option<Currency> {
-        spec::products::all(self.yaml()).ok()
+        spec::products::invoice_items(self.yaml()).ok()
             .map(|products| spec::products::sum_sold(&products))
             .map(|sum| sum * 0.19)
     }
