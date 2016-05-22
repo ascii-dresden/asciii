@@ -65,11 +65,11 @@ impl<'a> Product<'a>{
 
 impl<'a> InvoiceItem<'a> {
     pub fn cost_before_tax(&self) -> Currency {
-        self.amount_sold * &self.item.price
+        self.amount_sold * self.item.price
     }
 
     pub fn cost_after_tax(&self) -> Currency {
-        self.amount_sold * &self.item.price * (1.0 + self.item.tax)
+        self.amount_sold * self.item.price * (1.0 + self.item.tax)
     }
 
     pub fn from_desc_and_value<'y>(desc: &'y Yaml, values: &'y Yaml) -> ProductResult<InvoiceItem<'y>> {

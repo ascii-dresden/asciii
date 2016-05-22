@@ -18,7 +18,8 @@ maplit = "0.1"
 clap = {version = "2"}
 enum_derive = "0.1"
 custom_derive = "0.1"
-currency = {git="https://github.com/hoodie/rust-lang-currency"}
+#currency = {git="https://github.com/hoodie/rust-lang-currency"}
+currency = {path="../currency-rs/"}
 #currency = "0.4"
 open = "1.1"
 

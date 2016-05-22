@@ -1,11 +1,13 @@
 
 use util::yaml;
-use util::yaml::YamlError;
 use currency::Currency;
 
-use super::ProductResult;
 use super::ProductError;
 use super::spec;
+
+
+
+
 
 static CLIENT_TEST_DOC:&'static str =
 r#"
@@ -21,6 +23,17 @@ client:
     01234 Countilvania
 "#;
 
+#[test]
+fn validate_stage1(){
+    let doc = yaml::parse(CLIENT_TEST_DOC).unwrap();
+    assert!(spec::client::validate(&doc).is_ok());
+}
+
+
+
+
+
+
 static OFFER_TEST_DOC:&'static str =
 r#"
 offer:
@@ -28,6 +41,15 @@ offer:
   appendix: 1
 manager: somebody
 "#;
+
+#[test]
+fn validate_stage2(){
+    let doc = yaml::parse(OFFER_TEST_DOC).unwrap();
+    let errors = spec::offer::validate(&doc);
+    println!("{:#?}", errors);
+    assert!(errors.is_ok());
+}
+
 
 static INVOICE_TEST_DOC:&'static str =
 r#"
@@ -38,26 +60,16 @@ invoice:
 "#;
 
 #[test]
-fn validate_stage1(){
-    let doc = yaml::parse(CLIENT_TEST_DOC).unwrap();
-    assert!(spec::client::validate(&doc).is_ok());
-}
-
-#[test]
-fn validate_stage2(){
-    let doc = yaml::parse(OFFER_TEST_DOC).unwrap();
-    let errors = spec::offer::validate(&doc);
-    println!("{:#?}", errors);
-    assert!(errors.is_ok());
-}
-
-#[test]
 fn validate_stage3(){
     let doc = yaml::parse(INVOICE_TEST_DOC).unwrap();
     let errors = spec::invoice::validate(&doc);
     println!("{:#?}", errors);
     assert!(errors.is_ok());
 }
+
+
+
+
 
 static PRODUCT_TEST_DOC_VALID:&'static str =
 r#"
@@ -76,19 +88,23 @@ products:
 ...
 "#;
 
+
+
+
+
 #[test]
-#[ignore]
+//#[ignore]
 fn validate_products(){
     let doc = yaml::parse(PRODUCT_TEST_DOC_VALID).unwrap();
 
     println!("{:#?}",doc);
-    let products = spec::products::all(&doc).unwrap();
+    let products = spec::products::invoice_items(&doc).unwrap();
     println!("Products {:#?}",products);
     assert_eq!(products[0].item.name, "Kaffee");
     assert_eq!(products[0].amount_offered, 5f64);
     assert_eq!(products[0].amount_sold, 5f64);
-    assert_eq!(products[0].cost_before_tax(), Currency::from_str("1250€").unwrap());
-    assert_eq!(products[0].cost_after_tax(), Currency::from_str("1488€").unwrap());
+    assert_eq!(products[0].cost_before_tax(), Currency(Some('€'), 12_50));
+    assert_eq!(products[0].cost_after_tax(), Currency(Some('€'), 14_88));
 
     assert_eq!(products[1].item.name, "Tee");
     assert_eq!(products[1].amount_offered, 6f64);
@@ -98,6 +114,11 @@ fn validate_products(){
     assert_eq!(products[2].amount_offered, 6f64);
     assert_eq!(products[2].amount_sold, 2f64);
 }
+
+
+
+
+
 
 static PRODUCT_TEST_DOC_INVALID1:&'static str =
 r#"
@@ -135,14 +156,8 @@ fn validate_invalid_products(){
     let invalid1= yaml::parse(PRODUCT_TEST_DOC_INVALID1).unwrap();
     let invalid2= yaml::parse(PRODUCT_TEST_DOC_INVALID2).unwrap();
     let invalid3= yaml::parse(PRODUCT_TEST_DOC_INVALID3).unwrap();
-    assert_eq!( spec::products::all(&invalid1).unwrap_err(), ProductError::AmbiguousAmounts("Tee".to_owned()));
-    assert_eq!( spec::products::all(&invalid2).unwrap_err(), ProductError::TooMuchReturned("Tee".to_owned()));
-    assert_eq!( spec::products::all(&invalid3).unwrap_err(), ProductError::MissingAmount("Tee".to_owned()));
+    assert_eq!( spec::products::invoice_items(&invalid1).unwrap_err(), ProductError::AmbiguousAmounts("Tee".to_owned()));
+    assert_eq!( spec::products::invoice_items(&invalid2).unwrap_err(), ProductError::TooMuchReturned("Tee".to_owned()));
+    assert_eq!( spec::products::invoice_items(&invalid3).unwrap_err(), ProductError::MissingAmount("Tee".to_owned()));
 }
-
-//#[test]
-//fn validate_stage5(){
-//    let doc = yaml::parse(CLIENT_TEST_DOC).unwrap();
-//    assert!(spec::validate::wages(&doc));
-//}
 

@@ -304,7 +304,7 @@ pub fn show_items(project:&Project){
                                 Cell::new(item.item.name),
                                 Cell::new(&item.amount_sold.to_string()),
                                 Cell::new(&item.item.price.to_string()),
-                                Cell::new(&(&item.item.price * item.amount_sold).to_string()),
+                                Cell::new(&(item.item.price * item.amount_sold).to_string()),
         ]));
     }
     table.printstd();
