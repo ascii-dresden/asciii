@@ -74,7 +74,7 @@ impl VirtualField{
 
 //TODO there may be cases where an f64 can't be converted into Currency
 pub fn to_currency(f:f64) -> ProductResult<Currency> {
-    Ok(Currency(Some('€'),(f * 100.0) as i64))
+    Ok(Currency(Some('€'),(f * 1000.0) as i64)/10) // TODO XXX FIXME use fucking decimals
 }
 
 fn field_exists<'a>(yaml:&Yaml, paths:&[&'a str]) -> Vec<&'a str>{
@@ -433,14 +433,21 @@ pub mod products{
 
     pub fn sum_offered(items:&[InvoiceItem]) -> Currency{
         items.iter()
-             .fold(Currency(Some('€'),100),
+             .fold(Currency(Some('€'),0_00),
              |acc, item| acc + item.item.price * item.amount_offered)
     }
 
     pub fn sum_sold(items:&[InvoiceItem]) -> Currency{
         items.iter()
-             .fold(Currency(Some('€'),100),
-             |acc, item| acc + item.item.price * item.amount_sold)
+             .fold(Currency(Some('€'),0_00),
+             |acc, item|{
+                 println!("+ {} * {} = {} => {:?}",
+                          item.item.price ,
+                          item.amount_sold,
+                          item.item.price *item.amount_sold,
+                          acc + item.item.price * item.amount_sold);
+                 acc + item.item.price * item.amount_sold
+             })
     }
 
 }
