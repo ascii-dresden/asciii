@@ -440,14 +440,7 @@ pub mod products{
     pub fn sum_sold(items:&[InvoiceItem]) -> Currency{
         items.iter()
              .fold(Currency(Some('€'),0_00),
-             |acc, item|{
-                 println!("+ {} * {} = {} => {:?}",
-                          item.item.price ,
-                          item.amount_sold,
-                          item.item.price *item.amount_sold,
-                          acc + item.item.price * item.amount_sold);
-                 acc + item.item.price * item.amount_sold
-             })
+             |acc, item| acc + item.item.price * item.amount_sold)
     }
 
 }
