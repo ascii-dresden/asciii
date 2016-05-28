@@ -1,1 +1,1 @@
-initSidebarItems({"mod":[["product",""],["spec","Implements the ascii invoicer project file specification."]],"struct":[["Project","Represents a Project."]]});
+initSidebarItems({"enum":[["ProductError",""]],"mod":[["product",""],["spec","Implements the ascii invoicer project file specification."]],"struct":[["Project","Represents a Project."]],"type":[["ProductResult",""]]});

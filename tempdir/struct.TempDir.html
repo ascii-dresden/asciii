@@ -52,8 +52,7 @@
     // some fields omitted
 }</pre><div class='docblock'><p>A wrapper for a path to temporary directory implementing automatic
 scope-based deletion.</p>
-</div><h2 id='methods'>Methods</h2><h3 class='impl'><span class='in-band'><code>impl <a class='struct' href='../tempdir/struct.TempDir.html' title='tempdir::TempDir'>TempDir</a></code></span><span class='out-of-band'><a id='src-14' class='srclink' href='../src/tempdir/lib.rs.html#39-115' title='goto source code'>[src]</a></span></h3>
-<div class='impl-items'><h4 id='method.new_in' class='method'><code>fn <a href='#method.new_in' class='fnname'>new_in</a>&lt;P: <a class='trait' href='https://doc.rust-lang.org/nightly/core/convert/trait.AsRef.html' title='core::convert::AsRef'>AsRef</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/std/path/struct.Path.html' title='std::path::Path'>Path</a>&gt;&gt;(tmpdir: P, prefix: &amp;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>) -&gt; <a class='type' href='https://doc.rust-lang.org/nightly/std/io/error/type.Result.html' title='std::io::error::Result'>Result</a>&lt;<a class='struct' href='../tempdir/struct.TempDir.html' title='tempdir::TempDir'>TempDir</a>&gt;</code></h4>
+</div><h2 id='methods'>Methods</h2><h3 class='impl'><code>impl <a class='struct' href='../tempdir/struct.TempDir.html' title='tempdir::TempDir'>TempDir</a></code></h3><div class='impl-items'><h4 id='method.new_in' class='method'><code>fn <a href='#method.new_in' class='fnname'>new_in</a>&lt;P: <a class='trait' href='https://doc.rust-lang.org/nightly/core/convert/trait.AsRef.html' title='core::convert::AsRef'>AsRef</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/std/path/struct.Path.html' title='std::path::Path'>Path</a>&gt;&gt;(tmpdir: P, prefix: &amp;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>) -&gt; <a class='type' href='https://doc.rust-lang.org/nightly/std/io/error/type.Result.html' title='std::io::error::Result'>Result</a>&lt;<a class='struct' href='../tempdir/struct.TempDir.html' title='tempdir::TempDir'>TempDir</a>&gt;</code></h4>
 <div class='docblock'><p>Attempts to make a temporary directory inside of <code>tmpdir</code> whose name
 will have the prefix <code>prefix</code>. The directory will be automatically
 deleted once the returned wrapper is destroyed.</p>
@@ -77,8 +76,7 @@ temporary directory is prevented.</p>
 <p>Although <code>TempDir</code> removes the directory on drop, in the destructor
 any errors are ignored. To detect errors cleaning up the temporary
 directory, call <code>close</code> instead.</p>
-</div></div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><span class='in-band'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.Drop.html' title='core::ops::Drop'>Drop</a> for <a class='struct' href='../tempdir/struct.TempDir.html' title='tempdir::TempDir'>TempDir</a></code></span><span class='out-of-band'><a id='src-45' class='srclink' href='../src/tempdir/lib.rs.html#117-121' title='goto source code'>[src]</a></span></h3>
-<div class='impl-items'><h4 id='method.drop' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/ops/trait.Drop.html#tymethod.drop' class='fnname'>drop</a>(&amp;mut self)</code></h4>
+</div></div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.Drop.html' title='core::ops::Drop'>Drop</a> for <a class='struct' href='../tempdir/struct.TempDir.html' title='tempdir::TempDir'>TempDir</a></code></h3><div class='impl-items'><h4 id='method.drop' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/ops/trait.Drop.html#tymethod.drop' class='fnname'>drop</a>(&amp;mut self)</code></h4>
 </div></section>
     <section id='search' class="content hidden"></section>
 

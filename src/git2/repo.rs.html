@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="rustdoc">
-    <meta name="description" content="Source to the Rust file `/home/hendrik/.multirust/toolchains/nightly/cargo/registry/src/github.com-1ecc6299db9ec823/git2-0.4.3/src/repo.rs`.">
+    <meta name="description" content="Source to the Rust file `/home/hendrik/.cargo/registry/src/github.com-88ac128001ac3a9a/git2-0.4.3/src/repo.rs`.">
     <meta name="keywords" content="rust, rustlang, rust-lang">
 
     <title>repo.rs.html -- source</title>
@@ -2164,7 +2164,7 @@
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// The folder must exist prior to invoking this function.</span>
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>init_bare</span><span class='op'>&lt;</span><span class='ident'>P</span>: <span class='ident'>AsRef</span><span class='op'>&lt;</span><span class='ident'>Path</span><span class='op'>&gt;&gt;</span>(<span class='ident'>path</span>: <span class='ident'>P</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>Repository</span>, <span class='ident'>Error</span><span class='op'>&gt;</span> {
-        <span class='ident'>Repository</span>::<span class='ident'>init_opts</span>(<span class='ident'>path</span>, <span class='ident'>RepositoryInitOptions</span>::<span class='ident'>new</span>().<span class='ident'>bare</span>(<span class='boolvalue'>true</span>))
+        <span class='ident'>Repository</span>::<span class='ident'>init_opts</span>(<span class='ident'>path</span>, <span class='ident'>RepositoryInitOptions</span>::<span class='ident'>new</span>().<span class='ident'>bare</span>(<span class='boolval'>true</span>))
     }
 
     <span class='doccomment'>/// Creates a new `--bare` repository in the specified folder.</span>
@@ -2277,7 +2277,7 @@
         <span class='kw'>let</span> <span class='ident'>state</span> <span class='op'>=</span> <span class='kw'>unsafe</span> { <span class='ident'>raw</span>::<span class='ident'>git_repository_state</span>(<span class='self'>self</span>.<span class='ident'>raw</span>) };
         <span class='macro'>macro_rules</span><span class='macro'>!</span> <span class='ident'>check</span>( ($(<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>raw</span>:<span class='ident'>ident</span> <span class='op'>=&gt;</span> <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>real</span>:<span class='ident'>ident</span>),<span class='op'>*</span>) <span class='op'>=&gt;</span> (
             $(<span class='kw'>if</span> <span class='ident'>state</span> <span class='op'>==</span> <span class='ident'>raw</span>::<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>raw</span> <span class='kw'>as</span> <span class='ident'>c_int</span> {
-                <span class='kw'>super</span>::<span class='ident'>RepositoryState</span>::<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>real</span>
+                <span class='ident'>super</span>::<span class='ident'>RepositoryState</span>::<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>real</span>
             }) <span class='kw'>else</span> <span class='op'>*</span>
             <span class='kw'>else</span> {
                 <span class='macro'>panic</span><span class='macro'>!</span>(<span class='string'>&quot;unknown repository state: {}&quot;</span>, <span class='ident'>state</span>)
@@ -3940,8 +3940,8 @@
         <span class='kw'>let</span> <span class='ident'>commit1</span> <span class='op'>=</span> <span class='ident'>repo</span>.<span class='ident'>find_commit</span>(<span class='ident'>oid1</span>).<span class='ident'>unwrap</span>();
         <span class='macro'>println</span><span class='macro'>!</span>(<span class='string'>&quot;created oid1 {:?}&quot;</span>, <span class='ident'>oid1</span>);
 
-        <span class='ident'>repo</span>.<span class='ident'>branch</span>(<span class='string'>&quot;branch_a&quot;</span>, <span class='kw-2'>&amp;</span><span class='ident'>commit1</span>, <span class='boolvalue'>true</span>).<span class='ident'>unwrap</span>();
-        <span class='ident'>repo</span>.<span class='ident'>branch</span>(<span class='string'>&quot;branch_b&quot;</span>, <span class='kw-2'>&amp;</span><span class='ident'>commit1</span>, <span class='boolvalue'>true</span>).<span class='ident'>unwrap</span>();
+        <span class='ident'>repo</span>.<span class='ident'>branch</span>(<span class='string'>&quot;branch_a&quot;</span>, <span class='kw-2'>&amp;</span><span class='ident'>commit1</span>, <span class='boolval'>true</span>).<span class='ident'>unwrap</span>();
+        <span class='ident'>repo</span>.<span class='ident'>branch</span>(<span class='string'>&quot;branch_b&quot;</span>, <span class='kw-2'>&amp;</span><span class='ident'>commit1</span>, <span class='boolval'>true</span>).<span class='ident'>unwrap</span>();
 
         <span class='comment'>// create commit oid2 on branchA</span>
         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>index</span> <span class='op'>=</span> <span class='ident'>repo</span>.<span class='ident'>index</span>().<span class='ident'>unwrap</span>();
@@ -3990,16 +3990,16 @@
 
         <span class='comment'>// merge bases of (oid4,oid5) should be (oid2,oid3)</span>
         <span class='kw'>let</span> <span class='ident'>merge_bases</span> <span class='op'>=</span> <span class='ident'>repo</span>.<span class='ident'>merge_bases</span>(<span class='ident'>oid4</span>, <span class='ident'>oid5</span>).<span class='ident'>unwrap</span>();
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>found_oid2</span> <span class='op'>=</span> <span class='boolvalue'>false</span>;
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>found_oid3</span> <span class='op'>=</span> <span class='boolvalue'>false</span>;
+        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>found_oid2</span> <span class='op'>=</span> <span class='boolval'>false</span>;
+        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>found_oid3</span> <span class='op'>=</span> <span class='boolval'>false</span>;
         <span class='kw'>for</span> <span class='ident'>mg</span> <span class='kw'>in</span> <span class='ident'>merge_bases</span>.<span class='ident'>iter</span>() {
             <span class='macro'>println</span><span class='macro'>!</span>(<span class='string'>&quot;found merge base {:?}&quot;</span>, <span class='ident'>mg</span>);
             <span class='kw'>if</span> <span class='ident'>mg</span> <span class='op'>==</span> <span class='kw-2'>&amp;</span><span class='ident'>oid2</span> {
-                <span class='ident'>found_oid2</span> <span class='op'>=</span> <span class='boolvalue'>true</span>;
+                <span class='ident'>found_oid2</span> <span class='op'>=</span> <span class='boolval'>true</span>;
             } <span class='kw'>else</span> <span class='kw'>if</span> <span class='ident'>mg</span> <span class='op'>==</span> <span class='kw-2'>&amp;</span><span class='ident'>oid3</span> {
-                <span class='ident'>found_oid3</span> <span class='op'>=</span> <span class='boolvalue'>true</span>;
+                <span class='ident'>found_oid3</span> <span class='op'>=</span> <span class='boolval'>true</span>;
             } <span class='kw'>else</span> {
-                <span class='macro'>assert</span><span class='macro'>!</span>(<span class='boolvalue'>false</span>);
+                <span class='macro'>assert</span><span class='macro'>!</span>(<span class='boolval'>false</span>);
             }
         }
         <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>found_oid2</span>);

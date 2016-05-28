@@ -47,12 +47,11 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-1951' class='srclink' href='../src/git2/commit.rs.html#13-16' title='goto source code'>[src]</a></span></h1>
+               </span><a id='src-1949' class='srclink' href='../src/git2/commit.rs.html#13-16' title='goto source code'>[src]</a></span></h1>
 <pre class='rust struct'>pub struct Commit&lt;'repo&gt; {
     // some fields omitted
 }</pre><div class='docblock'><p>A structure to represent a git <a href="http://git-scm.com/book/en/Git-Internals-Git-Objects">commit</a></p>
-</div><h2 id='methods'>Methods</h2><h3 class='impl'><span class='in-band'><code>impl&lt;'repo&gt; <a class='struct' href='../git2/struct.Commit.html' title='git2::Commit'>Commit</a>&lt;'repo&gt;</code></span><span class='out-of-band'><a id='src-1964' class='srclink' href='../src/git2/commit.rs.html#30-249' title='goto source code'>[src]</a></span></h3>
-<div class='impl-items'><h4 id='method.id' class='method'><code>fn <a href='#method.id' class='fnname'>id</a>(&amp;self) -&gt; <a class='struct' href='../git2/struct.Oid.html' title='git2::Oid'>Oid</a></code></h4>
+</div><h2 id='methods'>Methods</h2><h3 class='impl'><code>impl&lt;'repo&gt; <a class='struct' href='../git2/struct.Commit.html' title='git2::Commit'>Commit</a>&lt;'repo&gt;</code></h3><div class='impl-items'><h4 id='method.id' class='method'><code>fn <a href='#method.id' class='fnname'>id</a>(&amp;self) -&gt; <a class='struct' href='../git2/struct.Oid.html' title='git2::Oid'>Oid</a></code></h4>
 <div class='docblock'><p>Get the id (SHA1) of a repository commit</p>
 </div><h4 id='method.tree_id' class='method'><code>fn <a href='#method.tree_id' class='fnname'>tree_id</a>(&amp;self) -&gt; <a class='struct' href='../git2/struct.Oid.html' title='git2::Oid'>Oid</a></code></h4>
 <div class='docblock'><p>Get the id of the tree pointed to by this commit.</p>
@@ -143,8 +142,7 @@ parent commit from the ODB.</p>
 <div class='docblock'><p>Casts this Commit to be usable as an <code>Object</code></p>
 </div><h4 id='method.into_object' class='method'><code>fn <a href='#method.into_object' class='fnname'>into_object</a>(self) -&gt; <a class='struct' href='../git2/struct.Object.html' title='git2::Object'>Object</a>&lt;'repo&gt;</code></h4>
 <div class='docblock'><p>Consumes Commit to be returned as an <code>Object</code></p>
-</div></div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><span class='in-band'><code>impl&lt;'repo&gt; <a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.Drop.html' title='core::ops::Drop'>Drop</a> for <a class='struct' href='../git2/struct.Commit.html' title='git2::Commit'>Commit</a>&lt;'repo&gt;</code></span><span class='out-of-band'><a id='src-2106' class='srclink' href='../src/git2/commit.rs.html#295-299' title='goto source code'>[src]</a></span></h3>
-<div class='impl-items'><h4 id='method.drop' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/ops/trait.Drop.html#tymethod.drop' class='fnname'>drop</a>(&amp;mut self)</code></h4>
+</div></div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><code>impl&lt;'repo&gt; <a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.Drop.html' title='core::ops::Drop'>Drop</a> for <a class='struct' href='../git2/struct.Commit.html' title='git2::Commit'>Commit</a>&lt;'repo&gt;</code></h3><div class='impl-items'><h4 id='method.drop' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/ops/trait.Drop.html#tymethod.drop' class='fnname'>drop</a>(&amp;mut self)</code></h4>
 </div></section>
     <section id='search' class="content hidden"></section>
 

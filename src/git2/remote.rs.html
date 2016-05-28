@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="rustdoc">
-    <meta name="description" content="Source to the Rust file `/home/hendrik/.multirust/toolchains/nightly/cargo/registry/src/github.com-1ecc6299db9ec823/git2-0.4.3/src/remote.rs`.">
+    <meta name="description" content="Source to the Rust file `/home/hendrik/.cargo/registry/src/github.com-88ac128001ac3a9a/git2-0.4.3/src/remote.rs`.">
     <meta name="keywords" content="rust, rustlang, rust-lang">
 
     <title>remote.rs.html -- source</title>
@@ -916,19 +916,19 @@
         <span class='ident'>FetchOptions</span> {
             <span class='ident'>callbacks</span>: <span class='prelude-val'>None</span>,
             <span class='ident'>prune</span>: <span class='ident'>FetchPrune</span>::<span class='ident'>Unspecified</span>,
-            <span class='ident'>update_fetchhead</span>: <span class='boolvalue'>true</span>,
+            <span class='ident'>update_fetchhead</span>: <span class='boolval'>true</span>,
             <span class='ident'>download_tags</span>: <span class='ident'>AutotagOption</span>::<span class='ident'>Unspecified</span>,
         }
     }
 
     <span class='doccomment'>/// Set the callbacks to use for the fetch operation.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>remote_callbacks</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>cbs</span>: <span class='ident'>RemoteCallbacks</span><span class='op'>&lt;</span><span class='lifetime'>&#39;cb</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>Self</span> {
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>remote_callbacks</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>cbs</span>: <span class='ident'>RemoteCallbacks</span><span class='op'>&lt;</span><span class='lifetime'>&#39;cb</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='kw'>Self</span> {
         <span class='self'>self</span>.<span class='ident'>callbacks</span> <span class='op'>=</span> <span class='prelude-val'>Some</span>(<span class='ident'>cbs</span>);
         <span class='self'>self</span>
     }
 
     <span class='doccomment'>/// Set whether to perform a prune after the fetch.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>prune</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>prune</span>: <span class='ident'>FetchPrune</span>) <span class='op'>-&gt;</span> <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>Self</span> {
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>prune</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>prune</span>: <span class='ident'>FetchPrune</span>) <span class='op'>-&gt;</span> <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='kw'>Self</span> {
         <span class='self'>self</span>.<span class='ident'>prune</span> <span class='op'>=</span> <span class='ident'>prune</span>;
         <span class='self'>self</span>
     }
@@ -936,7 +936,7 @@
     <span class='doccomment'>/// Set whether to write the results to FETCH_HEAD.</span>
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// Defaults to `true`.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>update_fetchhead</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>update</span>: <span class='ident'>bool</span>) <span class='op'>-&gt;</span> <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>Self</span> {
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>update_fetchhead</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>update</span>: <span class='ident'>bool</span>) <span class='op'>-&gt;</span> <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='kw'>Self</span> {
         <span class='self'>self</span>.<span class='ident'>update_fetchhead</span> <span class='op'>=</span> <span class='ident'>update</span>;
         <span class='self'>self</span>
     }
@@ -945,7 +945,7 @@
     <span class='doccomment'>/// tags for objects we&#39;re downloading or downloading all of them.</span>
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// The default is to auto-follow tags.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>download_tags</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>opt</span>: <span class='ident'>AutotagOption</span>) <span class='op'>-&gt;</span> <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>Self</span> {
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>download_tags</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>opt</span>: <span class='ident'>AutotagOption</span>) <span class='op'>-&gt;</span> <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='kw'>Self</span> {
         <span class='self'>self</span>.<span class='ident'>download_tags</span> <span class='op'>=</span> <span class='ident'>opt</span>;
         <span class='self'>self</span>
     }
@@ -984,7 +984,7 @@
     }
 
     <span class='doccomment'>/// Set the callbacks to use for the fetch operation.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>remote_callbacks</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>cbs</span>: <span class='ident'>RemoteCallbacks</span><span class='op'>&lt;</span><span class='lifetime'>&#39;cb</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>Self</span> {
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>remote_callbacks</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>cbs</span>: <span class='ident'>RemoteCallbacks</span><span class='op'>&lt;</span><span class='lifetime'>&#39;cb</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='kw'>Self</span> {
         <span class='self'>self</span>.<span class='ident'>callbacks</span> <span class='op'>=</span> <span class='prelude-val'>Some</span>(<span class='ident'>cbs</span>);
         <span class='self'>self</span>
     }
@@ -995,7 +995,7 @@
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// if set to 0 the packbuilder will auto-detect the number of threads to</span>
     <span class='doccomment'>/// create, and the default value is 1.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>packbuilder_parallelism</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>parallel</span>: <span class='ident'>u32</span>) <span class='op'>-&gt;</span> <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>Self</span> {
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>packbuilder_parallelism</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>parallel</span>: <span class='ident'>u32</span>) <span class='op'>-&gt;</span> <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='kw'>Self</span> {
         <span class='self'>self</span>.<span class='ident'>pb_parallelism</span> <span class='op'>=</span> <span class='ident'>parallel</span>;
         <span class='self'>self</span>
     }
@@ -1096,8 +1096,8 @@
 
         <span class='ident'>origin</span>.<span class='ident'>fetch</span>(<span class='kw-2'>&amp;</span>[], <span class='prelude-val'>None</span>, <span class='prelude-val'>None</span>).<span class='ident'>unwrap</span>();
         <span class='ident'>origin</span>.<span class='ident'>fetch</span>(<span class='kw-2'>&amp;</span>[], <span class='prelude-val'>None</span>, <span class='prelude-val'>Some</span>(<span class='string'>&quot;foo&quot;</span>)).<span class='ident'>unwrap</span>();
-        <span class='ident'>origin</span>.<span class='ident'>update_tips</span>(<span class='prelude-val'>None</span>, <span class='boolvalue'>true</span>, <span class='ident'>AutotagOption</span>::<span class='ident'>Unspecified</span>, <span class='prelude-val'>None</span>).<span class='ident'>unwrap</span>();
-        <span class='ident'>origin</span>.<span class='ident'>update_tips</span>(<span class='prelude-val'>None</span>, <span class='boolvalue'>true</span>, <span class='ident'>AutotagOption</span>::<span class='ident'>All</span>, <span class='prelude-val'>Some</span>(<span class='string'>&quot;foo&quot;</span>)).<span class='ident'>unwrap</span>();
+        <span class='ident'>origin</span>.<span class='ident'>update_tips</span>(<span class='prelude-val'>None</span>, <span class='boolval'>true</span>, <span class='ident'>AutotagOption</span>::<span class='ident'>Unspecified</span>, <span class='prelude-val'>None</span>).<span class='ident'>unwrap</span>();
+        <span class='ident'>origin</span>.<span class='ident'>update_tips</span>(<span class='prelude-val'>None</span>, <span class='boolval'>true</span>, <span class='ident'>AutotagOption</span>::<span class='ident'>All</span>, <span class='prelude-val'>Some</span>(<span class='string'>&quot;foo&quot;</span>)).<span class='ident'>unwrap</span>();
 
         <span class='macro'>t</span><span class='macro'>!</span>(<span class='ident'>repo</span>.<span class='ident'>remote_add_fetch</span>(<span class='string'>&quot;origin&quot;</span>, <span class='string'>&quot;foo&quot;</span>));
         <span class='macro'>t</span><span class='macro'>!</span>(<span class='ident'>repo</span>.<span class='ident'>remote_add_fetch</span>(<span class='string'>&quot;origin&quot;</span>, <span class='string'>&quot;bar&quot;</span>));
@@ -1134,14 +1134,14 @@
         <span class='kw'>let</span> <span class='ident'>url</span> <span class='op'>=</span> ::<span class='ident'>test</span>::<span class='ident'>path2url</span>(<span class='kw-2'>&amp;</span><span class='ident'>td</span>.<span class='ident'>path</span>());
 
         <span class='kw'>let</span> <span class='ident'>repo</span> <span class='op'>=</span> <span class='ident'>Repository</span>::<span class='ident'>init</span>(<span class='ident'>td2</span>.<span class='ident'>path</span>()).<span class='ident'>unwrap</span>();
-        <span class='kw'>let</span> <span class='ident'>progress_hit</span> <span class='op'>=</span> <span class='ident'>Cell</span>::<span class='ident'>new</span>(<span class='boolvalue'>false</span>);
+        <span class='kw'>let</span> <span class='ident'>progress_hit</span> <span class='op'>=</span> <span class='ident'>Cell</span>::<span class='ident'>new</span>(<span class='boolval'>false</span>);
         {
             <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>callbacks</span> <span class='op'>=</span> <span class='ident'>RemoteCallbacks</span>::<span class='ident'>new</span>();
             <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>origin</span> <span class='op'>=</span> <span class='ident'>repo</span>.<span class='ident'>remote</span>(<span class='string'>&quot;origin&quot;</span>, <span class='kw-2'>&amp;</span><span class='ident'>url</span>).<span class='ident'>unwrap</span>();
 
             <span class='ident'>callbacks</span>.<span class='ident'>transfer_progress</span>(<span class='op'>|</span><span class='ident'>_progress</span><span class='op'>|</span> {
-                <span class='ident'>progress_hit</span>.<span class='ident'>set</span>(<span class='boolvalue'>true</span>);
-                <span class='boolvalue'>true</span>
+                <span class='ident'>progress_hit</span>.<span class='ident'>set</span>(<span class='boolval'>true</span>);
+                <span class='boolval'>true</span>
             });
             <span class='ident'>origin</span>.<span class='ident'>fetch</span>(<span class='kw-2'>&amp;</span>[],
                          <span class='prelude-val'>Some</span>(<span class='ident'>FetchOptions</span>::<span class='ident'>new</span>().<span class='ident'>remote_callbacks</span>(<span class='ident'>callbacks</span>)),

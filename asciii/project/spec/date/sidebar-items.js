@@ -1,1 +1,1 @@
-initSidebarItems({"fn":[["date",""],["event",""],["events",""],["invoice",""],["offer",""],["payed",""],["wages",""]],"type":[["DateRange",""],["DateRanges",""]]});
+initSidebarItems({"fn":[["date","When is the first event"],["event","Date of first event"],["events",""],["invoice","When was the invoice created"],["offer","When was the offer created"],["payed","When was the project payed"],["wages","When were the wages payed"]],"type":[["DateRange",""],["DateRanges",""]]});

@@ -374,7 +374,7 @@
 
 <span class='doccomment'>/// Gets `Some(Yaml::Hash)` or `None`.</span>
 <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>get_hash</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span>(<span class='ident'>yaml</span>:<span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>Yaml</span>, <span class='ident'>key</span>:<span class='kw-2'>&amp;</span><span class='ident'>str</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>BTreeMap</span><span class='op'>&lt;</span><span class='ident'>Yaml</span>,<span class='ident'>Yaml</span><span class='op'>&gt;&gt;</span> {
-    <span class='ident'>get</span>(<span class='kw-2'>&amp;</span><span class='ident'>yaml</span>,<span class='kw-2'>&amp;</span><span class='ident'>key</span>).<span class='ident'>and_then</span>(<span class='op'>|</span><span class='ident'>y</span><span class='op'>|</span><span class='ident'>y</span>.<span class='ident'>as_hash</span>())
+    <span class='ident'>get</span>(<span class='ident'>yaml</span>,<span class='ident'>key</span>).<span class='ident'>and_then</span>(<span class='op'>|</span><span class='ident'>y</span><span class='op'>|</span><span class='ident'>y</span>.<span class='ident'>as_hash</span>())
 }
 
 <span class='doccomment'>/// Gets a `Bool` value.</span>
@@ -383,7 +383,7 @@
 <span class='doccomment'>/// this will interpret `&quot;yes&quot;` and `&quot;no&quot;` as booleans, similar to `YAML1.1`.</span>
 <span class='doccomment'>/// Actually it will interpret any string but `&quot;yes&quot;` als `false`.</span>
 <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>get_bool</span>(<span class='ident'>yaml</span>:<span class='kw-2'>&amp;</span><span class='ident'>Yaml</span>, <span class='ident'>key</span>:<span class='kw-2'>&amp;</span><span class='ident'>str</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>bool</span><span class='op'>&gt;</span> {
-    <span class='ident'>get</span>(<span class='kw-2'>&amp;</span><span class='ident'>yaml</span>,<span class='kw-2'>&amp;</span><span class='ident'>key</span>)
+    <span class='ident'>get</span>(<span class='ident'>yaml</span>,<span class='ident'>key</span>)
         .<span class='ident'>and_then</span>(<span class='op'>|</span><span class='ident'>y</span><span class='op'>|</span> <span class='ident'>y</span>
                   .<span class='ident'>as_bool</span>()
                   <span class='comment'>// allowing it to be a str: &quot;yes&quot; or &quot;no&quot;</span>
@@ -391,9 +391,9 @@
                        .<span class='ident'>map</span>( <span class='op'>|</span><span class='ident'>yes_or_no</span><span class='op'>|</span>
                              <span class='kw'>match</span> <span class='ident'>yes_or_no</span>.<span class='ident'>to_lowercase</span>().<span class='ident'>as_ref</span>() <span class='comment'>// XXX ??? why as_ref?</span>
                              {
-                                 <span class='string'>&quot;yes&quot;</span> <span class='op'>=&gt;</span> <span class='boolvalue'>true</span>,
+                                 <span class='string'>&quot;yes&quot;</span> <span class='op'>=&gt;</span> <span class='boolval'>true</span>,
                                  <span class='comment'>//&quot;no&quot; =&gt; false,</span>
-                                 _ <span class='op'>=&gt;</span> <span class='boolvalue'>false</span>
+                                 _ <span class='op'>=&gt;</span> <span class='boolval'>false</span>
                              })
                      ))
 }
@@ -402,36 +402,36 @@
 <span class='doccomment'>///</span>
 <span class='doccomment'>/// Also takes a `Yaml::I64` and reinterprets it.</span>
 <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>get_f64</span>(<span class='ident'>yaml</span>:<span class='kw-2'>&amp;</span><span class='ident'>Yaml</span>, <span class='ident'>key</span>:<span class='kw-2'>&amp;</span><span class='ident'>str</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span> {
-    <span class='ident'>get</span>(<span class='kw-2'>&amp;</span><span class='ident'>yaml</span>,<span class='kw-2'>&amp;</span><span class='ident'>key</span>).<span class='ident'>and_then</span>(<span class='op'>|</span><span class='ident'>y</span><span class='op'>|</span> <span class='ident'>y</span>.<span class='ident'>as_f64</span>().<span class='ident'>or</span>( <span class='ident'>y</span>.<span class='ident'>as_i64</span>().<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>y</span><span class='op'>|</span><span class='ident'>y</span> <span class='kw'>as</span> <span class='ident'>f64</span>)))
+    <span class='ident'>get</span>(<span class='ident'>yaml</span>,<span class='ident'>key</span>).<span class='ident'>and_then</span>(<span class='op'>|</span><span class='ident'>y</span><span class='op'>|</span> <span class='ident'>y</span>.<span class='ident'>as_f64</span>().<span class='ident'>or</span>( <span class='ident'>y</span>.<span class='ident'>as_i64</span>().<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>y</span><span class='op'>|</span><span class='ident'>y</span> <span class='kw'>as</span> <span class='ident'>f64</span>)))
 }
 
 <span class='doccomment'>/// Gets an `Int` value.</span>
 <span class='doccomment'>///</span>
 <span class='doccomment'>/// Same mentality as `yaml_rust`, only returns `Some`, if it&#39;s a `Yaml::Int`.</span>
 <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>get_int</span>(<span class='ident'>yaml</span>:<span class='kw-2'>&amp;</span><span class='ident'>Yaml</span>, <span class='ident'>key</span>:<span class='kw-2'>&amp;</span><span class='ident'>str</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>i64</span><span class='op'>&gt;</span> {
-    <span class='ident'>get</span>(<span class='kw-2'>&amp;</span><span class='ident'>yaml</span>,<span class='kw-2'>&amp;</span><span class='ident'>key</span>).<span class='ident'>and_then</span>(<span class='op'>|</span><span class='ident'>y</span><span class='op'>|</span><span class='ident'>y</span>.<span class='ident'>as_i64</span>())
+    <span class='ident'>get</span>(<span class='ident'>yaml</span>,<span class='ident'>key</span>).<span class='ident'>and_then</span>(<span class='op'>|</span><span class='ident'>y</span><span class='op'>|</span><span class='ident'>y</span>.<span class='ident'>as_i64</span>())
 }
 
 <span class='doccomment'>/// Gets a `&amp;str` value.</span>
 <span class='doccomment'>///</span>
 <span class='doccomment'>/// Same mentality as `yaml_rust`, only returns `Some`, if it&#39;s a `Yaml::String`.</span>
 <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>get_str</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span>(<span class='ident'>yaml</span>:<span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>Yaml</span>, <span class='ident'>key</span>:<span class='kw-2'>&amp;</span><span class='ident'>str</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>str</span><span class='op'>&gt;</span> {
-    <span class='ident'>get</span>(<span class='kw-2'>&amp;</span><span class='ident'>yaml</span>,<span class='kw-2'>&amp;</span><span class='ident'>key</span>).<span class='ident'>and_then</span>(<span class='op'>|</span><span class='ident'>y</span><span class='op'>|</span><span class='ident'>y</span>.<span class='ident'>as_str</span>())
+    <span class='ident'>get</span>(<span class='ident'>yaml</span>,<span class='ident'>key</span>).<span class='ident'>and_then</span>(<span class='op'>|</span><span class='ident'>y</span><span class='op'>|</span><span class='ident'>y</span>.<span class='ident'>as_str</span>())
 }
 
 <span class='doccomment'>/// same as `get_str()`, but owned.</span>
 <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>get_string</span>(<span class='ident'>yaml</span>:<span class='kw-2'>&amp;</span><span class='ident'>Yaml</span>, <span class='ident'>key</span>:<span class='kw-2'>&amp;</span><span class='ident'>str</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>String</span><span class='op'>&gt;</span> {
-    <span class='ident'>get_str</span>(<span class='kw-2'>&amp;</span><span class='ident'>yaml</span>,<span class='kw-2'>&amp;</span><span class='ident'>key</span>).<span class='ident'>map</span>(<span class='ident'>ToOwned</span>::<span class='ident'>to_owned</span>)
+    <span class='ident'>get_str</span>(<span class='ident'>yaml</span>,<span class='ident'>key</span>).<span class='ident'>map</span>(<span class='ident'>ToOwned</span>::<span class='ident'>to_owned</span>)
 }
 
 <span class='doccomment'>/// Gets anything **as** `String`.</span>
 <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>get_as_string</span>(<span class='ident'>yaml</span>:<span class='kw-2'>&amp;</span><span class='ident'>Yaml</span>, <span class='ident'>key</span>:<span class='kw-2'>&amp;</span><span class='ident'>str</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>String</span><span class='op'>&gt;</span> {
-    <span class='ident'>get</span>(<span class='kw-2'>&amp;</span><span class='ident'>yaml</span>,<span class='kw-2'>&amp;</span><span class='ident'>key</span>).<span class='ident'>map</span>(<span class='ident'>ToString</span>::<span class='ident'>to_string</span>)
+    <span class='ident'>get</span>(<span class='ident'>yaml</span>,<span class='ident'>key</span>).<span class='ident'>map</span>(<span class='ident'>ToString</span>::<span class='ident'>to_string</span>)
 }
 
 <span class='doccomment'>/// Gets a Date in `dd.mm.YYYY` format.</span>
 <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>get_dmy</span>(<span class='ident'>yaml</span>:<span class='kw-2'>&amp;</span><span class='ident'>Yaml</span>, <span class='ident'>key</span>:<span class='kw-2'>&amp;</span><span class='ident'>str</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Date</span><span class='op'>&lt;</span><span class='ident'>UTC</span><span class='op'>&gt;&gt;</span> {
-    <span class='ident'>get</span>(<span class='kw-2'>&amp;</span><span class='ident'>yaml</span>,<span class='kw-2'>&amp;</span><span class='ident'>key</span>).<span class='ident'>and_then</span>(<span class='op'>|</span><span class='ident'>y</span><span class='op'>|</span><span class='ident'>y</span>.<span class='ident'>as_str</span>()).<span class='ident'>and_then</span>(<span class='op'>|</span><span class='ident'>d</span><span class='op'>|</span><span class='ident'>parse_dmy_date</span>(<span class='ident'>d</span>))
+    <span class='ident'>get</span>(<span class='ident'>yaml</span>,<span class='ident'>key</span>).<span class='ident'>and_then</span>(<span class='op'>|</span><span class='ident'>y</span><span class='op'>|</span><span class='ident'>y</span>.<span class='ident'>as_str</span>()).<span class='ident'>and_then</span>(<span class='op'>|</span><span class='ident'>d</span><span class='op'>|</span><span class='ident'>parse_dmy_date</span>(<span class='ident'>d</span>))
 }
 
 <span class='doccomment'>/// Wrapper around `get_path()`.</span>
@@ -439,7 +439,7 @@
 <span class='doccomment'>/// Splits path string</span>
 <span class='doccomment'>/// and replaces `Yaml::Null` and `Yaml::BadValue`.</span>
 <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>get</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span>(<span class='ident'>yaml</span>:<span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>Yaml</span>, <span class='ident'>key</span>:<span class='kw-2'>&amp;</span><span class='ident'>str</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>Yaml</span><span class='op'>&gt;</span>{
-    <span class='kw'>match</span> <span class='ident'>get_path</span>(<span class='kw-2'>&amp;</span><span class='ident'>yaml</span>, <span class='kw-2'>&amp;</span><span class='ident'>key</span>.<span class='ident'>split</span>(<span class='string'>&#39;/&#39;</span>).<span class='ident'>filter</span>(<span class='op'>|</span><span class='ident'>k</span><span class='op'>|</span><span class='op'>!</span><span class='ident'>k</span>.<span class='ident'>is_empty</span>()).<span class='ident'>collect</span>::<span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='ident'>str</span><span class='op'>&gt;&gt;</span>()) {
+    <span class='kw'>match</span> <span class='ident'>get_path</span>(<span class='ident'>yaml</span>, <span class='kw-2'>&amp;</span><span class='ident'>key</span>.<span class='ident'>split</span>(<span class='string'>&#39;/&#39;</span>).<span class='ident'>filter</span>(<span class='op'>|</span><span class='ident'>k</span><span class='op'>|</span><span class='op'>!</span><span class='ident'>k</span>.<span class='ident'>is_empty</span>()).<span class='ident'>collect</span>::<span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='ident'>str</span><span class='op'>&gt;&gt;</span>()) {
         <span class='prelude-val'>Some</span>(<span class='kw-2'>&amp;</span><span class='ident'>Yaml</span>::<span class='ident'>Null</span>) <span class='op'>|</span>
         <span class='prelude-val'>Some</span>(<span class='kw-2'>&amp;</span><span class='ident'>Yaml</span>::<span class='ident'>BadValue</span>) <span class='op'>=&gt;</span> <span class='prelude-val'>None</span>,
         <span class='ident'>content</span> <span class='op'>=&gt;</span> <span class='ident'>content</span>

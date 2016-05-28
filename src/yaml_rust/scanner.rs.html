@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="rustdoc">
-    <meta name="description" content="Source to the Rust file `/home/hendrik/.multirust/toolchains/nightly/cargo/git/checkouts/yaml-rust-7ea78ddceaf4cc2e/.cargo-lock-yaml-rust-7ea78ddceaf4cc2e-feature/feature/to_string/src/scanner.rs`.">
+    <meta name="description" content="Source to the Rust file `/home/hendrik/.cargo/git/checkouts/yaml-rust-cd4372d92c348ba0/.cargo-lock-yaml-rust-cd4372d92c348ba0-feature/feature/to_string/src/scanner.rs`.">
     <meta name="keywords" content="rust, rustlang, rust-lang">
 
     <title>scanner.rs.html -- source</title>
@@ -2143,8 +2143,8 @@
 <span class='kw'>impl</span> <span class='ident'>SimpleKey</span> {
     <span class='kw'>fn</span> <span class='ident'>new</span>(<span class='ident'>mark</span>: <span class='ident'>Marker</span>) <span class='op'>-&gt;</span> <span class='ident'>SimpleKey</span> {
         <span class='ident'>SimpleKey</span> {
-            <span class='ident'>possible</span>: <span class='boolvalue'>false</span>,
-            <span class='ident'>required</span>: <span class='boolvalue'>false</span>,
+            <span class='ident'>possible</span>: <span class='boolval'>false</span>,
+            <span class='ident'>required</span>: <span class='boolval'>false</span>,
             <span class='ident'>token_number</span>: <span class='number'>0</span>,
             <span class='ident'>mark</span>: <span class='ident'>mark</span>,
         }
@@ -2213,9 +2213,9 @@
 <span class='attribute'>#[<span class='ident'>inline</span>]</span>
 <span class='kw'>fn</span> <span class='ident'>is_alpha</span>(<span class='ident'>c</span>: <span class='ident'>char</span>) <span class='op'>-&gt;</span> <span class='ident'>bool</span> {
     <span class='kw'>match</span> <span class='ident'>c</span> {
-        <span class='string'>&#39;0&#39;</span>...<span class='string'>&#39;9&#39;</span> <span class='op'>|</span> <span class='string'>&#39;a&#39;</span>...<span class='string'>&#39;z&#39;</span> <span class='op'>|</span> <span class='string'>&#39;A&#39;</span>...<span class='string'>&#39;Z&#39;</span> <span class='op'>=&gt;</span> <span class='boolvalue'>true</span>,
-        <span class='string'>&#39;_&#39;</span> <span class='op'>|</span> <span class='string'>&#39;-&#39;</span> <span class='op'>=&gt;</span> <span class='boolvalue'>true</span>,
-        _ <span class='op'>=&gt;</span> <span class='boolvalue'>false</span>
+        <span class='string'>&#39;0&#39;</span>...<span class='string'>&#39;9&#39;</span> <span class='op'>|</span> <span class='string'>&#39;a&#39;</span>...<span class='string'>&#39;z&#39;</span> <span class='op'>|</span> <span class='string'>&#39;A&#39;</span>...<span class='string'>&#39;Z&#39;</span> <span class='op'>=&gt;</span> <span class='boolval'>true</span>,
+        <span class='string'>&#39;_&#39;</span> <span class='op'>|</span> <span class='string'>&#39;-&#39;</span> <span class='op'>=&gt;</span> <span class='boolval'>true</span>,
+        _ <span class='op'>=&gt;</span> <span class='boolval'>false</span>
     }
 }
 <span class='attribute'>#[<span class='ident'>inline</span>]</span>
@@ -2246,15 +2246,15 @@
             <span class='ident'>tokens</span>: <span class='ident'>VecDeque</span>::<span class='ident'>new</span>(),
             <span class='ident'>error</span>: <span class='prelude-val'>None</span>,
 
-            <span class='ident'>stream_start_produced</span>: <span class='boolvalue'>false</span>,
-            <span class='ident'>stream_end_produced</span>: <span class='boolvalue'>false</span>,
-            <span class='ident'>simple_key_allowed</span>: <span class='boolvalue'>true</span>,
+            <span class='ident'>stream_start_produced</span>: <span class='boolval'>false</span>,
+            <span class='ident'>stream_end_produced</span>: <span class='boolval'>false</span>,
+            <span class='ident'>simple_key_allowed</span>: <span class='boolval'>true</span>,
             <span class='ident'>simple_keys</span>: <span class='ident'>Vec</span>::<span class='ident'>new</span>(),
             <span class='ident'>indent</span>: <span class='op'>-</span><span class='number'>1</span>,
             <span class='ident'>indents</span>: <span class='ident'>Vec</span>::<span class='ident'>new</span>(),
             <span class='ident'>flow_level</span>: <span class='number'>0</span>,
             <span class='ident'>tokens_parsed</span>: <span class='number'>0</span>,
-            <span class='ident'>token_available</span>: <span class='boolvalue'>false</span>,
+            <span class='ident'>token_available</span>: <span class='boolval'>false</span>,
         }
     }
     <span class='attribute'>#[<span class='ident'>inline</span>]</span>
@@ -2342,10 +2342,10 @@
         }
     }
     <span class='kw'>fn</span> <span class='ident'>allow_simple_key</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) {
-            <span class='self'>self</span>.<span class='ident'>simple_key_allowed</span> <span class='op'>=</span> <span class='boolvalue'>true</span>;
+            <span class='self'>self</span>.<span class='ident'>simple_key_allowed</span> <span class='op'>=</span> <span class='boolval'>true</span>;
     }
     <span class='kw'>fn</span> <span class='ident'>disallow_simple_key</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) {
-            <span class='self'>self</span>.<span class='ident'>simple_key_allowed</span> <span class='op'>=</span> <span class='boolvalue'>false</span>;
+            <span class='self'>self</span>.<span class='ident'>simple_key_allowed</span> <span class='op'>=</span> <span class='boolval'>false</span>;
     }
 
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>fetch_next_token</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>ScanResult</span> {
@@ -2405,16 +2405,16 @@
             <span class='string'>&#39;?&#39;</span> <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>flow_level</span> <span class='op'>&gt;</span> <span class='number'>0</span> <span class='op'>||</span> <span class='ident'>is_blankz</span>(<span class='ident'>nc</span>) <span class='op'>=&gt;</span> <span class='self'>self</span>.<span class='ident'>fetch_key</span>(),
             <span class='string'>&#39;:&#39;</span> <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>flow_level</span> <span class='op'>&gt;</span> <span class='number'>0</span> <span class='op'>||</span> <span class='ident'>is_blankz</span>(<span class='ident'>nc</span>) <span class='op'>=&gt;</span> <span class='self'>self</span>.<span class='ident'>fetch_value</span>(),
             <span class='comment'>// Is it an alias?</span>
-            <span class='string'>&#39;*&#39;</span> <span class='op'>=&gt;</span> <span class='self'>self</span>.<span class='ident'>fetch_anchor</span>(<span class='boolvalue'>true</span>),
+            <span class='string'>&#39;*&#39;</span> <span class='op'>=&gt;</span> <span class='self'>self</span>.<span class='ident'>fetch_anchor</span>(<span class='boolval'>true</span>),
             <span class='comment'>// Is it an anchor?</span>
-            <span class='string'>&#39;&amp;&#39;</span> <span class='op'>=&gt;</span> <span class='self'>self</span>.<span class='ident'>fetch_anchor</span>(<span class='boolvalue'>false</span>),
+            <span class='string'>&#39;&amp;&#39;</span> <span class='op'>=&gt;</span> <span class='self'>self</span>.<span class='ident'>fetch_anchor</span>(<span class='boolval'>false</span>),
             <span class='string'>&#39;!&#39;</span> <span class='op'>=&gt;</span> <span class='self'>self</span>.<span class='ident'>fetch_tag</span>(),
             <span class='comment'>// Is it a literal scalar?</span>
-            <span class='string'>&#39;|&#39;</span> <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>flow_level</span> <span class='op'>==</span> <span class='number'>0</span> <span class='op'>=&gt;</span> <span class='self'>self</span>.<span class='ident'>fetch_block_scalar</span>(<span class='boolvalue'>true</span>),
+            <span class='string'>&#39;|&#39;</span> <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>flow_level</span> <span class='op'>==</span> <span class='number'>0</span> <span class='op'>=&gt;</span> <span class='self'>self</span>.<span class='ident'>fetch_block_scalar</span>(<span class='boolval'>true</span>),
             <span class='comment'>// Is it a folded scalar?</span>
-            <span class='string'>&#39;&gt;&#39;</span> <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>flow_level</span> <span class='op'>==</span> <span class='number'>0</span> <span class='op'>=&gt;</span> <span class='self'>self</span>.<span class='ident'>fetch_block_scalar</span>(<span class='boolvalue'>false</span>),
-            <span class='string'>&#39;\&#39;&#39;</span> <span class='op'>=&gt;</span> <span class='self'>self</span>.<span class='ident'>fetch_flow_scalar</span>(<span class='boolvalue'>true</span>),
-            <span class='string'>&#39;&quot;&#39;</span> <span class='op'>=&gt;</span> <span class='self'>self</span>.<span class='ident'>fetch_flow_scalar</span>(<span class='boolvalue'>false</span>),
+            <span class='string'>&#39;&gt;&#39;</span> <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>flow_level</span> <span class='op'>==</span> <span class='number'>0</span> <span class='op'>=&gt;</span> <span class='self'>self</span>.<span class='ident'>fetch_block_scalar</span>(<span class='boolval'>false</span>),
+            <span class='string'>&#39;\&#39;&#39;</span> <span class='op'>=&gt;</span> <span class='self'>self</span>.<span class='ident'>fetch_flow_scalar</span>(<span class='boolval'>true</span>),
+            <span class='string'>&#39;&quot;&#39;</span> <span class='op'>=&gt;</span> <span class='self'>self</span>.<span class='ident'>fetch_flow_scalar</span>(<span class='boolval'>false</span>),
             <span class='comment'>// plain scalar</span>
             <span class='string'>&#39;-&#39;</span> <span class='kw'>if</span> <span class='op'>!</span><span class='ident'>is_blankz</span>(<span class='ident'>nc</span>) <span class='op'>=&gt;</span> <span class='self'>self</span>.<span class='ident'>fetch_plain_scalar</span>(),
             <span class='string'>&#39;:&#39;</span> <span class='op'>|</span> <span class='string'>&#39;?&#39;</span> <span class='kw'>if</span> <span class='op'>!</span><span class='ident'>is_blankz</span>(<span class='ident'>nc</span>) <span class='op'>&amp;&amp;</span> <span class='self'>self</span>.<span class='ident'>flow_level</span> <span class='op'>==</span> <span class='number'>0</span> <span class='op'>=&gt;</span> <span class='self'>self</span>.<span class='ident'>fetch_plain_scalar</span>(),
@@ -2433,11 +2433,11 @@
             <span class='macro'>try</span><span class='macro'>!</span>(<span class='self'>self</span>.<span class='ident'>fetch_more_tokens</span>());
         }
         <span class='kw'>let</span> <span class='ident'>t</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>tokens</span>.<span class='ident'>pop_front</span>().<span class='ident'>unwrap</span>();
-        <span class='self'>self</span>.<span class='ident'>token_available</span> <span class='op'>=</span> <span class='boolvalue'>false</span>;
+        <span class='self'>self</span>.<span class='ident'>token_available</span> <span class='op'>=</span> <span class='boolval'>false</span>;
         <span class='self'>self</span>.<span class='ident'>tokens_parsed</span> <span class='op'>+=</span> <span class='number'>1</span>;
 
         <span class='kw'>if</span> <span class='kw'>let</span> <span class='ident'>TokenType</span>::<span class='ident'>StreamEnd</span> <span class='op'>=</span> <span class='ident'>t</span>.<span class='number'>1</span> {
-            <span class='self'>self</span>.<span class='ident'>stream_end_produced</span> <span class='op'>=</span> <span class='boolvalue'>true</span>;
+            <span class='self'>self</span>.<span class='ident'>stream_end_produced</span> <span class='op'>=</span> <span class='boolval'>true</span>;
         }
         <span class='prelude-val'>Ok</span>(<span class='prelude-val'>Some</span>(<span class='ident'>t</span>))
     }
@@ -2445,14 +2445,14 @@
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>fetch_more_tokens</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>ScanResult</span> {
         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>need_more</span>;
         <span class='kw'>loop</span> {
-            <span class='ident'>need_more</span> <span class='op'>=</span> <span class='boolvalue'>false</span>;
+            <span class='ident'>need_more</span> <span class='op'>=</span> <span class='boolval'>false</span>;
             <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>tokens</span>.<span class='ident'>is_empty</span>() {
-                <span class='ident'>need_more</span> <span class='op'>=</span> <span class='boolvalue'>true</span>;
+                <span class='ident'>need_more</span> <span class='op'>=</span> <span class='boolval'>true</span>;
             } <span class='kw'>else</span> {
                 <span class='macro'>try</span><span class='macro'>!</span>(<span class='self'>self</span>.<span class='ident'>stale_simple_keys</span>());
                 <span class='kw'>for</span> <span class='ident'>sk</span> <span class='kw'>in</span> <span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>simple_keys</span> {
                     <span class='kw'>if</span> <span class='ident'>sk</span>.<span class='ident'>possible</span> <span class='op'>&amp;&amp;</span> <span class='ident'>sk</span>.<span class='ident'>token_number</span> <span class='op'>==</span> <span class='self'>self</span>.<span class='ident'>tokens_parsed</span> {
-                        <span class='ident'>need_more</span> <span class='op'>=</span> <span class='boolvalue'>true</span>;
+                        <span class='ident'>need_more</span> <span class='op'>=</span> <span class='boolval'>true</span>;
                         <span class='kw'>break</span>;
                     }
                 }
@@ -2461,7 +2461,7 @@
             <span class='kw'>if</span> <span class='op'>!</span><span class='ident'>need_more</span> { <span class='kw'>break</span>; }
             <span class='macro'>try</span><span class='macro'>!</span>(<span class='self'>self</span>.<span class='ident'>fetch_next_token</span>());
         }
-        <span class='self'>self</span>.<span class='ident'>token_available</span> <span class='op'>=</span> <span class='boolvalue'>true</span>;
+        <span class='self'>self</span>.<span class='ident'>token_available</span> <span class='op'>=</span> <span class='boolval'>true</span>;
 
         <span class='prelude-val'>Ok</span>(())
     }
@@ -2473,7 +2473,7 @@
                     <span class='kw'>if</span> <span class='ident'>sk</span>.<span class='ident'>required</span> {
                         <span class='kw'>return</span> <span class='prelude-val'>Err</span>(<span class='ident'>ScanError</span>::<span class='ident'>new</span>(<span class='self'>self</span>.<span class='ident'>mark</span>, <span class='string'>&quot;simple key expect &#39;:&#39;&quot;</span>));
                     }
-                    <span class='ident'>sk</span>.<span class='ident'>possible</span> <span class='op'>=</span> <span class='boolvalue'>false</span>;
+                    <span class='ident'>sk</span>.<span class='ident'>possible</span> <span class='op'>=</span> <span class='boolval'>false</span>;
                 }
         }
         <span class='prelude-val'>Ok</span>(())
@@ -2502,7 +2502,7 @@
     <span class='kw'>fn</span> <span class='ident'>fetch_stream_start</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) {
         <span class='kw'>let</span> <span class='ident'>mark</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>mark</span>;
         <span class='self'>self</span>.<span class='ident'>indent</span> <span class='op'>=</span> <span class='op'>-</span><span class='number'>1</span>;
-        <span class='self'>self</span>.<span class='ident'>stream_start_produced</span> <span class='op'>=</span> <span class='boolvalue'>true</span>;
+        <span class='self'>self</span>.<span class='ident'>stream_start_produced</span> <span class='op'>=</span> <span class='boolval'>true</span>;
         <span class='self'>self</span>.<span class='ident'>allow_simple_key</span>();
         <span class='self'>self</span>.<span class='ident'>tokens</span>.<span class='ident'>push_back</span>(<span class='ident'>Token</span>(<span class='ident'>mark</span>, <span class='ident'>TokenType</span>::<span class='ident'>StreamStart</span>(<span class='ident'>TEncoding</span>::<span class='ident'>Utf8</span>)));
         <span class='self'>self</span>.<span class='ident'>simple_keys</span>.<span class='ident'>push</span>(<span class='ident'>SimpleKey</span>::<span class='ident'>new</span>(<span class='ident'>Marker</span>::<span class='ident'>new</span>(<span class='number'>0</span>,<span class='number'>0</span>,<span class='number'>0</span>)));
@@ -2665,7 +2665,7 @@
             <span class='self'>self</span>.<span class='ident'>skip</span>();
             <span class='self'>self</span>.<span class='ident'>lookahead</span>(<span class='number'>1</span>);
         }
-        <span class='kw'>let</span> <span class='ident'>handle</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='self'>self</span>.<span class='ident'>scan_tag_handle</span>(<span class='boolvalue'>true</span>, <span class='ident'>mark</span>));
+        <span class='kw'>let</span> <span class='ident'>handle</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='self'>self</span>.<span class='ident'>scan_tag_handle</span>(<span class='boolval'>true</span>, <span class='ident'>mark</span>));
 
         <span class='self'>self</span>.<span class='ident'>lookahead</span>(<span class='number'>1</span>);
         <span class='comment'>/* Eat whitespaces. */</span>
@@ -2675,7 +2675,7 @@
         }
 
         <span class='kw'>let</span> <span class='ident'>is_secondary</span> <span class='op'>=</span> <span class='ident'>handle</span> <span class='op'>==</span> <span class='string'>&quot;!!&quot;</span>;
-        <span class='kw'>let</span> <span class='ident'>prefix</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='self'>self</span>.<span class='ident'>scan_tag_uri</span>(<span class='boolvalue'>true</span>, <span class='ident'>is_secondary</span>, <span class='kw-2'>&amp;</span><span class='ident'>String</span>::<span class='ident'>new</span>(), <span class='ident'>mark</span>));
+        <span class='kw'>let</span> <span class='ident'>prefix</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='self'>self</span>.<span class='ident'>scan_tag_uri</span>(<span class='boolval'>true</span>, <span class='ident'>is_secondary</span>, <span class='kw-2'>&amp;</span><span class='ident'>String</span>::<span class='ident'>new</span>(), <span class='ident'>mark</span>));
 
         <span class='self'>self</span>.<span class='ident'>lookahead</span>(<span class='number'>1</span>);
 
@@ -2700,7 +2700,7 @@
         <span class='kw'>let</span> <span class='ident'>start_mark</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>mark</span>;
         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>handle</span> <span class='op'>=</span> <span class='ident'>String</span>::<span class='ident'>new</span>();
         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>suffix</span>;
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>secondary</span> <span class='op'>=</span> <span class='boolvalue'>false</span>;
+        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>secondary</span> <span class='op'>=</span> <span class='boolval'>false</span>;
 
         <span class='comment'>// Check if the tag is in the canonical form (verbatim).</span>
         <span class='self'>self</span>.<span class='ident'>lookahead</span>(<span class='number'>2</span>);
@@ -2709,7 +2709,7 @@
             <span class='comment'>// Eat &#39;!&lt;&#39;</span>
             <span class='self'>self</span>.<span class='ident'>skip</span>();
             <span class='self'>self</span>.<span class='ident'>skip</span>();
-            <span class='ident'>suffix</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='self'>self</span>.<span class='ident'>scan_tag_uri</span>(<span class='boolvalue'>false</span>, <span class='boolvalue'>false</span>, <span class='kw-2'>&amp;</span><span class='ident'>String</span>::<span class='ident'>new</span>(), <span class='kw-2'>&amp;</span><span class='ident'>start_mark</span>));
+            <span class='ident'>suffix</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='self'>self</span>.<span class='ident'>scan_tag_uri</span>(<span class='boolval'>false</span>, <span class='boolval'>false</span>, <span class='kw-2'>&amp;</span><span class='ident'>String</span>::<span class='ident'>new</span>(), <span class='kw-2'>&amp;</span><span class='ident'>start_mark</span>));
 
             <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>ch</span>() <span class='op'>!=</span> <span class='string'>&#39;&gt;&#39;</span> {
                 <span class='kw'>return</span> <span class='prelude-val'>Err</span>(<span class='ident'>ScanError</span>::<span class='ident'>new</span>(<span class='ident'>start_mark</span>,
@@ -2719,15 +2719,15 @@
             <span class='self'>self</span>.<span class='ident'>skip</span>();
         } <span class='kw'>else</span> {
             <span class='comment'>// The tag has either the &#39;!suffix&#39; or the &#39;!handle!suffix&#39;</span>
-            <span class='ident'>handle</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='self'>self</span>.<span class='ident'>scan_tag_handle</span>(<span class='boolvalue'>false</span>, <span class='kw-2'>&amp;</span><span class='ident'>start_mark</span>));
+            <span class='ident'>handle</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='self'>self</span>.<span class='ident'>scan_tag_handle</span>(<span class='boolval'>false</span>, <span class='kw-2'>&amp;</span><span class='ident'>start_mark</span>));
             <span class='comment'>// Check if it is, indeed, handle.</span>
             <span class='kw'>if</span> <span class='ident'>handle</span>.<span class='ident'>len</span>() <span class='op'>&gt;=</span> <span class='number'>2</span> <span class='op'>&amp;&amp;</span> <span class='ident'>handle</span>.<span class='ident'>starts_with</span>(<span class='string'>&#39;!&#39;</span>) <span class='op'>&amp;&amp;</span> <span class='ident'>handle</span>.<span class='ident'>ends_with</span>(<span class='string'>&#39;!&#39;</span>) {
                 <span class='kw'>if</span> <span class='ident'>handle</span> <span class='op'>==</span> <span class='string'>&quot;!!&quot;</span> {
-                    <span class='ident'>secondary</span> <span class='op'>=</span> <span class='boolvalue'>true</span>;
+                    <span class='ident'>secondary</span> <span class='op'>=</span> <span class='boolval'>true</span>;
                 }
-                <span class='ident'>suffix</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='self'>self</span>.<span class='ident'>scan_tag_uri</span>(<span class='boolvalue'>false</span>, <span class='ident'>secondary</span>, <span class='kw-2'>&amp;</span><span class='ident'>String</span>::<span class='ident'>new</span>(), <span class='kw-2'>&amp;</span><span class='ident'>start_mark</span>));
+                <span class='ident'>suffix</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='self'>self</span>.<span class='ident'>scan_tag_uri</span>(<span class='boolval'>false</span>, <span class='ident'>secondary</span>, <span class='kw-2'>&amp;</span><span class='ident'>String</span>::<span class='ident'>new</span>(), <span class='kw-2'>&amp;</span><span class='ident'>start_mark</span>));
             } <span class='kw'>else</span> {
-                <span class='ident'>suffix</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='self'>self</span>.<span class='ident'>scan_tag_uri</span>(<span class='boolvalue'>false</span>, <span class='boolvalue'>false</span>, <span class='kw-2'>&amp;</span><span class='ident'>handle</span>, <span class='kw-2'>&amp;</span><span class='ident'>start_mark</span>));
+                <span class='ident'>suffix</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='self'>self</span>.<span class='ident'>scan_tag_uri</span>(<span class='boolval'>false</span>, <span class='boolval'>false</span>, <span class='kw-2'>&amp;</span><span class='ident'>handle</span>, <span class='kw-2'>&amp;</span><span class='ident'>start_mark</span>));
                 <span class='ident'>handle</span> <span class='op'>=</span> <span class='string'>&quot;!&quot;</span>.<span class='ident'>to_owned</span>();
                 <span class='comment'>// A special case: the &#39;!&#39; tag.  Set the handle to &#39;&#39; and the</span>
                 <span class='comment'>// suffix to &#39;!&#39;.</span>
@@ -2800,11 +2800,11 @@
          *      &#39;%&#39;.
          */</span>
         <span class='kw'>while</span> <span class='kw'>match</span> <span class='self'>self</span>.<span class='ident'>ch</span>() {
-            <span class='string'>&#39;;&#39;</span> <span class='op'>|</span> <span class='string'>&#39;/&#39;</span> <span class='op'>|</span> <span class='string'>&#39;?&#39;</span> <span class='op'>|</span> <span class='string'>&#39;:&#39;</span> <span class='op'>|</span> <span class='string'>&#39;@&#39;</span> <span class='op'>|</span> <span class='string'>&#39;&amp;&#39;</span> <span class='op'>=&gt;</span> <span class='boolvalue'>true</span>,
-            <span class='string'>&#39;=&#39;</span> <span class='op'>|</span> <span class='string'>&#39;+&#39;</span> <span class='op'>|</span> <span class='string'>&#39;$&#39;</span> <span class='op'>|</span> <span class='string'>&#39;,&#39;</span> <span class='op'>|</span> <span class='string'>&#39;.&#39;</span> <span class='op'>|</span> <span class='string'>&#39;!&#39;</span> <span class='op'>|</span> <span class='string'>&#39;~&#39;</span> <span class='op'>|</span> <span class='string'>&#39;*&#39;</span> <span class='op'>|</span> <span class='string'>&#39;\&#39;&#39;</span> <span class='op'>|</span> <span class='string'>&#39;(&#39;</span> <span class='op'>|</span> <span class='string'>&#39;)&#39;</span> <span class='op'>|</span> <span class='string'>&#39;[&#39;</span> <span class='op'>|</span> <span class='string'>&#39;]&#39;</span> <span class='op'>=&gt;</span> <span class='boolvalue'>true</span>,
-            <span class='string'>&#39;%&#39;</span> <span class='op'>=&gt;</span> <span class='boolvalue'>true</span>,
-            <span class='ident'>c</span> <span class='kw'>if</span> <span class='ident'>is_alpha</span>(<span class='ident'>c</span>) <span class='op'>=&gt;</span> <span class='boolvalue'>true</span>,
-            _ <span class='op'>=&gt;</span> <span class='boolvalue'>false</span>
+            <span class='string'>&#39;;&#39;</span> <span class='op'>|</span> <span class='string'>&#39;/&#39;</span> <span class='op'>|</span> <span class='string'>&#39;?&#39;</span> <span class='op'>|</span> <span class='string'>&#39;:&#39;</span> <span class='op'>|</span> <span class='string'>&#39;@&#39;</span> <span class='op'>|</span> <span class='string'>&#39;&amp;&#39;</span> <span class='op'>=&gt;</span> <span class='boolval'>true</span>,
+            <span class='string'>&#39;=&#39;</span> <span class='op'>|</span> <span class='string'>&#39;+&#39;</span> <span class='op'>|</span> <span class='string'>&#39;$&#39;</span> <span class='op'>|</span> <span class='string'>&#39;,&#39;</span> <span class='op'>|</span> <span class='string'>&#39;.&#39;</span> <span class='op'>|</span> <span class='string'>&#39;!&#39;</span> <span class='op'>|</span> <span class='string'>&#39;~&#39;</span> <span class='op'>|</span> <span class='string'>&#39;*&#39;</span> <span class='op'>|</span> <span class='string'>&#39;\&#39;&#39;</span> <span class='op'>|</span> <span class='string'>&#39;(&#39;</span> <span class='op'>|</span> <span class='string'>&#39;)&#39;</span> <span class='op'>|</span> <span class='string'>&#39;[&#39;</span> <span class='op'>|</span> <span class='string'>&#39;]&#39;</span> <span class='op'>=&gt;</span> <span class='boolval'>true</span>,
+            <span class='string'>&#39;%&#39;</span> <span class='op'>=&gt;</span> <span class='boolval'>true</span>,
+            <span class='ident'>c</span> <span class='kw'>if</span> <span class='ident'>is_alpha</span>(<span class='ident'>c</span>) <span class='op'>=&gt;</span> <span class='boolval'>true</span>,
+            _ <span class='op'>=&gt;</span> <span class='boolval'>false</span>
         } {
             <span class='comment'>// Check if it is a URI-escape sequence.</span>
             <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>ch</span>() <span class='op'>==</span> <span class='string'>&#39;%&#39;</span> {
@@ -2904,9 +2904,9 @@
 
         <span class='kw'>if</span> <span class='ident'>string</span>.<span class='ident'>is_empty</span>()
             <span class='op'>||</span> <span class='kw'>match</span> <span class='self'>self</span>.<span class='ident'>ch</span>() {
-                <span class='ident'>c</span> <span class='kw'>if</span> <span class='ident'>is_blankz</span>(<span class='ident'>c</span>) <span class='op'>=&gt;</span> <span class='boolvalue'>false</span>,
-                <span class='string'>&#39;?&#39;</span> <span class='op'>|</span> <span class='string'>&#39;:&#39;</span> <span class='op'>|</span> <span class='string'>&#39;,&#39;</span> <span class='op'>|</span> <span class='string'>&#39;]&#39;</span> <span class='op'>|</span> <span class='string'>&#39;}&#39;</span> <span class='op'>|</span> <span class='string'>&#39;%&#39;</span> <span class='op'>|</span> <span class='string'>&#39;@&#39;</span> <span class='op'>|</span> <span class='string'>&#39;`&#39;</span> <span class='op'>=&gt;</span> <span class='boolvalue'>false</span>,
-                _ <span class='op'>=&gt;</span> <span class='boolvalue'>true</span>
+                <span class='ident'>c</span> <span class='kw'>if</span> <span class='ident'>is_blankz</span>(<span class='ident'>c</span>) <span class='op'>=&gt;</span> <span class='boolval'>false</span>,
+                <span class='string'>&#39;?&#39;</span> <span class='op'>|</span> <span class='string'>&#39;:&#39;</span> <span class='op'>|</span> <span class='string'>&#39;,&#39;</span> <span class='op'>|</span> <span class='string'>&#39;]&#39;</span> <span class='op'>|</span> <span class='string'>&#39;}&#39;</span> <span class='op'>|</span> <span class='string'>&#39;%&#39;</span> <span class='op'>|</span> <span class='string'>&#39;@&#39;</span> <span class='op'>|</span> <span class='string'>&#39;`&#39;</span> <span class='op'>=&gt;</span> <span class='boolval'>false</span>,
+                _ <span class='op'>=&gt;</span> <span class='boolval'>true</span>
             } {
             <span class='kw'>return</span> <span class='prelude-val'>Err</span>(<span class='ident'>ScanError</span>::<span class='ident'>new</span>(<span class='ident'>start_mark</span>, <span class='string'>&quot;while scanning an anchor or alias, did not find expected alphabetic or numeric character&quot;</span>));
         }
@@ -3023,7 +3023,7 @@
         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>increment</span>: <span class='ident'>usize</span> <span class='op'>=</span> <span class='number'>0</span>;
         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>indent</span>: <span class='ident'>usize</span> <span class='op'>=</span> <span class='number'>0</span>;
         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>trailing_blank</span>: <span class='ident'>bool</span>;
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>leading_blank</span>: <span class='ident'>bool</span> <span class='op'>=</span> <span class='boolvalue'>false</span>;
+        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>leading_blank</span>: <span class='ident'>bool</span> <span class='op'>=</span> <span class='boolval'>false</span>;
 
         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>string</span> <span class='op'>=</span> <span class='ident'>String</span>::<span class='ident'>new</span>();
         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>leading_break</span> <span class='op'>=</span> <span class='ident'>String</span>::<span class='ident'>new</span>();
@@ -3241,7 +3241,7 @@
 
             <span class='self'>self</span>.<span class='ident'>lookahead</span>(<span class='number'>2</span>);
 
-            <span class='ident'>leading_blanks</span> <span class='op'>=</span> <span class='boolvalue'>false</span>;
+            <span class='ident'>leading_blanks</span> <span class='op'>=</span> <span class='boolval'>false</span>;
             <span class='comment'>// Consume non-blank characters.</span>
 
             <span class='kw'>while</span> <span class='op'>!</span><span class='ident'>is_blankz</span>(<span class='self'>self</span>.<span class='ident'>ch</span>()) {
@@ -3260,7 +3260,7 @@
                         <span class='self'>self</span>.<span class='ident'>lookahead</span>(<span class='number'>3</span>);
                         <span class='self'>self</span>.<span class='ident'>skip</span>();
                         <span class='self'>self</span>.<span class='ident'>skip_line</span>();
-                        <span class='ident'>leading_blanks</span> <span class='op'>=</span> <span class='boolvalue'>true</span>;
+                        <span class='ident'>leading_blanks</span> <span class='op'>=</span> <span class='boolval'>true</span>;
                         <span class='kw'>break</span>;
                     }
                     <span class='comment'>// Check for an escape sequence.</span>
@@ -3351,7 +3351,7 @@
                     } <span class='kw'>else</span> {
                         <span class='ident'>whitespaces</span>.<span class='ident'>clear</span>();
                         <span class='self'>self</span>.<span class='ident'>read_break</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>leading_break</span>);
-                        <span class='ident'>leading_blanks</span> <span class='op'>=</span> <span class='boolvalue'>true</span>;
+                        <span class='ident'>leading_blanks</span> <span class='op'>=</span> <span class='boolval'>true</span>;
                     }
                 }
                 <span class='self'>self</span>.<span class='ident'>lookahead</span>(<span class='number'>1</span>);
@@ -3406,7 +3406,7 @@
         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>leading_break</span> <span class='op'>=</span> <span class='ident'>String</span>::<span class='ident'>new</span>();
         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>trailing_breaks</span> <span class='op'>=</span> <span class='ident'>String</span>::<span class='ident'>new</span>();
         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>whitespaces</span> <span class='op'>=</span> <span class='ident'>String</span>::<span class='ident'>new</span>();
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>leading_blanks</span> <span class='op'>=</span> <span class='boolvalue'>false</span>;
+        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>leading_blanks</span> <span class='op'>=</span> <span class='boolval'>false</span>;
 
         <span class='kw'>loop</span> {
             <span class='comment'>/* Check for a document indicator. */</span>
@@ -3454,7 +3454,7 @@
                             <span class='ident'>leading_break</span>.<span class='ident'>clear</span>();
 
                         }
-                        <span class='ident'>leading_blanks</span> <span class='op'>=</span> <span class='boolvalue'>false</span>;
+                        <span class='ident'>leading_blanks</span> <span class='op'>=</span> <span class='boolval'>false</span>;
                     } <span class='kw'>else</span> {
                         <span class='ident'>string</span>.<span class='ident'>extend</span>(<span class='ident'>whitespaces</span>.<span class='ident'>chars</span>());
                         <span class='ident'>whitespaces</span>.<span class='ident'>clear</span>();
@@ -3491,7 +3491,7 @@
                     } <span class='kw'>else</span> {
                         <span class='ident'>whitespaces</span>.<span class='ident'>clear</span>();
                         <span class='self'>self</span>.<span class='ident'>read_break</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>leading_break</span>);
-                        <span class='ident'>leading_blanks</span> <span class='op'>=</span> <span class='boolvalue'>true</span>;
+                        <span class='ident'>leading_blanks</span> <span class='op'>=</span> <span class='boolval'>true</span>;
                     }
                 }
                 <span class='self'>self</span>.<span class='ident'>lookahead</span>(<span class='number'>1</span>);
@@ -3547,7 +3547,7 @@
             <span class='self'>self</span>.<span class='ident'>roll_indent</span>(<span class='ident'>sk</span>.<span class='ident'>mark</span>.<span class='ident'>col</span>, <span class='prelude-val'>Some</span>(<span class='ident'>sk</span>.<span class='ident'>token_number</span>),
                 <span class='ident'>TokenType</span>::<span class='ident'>BlockMappingStart</span>, <span class='ident'>start_mark</span>);
 
-            <span class='self'>self</span>.<span class='ident'>simple_keys</span>.<span class='ident'>last_mut</span>().<span class='ident'>unwrap</span>().<span class='ident'>possible</span> <span class='op'>=</span> <span class='boolvalue'>false</span>;
+            <span class='self'>self</span>.<span class='ident'>simple_keys</span>.<span class='ident'>last_mut</span>().<span class='ident'>unwrap</span>().<span class='ident'>possible</span> <span class='op'>=</span> <span class='boolval'>false</span>;
             <span class='self'>self</span>.<span class='ident'>disallow_simple_key</span>();
         } <span class='kw'>else</span> {
             <span class='comment'>// The &#39;:&#39; indicator follows a complex key.</span>
@@ -3604,7 +3604,7 @@
         <span class='kw'>let</span> <span class='ident'>required</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>flow_level</span> <span class='op'>&gt;</span> <span class='number'>0</span> <span class='op'>&amp;&amp;</span> <span class='self'>self</span>.<span class='ident'>indent</span> <span class='op'>==</span> (<span class='self'>self</span>.<span class='ident'>mark</span>.<span class='ident'>col</span> <span class='kw'>as</span> <span class='ident'>isize</span>);
         <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>simple_key_allowed</span> {
             <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>sk</span> <span class='op'>=</span> <span class='ident'>SimpleKey</span>::<span class='ident'>new</span>(<span class='self'>self</span>.<span class='ident'>mark</span>);
-            <span class='ident'>sk</span>.<span class='ident'>possible</span> <span class='op'>=</span> <span class='boolvalue'>true</span>;
+            <span class='ident'>sk</span>.<span class='ident'>possible</span> <span class='op'>=</span> <span class='boolval'>true</span>;
             <span class='ident'>sk</span>.<span class='ident'>required</span> <span class='op'>=</span> <span class='ident'>required</span>;
             <span class='ident'>sk</span>.<span class='ident'>token_number</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>tokens_parsed</span> <span class='op'>+</span> <span class='self'>self</span>.<span class='ident'>tokens</span>.<span class='ident'>len</span>();
 
@@ -3622,7 +3622,7 @@
             <span class='kw'>return</span> <span class='prelude-val'>Err</span>(<span class='ident'>ScanError</span>::<span class='ident'>new</span>(<span class='self'>self</span>.<span class='ident'>mark</span>, <span class='string'>&quot;simple key expected&quot;</span>));
         }
 
-        <span class='ident'>last</span>.<span class='ident'>possible</span> <span class='op'>=</span> <span class='boolvalue'>false</span>;
+        <span class='ident'>last</span>.<span class='ident'>possible</span> <span class='op'>=</span> <span class='boolval'>false</span>;
         <span class='prelude-val'>Ok</span>(())
     }
 
@@ -3630,8 +3630,8 @@
 
 <span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>test</span>)]</span>
 <span class='kw'>mod</span> <span class='ident'>test</span> {
-    <span class='kw'>use</span> <span class='kw'>super</span>::<span class='op'>*</span>;
-    <span class='kw'>use</span> <span class='kw'>super</span>::<span class='ident'>TokenType</span>::<span class='op'>*</span>;
+    <span class='kw'>use</span> <span class='ident'>super</span>::<span class='op'>*</span>;
+    <span class='kw'>use</span> <span class='ident'>super</span>::<span class='ident'>TokenType</span>::<span class='op'>*</span>;
 
 <span class='macro'>macro_rules</span><span class='macro'>!</span> <span class='ident'>next</span> {
     (<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>p</span>:<span class='ident'>ident</span>, <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>tk</span>:<span class='ident'>pat</span>) <span class='op'>=&gt;</span> {{

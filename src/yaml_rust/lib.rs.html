@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="rustdoc">
-    <meta name="description" content="Source to the Rust file `/home/hendrik/.multirust/toolchains/nightly/cargo/git/checkouts/yaml-rust-7ea78ddceaf4cc2e/.cargo-lock-yaml-rust-7ea78ddceaf4cc2e-feature/feature/to_string/src/lib.rs`.">
+    <meta name="description" content="Source to the Rust file `/home/hendrik/.cargo/git/checkouts/yaml-rust-cd4372d92c348ba0/.cargo-lock-yaml-rust-cd4372d92c348ba0-feature/feature/to_string/src/lib.rs`.">
     <meta name="keywords" content="rust, rustlang, rust-lang">
 
     <title>lib.rs.html -- source</title>
@@ -251,7 +251,7 @@
 
 <span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>test</span>)]</span>
 <span class='kw'>mod</span> <span class='ident'>tests</span> {
-    <span class='kw'>use</span> <span class='kw'>super</span>::<span class='op'>*</span>;
+    <span class='kw'>use</span> <span class='ident'>super</span>::<span class='op'>*</span>;
 
     <span class='attribute'>#[<span class='ident'>test</span>]</span>
     <span class='kw'>fn</span> <span class='ident'>test_api</span>() {
@@ -320,13 +320,13 @@ key1:a2
 
         <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>Yaml</span>::<span class='ident'>String</span>(<span class='ident'>String</span>::<span class='ident'>from</span>(<span class='string'>&quot;Hello World&quot;</span>)).<span class='ident'>to_string</span>(), <span class='ident'>String</span>::<span class='ident'>from</span>(<span class='string'>&quot;Hello World&quot;</span>));
 
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>Yaml</span>::<span class='ident'>Boolean</span>(<span class='boolvalue'>true</span>).<span class='ident'>to_string</span>(), <span class='ident'>String</span>::<span class='ident'>from</span>(<span class='string'>&quot;true&quot;</span>));
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>Yaml</span>::<span class='ident'>Boolean</span>(<span class='boolval'>true</span>).<span class='ident'>to_string</span>(), <span class='ident'>String</span>::<span class='ident'>from</span>(<span class='string'>&quot;true&quot;</span>));
 
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>Yaml</span>::<span class='ident'>Boolean</span>(<span class='boolvalue'>false</span>).<span class='ident'>to_string</span>(), <span class='ident'>String</span>::<span class='ident'>from</span>(<span class='string'>&quot;false&quot;</span>));
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>Yaml</span>::<span class='ident'>Boolean</span>(<span class='boolval'>false</span>).<span class='ident'>to_string</span>(), <span class='ident'>String</span>::<span class='ident'>from</span>(<span class='string'>&quot;false&quot;</span>));
 
         <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>Yaml</span>::<span class='ident'>Array</span>(<span class='macro'>vec</span><span class='macro'>!</span>[
-                               <span class='ident'>Yaml</span>::<span class='ident'>Boolean</span>(<span class='boolvalue'>true</span>),
-                               <span class='ident'>Yaml</span>::<span class='ident'>Boolean</span>(<span class='boolvalue'>false</span>),
+                               <span class='ident'>Yaml</span>::<span class='ident'>Boolean</span>(<span class='boolval'>true</span>),
+                               <span class='ident'>Yaml</span>::<span class='ident'>Boolean</span>(<span class='boolval'>false</span>),
                                <span class='ident'>Yaml</span>::<span class='ident'>Integer</span>(<span class='number'>4711</span>),
                                <span class='ident'>Yaml</span>::<span class='ident'>String</span>(<span class='ident'>String</span>::<span class='ident'>from</span>(<span class='string'>&quot;Hello World&quot;</span>))
         ]).<span class='ident'>to_string</span>(),
@@ -334,7 +334,7 @@ key1:a2
 
         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>hash</span> <span class='op'>=</span> <span class='ident'>yaml</span>::<span class='ident'>Hash</span>::<span class='ident'>new</span>();
         <span class='ident'>hash</span>.<span class='ident'>insert</span>(<span class='ident'>Yaml</span>::<span class='ident'>from_str</span>(<span class='string'>&quot;dog&quot;</span>), <span class='ident'>Yaml</span>::<span class='ident'>from_str</span>(<span class='string'>&quot;lassy&quot;</span>) );
-        <span class='ident'>hash</span>.<span class='ident'>insert</span>(<span class='ident'>Yaml</span>::<span class='ident'>from_str</span>(<span class='string'>&quot;love&quot;</span>), <span class='ident'>Yaml</span>::<span class='ident'>Boolean</span>(<span class='boolvalue'>true</span>) );
+        <span class='ident'>hash</span>.<span class='ident'>insert</span>(<span class='ident'>Yaml</span>::<span class='ident'>from_str</span>(<span class='string'>&quot;love&quot;</span>), <span class='ident'>Yaml</span>::<span class='ident'>Boolean</span>(<span class='boolval'>true</span>) );
         <span class='ident'>hash</span>.<span class='ident'>insert</span>(<span class='ident'>Yaml</span>::<span class='ident'>from_str</span>(<span class='string'>&quot;number&quot;</span>), <span class='ident'>Yaml</span>::<span class='ident'>Integer</span>(<span class='number'>42</span>) );
         <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>Yaml</span>::<span class='ident'>Hash</span>(<span class='ident'>hash</span>).<span class='ident'>to_string</span>(), <span class='ident'>String</span>::<span class='ident'>from</span>(<span class='string'>&quot;dog: lassy, love: true, number: 42&quot;</span>));
     }

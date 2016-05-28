@@ -365,8 +365,6 @@
 <span id="321">321</span>
 <span id="322">322</span>
 <span id="323">323</span>
-<span id="324">324</span>
-<span id="325">325</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! All the printing code lives here.</span>
 
@@ -405,12 +403,10 @@
 <span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span> <span class='ident'>Default</span> <span class='kw'>for</span> <span class='ident'>ListConfig</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span>{
     <span class='kw'>fn</span> <span class='ident'>default</span>() <span class='op'>-&gt;</span> <span class='ident'>ListConfig</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span>{
         <span class='ident'>ListConfig</span>{
-            <span class='ident'>mode</span>:         <span class='kw'>if</span> ::<span class='ident'>CONFIG</span>.<span class='ident'>get_bool</span>(<span class='string'>&quot;list/verbose&quot;</span>){ <span class='ident'>ListMode</span>::<span class='ident'>Verbose</span> }
-                          <span class='kw'>else</span>{ <span class='ident'>ListMode</span>::<span class='ident'>Simple</span> },
+            <span class='ident'>mode</span>:         <span class='kw'>if</span> ::<span class='ident'>CONFIG</span>.<span class='ident'>get_bool</span>(<span class='string'>&quot;list/verbose&quot;</span>){ <span class='ident'>ListMode</span>::<span class='ident'>Verbose</span> } <span class='kw'>else</span>{ <span class='ident'>ListMode</span>::<span class='ident'>Simple</span> },
             <span class='ident'>git_status</span>:   ::<span class='ident'>CONFIG</span>.<span class='ident'>get_bool</span>(<span class='string'>&quot;list/gitstatus&quot;</span>),
-            <span class='ident'>show_errors</span>:  <span class='boolvalue'>false</span>,
-            <span class='ident'>sort_by</span>:      ::<span class='ident'>CONFIG</span>.<span class='ident'>get_str</span>(<span class='string'>&quot;list/sort&quot;</span>)
-                .<span class='ident'>expect</span>(<span class='string'>&quot;Faulty config: list/sort does not contain a value&quot;</span>),
+            <span class='ident'>show_errors</span>:  <span class='boolval'>false</span>,
+            <span class='ident'>sort_by</span>:      ::<span class='ident'>CONFIG</span>.<span class='ident'>get_str</span>(<span class='string'>&quot;list/sort&quot;</span>).<span class='ident'>expect</span>(<span class='string'>&quot;Faulty config: list/sort does not contain a value&quot;</span>),
             <span class='ident'>filter_by</span>:    <span class='prelude-val'>None</span>,
             <span class='ident'>use_colors</span>:   ::<span class='ident'>CONFIG</span>.<span class='ident'>get_bool</span>(<span class='string'>&quot;list/colors&quot;</span>),
             <span class='ident'>details</span>:      <span class='prelude-val'>None</span>,
@@ -418,7 +414,6 @@
     }
 }
 
-<span class='attribute'>#[<span class='ident'>inline</span>]</span>
 <span class='kw'>fn</span> <span class='ident'>result_to_cell</span>(<span class='ident'>res</span>:<span class='kw-2'>&amp;</span><span class='prelude-ty'>Result</span><span class='op'>&lt;</span>(), <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='ident'>str</span><span class='op'>&gt;&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>Cell</span>{
     <span class='kw'>match</span> <span class='op'>*</span><span class='ident'>res</span>{
         <span class='prelude-val'>Ok</span>(_)           <span class='op'>=&gt;</span> <span class='ident'>Cell</span>::<span class='ident'>new</span>(<span class='string'>&quot;✓&quot;</span>).<span class='ident'>with_style</span>(<span class='ident'>Attr</span>::<span class='ident'>ForegroundColor</span>(<span class='ident'>color</span>::<span class='ident'>GREEN</span>)), <span class='comment'>// ✗</span>
@@ -457,7 +452,7 @@
     <span class='ident'>projects</span>
         .<span class='ident'>iter</span>()
         .<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>project</span><span class='op'>|</span> {
-            <span class='kw'>let</span> <span class='ident'>row_style</span> <span class='op'>=</span> <span class='kw'>if</span> <span class='ident'>list_config</span>.<span class='ident'>use_colors</span> {<span class='ident'>project_to_style</span>(<span class='kw-2'>&amp;</span><span class='ident'>project</span>)}<span class='kw'>else</span>{<span class='string'>&quot;&quot;</span>};
+            <span class='kw'>let</span> <span class='ident'>row_style</span> <span class='op'>=</span> <span class='kw'>if</span> <span class='ident'>list_config</span>.<span class='ident'>use_colors</span> {<span class='ident'>project_to_style</span>(<span class='ident'>project</span>)}<span class='kw'>else</span>{<span class='string'>&quot;&quot;</span>};
             <span class='ident'>Row</span>::<span class='ident'>new</span>(<span class='macro'>vec</span><span class='macro'>!</span>[
                      <span class='macro'>cell</span><span class='macro'>!</span>(<span class='ident'>project</span>.<span class='ident'>invoice_num</span>().<span class='ident'>unwrap_or</span>(<span class='string'>&quot;&quot;</span>.<span class='ident'>into</span>())),
                      <span class='macro'>cell</span><span class='macro'>!</span>(<span class='ident'>project</span>.<span class='ident'>name</span>()).<span class='ident'>style_spec</span>(<span class='ident'>row_style</span>),
@@ -475,7 +470,7 @@
     <span class='ident'>projects</span>
         .<span class='ident'>iter</span>()
         .<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>project</span><span class='op'>|</span> {
-            <span class='kw'>let</span> <span class='ident'>row_style</span> <span class='op'>=</span> <span class='kw'>if</span> <span class='ident'>list_config</span>.<span class='ident'>use_colors</span> {<span class='ident'>project_to_style</span>(<span class='kw-2'>&amp;</span><span class='ident'>project</span>)}<span class='kw'>else</span>{<span class='string'>&quot;&quot;</span>};
+            <span class='kw'>let</span> <span class='ident'>row_style</span> <span class='op'>=</span> <span class='kw'>if</span> <span class='ident'>list_config</span>.<span class='ident'>use_colors</span> {<span class='ident'>project_to_style</span>(<span class='ident'>project</span>)}<span class='kw'>else</span>{<span class='string'>&quot;&quot;</span>};
             <span class='ident'>Row</span>::<span class='ident'>new</span>(<span class='macro'>vec</span><span class='macro'>!</span>[
                      <span class='macro'>cell</span><span class='macro'>!</span>(
                          <span class='kw'>if</span> <span class='ident'>project</span>.<span class='ident'>canceled</span>() {
@@ -503,7 +498,7 @@
     <span class='ident'>projects</span>.<span class='ident'>iter</span>().<span class='ident'>enumerate</span>()
         .<span class='ident'>map</span>(<span class='op'>|</span>(<span class='ident'>i</span>, <span class='ident'>project</span>)<span class='op'>|</span> {
             <span class='comment'>//trace!(&quot;configuring row: {:?}&quot;, project.name());</span>
-            <span class='kw'>let</span> <span class='ident'>row_style</span> <span class='op'>=</span> <span class='kw'>if</span> <span class='ident'>list_config</span>.<span class='ident'>use_colors</span> {<span class='ident'>project_to_style</span>(<span class='kw-2'>&amp;</span><span class='ident'>project</span>)}<span class='kw'>else</span>{<span class='string'>&quot;&quot;</span>};
+            <span class='kw'>let</span> <span class='ident'>row_style</span> <span class='op'>=</span> <span class='kw'>if</span> <span class='ident'>list_config</span>.<span class='ident'>use_colors</span> {<span class='ident'>project_to_style</span>(<span class='ident'>project</span>)}<span class='kw'>else</span>{<span class='string'>&quot;&quot;</span>};
             <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>cells</span> <span class='op'>=</span> <span class='ident'>Vec</span>::<span class='ident'>new</span>();
 
             <span class='comment'>// TODO how can we illustrate that a project has been removed? what about a red x</span>
@@ -515,7 +510,7 @@
 
             <span class='ident'>cells</span>.<span class='ident'>push</span>( <span class='ident'>Cell</span>::<span class='ident'>new</span>( <span class='kw-2'>&amp;</span><span class='ident'>status</span>.<span class='ident'>to_string</span>() )
                         .<span class='ident'>with_style</span>( <span class='ident'>Attr</span>::<span class='ident'>ForegroundColor</span>(<span class='ident'>color</span>) )
-                        .<span class='ident'>with_style</span>( <span class='ident'>style</span>.<span class='ident'>unwrap_or</span>(<span class='ident'>Attr</span>::<span class='ident'>Standout</span>(<span class='boolvalue'>false</span>)) )
+                        .<span class='ident'>with_style</span>( <span class='ident'>style</span>.<span class='ident'>unwrap_or_else</span>(<span class='op'>||</span><span class='ident'>Attr</span>::<span class='ident'>Standout</span>(<span class='boolval'>false</span>)) )
                       );
 
 
@@ -593,7 +588,7 @@
     <span class='ident'>projects</span>
         .<span class='ident'>iter</span>()
         .<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>project</span><span class='op'>|</span> {
-            <span class='kw'>let</span> <span class='ident'>row_style</span> <span class='op'>=</span> <span class='kw'>if</span> <span class='ident'>list_config</span>.<span class='ident'>use_colors</span> {<span class='ident'>project_to_style</span>(<span class='kw-2'>&amp;</span><span class='ident'>project</span>)}<span class='kw'>else</span>{<span class='string'>&quot;&quot;</span>};
+            <span class='kw'>let</span> <span class='ident'>row_style</span> <span class='op'>=</span> <span class='kw'>if</span> <span class='ident'>list_config</span>.<span class='ident'>use_colors</span> {<span class='ident'>project_to_style</span>(<span class='ident'>project</span>)}<span class='kw'>else</span>{<span class='string'>&quot;&quot;</span>};
 
             <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>cells</span> <span class='op'>=</span> <span class='ident'>Vec</span>::<span class='ident'>new</span>();
 
@@ -629,9 +624,7 @@
 <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>print_projects</span>(<span class='ident'>rows</span>:<span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Row</span><span class='op'>&gt;</span>){
     <span class='macro'>trace</span><span class='macro'>!</span>(<span class='string'>&quot;starting table print&quot;</span>);
     <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>table</span> <span class='op'>=</span> <span class='ident'>Table</span>::<span class='ident'>init</span>(<span class='ident'>rows</span>);
-    <span class='macro'>trace</span><span class='macro'>!</span>(<span class='string'>&quot;setting table format&quot;</span>);
     <span class='ident'>table</span>.<span class='ident'>set_format</span>(<span class='ident'>FormatBuilder</span>::<span class='ident'>new</span>().<span class='ident'>column_separator</span>(<span class='string'>&#39; &#39;</span>).<span class='ident'>padding</span>(<span class='number'>0</span>,<span class='number'>0</span>).<span class='ident'>build</span>());
-    <span class='macro'>trace</span><span class='macro'>!</span>(<span class='string'>&quot;calling table print&quot;</span>);
     <span class='ident'>table</span>.<span class='ident'>printstd</span>();
     <span class='macro'>trace</span><span class='macro'>!</span>(<span class='string'>&quot;done printing table.&quot;</span>);
 }
@@ -670,13 +663,16 @@
     <span class='macro'>println</span><span class='macro'>!</span>(<span class='string'>&quot;{}&quot;</span>, <span class='ident'>project</span>.<span class='ident'>name</span>());
 
     <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>table</span> <span class='op'>=</span> <span class='ident'>Table</span>::<span class='ident'>new</span>();
-    <span class='ident'>table</span>.<span class='ident'>set_format</span>(<span class='ident'>TableFormat</span>::<span class='ident'>new</span>());
-    <span class='kw'>for</span> <span class='ident'>item</span> <span class='kw'>in</span> <span class='kw-2'>&amp;</span><span class='ident'>project</span>.<span class='ident'>invoice_items</span>().<span class='ident'>unwrap</span>(){
+    <span class='kw'>let</span> <span class='ident'>items</span> <span class='op'>=</span> <span class='ident'>project</span>.<span class='ident'>invoice_items</span>().<span class='ident'>expect</span>(<span class='string'>&quot;problem opening items&quot;</span>);
+    <span class='comment'>//table.set_format(TableFormat::new());</span>
+    <span class='ident'>table</span>.<span class='ident'>add_row</span>( <span class='ident'>Row</span>::<span class='ident'>new</span>(<span class='macro'>vec</span><span class='macro'>!</span>[<span class='macro'>cell</span><span class='macro'>!</span>(<span class='string'>&quot;&quot;</span>), <span class='macro'>cell</span><span class='macro'>!</span>(<span class='string'>&quot;name&quot;</span>), <span class='macro'>cell</span><span class='macro'>!</span>( <span class='string'>&quot;amount&quot;</span>), <span class='macro'>cell</span><span class='macro'>!</span>(<span class='string'>&quot;price&quot;</span>), <span class='macro'>cell</span><span class='macro'>!</span>(<span class='string'>&quot;cost&quot;</span>)]));
+    <span class='kw'>for</span> (<span class='ident'>index</span>,<span class='ident'>item</span>) <span class='kw'>in</span> <span class='ident'>items</span>.<span class='ident'>iter</span>().<span class='ident'>enumerate</span>(){
         <span class='ident'>table</span>.<span class='ident'>add_row</span>( <span class='ident'>Row</span>::<span class='ident'>new</span>(<span class='macro'>vec</span><span class='macro'>!</span>[
+                                <span class='ident'>Cell</span>::<span class='ident'>new</span>(<span class='kw-2'>&amp;</span><span class='ident'>index</span>.<span class='ident'>to_string</span>()),
                                 <span class='ident'>Cell</span>::<span class='ident'>new</span>(<span class='ident'>item</span>.<span class='ident'>item</span>.<span class='ident'>name</span>),
                                 <span class='ident'>Cell</span>::<span class='ident'>new</span>(<span class='kw-2'>&amp;</span><span class='ident'>item</span>.<span class='ident'>amount_sold</span>.<span class='ident'>to_string</span>()),
                                 <span class='ident'>Cell</span>::<span class='ident'>new</span>(<span class='kw-2'>&amp;</span><span class='ident'>item</span>.<span class='ident'>item</span>.<span class='ident'>price</span>.<span class='ident'>to_string</span>()),
-                                <span class='ident'>Cell</span>::<span class='ident'>new</span>(<span class='kw-2'>&amp;</span>(<span class='kw-2'>&amp;</span><span class='ident'>item</span>.<span class='ident'>item</span>.<span class='ident'>price</span> <span class='op'>*</span> <span class='ident'>item</span>.<span class='ident'>amount_sold</span>).<span class='ident'>to_string</span>()),
+                                <span class='ident'>Cell</span>::<span class='ident'>new</span>(<span class='kw-2'>&amp;</span>(<span class='ident'>item</span>.<span class='ident'>item</span>.<span class='ident'>price</span> <span class='op'>*</span> <span class='ident'>item</span>.<span class='ident'>amount_sold</span>).<span class='ident'>to_string</span>()),
         ]));
     }
     <span class='ident'>table</span>.<span class='ident'>printstd</span>();
