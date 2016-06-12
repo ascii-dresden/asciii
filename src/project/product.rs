@@ -42,7 +42,7 @@ impl<'a> Product<'a>{
         })
     }
 
-    pub fn from_new_format<'y>(desc: &'y Yaml) -> ProductResult<Product<'y>> {
+    pub fn from_new_format(desc: &Yaml) -> ProductResult<Product> {
         Ok(Product{
             name:  yaml::get_str(desc, "name").unwrap_or("unnamed"),
             unit:  yaml::get_str(desc, "unit"),
