@@ -5,6 +5,7 @@ use std::collections::HashMap;
 
 use clap::ArgMatches;
 use open;
+use rustc_serialize::json::{ToJson};
 
 use asciii::CONFIG;
 use asciii::config;
@@ -259,13 +260,11 @@ pub fn edit(matches:&ArgMatches) {
     if matches.is_present("template"){
         edit_template(search_term, &editor);
 
+    } else if let Some(archive) = matches.value_of("archive"){
+        let archive = archive.parse::<i32>().unwrap();
+        edit_projects(StorageDir::Archive(archive), &search_terms, &editor);
     } else {
-        if let Some(archive) = matches.value_of("archive"){
-            let archive = archive.parse::<i32>().unwrap();
-            edit_projects(StorageDir::Archive(archive), &search_terms, &editor);
-        } else {
-            edit_projects(StorageDir::Working, &search_terms, &editor);
-        }
+        edit_projects(StorageDir::Working, &search_terms, &editor);
     }
 }
 
@@ -307,11 +306,26 @@ pub fn show(matches:&ArgMatches){
         if let Some(year) = matches.value_of("archive"){
             let year = year.parse::<i32>().unwrap();
             show_project(StorageDir::Archive(year), search_term);
+        } else if  matches.is_present("json"){
+            with_projects(StorageDir::Working, search_term, |p|println!("{}", p.to_json()));
         } else if  matches.is_present("template"){
             show_template(search_term);
         } else {
             show_project(StorageDir::Working, search_term);
         }
+}
+
+fn with_projects<F:Fn(&Project)>(dir:StorageDir, search_term:&str, cb:F){
+    // TODO make this use ProjectList
+    let luigi = setup_luigi();
+    let projects = super::execute(||luigi.search_projects(dir, search_term));
+    if !projects.is_empty(){
+        for project in &projects{
+            cb(project);
+        }
+    } else {
+        fail(format!("Nothing found for {:?}", search_term));
+}
 }
 
 fn show_project(dir:StorageDir, search_term:&str){
@@ -480,6 +494,8 @@ pub fn path<F:Fn(&Path)>(matches:&ArgMatches, action:F){
     let templates_path = CONFIG.get_str("dirs/templates").expect("Faulty config: field output_path does not contain a string value");
     let output_path = CONFIG.get_str("output_path").expect("Faulty config: field output_path does not contain a string value");
 
+    let exe = env::current_exe().unwrap();
+
     if matches.is_present("templates"){
         action(&PathBuf::from(path)
                .join(storage_path)
@@ -493,7 +509,7 @@ pub fn path<F:Fn(&Path)>(matches:&ArgMatches, action:F){
                 ));
     }
     else if matches.is_present("bin"){
-        action(&env::current_exe().unwrap());
+        action(exe.parent().unwrap());
     }
     else { // default case
         let path = util::replace_home_tilde(Path::new(path))

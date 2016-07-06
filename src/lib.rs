@@ -30,6 +30,9 @@
 #![cfg_attr(feature = "lints", plugin(clippy))]
 #![cfg_attr(feature = "document_export", feature(custom_derive))]
 
+//#![feature(alloc_system)]
+//extern crate alloc_system;
+
 extern crate yaml_rust;
 extern crate chrono;
 extern crate regex;
@@ -38,6 +41,7 @@ extern crate tempdir;
 extern crate term; // TODO consolidate term, ansi_term and terminal_size
 extern crate currency;
 extern crate open;
+extern crate rustc_serialize;
 #[macro_use] extern crate log;
 #[macro_use] extern crate prettytable;
 #[macro_use] extern crate lazy_static;
@@ -47,9 +51,6 @@ extern crate open;
 
 #[cfg(feature="git_statuses")] extern crate git2;
 #[cfg(feature="document_export")] extern crate handlebars;
-#[cfg(feature="document_export")] extern crate serde;
-#[cfg(feature="document_export")] extern crate serde_json;
-#[cfg(feature="document_export")] extern crate rustc_serialize;
 
 #[macro_use]
 pub mod util;
@@ -73,5 +74,7 @@ lazy_static!{
 ///
 /// Human readable, no semantic versioning.
 pub fn version() -> String{
-    format!("{} - {}", env!("CARGO_PKG_VERSION"), include_str!("../.most_recent_commit"))
+    format!("{} - {}",
+            env!("CARGO_PKG_VERSION"),
+            include_str!("../.most_recent_commit"))
 }

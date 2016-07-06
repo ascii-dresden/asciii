@@ -12,6 +12,7 @@ extern crate chrono;
 extern crate term; // TODO consolidate term, ansi_term and terminal_size
 extern crate terminal_size;
 extern crate open;
+extern crate rustc_serialize;
 
 extern crate env_logger;
 #[macro_use] extern crate log;

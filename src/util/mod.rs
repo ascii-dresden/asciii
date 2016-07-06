@@ -64,13 +64,11 @@ pub fn open_in_editor(editor:&Option<&str>, paths:&[PathBuf]){
             .args(paths)
             .status()
             .unwrap_or_else(|e| { panic!("failed to execute process: {}", e) });
+    } else if paths.len() > 4{
+        println!("you are a about to open {} files\n{:#?}", paths.len(), paths);
     } else {
-        if paths.len() > 4{
-            println!("you are a about to open {} files\n{:#?}", paths.len(), paths);
-        } else {
-            for path in paths{
-                open::that(path).unwrap();
-            }
+        for path in paths{
+            open::that(path).unwrap();
         }
     }
 }
@@ -87,12 +85,13 @@ pub fn get_storage_path() -> PathBuf
             .expect("Faulty config: field dirs/storage does not contain a string value"));
 
     // TODO make replace tilde a Trait function
-    let mut storage_path = replace_home_tilde(&storage_path);
+    let storage_path = replace_home_tilde(&storage_path);
 
     if !storage_path.is_absolute(){
-        storage_path = current_dir().unwrap().join(storage_path);
+        current_dir().unwrap().join(storage_path)
+    } else {
+        storage_path
     }
-    storage_path
 }
 
 /// Exits with the exit status of a child process.

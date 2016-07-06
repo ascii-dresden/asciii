@@ -15,6 +15,7 @@ use yaml_rust::Yaml;
 use tempdir::TempDir;
 use slug;
 use currency::Currency;
+use rustc_serialize::json::{ToJson, Json};
 
 use util::yaml;
 use storage::*;
@@ -44,6 +45,17 @@ pub enum ProductError{
 }
 
 
+
+/// Output of `Project::debug()`.
+///
+/// A project is storable, contains products, and you can create an offer or invoice from it.
+#[derive(Debug)]
+pub struct DebugProject {
+    file_path: PathBuf,
+    //temp_dir: Option<PathBuf>, // TODO
+    git_status: Option<GitStatus>,
+    yaml: Yaml
+}
 
 /// Represents a Project.
 ///
@@ -285,8 +297,52 @@ impl Project{
             Some(wages+sum+tax)
         } else{ None }
     }
+
+    pub fn debug(&self) -> DebugProject{
+        self.into()
+    }
 }
 
+impl ToJson for Project{
+    fn to_json(&self) -> Json{
+        use self::spec::*;
+
+        let s = |s:&str| String::from(s);
+
+        let opt_str = |opt:Option<&str>| opt.map(|e|e.to_owned()).to_json() ;
+        let y = &self.yaml;
+
+
+        let map = btreemap!{
+            String::from("name") => self.name().to_json(),
+            //String::from("adressing") => ,
+
+            s("client")       => btreemap!{
+                s("email")      => opt_str(client::email(y)),
+                s("last_name")  => opt_str(client::last_name(y)),
+                s("first_name") => opt_str(client::first_name(y)),
+                s("addressing") => client::addressing(y, &::CONFIG).to_json(),
+            }.to_json(),
+            s("offer")        => offer::number(y).to_json(),
+            s("date")         => project::date_dmy_str(y).to_json(),
+            s("invoice")      => invoice::number_str(y).to_json(),
+            s("invoice_long") => invoice::number_long_str(y).to_json(),
+            s("manager")      => self.manager().to_json(),
+
+        };
+        Json::Object(map)
+    }
+}
+
+impl<'a> From<&'a Project> for DebugProject{
+    fn from(project: &'a Project) -> DebugProject{
+        DebugProject{
+            file_path:  project.file_path.clone(),
+            git_status: project.git_status.clone(),
+            yaml:       project.yaml.clone()
+        }
+    }
+}
 
 #[cfg(test)]
 mod test{

@@ -299,6 +299,11 @@ pub fn setup() -> ArgMatches<'static>{
                          .multiple(true)
                         )
 
+                    .arg(Arg::with_name("json")
+                         .help("Show project as JSON")
+                         .long("json")
+                         .short("j"))
+
                     .arg(Arg::with_name("archive")
                          .help("Pick an archived project")
                          .long("archive")

@@ -32,6 +32,7 @@ custom_derive! {
         /// Usually `storage`, or in legacy part of `signature`
         Responsible,
         /// Pretty version of `invoice/number`: "`R042`"
+        OfferNumber,
         InvoiceNumber,
         /// Pretty version of `invoice/number` including year: "`R2016-042`"
         InvoiceNumberLong,
@@ -56,6 +57,7 @@ impl VirtualField{
     pub fn get(&self,project:&Project) -> Option<String>{
         match *self{
             VirtualField::Responsible       => project::manager(project.yaml()).map(|s|s.to_owned()),
+            VirtualField::OfferNumber       => offer::number(project.yaml()),
             VirtualField::InvoiceNumber     => invoice::number_str(project.yaml()),
             VirtualField::InvoiceNumberLong => invoice::number_long_str(project.yaml()),
             VirtualField::Name              => project::name(project.yaml()).map(|s|s.to_owned()),
@@ -100,6 +102,10 @@ pub mod project{
 
     pub fn date(yaml:&Yaml) -> Option<Date<UTC>>{
         super::date::date(yaml)
+    }
+    pub fn date_dmy_str(yaml:&Yaml) -> Option<String>{
+        super::date::date(yaml)
+            .map(|d|d.format("%d.%m.%Y").to_string())
     }
 
     pub fn manager(yaml:&Yaml) -> Option<&str>{
@@ -417,14 +423,11 @@ pub mod products{
     use super::to_currency;
 
     pub fn invoice_items(yaml:&Yaml) -> ProductResult<Vec<InvoiceItem>>{
-        let products = try!(yaml::get_hash(yaml, "products")
+        try!(yaml::get_hash(yaml, "products")
                             .ok_or(ProductError::UnknownFormat))
             .iter()
             .map(|(desc,values)| InvoiceItem::from_desc_and_value(desc, values))
             .collect::< ProductResult<Vec<InvoiceItem> >>()
-            ;
-
-        products
     }
 
     pub fn all_by_tax(yaml:&Yaml)// -> ProductResult<Vec<InvoiceItem>>

@@ -256,3 +256,19 @@ fn validate_invalid_products(){
     assert_eq!( spec::products::invoice_items(&invalid3).unwrap_err(), ProductError::MissingAmount("Tee".to_owned()));
 }
 
+
+#[test]
+fn rounding(){
+static PRODUCT_TEST_DOC_INVALID3:&'static str =
+r#"
+products:
+  gutschein5: { amount: 8, sold: 8, price: 4.20 }
+  gutschein7: { amount: 1, sold: 1, price: 5.90 }
+"#;
+
+    let doc = yaml::parse(CLIENT_TEST_DOC).unwrap();
+    let products = spec::products::invoice_items(&doc).unwrap();
+    let sum_offered = spec::products::sum_offered(&products);
+    let sum_sold    = spec::products::sum_sold(&products);
+    assert_eq!(sum_sold*1.19, Currency(Some('€'), 4701))
+}
