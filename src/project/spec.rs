@@ -3,6 +3,7 @@
 #![allow(dead_code)]
 #![allow(unused_imports)]
 
+use multimap::MultiMap;
 use chrono::Datelike;
 
 use util::yaml;
@@ -103,10 +104,6 @@ pub mod project{
     pub fn date(yaml:&Yaml) -> Option<Date<UTC>>{
         super::date::date(yaml)
     }
-    pub fn date_dmy_str(yaml:&Yaml) -> Option<String>{
-        super::date::date(yaml)
-            .map(|d|d.format("%d.%m.%Y").to_string())
-    }
 
     pub fn manager(yaml:&Yaml) -> Option<&str>{
         yaml::get_str(yaml, "manager")
@@ -171,13 +168,16 @@ pub mod client{
     }
 
     pub fn addressing(yaml:&Yaml, config:&ConfigReader) -> Option<String>{
-        if let Some(title) = title(yaml){
+        if let Some(title) = title(yaml)
+                .and_then(|title| title.split_whitespace().nth(0)) // only the first word
+        {
             let last_name = last_name(yaml);
 
             let lang = config.get_str("defaults/lang")
                 .expect("Faulty config: defaults/lang does not contain a value");
 
-            let gend_path = "gender_matches/".to_owned() + &title.to_lowercase();
+            let gend_path = "gender_matches/".to_owned() + &title
+                .to_lowercase();
             let gend = config.get_str(&gend_path)
                 .expect(&format!("Faulty config: {} does not contain a value",gend_path));
 
@@ -415,10 +415,11 @@ pub mod hours {
 
 pub mod products{
     use std::collections::BTreeMap;
+    use multimap::MultiMap;
     use currency::Currency;
     use util::yaml;
     use util::yaml::Yaml;
-    use project::product::{Product, InvoiceItem, ProductUnit};
+    use project::product::{Product, InvoiceItem, ProductUnit, TaxType};
     use project::{ProductResult, ProductError};
     use super::to_currency;
 
@@ -430,8 +431,17 @@ pub mod products{
             .collect::< ProductResult<Vec<InvoiceItem> >>()
     }
 
-    pub fn all_by_tax(yaml:&Yaml)// -> ProductResult<Vec<InvoiceItem>>
+    pub fn all_by_tax(yaml:&Yaml) -> ProductResult<MultiMap<usize,InvoiceItem>>
     {
+        // TODO need to replace tax:f64 with Decimal value
+        unimplemented!();
+        let mut map = MultiMap::new();
+        for item in try!(invoice_items(yaml)){
+            let tax = 0;
+            //map.insert(item.item.tax, item);
+            map.insert(tax, item);
+        }
+        Ok(map)
     }
 
     pub fn sum_offered(items:&[InvoiceItem]) -> Currency{
