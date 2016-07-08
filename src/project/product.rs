@@ -1,5 +1,9 @@
 use std::fmt;
+
+use rustc_serialize::json::{ToJson, Json};
+
 use currency::Currency;
+use decimate::Decimal;
 
 use util::yaml;
 use util::yaml::Yaml;
@@ -8,7 +12,9 @@ use super::{ProductResult, ProductError};
 use super::spec::to_currency;
 
 #[deprecated]
-const DEFAULT_TAX:f64 = 0.19;// TODO read from config
+const DEFAULT_TAX:f64= 0.19;// TODO read from config
+
+pub type TaxType = f64;
 
 pub enum ProductUnit {
     Piece, Liter, Hour, Kilogramm, Gramm, None
@@ -18,7 +24,7 @@ pub enum ProductUnit {
 pub struct Product<'a> {
     pub name: &'a str,
     pub unit: Option<&'a str>,
-    pub tax: f64,
+    pub tax: TaxType,
     pub price: Currency
 }
 
@@ -26,10 +32,12 @@ pub struct Product<'a> {
 pub struct InvoiceItem<'a> {
     pub amount_offered: f64,
     pub amount_sold: f64,
-    pub item: Product<'a>
+    pub product: Product<'a>
 }
 
 impl<'a> Product<'a>{
+
+    fn default_tax() -> Decimal<usize>{ Decimal::from_parts(0,19)}
 
     pub fn from_old_format<'y>(name:&'y str, values: &'y Yaml) -> ProductResult<Product<'y>> {
         Ok(Product{
@@ -63,13 +71,36 @@ impl<'a> Product<'a>{
 
 }
 
+impl<'a> ToJson for Product<'a>{
+    fn to_json(&self) -> Json{
+        let s = |s:&str| String::from(s);
+        Json::Object(btreemap!{
+            String::from("name")     => self.name.to_json(),
+            String::from("unit")     => self.unit.map(|s|s.to_owned()).to_json(),
+            String::from("tax")      => self.tax.to_json(),
+            String::from("price")    => self.price.1.to_json(),
+            String::from("currency") => self.price.0.map(|s|s.to_string()).to_json(),
+        })
+    }
+}
+
+impl<'a> ToJson for InvoiceItem<'a> {
+    fn to_json(&self) -> Json{
+        Json::Object(btreemap!{
+        String::from("amount_offered") => self.amount_offered.to_json(),
+        String::from("amount_sold")    => self.amount_sold.to_json(),
+        String::from("product")           => self.product.to_json(),
+        })
+    }
+}
+
 impl<'a> InvoiceItem<'a> {
     pub fn cost_before_tax(&self) -> Currency {
-        self.amount_sold * self.item.price
+        self.amount_sold * self.product.price
     }
 
     pub fn cost_after_tax(&self) -> Currency {
-        self.amount_sold * self.item.price * (1.0 + self.item.tax)
+        self.amount_sold * self.product.price * (1.0 + self.product.tax)
     }
 
     pub fn from_desc_and_value<'y>(desc: &'y Yaml, values: &'y Yaml) -> ProductResult<InvoiceItem<'y>> {
@@ -92,7 +123,7 @@ impl<'a> InvoiceItem<'a> {
         Ok(InvoiceItem {
             amount_offered: offered,
             amount_sold: sold,
-            item: product
+            product: product
         })
     }
 }

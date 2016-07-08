@@ -28,7 +28,6 @@
 #![cfg_attr(feature = "lints", allow(unstable_features))]
 #![cfg_attr(feature = "lints", feature(plugin))]
 #![cfg_attr(feature = "lints", plugin(clippy))]
-#![cfg_attr(feature = "document_export", feature(custom_derive))]
 
 //#![feature(alloc_system)]
 //extern crate alloc_system;
@@ -40,8 +39,11 @@ extern crate slug;
 extern crate tempdir;
 extern crate term; // TODO consolidate term, ansi_term and terminal_size
 extern crate currency;
+extern crate decimate;
 extern crate open;
 extern crate rustc_serialize;
+extern crate handlebars;
+extern crate multimap;
 #[macro_use] extern crate log;
 #[macro_use] extern crate prettytable;
 #[macro_use] extern crate lazy_static;
@@ -50,7 +52,6 @@ extern crate rustc_serialize;
 #[macro_use] extern crate enum_derive;
 
 #[cfg(feature="git_statuses")] extern crate git2;
-#[cfg(feature="document_export")] extern crate handlebars;
 
 #[macro_use]
 pub mod util;
@@ -62,8 +63,6 @@ pub mod storage;
 pub mod print;
 
 pub mod templater;
-
-#[cfg(feature="document_export")]
 pub mod fill_docs;
 
 lazy_static!{

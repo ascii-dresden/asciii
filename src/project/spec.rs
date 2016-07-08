@@ -167,22 +167,23 @@ pub mod client{
             Some(format!("{} {}", first.unwrap_or(""), last.unwrap_or(""))))
     }
 
-    pub fn addressing(yaml:&Yaml, config:&ConfigReader) -> Option<String>{
+    pub fn addressing(yaml:&Yaml) -> Option<String>{
         if let Some(title) = title(yaml)
                 .and_then(|title| title.split_whitespace().nth(0)) // only the first word
         {
             let last_name = last_name(yaml);
 
-            let lang = config.get_str("defaults/lang")
+
+            let lang = ::CONFIG.get_str("defaults/lang")
                 .expect("Faulty config: defaults/lang does not contain a value");
 
             let gend_path = "gender_matches/".to_owned() + &title
                 .to_lowercase();
-            let gend = config.get_str(&gend_path)
+            let gend = ::CONFIG.get_str(&gend_path)
                 .expect(&format!("Faulty config: {} does not contain a value",gend_path));
 
             let addr_path = "lang_addressing/".to_owned() + &lang.to_lowercase() + "/" + gend;
-            let addr = config.get_str(&addr_path)
+            let addr = ::CONFIG.get_str(&addr_path)
                 .expect(&format!("Faulty config: {} does not contain a value",addr_path));
 
             last_name.and(
@@ -190,6 +191,7 @@ pub mod client{
         } else { None }
     }
 
+    /// Validates the output of each of this modules functions.
     pub fn validate(yaml:&Yaml) -> super::SpecResult {
         let mut errors = super::field_exists(yaml, &[
                  "client/email",
@@ -198,7 +200,12 @@ pub mod client{
                  "client/first_name",
         ]);
 
-        if title(yaml).is_none(){       errors.push("client_title");}
+
+        if let Some(title) =  title(yaml){
+            if title.split_whitespace().count() > 1{ errors.push("client_title"); }
+        } else{ errors.push("client_title"); }
+
+        if addressing(yaml).is_none(){  errors.push("client_addressing");}
         if first_name(yaml).is_none(){  errors.push("client_first_name");}
         if last_name(yaml).is_none(){   errors.push("client_last_name");}
 
@@ -438,7 +445,7 @@ pub mod products{
         let mut map = MultiMap::new();
         for item in try!(invoice_items(yaml)){
             let tax = 0;
-            //map.insert(item.item.tax, item);
+            //map.insert(item.product.tax, item);
             map.insert(tax, item);
         }
         Ok(map)
@@ -447,13 +454,13 @@ pub mod products{
     pub fn sum_offered(items:&[InvoiceItem]) -> Currency{
         items.iter()
              .fold(Currency(Some('€'),0_00),
-             |acc, item| acc + item.item.price * item.amount_offered)
+             |acc, item| acc + item.product.price * item.amount_offered)
     }
 
     pub fn sum_sold(items:&[InvoiceItem]) -> Currency{
         items.iter()
              .fold(Currency(Some('€'),0_00),
-             |acc, item| acc + item.item.price * item.amount_sold)
+             |acc, item| acc + item.product.price * item.amount_sold)
     }
 
 }

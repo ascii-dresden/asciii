@@ -34,6 +34,7 @@ use self::spec::{SpecResult, VirtualField};
 static PROJECT_FILE_EXTENSION:&'static str = "yml";
 
 pub type ProductResult<T> = Result<T, ProductError>;
+
 #[derive(Debug, PartialEq, Eq)]
 pub enum ProductError{
     //DuplicateProduct // not an error
@@ -311,23 +312,41 @@ impl ToJson for Project{
 
         let opt_str = |opt:Option<&str>| opt.map(|e|e.to_owned()).to_json() ;
         let y = &self.yaml;
+        let dmy = |date:Option<Date<UTC>>| date.map(|d|d.format("%d.%m.%Y").to_string()).to_json();
 
 
         let map = btreemap!{
-            String::from("name") => self.name().to_json(),
             //String::from("adressing") => ,
+            s("is_invoice") => true.to_json(),
 
-            s("client")       => btreemap!{
+            s("client") => btreemap!{
                 s("email")      => opt_str(client::email(y)),
                 s("last_name")  => opt_str(client::last_name(y)),
                 s("first_name") => opt_str(client::first_name(y)),
-                s("addressing") => client::addressing(y, &::CONFIG).to_json(),
+                s("full_name")  => client::full_name(y).to_json(),
+                s("title")      => opt_str(client::title(y)),
+                s("address")    => opt_str(client::address(y)),
+                s("addressing") => client::addressing(y).to_json(),
             }.to_json(),
-            s("offer")        => offer::number(y).to_json(),
-            s("date")         => project::date_dmy_str(y).to_json(),
-            s("invoice")      => invoice::number_str(y).to_json(),
-            s("invoice_long") => invoice::number_long_str(y).to_json(),
-            s("manager")      => self.manager().to_json(),
+
+            s("products") => products::invoice_items(y).unwrap().to_json(),
+
+
+            s("offer") => btreemap!{
+                s("number") => offer::number(y).to_json(),
+                s("date")   => dmy(spec::date::offer(y)),
+            }.to_json(),
+
+            s("event") => btreemap!{
+                s("name")    => self.name().to_json(),
+                s("date")    => dmy(project::date(y)),
+                s("manager") => self.manager().to_json(),
+            }.to_json(),
+
+            s("invoice") => btreemap!{
+                s("number")      => invoice::number_str(y).to_json(),
+                s("number_long") => invoice::number_long_str(y).to_json(),
+            }.to_json(),
 
         };
         Json::Object(map)

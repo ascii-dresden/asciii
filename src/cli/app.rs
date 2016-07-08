@@ -1,4 +1,5 @@
 use asciii::version;
+use asciii::fill_docs::Template;
 use super::validators;
 use clap::{App, AppSettings, Arg, ArgMatches, SubCommand};
 
@@ -129,8 +130,7 @@ pub fn setup() -> ArgMatches<'static>{
                         )
                     .arg(Arg::with_name("all")
                          .help("List all projects, ever")
-                         .long("all")
-                        )
+                         .long("all"))
 
                     .arg(Arg::with_name("templates")
                          .help("List templates")
@@ -140,8 +140,7 @@ pub fn setup() -> ArgMatches<'static>{
 
                     .arg(Arg::with_name("years")
                          .help("List years in archive")
-                         .long("years")
-                        )
+                         .long("years"))
 
                     .arg(Arg::with_name("paths")
                          .help("List paths to each project file")
@@ -320,8 +319,7 @@ pub fn setup() -> ArgMatches<'static>{
 
                     .arg(Arg::with_name("files")
                          .help("List files that belong to a project")
-                         .long("files")
-                        )
+                         .long("files"))
 
                     .arg(Arg::with_name("invoice")
                          .help("Display values in invoice mode")
@@ -353,14 +351,24 @@ pub fn setup() -> ArgMatches<'static>{
                         )
                 )
 
+        .subcommand(SubCommand::with_name("spec")
+                    .about("runs full spec on all projects")
+                )
+
         .subcommand(SubCommand::with_name("make")
                     .about("Creates documents from projects")
                     .arg(Arg::with_name("search_term")
                          .help("Search term, possibly event name")
                          .required(true)
-                         .multiple(true)
-                        )
-                )
+                         .multiple(true))
+
+                    .arg(Arg::with_name("template")
+                         .help("Use a particular template")
+                         .short("t")
+                         .long("template")
+                         .takes_value(true)
+                         .possible_values( &Template::iter_variant_names().filter(|v|*v!="Invalid").collect::<Vec<&str>>()))
+                   )
 
 
         .subcommand(SubCommand::with_name("config")
@@ -423,7 +431,7 @@ pub fn setup() -> ArgMatches<'static>{
                          .takes_value(true)
                         )
                     .arg(Arg::with_name("template")
-                         .help("A a template")
+                         .help("A template")
                          .short("t")
                          .long("template")
                         )

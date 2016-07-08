@@ -9,7 +9,7 @@ Here I rewrite the original [ascii-invoicer](http://github.com/ascii-dresden/asc
 This has evolved from a technical experiment into a full blown rewrite,
 I'm currently working on restoring full functionality and release the first version with the number [3.0.0](https://github.com/hoodie/asciii-rs/milestones/3.0.0).
 
-This should hopefully run smoothly on the same platforms that ascii2 currently runs on.
+This should hopefully run smoothly on the same platforms that ascii 2 currently runs on.
 
 
 ## Build
@@ -56,18 +56,17 @@ Modules are all top-level files and folders in `src/`.
 
 ### make use if these crates (optional)
 
-* rayon / simple_parallel
-* sparkline
-* xdg / xdg-basedir
-* env_logger
-* filetime, for make like features
-* itertools
-* multimap
-* cool faces
-* open
-* notify-rust
-* colored
-* strsim
+* [ ] sparkline
+* [ ] xdg / xdg-basedir
+* [x] env_logger
+* [ ] filetime, for make like features
+* [ ] itertools
+* [ ] multimap
+* [ ] cool faces
+* [x] open
+* [ ] notify-rust
+* [ ] strsim
+* [ ] https://github.com/frewsxcv/afl.rs
 
 
 ## Side Effects

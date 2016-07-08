@@ -1,11 +1,12 @@
 use std::path::{Path,PathBuf};
 use std::ffi::OsStr;
-use std::env;
+use std::{env,fs};
 use std::collections::HashMap;
 
 use clap::ArgMatches;
 use open;
-use rustc_serialize::json::{ToJson};
+use chrono::Datelike;
+use rustc_serialize::json::ToJson;
 
 use asciii::CONFIG;
 use asciii::config;
@@ -15,6 +16,7 @@ use asciii::storage::*;
 use asciii::templater::Templater;
 use asciii::project::Project;
 use asciii::project::spec::VirtualField;
+use asciii::fill_docs::{fill_template,Template};
 
 use super::{setup_luigi, setup_luigi_with_git, fail};
 use asciii::print;
@@ -302,17 +304,74 @@ fn edit_template(name:&str, editor:&Option<&str>){
 
 /// Command SHOW
 pub fn show(matches:&ArgMatches){
-        let search_term = matches.value_of("search_term").unwrap();
-        if let Some(year) = matches.value_of("archive"){
-            let year = year.parse::<i32>().unwrap();
-            show_project(StorageDir::Archive(year), search_term);
-        } else if  matches.is_present("json"){
-            with_projects(StorageDir::Working, search_term, |p|println!("{}", p.to_json()));
-        } else if  matches.is_present("template"){
-            show_template(search_term);
-        } else {
-            show_project(StorageDir::Working, search_term);
-        }
+    let search_term = matches.value_of("search_term").unwrap();
+    if let Some(year) = matches.value_of("archive"){
+        let year = year.parse::<i32>().unwrap();
+        show_project(StorageDir::Archive(year), search_term);
+    } else if  matches.is_present("files"){
+        with_projects(StorageDir::Working, search_term,
+                      |p| {
+                          println!("{}: ", p.dir().display());
+                          for entry in fs::read_dir(p.dir()).unwrap(){
+                              println!("  {}", entry.unwrap().path().display())
+                          }
+                      }
+                     );
+    } else if  matches.is_present("json"){
+        with_projects(StorageDir::Working, search_term, |p|println!("{:#?}", p.to_json()));
+    } else if  matches.is_present("template"){
+        show_template(search_term);
+    } else {
+        show_project(StorageDir::Working, search_term);
+    }
+}
+
+//pub fn fill_template<E:ToJson>(document:&E){ println!("{:#?}", document.to_json()); }
+
+/// Command MAKE
+pub fn spec(matches:&ArgMatches){
+    use asciii::project::spec::*;
+    let luigi = setup_luigi();
+    //let projects = super::execute(||luigi.open_projects(StorageDir::All));
+    let projects = super::execute(||luigi.open_projects(StorageDir::Working));
+    for project in projects{
+        println!("{}", project.dir().display());
+        let yaml = project.yaml();
+        client::validate(&yaml).map_err(|errors|for error in errors{
+            println!("  error: {}", error);
+        });
+
+        client::full_name(&yaml);
+        client::first_name(&yaml);
+        client::title(&yaml);
+        client::email(&yaml);
+
+
+        hours::caterers_string(&yaml);
+        invoice::number_long_str(&yaml);
+        invoice::number_str(&yaml);
+        offer::number(&yaml);
+        project.age().map(|a|format!("{} days", a));
+        project.date().map(|d|d.year().to_string());
+        project.sum_sold().map(|c|c.to_string());
+        project::manager(&yaml).map(|s|s.to_owned());
+        project::name(&yaml).map(|s|s.to_owned());
+    }
+}
+
+/// Command MAKE
+pub fn make(matches:&ArgMatches){
+    let search_term = matches.value_of("search_term").unwrap();
+    let template = matches.value_of("template").unwrap_or("Document");
+    let dir = match  matches.value_of("archive"){
+        Some(year) => { let year = year.parse::<i32>().unwrap(); StorageDir::Archive(year) },
+        _ => StorageDir::Working
+    };
+
+    with_projects( dir, search_term, |p| {
+        let filled = fill_template(p,template.into()).unwrap();
+        println!("{}", filled);
+    });
 }
 
 fn with_projects<F:Fn(&Project)>(dir:StorageDir, search_term:&str, cb:F){
@@ -341,21 +400,6 @@ fn show_project(dir:StorageDir, search_term:&str){
     }
 }
 
-
-
-//use fill_docs::{Exportable, fill_template};
-//fn make_project(dir:StorageDir, search_term:&str){
-//    // TODO make this use ProjectList
-//    let luigi = setup_luigi();
-//    let projects = super::execute(||luigi.search_projects(dir, &search_term));
-//    if !projects.is_empty(){
-//        for project in &projects{
-//            fill_template(project);
-//        }
-//    } else{
-//        fail(format!("Nothing found for {:?}", search_term));
-//    }
-//}
 
 
 

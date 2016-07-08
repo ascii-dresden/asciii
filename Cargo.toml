@@ -3,7 +3,7 @@ name = "asciii"
 version = "2.9.9-dev"
 authors = ["Hendrik Sollich <hendrik@hoodie.de>"]
 
-build = "build.rs"
+#build = "build.rs"
 
 
 [dependencies]
@@ -15,11 +15,13 @@ chrono = "0.2"
 regex = "0.1"
 lazy_static = "0.2"
 maplit = "0.1"
+multimap= "*"
 clap = {version = "2"}
 enum_derive = "0.1"
 custom_derive = "0.1"
 currency = {git="https://github.com/hoodie/currency-rs"}
 open = "1.1"
+decimate = {git="https://github.com/hoodie/decimate"}
 
 slug = "0.1"
 tempdir = "0.3"
@@ -32,10 +34,8 @@ prettytable-rs = "0.6"
 clippy = {version = "*", optional = true}
 
 # feature: document_export
-handlebars = {version = "*", optional = true}
-serde = { version = "*", optional = true }
-serde_json = { version = "^0.7.0", optional = true }
-rustc-serialize = {version = "*", optional = true }
+handlebars = "*"
+rustc-serialize = "*"
 
 # feature: git_statuses
 git2 = {version = "*", default-features= false, optional = true}
@@ -44,7 +44,6 @@ git2 = {version = "*", default-features= false, optional = true}
 
 [features]
 default = ["git_statuses"]
-document_export = ["handlebars","serde","serde_json","rustc-serialize"]
 debug_config = []
 git_statuses = ["git2"]
 nightly = []

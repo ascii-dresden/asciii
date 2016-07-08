@@ -1,0 +1,99 @@
+\documentclass[11pt,utf8]<{x{ File.join $SETTINGS.plumber_dirs.templates, "latex/ascii-brief" }}>
+\Logo <{x{ File.join $SETTINGS.plumber_dirs.templates, includes_logopath }}>
+
+\lochermarke
+\faltmarken
+\fenstermarken
+\trennlinien
+%%\klassisch
+
+\Name                {}
+\Strasse             {}
+\Universitaet        {}
+\Fakultaet           {}
+\Zusatz              {}
+\RetourAdresse       {}
+\Ort                 {}
+\Land                {}
+\Telefon             {}
+\Telefax             {}
+\Telex               {}
+\HTTP                {}
+\EMail               {}
+\Bank                {}
+\BLZ                 {}
+\IBAN                {}
+\BIC                 {}
+\Konto               {}
+\Steuernummer        {}
+
+\Unterschrift        <{{ manager }}>
+\Postvermerk         {}
+\Adresse             <{{ client_address }}> %.gsub("\n","\\newline ")
+
+\Betreff             <{x{ messages[document_type][0] }}
+                      {x{ "\\newline #{invoice_official}" unless invoice_official.nil?  }}> %% [Angebot|Rechnung]
+
+{{#if is_invoice}}
+\Datum               <{{invoice.date}}>
+% THIS IS AN INVOICE
+{{else}}
+\Datum               <{{offer.date}}>
+% THIS IS AN OFFER
+{{/if}}
+
+
+\AngebotManuel       <{{ offer.number }}> %% Manuel ueberschreibbar ansonsten automatisch heute
+\Veranstaltung       <{{ event.name }}>
+\RechnungsNummer     <{{ invoice.longnumber  }}> % if type == :invoice %% bei Angeboten leer lassen
+\Anrede              <{{ client.addressing }},}
+\Gruss               {Mit freundlichen Grüßen <{{ signature }}>}{1cm}
+
+%\Anlagen             {Anlagen}
+%\Verteiler           {Verteiler}
+
+\begin{document}
+\begin{ascii-brief}
+
+
+{x{ messages[document_type][1] }}
+
+\begin{center}
+\begin{tabular}{rp{7cm}rrr}
+  \textbf{Nr.} & \textbf{Bezeichnung}&    \textbf{Menge}    &    \textbf{EP}&    \textbf{Preis}    \\
+  \midrule
+
+{{#each products}} {{amount_sold}} {{product.name}} {{product.unit}} {{product.price}} {{product.tax}} {{/each}}
+
+{{#each products}}
+  -1 & {{ product.name }} {{#if product.unit }}
+    ({{ product.unit }})
+  {{ /if }} & {{ amount_sold }}  & {{ product.price }} & {x{ product.cost   type }} \\
+{{/each}}
+
+{x{ if hours_time >0}}
+{x{ products.count + 1 }} & Betreuung (Stunden) & {{ hours_time }} & {{ hours_salary }} & {{ hours_total }} \\
+{x{ end }}
+
+\bottomrule[1pt]
+\multicolumn{4}{r}{Netto MwSt.}   & {{ type_costs }}  \\
+%\multicolumn{4}{r}{Brutto MwSt. 19\%} & {{ type_total }}  \\
+
+{x{ productsbytax.each {|tax,products|
+  t = 0 .to_euro
+  products.each {|p| t+= p.tax(type)}
+}}
+    \multicolumn{4}{r}{+MwSt. {x{ (tax.rationalize*100).to_f }}\%}        & {{ t }}  \\
+{x{ } }}
+
+{x{ if hours_time >0}}
+\multicolumn{4}{r}{MwSt 0\%}           & {{ hours_total }} \\
+{x{ end }}
+\multicolumn{4}{r}{Gesamtpreis}        & {{ type_final }} \\
+\end{tabular}
+\end{center}
+
+Wir bitten um eine Begleichung des Betrags innerhalb von 14 Tagen nach Erhalt der Rechnung.
+
+\end{ascii-brief}
+\end{document}

@@ -301,10 +301,10 @@ pub fn show_items(project:&Project){
     for (index,item) in items.iter().enumerate(){
         table.add_row( Row::new(vec![
                                 Cell::new(&index.to_string()),
-                                Cell::new(item.item.name),
+                                Cell::new(item.product.name),
                                 Cell::new(&item.amount_sold.to_string()),
-                                Cell::new(&item.item.price.to_string()),
-                                Cell::new(&(item.item.price * item.amount_sold).to_string()),
+                                Cell::new(&item.product.price.to_string()),
+                                Cell::new(&(item.product.price * item.amount_sold).to_string()),
         ]));
     }
     table.printstd();

@@ -66,7 +66,8 @@ fn setup_app(){
      ("path",      Some(sub_m)) => subcommands::show_path(sub_m),
      ("open",      Some(sub_m)) => subcommands::open_path(sub_m),
 
-     //("make",      Some(sub_m)) => subcommands::make_project(sub_m),
+     ("make",      Some(sub_m)) => subcommands::make(sub_m),
+     ("spec",      Some(sub_m)) => subcommands::spec(sub_m),
 
      ("term",      _          ) => subcommands::term(),
      ("doc",       _          ) => subcommands::doc(),

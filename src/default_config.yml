@@ -21,49 +21,16 @@ template: default # default template
 ## CAREFUL HERE
 project_file_extension: .yml
 latex:    pdflatex
-log_file: ~/.ascii_log
-calendar_file: invoicer.ics # will be put in current directory
+#log_file: ~/.ascii_log # unimplemented
+#calendar_file: invoicer.ics #unimplemented
 
 defaults:
   tax: 0.19
-  lang: de
   canceled: false
   salary: 8.0
-  includes:
-    logopath:
-    name:
-    strasse:
-    universitaet:
-    fakultaet:
-    zusatz:
-    retouradresse:
-    ort:
-    land:
-    telefon:
-    telefax:
-    telex:
-    http:
-    email:
-    bank:
-    blz:
-    iban:
-    bic:
-    konto:
-    steuernummer:
+  lang: de
 
-  messages:
-    de:
-      offer:
-        - Angebot
-        - "hiermit möchten wir Ihnen für die gastronomische Betreuung Ihrer Veranstaltung am __EVENT__PRETTYDATE__ folgendes Angebot unterbreiten:"
-        - ""
-      invoice:
-        - Rechnung
-        - "wir bedanken uns für Ihren Auftrag für das Catering am __EVENT__PRETTYDATE__ und erlauben uns Ihnen folgende Rechnung zu stellen:"
-        - "Wir bitten um eine Begleichung des Betrags innerhalb von 14 Tagen nach Erhalt der Rechnung."
-      signature: Mit freundlichen Grüßen
-
-currency: "€" # see gem "money"
+currency: "€"
 
 gender_matches:
   herr: male

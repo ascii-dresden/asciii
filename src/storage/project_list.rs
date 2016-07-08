@@ -26,6 +26,16 @@ impl<L: Storable> ProjectList<L> {
     }
 }
 
+use std::iter::IntoIterator;
+impl<L: Storable> IntoIterator for ProjectList<L> {
+    type Item = L;
+    type IntoIter = ::std::vec::IntoIter<L>;
+
+    fn into_iter(self) -> Self::IntoIter{
+        self.projects.into_iter()
+    }
+}
+
 impl<L: Storable> Deref for ProjectList<L> {
     type Target = Vec<L>;
     fn deref(&self) -> &Vec<L> {
