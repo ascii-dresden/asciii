@@ -21,7 +21,9 @@
     unused_qualifications
     )]
 #![allow(unknown_lints)]
-#![allow(used_underscore_binding)]
+//#![allow(used_underscore_binding)]
+#![allow(unknown_lints)]
+#![allow(needless_borrow)]
 
 #![allow(deprecated)]
 
@@ -39,7 +41,6 @@ extern crate slug;
 extern crate tempdir;
 extern crate term; // TODO consolidate term, ansi_term and terminal_size
 extern crate currency;
-extern crate decimate;
 extern crate open;
 extern crate rustc_serialize;
 extern crate handlebars;

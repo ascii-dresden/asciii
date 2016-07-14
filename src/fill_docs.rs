@@ -7,8 +7,12 @@
 use std::fmt;
 use std::path::Path;
 use std::error::Error;
-use rustc_serialize::json::ToJson;
+use rustc_serialize::json::{ToJson,Json};
 use handlebars::{RenderError,Handlebars,no_escape};
+
+use util;
+use project::Project;
+use storage::{Storage,StorageResult};
 
 custom_derive! {
     #[derive(Debug,
@@ -62,6 +66,48 @@ impl From<RenderError>  for FillError{
     fn from(he: RenderError) -> FillError{ FillError::RenderError(he) }
 }
 
+
+/// Sets up an instance of `Storage`.
+fn setup_luigi() -> Storage<Project> {
+    let working = ::CONFIG.get_str("dirs/working")
+                .expect("Faulty config: dirs/working does not contain a value");
+    let archive = ::CONFIG.get_str("dirs/archive")
+                .expect("Faulty config: dirs/archive does not contain a value");
+    let templates = ::CONFIG.get_str("dirs/templates")
+                .expect("Faulty config: dirs/templates does not contain a value");
+    Storage::new(util::get_storage_path(), working, archive, templates).unwrap()
+}
+
+struct PackData<'a, T:'a +ToJson>{
+    document: &'a T,
+    storage: Storage<Project>
+}
+
+
+impl<'a, T> ToJson for PackData<'a, T> where T:ToJson
+{
+    fn to_json(&self) -> Json{
+        Json::Object(btreemap!{
+            String::from("document") => self.document.to_json(),
+            String::from("storage") => self.storage.to_json(),
+            String::from("is_invoice") => true.to_json(),
+        })
+    }
+}
+
+fn pack_data<'a, E:ToJson>(document:&'a E ) -> PackData<'a, E>{
+    PackData{document:document,storage:setup_luigi()}
+}
+
+use handlebars::{Context,Helper,RenderContext};
+fn inc_helper (_: &Context, h: &Helper, _: &Handlebars, rc: &mut RenderContext) -> Result<(), RenderError> {
+    // just for example, add error check for unwrap
+    let param = h.param(0).unwrap().value();
+    let rendered = format!("{}", param.as_u64().unwrap()+1);
+    try!(rc.writer.write(rendered.into_bytes().as_ref()));
+    Ok(())
+}
+
 /// Takes a `T:ToJson` and a template path and does it's thing.
 ///
 /// Returns path to created file, potenially in a `tempdir`.
@@ -75,51 +121,21 @@ pub fn fill_template<E:ToJson>(document:&E, template:Template) -> Result<String,
     handlebars.register_template_string("test", test_template).unwrap();
     handlebars.register_template_file("document", Path::new("./templates/document.tex.hbs")).unwrap();
     handlebars.register_template_file("simple", Path::new("./templates/simple.hbs")).unwrap();
+    handlebars.register_helper("inc", Box::new(inc_helper));
+
+    let packed = pack_data(document);
 
     let rendered = match template{
         Template::Document => {
-            handlebars.register_escape_fn(|data|data .replace("\n",r#"\newline"#));
-            handlebars.render("document", document)
-                .map(|r|r .replace("<","{") .replace(">","}"))
+            handlebars.register_escape_fn(|data|data .replace("\n",r#"\newline "#));
+            handlebars
+                .render("document", &packed).map(|r|r .replace("<","{") .replace(">","}"))
         },
-        Template::Simple => handlebars.render("simple", document),
+        Template::Simple => handlebars.render("simple", &packed),
         Template::Invalid => return Err(FillError::InvalidTemplate)
     }.map_err(FillError::RenderError);
 
-    println!("{:?}\n", document.to_json());
+    println!("{}\n", packed.to_json());
     rendered
 }
 
-/// Print config that lands in output files, for now
-pub fn print_config(){
-//Name                includes/name
-//Strasse             includes/strasse
-//Universitaet        includes/universitaet
-//Fakultaet           includes/fakultaet
-//Zusatz              includes/zusatz
-//RetourAdresse       includes/retouradresse
-//Ort                 includes/ort
-//Land                includes/land
-//Telefon             includes/telefon
-//Telefax             includes/telefax
-//Telex               includes/telex
-//HTTP                includes/http
-//EMail               includes/email
-//Bank                includes/bank
-//BLZ                 includes/blz
-//IBAN                includes/iban
-//BIC                 includes/bic
-//Konto               includes/konto
-//Steuernummer        includes/steuernummer
-//Unterschrift        manager
-//Adresse             client/address //].gsub("\n","\\newline ") %>}
-//Betreff             messages][document_type][0]
-//                    invoice/official]}" unless @data[:invoice/official].nil?  %>} %% [Angebot|Rechnung]
-//Datum               ype/date
-//AngebotManuel       offer/number
-//Veranstaltung       event/name
-//RechnungsNummer     invoice/longnumber //if type == :invoice %% bei Angeboten leer lassen
-//Anrede              client/addressing
-//Gruss               messages/signature //<%= @data[:signature] %>}{1cm}
-
-}

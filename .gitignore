@@ -10,3 +10,4 @@ tests/caterings
 *.csv
 *.png
 *.bk
+.most_recent_commit

@@ -3,7 +3,6 @@ use std::fmt;
 use rustc_serialize::json::{ToJson, Json};
 
 use currency::Currency;
-use decimate::Decimal;
 
 use util::yaml;
 use util::yaml::Yaml;
@@ -37,15 +36,13 @@ pub struct InvoiceItem<'a> {
 
 impl<'a> Product<'a>{
 
-    fn default_tax() -> Decimal<usize>{ Decimal::from_parts(0,19)}
-
     pub fn from_old_format<'y>(name:&'y str, values: &'y Yaml) -> ProductResult<Product<'y>> {
         Ok(Product{
             name:  name,
             unit:  yaml::get_str(values, "unit"),
             price: try!(yaml::get_f64(values, "price")
                 .ok_or(ProductError::InvalidPrice)
-                .and_then(to_currency)),
+                .map(to_currency)),
             tax:   yaml::get_f64(values, "tax").unwrap_or(DEFAULT_TAX),
         })
     }
@@ -56,7 +53,7 @@ impl<'a> Product<'a>{
             unit:  yaml::get_str(desc, "unit"),
             price: try!(yaml::get_f64(desc, "price")
                 .ok_or(ProductError::InvalidPrice)
-                .and_then(to_currency)),
+                .map(to_currency)),
             tax:   yaml::get_f64(desc, "tax").unwrap_or(DEFAULT_TAX),
         })
     }
@@ -75,11 +72,11 @@ impl<'a> ToJson for Product<'a>{
     fn to_json(&self) -> Json{
         let s = |s:&str| String::from(s);
         Json::Object(btreemap!{
-            String::from("name")     => self.name.to_json(),
-            String::from("unit")     => self.unit.map(|s|s.to_owned()).to_json(),
-            String::from("tax")      => self.tax.to_json(),
-            String::from("price")    => self.price.1.to_json(),
-            String::from("currency") => self.price.0.map(|s|s.to_string()).to_json(),
+            s("name")     => self.name.to_json(),
+            s("unit")     => self.unit.map(|s|s.to_owned()).to_json(),
+            s("tax")      => self.tax.to_json(),
+            s("price")    => self.price.1.to_json(),
+            s("currency") => self.price.0.map(|s|s.to_string()).to_json(),
         })
     }
 }

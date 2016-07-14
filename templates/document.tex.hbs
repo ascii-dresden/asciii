@@ -1,6 +1,7 @@
-\documentclass[11pt,utf8]<{x{ File.join $SETTINGS.plumber_dirs.templates, "latex/ascii-brief" }}>
-\Logo <{x{ File.join $SETTINGS.plumber_dirs.templates, includes_logopath }}>
+\documentclass[11pt,utf8]<{{storage.dirs.template}}/latex/ascii-brief">
+\Logo <{{storage.dirs.template}}/latex/ascii-logo.png>
 
+{{#with document}}
 \lochermarke
 \faltmarken
 \fenstermarken
@@ -27,18 +28,17 @@
 \Konto               {}
 \Steuernummer        {}
 
-\Unterschrift        <{{ manager }}>
+\Unterschrift        <{{ event.manager }}>
 \Postvermerk         {}
-\Adresse             <{{ client_address }}> %.gsub("\n","\\newline ")
+\Adresse             <{{ client.address }}>
 
-\Betreff             <{x{ messages[document_type][0] }}
-                      {x{ "\\newline #{invoice_official}" unless invoice_official.nil?  }}> %% [Angebot|Rechnung]
-
-{{#if is_invoice}}
+{{#if ../is_invoice}}% THIS IS AN INVOICE
 \Datum               <{{invoice.date}}>
-% THIS IS AN INVOICE
-{{else}}
+\Betreff             <Rechnung{{#if invoice.official}}\newline {{invoice.official}}{{/if}}>
+
+{{else}}% THIS IS AN OFFER
 \Datum               <{{offer.date}}>
+\Betreff             <Rechnung>
 % THIS IS AN OFFER
 {{/if}}
 
@@ -56,7 +56,7 @@
 \begin{ascii-brief}
 
 
-{x{ messages[document_type][1] }}
+wir bedanken uns für Ihren Auftrag für das Catering am {{ event.date }} und erlauben uns Ihnen folgende Rechnung zu stellen:
 
 \begin{center}
 \begin{tabular}{rp{7cm}rrr}
@@ -66,7 +66,7 @@
 {{#each products}} {{amount_sold}} {{product.name}} {{product.unit}} {{product.price}} {{product.tax}} {{/each}}
 
 {{#each products}}
-  -1 & {{ product.name }} {{#if product.unit }}
+  {{inc @index}} & {{ product.name }} {{#if product.unit }}
     ({{ product.unit }})
   {{ /if }} & {{ amount_sold }}  & {{ product.price }} & {x{ product.cost   type }} \\
 {{/each}}
@@ -97,3 +97,4 @@ Wir bitten um eine Begleichung des Betrags innerhalb von 14 Tagen nach Erhalt de
 
 \end{ascii-brief}
 \end{document}
+{{/with}}

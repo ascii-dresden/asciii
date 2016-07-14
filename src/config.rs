@@ -82,6 +82,15 @@ impl ConfigReader{
             .or_else(||yaml::get(&self.defaults, path))
     }
 
+    /// Returns the first character.
+    ///
+    /// # Panics
+    /// This panics if nothing is found.
+    /// You should have a default config for everything that you use.
+    pub fn get_char(&self, key:&str) -> Option<char> {
+        self.get_str(key).and_then(|s|s.chars().nth(0))
+    }
+
     /// Returns the string in the position or an empty string
     ///
     /// # Panics

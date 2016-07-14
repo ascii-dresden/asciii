@@ -76,8 +76,8 @@ impl VirtualField{
 }
 
 //TODO there may be cases where an f64 can't be converted into Currency
-pub fn to_currency(f:f64) -> ProductResult<Currency> {
-    Ok(Currency(Some('€'),(f * 1000.0) as i64)/10) // TODO XXX FIXME use fucking decimals
+pub fn to_currency(f:f64) -> Currency {
+    Currency(::CONFIG.get_char("currency"),(f * 1000.0) as i64)/10
 }
 
 fn field_exists<'a>(yaml:&Yaml, paths:&[&'a str]) -> Vec<&'a str>{
@@ -348,6 +348,10 @@ pub mod invoice{
         number(yaml).map(|n| format!("R{}-{:03}", year, n))
     }
 
+    pub fn official(yaml:&Yaml) -> Option<String>{
+        yaml::get_string(yaml, "invoice/official")
+    }
+
     pub fn validate(yaml:&Yaml) -> super::SpecResult {
         let mut errors = super::field_exists(yaml,&[
                                    "invoice/number",
@@ -391,7 +395,7 @@ pub mod hours {
 
     pub fn salary(yaml:&Yaml) -> Option<Currency>{
         yaml::get_f64(yaml, "hours/salary")
-            .and_then(|s|to_currency(s).ok())
+            .map(to_currency)
     }
 
     pub fn total(yaml:&Yaml) -> Option<f64> {
@@ -438,28 +442,26 @@ pub mod products{
             .collect::< ProductResult<Vec<InvoiceItem> >>()
     }
 
-    pub fn all_by_tax(yaml:&Yaml) -> ProductResult<MultiMap<usize,InvoiceItem>>
+    pub fn invoice_items_by_tax(yaml:&Yaml) -> ProductResult<MultiMap<String,InvoiceItem>>
     {
         // TODO need to replace tax:f64 with Decimal value
-        unimplemented!();
         let mut map = MultiMap::new();
         for item in try!(invoice_items(yaml)){
             let tax = 0;
-            //map.insert(item.product.tax, item);
-            map.insert(tax, item);
+            map.insert(item.product.tax.to_string(), item);
         }
         Ok(map)
     }
 
     pub fn sum_offered(items:&[InvoiceItem]) -> Currency{
         items.iter()
-             .fold(Currency(Some('€'),0_00),
+             .fold(to_currency(0_00f64),
              |acc, item| acc + item.product.price * item.amount_offered)
     }
 
     pub fn sum_sold(items:&[InvoiceItem]) -> Currency{
         items.iter()
-             .fold(Currency(Some('€'),0_00),
+             .fold(to_currency(0_00f64),
              |acc, item| acc + item.product.price * item.amount_sold)
     }
 

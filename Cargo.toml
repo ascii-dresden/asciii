@@ -9,6 +9,7 @@ authors = ["Hendrik Sollich <hendrik@hoodie.de>"]
 [dependencies]
 
 log = "0.3"
+num = "0.1"
 env_logger = "0.3"
 yaml-rust = {git="https://github.com/hoodie/yaml-rust", branch="feature/to_string"}
 chrono = "0.2"
@@ -19,9 +20,9 @@ multimap= "*"
 clap = {version = "2"}
 enum_derive = "0.1"
 custom_derive = "0.1"
-currency = {git="https://github.com/hoodie/currency-rs"}
 open = "1.1"
-decimate = {git="https://github.com/hoodie/decimate"}
+
+currency = {git="https://github.com/hoodie/currency-rs"}
 
 slug = "0.1"
 tempdir = "0.3"

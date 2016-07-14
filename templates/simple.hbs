@@ -1,3 +1,18 @@
+# Storage
+storage_dir: {{storage.dirs.storage}}
+working_dir: {{storage.dirs.working}}
+archive_dir: {{storage.dirs.archive}}
+template_dir: {{storage.dirs.template}}
+
+# Project
+{{#with document}}
+
+{{#if invoice.official}}
+this is official
+{{/if}}
+
+official: {{invoice.official}}
+
 {{invoice.number}} {{event.name}}
 
 {{client.address}}
@@ -7,3 +22,5 @@
 {{/each}}
 
  - ({{event.manager}})
+ ({{hours.time}})h
+{{/with}}

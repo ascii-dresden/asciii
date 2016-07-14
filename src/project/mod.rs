@@ -9,7 +9,7 @@ use std::fs::File;
 use std::io::prelude::*;
 use std::ffi::OsStr;
 use std::path::{Path, PathBuf};
-use std::collections::HashMap;
+use std::collections::{HashMap,BTreeMap};
 use chrono::*;
 use yaml_rust::Yaml;
 use tempdir::TempDir;
@@ -314,11 +314,13 @@ impl ToJson for Project{
         let y = &self.yaml;
         let dmy = |date:Option<Date<UTC>>| date.map(|d|d.format("%d.%m.%Y").to_string()).to_json();
 
+        let mut by_tax = BTreeMap::new();
+        for (key,values) in products::invoice_items_by_tax(y).unwrap().iter_all(){
+            by_tax.insert(key.to_owned(), values.to_json());
+        }
 
         let map = btreemap!{
             //String::from("adressing") => ,
-            s("is_invoice") => true.to_json(),
-
             s("client") => btreemap!{
                 s("email")      => opt_str(client::email(y)),
                 s("last_name")  => opt_str(client::last_name(y)),
@@ -330,6 +332,7 @@ impl ToJson for Project{
             }.to_json(),
 
             s("products") => products::invoice_items(y).unwrap().to_json(),
+            s("products_by_tax") =>  by_tax.to_json(),
 
 
             s("offer") => btreemap!{
@@ -344,8 +347,14 @@ impl ToJson for Project{
             }.to_json(),
 
             s("invoice") => btreemap!{
+                s("date")   => dmy(spec::date::invoice(y)),
                 s("number")      => invoice::number_str(y).to_json(),
                 s("number_long") => invoice::number_long_str(y).to_json(),
+                s("official") => invoice::official(y).to_json(),
+            }.to_json(),
+
+            s("hours") => btreemap!{
+                s("time")   => hours::total(y),
             }.to_json(),
 
         };
@@ -394,6 +403,6 @@ mod test{
         assert_eq!(spec::date::payed(&old_yaml), spec::date::payed(&new_yaml));
         assert_eq!(spec::client::title(&old_yaml), spec::client::title(&new_yaml));
         assert_eq!(spec::client::last_name(&old_yaml), spec::client::last_name(&new_yaml));
-        assert_eq!(spec::client::addressing(&old_yaml, &config), spec::client::addressing(&new_yaml, &config));
+        assert_eq!(spec::client::addressing(&old_yaml), spec::client::addressing(&new_yaml));
     }
 }

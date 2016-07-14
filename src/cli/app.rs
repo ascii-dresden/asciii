@@ -72,7 +72,7 @@ pub fn setup() -> ArgMatches<'static>{
                     )
 
         .subcommand(SubCommand::with_name("list")
-                    .aliases(&["ls", "dir"])
+                    .aliases(&["ls", "dir", "l", "lsit"])
                     .about("List Projects")
                     .arg(Arg::with_name("archive")
                          .help("list archived projects")

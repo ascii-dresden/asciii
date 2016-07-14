@@ -329,7 +329,7 @@ pub fn show(matches:&ArgMatches){
 //pub fn fill_template<E:ToJson>(document:&E){ println!("{:#?}", document.to_json()); }
 
 /// Command MAKE
-pub fn spec(matches:&ArgMatches){
+pub fn spec(_matches:&ArgMatches){
     use asciii::project::spec::*;
     let luigi = setup_luigi();
     //let projects = super::execute(||luigi.open_projects(StorageDir::All));
@@ -339,7 +339,7 @@ pub fn spec(matches:&ArgMatches){
         let yaml = project.yaml();
         client::validate(&yaml).map_err(|errors|for error in errors{
             println!("  error: {}", error);
-        });
+        }).unwrap();
 
         client::full_name(&yaml);
         client::first_name(&yaml);

@@ -99,17 +99,17 @@ fn validate_products(){
     println!("{:#?}",doc);
     let products = spec::products::invoice_items(&doc).unwrap();
     println!("Products {:#?}",products);
-    assert_eq!(products[0].item.name, "Kaffee");
+    assert_eq!(products[0].product.name, "Kaffee");
     assert_eq!(products[0].amount_offered, 5f64);
     assert_eq!(products[0].amount_sold, 5f64);
     assert_eq!(products[0].cost_before_tax(), Currency(Some('€'), 12_50));
     assert_eq!(products[0].cost_after_tax(), Currency(Some('€'), 14_88));
 
-    assert_eq!(products[1].item.name, "Tee");
+    assert_eq!(products[1].product.name, "Tee");
     assert_eq!(products[1].amount_offered, 6f64);
     assert_eq!(products[1].amount_sold, 2f64);
 
-    assert_eq!(products[2].item.name, "Wasser");
+    assert_eq!(products[2].product.name, "Wasser");
     assert_eq!(products[2].amount_offered, 6f64);
     assert_eq!(products[2].amount_sold, 2f64);
 }
@@ -197,17 +197,17 @@ fn compare_sum(doc_string:&str, want:i64){
 fn check_prices(){
     let doc = yaml::parse(&[PRODUCT_CATALOG,PRODUCT_TEST_SUM_UP1].join("\n")).unwrap();
     let products = spec::products::invoice_items(&doc).unwrap();
-    assert_eq!(products[0].item.name, "Apfelsaft");
-    assert_eq!(products[0].item.price.1, 164);
-    assert_eq!(products[1].item.name, "Kaffee");
-    assert_eq!(products[2].item.name, "Kekse");
+    assert_eq!(products[0].product.name, "Apfelsaft");
+    assert_eq!(products[0].product.price.1, 164);
+    assert_eq!(products[1].product.name, "Kaffee");
+    assert_eq!(products[2].product.name, "Kekse");
 
     let odd_prices = r#"products: { *broetchen:    { amount: 40 } } "#;
 
     let doc = yaml::parse(&[PRODUCT_CATALOG,odd_prices].join("\n")).unwrap();
     let products = spec::products::invoice_items(&doc).unwrap();
-    assert_eq!(products[0].item.name, "halbe Brötchen");
-    assert_eq!(products[0].item.price.1, 116);
+    assert_eq!(products[0].product.name, "halbe Brötchen");
+    assert_eq!(products[0].product.price.1, 116);
 }
 
 #[test] fn sum_up_products1(){ compare_sum(PRODUCT_TEST_SUM_UP1, 180_50); }
@@ -266,7 +266,7 @@ products:
   gutschein7: { amount: 1, sold: 1, price: 5.90 }
 "#;
 
-    let doc = yaml::parse(CLIENT_TEST_DOC).unwrap();
+    let doc = yaml::parse(PRODUCT_TEST_DOC_INVALID3).unwrap();
     let products = spec::products::invoice_items(&doc).unwrap();
     let sum_offered = spec::products::sum_offered(&products);
     let sum_sold    = spec::products::sum_sold(&products);

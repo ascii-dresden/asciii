@@ -1,3 +1,5 @@
+#![allow(unknown_lints)]
+#![allow(needless_borrow)]
 #![cfg_attr(feature = "lints", allow(unstable_features))]
 #![cfg_attr(feature = "lints", feature(plugin))]
 #![cfg_attr(feature = "lints", plugin(clippy))]
