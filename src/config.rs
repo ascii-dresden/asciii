@@ -40,7 +40,7 @@ impl ConfigReader{
 
     /// Opens config from `self.path()` and parses Yaml right away.
     #[cfg(feature = "debug_config")]
-    pub fn new () -> Result<ConfigReader, YamlError> {
+    pub fn new() -> Result<ConfigReader, YamlError> {
         let path = ConfigReader::path_home();
         let config = Ok(ConfigReader{
             path: path.to_owned(),
@@ -112,6 +112,14 @@ impl ConfigReader{
         yaml::get_as_string(&self.local, key)
             .or_else(||yaml::get_as_string(&self.custom, key))
             .or_else(||yaml::get_as_string(&self.defaults, key))
+            //.expect(&format!("Config file {} in field {} does not contain a value", DEFAULT_LOCATION, key))
+    }
+
+    /// Tries to get the config field as float
+    pub fn get_f64(&self, key:&str) -> Option<f64>{
+        yaml::get_f64(&self.local, key)
+            .or_else(||yaml::get_f64(&self.custom, key))
+            .or_else(||yaml::get_f64(&self.defaults, key))
             //.expect(&format!("Config file {} in field {} does not contain a value", DEFAULT_LOCATION, key))
     }
 

@@ -40,11 +40,9 @@ extern crate regex;
 extern crate slug;
 extern crate tempdir;
 extern crate term; // TODO consolidate term, ansi_term and terminal_size
-extern crate currency;
+extern crate claude as currency;
+extern crate bill;
 extern crate open;
-extern crate rustc_serialize;
-extern crate handlebars;
-extern crate multimap;
 #[macro_use] extern crate log;
 #[macro_use] extern crate prettytable;
 #[macro_use] extern crate lazy_static;
@@ -64,7 +62,10 @@ pub mod storage;
 pub mod print;
 
 pub mod templater;
-pub mod fill_docs;
+
+#[cfg(feature="document_export")] extern crate rustc_serialize;
+#[cfg(feature="document_export")] extern crate handlebars;
+#[cfg(feature="document_export")] pub mod fill_docs;
 
 lazy_static!{
     pub static ref CONFIG: config::ConfigReader = config::ConfigReader::new().unwrap();

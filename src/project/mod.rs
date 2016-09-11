@@ -9,13 +9,14 @@ use std::fs::File;
 use std::io::prelude::*;
 use std::ffi::OsStr;
 use std::path::{Path, PathBuf};
-use std::collections::{HashMap,BTreeMap};
+use std::collections::HashMap;
+
 use chrono::*;
 use yaml_rust::Yaml;
 use tempdir::TempDir;
 use slug;
 use currency::Currency;
-use rustc_serialize::json::{ToJson, Json};
+use bill::Bill;
 
 use util::yaml;
 use storage::*;
@@ -24,12 +25,15 @@ use templater::Templater;
 
 pub mod product;
 pub mod spec;
+
+#[cfg(feature="document_export")]
+pub mod tojson;
+
 #[cfg(test)] mod tests;
 
 use self::spec::{SpecResult, VirtualField};
+use self::product::Product;
 
-//#[cfg(feature="document_export")]
-//pub mod export;
 
 static PROJECT_FILE_EXTENSION:&'static str = "yml";
 
@@ -42,10 +46,9 @@ pub enum ProductError{
     MissingAmount(String),
     TooMuchReturned(String),
     InvalidPrice,
+    Unimplemented, // TODO remove
     UnknownFormat
 }
-
-
 
 /// Output of `Project::debug()`.
 ///
@@ -68,6 +71,79 @@ pub struct Project {
     yaml: Yaml
 }
 
+impl Project{
+    /// Access to inner data
+    pub fn yaml(&self) -> &Yaml{ &self.yaml }
+
+    /// wrapper around yaml::get() with replacement
+    pub fn get(&self, path:&str) -> Option<String>{
+        VirtualField::from(path).get(self).or_else(||
+            yaml::get_as_string(self.yaml(),path)
+        )
+    }
+
+    pub fn manager(&self) -> String{
+        spec::project::manager(self.yaml()).unwrap_or("").into()
+    }
+
+    pub fn canceled(&self) -> bool{
+        spec::project::canceled(self.yaml())
+    }
+
+    /// either `"canceled"` or `""`
+    pub fn canceled_string(&self) -> &'static str{
+        if self.canceled(){"canceled"}
+        else {""}
+    }
+
+    pub fn invoice_num(&self) -> Option<String>{
+        spec::invoice::number_str(self.yaml())
+    }
+
+    /// Minimum correctness.
+    ///
+    /// Ready to send an **offer** to the client.
+    pub fn valid_stage1(&self) -> SpecResult{
+        spec::offer::validate(&self.yaml)
+    }
+
+    /// Valid project
+    ///
+    /// Ready to send an **invoice** to the client.
+    pub fn valid_stage2(&self) -> SpecResult{
+        spec::invoice::validate(&self.yaml)
+    }
+
+    /// Completely done and in the past.
+    ///
+    /// Ready to be **archived**.
+    pub fn valid_stage3(&self) -> SpecResult{
+        if self.canceled(){
+            Ok(())
+        } else {
+            spec::archive::validate(&self.yaml)
+        }
+    }
+
+    pub fn age(&self) -> Option<i64> {
+        self.date().map(|date| (Local::today() - date).num_days() )
+    }
+
+    pub fn bills(&self) -> ProductResult<(Bill<Product>, Bill<Product>)>{
+        spec::billing::bills(&self.yaml)
+    }
+
+    pub fn wages(&self) -> Option<Currency> {
+        if let (Some(total), Some(salary)) = (spec::hours::total(&self.yaml), spec::hours::salary(&self.yaml)){
+            Some(total * salary)
+        } else{None}
+    }
+
+    pub fn debug(&self) -> DebugProject{
+        self.into()
+    }
+}
+
 impl From<yaml::YamlError> for StorageError {
     fn from(yerror: yaml::YamlError) -> StorageError{ StorageError::ParseError(yerror) }
 }
@@ -87,8 +163,10 @@ impl Storable for Project{
             "PROJECT-NAME"  => project_name.to_owned(),
             "DATE-EVENT"    => event_date,
             "DATE-CREATED"  => created_date,
+            "TAX"           => ::CONFIG.get_as_string("defaults/tax")
+                .expect("Faulty config: field defaults/tax does not contain a value"),
             "SALARY"        => ::CONFIG.get_as_string("defaults/salary")
-                .expect("Faulty config: field defaults/salary does not contain a string value"),
+                .expect("Faulty config: field defaults/salary does not contain a value"),
             "MANAGER"       => ::CONFIG.get_str("manager_name").unwrap_or("").to_string(),
             "DESCRIPTION"   => String::new(),
             "TIME-START"    => String::new(),
@@ -195,170 +273,6 @@ impl Storable for Project{
         self.invoice_num().map_or(false, |num|num.to_lowercase().contains(&search))
         ||
         self.name().to_lowercase().contains(&search)
-    }
-}
-
-impl Project{
-    /// Access to inner data
-    pub fn yaml(&self) -> &Yaml{ &self.yaml }
-
-    /// wrapper around yaml::get() with replacement
-    pub fn get(&self, path:&str) -> Option<String>{
-        VirtualField::from(path).get(self).or_else(||
-            yaml::get_as_string(self.yaml(),path)
-        )
-    }
-
-    pub fn manager(&self) -> String{
-        spec::project::manager(self.yaml()).unwrap_or("").into()
-    }
-
-    pub fn canceled(&self) -> bool{
-        spec::project::canceled(self.yaml())
-    }
-
-    /// either `"canceled"` or `""`
-    pub fn canceled_string(&self) -> &'static str{
-        if self.canceled(){"canceled"}
-        else {""}
-    }
-
-    pub fn invoice_num(&self) -> Option<String>{
-        spec::invoice::number_str(self.yaml())
-    }
-
-    /// Minimum correctness.
-    ///
-    /// Ready to send an **offer** to the client.
-    pub fn valid_stage1(&self) -> SpecResult{
-        spec::offer::validate(&self.yaml)
-    }
-
-    /// Valid project
-    ///
-    /// Ready to send an **invoice** to the client.
-    pub fn valid_stage2(&self) -> SpecResult{
-        spec::invoice::validate(&self.yaml)
-    }
-
-    /// Completely done and in the past.
-    ///
-    /// Ready to be **archived**.
-    pub fn valid_stage3(&self) -> SpecResult{
-        if self.canceled(){
-            Ok(())
-        } else {
-            spec::archive::validate(&self.yaml)
-        }
-    }
-
-    pub fn age(&self) -> Option<i64> {
-        self.date().map(|date| (Local::today() - date).num_days() )
-    }
-
-    pub fn invoice_items(&self) -> ProductResult<Vec<product::InvoiceItem>> {
-        spec::products::invoice_items(self.yaml())
-    }
-
-    pub fn wages(&self) -> Option<Currency> {
-        if let (Some(total), Some(salary)) = (spec::hours::total(&self.yaml), spec::hours::salary(&self.yaml)){
-            Some(total * salary)
-        } else{None}
-    }
-
-    pub fn sum_offered(&self) -> Option<Currency> {
-        spec::products::invoice_items(self.yaml()).ok() .map(|products| spec::products::sum_offered(&products))
-    }
-
-    pub fn sum_sold(&self) -> Option<Currency> {
-        spec::products::invoice_items(self.yaml()).ok()
-            .map(|products| spec::products::sum_sold(&products))
-    }
-
-    pub fn tax_offered(&self) -> Option<Currency> {
-        spec::products::invoice_items(self.yaml()).ok()
-            .map(|products| spec::products::sum_offered(&products))
-            .map(|sum| sum * 0.19)
-    }
-
-    pub fn tax_sold(&self) -> Option<Currency> {
-        spec::products::invoice_items(self.yaml()).ok()
-            .map(|products| spec::products::sum_sold(&products))
-            .map(|sum| sum * 0.19)
-    }
-
-    pub fn sum_sold_and_taxes(&self) -> Option<Currency> {
-        if let (Some(wages), Some(tax), Some(sum)) = (self.wages(), self.tax_sold(), self.sum_sold()){
-            Some(sum+tax)
-        } else{ None }
-    }
-
-    pub fn sum_sold_and_wages(&self) -> Option<Currency> {
-        if let (Some(wages), Some(tax), Some(sum)) = (self.wages(), self.tax_sold(), self.sum_sold()){
-            Some(wages+sum+tax)
-        } else{ None }
-    }
-
-    pub fn debug(&self) -> DebugProject{
-        self.into()
-    }
-}
-
-impl ToJson for Project{
-    fn to_json(&self) -> Json{
-        use self::spec::*;
-
-        let s = |s:&str| String::from(s);
-
-        let opt_str = |opt:Option<&str>| opt.map(|e|e.to_owned()).to_json() ;
-        let y = &self.yaml;
-        let dmy = |date:Option<Date<UTC>>| date.map(|d|d.format("%d.%m.%Y").to_string()).to_json();
-
-        let mut by_tax = BTreeMap::new();
-        for (key,values) in products::invoice_items_by_tax(y).unwrap().iter_all(){
-            by_tax.insert(key.to_owned(), values.to_json());
-        }
-
-        let map = btreemap!{
-            //String::from("adressing") => ,
-            s("client") => btreemap!{
-                s("email")      => opt_str(client::email(y)),
-                s("last_name")  => opt_str(client::last_name(y)),
-                s("first_name") => opt_str(client::first_name(y)),
-                s("full_name")  => client::full_name(y).to_json(),
-                s("title")      => opt_str(client::title(y)),
-                s("address")    => opt_str(client::address(y)),
-                s("addressing") => client::addressing(y).to_json(),
-            }.to_json(),
-
-            s("products") => products::invoice_items(y).unwrap().to_json(),
-            s("products_by_tax") =>  by_tax.to_json(),
-
-
-            s("offer") => btreemap!{
-                s("number") => offer::number(y).to_json(),
-                s("date")   => dmy(spec::date::offer(y)),
-            }.to_json(),
-
-            s("event") => btreemap!{
-                s("name")    => self.name().to_json(),
-                s("date")    => dmy(project::date(y)),
-                s("manager") => self.manager().to_json(),
-            }.to_json(),
-
-            s("invoice") => btreemap!{
-                s("date")   => dmy(spec::date::invoice(y)),
-                s("number")      => invoice::number_str(y).to_json(),
-                s("number_long") => invoice::number_long_str(y).to_json(),
-                s("official") => invoice::official(y).to_json(),
-            }.to_json(),
-
-            s("hours") => btreemap!{
-                s("time")   => hours::total(y),
-            }.to_json(),
-
-        };
-        Json::Object(map)
     }
 }
 
