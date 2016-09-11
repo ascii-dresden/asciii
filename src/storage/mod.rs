@@ -20,9 +20,7 @@
 //!
 
 
-#![allow(unused_imports)]
-
-use std::{fs,io};
+use std::fs;
 use std::path::{Path, PathBuf};
 use std::marker::PhantomData;
 

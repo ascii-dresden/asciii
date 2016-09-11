@@ -3,7 +3,6 @@ use std::fmt;
 use std::path::{Path, PathBuf};
 #[cfg(feature="git_statuses")]
 use std::collections::HashMap;
-use std::io::Write;
 use std::process::{Command,ExitStatus};
 
 #[cfg(not(feature="git_statuses"))]

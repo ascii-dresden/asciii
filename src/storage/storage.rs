@@ -4,7 +4,7 @@
 use std::fs;
 use std::fmt;
 use std::ffi::OsStr;
-use std::ops::{Deref, DerefMut};
+use std::ops::DerefMut;
 use std::path::{Path, PathBuf};
 use std::marker::PhantomData;
 use std::collections::HashMap;
@@ -481,7 +481,9 @@ impl<P:Storable> fmt::Debug for Storage<P>{
     }
 }
 
+#[cfg(feature="document_export")]
 use rustc_serialize::json::{ToJson, Json};
+#[cfg(feature="document_export")]
 impl<P:Storable> ToJson for Storage<P>{
     fn to_json(&self) -> Json{
         let s = |s:&str| String::from(s);
