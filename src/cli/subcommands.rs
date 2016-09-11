@@ -6,7 +6,6 @@ use std::collections::HashMap;
 use clap::ArgMatches;
 use open;
 use chrono::Datelike;
-use rustc_serialize::json::ToJson;
 
 use asciii::CONFIG;
 use asciii::config;
@@ -16,7 +15,9 @@ use asciii::storage::*;
 use asciii::templater::Templater;
 use asciii::project::Project;
 use asciii::project::spec::VirtualField;
-use asciii::fill_docs::{fill_template,Template};
+
+#[cfg(feature="document_export")]
+use asciii::fill_docs::fill_template;
 
 use super::{setup_luigi, setup_luigi_with_git, fail};
 use asciii::print;
@@ -318,7 +319,8 @@ pub fn show(matches:&ArgMatches){
                       }
                      );
     } else if  matches.is_present("json"){
-        with_projects(StorageDir::Working, search_term, |p|println!("{:#?}", p.to_json()));
+        //with_projects(StorageDir::Working, search_term, |p|println!("{}", p.to_json()));
+        error!("feature temporarily disabled")
     } else if  matches.is_present("template"){
         show_template(search_term);
     } else {
@@ -326,9 +328,8 @@ pub fn show(matches:&ArgMatches){
     }
 }
 
-//pub fn fill_template<E:ToJson>(document:&E){ println!("{:#?}", document.to_json()); }
-
-/// Command MAKE
+/// Command SPEC
+/// TODO make this not panic :D
 pub fn spec(_matches:&ArgMatches){
     use asciii::project::spec::*;
     let luigi = setup_luigi();
@@ -336,6 +337,7 @@ pub fn spec(_matches:&ArgMatches){
     let projects = super::execute(||luigi.open_projects(StorageDir::Working));
     for project in projects{
         println!("{}", project.dir().display());
+
         let yaml = project.yaml();
         client::validate(&yaml).map_err(|errors|for error in errors{
             println!("  error: {}", error);
@@ -353,17 +355,18 @@ pub fn spec(_matches:&ArgMatches){
         offer::number(&yaml);
         project.age().map(|a|format!("{} days", a));
         project.date().map(|d|d.year().to_string());
-        project.sum_sold().map(|c|c.to_string());
+        //project.sum_sold().map(|c|c.to_string()); //TODO restore
         project::manager(&yaml).map(|s|s.to_owned());
         project::name(&yaml).map(|s|s.to_owned());
     }
 }
 
 /// Command MAKE
+#[cfg(feature="document_export")]
 pub fn make(matches:&ArgMatches){
     let search_term = matches.value_of("search_term").unwrap();
     let template = matches.value_of("template").unwrap_or("Document");
-    let dir = match  matches.value_of("archive"){
+    let dir = match matches.value_of("archive"){
         Some(year) => { let year = year.parse::<i32>().unwrap(); StorageDir::Archive(year) },
         _ => StorageDir::Working
     };
@@ -372,6 +375,11 @@ pub fn make(matches:&ArgMatches){
         let filled = fill_template(p,template.into()).unwrap();
         println!("{}", filled);
     });
+}
+#[cfg(not(feature="document_export"))]
+pub fn make(_:&ArgMatches){
+    error!("Make functionality not built-in with this release!");
+    unimplemented!();
 }
 
 fn with_projects<F:Fn(&Project)>(dir:StorageDir, search_term:&str, cb:F){
@@ -530,6 +538,7 @@ pub fn term(){
 }
 
 pub fn show_path(matches:&ArgMatches){path(matches, |path| println!("{}", path.display()))}
+
 pub fn open_path(matches:&ArgMatches){path(matches, |path| {open::that(path).unwrap();})}
 
 pub fn path<F:Fn(&Path)>(matches:&ArgMatches, action:F){

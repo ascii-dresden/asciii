@@ -181,7 +181,7 @@ pub fn verbose_rows(projects:&[Project], list_config:&ListConfig) -> Vec<Row>{
 
                 //cell!(project.sum_invoice().map(|i|i.to_string()).unwrap_or(String::from("none"))),
                 //cell!(project.wages().map(|i|i.to_string()).unwrap_or(String::from("none"))),
-                cell!(project.sum_sold_and_wages().map(|i|i.to_string()).unwrap_or(String::from("none"))),
+                //cell!(project.sum_sold_and_wages().map(|i|i.to_string()).unwrap_or(String::from("none"))),
 
             ]);
 
@@ -295,25 +295,26 @@ pub fn show_items(project:&Project){
     println!("{}", project.name());
 
     let mut table = Table::new();
-    let items = project.invoice_items().expect("problem opening items");
+    //let items = project.invoice_items().expect("problem opening items");
     //table.set_format(TableFormat::new());
     table.add_row( Row::new(vec![cell!(""), cell!("name"), cell!( "amount"), cell!("price"), cell!("cost")]));
-    for (index,item) in items.iter().enumerate(){
-        table.add_row( Row::new(vec![
-                                Cell::new(&index.to_string()),
-                                Cell::new(item.product.name),
-                                Cell::new(&item.amount_sold.to_string()),
-                                Cell::new(&item.product.price.to_string()),
-                                Cell::new(&(item.product.price * item.amount_sold).to_string()),
-        ]));
-    }
-    table.printstd();
-    let mut table = table!{
-        ["sold ", project.sum_sold().unwrap() ],
-        ["tax", project.tax_sold().unwrap() ],
-        ["sum+tax", project.sum_sold_and_taxes().unwrap()],
-        ["sum+wages", project.sum_sold_and_wages().unwrap()]
-    };
+    // TODO restore
+    //for (index,item) in items.iter().enumerate(){
+    //    table.add_row( Row::new(vec![
+    //                            Cell::new(&index.to_string()),
+    //                            Cell::new(item.product.name),
+    //                            Cell::new(&item.amount_sold.to_string()),
+    //                            Cell::new(&item.product.price.to_string()),
+    //                            Cell::new(&(item.product.price * item.amount_sold).to_string()),
+    //    ]));
+    //}
+    //table.printstd();
+    //let mut table = table!{
+    //    ["sold ", project.sum_sold().unwrap() ],
+    //    ["tax", project.tax_sold().unwrap() ],
+    //    ["sum+tax", project.sum_sold_and_taxes().unwrap()],
+    //    ["sum+wages", project.sum_sold_and_wages().unwrap()]
+    //};
     table.set_format(TableFormat::new());
     table.printstd();
 

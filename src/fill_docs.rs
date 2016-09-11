@@ -7,12 +7,12 @@
 use std::fmt;
 use std::path::Path;
 use std::error::Error;
-use rustc_serialize::json::{ToJson,Json};
-use handlebars::{RenderError,Handlebars,no_escape};
+use rustc_serialize::json::{ToJson, Json};
+use handlebars::{RenderError, Handlebars, no_escape};
 
 use util;
 use project::Project;
-use storage::{Storage,StorageResult};
+use storage::Storage;
 
 custom_derive! {
     #[derive(Debug,
@@ -25,85 +25,93 @@ pub enum Template{
     Invalid
 }
 }
-impl<'a> From<&'a str> for Template{
-    fn from(s:&'a str) -> Template{
+
+impl<'a> From<&'a str> for Template {
+    fn from(s: &'a str) -> Template {
         s.parse::<Template>().unwrap_or(Template::Invalid)
     }
 }
 
 #[derive(Debug)]
-pub enum FillError{
+pub enum FillError {
     RenderError(RenderError),
-    InvalidTemplate
+    InvalidTemplate,
 }
-impl Error for FillError{
-    fn description(&self) -> &str{
-        match *self{
+
+impl Error for FillError {
+    fn description(&self) -> &str {
+        match *self {
             FillError::RenderError(ref inner) => inner.description(),
-            FillError::InvalidTemplate => "Invalid Template"
+            FillError::InvalidTemplate => "Invalid Template",
         }
     }
 
-    fn cause(&self) -> Option<&Error>{
-        match *self{
+    fn cause(&self) -> Option<&Error> {
+        match *self {
             FillError::RenderError(ref inner) => Some(inner),
-            FillError::InvalidTemplate => None
+            FillError::InvalidTemplate => None,
         }
     }
 }
-impl fmt::Display for FillError{
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result{
+
+impl fmt::Display for FillError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self.cause() {
             None => write!(f, "{}", self.description(),),
-            Some(cause) => write!(f, "{}", cause)
+            Some(cause) => write!(f, "{}", cause),
         }
     }
 }
 
-//
 // All you need to make try!() fun again
-impl From<RenderError>  for FillError{
-    fn from(he: RenderError) -> FillError{ FillError::RenderError(he) }
+impl From<RenderError> for FillError {
+    fn from(he: RenderError) -> FillError {
+        FillError::RenderError(he)
+    }
 }
 
 
 /// Sets up an instance of `Storage`.
 fn setup_luigi() -> Storage<Project> {
     let working = ::CONFIG.get_str("dirs/working")
-                .expect("Faulty config: dirs/working does not contain a value");
+        .expect("Faulty config: dirs/working does not contain a value");
     let archive = ::CONFIG.get_str("dirs/archive")
-                .expect("Faulty config: dirs/archive does not contain a value");
+        .expect("Faulty config: dirs/archive does not contain a value");
     let templates = ::CONFIG.get_str("dirs/templates")
-                .expect("Faulty config: dirs/templates does not contain a value");
+        .expect("Faulty config: dirs/templates does not contain a value");
     Storage::new(util::get_storage_path(), working, archive, templates).unwrap()
 }
 
-struct PackData<'a, T:'a +ToJson>{
+struct PackData<'a, T: 'a + ToJson> {
     document: &'a T,
-    storage: Storage<Project>
+    storage: Storage<Project>,
 }
 
 
-impl<'a, T> ToJson for PackData<'a, T> where T:ToJson
+impl<'a, T> ToJson for PackData<'a, T>
+    where T: ToJson
 {
-    fn to_json(&self) -> Json{
+    fn to_json(&self) -> Json {
         Json::Object(btreemap!{
-            String::from("document") => self.document.to_json(),
-            String::from("storage") => self.storage.to_json(),
+            String::from("document")   => self.document.to_json(),
+            String::from("storage")    => self.storage.to_json(),
             String::from("is_invoice") => true.to_json(),
         })
     }
 }
 
-fn pack_data<'a, E:ToJson>(document:&'a E ) -> PackData<'a, E>{
-    PackData{document:document,storage:setup_luigi()}
+fn pack_data<E: ToJson>(document: &E) -> PackData<E> {
+    PackData {
+        document: document,
+        storage: setup_luigi(),
+    }
 }
 
-use handlebars::{Context,Helper,RenderContext};
-fn inc_helper (_: &Context, h: &Helper, _: &Handlebars, rc: &mut RenderContext) -> Result<(), RenderError> {
+use handlebars::{Context, Helper, RenderContext};
+fn inc_helper(_: &Context, h: &Helper, _: &Handlebars, rc: &mut RenderContext) -> Result<(), RenderError> {
     // just for example, add error check for unwrap
     let param = h.param(0).unwrap().value();
-    let rendered = format!("{}", param.as_u64().unwrap()+1);
+    let rendered = format!("{}", param.as_u64().unwrap() + 1);
     try!(rc.writer.write(rendered.into_bytes().as_ref()));
     Ok(())
 }
@@ -111,31 +119,34 @@ fn inc_helper (_: &Context, h: &Helper, _: &Handlebars, rc: &mut RenderContext) 
 /// Takes a `T:ToJson` and a template path and does it's thing.
 ///
 /// Returns path to created file, potenially in a `tempdir`.
-//pub fn fill_template<E:ToJson>(document:E, template_file:&Path) -> PathBuf{
-pub fn fill_template<E:ToJson>(document:&E, template:Template) -> Result<String, FillError>{
+// pub fn fill_template<E:ToJson>(document:E, template_file:&Path) -> PathBuf{
+pub fn fill_template<E: ToJson>(document: &E, template: Template) -> Result<String, FillError> {
 
-    let test_template = String::from(r#"\Name{{{name}}}"#);
     let mut handlebars = Handlebars::new();
     handlebars.register_escape_fn(no_escape);
-
-    handlebars.register_template_string("test", test_template).unwrap();
-    handlebars.register_template_file("document", Path::new("./templates/document.tex.hbs")).unwrap();
-    handlebars.register_template_file("simple", Path::new("./templates/simple.hbs")).unwrap();
     handlebars.register_helper("inc", Box::new(inc_helper));
+
+    handlebars.register_template_file(
+        "document",
+        Path::new("./templates/document.tex.hbs"))
+        .unwrap();
+
+    handlebars.register_template_file(
+        "simple",
+        Path::new("./templates/simple.hbs"))
+        .unwrap();
 
     let packed = pack_data(document);
 
-    let rendered = match template{
+    match template {
         Template::Document => {
-            handlebars.register_escape_fn(|data|data .replace("\n",r#"\newline "#));
-            handlebars
-                .render("document", &packed).map(|r|r .replace("<","{") .replace(">","}"))
-        },
+            handlebars.register_escape_fn(|data| data.replace("\n", r#"\newline "#));
+            handlebars.render("document", &packed)
+                      .map(|r| r.replace("<", "{")
+                                .replace(">", "}"))
+        }
         Template::Simple => handlebars.render("simple", &packed),
-        Template::Invalid => return Err(FillError::InvalidTemplate)
-    }.map_err(FillError::RenderError);
-
-    println!("{}\n", packed.to_json());
-    rendered
+        Template::Invalid => return Err(FillError::InvalidTemplate),
+    }
+    .map_err(FillError::RenderError)
 }
-

@@ -70,7 +70,7 @@ manager: __MANAGER__
 
 #canceled: yes
 #lang:
-#tax:
+#tax: __TAX__
 
 #messages: # read default-settings.yml on how to overwrite
 

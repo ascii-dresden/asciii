@@ -1,5 +1,6 @@
-\documentclass[11pt,utf8]<{{storage.dirs.template}}/latex/ascii-brief">
+\documentclass[11pt,utf8]<{{storage.dirs.template}}/latex/ascii-brief>
 \Logo <{{storage.dirs.template}}/latex/ascii-logo.png>
+
 
 {{#with document}}
 \lochermarke
@@ -32,22 +33,25 @@
 \Postvermerk         {}
 \Adresse             <{{ client.address }}>
 
-{{#if ../is_invoice}}% THIS IS AN INVOICE
+{{#if ../is_invoice}}
 \Datum               <{{invoice.date}}>
 \Betreff             <Rechnung{{#if invoice.official}}\newline {{invoice.official}}{{/if}}>
+\RechnungsNummer     <{{ invoice.longnumber  }}>
+\AngebotsNummer      {} %% Manuel ueberschreibbar ansonsten automatisch heute
 
-{{else}}% THIS IS AN OFFER
+{{else}}
 \Datum               <{{offer.date}}>
-\Betreff             <Rechnung>
-% THIS IS AN OFFER
+\Betreff             <Angebot>
+\RechnungsNummer     {}
+\AngebotManuel       <{{ offer.number }}> %% Manuel ueberschreibbar ansonsten automatisch heute
+
 {{/if}}
 
 
-\AngebotManuel       <{{ offer.number }}> %% Manuel ueberschreibbar ansonsten automatisch heute
+
 \Veranstaltung       <{{ event.name }}>
-\RechnungsNummer     <{{ invoice.longnumber  }}> % if type == :invoice %% bei Angeboten leer lassen
 \Anrede              <{{ client.addressing }},}
-\Gruss               {Mit freundlichen Grüßen <{{ signature }}>}{1cm}
+\Gruss               {Mit freundlichen Grüßen}{1cm}
 
 %\Anlagen             {Anlagen}
 %\Verteiler           {Verteiler}
@@ -62,34 +66,26 @@ wir bedanken uns für Ihren Auftrag für das Catering am {{ event.date }} und er
 \begin{tabular}{rp{7cm}rrr}
   \textbf{Nr.} & \textbf{Bezeichnung}&    \textbf{Menge}    &    \textbf{EP}&    \textbf{Preis}    \\
   \midrule
-
-{{#each products}} {{amount_sold}} {{product.name}} {{product.unit}} {{product.price}} {{product.tax}} {{/each}}
-
 {{#each products}}
-  {{inc @index}} & {{ product.name }} {{#if product.unit }}
-    ({{ product.unit }})
-  {{ /if }} & {{ amount_sold }}  & {{ product.price }} & {x{ product.cost   type }} \\
+  {{inc @index}} & {{ product.name }}
+{{#if product.unit }} ({{ product.unit }})
+{{ /if }} & {{ amount_sold }}  & {{ product.price }} & {{ cost_offered }}\\
 {{/each}}
 
-{x{ if hours_time >0}}
+{{#if hours_time }}
 {x{ products.count + 1 }} & Betreuung (Stunden) & {{ hours_time }} & {{ hours_salary }} & {{ hours_total }} \\
-{x{ end }}
+{{ /if }}
 
 \bottomrule[1pt]
-\multicolumn{4}{r}{Netto MwSt.}   & {{ type_costs }}  \\
-%\multicolumn{4}{r}{Brutto MwSt. 19\%} & {{ type_total }}  \\
+\multicolumn{4}{r}{Netto MwSt.}   & 39,50€  \\
+%\multicolumn{4}{r}{Brutto MwSt. 19\%} & 47,00€  \\
 
-{x{ productsbytax.each {|tax,products|
-  t = 0 .to_euro
-  products.each {|p| t+= p.tax(type)}
-}}
-    \multicolumn{4}{r}{+MwSt. {x{ (tax.rationalize*100).to_f }}\%}        & {{ t }}  \\
-{x{ } }}
 
-{x{ if hours_time >0}}
-\multicolumn{4}{r}{MwSt 0\%}           & {{ hours_total }} \\
-{x{ end }}
-\multicolumn{4}{r}{Gesamtpreis}        & {{ type_final }} \\
+    \multicolumn{4}{r}{+MwSt. 19.0\%}        & 7,50€  \\
+
+
+
+\multicolumn{4}{r}{Gesamtpreis}        & 47,00€ \\
 \end{tabular}
 \end{center}
 

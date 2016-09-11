@@ -1,4 +1,5 @@
 use asciii::version;
+#[cfg(feature="document_export")]
 use asciii::fill_docs::Template;
 use super::validators;
 use clap::{App, AppSettings, Arg, ArgMatches, SubCommand};
@@ -35,7 +36,7 @@ pub fn setup() -> ArgMatches<'static>{
                          .takes_value(true))
 
                     .arg(Arg::with_name("template")
-                         .help("Use a specific template.")
+                         .help("Use a specific template")
                          .long("template")
                          .short("t"))
 
@@ -357,17 +358,31 @@ pub fn setup() -> ArgMatches<'static>{
 
         .subcommand(SubCommand::with_name("make")
                     .about("Creates documents from projects")
+
                     .arg(Arg::with_name("search_term")
                          .help("Search term, possibly event name")
                          .required(true)
                          .multiple(true))
 
-                    .arg(Arg::with_name("template")
-                         .help("Use a particular template")
-                         .short("t")
-                         .long("template")
-                         .takes_value(true)
-                         .possible_values( &Template::iter_variant_names().filter(|v|*v!="Invalid").collect::<Vec<&str>>()))
+                    .arg(Arg::with_name("offer")
+                         .help("Produce an offer document")
+                         .short("o")
+                         .long("offer")
+                         .conflicts_with("invoice")
+                         )
+
+                    .arg(Arg::with_name("invoice")
+                         .help("Produce an invoice document")
+                         .short("i")
+                         .long("invoice")
+                         )
+
+                    //.arg(Arg::with_name("template")
+                    //     .help("Use a particular template")
+                    //     .short("t")
+                    //     .long("template")
+                    //     .takes_value(true)
+                    //     .possible_values( &Template::iter_variant_names().filter(|v|*v!="Invalid").collect::<Vec<&str>>()))
                    )
 
 

@@ -11,3 +11,9 @@ tests/caterings
 *.png
 *.bk
 .most_recent_commit
+*.pdf
+*.log
+*.tex
+*.aux
+*.ymlx
+*.json
