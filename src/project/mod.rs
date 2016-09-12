@@ -129,6 +129,7 @@ impl Project{
         self.date().map(|date| (Local::today() - date).num_days() )
     }
 
+    /// Returs a tuple containing both `(Order,` and ` Invoice)`
     pub fn bills(&self) -> ProductResult<(Bill<Product>, Bill<Product>)>{
         spec::billing::bills(&self.yaml)
     }

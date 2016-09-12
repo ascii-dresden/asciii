@@ -4,11 +4,13 @@ use chrono::*;
 use prettytable::Table;
 use prettytable::row::Row;
 use prettytable::cell::Cell;
-use prettytable::format::{TableFormat,FormatBuilder};
+use prettytable::format::{LineSeparator,LinePosition,FormatBuilder};
 use term::{Attr, color};
 
 use project::Project;
 use storage::Storable;
+use ordered_float::OrderedFloat;
+use currency::Currency;
 
 //TODO construct table rows way more dynamically
 
@@ -291,32 +293,66 @@ pub fn print_csv(projects:&[Project]){
 }
 
 pub fn show_items(project:&Project){
-
+//┌───────────────────────────────────────────┐
+//│     Project:         "ESE Gutscheine"     │
+//├───────────────────────────────────────────┤
+//│    name          amount  price    cost    │
+//│ 1  Gutschein 5€       8  4,20€  33,60€    │
+//│ 2  Gutschein 7€       1  5,90€   5,90€    │
+//│    ============  ======  =====  ======    │
+//│    Kosten                       39,50€    │
+//│    MWST 19.0%                    7,50€    │
+//│    Final                        47,00€    │
+//└───────────────────────────────────────────┘
+ 
+    trace!("print::show_items()");
     println!("{}", project.name());
 
+    let (order, _invoice) = project.bills().unwrap();
+    let bill = order;
+
     let mut table = Table::new();
-    //let items = project.invoice_items().expect("problem opening items");
-    //table.set_format(TableFormat::new());
-    table.add_row( Row::new(vec![cell!(""), cell!("name"), cell!( "amount"), cell!("price"), cell!("cost")]));
-    // TODO restore
-    //for (index,item) in items.iter().enumerate(){
-    //    table.add_row( Row::new(vec![
-    //                            Cell::new(&index.to_string()),
-    //                            Cell::new(item.product.name),
-    //                            Cell::new(&item.amount_sold.to_string()),
-    //                            Cell::new(&item.product.price.to_string()),
-    //                            Cell::new(&(item.product.price * item.amount_sold).to_string()),
-    //    ]));
-    //}
-    //table.printstd();
-    //let mut table = table!{
-    //    ["sold ", project.sum_sold().unwrap() ],
-    //    ["tax", project.tax_sold().unwrap() ],
-    //    ["sum+tax", project.sum_sold_and_taxes().unwrap()],
-    //    ["sum+wages", project.sum_sold_and_wages().unwrap()]
-    //};
-    table.set_format(TableFormat::new());
+    trace!("                   - created table");
+    //table.set_format(*format::consts::FORMAT_BORDERS_ONLY);
+    table.set_format(
+        FormatBuilder::new()
+        //.column_separator('│')
+        .borders('│')
+        .padding(1, 1)
+        //.separators( &[LinePosition::Top],    LineSeparator::new('─', '┬', '┌', '┐'))
+        //.separators( &[LinePosition::Title], LineSeparator::new('─', '┴', '├', '┤'))
+        .separators( &[LinePosition::Title], LineSeparator::new('─', '─', '├', '┤'))
+        //.separators( &[LinePosition::Intern], format::LineSeparator::new('─', '┼', '├', '┤'))
+        //.separators( &[LinePosition::Bottom], LineSeparator::new('─', '┴', '└', '┘'))
+        .separators( &[LinePosition::Top],    LineSeparator::new('─', '─', '┌', '┐'))
+        .separators( &[LinePosition::Bottom], LineSeparator::new('─', '─', '└', '┘'))
+        .build()
+        );
+    table.set_titles( Row::new(vec![cell!(""), cell!("name"), cell!( "amount"), cell!("price"), cell!("cost")]));
+    trace!("                   - added a row");
+    for (_tax, items) in bill.items_by_tax.iter_all(){
+        for (index,item) in items.iter().enumerate(){
+            table.add_row( Row::new(vec![
+                                    Cell::new(&index.to_string()),
+                                    Cell::new(item.product.name),
+                                    Cell::new(&item.amount.to_string()),
+                                    Cell::new(&item.product.price.to_string()),
+                                    Cell::new(&(item.product.price * item.amount).to_string()),
+            ]));
+        }
+    }
     table.printstd();
+    trace!("                   - printed table");
+    let taxes = bill.taxes_by_tax();
+    let sums = bill.sums_by_tax();
+    let total = bill.total();
+
+    println!("Taxes   0% : {}", taxes.get(&OrderedFloat(0.0)).unwrap_or(&Currency(Some('€'),0)));
+    println!("     19,0% : {}", taxes.get(&OrderedFloat(0.19)).unwrap_or(&Currency(Some('€'),0)));
+
+    println!("Sums    0% : {}", sums.get(&OrderedFloat(0.0)).unwrap_or(&Currency(Some('€'),0)));
+    println!("     19,0% : {}", sums.get(&OrderedFloat(0.19)).unwrap_or(&Currency(Some('€'),0)));
+    println!("Total        {}", total);
 
     //println!("{}", project.sum_offered().unwrap());
     //println!("{}", project.tax_offered().unwrap());

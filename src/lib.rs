@@ -42,6 +42,7 @@ extern crate tempdir;
 extern crate term; // TODO consolidate term, ansi_term and terminal_size
 extern crate claude as currency;
 extern crate bill;
+extern crate ordered_float;
 extern crate open;
 #[macro_use] extern crate log;
 #[macro_use] extern crate prettytable;
