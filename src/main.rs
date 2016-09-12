@@ -6,14 +6,14 @@
 
 #![cfg_attr(feature = "nightly", feature(alloc_system))]
 
-#[feature(deprecated)]
-
 #[cfg(feature = "nightly")]
 extern crate alloc_system;
 extern crate chrono;
 extern crate term; // TODO consolidate term, ansi_term and terminal_size
 extern crate terminal_size;
 extern crate open;
+
+#[cfg(feature="document_export")] extern crate rustc_serialize;
 
 extern crate env_logger;
 #[macro_use] extern crate log;

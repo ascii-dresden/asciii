@@ -1,7 +1,7 @@
 use rustc_serialize::json::{ToJson, Json};
 use chrono::*;
-
-use std::collections::BTreeMap;
+use bill::{Bill, BillItem};
+use ordered_float::OrderedFloat;
 
 use super::Project;
 use super::product::Product;
@@ -18,8 +18,38 @@ impl ToJson for Project{
         let y = &self.yaml;
         let dmy = |date:Option<Date<UTC>>| date.map(|d|d.format("%d.%m.%Y").to_string()).to_json();
 
+        let item_to_json = |item:&BillItem<Product>, tax:OrderedFloat<f64>| btreemap!{
+            s("name") => item.product.name.to_json(),
+            s("price") => item.product.price.to_string().to_json(),
+            s("unit") => item.product.unit.unwrap_or_else(||"").to_json(),
+            s("amount") => item.amount.to_json(),
+            s("cost") => item.sum().to_string().to_json(),
+            s("tax") => tax.into_inner().to_json()
+        }.to_json();
+
+        let bill_to_json = |bill:&Bill<Product>| bill.as_items_with_tax().into_iter()
+                                                                     .map(|(tax, item)| item_to_json(item,tax) )
+                                                                     .collect::<Vec<Json>>()
+                                                                     .to_json();
+
+        let taxes_by_tax_to_json = |bill:&Bill<Product>| bill.taxes_by_tax().iter()
+                                                                            .map(|(tax,taxes)| btreemap!{
+                                                                                s("tax") => (tax.into_inner()*100.0).to_json(),
+                                                                                s("taxes") => taxes.to_json(),
+                                                                            }.to_json())
+                                                                            .collect::<Vec<Json>>()
+                                                                            .to_json();
+
+        let (offer, invoice) = self.bills().unwrap();
+
         let map = btreemap!{
             //String::from("adressing") => ,
+
+            s("bills") =>  btreemap!{
+                s("offer") => bill_to_json(&offer),
+                s("invoice") => bill_to_json(&invoice),
+            }.to_json(),
+
             s("client") => btreemap!{
                 s("email")      => opt_str(client::email(y)),
                 s("last_name")  => opt_str(client::last_name(y)),
@@ -30,17 +60,6 @@ impl ToJson for Project{
                 s("addressing") => client::addressing(y).to_json(),
             }.to_json(),
 
-            ("bills") =>  btreemap!{
-                s("offer") => Json::Null,
-                s("invoice") => Json::Null
-            }.to_json(),
-
-
-            s("offer") => btreemap!{
-                s("number") => offer::number(y).to_json(),
-                s("date")   => dmy(spec::date::offer(y)),
-                s("sum")   => Json::I64(-1), // TODO per tax please
-            }.to_json(),
 
             s("event") => btreemap!{
                 s("name")    => self.name().to_json(),
@@ -48,12 +67,23 @@ impl ToJson for Project{
                 s("manager") => self.manager().to_json(),
             }.to_json(),
 
+
+            s("offer") => btreemap!{
+                s("number") => offer::number(y).to_json(),
+                s("date")   => dmy(spec::date::offer(y)),
+                s("sums")   => taxes_by_tax_to_json(&offer),
+                s("total")  => offer.total().to_json(),
+                s("total_before_tax")  => offer.total_before_tax().to_json(),
+            }.to_json(),
+
             s("invoice") => btreemap!{
                 s("date")   => dmy(spec::date::invoice(y)),
                 s("number")      => invoice::number_str(y).to_json(),
                 s("number_long") => invoice::number_long_str(y).to_json(),
                 s("official") => invoice::official(y).to_json(),
-                s("sum")   => Json::I64(-1),
+                s("sums")   => taxes_by_tax_to_json(&invoice),
+                s("total")  => invoice.total().to_json(),
+                s("total_before_tax")  => invoice.total_before_tax().to_json(),
             }.to_json(),
 
             s("hours") => btreemap!{

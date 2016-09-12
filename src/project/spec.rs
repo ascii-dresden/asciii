@@ -471,7 +471,6 @@ pub mod billing {
         let raw_products = try!(yaml::get_hash(yaml, "products").ok_or(ProductError::UnknownFormat));
 
         for (desc,values) in raw_products {
-            let product = try!(Product::from_desc_and_value(desc, values));
             let (offer_item, invoice_item) = try!(item_from_desc_and_value(desc, values));
             offer.add(offer_item);
             invoice.add(invoice_item);

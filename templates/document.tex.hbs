@@ -1,7 +1,6 @@
 \documentclass[11pt,utf8]<{{storage.dirs.template}}/latex/ascii-brief>
 \Logo <{{storage.dirs.template}}/latex/ascii-logo.png>
 
-
 {{#with document}}
 \lochermarke
 \faltmarken
@@ -66,26 +65,43 @@ wir bedanken uns für Ihren Auftrag für das Catering am {{ event.date }} und er
 \begin{tabular}{rp{7cm}rrr}
   \textbf{Nr.} & \textbf{Bezeichnung}&    \textbf{Menge}    &    \textbf{EP}&    \textbf{Preis}    \\
   \midrule
-{{#each products}}
-  {{inc @index}} & {{ product.name }}
-{{#if product.unit }} ({{ product.unit }})
-{{ /if }} & {{ amount_sold }}  & {{ product.price }} & {{ cost_offered }}\\
+
+{{#with bills}}
+
+{{#if ../../is_invoice}}
+
+{{#each invoice}}
+  {{inc @index}} & {{ name }}
+{{#if unit }}    ({{ unit }})
+{{ /if }}   & {{ amount}}  & {{ price }} & {{ cost }} \\
 {{/each}}
+{{else}}
+{{#each offer}}
+  {{inc @index}} & {{ name }}
+{{#if unit }}    ({{ unit }})
+{{ /if }}   & {{ amount}}  & {{ price }} & {{ cost }} \\
+{{/each}}
+
+{{ /if }}
+
+{{/with}}
+
+
 
 {{#if hours_time }}
 {x{ products.count + 1 }} & Betreuung (Stunden) & {{ hours_time }} & {{ hours_salary }} & {{ hours_total }} \\
 {{ /if }}
 
 \bottomrule[1pt]
-\multicolumn{4}{r}{Netto MwSt.}   & 39,50€  \\
+\multicolumn{4}{r}{Netto MwSt.}   & {{offer.total_before_tax}}  \\
 %\multicolumn{4}{r}{Brutto MwSt. 19\%} & 47,00€  \\
 
+{{#each offer.sums}}
+  \multicolumn{4}{r}{+MwSt. {{tax}}\%}        & {{taxes}}  \\
+{{/each}}
 
-    \multicolumn{4}{r}{+MwSt. 19.0\%}        & 7,50€  \\
 
-
-
-\multicolumn{4}{r}{Gesamtpreis}        & 47,00€ \\
+\multicolumn{4}{r}{Gesamtpreis}        & {{offer.total}} \\
 \end{tabular}
 \end{center}
 

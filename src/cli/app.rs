@@ -377,12 +377,12 @@ pub fn setup() -> ArgMatches<'static>{
                          .long("invoice")
                          )
 
-                    //.arg(Arg::with_name("template")
-                    //     .help("Use a particular template")
-                    //     .short("t")
-                    //     .long("template")
-                    //     .takes_value(true)
-                    //     .possible_values( &Template::iter_variant_names().filter(|v|*v!="Invalid").collect::<Vec<&str>>()))
+                    .arg(Arg::with_name("template")
+                         .help("Use a particular template")
+                         .short("t")
+                         .long("template")
+                         .takes_value(true)
+                         .possible_values( &Template::iter_variant_names().filter(|v|*v!="Invalid").collect::<Vec<&str>>()))
                    )
 
 

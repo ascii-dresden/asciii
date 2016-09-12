@@ -22,16 +22,16 @@ custom_derive = "*" #"0.1"
 open = "*" #"1.1"
 ordered-float = "*"
 
-claude = {git="https://github.com/hoodie/claude-rs"}
-bill = {git="https://github.com/hoodie/bill-rs"}
+claude = {git="https://github.com/hoodie/claude-rs", features=["tojson"]}
+#bill = {git="https://github.com/hoodie/bill-rs"}
+bill = {path="../bill-rs"}
 
 slug = "*" #"0.1"
 tempdir = "*" #"0.3"
 
 term = "0.4"
 terminal_size = "0.1.1" # TODO consider termsize or others
-#prettytable-rs = "0.6"
-prettytable-rs = { git = "https://github.com/hoodie/prettytable-rs", branch = "bug/encode_tostring" }
+prettytable-rs = "0.6"
 
 # feature: lints
 clippy = {version = "*", optional = true}
@@ -46,7 +46,7 @@ git2 = {version = "*", default-features= false, optional = true}
 # planned optional features: termprint, term resize, xdg-open, web server :D
 
 [features]
-default = []
+default = ["document_export"]
 document_export = ["rustc-serialize", "handlebars"]
 debug_config = []
 git_statuses = ["git2"]

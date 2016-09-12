@@ -18,6 +18,8 @@ use asciii::project::spec::VirtualField;
 
 #[cfg(feature="document_export")]
 use asciii::fill_docs::fill_template;
+#[cfg(feature="document_export")]
+use rustc_serialize::json::ToJson;
 
 use super::{setup_luigi, setup_luigi_with_git, fail};
 use asciii::print;
@@ -306,11 +308,14 @@ fn edit_template(name:&str, editor:&Option<&str>){
 /// Command SHOW
 pub fn show(matches:&ArgMatches){
     let search_term = matches.value_of("search_term").unwrap();
-    if let Some(year) = matches.value_of("archive"){
-        let year = year.parse::<i32>().unwrap();
-        show_project(StorageDir::Archive(year), search_term);
-    } else if  matches.is_present("files"){
-        with_projects(StorageDir::Working, search_term,
+
+    let dir = match matches.value_of("archive"){
+        Some(year) => StorageDir::Archive(year.parse::<i32>().unwrap()),
+        _ => StorageDir::Working,
+    };
+
+    if matches.is_present("files"){
+        with_projects(dir, search_term,
                       |p| {
                           println!("{}: ", p.dir().display());
                           for entry in fs::read_dir(p.dir()).unwrap(){
@@ -319,13 +324,22 @@ pub fn show(matches:&ArgMatches){
                       }
                      );
     } else if  matches.is_present("json"){
-        //with_projects(StorageDir::Working, search_term, |p|println!("{}", p.to_json()));
-        error!("feature temporarily disabled")
+        show_json(dir, &search_term)
     } else if  matches.is_present("template"){
         show_template(search_term);
     } else {
-        show_project(StorageDir::Working, search_term);
+        show_project(dir, search_term);
     }
+}
+
+#[cfg(feature="document_export")]
+fn show_json(dir:StorageDir, search_term:&str){
+    with_projects(dir, search_term, |p|println!("{}", p.to_json()));
+}
+
+#[cfg(not(feature="document_export"))]
+fn show_json(_:StorageDir, _:&str){
+    error!("feature temporarily disabled")
 }
 
 /// Command SPEC
@@ -365,17 +379,22 @@ pub fn spec(_matches:&ArgMatches){
 #[cfg(feature="document_export")]
 pub fn make(matches:&ArgMatches){
     let search_term = matches.value_of("search_term").unwrap();
+
     let template = matches.value_of("template").unwrap_or("Document");
+
     let dir = match matches.value_of("archive"){
         Some(year) => { let year = year.parse::<i32>().unwrap(); StorageDir::Archive(year) },
         _ => StorageDir::Working
     };
 
+    let is_invoice = matches.is_present("invoice");
+
     with_projects( dir, search_term, |p| {
-        let filled = fill_template(p,template.into()).unwrap();
+        let filled = fill_template(p, is_invoice, template.into()).unwrap();
         println!("{}", filled);
     });
 }
+
 #[cfg(not(feature="document_export"))]
 pub fn make(_:&ArgMatches){
     error!("Make functionality not built-in with this release!");

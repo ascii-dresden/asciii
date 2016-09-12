@@ -11,21 +11,11 @@
 //        unused_import_braces,
 //        )]
 
-#![deny(
-    trivial_casts,
-    trivial_numeric_casts,
-    )]
-#![warn(
-    unstable_features,
-    unused_import_braces,
-    unused_qualifications
-    )]
-#![allow(unknown_lints)]
-//#![allow(used_underscore_binding)]
-#![allow(unknown_lints)]
-#![allow(needless_borrow)]
+#![deny( trivial_casts, trivial_numeric_casts,)]
 
-#![allow(deprecated)]
+#![warn( unused_import_braces, unused_qualifications)]
+
+#![allow(unknown_lints, needless_borrow, deprecated)]
 
 #![cfg_attr(feature = "lints", allow(unstable_features))]
 #![cfg_attr(feature = "lints", feature(plugin))]

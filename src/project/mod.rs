@@ -2,9 +2,6 @@
 //!
 //! This module implements all functionality of a project.
 
-#![allow(unused_variables)]
-#![allow(dead_code)]
-
 use std::fs::File;
 use std::io::prelude::*;
 use std::ffi::OsStr;
@@ -66,7 +63,7 @@ pub struct DebugProject {
 /// A project is storable, contains products, and you can create an offer or invoice from it.
 pub struct Project {
     file_path: PathBuf,
-    temp_dir: Option<TempDir>,
+    _temp_dir: Option<TempDir>,
     git_status: Option<GitStatus>,
     yaml: Yaml
 }
@@ -194,7 +191,7 @@ impl Storable for Project{
         // project now lives in the temp_file
         Ok(Project{
             file_path: temp_file,
-            temp_dir: Some(temp_dir), // needs to be kept alive to avoid deletion TODO: try something manually
+            _temp_dir: Some(temp_dir), // needs to be kept alive to avoid deletion TODO: try something manually
             git_status: None,
             yaml: try!(yaml::parse(&filled))
         })
@@ -255,7 +252,7 @@ impl Storable for Project{
                                 }));
         Ok(Project{
             file_path: file_path.to_owned(),
-            temp_dir: None,
+            _temp_dir: None,
             git_status: None,
             yaml: try!(yaml::parse(&file_content))
         })
