@@ -16,15 +16,27 @@ use currency::Currency;
 use bill::Bill;
 
 use util::yaml;
-use storage::*;
+use storage::list_path_content;
+use storage::{Storable,StorageError,StorageResult};
 use storage::repo::GitStatus;
 use templater::Templater;
 
+#[export_macro]
+macro_rules! try_some {
+    ($expr:expr) => (match $expr {
+        Some(val) => val,
+        None => return None,
+    });
+}
+
 pub mod product;
 pub mod spec;
+pub mod error;
+
+use self::error::*;
 
 #[cfg(feature="document_export")]
-pub mod tojson;
+mod tojson;
 
 #[cfg(test)] mod tests;
 
@@ -32,20 +44,10 @@ use self::spec::{SpecResult, VirtualField};
 use self::product::Product;
 
 
+
+
+
 static PROJECT_FILE_EXTENSION:&'static str = "yml";
-
-pub type ProductResult<T> = Result<T, ProductError>;
-
-#[derive(Debug, PartialEq, Eq)]
-pub enum ProductError{
-    //DuplicateProduct // not an error
-    AmbiguousAmounts(String),
-    MissingAmount(String),
-    TooMuchReturned(String),
-    InvalidPrice,
-    Unimplemented, // TODO remove
-    UnknownFormat
-}
 
 /// Output of `Project::debug()`.
 ///
@@ -61,6 +63,7 @@ pub struct DebugProject {
 /// Represents a Project.
 ///
 /// A project is storable, contains products, and you can create an offer or invoice from it.
+/// The main implementation is done in [`spec`](spec/index.html).
 pub struct Project {
     file_path: PathBuf,
     _temp_dir: Option<TempDir>,
@@ -79,10 +82,12 @@ impl Project{
         )
     }
 
+    /// Wraps `spec::project::manager()`
     pub fn manager(&self) -> String{
         spec::project::manager(self.yaml()).unwrap_or("").into()
     }
 
+    /// Wraps `spec::project::canceled()`
     pub fn canceled(&self) -> bool{
         spec::project::canceled(self.yaml())
     }
@@ -96,6 +101,42 @@ impl Project{
     pub fn invoice_num(&self) -> Option<String>{
         spec::invoice::number_str(self.yaml())
     }
+
+    /// Filename of the offer output file.
+    pub fn offer_file_name(&self, extension:&str) -> Option<String>{
+        let num = try_some!(spec::offer::number(self.yaml()));
+        let name = slug::slugify(try_some!(spec::project::name(self.yaml())));
+        Some(format!("{} {}.{}",num,name,extension))
+    }
+
+    /// Filename of the invoice output file. **Carefull!** uses today's date.
+    pub fn invoice_file_name(&self, extension:&str) -> Option<String>{
+        let num = try_some!(spec::invoice::number_str(self.yaml()));
+        let name = slug::slugify(try_some!(spec::project::name(self.yaml())));
+        let date = Local::today().format("%Y-%m-%d").to_string();
+        Some(format!("{} {} {}.{}",num,name,date,extension))
+    }
+
+    fn write_to_path<P:AsRef<Path> + ::std::fmt::Debug>(content:&str, target:P) -> ProjectResult<()> {
+        trace!("writing content ({}bytes) to {:?}", content.len(), target);
+        let mut file = try!(File::create(target));
+        try!(file.write_all(content.as_bytes()));
+        try!(file.sync_all());
+        Ok(())
+    }
+
+    pub fn write_to_offer_file(&self,content:&str, ext:&str) -> ProjectResult<()> {
+        if let Some(target) = self.offer_file_name(ext){
+            Self::write_to_path(content,self.dir().join(&target))
+        } else {Err(ProjectError::CantDetermineTargetFile)}
+    }
+
+    pub fn write_to_invoice_file(&self,content:&str, ext:&str) -> ProjectResult<()> {
+        if let Some(target) = self.invoice_file_name(ext){
+            Self::write_to_path(content,self.dir().join(&target))
+        } else {Err(ProjectError::CantDetermineTargetFile)}
+    }
+
 
     /// Minimum correctness.
     ///
@@ -137,8 +178,23 @@ impl Project{
         } else{None}
     }
 
+    pub fn sum_sold(&self) -> ProductResult<Currency> {
+        let (_,invoice) = try!(self.bills());
+        Ok(invoice.total())
+    }
+
     pub fn debug(&self) -> DebugProject{
         self.into()
+    }
+
+    pub fn dump_yaml(&self) -> String {
+        use yaml_rust::emitter::YamlEmitter;
+        let mut buf = String::new();
+        {
+            let mut emitter = YamlEmitter::new(&mut buf);
+            emitter.dump(self.yaml()).unwrap();
+        }
+        buf
     }
 }
 
@@ -283,6 +339,8 @@ impl<'a> From<&'a Project> for DebugProject{
         }
     }
 }
+
+
 
 #[cfg(test)]
 mod test{

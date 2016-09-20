@@ -1,22 +1,19 @@
 //! Implements the ascii invoicer project file specification.
+//!
+//! This does all of the heavy lifting.
+//! The implementation is separated into sub-modules which take care of separate objectives.
+//! Most of the functions in these modules take the `yaml` data directly as reference.
+//! Each module contains a `validate()` function which ought to be kept up to date.
 
 use chrono::Datelike;
+use currency::Currency;
 
 use util::yaml;
 use util::yaml::Yaml;
-use currency::Currency;
+use storage::Storable;
 use super::Project;
-use ::storage::Storable;
 
 pub type SpecResult<'a> = Result<(), Vec<&'a str>>;
-
-#[export_macro]
-macro_rules! try_some {
-    ($expr:expr) => (match $expr {
-        Some(val) => val,
-        None => return None,
-    });
-}
 
 /// Fields that are accessible but are not directly found in the file format.
 /// This is used to get fields that are computed through an ordinary `get("responsible")`
@@ -25,6 +22,11 @@ custom_derive! {
              IterVariants(VirtualFields), IterVariantNames(VirtualFieldNames),
              EnumFromStr
              )]
+    /// `Project::get()` allows accessing fields within the raw `yaml` data structure.
+    /// Virtual fields are fields that are not present in the document but computed.
+    ///
+    /// `VirtualFields` is an automatically generated type that allows iterating of the variants of
+    /// this Enum.
     pub enum VirtualField{
         /// Usually `storage`, or in legacy part of `signature`
         Responsible,
@@ -35,7 +37,7 @@ custom_derive! {
         InvoiceNumberLong,
         ///Overall Cost Project, including taxes
         Name,
-        //Final,
+        Final,
         Age,
         Year,
         Caterers,
@@ -58,7 +60,7 @@ impl VirtualField {
             VirtualField::InvoiceNumber => invoice::number_str(project.yaml()),
             VirtualField::InvoiceNumberLong => invoice::number_long_str(project.yaml()),
             VirtualField::Name => project::name(project.yaml()).map(|s| s.to_owned()),
-            //VirtualField::Final => project.sum_sold().map(|c| c.to_string()), // TODO restore
+            VirtualField::Final => project.sum_sold().map(|c| c.to_string()).ok(),
             VirtualField::Age => project.age().map(|a| format!("{} days", a)),
             VirtualField::Year => project.date().map(|d| d.year().to_string()),
 
@@ -91,30 +93,40 @@ pub mod project {
     use chrono::{Date, UTC};
     use super::hours;
 
+    ///Returns the content of `/event/name` or...
+    ///
+    ///...that of the older formats `/event`
     pub fn name(yaml: &Yaml) -> Option<&str> {
         yaml::get_str(yaml, "event/name")
             // old spec
             .or_else(|| yaml::get_str(yaml, "event"))
     }
 
+    /// Wrapper for `super::date::date()`
     pub fn date(yaml: &Yaml) -> Option<Date<UTC>> {
         super::date::date(yaml)
     }
 
+    ///Returns the content of `/manager` or...
+    ///
+    ///...that of the older formats `/signature`
     pub fn manager(yaml: &Yaml) -> Option<&str> {
         yaml::get_str(yaml, "manager")
         // old spec
         .or_else(|| yaml::get_str(yaml, "signature").and_then(|c|c.lines().last()))
     }
 
+    ///Returns the content of `/format`
     pub fn format(yaml: &Yaml) -> Option<&str> {
         yaml::get_str(yaml, "format")
     }
 
+    ///Returns the content of `/canceled`
     pub fn canceled(yaml: &Yaml) -> bool {
         yaml::get_bool(yaml, "canceled").unwrap_or(false)
     }
 
+    /// Validates if all of the functions in this module return `Some(_)`
     pub fn validate(yaml: &Yaml) -> bool {
         name(yaml).is_some() && date(yaml).is_some() && manager(yaml).is_some() &&
         format(yaml).is_some() && hours::salary(yaml).is_some()
@@ -126,38 +138,48 @@ pub mod client {
     use util::yaml;
     use util::yaml::Yaml;
 
+    ///Returns the content of `/client/email`
     pub fn email(yaml: &Yaml) -> Option<&str> {
         yaml::get_str(yaml, "client/email")
     }
 
+    ///Returns the content of `/client/address`
     pub fn address(yaml: &Yaml) -> Option<&str> {
         yaml::get_str(yaml, "client/address")
     }
 
+    ///Returns the content of `/client/title`
     pub fn title(yaml: &Yaml) -> Option<&str> {
         yaml::get_str(yaml, "client/title")
         // old spec
         .or_else(|| yaml::get_str(yaml, "client").and_then(|c|c.lines().nth(0)))
     }
 
+    ///Returns the content of `/client/first_name`
     pub fn first_name(yaml: &Yaml) -> Option<&str> {
         yaml::get_str(yaml, "client/first_name")
         // old spec
         // .or_else(|| yaml::get_str(&yaml, "client").and_then(|c|c.lines().nth(0)))
     }
 
+    ///Returns the content of `/client/last_name`
     pub fn last_name(yaml: &Yaml) -> Option<&str> {
         yaml::get_str(yaml, "client/last_name")
         // old spec
         .or_else(|| yaml::get_str(yaml, "client").and_then(|c|c.lines().nth(1)))
     }
 
+    /// Combines `first_name` and `last_name`.
     pub fn full_name(yaml: &Yaml) -> Option<String> {
-        let first = yaml::get_str(yaml, "client/first_name");
+        let first = first_name(yaml);
         let last = last_name(yaml);
-        first.and(last).and(Some(format!("{} {}", first.unwrap_or(""), last.unwrap_or(""))))
+        first.and(last)
+             .and(Some(format!("{} {}",
+                               first.unwrap_or(""),
+                               last.unwrap_or(""))))
     }
 
+    /// Produces a standard salutation field.
     pub fn addressing(yaml: &Yaml) -> Option<String> {
         if let Some(title) = title(yaml).and_then(|title| title.split_whitespace().nth(0))
         // only the first word
@@ -269,6 +291,8 @@ pub mod date {
     // TODO packed to deep? Clippy says YES, remove this allow!
     pub type DateRange = (Option<Date<UTC>>, Option<Date<UTC>>);
     pub type DateRanges = Vec<DateRange>;
+
+    /// Produces a list of `DateRange`s for the event.
     pub fn events(yaml: &Yaml) -> Option<DateRanges> {
         yaml::get(yaml, "event/dates/")
             .and_then(|e| e.as_vec())
@@ -436,7 +460,7 @@ pub mod billing {
 
     use util::yaml;
     use util::yaml::Yaml;
-    use ::project::{ProductResult,ProductError};
+    use ::project::error::{ProductResult,ProductError};
     use ::project::product::Product;
 
     fn item_from_desc_and_value<'y>(desc: &'y Yaml, values: &'y Yaml) -> ProductResult<(BillItem<Product<'y>>,BillItem<Product<'y>>)> {
@@ -467,6 +491,16 @@ pub mod billing {
     pub fn bills(yaml: &Yaml) -> ProductResult<(Bill<Product>, Bill<Product>)>{
         let mut offer: Bill<Product> = Bill::new();
         let mut invoice: Bill<Product> = Bill::new();
+
+        let service = || Product {
+            name: "Service",
+            unit: None,
+            tax: ::ordered_float::OrderedFloat(0f64),
+            price: super::hours::salary(&yaml).unwrap()
+        };
+
+        offer  .add_item(super::hours::total(&yaml).unwrap(), service());
+        invoice.add_item(super::hours::total(&yaml).unwrap(), service());
 
         let raw_products = try!(yaml::get_hash(yaml, "products").ok_or(ProductError::UnknownFormat));
 

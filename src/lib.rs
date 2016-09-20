@@ -29,7 +29,7 @@ extern crate chrono;
 extern crate regex;
 extern crate slug;
 extern crate tempdir;
-extern crate term; // TODO consolidate term, ansi_term and terminal_size
+extern crate term;
 extern crate claude as currency;
 extern crate bill;
 extern crate ordered_float;

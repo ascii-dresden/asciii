@@ -14,7 +14,8 @@ use storage::Storage;
 
 custom_derive! {
     #[derive(Debug,
-             IterVariants(VirtualFields), IterVariantNames(VirtualFieldNames),
+             IterVariants(VirtualFields),
+             IterVariantNames(VirtualFieldNames),
              EnumFromStr
              )]
 pub enum Template{
@@ -116,15 +117,30 @@ fn inc_helper(_: &Context, h: &Helper, _: &Handlebars, rc: &mut RenderContext) -
     Ok(())
 }
 
+fn path_helper(_: &Context, _: &Helper, _: &Handlebars, rc: &mut RenderContext) -> Result<(), RenderError> {
+    let rendered = format!("{}", rc.get_local_path_root());
+    try!(rc.writer.write(rendered.into_bytes().as_ref()));
+    Ok(())
+}
+
+fn count_helper(_: &Context, h: &Helper, _: &Handlebars, rc: &mut RenderContext) -> Result<(), RenderError> {
+    let count = h.param(0).unwrap().value().as_array().map(|a|a.len()).unwrap_or(0);
+    //println!("count_helper{:?}", param);
+    let rendered = format!("{}", count);
+    try!(rc.writer.write(rendered.into_bytes().as_ref()));
+    Ok(())
+}
+
 /// Takes a `T:ToJson` and a template path and does it's thing.
 ///
 /// Returns path to created file, potenially in a `tempdir`.
 // pub fn fill_template<E:ToJson>(document:E, template_file:&Path) -> PathBuf{
 pub fn fill_template<E: ToJson>(document: &E, is_invoice:bool, template: Template) -> Result<String, FillError> {
-
     let mut handlebars = Handlebars::new();
     handlebars.register_escape_fn(no_escape);
     handlebars.register_helper("inc", Box::new(inc_helper));
+    handlebars.register_helper("path", Box::new(path_helper));
+    handlebars.register_helper("count", Box::new(count_helper));
 
     handlebars.register_template_file(
         "document",
@@ -138,7 +154,7 @@ pub fn fill_template<E: ToJson>(document: &E, is_invoice:bool, template: Templat
 
     let packed = pack_data(document, is_invoice);
 
-    match template {
+    let content = match template {
         Template::Document => {
             handlebars.register_escape_fn(|data| data.replace("\n", r#"\newline "#));
             handlebars.render("document", &packed)
@@ -148,5 +164,8 @@ pub fn fill_template<E: ToJson>(document: &E, is_invoice:bool, template: Templat
         Template::Simple => handlebars.render("simple", &packed),
         Template::Invalid => return Err(FillError::InvalidTemplate),
     }
-    .map_err(FillError::RenderError)
+    .map_err(FillError::RenderError);
+    content
 }
+
+

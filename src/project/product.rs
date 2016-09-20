@@ -1,13 +1,20 @@
+//! Takes care of instantiating the Product.
+//! All of the calculating is done by `extern crate bill`.
+
 use currency::Currency;
 use bill::{BillProduct, Tax};
 
 use util::yaml;
 use util::yaml::Yaml;
 
-use super::{ProductResult,ProductError};
+use super::error::{ProductResult,ProductError};
 use super::spec::to_currency;
 
 //#[derive(Debug)] // manually implemented
+/// Stores properties of a product.
+///
+/// Products are mapped to `Bill`s by `BillItems`,
+/// these are implemented by `bill`.
 #[derive(Copy,Clone)]
 pub struct Product<'a> {
     pub name: &'a str,

@@ -2,8 +2,8 @@
 use util::yaml;
 use currency::Currency;
 
-use super::ProductError;
 use super::spec;
+use super::error::ProductError;
 
 
 

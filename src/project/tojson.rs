@@ -8,6 +8,13 @@ use super::product::Product;
 use super::spec;
 use ::storage::Storable;
 
+fn opt_to_json<T: ::std::fmt::Display>(opt:Option<T>) -> Json{
+    match opt{
+        Some(t) => Json::String(t.to_string()),
+        None    => Json::Null
+    }
+}
+
 impl ToJson for Project{
     fn to_json(&self) -> Json{
         use ::project::spec::*;
@@ -87,7 +94,8 @@ impl ToJson for Project{
             }.to_json(),
 
             s("hours") => btreemap!{
-                s("time")   => hours::total(y),
+                s("time")   => opt_to_json(hours::total(y)),
+                s("salary") => opt_to_json(hours::salary(y)),
             }.to_json(),
 
         };

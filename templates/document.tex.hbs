@@ -1,6 +1,21 @@
 \documentclass[11pt,utf8]<{{storage.dirs.template}}/latex/ascii-brief>
 \Logo <{{storage.dirs.template}}/latex/ascii-logo.png>
 
+{{#partial items}}
+{{#each this}} {{inc @index}} & {{ name }} {{#if unit}}    ({{ unit }}) {{/if}}   & {{ amount}}  & {{ price }} & {{ cost }} \\
+{{/each~}}
+{{/partial}}
+
+{{#partial foo}}
+\multicolumn{4}{r}{Netto MwSt.}   & {{total_before_tax}}  \\
+
+{{#each sums}}\multicolumn{4}{r}{+MwSt. {{tax}}\%}   & {{taxes}}  \\ {{/each}}
+
+\multicolumn{4}{r}{Gesamtpreis}   & {{total}} \\
+\end{tabular}
+\end{center}
+{{/partial}}
+
 {{#with document}}
 \lochermarke
 \faltmarken
@@ -36,14 +51,12 @@
 \Datum               <{{invoice.date}}>
 \Betreff             <Rechnung{{#if invoice.official}}\newline {{invoice.official}}{{/if}}>
 \RechnungsNummer     <{{ invoice.longnumber  }}>
-\AngebotsNummer      {} %% Manuel ueberschreibbar ansonsten automatisch heute
-
+\AngebotsNummer      {}
 {{else}}
 \Datum               <{{offer.date}}>
 \Betreff             <Angebot>
 \RechnungsNummer     {}
-\AngebotManuel       <{{ offer.number }}> %% Manuel ueberschreibbar ansonsten automatisch heute
-
+\AngebotsNummer      <{{ offer.number }}>
 {{/if}}
 
 
@@ -64,46 +77,19 @@ wir bedanken uns für Ihren Auftrag für das Catering am {{ event.date }} und er
 \begin{center}
 \begin{tabular}{rp{7cm}rrr}
   \textbf{Nr.} & \textbf{Bezeichnung}&    \textbf{Menge}    &    \textbf{EP}&    \textbf{Preis}    \\
-  \midrule
-
-{{#with bills}}
-
-{{#if ../../is_invoice}}
-
-{{#each invoice}}
-  {{inc @index}} & {{ name }}
-{{#if unit }}    ({{ unit }})
-{{ /if }}   & {{ amount}}  & {{ price }} & {{ cost }} \\
-{{/each}}
-{{else}}
-{{#each offer}}
-  {{inc @index}} & {{ name }}
-{{#if unit }}    ({{ unit }})
-{{ /if }}   & {{ amount}}  & {{ price }} & {{ cost }} \\
-{{/each}}
-
-{{ /if }}
-
+  \midrule {{#with bills}}
+  {{#if ../../is_invoice}}
+{{#with invoice}} {{#block items}}{{/block}} {{/with}}
+  {{else}}
+{{#with offer}} {{#block items}}{{/block}} {{/with}}
+  {{/if}}
 {{/with}}
 
-
-
-{{#if hours_time }}
-{x{ products.count + 1 }} & Betreuung (Stunden) & {{ hours_time }} & {{ hours_salary }} & {{ hours_total }} \\
-{{ /if }}
+{{#if hours.time }} {{count bills.invoice}} & Betreuung (Stunden) & {{ hours.time }} & {{ hours.salary }} & {{ hours.total }} \\ {{/if}}
 
 \bottomrule[1pt]
-\multicolumn{4}{r}{Netto MwSt.}   & {{offer.total_before_tax}}  \\
-%\multicolumn{4}{r}{Brutto MwSt. 19\%} & 47,00€  \\
-
-{{#each offer.sums}}
-  \multicolumn{4}{r}{+MwSt. {{tax}}\%}        & {{taxes}}  \\
-{{/each}}
-
-
-\multicolumn{4}{r}{Gesamtpreis}        & {{offer.total}} \\
-\end{tabular}
-\end{center}
+{{#if ../is_invoice}} {{#with invoice}}{{#block foo}}{{/block}}{{/with}}
+{{else}} {{#with offer}}{{#block foo}}{{/block}}{{/with}} {{/if}}
 
 Wir bitten um eine Begleichung des Betrags innerhalb von 14 Tagen nach Erhalt der Rechnung.
 

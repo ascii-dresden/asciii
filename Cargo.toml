@@ -9,35 +9,34 @@ authors = ["Hendrik Sollich <hendrik@hoodie.de>"]
 [dependencies]
 
 log = "*" #"0.3"
-num = "*" #"0.1"
 env_logger = "*" #"0.3"
+#yaml-rust = {git="https://github.com/hoodie/yaml-rust", branch="feature/to_string", features=["preserve_order"]}
 yaml-rust = {git="https://github.com/hoodie/yaml-rust", branch="feature/to_string"}
 chrono = "*" #"0.2"
 regex = "*" #"0.1"
 lazy_static = "*" #"0.2"
 maplit = "*" #"0.1"
-clap = {version = "2"}
+clap = "*"
 enum_derive = "*" #"0.1"
 custom_derive = "*" #"0.1"
 open = "*" #"1.1"
 ordered-float = "*"
 
 claude = {git="https://github.com/hoodie/claude-rs", features=["tojson"]}
-#bill = {git="https://github.com/hoodie/bill-rs"}
-bill = {path="../bill-rs"}
+bill = {git="https://github.com/hoodie/bill-rs"}
 
 slug = "*" #"0.1"
 tempdir = "*" #"0.3"
 
 term = "0.4"
-terminal_size = "0.1.1" # TODO consider termsize or others
-prettytable-rs = "0.6"
+prettytable-rs = { version = "0.6", default-features=false}
 
 # feature: lints
 clippy = {version = "*", optional = true}
 
 # feature: document_export
-handlebars = {version = "*", optional = true}
+#handlebars = {version = "*", optional = true}
+handlebars = {git = "https://github.com/sunng87/handlebars-rust", optional = true}
 rustc-serialize = {version = "*", optional = true}
 
 # feature: git_statuses
@@ -46,7 +45,7 @@ git2 = {version = "*", default-features= false, optional = true}
 # planned optional features: termprint, term resize, xdg-open, web server :D
 
 [features]
-default = ["document_export"]
+default = ["document_export", "git_statuses"]
 document_export = ["rustc-serialize", "handlebars"]
 debug_config = []
 git_statuses = ["git2"]
@@ -60,4 +59,3 @@ lto = true
 test = false
 doc = false
 name = "asciii"
-
