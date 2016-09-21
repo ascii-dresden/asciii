@@ -198,6 +198,15 @@ impl Repository {
         self.execute_git("status", &[])
     }
 
+    /// TODO not yet functional
+    pub fn stash(&self) -> ExitStatus{
+        self.execute_git("stash", &["origin", "master"])
+    }
+
+    pub fn stash_pop(&self) -> ExitStatus{
+        self.execute_git("stash pop", &["origin", "master"])
+    }
+
     pub fn push(&self) -> ExitStatus{
         self.execute_git("push", &["origin", "master"])
     }
