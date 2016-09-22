@@ -1,6 +1,5 @@
 use asciii::version;
 #[cfg(feature="document_export")]
-use asciii::fill_docs::Template;
 use super::validators;
 use clap::{App, AppSettings, Arg, ArgMatches, SubCommand};
 
@@ -277,7 +276,7 @@ pub fn setup() -> ArgMatches<'static>{
                         )
 
                     .arg(Arg::with_name("template")
-                         .help("Edit a template currently tyml")
+                         .help("Edit a template file, use `list --templates` to learn which.")
                          .short("t")
                          .long("template")
                         )
@@ -303,6 +302,11 @@ pub fn setup() -> ArgMatches<'static>{
                          .help("Show project as JSON")
                          .long("json")
                          .short("j"))
+
+                    .arg(Arg::with_name("dump")
+                         .help("Dump project yaml")
+                         .long("dump")
+                         .short("d"))
 
                     .arg(Arg::with_name("archive")
                          .help("Pick an archived project")
@@ -382,7 +386,7 @@ pub fn setup() -> ArgMatches<'static>{
                          .short("t")
                          .long("template")
                          .takes_value(true)
-                         .possible_values( &Template::iter_variant_names().filter(|v|*v!="Invalid").collect::<Vec<&str>>()))
+                         )
                    )
 
 
@@ -412,6 +416,13 @@ pub fn setup() -> ArgMatches<'static>{
                          .help("Show default config")
                          .short("l")
                          .long("location")
+                        )
+
+                    // TODO unimplemented!()
+                    .arg(Arg::with_name("init")
+                         .help("Create config file.")
+                         .short("i")
+                         .long("init")
                         )
 
                     )
@@ -459,15 +470,17 @@ pub fn setup() -> ArgMatches<'static>{
         .subcommand(SubCommand::with_name("remote")
                     .about("Show information about the remote")
                    )
+
         .subcommand(SubCommand::with_name("push")
                     .about("Upload locally saved changes to the remote")
                    )
-        .subcommand(SubCommand::with_name("log")
-                    .about("Show commit logs")
-                   )
 
-        .subcommand(SubCommand::with_name("term")
-                    .about("terminal info")
+        .subcommand(SubCommand::with_name("stash").about(""))
+        .subcommand(SubCommand::with_name("pop").about(""))
+
+        .subcommand(SubCommand::with_name("log")
+                    .aliases(&["lg", "hist", "history"])
+                    .about("Show commit logs")
                    )
 
     .get_matches()

@@ -5,6 +5,7 @@
 use std::fs::File;
 use std::io::prelude::*;
 use std::ffi::OsStr;
+use std::fmt::Debug;
 use std::path::{Path, PathBuf};
 use std::collections::HashMap;
 
@@ -117,23 +118,23 @@ impl Project{
         Some(format!("{} {} {}.{}",num,name,date,extension))
     }
 
-    fn write_to_path<P:AsRef<Path> + ::std::fmt::Debug>(content:&str, target:P) -> ProjectResult<()> {
+    fn write_to_path<P:AsRef<OsStr> + Debug>(content:&str, target:&P) -> ProjectResult<PathBuf> {
         trace!("writing content ({}bytes) to {:?}", content.len(), target);
-        let mut file = try!(File::create(target));
+        let mut file = try!(File::create(Path::new(target)));
         try!(file.write_all(content.as_bytes()));
         try!(file.sync_all());
-        Ok(())
+        Ok(Path::new(target).to_owned())
     }
 
-    pub fn write_to_offer_file(&self,content:&str, ext:&str) -> ProjectResult<()> {
+    pub fn write_to_offer_file(&self,content:&str, ext:&str) -> ProjectResult<PathBuf> {
         if let Some(target) = self.offer_file_name(ext){
-            Self::write_to_path(content,self.dir().join(&target))
+            Self::write_to_path(content, &self.dir().join(&target))
         } else {Err(ProjectError::CantDetermineTargetFile)}
     }
 
-    pub fn write_to_invoice_file(&self,content:&str, ext:&str) -> ProjectResult<()> {
+    pub fn write_to_invoice_file(&self,content:&str, ext:&str) -> ProjectResult<PathBuf> {
         if let Some(target) = self.invoice_file_name(ext){
-            Self::write_to_path(content,self.dir().join(&target))
+            Self::write_to_path(content, &self.dir().join(&target))
         } else {Err(ProjectError::CantDetermineTargetFile)}
     }
 
@@ -141,20 +142,29 @@ impl Project{
     /// Minimum correctness.
     ///
     /// Ready to send an **offer** to the client.
-    pub fn valid_stage1(&self) -> SpecResult{
-        spec::offer::validate(&self.yaml)
-    }
+    #[deprecated] // use is_ready_for_offer()
+    pub fn valid_stage1(&self) -> SpecResult{ spec::offer::validate(&self.yaml) }
+
+    /// Ready to produce offer.
+    ///
+    /// Ready to send an **offer** to the client.
+    pub fn is_ready_for_offer(&self) -> SpecResult{ spec::offer::validate(&self.yaml) }
 
     /// Valid project
     ///
     /// Ready to send an **invoice** to the client.
-    pub fn valid_stage2(&self) -> SpecResult{
-        spec::invoice::validate(&self.yaml)
-    }
+    #[deprecated] // use is_ready_for_invoice()
+    pub fn valid_stage2(&self) -> SpecResult{ spec::invoice::validate(&self.yaml) }
+
+    /// Valid to produce invoice
+    ///
+    /// Ready to send an **invoice** to the client.
+    pub fn is_ready_for_invoice(&self) -> SpecResult{ spec::invoice::validate(&self.yaml) }
 
     /// Completely done and in the past.
     ///
     /// Ready to be **archived**.
+    #[deprecated] //rename to is_ready_for_archive
     pub fn valid_stage3(&self) -> SpecResult{
         if self.canceled(){
             Ok(())
@@ -339,7 +349,6 @@ impl<'a> From<&'a Project> for DebugProject{
         }
     }
 }
-
 
 
 #[cfg(test)]

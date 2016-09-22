@@ -11,6 +11,7 @@ use project::Project;
 use storage::Storable;
 use ordered_float::OrderedFloat;
 use currency::Currency;
+use util::currency_to_string;
 
 //TODO construct table rows way more dynamically
 
@@ -72,8 +73,8 @@ fn project_to_style(project:&Project) -> &str{
             _ if age > 28  => "Fm",
               1 ... 28     => "Fc",
                     0      => "Fyb",
-             -7 ... 0      => "Fr",
-            -14 ... -7     => "Fy",
+             -7 ... -1     => "Fr",
+            -14 ... -8     => "Fy",
             _ if age < -14 => "Fg",
             _              => "d"
         };
@@ -181,7 +182,7 @@ pub fn verbose_rows(projects:&[Project], list_config:&ListConfig) -> Vec<Row>{
                 result_to_cell(&validation2),
                 result_to_cell(&validation3),
 
-                //cell!(project.sum_invoice().map(|i|i.to_string()).unwrap_or(String::from("none"))),
+                cell!(project.sum_sold().map(|i|currency_to_string(&i)).unwrap_or(String::from("none"))),
                 //cell!(project.wages().map(|i|i.to_string()).unwrap_or(String::from("none"))),
                 //cell!(project.sum_sold_and_wages().map(|i|i.to_string()).unwrap_or(String::from("none"))),
 
@@ -293,18 +294,6 @@ pub fn print_csv(projects:&[Project]){
 }
 
 pub fn show_items(project:&Project){
-//┌───────────────────────────────────────────┐
-//│     Project:         "ESE Gutscheine"     │
-//├───────────────────────────────────────────┤
-//│    name          amount  price    cost    │
-//│ 1  Gutschein 5€       8  4,20€  33,60€    │
-//│ 2  Gutschein 7€       1  5,90€   5,90€    │
-//│    ============  ======  =====  ======    │
-//│    Kosten                       39,50€    │
-//│    MWST 19.0%                    7,50€    │
-//│    Final                        47,00€    │
-//└───────────────────────────────────────────┘
- 
     trace!("print::show_items()");
     println!("{}", project.name());
 
@@ -336,8 +325,8 @@ pub fn show_items(project:&Project){
                                     Cell::new(&index.to_string()),
                                     Cell::new(item.product.name),
                                     Cell::new(&item.amount.to_string()),
-                                    Cell::new(&item.product.price.to_string()),
-                                    Cell::new(&(item.product.price * item.amount).to_string()),
+                                    Cell::new(&currency_to_string(&item.product.price)),
+                                    Cell::new(&currency_to_string(&(item.product.price * item.amount))),
             ]));
         }
     }
@@ -347,12 +336,12 @@ pub fn show_items(project:&Project){
     let sums = bill.sums_by_tax();
     let total = bill.total();
 
-    println!("Taxes   0% : {}", taxes.get(&OrderedFloat(0.0)).unwrap_or(&Currency(Some('€'),0)));
-    println!("     19,0% : {}", taxes.get(&OrderedFloat(0.19)).unwrap_or(&Currency(Some('€'),0)));
+    println!("Taxes   0% : {}", currency_to_string(&taxes.get(&OrderedFloat(0.0)).unwrap_or(&Currency(Some('€'),0))));
+    println!("     19,0% : {}", currency_to_string(&taxes.get(&OrderedFloat(0.19)).unwrap_or(&Currency(Some('€'),0))));
 
-    println!("Sums    0% : {}", sums.get(&OrderedFloat(0.0)).unwrap_or(&Currency(Some('€'),0)));
-    println!("     19,0% : {}", sums.get(&OrderedFloat(0.19)).unwrap_or(&Currency(Some('€'),0)));
-    println!("Total        {}", total);
+    println!("Sums    0% : {}", currency_to_string(&sums.get(&OrderedFloat(0.0)).unwrap_or(&Currency(Some('€'),0))));
+    println!("     19,0% : {}", currency_to_string(&sums.get(&OrderedFloat(0.19)).unwrap_or(&Currency(Some('€'),0))));
+    println!("Total        {}", currency_to_string(&total));
 
     //println!("{}", project.sum_offered().unwrap());
     //println!("{}", project.tax_offered().unwrap());

@@ -10,7 +10,6 @@
 extern crate alloc_system;
 extern crate chrono;
 extern crate term; // TODO consolidate term, ansi_term and terminal_size
-extern crate terminal_size;
 extern crate open;
 
 #[cfg(feature="document_export")] extern crate rustc_serialize;
@@ -29,6 +28,7 @@ use env_logger::LogBuilder;
 
 mod cli;
 use cli::subcommands;
+pub mod manual;
 
 fn setup_log(){
     let format = |record: &LogRecord| {
@@ -70,7 +70,6 @@ fn setup_app(){
      ("make",      Some(sub_m)) => subcommands::make(sub_m),
      ("spec",      Some(sub_m)) => subcommands::spec(sub_m),
 
-     ("term",      _          ) => subcommands::term(),
      ("doc",       _          ) => subcommands::doc(),
      ("version",   _          ) => subcommands::version(),
 
@@ -81,6 +80,8 @@ fn setup_app(){
      ("add",       Some(sub_m)) => subcommands::git_add(sub_m),
      ("commit",    _          ) => subcommands::git_commit(),
      ("push",      _          ) => subcommands::git_push(),
+     ("stash",      _          ) => subcommands::git_stash(),
+     ("pop",      _          ) => subcommands::git_stash_pop(),
      ("log",       _          ) => subcommands::git_log(),
      _                       => ()
     }

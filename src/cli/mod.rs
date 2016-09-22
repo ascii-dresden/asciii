@@ -29,12 +29,13 @@ pub fn fail<T:Display>(message:T) -> !{
 fn execute<F, S>(command:F) -> S where F: FnOnce() -> StorageResult<S> {
     match command(){
         Ok(s) => s,
-        Err(lerr) => { println!("ERROR: {}", lerr); exit(1) }
+        Err(lerr) => { error!("{}", lerr); exit(1) }
     }
 }
 
 /// Sets up an instance of `Storage`.
 fn setup_luigi() -> Storage<Project> {
+    trace!("setup_luigi()");
     let working = CONFIG.get_str("dirs/working")
                 .expect("Faulty config: dirs/working does not contain a value");
     let archive = CONFIG.get_str("dirs/archive")
@@ -46,6 +47,7 @@ fn setup_luigi() -> Storage<Project> {
 
 /// Sets up an instance of `Storage`, with git turned on.
 fn setup_luigi_with_git() -> Storage<Project> {
+    trace!("setup_luigi_with_git()");
     let working = CONFIG.get_str("dirs/working")
                 .expect("Faulty config: dirs/working does not contain a value");
     let archive = CONFIG.get_str("dirs/archive")

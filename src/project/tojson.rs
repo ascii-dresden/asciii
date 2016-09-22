@@ -6,7 +6,8 @@ use ordered_float::OrderedFloat;
 use super::Project;
 use super::product::Product;
 use super::spec;
-use ::storage::Storable;
+use util::currency_to_string;
+use storage::Storable;
 
 fn opt_to_json<T: ::std::fmt::Display>(opt:Option<T>) -> Json{
     match opt{
@@ -27,10 +28,10 @@ impl ToJson for Project{
 
         let item_to_json = |item:&BillItem<Product>, tax:OrderedFloat<f64>| btreemap!{
             s("name") => item.product.name.to_json(),
-            s("price") => item.product.price.to_string().to_json(),
+            s("price") => currency_to_string(&item.product.price).to_json(),
             s("unit") => item.product.unit.unwrap_or_else(||"").to_json(),
             s("amount") => item.amount.to_json(),
-            s("cost") => item.sum().to_string().to_json(),
+            s("cost") => currency_to_string(&item.sum()).to_json(),
             s("tax") => tax.into_inner().to_json()
         }.to_json();
 
@@ -42,7 +43,7 @@ impl ToJson for Project{
         let taxes_by_tax_to_json = |bill:&Bill<Product>| bill.taxes_by_tax().iter()
                                                                             .map(|(tax,taxes)| btreemap!{
                                                                                 s("tax") => (tax.into_inner()*100.0).to_json(),
-                                                                                s("taxes") => taxes.to_json(),
+                                                                                s("taxes") => currency_to_string(&taxes).to_json(),
                                                                             }.to_json())
                                                                             .collect::<Vec<Json>>()
                                                                             .to_json();
@@ -79,8 +80,8 @@ impl ToJson for Project{
                 s("number") => offer::number(y).to_json(),
                 s("date")   => dmy(spec::date::offer(y)),
                 s("sums")   => taxes_by_tax_to_json(&offer),
-                s("total")  => offer.total().to_json(),
-                s("total_before_tax")  => offer.total_before_tax().to_json(),
+                s("total")  => currency_to_string(&offer.total()).to_json(),
+                s("total_before_tax")  => currency_to_string(&offer.total_before_tax()).to_json(),
             }.to_json(),
 
             s("invoice") => btreemap!{
@@ -89,13 +90,13 @@ impl ToJson for Project{
                 s("number_long") => invoice::number_long_str(y).to_json(),
                 s("official") => invoice::official(y).to_json(),
                 s("sums")   => taxes_by_tax_to_json(&invoice),
-                s("total")  => invoice.total().to_json(),
-                s("total_before_tax")  => invoice.total_before_tax().to_json(),
+                s("total")  => currency_to_string(&invoice.total()).to_json(),
+                s("total_before_tax")  => currency_to_string(&invoice.total_before_tax()).to_json(),
             }.to_json(),
 
             s("hours") => btreemap!{
                 s("time")   => opt_to_json(hours::total(y)),
-                s("salary") => opt_to_json(hours::salary(y)),
+                s("salary") => opt_to_json(hours::salary(y).map(|ref c|currency_to_string(c)))
             }.to_json(),
 
         };
@@ -110,7 +111,7 @@ impl<'a> ToJson for Product<'a> {
             s("name")     => self.name.to_json(),
             s("unit")     => self.unit.map(|s|s.to_owned()).to_json(),
             s("tax")      => self.tax.to_string().to_json(),
-            s("price")    => self.price.to_string().to_json(),
+            s("price")    => currency_to_string(&self.price).to_json(),
             s("currency") => self.price.0.map(|s|s.to_string()).to_json(),
         })
     }

@@ -3,8 +3,8 @@ use std::ffi::OsStr;
 use std::{env,fs};
 use std::collections::HashMap;
 
-use clap::ArgMatches;
 use open;
+use clap::ArgMatches;
 use chrono::Datelike;
 
 use asciii::CONFIG;
@@ -32,7 +32,6 @@ use asciii::print::{ListConfig, ListMode};
 
 /// Create NEW Project
 pub fn new(matches:&ArgMatches){
-    #![allow(unreachable_code,unused_variables)]
     let project_name     = matches.value_of("name").expect("You did not pass a \"Name\"!");
     let editor           = CONFIG.get("editor").and_then(|e|e.as_str());
 
@@ -183,10 +182,6 @@ fn list_projects(dir:StorageDir, list_config:&ListConfig){
 
     // fit screen
     let wide_enough = true;
-    //match terminal_size() {
-    //    Some((Width(w), _)) if w >= STATUS_ROWS_WIDTH => true,
-    //    _ => false
-    //};
 
     if !wide_enough && list_config.mode != ListMode::Csv { // TODO room for improvement
         print::print_projects(print::simple_rows(&projects, list_config));
@@ -315,7 +310,7 @@ pub fn show(matches:&ArgMatches){
     };
 
     if matches.is_present("files"){
-        with_projects(dir, search_term,
+        with_projects(&setup_luigi(), dir, search_term,
                       |p| {
                           println!("{}: ", p.dir().display());
                           for entry in fs::read_dir(p.dir()).unwrap(){
@@ -323,6 +318,8 @@ pub fn show(matches:&ArgMatches){
                           }
                       }
                      );
+    } else if  matches.is_present("dump"){
+        dump_yaml(dir, &search_term)
     } else if  matches.is_present("json"){
         show_json(dir, &search_term)
     } else if  matches.is_present("template"){
@@ -332,9 +329,13 @@ pub fn show(matches:&ArgMatches){
     }
 }
 
+fn dump_yaml(dir:StorageDir, search_term:&str){
+    with_projects(&setup_luigi(), dir, search_term, |p| println!("{}", p.yaml().to_string()));
+}
+
 #[cfg(feature="document_export")]
 fn show_json(dir:StorageDir, search_term:&str){
-    with_projects(dir, search_term, |p|println!("{}", p.to_json()));
+    with_projects(&setup_luigi(), dir, search_term, |p|println!("{}", p.to_json()));
 }
 
 #[cfg(not(feature="document_export"))]
@@ -344,6 +345,7 @@ fn show_json(_:StorageDir, _:&str){
 
 /// Command SPEC
 /// TODO make this not panic :D
+/// TODO move this to `spec::all_the_things`
 pub fn spec(_matches:&ArgMatches){
     use asciii::project::spec::*;
     let luigi = setup_luigi();
@@ -367,32 +369,74 @@ pub fn spec(_matches:&ArgMatches){
         invoice::number_long_str(&yaml);
         invoice::number_str(&yaml);
         offer::number(&yaml);
-        project.age().map(|a|format!("{} days", a));
-        project.date().map(|d|d.year().to_string());
-        //project.sum_sold().map(|c|c.to_string()); //TODO restore
-        project::manager(&yaml).map(|s|s.to_owned());
-        project::name(&yaml).map(|s|s.to_owned());
+        project.age().map(|a|format!("{} days", a)).unwrap();
+        project.date().map(|d|d.year().to_string()).unwrap();
+        project.sum_sold().map(|c|util::currency_to_string(&c)).unwrap();
+        project::manager(&yaml).map(|s|s.to_owned()).unwrap();
+        project::name(&yaml).map(|s|s.to_owned()).unwrap();
     }
 }
 
 /// Command MAKE
 #[cfg(feature="document_export")]
-pub fn make(matches:&ArgMatches){
-    let search_term = matches.value_of("search_term").unwrap();
+pub fn make(matches:&ArgMatches) {
 
-    let template = matches.value_of("template").unwrap_or("Document");
+    let luigi = setup_luigi();
+    let search_term = matches.value_of("search_term").unwrap();
+    let template_name = matches.value_of("template").unwrap_or("document");
 
     let dir = match matches.value_of("archive"){
         Some(year) => { let year = year.parse::<i32>().unwrap(); StorageDir::Archive(year) },
         _ => StorageDir::Working
     };
 
+    let template_ext = CONFIG.get_str("extensions/output_template").expect("Internal Error: default config is wrong");
+    let output_ext = CONFIG.get_str("extensions/output_file").expect("Internal Error: default config is wrong");
+    let mut template_path = PathBuf::new();
+
+    template_path.push(luigi.templates_dir());
+    template_path.push(template_name);
+    template_path.set_extension(template_ext);
+
     let is_invoice = matches.is_present("invoice");
 
-    with_projects( dir, search_term, |p| {
-        let filled = fill_template(p, is_invoice, template.into()).unwrap();
-        println!("{}", filled);
+    debug!("template file={:?} exists={}", template_path, template_path.exists());
+
+    with_projects(&luigi, dir, search_term, |p| {
+
+        let filled = fill_template(p, is_invoice, &template_path).unwrap();
+
+        let ready_for_offer = p.is_ready_for_offer();
+        let ready_for_invoice = p.is_ready_for_invoice();
+
+        if ready_for_invoice.is_ok() { // if we can do an invoice, we do so!
+            let invoice_file = p.dir().join(p.invoice_file_name(output_ext).unwrap());
+            debug!("invoice file name would be {} exists={}", invoice_file.display(), invoice_file.exists());
+            trace!("creating an invoice");
+            //p.write_to_invoice_file(&filled,output_ext).unwrap(); //TODO try!()
+        } else if is_invoice { // if we can't do an invoice, but the user really wants one, we say "sorry"
+            let errors = ready_for_invoice.unwrap_err();
+            error!("sorry, {name} is not ready to create and invoice! Checkout: {errors:#?}", name = p.name(), errors = errors);
+        }
+
+        else if !is_invoice && ready_for_offer.is_ok() { // if the user wants an offer...
+            let offer_file = p.dir().join(p.offer_file_name(output_ext).unwrap());
+            debug!("  offer file name would be {} exists={}", offer_file.display(), offer_file.exists()  );
+            trace!("creating an offer");
+            // check file age!
+            // TODO warn about offer number
+            if let Ok(metadata) = fs::metadata(&offer_file){
+                // TODO Too many different types of errors
+                //debug!("{} was last accessed in {:?}", offer_file.display(), metadata.accessed().and_then(|t|t.elapsed().and_then(|d|d.as_secs()))); // try!s
+            }
+            p.write_to_offer_file(&filled,output_ext).unwrap();
+        } else {
+            let errors = ready_for_offer.unwrap_err();
+            error!("sorry, {name} is not ready to create and offer! Checkout: {errors:#?}", name = p.name(), errors = errors);
+        }
+
     });
+
 }
 
 #[cfg(not(feature="document_export"))]
@@ -401,9 +445,9 @@ pub fn make(_:&ArgMatches){
     unimplemented!();
 }
 
-fn with_projects<F:Fn(&Project)>(dir:StorageDir, search_term:&str, cb:F){
+fn with_projects<F:Fn(&Project)>(luigi: &Storage<Project>, dir:StorageDir, search_term:&str, cb:F){
+    trace!("with_projects({})", search_term);
     // TODO make this use ProjectList
-    let luigi = setup_luigi();
     let projects = super::execute(||luigi.search_projects(dir, search_term));
     if !projects.is_empty(){
         for project in &projects{
@@ -420,6 +464,7 @@ fn show_project(dir:StorageDir, search_term:&str){
     let projects = super::execute(||luigi.search_projects(dir, search_term));
     if !projects.is_empty(){
         for project in &projects{
+            trace!("showing project {:?}", project.file());
             print::show_items(project);
         }
     } else{
@@ -544,16 +589,6 @@ pub fn doc(){
 /// Command VERSION
 pub fn version(){
     println!("{}", asciii_version());
-}
-
-/// Command TERM
-pub fn term(){
-    use terminal_size::{Width, Height, terminal_size };
-    if let Some((Width(w), Height(h))) = terminal_size() {
-        println!("Your terminal is {} cols wide and {} lines tall", w, h);
-    } else {
-        println!("Unable to get terminal size");
-    }
 }
 
 pub fn show_path(matches:&ArgMatches){path(matches, |path| println!("{}", path.display()))}
@@ -709,3 +744,18 @@ pub fn git_push(){
     let repo = luigi.repository.unwrap();
     util::exit(repo.push())
 }
+
+/// Command DIFF
+pub fn git_stash(){
+    let luigi = setup_luigi_with_git();
+    let repo = luigi.repository.unwrap();
+    util::exit(repo.stash())
+}
+
+/// Command DIFF
+pub fn git_stash_pop(){
+    let luigi = setup_luigi_with_git();
+    let repo = luigi.repository.unwrap();
+    util::exit(repo.stash_pop())
+}
+

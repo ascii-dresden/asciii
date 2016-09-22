@@ -39,7 +39,6 @@ impl ConfigReader{
     }
 
     /// Opens config from `self.path()` and parses Yaml right away.
-    #[cfg(feature = "debug_config")]
     pub fn new() -> Result<ConfigReader, YamlError> {
         let path = ConfigReader::path_home();
         let config = Ok(ConfigReader{
@@ -49,29 +48,11 @@ impl ConfigReader{
             local:  yaml::open(Path::new(&DEFAULT_LOCATION)).unwrap_or(Yaml::Null)
         });
 
-        println!("CONFIG_DEBUG\n  {default_path:?} exists: {default_exists}\n  {local_path:?} exists: {local_exists}",
-                 default_path = path,
-                 default_exists= path.exists(),
-                 local_path = DEFAULT_LOCATION,
-                 local_exists = Path::new(&DEFAULT_LOCATION).exists(),
-                 );
+        trace!("{default_path:?} exists={default_exists}", default_path = path, default_exists= path.exists());
+        trace!("local config: {local_path:?} exists={local_exists}", local_path = DEFAULT_LOCATION, local_exists = Path::new(&DEFAULT_LOCATION).exists());
 
         config
     }
-
-    /// Opens config from `self.path()` and parses Yaml right away.
-    #[cfg(not(feature = "debug_config"))]
-    pub fn new () -> Result<ConfigReader, YamlError> {
-        let path = ConfigReader::path_home();
-        Ok(ConfigReader{
-            path: path.to_owned(),
-            defaults: try!(yaml::parse(&DEFAULT_CONFIG)),
-            custom: yaml::open(&path).unwrap_or(Yaml::Null),
-            local:  yaml::open(Path::new(&DEFAULT_LOCATION)).unwrap_or(Yaml::Null)
-        })
-    }
-
-
 
     /// Returns whatever it finds in that position
     ///

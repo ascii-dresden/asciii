@@ -2,9 +2,7 @@
 //!
 //! Haven't decided on a templating engine yet, my own will probably not do.
 
-use std::fmt;
 use std::path::Path;
-use std::error::Error;
 use rustc_serialize::json::{ToJson, Json};
 use handlebars::{RenderError, Handlebars, no_escape};
 
@@ -12,65 +10,8 @@ use util;
 use project::Project;
 use storage::Storage;
 
-custom_derive! {
-    #[derive(Debug,
-             IterVariants(VirtualFields),
-             IterVariantNames(VirtualFieldNames),
-             EnumFromStr
-             )]
-pub enum Template{
-    Document,
-    Simple,
-    Invalid
-}
-}
-
-impl<'a> From<&'a str> for Template {
-    fn from(s: &'a str) -> Template {
-        s.parse::<Template>().unwrap_or(Template::Invalid)
-    }
-}
-
-#[derive(Debug)]
-pub enum FillError {
-    RenderError(RenderError),
-    InvalidTemplate,
-}
-
-impl Error for FillError {
-    fn description(&self) -> &str {
-        match *self {
-            FillError::RenderError(ref inner) => inner.description(),
-            FillError::InvalidTemplate => "Invalid Template",
-        }
-    }
-
-    fn cause(&self) -> Option<&Error> {
-        match *self {
-            FillError::RenderError(ref inner) => Some(inner),
-            FillError::InvalidTemplate => None,
-        }
-    }
-}
-
-impl fmt::Display for FillError {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match self.cause() {
-            None => write!(f, "{}", self.description(),),
-            Some(cause) => write!(f, "{}", cause),
-        }
-    }
-}
-
-// All you need to make try!() fun again
-impl From<RenderError> for FillError {
-    fn from(he: RenderError) -> FillError {
-        FillError::RenderError(he)
-    }
-}
-
-
 /// Sets up an instance of `Storage`.
+/// TODO isn't this redundant
 fn setup_luigi() -> Storage<Project> {
     let working = ::CONFIG.get_str("dirs/working")
         .expect("Faulty config: dirs/working does not contain a value");
@@ -118,13 +59,13 @@ fn inc_helper(_: &Context, h: &Helper, _: &Handlebars, rc: &mut RenderContext) -
 }
 
 fn path_helper(_: &Context, _: &Helper, _: &Handlebars, rc: &mut RenderContext) -> Result<(), RenderError> {
-    let rendered = format!("{}", rc.get_local_path_root());
+    let rendered = rc.get_local_path_root().to_string();
     try!(rc.writer.write(rendered.into_bytes().as_ref()));
     Ok(())
 }
 
 fn count_helper(_: &Context, h: &Helper, _: &Handlebars, rc: &mut RenderContext) -> Result<(), RenderError> {
-    let count = h.param(0).unwrap().value().as_array().map(|a|a.len()).unwrap_or(0);
+    let count = h.param(0).unwrap().value().as_array().map_or(0, |a|a.len());
     //println!("count_helper{:?}", param);
     let rendered = format!("{}", count);
     try!(rc.writer.write(rendered.into_bytes().as_ref()));
@@ -135,37 +76,24 @@ fn count_helper(_: &Context, h: &Helper, _: &Handlebars, rc: &mut RenderContext)
 ///
 /// Returns path to created file, potenially in a `tempdir`.
 // pub fn fill_template<E:ToJson>(document:E, template_file:&Path) -> PathBuf{
-pub fn fill_template<E: ToJson>(document: &E, is_invoice:bool, template: Template) -> Result<String, FillError> {
+pub fn fill_template<E: ToJson, P:AsRef<Path>>(document: &E, is_invoice:bool, template_path: P) -> Result<String, RenderError> {
+
     let mut handlebars = Handlebars::new();
+
     handlebars.register_escape_fn(no_escape);
-    handlebars.register_helper("inc", Box::new(inc_helper));
-    handlebars.register_helper("path", Box::new(path_helper));
+    handlebars.register_escape_fn(|data| data.replace("\n", r#"\newline "#));
+    handlebars.register_helper("inc",   Box::new(inc_helper));
+    handlebars.register_helper("path",  Box::new(path_helper));
     handlebars.register_helper("count", Box::new(count_helper));
 
-    handlebars.register_template_file(
-        "document",
-        Path::new("./templates/document.tex.hbs"))
-        .unwrap();
-
-    handlebars.register_template_file(
-        "simple",
-        Path::new("./templates/simple.hbs"))
-        .unwrap();
+    handlebars.register_template_file("document", template_path).unwrap();
 
     let packed = pack_data(document, is_invoice);
 
-    let content = match template {
-        Template::Document => {
-            handlebars.register_escape_fn(|data| data.replace("\n", r#"\newline "#));
-            handlebars.render("document", &packed)
-                      .map(|r| r.replace("<", "{")
-                                .replace(">", "}"))
-        }
-        Template::Simple => handlebars.render("simple", &packed),
-        Template::Invalid => return Err(FillError::InvalidTemplate),
-    }
-    .map_err(FillError::RenderError);
-    content
+    handlebars.render("document", &packed)
+              .map(|r| r.replace("<", "{")
+                        .replace(">", "}")
+                  )
 }
 
 

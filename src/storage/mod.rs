@@ -24,8 +24,6 @@ use std::fs;
 use std::path::{Path, PathBuf};
 use std::marker::PhantomData;
 
-static TEMPLATE_FILE_EXTENSION:&'static str = "tyml";
-
 /// Year = `i32`
 pub type Year =  i32;
 
@@ -207,14 +205,16 @@ impl<L:Storable> Storage<L> {
 
     /// Produces a list of files in the `template_dir()`
     pub fn list_template_files(&self) -> StorageResult<Vec<PathBuf>> {
-        trace!("listing template files");
+        let template_file_extension = ::CONFIG.get_str("extensions/project_template").expect("Internal Error: default config is wrong");
+        trace!("listing template files (.{})", template_file_extension);
         let template_files :Vec<PathBuf>=
         try!(list_path_content(&self.templates_dir()))
             .iter()
             .filter(|p|p.extension()
-                        .unwrap_or_else(|| OsStr::new("")) == OsStr::new(TEMPLATE_FILE_EXTENSION)
+                        .unwrap_or_else(|| OsStr::new("")) == OsStr::new(template_file_extension)
                         )
-            .cloned().collect();
+            .cloned()
+            .collect();
         if template_files.is_empty(){
             Err(StorageError::TemplateNotFound) // TODO: RFC perhaps "NoTemplates"?
         } else {

@@ -10,6 +10,7 @@ use currency::Currency;
 
 use util::yaml;
 use util::yaml::Yaml;
+use util::currency_to_string;
 use storage::Storable;
 use super::Project;
 
@@ -60,7 +61,7 @@ impl VirtualField {
             VirtualField::InvoiceNumber => invoice::number_str(project.yaml()),
             VirtualField::InvoiceNumberLong => invoice::number_long_str(project.yaml()),
             VirtualField::Name => project::name(project.yaml()).map(|s| s.to_owned()),
-            VirtualField::Final => project.sum_sold().map(|c| c.to_string()).ok(),
+            VirtualField::Final => project.sum_sold().map(|c| currency_to_string(&c)).ok(),
             VirtualField::Age => project.age().map(|a| format!("{} days", a)),
             VirtualField::Year => project.date().map(|d| d.year().to_string()),
 

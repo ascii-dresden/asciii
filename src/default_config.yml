@@ -19,8 +19,16 @@ dirs:
 template: default # default template
 
 ## CAREFUL HERE
-project_file_extension: .yml
-latex:    pdflatex
+extensions:
+  project_file: yml
+  project_template: tyml
+  output_file: tex
+  output_template: tex.hbs
+
+convert:
+  tool: pdflatex
+  output_extension: pdf
+
 #log_file: ~/.ascii_log # unimplemented
 #calendar_file: invoicer.ics #unimplemented
 
