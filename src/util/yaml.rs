@@ -30,6 +30,7 @@ use std::error::Error;
 pub use yaml_rust::Yaml;
 use yaml_rust::YamlLoader;
 use yaml_rust::scanner::ScanError;
+use yaml_rust::emitter::YamlEmitter;
 use chrono::*;
 
 /// Wrapper around `io::Error` and `yaml_rust::scanner::ScanError`.
@@ -164,7 +165,17 @@ pub fn get_string(yaml:&Yaml, key:&str) -> Option<String> {
 
 /// Gets anything **as** `String`.
 pub fn get_as_string(yaml:&Yaml, key:&str) -> Option<String> {
-    get(yaml,key).map(ToString::to_string)
+    if let Some(yml) = get(yaml,key) {
+        let mut buf = String::new();
+        {
+            let mut emitter = YamlEmitter::new(&mut buf);
+            if emitter.dump(&yml).is_err(){
+                return None
+            }
+        }
+        return Some(buf);
+    }
+    None
 }
 
 /// Gets a Date in `dd.mm.YYYY` format.

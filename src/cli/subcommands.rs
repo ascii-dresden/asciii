@@ -330,7 +330,7 @@ pub fn show(matches:&ArgMatches){
 }
 
 fn dump_yaml(dir:StorageDir, search_term:&str){
-    with_projects(&setup_luigi(), dir, search_term, |p| println!("{}", p.yaml().to_string()));
+    with_projects(&setup_luigi(), dir, search_term, |p| println!("{:?}", p.yaml().dump()));
 }
 
 #[cfg(feature="document_export")]
@@ -523,7 +523,7 @@ fn archive_project(name:&str, manual_year:Option<i32>, force:bool){
     if let Ok(projects) = luigi.search_projects(StorageDir::Working, name){
         if projects.is_empty(){ fail(format!("Nothing found for {:?}", name)); }
         for project in &projects {
-            if project.valid_stage3().is_ok() || force{
+            if project.is_ready_for_archive().is_ok() || force {
                 let year = manual_year.or(project.year()).unwrap();
                 println!("archiving {} ({})",  project.ident(), project.year().unwrap());
                 let archive_target = super::execute(||luigi.archive_project(project, year));
@@ -566,7 +566,7 @@ fn unarchive_project(year:i32, name:&str){
 /// Command CONFIG --show
 pub fn config_show(path:&str){
     println!("{}: {:#?}", path, CONFIG.get(&path)
-             .map(|v|v.to_string())
+             .map(|v|v.dump().unwrap_or(String::from("error")))
              .unwrap_or_else(||format!("{} not set", path)));
 }
 

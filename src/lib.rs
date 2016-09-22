@@ -20,6 +20,7 @@
 #![cfg_attr(feature = "lints", allow(unstable_features))]
 #![cfg_attr(feature = "lints", feature(plugin))]
 #![cfg_attr(feature = "lints", plugin(clippy))]
+//#![cfg_attr(feature = "lints", plugin(herbie_lint))]
 
 //#![feature(alloc_system)]
 //extern crate alloc_system;

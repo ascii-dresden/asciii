@@ -9,9 +9,9 @@ authors = ["Hendrik Sollich <hendrik@hoodie.de>"]
 [dependencies]
 
 log = "*" #"0.3"
-env_logger = "*" #"0.3"
-#yaml-rust = {git="https://github.com/hoodie/yaml-rust", branch="feature/to_string", features=["preserve_order"]}
-yaml-rust = {git="https://github.com/hoodie/yaml-rust", branch="feature/to_string"}
+env_logger = { version = "0.3", default-features=false} # default feature requires regex
+#yaml-rust = {git="https://github.com/hoodie/yaml-rust", branch="bug/emitter"}
+yaml-rust = {path="../yaml-rust"}
 chrono = "*" #"0.2"
 regex = "*" #"0.1"
 lazy_static = "*" #"0.2"
@@ -33,6 +33,7 @@ prettytable-rs = { version = "0.6", default-features=false}
 
 # feature: lints
 clippy = {version = "*", optional = true}
+#herbie-lint = {version = "*", optional = true}
 
 # feature: document_export
 #handlebars = {version = "*", optional = true}
@@ -47,7 +48,6 @@ git2 = {version = "*", default-features= false, optional = true}
 [features]
 default = ["document_export", "git_statuses"]
 document_export = ["rustc-serialize", "handlebars"]
-debug_config = []
 git_statuses = ["git2"]
 nightly = []
 lints = ["clippy"]

@@ -142,7 +142,7 @@ impl Project{
     /// Minimum correctness.
     ///
     /// Ready to send an **offer** to the client.
-    #[deprecated] // use is_ready_for_offer()
+    #[deprecated(note="please use is_ready_for_offer()")]
     pub fn valid_stage1(&self) -> SpecResult{ spec::offer::validate(&self.yaml) }
 
     /// Ready to produce offer.
@@ -153,7 +153,7 @@ impl Project{
     /// Valid project
     ///
     /// Ready to send an **invoice** to the client.
-    #[deprecated] // use is_ready_for_invoice()
+    #[deprecated(note="please use is_ready_for_invoice()")]
     pub fn valid_stage2(&self) -> SpecResult{ spec::invoice::validate(&self.yaml) }
 
     /// Valid to produce invoice
@@ -164,13 +164,17 @@ impl Project{
     /// Completely done and in the past.
     ///
     /// Ready to be **archived**.
-    #[deprecated] //rename to is_ready_for_archive
+    #[deprecated(note="please use is_ready_for_archive()")]
     pub fn valid_stage3(&self) -> SpecResult{
         if self.canceled(){
             Ok(())
         } else {
             spec::archive::validate(&self.yaml)
         }
+    }
+
+    pub fn is_ready_for_archive(&self) -> SpecResult{
+        self.valid_stage3()
     }
 
     pub fn age(&self) -> Option<i64> {
