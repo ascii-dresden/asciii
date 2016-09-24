@@ -103,6 +103,7 @@ pub fn setup() -> ArgMatches<'static>{
                     .arg(Arg::with_name("errors")
                          .help("Show Errors for each project")
                          .long("errors")
+                         .short("e")
                         )
                     .arg(Arg::with_name("simple")
                          .help("Use simple list")

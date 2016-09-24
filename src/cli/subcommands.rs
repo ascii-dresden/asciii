@@ -345,7 +345,7 @@ fn show_json(_:StorageDir, _:&str){
 /// Command SPEC
 /// TODO make this not panic :D
 /// TODO move this to `spec::all_the_things`
-pub fn spec(m:&ArgMatches){
+pub fn spec(_:&ArgMatches){
     super::execute(||actions::spec())
 }
 
@@ -355,7 +355,12 @@ pub fn spec(m:&ArgMatches){
 pub fn make(m:&ArgMatches) {
     let search_term = m.value_of("search_term").unwrap();
     let template_name = m.value_of("template").unwrap_or("document");
-    let bill_type = if m.is_present("invoice") {BillType::Invoice} else {BillType::Offer};
+    let bill_type = match (m.is_present("offer"),m.is_present("invoice")) {
+        (true,true)  => unreachable!("this should have been prevented by clap-rs"),
+        (true,false) => Some(BillType::Offer),
+        (false,true) => Some(BillType::Invoice),
+        (false,false) => None
+    };
     let dir = match m.value_of("archive"){
         Some(year) => { let year = year.parse::<i32>().unwrap(); StorageDir::Archive(year) },
         _ => StorageDir::Working

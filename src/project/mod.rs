@@ -152,12 +152,18 @@ impl Project{
     ///
     /// Ready to send an **offer** to the client.
     #[deprecated(note="please use is_ready_for_offer()")]
-    pub fn valid_stage1(&self) -> SpecResult{ spec::offer::validate(&self.yaml) }
+    pub fn valid_stage1(&self) -> SpecResult{
+        self.is_ready_for_offer()
+    }
 
     /// Ready to produce offer.
     ///
     /// Ready to send an **offer** to the client.
-    pub fn is_ready_for_offer(&self) -> SpecResult{ spec::offer::validate(&self.yaml) }
+    pub fn is_ready_for_offer(&self) -> SpecResult{
+        let client_validation = spec::client::validate(&self.yaml);
+        let offer_validation = spec::offer::validate(&self.yaml);
+        offer_validation.and(client_validation)
+    }
 
     /// Valid project
     ///

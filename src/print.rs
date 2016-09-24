@@ -17,7 +17,6 @@ use util::currency_to_string;
 
 //TODO construct table rows way more dynamically
 
-#[allow(dead_code)]
 pub fn print_project(_project:&Project){
     unimplemented!();
 }
@@ -236,10 +235,7 @@ pub fn dynamic_rows(projects:&[Project], list_config:&ListConfig) -> Vec<Row>{
                                         ).collect::<Vec<Cell>>()
                     );
                 if list_config.show_errors{
-                    let validation = (project.valid_stage1(),
-                    project.valid_stage2(),
-                    project.valid_stage3());
-
+                    let validation = (project.valid_stage1(), project.valid_stage2(), project.valid_stage3());
                     cells.extend_from_slice( &[
                                              // Errors
                                              cell!(validation.0.err().map(|errs| errs.join(", ")).unwrap_or("".to_owned())),

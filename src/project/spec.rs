@@ -208,10 +208,12 @@ pub mod client {
     /// Validates the output of each of this modules functions.
     pub fn validate(yaml: &Yaml) -> super::SpecResult {
         let mut errors = super::field_exists(yaml,
-                                             &["client/email",
-                                               "client/address",
-                                               "client/last_name",
-                                               "client/first_name"]);
+                                             &[
+                                             //"client/email", // TODO make this a requirement
+                                             "client/address",
+                                             "client/last_name",
+                                             "client/first_name"
+                                             ]);
 
 
         if let Some(title) = title(yaml) {
@@ -225,13 +227,6 @@ pub mod client {
         if addressing(yaml).is_none() {
             errors.push("client_addressing");
         }
-        if first_name(yaml).is_none() {
-            errors.push("client_first_name");
-        }
-        if last_name(yaml).is_none() {
-            errors.push("client_last_name");
-        }
-
         if !errors.is_empty() {
             return Err(errors);
         }

@@ -74,17 +74,11 @@ pub fn projects_to_csv(projects:&[Project]) -> Result<String>{
 }
 
 /// Creates the latex files within each projects directory, either for Invoice or Offer.
-pub fn projects_to_tex(dir:StorageDir, search_term:&str, template_name:&str, bill_type:&BillType, dry_run:bool, force:bool) -> Result<()> {
+pub fn projects_to_tex(dir:StorageDir, search_term:&str, template_name:&str, bill_type:&Option<BillType>, dry_run:bool, force:bool) -> Result<()> {
     let luigi = try!(setup_luigi());
     //let search_term = "ese";
     //let template_name = "document";
     //let dir = StorageDir::Working ;
-
-    let is_invoice = match *bill_type {
-        BillType::Offer => false,
-        BillType::Invoice => true
-    };
-
 
     let template_ext = ::CONFIG.get_str("extensions/output_template").expect("Faulty default config");
     let output_ext   = ::CONFIG.get_str("extensions/output_file").expect("Faulty default config");
@@ -104,7 +98,6 @@ pub fn projects_to_tex(dir:StorageDir, search_term:&str, template_name:&str, bil
 
     with_projects(&luigi, dir, search_term, |p| {
 
-        let filled = try!(fill_template(p, bill_type, &template_path));
         let convert_tool = ::CONFIG.get_str("convert/tool");
         let output_folder = ::CONFIG.get_str("output_path").and_then(util::get_valid_path);
 
@@ -112,41 +105,29 @@ pub fn projects_to_tex(dir:StorageDir, search_term:&str, template_name:&str, bil
         let ready_for_invoice = p.is_ready_for_invoice();
         let project_file = p.file();
 
-        let outfile_tex: Option<PathBuf>;
-        let dyn_bill_type: Option<BillType>;
+        use BillType::*;
+        let (dyn_bill_type, outfile_tex):
+            (Option<BillType>, Option<PathBuf>) =
+             match (bill_type, ready_for_offer, ready_for_invoice)
+        {
+            (&Some(Offer),   Ok(_), _     )  |
+            (&None,          Ok(_), Err(_))  => (Some(Offer), Some(p.dir().join(p.offer_file_name(output_ext).expect("this should have been cought by ready_for_offer()")))),
+            (&Some(Invoice), _,      Ok(_))  |
+            (&None,          _,      Ok(_))  => (Some(Invoice), Some(p.dir().join(p.invoice_file_name(output_ext).expect("this should have been cought by ready_for_invoice()")))),
+            (&Some(Offer),   Err(e), _    )  => {error!("cannot create an offer, check out:{:#?}",e);(None,None)},
+            (&Some(Invoice), _,      Err(e)) => {error!("cannot create an invoice, check out:{:#?}",e);(None,None)},
+            (_,              Err(e), Err(_)) => {error!("Neither an Offer nor an Invoice can be created from this project\n please check out {:#?}", e);(None,None)}
+        };
 
-        if ready_for_invoice.is_ok() {
-            // if we can do an invoice, we do so!
-            outfile_tex = Some(p.dir().join(p.invoice_file_name(output_ext).expect("this should have been cought by ready_for_invoice()")));
-            dyn_bill_type = Some(BillType::Invoice);
-        }
-        else if !ready_for_invoice.is_ok() && is_invoice {
-            // if we can't do an invoice, but the user really wants one, we say "sorry"
-            let errors = ready_for_invoice.unwrap_err();
-            error!("sorry, {name} is not ready to create and invoice! Checkout: {errors:#?}", name = p.name(), errors = errors);
-            outfile_tex = None;
-            dyn_bill_type = None;
-        }
+        //debug!("{:?} -> {:?}",(bill_type, p.is_ready_for_offer(), p.is_ready_for_invoice()), (dyn_bill_type, outfile_tex));
 
-        else
+        if let (Some(outfile), Some(dyn_bill)) = (outfile_tex, dyn_bill_type) {
+            let filled = try!(fill_template(p, &dyn_bill, &template_path));
 
-        if !is_invoice && ready_for_offer.is_ok() {
-            // if the user wants an offer, we happyly create an offer
-            outfile_tex = Some(p.dir().join(p.offer_file_name(output_ext).expect("this should have been cought by ready_for_offer()")));
-            dyn_bill_type = Some(BillType::Offer);
-        } else {
-            // here we can't do an offer either be cause of reasons :D
-            let errors = ready_for_offer.unwrap_err();
-            error!("sorry, {name} is not ready to create and offer! Checkout: {errors:#?}", name = p.name(), errors = errors);
-            outfile_tex = None;
-            dyn_bill_type = None;
-        }
-
-        if let (Some(outfile), Some(dyn_bill)) = (outfile_tex,dyn_bill_type) {
             // ok, so apparently we can create a tex file, so lets do it
             if !force && outfile.exists() && try!(file_age(&outfile)) < try!(file_age(&project_file)){
                 // no wait, nothing has changed, so lets save ourselves the work
-                info!("nothing to be done, {} is younger than {}", outfile.display(), project_file.display());
+                info!("nothing to be done, {} is younger than {}\n       use -f if you don't agree", outfile.display(), project_file.display());
             } else {
                 // \o/ we created a tex file
 
