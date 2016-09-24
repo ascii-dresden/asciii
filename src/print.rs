@@ -236,6 +236,7 @@ pub fn dynamic_rows(projects:&[Project], list_config:&ListConfig) -> Vec<Row>{
                     );
                 if list_config.show_errors{
                     let validation = (project.valid_stage1(), project.valid_stage2(), project.valid_stage3());
+
                     cells.extend_from_slice( &[
                                              // Errors
                                              cell!(validation.0.err().map(|errs| errs.join(", ")).unwrap_or("".to_owned())),

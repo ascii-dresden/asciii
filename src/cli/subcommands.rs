@@ -5,7 +5,6 @@ use std::collections::HashMap;
 
 use open;
 use clap::ArgMatches;
-use chrono::Datelike;
 
 use asciii::CONFIG;
 use asciii::config;

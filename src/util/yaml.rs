@@ -79,7 +79,12 @@ pub fn open( path:&Path ) -> Result<Yaml, YamlError> {
 
 /// Ruby like API to yaml-rust.
 pub fn parse( file_content:&str ) -> Result<Yaml, YamlError> {
-    Ok(try!(YamlLoader::load_from_str(&file_content)).get(0).unwrap().to_owned())
+    Ok(
+        try!(YamlLoader::load_from_str(&file_content))
+        .get(0)
+        .map(|i|i.to_owned())
+        .unwrap_or_else(||Yaml::from_str("[]"))
+      )
 }
 
 /// Interprets `"25.12.2016"` as date.
