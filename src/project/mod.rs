@@ -162,7 +162,9 @@ impl Project{
     pub fn is_ready_for_offer(&self) -> SpecResult{
         let client_validation = spec::client::validate(&self.yaml);
         let offer_validation = spec::offer::validate(&self.yaml);
-        offer_validation.and(client_validation)
+        let project_validation = spec::project::validate(&self.yaml);
+        //TODO join error lists
+        offer_validation.and(client_validation).and(project_validation)
     }
 
     /// Valid project
@@ -308,7 +310,7 @@ impl Storable for Project{
 
     fn name(&self) -> String {
         spec::project::name(self.yaml())
-            .unwrap_or("unnamed").to_owned()
+            .unwrap_or(&format!("unnamed: {:?}", self.file().file_name())).to_owned()
     }
 
     fn date(&self) -> Option<Date<UTC>>{ spec::project::date(self.yaml()) }

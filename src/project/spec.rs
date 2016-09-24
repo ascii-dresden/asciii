@@ -128,9 +128,16 @@ pub mod project {
     }
 
     /// Validates if all of the functions in this module return `Some(_)`
-    pub fn validate(yaml: &Yaml) -> bool {
-        name(yaml).is_some() && date(yaml).is_some() && manager(yaml).is_some() &&
-        format(yaml).is_some() && hours::salary(yaml).is_some()
+    pub fn validate(yaml: &Yaml) -> super::SpecResult {
+        let mut errors = Vec::new();
+        if name(yaml).is_none(){errors.push("name")}
+        if date(yaml).is_none(){errors.push("date")}
+        if manager(yaml).is_none(){errors.push("manager")}
+        if format(yaml).is_none(){errors.push("format")}
+        if hours::salary(yaml).is_none(){errors.push("salary")}
+
+        if errors.is_empty(){ Ok(()) }
+        else { Err(errors) }
     }
 }
 
@@ -368,11 +375,11 @@ pub mod invoice {
     }
 
     pub fn validate(yaml: &Yaml) -> super::SpecResult {
-        let mut errors = super::field_exists(yaml, &["invoice/number", "invoice/date"]);
+        let mut errors = super::field_exists(yaml, &["invoice/number"]);
 
         // if super::offer::validate(yaml).is_err() {errors.push("offer")}
         if super::date::invoice(yaml).is_none() {
-            errors.push("invoice_date_format");
+            errors.push("invoice_date");
         }
 
         if !errors.is_empty() {
@@ -389,10 +396,8 @@ pub mod archive {
 
     pub fn validate(yaml: &Yaml) -> super::SpecResult {
         let mut errors = Vec::new();
-        if super::date::payed(yaml).is_none() {
-            errors.push("payed_date");
-        }
-        // if super::date::wages(yaml).is_none(){ errors.push("wages_date");} // TODO validate WAGES_DATE also
+        if super::date::payed(yaml).is_none() { errors.push("payed_date"); }
+        //if super::date::wages(yaml).is_none(){ errors.push("wages_date");} // TODO validate WAGES_DATE also
         if !errors.is_empty() {
             return Err(errors);
         }
