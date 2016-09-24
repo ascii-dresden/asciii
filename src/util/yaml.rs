@@ -151,6 +151,11 @@ pub fn get_int(yaml:&Yaml, key:&str) -> Option<i64> {
     get(yaml,key).and_then(|y|y.as_i64())
 }
 
+//TODO this would be nice
+//pub fn get_vec_of<T>(yaml:&Yaml, key:&str) -> Option<Vec<T>>{
+//    Some(Vec::new())
+//}
+
 /// Gets a `&str` value.
 ///
 /// Same mentality as `yaml_rust`, only returns `Some`, if it's a `Yaml::String`.
@@ -176,6 +181,19 @@ pub fn get_as_string(yaml:&Yaml, key:&str) -> Option<String> {
         return Some(buf);
     }
     None
+}
+
+/// Gets anything **as** `String`.
+pub fn get_to_string(yaml:&Yaml, key:&str) -> Option<String> {
+    use self::Yaml::*;
+    get(yaml,key).and_then(|i| match *i {
+        Real(ref inner) | String(ref inner) => Some(inner.to_owned()),
+        Boolean(ref inner) => Some(inner.to_string()),
+        Integer(ref inner) => Some(inner.to_string()),
+        Hash(ref inner) => Some(format!("{:?}", inner)),
+        Array(ref inner) => Some(format!("{:?}", inner)),
+        _ => None
+    })
 }
 
 /// Gets a Date in `dd.mm.YYYY` format.

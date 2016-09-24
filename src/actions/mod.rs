@@ -1,0 +1,226 @@
+//! General actions
+
+#![allow(unused_imports)]
+#![allow(dead_code)]
+
+
+use chrono::*;
+
+use std::{env,fs};
+use std::time;
+use std::fmt::Write;
+use std::path::{Path,PathBuf};
+
+use util;
+use super::BillType;
+use storage::{Storage,StorageDir,Storable,Selection};
+use project::Project;
+use fill_docs::fill_template;
+
+pub mod error;
+use self::error::*;
+
+/// Sets up an instance of `Storage`.
+fn setup_luigi() -> Result<Storage<Project>> {
+    trace!("setup_luigi()");
+    let working   = try!(::CONFIG.get_str("dirs/working").ok_or("Faulty config: dirs/working does not contain a value"));
+    let archive   = try!(::CONFIG.get_str("dirs/archive").ok_or("Faulty config: dirs/archive does not contain a value"));
+    let templates = try!(::CONFIG.get_str("dirs/templates").ok_or("Faulty config: dirs/templates does not contain a value"));
+    let storage   = try!(Storage::new(util::get_storage_path(), working, archive, templates));
+    Ok(storage)
+}
+
+fn with_projects<F>(luigi: &Storage<Project>, dir:StorageDir, search_term:&str, cb:F) -> Result<()>
+    where F:Fn(&Project)->Result<()>
+{
+    trace!("with_projects({})", search_term);
+    // TODO make this use ProjectList
+    let projects = try!(luigi.search_projects(dir, search_term));
+    if !projects.is_empty(){
+        for project in &projects{
+            try!(cb(project));
+        }
+    } else {
+        return Err(format!("Nothing found for {:?}", search_term).into());
+    }
+    Ok(())
+}
+
+pub fn csv(year:i32) -> Result<String> {
+    let luigi = try!(setup_luigi());
+    let mut projects = try!(luigi.open_projects(StorageDir::Year(year)));
+    projects.sort_by(|pa,pb| pa.index().unwrap_or("zzzz".to_owned()).cmp( &pb.index().unwrap_or("zzzz".to_owned())));
+    projects_to_csv(&projects)
+}
+
+pub fn projects_to_csv(projects:&[Project]) -> Result<String>{
+    let mut string = String::new();
+    let splitter = "\";\"";
+    try!(writeln!(&mut string, "\"{}\"", [ "Rnum", "Bezeichnung", "Datum", "Rechnungs", "Betreuer", "Verantwortlich", "Bezahlt am", "Betrag", "Canceled"].join(splitter)));
+    for project in projects{
+        try!(writeln!(&mut string, "\"{}\"", [
+                 project.get("InvoiceNumber").unwrap_or_else(String::new),
+                 project.get("Name").unwrap_or_else(String::new),
+                 project.get("event/dates/0/begin").unwrap_or_else(String::new),
+                 project.get("invoice/date").unwrap_or_else(String::new),
+                 project.get("Caterers").unwrap_or_else(String::new),
+                 project.get("Responsible").unwrap_or_else(String::new),
+                 project.get("invoice/payed_date").unwrap_or_else(String::new),
+                 project.get("Final").unwrap_or_else(String::new),
+                 project.canceled_string().to_owned()
+        ].join(splitter)));
+    }
+    Ok(string)
+}
+
+/// Creates the latex files within each projects directory, either for Invoice or Offer.
+pub fn projects_to_tex(dir:StorageDir, search_term:&str, template_name:&str, bill_type:&BillType, dry_run:bool, force:bool) -> Result<()> {
+    let luigi = try!(setup_luigi());
+    //let search_term = "ese";
+    //let template_name = "document";
+    //let dir = StorageDir::Working ;
+
+    let is_invoice = match *bill_type {
+        BillType::Offer => false,
+        BillType::Invoice => true
+    };
+
+
+    let template_ext = ::CONFIG.get_str("extensions/output_template").expect("Faulty default config");
+    let output_ext   = ::CONFIG.get_str("extensions/output_file").expect("Faulty default config");
+    let convert_ext  = ::CONFIG.get_str("convert/output_extension").expect("Faulty default config");
+    let trash_exts   = ::CONFIG.get("convert/trash_extensions") .expect("Faulty default config")
+                               .as_vec().expect("Faulty default config")
+                               .into_iter()
+                               .map(|v|v.as_str()).collect::<Vec<_>>();
+
+    let mut template_path = PathBuf::new();
+
+    template_path.push(luigi.templates_dir());
+    template_path.push(template_name);
+    template_path.set_extension(template_ext);
+
+    debug!("template file={:?} exists={}", template_path, template_path.exists());
+
+    with_projects(&luigi, dir, search_term, |p| {
+
+        let filled = try!(fill_template(p, bill_type, &template_path));
+        let convert_tool = ::CONFIG.get_str("convert/tool");
+        let output_folder = ::CONFIG.get_str("output_path").and_then(util::get_valid_path);
+
+        let ready_for_offer = p.is_ready_for_offer();
+        let ready_for_invoice = p.is_ready_for_invoice();
+        let project_file = p.file();
+
+        let outfile_tex;
+
+        if ready_for_invoice.is_ok() {
+            // if we can do an invoice, we do so!
+            outfile_tex = Some(p.dir().join(p.invoice_file_name(output_ext).expect("this should have been cought by ready_for_invoice()")));
+        }
+        else if !is_invoice && ready_for_offer.is_ok() {
+            // if the user wants an offer...
+            outfile_tex = Some(p.dir().join(p.offer_file_name(output_ext).expect("this should have been cought by ready_for_offer()")));
+        }
+        else if is_invoice {
+            // if we can't do an invoice, but the user really wants one, we say "sorry"
+            let errors = ready_for_invoice.unwrap_err();
+            error!("sorry, {name} is not ready to create and invoice! Checkout: {errors:#?}", name = p.name(), errors = errors);
+            outfile_tex = None;
+        } else {
+            // here we can't do an offer either be cause of reasons :D
+            let errors = ready_for_offer.unwrap_err();
+            error!("sorry, {name} is not ready to create and offer! Checkout: {errors:#?}", name = p.name(), errors = errors);
+            outfile_tex = None;
+        }
+
+        if let Some(outfile) = outfile_tex {
+            // ok, so apparently we can create a tex file, so lets do it
+            if !force && outfile.exists() && try!(file_age(&outfile)) < try!(file_age(&project_file)){
+                // no wait, nothing has changed, so lets save ourselves the work
+                info!("nothing to be done, {} is younger than {}", outfile.display(), project_file.display());
+            } else {
+                // \o/ we created a tex file
+
+                // tiny little helper
+                let to_local_file = |file:&Path, ext| {
+                    let mut _tmpfile = file.to_owned();
+                    _tmpfile.set_extension(ext);
+                    Path::new(_tmpfile.file_name().unwrap().into()).to_owned()
+                };
+
+                let pdffile = to_local_file(&outfile, convert_ext);
+
+                if dry_run{
+                    warn!("Dry run! This does not produce any output:\n * {}\n * {}", outfile.display(), pdffile.display());
+                } else {
+                    try!(p.write_to_file(&filled,bill_type,output_ext));
+                    util::open_in_editor(&convert_tool, &[&outfile]);
+                }
+                // clean up expected trash files
+                for trash_ext in trash_exts.iter().filter_map(|x|*x){
+                    let trash_file = to_local_file(&outfile, trash_ext);
+                    if  trash_file.exists() {
+                        try!(fs::remove_file(&trash_file));
+                        debug!("just deleted: {}", trash_file.display())
+                    }
+                    else {
+                        debug!("I expected there to be a {}, but there wasn't any ?", trash_file.display())
+                    }
+                }
+                if let Some(output_folder) = output_folder {
+                    if pdffile.exists(){
+                        debug!("now there is be a {:?} -> {:?}", pdffile, output_folder);
+                        try!(fs::rename(&pdffile, &output_folder.join(&pdffile)));
+                    }
+                }
+            }
+        }
+
+        Ok(())
+    })
+}
+
+fn file_age(path:&Path) -> Result<time::Duration>
+{
+    let metadata = try!(fs::metadata(path));
+    let accessed = try!(metadata.accessed());
+    Ok(try!(accessed.elapsed()))
+}
+
+/// Command SPEC
+/// TODO make this not panic :D
+/// TODO move this to `spec::all_the_things`
+pub fn spec() -> Result<()>{
+    use project::spec::*;
+    let luigi = try!(setup_luigi());
+    //let projects = super::execute(||luigi.open_projects(StorageDir::All));
+    let projects = try!(luigi.open_projects(StorageDir::Working));
+    for project in projects{
+        info!("{}", project.dir().display());
+
+        let yaml = project.yaml();
+        client::validate(&yaml).map_err(|errors|for error in errors{
+            println!("  error: {}", error);
+        }).unwrap();
+
+        client::full_name(&yaml);
+        client::first_name(&yaml);
+        client::title(&yaml);
+        client::email(&yaml);
+
+
+        hours::caterers_string(&yaml);
+        invoice::number_long_str(&yaml);
+        invoice::number_str(&yaml);
+        offer::number(&yaml);
+        project.age().map(|a|format!("{} days", a)).unwrap();
+        project.date().map(|d|d.year().to_string()).unwrap();
+        project.sum_sold().map(|c|util::currency_to_string(&c)).unwrap();
+        project::manager(&yaml).map(|s|s.to_owned()).unwrap();
+        project::name(&yaml).map(|s|s.to_owned()).unwrap();
+    }
+
+    Ok(())
+}
+

@@ -97,19 +97,15 @@ pub fn list_path_content(path:&Path) -> StorageResult<Vec<PathBuf>> {
 }
 
 
-use std::fmt;
-use std::ffi::OsStr;
-use std::ops::DerefMut;
-
-
-
-use std::collections::HashMap;
-
-use slug;
-
 
 use self::repo::Repository;
 
+use std::fmt;
+use std::ffi::OsStr;
+use std::ops::DerefMut;
+use std::collections::HashMap;
+
+use slug;
 fn slugify(string:&str) -> String{ slug::slugify(string) }
 
 
@@ -569,5 +565,22 @@ impl<P:Storable> fmt::Debug for Storage<P>{
                archive  = self.archive_dir(),
                template = self.templates_dir(),
                )
+    }
+}
+
+pub struct Selection<'a>{
+    pub search: &'a str,
+    pub dir: StorageDir,
+}
+
+impl<'a> Selection<'a>{
+    pub fn new(search:&'a str,archive:Option<i32>) -> Self{
+        Selection{
+            search: search,
+            dir: match archive{
+                Some(year) => StorageDir::Archive(year),
+                None => StorageDir::Working
+            }
+        }
     }
 }

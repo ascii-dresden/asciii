@@ -28,6 +28,7 @@ extensions:
 convert:
   tool: pdflatex
   output_extension: pdf
+  trash_extensions: [aux,log]
 
 #log_file: ~/.ascii_log # unimplemented
 #calendar_file: invoicer.ics #unimplemented

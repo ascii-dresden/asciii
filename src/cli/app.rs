@@ -169,8 +169,8 @@ pub fn setup() -> ArgMatches<'static>{
                     .about("Produces a CSV report for a given year")
                     .arg(Arg::with_name("year")
                          .help("List projects from that year, archived or not")
-                         .short("y")
-                         .long("year")
+                         //.short("y")
+                         //.long("year")
                          .validator(|y| y.parse::<i32>().map(|_ok|()).map_err(|e|e.to_string()))
                          .takes_value(true)
                         )
@@ -305,8 +305,14 @@ pub fn setup() -> ArgMatches<'static>{
 
                     .arg(Arg::with_name("dump")
                          .help("Dump project yaml")
-                         .long("dump")
-                         .short("d"))
+                         .long("dump"))
+
+                    .arg(Arg::with_name("detail")
+                         .help("Shows a particular detail")
+                         .long("detail")
+                         .short("d")
+                         .takes_value(true)
+                         )
 
                     .arg(Arg::with_name("archive")
                          .help("Pick an archived project")
@@ -362,6 +368,18 @@ pub fn setup() -> ArgMatches<'static>{
 
         .subcommand(SubCommand::with_name("make")
                     .about("Creates documents from projects")
+
+                    .arg(Arg::with_name("force")
+                         .help("Do it against better judgement")
+                         .short("f")
+                         .long("force")
+                        )
+
+                    .arg(Arg::with_name("dry-run")
+                         .help("Do not create final output file")
+                         .short("d")
+                         .long("dry")
+                        )
 
                     .arg(Arg::with_name("search_term")
                          .help("Search term, possibly event name")

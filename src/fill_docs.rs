@@ -72,11 +72,13 @@ fn count_helper(_: &Context, h: &Helper, _: &Handlebars, rc: &mut RenderContext)
     Ok(())
 }
 
+use super::BillType;
+
 /// Takes a `T:ToJson` and a template path and does it's thing.
 ///
 /// Returns path to created file, potenially in a `tempdir`.
 // pub fn fill_template<E:ToJson>(document:E, template_file:&Path) -> PathBuf{
-pub fn fill_template<E: ToJson, P:AsRef<Path>>(document: &E, is_invoice:bool, template_path: P) -> Result<String, RenderError> {
+pub fn fill_template<E: ToJson, P:AsRef<Path>>(document: &E, bill_type:&BillType, template_path: P) -> Result<String, RenderError> {
 
     let mut handlebars = Handlebars::new();
 
@@ -88,7 +90,11 @@ pub fn fill_template<E: ToJson, P:AsRef<Path>>(document: &E, is_invoice:bool, te
 
     handlebars.register_template_file("document", template_path).unwrap();
 
-    let packed = pack_data(document, is_invoice);
+    let packed = match *bill_type {
+        BillType::Offer => pack_data(document, false),
+        BillType::Invoice => pack_data(document, true)
+    };
+
 
     handlebars.render("document", &packed)
               .map(|r| r.replace("<", "{")

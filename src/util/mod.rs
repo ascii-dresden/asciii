@@ -2,6 +2,7 @@
 #![allow(dead_code)]
 use std::io;
 use std::env::{home_dir,current_dir};
+use std::ffi::OsStr;
 use std::path::{Path,PathBuf};
 use std::process;
 use std::process::{Command, ExitStatus};
@@ -9,6 +10,14 @@ use std::process::{Command, ExitStatus};
 use open;
 
 pub mod yaml;
+
+#[export_macro]
+macro_rules! try_some {
+    ($expr:expr) => (match $expr {
+        Some(val) => val,
+        None => return None,
+    });
+}
 
 /// Freezes the program until for inspection
 pub fn freeze() {
@@ -40,10 +49,9 @@ pub fn replace_home_tilde(p:&Path) -> PathBuf{
 ///
 /// This is by far the most important function of all utility functions.
 //TODO use https://crates.io/crates/open (supports linux, windows, mac)
-pub fn open_in_editor(editor:&Option<&str>, paths:&[PathBuf]){
-    for path in paths{
-        assert!(Path::new(&path).exists());
-    }
+pub fn open_in_editor<T:AsRef<OsStr>>(editor:&Option<&str>, paths:&[T]){
+
+    let paths = paths.iter().map(|o|PathBuf::from(&o)).collect::<Vec<PathBuf>>();
 
     if let Some(ref editor) = *editor{
         let editor_config = editor
@@ -61,7 +69,7 @@ pub fn open_in_editor(editor:&Option<&str>, paths:&[PathBuf]){
 
         Command::new(editor_command)
             .args(args)
-            .args(paths)
+            .args(&paths)
             .status()
             .unwrap_or_else(|e| { panic!("failed to execute process: {}", e) });
     } else if paths.len() > 4{
@@ -92,6 +100,18 @@ pub fn get_storage_path() -> PathBuf
     } else {
         storage_path
     }
+}
+
+/// takes a path that could be relative or contains a `~` and turn it into a path that exists
+pub fn get_valid_path<T:AsRef<OsStr>>(p:T) -> Option<PathBuf>{
+    let path = replace_home_tilde(Path::new(&p));
+    let path = if !path.is_absolute(){
+        current_dir().unwrap().join(path)
+    } else { path };
+
+    if path.exists() {
+        Some(path)
+    } else {None}
 }
 
 /// Exits with the exit status of a child process.

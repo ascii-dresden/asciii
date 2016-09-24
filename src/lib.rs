@@ -35,6 +35,7 @@ extern crate claude as currency;
 extern crate bill;
 extern crate ordered_float;
 extern crate open;
+#[macro_use] extern crate error_chain;
 #[macro_use] extern crate log;
 #[macro_use] extern crate prettytable;
 #[macro_use] extern crate lazy_static;
@@ -52,6 +53,7 @@ pub mod manual;
 pub mod project;
 pub mod storage;
 pub mod print;
+pub mod actions;
 
 pub mod templater;
 
@@ -61,6 +63,12 @@ pub mod templater;
 
 lazy_static!{
     pub static ref CONFIG: config::ConfigReader = config::ConfigReader::new().unwrap();
+}
+
+#[derive(Debug)]
+pub enum BillType{
+    Offer,
+    Invoice
 }
 
 /// Returns library version

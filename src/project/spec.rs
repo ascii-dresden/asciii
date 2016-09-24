@@ -80,9 +80,9 @@ pub fn to_currency(f: f64) -> Currency {
 }
 
 fn field_exists<'a>(yaml: &Yaml, paths: &[&'a str]) -> Vec<&'a str> {
-    paths.iter()
+    paths.into_iter()
+        .map(|i|*i)
         .filter(|path| yaml::get(yaml, path).is_none())
-        .cloned()
         .collect::<Vec<&'a str>>()
 }
 
@@ -419,12 +419,14 @@ pub mod hours {
     }
 
     /// Full number of service hours
+    /// XXX test this against old format
     pub fn total(yaml: &Yaml) -> Option<f64> {
         caterers(yaml).map(|vec| {
             vec.iter()
                 .map(|&(_, h)| h)
                 .fold(0f64, |acc, h| acc + h)
         })
+        //.or_else(|| )
     }
 
     /// Nicely formated list of caterers with their respective service hours
@@ -456,7 +458,6 @@ pub mod hours {
 
 /// Generates `Bill`s for offer and invoice.
 pub mod billing {
-
     use bill::{BillItem, Bill};
 
     use util::yaml;
@@ -500,8 +501,10 @@ pub mod billing {
             price: super::hours::salary(&yaml).unwrap()
         };
 
-        offer  .add_item(super::hours::total(&yaml).unwrap(), service());
-        invoice.add_item(super::hours::total(&yaml).unwrap(), service());
+        if let Some(total) = super::hours::total(&yaml) {
+            offer  .add_item(total, service());
+            invoice.add_item(total, service());
+        }
 
         let raw_products = try!(yaml::get_hash(yaml, "products").ok_or(ProductError::UnknownFormat));
 
@@ -513,5 +516,4 @@ pub mod billing {
 
         Ok((offer,invoice))
     }
-
 }

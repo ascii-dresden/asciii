@@ -21,9 +21,11 @@ enum_derive = "*" #"0.1"
 custom_derive = "*" #"0.1"
 open = "*" #"1.1"
 ordered-float = "*"
+error-chain = "0.5"
 
 claude = {git="https://github.com/hoodie/claude-rs", features=["tojson"]}
-bill = {git="https://github.com/hoodie/bill-rs"}
+#bill = {git="https://github.com/hoodie/bill-rs"}
+bill = {path="../bill-rs"}
 
 slug = "*" #"0.1"
 tempdir = "*" #"0.3"

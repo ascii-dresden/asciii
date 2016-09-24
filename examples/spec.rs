@@ -5,14 +5,11 @@ use asciii::project::spec;
 use asciii::project::Project;
 use asciii::storage::Storable;
 
-fn main(){
-    let config = &asciii::CONFIG;
+fn main() {
 
-    for project in [
-    Project::open(Path::new("./examples/pfeffer.yml")).unwrap(),
-    Project::open(Path::new("./examples/current.yml")).unwrap(),
-    Project::open(Path::new("./examples/old.yml")).unwrap()
-].iter(){
+    for project in [Project::open_file(Path::new("./examples/current.yml")).unwrap(),
+                    Project::open_file(Path::new("./examples/old.yml")).unwrap()]
+        .iter() {
         let yaml = project.yaml();
         println!("Index:     {:?}", project.index());
         println!("Canceled   {:?}", project.canceled());
@@ -27,12 +24,15 @@ fn main(){
         println!("Title:     {:?}", spec::client::title(&yaml));
         println!("FirstName: {:?}", spec::client::first_name(&yaml));
         println!("LastName:  {:?}", spec::client::last_name(&yaml));
-        println!("Client:    {:?}", spec::client::addressing(&yaml, config));
+        println!("Client:    {:?}", spec::client::addressing(&yaml));
         println!("--------------");
-        println!("Products:  {:#?}", spec::products::invoice_items(&yaml).unwrap());
+        //let (_offer, invoice) = spec::billing::bills(&yaml).unwrap();
+        //println!("Products:  {:#?}", invoice.as_items().iter().map(|item|format!("{:?}",item)).collect::<Vec<_>>());
         println!("--------------");
+        println!("hours:     {:?}h * {}", spec::hours::total(&yaml), spec::hours::salary(&yaml).map(|c|c.postfix().to_string()).unwrap_or_else(||String::from("0€")));
+        println!("caterers:  {:?}", spec::hours::caterers(&yaml));
+        println!("\n\n\n");
     }
 
-    //println!("Products: {:#?}", spec::products::all(new_project.yaml()));
+    // println!("Products: {:#?}", spec::products::all(new_project.yaml()));
 }
-

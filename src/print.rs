@@ -1,5 +1,7 @@
 //! All the printing code lives here.
 
+use std::error::Error;
+
 use chrono::*;
 use prettytable::Table;
 use prettytable::row::Row;
@@ -265,31 +267,18 @@ pub fn print_projects(rows:Vec<Row>){
 }
 
 /// Prints Projects as CSV
+pub fn print_csv_year(year:i32){
+    match ::actions::csv(year) {
+        Ok(csv) => println!("{}", csv),
+        Err(err) => println!("{}", err.description())
+    }
+}
+
+/// Prints Projects as CSV
 pub fn print_csv(projects:&[Project]){
-    // TODO print head
-    let splitter = ";";
-        println!("{}", [
-                 "Rnum",
-                 "Bezeichnung",
-                 "Datum",
-                 "Rechnungs",
-                 "Betreuer",
-                 "Verantwortlich",
-                 "Bezahlt am",
-                 "Betrag",
-                 "Canceled"].join(splitter));
-    for project in projects{
-        println!("{}", [
-            project.get("InvoiceNumber").unwrap_or_else(String::new),
-            project.get("Name").unwrap_or_else(String::new),
-            project.get("event/dates/0/begin").unwrap_or_else(String::new),
-            project.get("invoice/date").unwrap_or_else(String::new),
-            project.get("Caterers").unwrap_or_else(String::new),
-            project.get("Responsible").unwrap_or_else(String::new),
-            project.get("invoice/payed_date").unwrap_or_else(String::new),
-            project.get("Final").unwrap_or_else(String::new),
-            project.canceled_string().to_owned()
-        ].join(splitter));
+    match ::actions::projects_to_csv(projects) {
+        Ok(csv) => println!("{}", csv),
+        Err(err) => println!("{}", err.description())
     }
 }
 

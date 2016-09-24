@@ -6,6 +6,7 @@
 
 use std::process::exit;
 use std::fmt::Display;
+use std::error::Error;
 
 use asciii::project::Project;
 use asciii::storage::*;
@@ -26,7 +27,7 @@ pub fn fail<T:Display>(message:T) -> !{
 
 /// Execute a command returning a `StorageError`
 /// TODO make this a `try!` like macro
-fn execute<F, S>(command:F) -> S where F: FnOnce() -> StorageResult<S> {
+fn execute<F, S, E:Error>(command:F) -> S where F: FnOnce() -> Result<S, E> {
     match command(){
         Ok(s) => s,
         Err(lerr) => { error!("{}", lerr); exit(1) }

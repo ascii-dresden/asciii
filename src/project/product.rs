@@ -15,7 +15,7 @@ use super::spec::to_currency;
 ///
 /// Products are mapped to `Bill`s by `BillItems`,
 /// these are implemented by `bill`.
-#[derive(Copy,Clone)]
+#[derive(Copy,Clone,Debug)]
 pub struct Product<'a> {
     pub name: &'a str,
     pub unit: Option<&'a str>,

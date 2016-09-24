@@ -16,12 +16,14 @@ use slug;
 use currency::Currency;
 use bill::Bill;
 
+use super::BillType;
 use util::yaml;
 use storage::list_path_content;
 use storage::{Storable,StorageError,StorageResult};
 use storage::repo::GitStatus;
 use templater::Templater;
 
+pub mod product;
 #[export_macro]
 macro_rules! try_some {
     ($expr:expr) => (match $expr {
@@ -30,7 +32,6 @@ macro_rules! try_some {
     });
 }
 
-pub mod product;
 pub mod spec;
 pub mod error;
 
@@ -39,7 +40,7 @@ use self::error::*;
 #[cfg(feature="document_export")]
 mod tojson;
 
-#[cfg(test)] mod tests;
+//#[cfg(test)] mod tests;
 
 use self::spec::{SpecResult, VirtualField};
 use self::product::Product;
@@ -79,7 +80,7 @@ impl Project{
     /// wrapper around yaml::get() with replacement
     pub fn get(&self, path:&str) -> Option<String>{
         VirtualField::from(path).get(self).or_else(||
-            yaml::get_as_string(self.yaml(),path)
+            yaml::get_to_string(self.yaml(),path)
         )
     }
 
@@ -126,13 +127,20 @@ impl Project{
         Ok(Path::new(target).to_owned())
     }
 
-    pub fn write_to_offer_file(&self,content:&str, ext:&str) -> ProjectResult<PathBuf> {
+    pub fn write_to_file(&self,content:&str, bill_type:&BillType,ext:&str) -> ProjectResult<PathBuf> {
+        match *bill_type{
+            BillType::Offer   => self.write_to_offer_file(content, ext),
+            BillType::Invoice => self.write_to_invoice_file(content, ext)
+        }
+    }
+
+    fn write_to_offer_file(&self,content:&str, ext:&str) -> ProjectResult<PathBuf> {
         if let Some(target) = self.offer_file_name(ext){
             Self::write_to_path(content, &self.dir().join(&target))
         } else {Err(ProjectError::CantDetermineTargetFile)}
     }
 
-    pub fn write_to_invoice_file(&self,content:&str, ext:&str) -> ProjectResult<PathBuf> {
+    fn write_to_invoice_file(&self,content:&str, ext:&str) -> ProjectResult<PathBuf> {
         if let Some(target) = self.invoice_file_name(ext){
             Self::write_to_path(content, &self.dir().join(&target))
         } else {Err(ProjectError::CantDetermineTargetFile)}

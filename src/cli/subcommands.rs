@@ -10,14 +10,14 @@ use chrono::Datelike;
 use asciii::CONFIG;
 use asciii::config;
 use asciii::util;
+use asciii::BillType;
 use asciii::version as asciii_version;
+use asciii::actions;
 use asciii::storage::*;
 use asciii::templater::Templater;
 use asciii::project::Project;
 use asciii::project::spec::VirtualField;
 
-#[cfg(feature="document_export")]
-use asciii::fill_docs::fill_template;
 #[cfg(feature="document_export")]
 use rustc_serialize::json::ToJson;
 
@@ -31,6 +31,7 @@ use asciii::print::{ListConfig, ListMode};
 // TODO refactor this into actions module and actual, short subcommands
 
 /// Create NEW Project
+#[deprecated(note="move to asciii::actions")]
 pub fn new(matches:&ArgMatches){
     let project_name     = matches.value_of("name").expect("You did not pass a \"Name\"!");
     let editor           = CONFIG.get("editor").and_then(|e|e.as_str());
@@ -71,6 +72,7 @@ pub fn new(matches:&ArgMatches){
     }
 }
 
+#[deprecated(note="move to impl ListMode and then to asciii::actions")]
 fn decide_mode(simple:bool, verbose:bool, paths:bool,nothing:bool, csv:bool) -> ListMode{
     if csv{     ListMode::Csv }
     else if nothing{ ListMode::Nothing }
@@ -105,9 +107,10 @@ pub fn list(matches:&ArgMatches){
             );
 
         let mut list_config = ListConfig{
-            sort_by:   matches.value_of("sort") .unwrap_or_else(||CONFIG.get_str("list/sort")
-            .expect("Faulty config: field list/sort does not contain a string value")
-                                                                ),
+            sort_by:   matches.value_of("sort")
+                              .unwrap_or_else(||CONFIG.get_str("list/sort")
+                                              .expect("Faulty config: field list/sort does not contain a string value")
+                                             ),
             mode:      list_mode,
             details:   matches.values_of("details").map(|v|v.collect::<Vec<&str>>()),
             filter_by: matches.values_of("filter").map(|v|v.collect::<Vec<&str>>()),
@@ -156,7 +159,6 @@ pub fn list(matches:&ArgMatches){
 ///
 /// which it prints with `print::print_projects()`
 fn list_projects(dir:StorageDir, list_config:&ListConfig){
-
     let luigi = if CONFIG.get_bool("list/gitstatus"){
         setup_luigi_with_git()
     } else {
@@ -236,16 +238,13 @@ fn list_virtual_fields(){
 /// Command CSV
 pub fn csv(matches:&ArgMatches){
     use chrono::{Local,Datelike};
-
-    let luigi = setup_luigi();
     let year = matches.value_of("year")
         .and_then(|y|y.parse::<i32>().ok())
         .unwrap_or(Local::now().year());
 
-    let mut projects = super::execute(||luigi.open_projects(StorageDir::Year(year)));
-//    projects.sort_by(|pa,pb| pa.date().cmp( &pb.date()));
-    projects.sort_by(|pa,pb| pa.index().unwrap_or("zzzz".to_owned()).cmp( &pb.index().unwrap_or("zzzz".to_owned())));
-    print::print_csv(&projects);
+    debug!("asciii csv --year {}", year);
+    let csv = super::execute(||actions::csv(year));
+    println!("{}", csv);
 }
 
 
@@ -284,7 +283,7 @@ fn edit_projects(dir:StorageDir, search_terms:&[&str], editor:&Option<&str>){
         fail(format!("Nothing found for {:?}", search_terms));
     } else {
         let all_paths = all_projects.iter().map(|p|p.file()).collect::<Vec<PathBuf>>();
-        util::open_in_editor(editor, all_paths.as_slice());
+        util::open_in_editor(&editor, &all_paths);
     }
 }
 
@@ -292,9 +291,8 @@ fn edit_projects(dir:StorageDir, search_terms:&[&str], editor:&Option<&str>){
 fn edit_template(name:&str, editor:&Option<&str>){
     let luigi = setup_luigi();
     let template_paths = super::execute(||luigi.list_template_files())
-        .iter() // drain?
+        .into_iter() // drain?
         .filter(|f|f.file_stem() .unwrap_or_else(||OsStr::new("")) == name)
-        .cloned()
         .collect::<Vec<PathBuf>>();
     util::open_in_editor(editor, &template_paths);
 }
@@ -310,7 +308,7 @@ pub fn show(matches:&ArgMatches){
     };
 
     if matches.is_present("files"){
-        with_projects(&setup_luigi(), dir, search_term,
+        with_projects(dir, search_term,
                       |p| {
                           println!("{}: ", p.dir().display());
                           for entry in fs::read_dir(p.dir()).unwrap(){
@@ -318,24 +316,25 @@ pub fn show(matches:&ArgMatches){
                           }
                       }
                      );
-    } else if  matches.is_present("dump"){
-        dump_yaml(dir, &search_term)
-    } else if  matches.is_present("json"){
-        show_json(dir, &search_term)
-    } else if  matches.is_present("template"){
-        show_template(search_term);
-    } else {
-        show_project(dir, search_term);
-    }
+    } else if let Some(detail) = matches.value_of("detail"){
+        show_detail(dir, &search_term, detail);
+    } else if matches.is_present("dump"){ dump_yaml(dir, &search_term)
+    } else if matches.is_present("json"){ show_json(dir, &search_term)
+    } else if matches.is_present("template"){ show_template(search_term);
+    } else { with_projects(dir, search_term, print::show_items) }
 }
 
 fn dump_yaml(dir:StorageDir, search_term:&str){
-    with_projects(&setup_luigi(), dir, search_term, |p| println!("{:?}", p.yaml().dump()));
+    with_projects(dir, search_term, |p| println!("{}", p.yaml().dump().unwrap()));
 }
 
 #[cfg(feature="document_export")]
 fn show_json(dir:StorageDir, search_term:&str){
-    with_projects(&setup_luigi(), dir, search_term, |p|println!("{}", p.to_json()));
+    with_projects(dir, search_term, |p|println!("{}", p.to_json()));
+}
+
+fn show_detail(dir:StorageDir, search_term:&str, detail:&str){
+    with_projects(dir, search_term, |p| println!("{}", p.get(detail).unwrap()));
 }
 
 #[cfg(not(feature="document_export"))]
@@ -346,97 +345,30 @@ fn show_json(_:StorageDir, _:&str){
 /// Command SPEC
 /// TODO make this not panic :D
 /// TODO move this to `spec::all_the_things`
-pub fn spec(_matches:&ArgMatches){
-    use asciii::project::spec::*;
-    let luigi = setup_luigi();
-    //let projects = super::execute(||luigi.open_projects(StorageDir::All));
-    let projects = super::execute(||luigi.open_projects(StorageDir::Working));
-    for project in projects{
-        println!("{}", project.dir().display());
-
-        let yaml = project.yaml();
-        client::validate(&yaml).map_err(|errors|for error in errors{
-            println!("  error: {}", error);
-        }).unwrap();
-
-        client::full_name(&yaml);
-        client::first_name(&yaml);
-        client::title(&yaml);
-        client::email(&yaml);
-
-
-        hours::caterers_string(&yaml);
-        invoice::number_long_str(&yaml);
-        invoice::number_str(&yaml);
-        offer::number(&yaml);
-        project.age().map(|a|format!("{} days", a)).unwrap();
-        project.date().map(|d|d.year().to_string()).unwrap();
-        project.sum_sold().map(|c|util::currency_to_string(&c)).unwrap();
-        project::manager(&yaml).map(|s|s.to_owned()).unwrap();
-        project::name(&yaml).map(|s|s.to_owned()).unwrap();
-    }
+pub fn spec(m:&ArgMatches){
+    super::execute(||actions::spec())
 }
 
 /// Command MAKE
 #[cfg(feature="document_export")]
-pub fn make(matches:&ArgMatches) {
-
-    let luigi = setup_luigi();
-    let search_term = matches.value_of("search_term").unwrap();
-    let template_name = matches.value_of("template").unwrap_or("document");
-
-    let dir = match matches.value_of("archive"){
+#[allow(unused_variables)]
+pub fn make(m:&ArgMatches) {
+    let search_term = m.value_of("search_term").unwrap();
+    let template_name = m.value_of("template").unwrap_or("document");
+    let bill_type = if m.is_present("invoice") {BillType::Invoice} else {BillType::Offer};
+    let dir = match m.value_of("archive"){
         Some(year) => { let year = year.parse::<i32>().unwrap(); StorageDir::Archive(year) },
         _ => StorageDir::Working
     };
 
-    let template_ext = CONFIG.get_str("extensions/output_template").expect("Internal Error: default config is wrong");
-    let output_ext = CONFIG.get_str("extensions/output_file").expect("Internal Error: default config is wrong");
-    let mut template_path = PathBuf::new();
+    debug!("make {t}({s}/{d:?}, invoice={i:?})",
+    d = dir,
+    s = search_term,
+    t = template_name,
+    i = bill_type
+    );
 
-    template_path.push(luigi.templates_dir());
-    template_path.push(template_name);
-    template_path.set_extension(template_ext);
-
-    let is_invoice = matches.is_present("invoice");
-
-    debug!("template file={:?} exists={}", template_path, template_path.exists());
-
-    with_projects(&luigi, dir, search_term, |p| {
-
-        let filled = fill_template(p, is_invoice, &template_path).unwrap();
-
-        let ready_for_offer = p.is_ready_for_offer();
-        let ready_for_invoice = p.is_ready_for_invoice();
-
-        if ready_for_invoice.is_ok() { // if we can do an invoice, we do so!
-            let invoice_file = p.dir().join(p.invoice_file_name(output_ext).unwrap());
-            debug!("invoice file name would be {} exists={}", invoice_file.display(), invoice_file.exists());
-            trace!("creating an invoice");
-            //p.write_to_invoice_file(&filled,output_ext).unwrap(); //TODO try!()
-        } else if is_invoice { // if we can't do an invoice, but the user really wants one, we say "sorry"
-            let errors = ready_for_invoice.unwrap_err();
-            error!("sorry, {name} is not ready to create and invoice! Checkout: {errors:#?}", name = p.name(), errors = errors);
-        }
-
-        else if !is_invoice && ready_for_offer.is_ok() { // if the user wants an offer...
-            let offer_file = p.dir().join(p.offer_file_name(output_ext).unwrap());
-            debug!("  offer file name would be {} exists={}", offer_file.display(), offer_file.exists()  );
-            trace!("creating an offer");
-            // check file age!
-            // TODO warn about offer number
-            if let Ok(metadata) = fs::metadata(&offer_file){
-                // TODO Too many different types of errors
-                //debug!("{} was last accessed in {:?}", offer_file.display(), metadata.accessed().and_then(|t|t.elapsed().and_then(|d|d.as_secs()))); // try!s
-            }
-            p.write_to_offer_file(&filled,output_ext).unwrap();
-        } else {
-            let errors = ready_for_offer.unwrap_err();
-            error!("sorry, {name} is not ready to create and offer! Checkout: {errors:#?}", name = p.name(), errors = errors);
-        }
-
-    });
-
+    super::execute(||actions::projects_to_tex(dir, search_term, template_name, &bill_type, m.is_present("dry-run"), m.is_present("force")))
 }
 
 #[cfg(not(feature="document_export"))]
@@ -445,9 +377,11 @@ pub fn make(_:&ArgMatches){
     unimplemented!();
 }
 
-fn with_projects<F:Fn(&Project)>(luigi: &Storage<Project>, dir:StorageDir, search_term:&str, cb:F){
+#[deprecated(note="use the actions module")]
+fn with_projects<F:Fn(&Project)>(dir:StorageDir, search_term:&str, cb:F){
     trace!("with_projects({})", search_term);
     // TODO make this use ProjectList
+    let luigi = setup_luigi();
     let projects = super::execute(||luigi.search_projects(dir, search_term));
     if !projects.is_empty(){
         for project in &projects{
@@ -455,22 +389,9 @@ fn with_projects<F:Fn(&Project)>(luigi: &Storage<Project>, dir:StorageDir, searc
         }
     } else {
         fail(format!("Nothing found for {:?}", search_term));
-}
-}
-
-fn show_project(dir:StorageDir, search_term:&str){
-    // TODO make this use ProjectList
-    let luigi = setup_luigi();
-    let projects = super::execute(||luigi.search_projects(dir, search_term));
-    if !projects.is_empty(){
-        for project in &projects{
-            trace!("showing project {:?}", project.file());
-            print::show_items(project);
-        }
-    } else{
-        fail(format!("Nothing found for {:?}", search_term));
     }
 }
+
 
 
 
@@ -572,7 +493,7 @@ pub fn config_show(path:&str){
 
 /// Command CONFIG --edit
 fn config_edit(editor:&Option<&str>){
-    util::open_in_editor(editor, &[CONFIG.path.to_owned()]);
+    util::open_in_editor(editor, &[&CONFIG.path]);
 }
 
 /// Command CONFIG --default
