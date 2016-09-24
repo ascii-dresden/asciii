@@ -30,7 +30,6 @@ use std::error::Error;
 pub use yaml_rust::Yaml;
 use yaml_rust::YamlLoader;
 use yaml_rust::scanner::ScanError;
-use yaml_rust::emitter::YamlEmitter;
 use chrono::*;
 
 /// Wrapper around `io::Error` and `yaml_rust::scanner::ScanError`.
@@ -166,21 +165,6 @@ pub fn get_str<'a>(yaml:&'a Yaml, key:&str) -> Option<&'a str> {
 /// same as `get_str()`, but owned.
 pub fn get_string(yaml:&Yaml, key:&str) -> Option<String> {
     get_str(yaml,key).map(ToOwned::to_owned)
-}
-
-/// Gets anything **as** `String`.
-pub fn get_as_string(yaml:&Yaml, key:&str) -> Option<String> {
-    if let Some(yml) = get(yaml,key) {
-        let mut buf = String::new();
-        {
-            let mut emitter = YamlEmitter::new(&mut buf);
-            if emitter.dump(&yml).is_err(){
-                return None
-            }
-        }
-        return Some(buf);
-    }
-    None
 }
 
 /// Gets anything **as** `String`.

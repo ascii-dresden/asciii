@@ -8,6 +8,7 @@ use std::ffi::OsStr;
 use std::fmt::Debug;
 use std::path::{Path, PathBuf};
 use std::collections::HashMap;
+use std::error::Error;
 
 use chrono::*;
 use yaml_rust::Yaml;
@@ -239,9 +240,9 @@ impl Storable for Project{
             "PROJECT-NAME"  => project_name.to_owned(),
             "DATE-EVENT"    => event_date,
             "DATE-CREATED"  => created_date,
-            "TAX"           => ::CONFIG.get_as_string("defaults/tax")
+            "TAX"           => ::CONFIG.get_to_string("defaults/tax")
                 .expect("Faulty config: field defaults/tax does not contain a value"),
-            "SALARY"        => ::CONFIG.get_as_string("defaults/salary")
+            "SALARY"        => ::CONFIG.get_to_string("defaults/salary")
                 .expect("Faulty config: field defaults/salary does not contain a value"),
             "MANAGER"       => ::CONFIG.get_str("manager_name").unwrap_or("").to_string(),
             "DESCRIPTION"   => String::new(),
@@ -266,12 +267,22 @@ impl Storable for Project{
         try!(file.write_all(filled.as_bytes()));
         try!(file.sync_all());
 
+        let yaml = match yaml::parse(&filled){
+            Ok(y) => y,
+            Err(e) => {
+                error!("The created document is no valid yaml. SORRY!\n{}\n\n{}",
+                       filled.lines().enumerate().map(|(n,l)| format!("{:>3}. {}\n",n,l)).collect::<String>(), //line numbers :D
+                       e.description());
+                return Err(e.into())
+            }
+        };
+
         // project now lives in the temp_file
         Ok(Project{
             file_path: temp_file,
             _temp_dir: Some(temp_dir), // needs to be kept alive to avoid deletion TODO: try something manually
             git_status: None,
-            yaml: try!(yaml::parse(&filled))
+            yaml: yaml
         })
     }
 

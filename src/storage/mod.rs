@@ -268,13 +268,13 @@ impl<L:Storable> Storage<L> {
                tmpl = template_name
                );
         if !self.working_dir().exists(){
-            debug!("working directory does not exist");
+            error!("working directory does not exist");
             return Err(StorageError::NoWorkingDir)
         };
         let slugged_name = slugify(project_name);
         let project_dir  = self.working_dir().join(&slugged_name);
         if project_dir.exists() {
-            debug!("project directory already exists");
+            error!("project directory already exists");
             return Err(StorageError::ProjectDirExists);
         }
 
@@ -285,6 +285,7 @@ impl<L:Storable> Storage<L> {
 
         let template_path = try!(self.get_template_file(template_name));
 
+        trace!("crating project using concrete Project implementation of from_template");
         let mut project = try!(L::from_template(&project_name, &template_path, &fill_data));
 
         // TODO Hand of creation entirely to Storable implementation

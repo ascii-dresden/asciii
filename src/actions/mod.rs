@@ -112,29 +112,37 @@ pub fn projects_to_tex(dir:StorageDir, search_term:&str, template_name:&str, bil
         let ready_for_invoice = p.is_ready_for_invoice();
         let project_file = p.file();
 
-        let outfile_tex;
+        let outfile_tex: Option<PathBuf>;
+        let dyn_bill_type: Option<BillType>;
 
         if ready_for_invoice.is_ok() {
             // if we can do an invoice, we do so!
             outfile_tex = Some(p.dir().join(p.invoice_file_name(output_ext).expect("this should have been cought by ready_for_invoice()")));
+            dyn_bill_type = Some(BillType::Invoice);
         }
-        else if !is_invoice && ready_for_offer.is_ok() {
-            // if the user wants an offer...
-            outfile_tex = Some(p.dir().join(p.offer_file_name(output_ext).expect("this should have been cought by ready_for_offer()")));
-        }
-        else if is_invoice {
+        else if !ready_for_invoice.is_ok() && is_invoice {
             // if we can't do an invoice, but the user really wants one, we say "sorry"
             let errors = ready_for_invoice.unwrap_err();
             error!("sorry, {name} is not ready to create and invoice! Checkout: {errors:#?}", name = p.name(), errors = errors);
             outfile_tex = None;
+            dyn_bill_type = None;
+        }
+
+        else
+
+        if !is_invoice && ready_for_offer.is_ok() {
+            // if the user wants an offer, we happyly create an offer
+            outfile_tex = Some(p.dir().join(p.offer_file_name(output_ext).expect("this should have been cought by ready_for_offer()")));
+            dyn_bill_type = Some(BillType::Offer);
         } else {
             // here we can't do an offer either be cause of reasons :D
             let errors = ready_for_offer.unwrap_err();
             error!("sorry, {name} is not ready to create and offer! Checkout: {errors:#?}", name = p.name(), errors = errors);
             outfile_tex = None;
+            dyn_bill_type = None;
         }
 
-        if let Some(outfile) = outfile_tex {
+        if let (Some(outfile), Some(dyn_bill)) = (outfile_tex,dyn_bill_type) {
             // ok, so apparently we can create a tex file, so lets do it
             if !force && outfile.exists() && try!(file_age(&outfile)) < try!(file_age(&project_file)){
                 // no wait, nothing has changed, so lets save ourselves the work
@@ -154,8 +162,9 @@ pub fn projects_to_tex(dir:StorageDir, search_term:&str, template_name:&str, bil
                 if dry_run{
                     warn!("Dry run! This does not produce any output:\n * {}\n * {}", outfile.display(), pdffile.display());
                 } else {
-                    try!(p.write_to_file(&filled,bill_type,output_ext));
-                    util::open_in_editor(&convert_tool, &[&outfile]);
+                    let outfileb = try!(p.write_to_file(&filled,&dyn_bill,output_ext));
+                    debug!("{} vs\n        {}", outfile.display(), outfileb.display());
+                    util::pass_to_command(&convert_tool, &[&outfileb]);
                 }
                 // clean up expected trash files
                 for trash_ext in trash_exts.iter().filter_map(|x|*x){

@@ -68,7 +68,7 @@ pub fn new(matches:&ArgMatches){
     let project = super::execute(|| luigi.create_project(project_name, template_name, &fill_data));
     let project_file = project.file();
     if edit {
-        util::open_in_editor(&editor, &[project_file]);
+        util::pass_to_command(&editor, &[project_file]);
     }
 }
 
@@ -283,7 +283,7 @@ fn edit_projects(dir:StorageDir, search_terms:&[&str], editor:&Option<&str>){
         fail(format!("Nothing found for {:?}", search_terms));
     } else {
         let all_paths = all_projects.iter().map(|p|p.file()).collect::<Vec<PathBuf>>();
-        util::open_in_editor(&editor, &all_paths);
+        util::pass_to_command(&editor, &all_paths);
     }
 }
 
@@ -294,7 +294,7 @@ fn edit_template(name:&str, editor:&Option<&str>){
         .into_iter() // drain?
         .filter(|f|f.file_stem() .unwrap_or_else(||OsStr::new("")) == name)
         .collect::<Vec<PathBuf>>();
-    util::open_in_editor(editor, &template_paths);
+    util::pass_to_command(editor, &template_paths);
 }
 
 
@@ -493,7 +493,7 @@ pub fn config_show(path:&str){
 
 /// Command CONFIG --edit
 fn config_edit(editor:&Option<&str>){
-    util::open_in_editor(editor, &[&CONFIG.path]);
+    util::pass_to_command(editor, &[&CONFIG.path]);
 }
 
 /// Command CONFIG --default
