@@ -12,8 +12,7 @@ use term::{Attr, color};
 use project::Project;
 use storage::Storable;
 use ordered_float::OrderedFloat;
-use currency::Currency;
-use util;
+use bill::Currency;
 use util::currency_to_string;
 
 //TODO construct table rows way more dynamically

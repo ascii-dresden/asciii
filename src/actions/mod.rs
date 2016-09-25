@@ -99,11 +99,18 @@ pub fn projects_to_tex(dir:StorageDir, search_term:&str, template_name:&str, bil
     with_projects(&luigi, dir, search_term, |p| {
 
         let convert_tool = ::CONFIG.get_str("convert/tool");
-        let output_folder = ::CONFIG.get_str("output_path").and_then(util::get_valid_path);
+        let output_folder = ::CONFIG.get_str("output_path").and_then(util::get_valid_path).expect("Faulty config \"output_path\"");
 
         let ready_for_offer = p.is_ready_for_offer();
         let ready_for_invoice = p.is_ready_for_invoice();
         let project_file = p.file();
+
+        // tiny little helper
+        let to_local_file = |file:&Path, ext| {
+            let mut _tmpfile = file.to_owned();
+            _tmpfile.set_extension(ext);
+            Path::new(_tmpfile.file_name().unwrap().into()).to_owned()
+        };
 
         use BillType::*;
         let (dyn_bill_type, outfile_tex):
@@ -124,21 +131,15 @@ pub fn projects_to_tex(dir:StorageDir, search_term:&str, template_name:&str, bil
         if let (Some(outfile), Some(dyn_bill)) = (outfile_tex, dyn_bill_type) {
             let filled = try!(fill_template(p, &dyn_bill, &template_path));
 
+            let pdffile = to_local_file(&outfile, convert_ext);
+            let target = output_folder.join(&pdffile);
+
             // ok, so apparently we can create a tex file, so lets do it
-            if !force && outfile.exists() && try!(file_age(&outfile)) < try!(file_age(&project_file)){
+            if !force && target.exists() && try!(file_age(&target)) < try!(file_age(&project_file)){
                 // no wait, nothing has changed, so lets save ourselves the work
-                info!("nothing to be done, {} is younger than {}\n       use -f if you don't agree", outfile.display(), project_file.display());
+                info!("nothing to be done, {} is younger than {}\n       use -f if you don't agree", target.display(), project_file.display());
             } else {
                 // \o/ we created a tex file
-
-                // tiny little helper
-                let to_local_file = |file:&Path, ext| {
-                    let mut _tmpfile = file.to_owned();
-                    _tmpfile.set_extension(ext);
-                    Path::new(_tmpfile.file_name().unwrap().into()).to_owned()
-                };
-
-                let pdffile = to_local_file(&outfile, convert_ext);
 
                 if dry_run{
                     warn!("Dry run! This does not produce any output:\n * {}\n * {}", outfile.display(), pdffile.display());
@@ -158,11 +159,9 @@ pub fn projects_to_tex(dir:StorageDir, search_term:&str, template_name:&str, bil
                         debug!("I expected there to be a {}, but there wasn't any ?", trash_file.display())
                     }
                 }
-                if let Some(output_folder) = output_folder {
-                    if pdffile.exists(){
-                        debug!("now there is be a {:?} -> {:?}", pdffile, output_folder);
-                        try!(fs::rename(&pdffile, &output_folder.join(&pdffile)));
-                    }
+                if pdffile.exists(){
+                    debug!("now there is be a {:?} -> {:?}", pdffile, target);
+                    try!(fs::rename(&pdffile, &target));
                 }
             }
         }

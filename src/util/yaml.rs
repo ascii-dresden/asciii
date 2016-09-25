@@ -24,7 +24,6 @@ use std::io;
 use std::io::Read;
 use std::fs::File;
 use std::path::Path;
-use std::collections::BTreeMap;
 use std::error::Error;
 
 pub use yaml_rust::Yaml;

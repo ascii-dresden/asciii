@@ -6,7 +6,7 @@
 //! Each module contains a `validate()` function which ought to be kept up to date.
 
 use chrono::Datelike;
-use currency::Currency;
+use bill::Currency;
 
 use util::yaml;
 use util::yaml::Yaml;
@@ -408,7 +408,7 @@ pub mod archive {
 
 /// Everything related to service hours of a project
 pub mod hours {
-    use currency::Currency;
+    use bill::Currency;
     use util::yaml;
     use util::yaml::Yaml;
     use super::to_currency;
@@ -496,7 +496,7 @@ pub mod billing {
 
         let service = || Product {
             name: "Service",
-            unit: None,
+            unit: Some("h"),
             tax: ::ordered_float::OrderedFloat(0f64),
             price: super::hours::salary(&yaml).unwrap()
         };

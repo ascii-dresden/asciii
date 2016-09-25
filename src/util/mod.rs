@@ -136,7 +136,7 @@ pub fn exit(status:ExitStatus) -> !{
     process::exit(status.code().unwrap_or(1));
 }
 
-use currency::Currency;
+use bill::Currency;
 
 /// One place to decide how to display currency
 pub fn currency_to_string(currency:&Currency) -> String {

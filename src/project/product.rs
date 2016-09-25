@@ -1,8 +1,7 @@
 //! Takes care of instantiating the Product.
 //! All of the calculating is done by `extern crate bill`.
 
-use currency::Currency;
-use bill::{BillProduct, Tax};
+use bill::{Currency, BillProduct, Tax};
 
 use util::yaml;
 use util::yaml::Yaml;

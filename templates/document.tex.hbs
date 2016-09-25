@@ -9,7 +9,7 @@
 {{#partial foo}}
 \multicolumn{4}{r}{Netto MwSt.}   & {{total_before_tax}}  \\
 
-{{#each sums}}\multicolumn{4}{r}{+MwSt. {{tax}}\%}   & {{taxes}}  \\ {{/each}}
+{{#each sums}}{{#if tax}}\multicolumn{4}{r}{+MwSt. {{tax}}\%}   & {{taxes}}  \\ {{/if}}{{/each}}
 
 \multicolumn{4}{r}{Gesamtpreis}   & {{total}} \\
 \end{tabular}
@@ -84,8 +84,6 @@ wir bedanken uns für Ihren Auftrag für das Catering am {{ event.date }} und er
 {{#with offer}} {{#block items}}{{/block}} {{/with}}
   {{/if}}
 {{/with}}
-
-{{#if hours.time }} {{count bills.invoice}} & Betreuung (Stunden) & {{ hours.time }} & {{ hours.salary }} & {{ hours.total }} \\ {{/if}}
 
 \bottomrule[1pt]
 {{#if ../is_invoice}} {{#with invoice}}{{#block foo}}{{/block}}{{/with}}

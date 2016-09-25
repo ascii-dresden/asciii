@@ -43,6 +43,7 @@ impl ToJson for Project{
 
         let taxes_by_tax_to_json = |bill:&Bill<Product>| bill.taxes_by_tax()
                                                              .iter()
+                                                             .filter(|&(_,taxes)| taxes.value() > 0)
                                                              .map(|(tax,taxes)| btreemap!{
                                                                  s("tax") => (tax.into_inner()*100.0).to_json(),
                                                                  s("taxes") => currency_to_string(&taxes).to_json(),

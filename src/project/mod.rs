@@ -14,8 +14,7 @@ use chrono::*;
 use yaml_rust::Yaml;
 use tempdir::TempDir;
 use slug;
-use currency::Currency;
-use bill::Bill;
+use bill::{Bill,Currency};
 
 use super::BillType;
 use util;
