@@ -15,6 +15,8 @@ use util;
 use super::BillType;
 use storage::{Storage,StorageDir,Storable,Selection};
 use project::Project;
+
+#[cfg(feature="document_export")]
 use fill_docs::fill_template;
 
 pub mod error;
@@ -73,7 +75,14 @@ pub fn projects_to_csv(projects:&[Project]) -> Result<String>{
     Ok(string)
 }
 
+#[cfg(not(feature="document_export"))]
+pub fn projects_to_tex(_:StorageDir, _:&str, _:&str, _:&Option<BillType>, _:bool, _:bool) -> Result<()> {
+    info!("Sorry, but this version was not built with this functionality.");
+    unimplemented!();
+}
+
 /// Creates the latex files within each projects directory, either for Invoice or Offer.
+#[cfg(feature="document_export")]
 pub fn projects_to_tex(dir:StorageDir, search_term:&str, template_name:&str, bill_type:&Option<BillType>, dry_run:bool, force:bool) -> Result<()> {
     let luigi = try!(setup_luigi());
     //let search_term = "ese";
