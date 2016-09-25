@@ -171,8 +171,7 @@ pub fn projects_to_tex(dir:StorageDir, search_term:&str, template_name:&str, bil
     })
 }
 
-fn file_age(path:&Path) -> Result<time::Duration>
-{
+fn file_age(path:&Path) -> Result<time::Duration> {
     let metadata = try!(fs::metadata(path));
     let accessed = try!(metadata.accessed());
     Ok(try!(accessed.elapsed()))
@@ -181,7 +180,7 @@ fn file_age(path:&Path) -> Result<time::Duration>
 /// Command SPEC
 /// TODO make this not panic :D
 /// TODO move this to `spec::all_the_things`
-pub fn spec() -> Result<()>{
+pub fn spec() -> Result<()> {
     use project::spec::*;
     let luigi = try!(setup_luigi());
     //let projects = super::execute(||luigi.open_projects(StorageDir::All));
@@ -214,14 +213,14 @@ pub fn spec() -> Result<()>{
     Ok(())
 }
 
-pub fn delete_project_confirmation(selection:Selection) -> Result<()>{
+pub fn delete_project_confirmation(selection:Selection) -> Result<()> {
     let luigi = try!(setup_luigi());
     debug!("{:?}",selection);
     with_projects(&luigi, selection.dir, selection.search, |p| {
         println!("you want me to delete [y/N]{:?}", p.dir());
         if util::really() {
             println!("commencing");
-            luigi.delete_project(p);
+            try!(luigi.delete_project(p));
             Ok(())
         }else {
             try!(Err("nope"))

@@ -13,6 +13,7 @@ use project::Project;
 use storage::Storable;
 use ordered_float::OrderedFloat;
 use currency::Currency;
+use util;
 use util::currency_to_string;
 
 //TODO construct table rows way more dynamically
@@ -50,10 +51,12 @@ impl<'a> Default for ListConfig<'a>{
     }
 }
 
-fn result_to_cell(res:&Result<(), Vec<&str>>) -> Cell{
-    match *res{
-        Ok(_)           => Cell::new("✓").with_style(Attr::ForegroundColor(color::GREEN)), // ✗
-        Err(ref _errors) => Cell::new("✗").with_style(Attr::ForegroundColor(color::RED))// + &errors.join(", ") )
+fn result_to_cell(res:&Result<(), Vec<&str>>, bold:bool) -> Cell{
+    match (res, bold){
+        (&Ok(_),           false) => Cell::new("✓").with_style(Attr::ForegroundColor(color::GREEN)), // ✗
+        (&Ok(_),           true)  => Cell::new("✓").with_style(Attr::ForegroundColor(color::GREEN))
+                                                   .with_style(Attr::Bold), // ✗
+        (&Err(ref _errors),_)     => Cell::new("✗").with_style(Attr::ForegroundColor(color::RED))// + &errors.join(", ") )
         //&Err(ref errors) => Cell::new( &format!("✗ {}",  &errors.join(", ") )) .with_style(Attr::ForegroundColor(color::RED))
     }
 }
@@ -179,14 +182,16 @@ pub fn verbose_rows(projects:&[Project], list_config:&ListConfig) -> Vec<Row>{
                     .style_spec(row_style),
 
                 // status "✓  ✓  ✗"
-                result_to_cell(&validation1),
-                result_to_cell(&validation2),
-                result_to_cell(&validation3),
+                result_to_cell(&validation1, project.offer_file_exists()),
+                result_to_cell(&validation2, project.invoice_file_exists()),
+                result_to_cell(&validation3, false),
+
+                //cell!(output_file_exists(project, Project::offer_file_name)),
+                //cell!(output_file_exists(project, Project::invoice_file_name)),
 
                 cell!(project.sum_sold().map(|i|currency_to_string(&i)).unwrap_or(String::from("none"))),
                 //cell!(project.wages().map(|i|i.to_string()).unwrap_or(String::from("none"))),
                 //cell!(project.sum_sold_and_wages().map(|i|i.to_string()).unwrap_or(String::from("none"))),
-
             ]);
 
 

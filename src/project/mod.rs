@@ -18,6 +18,7 @@ use currency::Currency;
 use bill::Bill;
 
 use super::BillType;
+use util;
 use util::yaml;
 use storage::list_path_content;
 use storage::{Storable,StorageError,StorageResult};
@@ -118,6 +119,24 @@ impl Project{
         let name = slug::slugify(try_some!(spec::project::name(self.yaml())));
         let date = Local::today().format("%Y-%m-%d").to_string();
         Some(format!("{} {} {}.{}",num,name,date,extension))
+    }
+
+    pub fn offer_file_exists(&self) -> bool {
+        let output_folder = ::CONFIG.get_str("output_path").and_then(util::get_valid_path);
+        let convert_ext  = ::CONFIG.get_str("convert/output_extension").expect("Faulty default config");
+        match (output_folder, self.offer_file_name(convert_ext)) {
+            (Some(folder), Some(name)) => folder.join(&name).exists(),
+            _ => false
+        }
+    }
+
+    pub fn invoice_file_exists(&self) -> bool {
+        let output_folder = ::CONFIG.get_str("output_path").and_then(util::get_valid_path);
+        let convert_ext  = ::CONFIG.get_str("convert/output_extension").expect("Faulty default config");
+        match (output_folder, self.invoice_file_name(convert_ext)) {
+            (Some(folder), Some(name)) => folder.join(&name).exists(),
+            _ => false
+        }
     }
 
     fn write_to_path<P:AsRef<OsStr> + Debug>(content:&str, target:&P) -> ProjectResult<PathBuf> {
