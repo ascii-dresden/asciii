@@ -10,8 +10,8 @@ authors = ["Hendrik Sollich <hendrik@hoodie.de>"]
 
 log = "*" #"0.3"
 env_logger = { version = "0.3", default-features=false} # default feature requires regex
-#yaml-rust = {git="https://github.com/hoodie/yaml-rust", branch="bug/emitter"}
-yaml-rust = {path="../yaml-rust", features=["preserve_order"]}
+yaml-rust = {git="https://github.com/hoodie/yaml-rust", branch="bug/emitter"}
+#yaml-rust = {path="../yaml-rust", features=["preserve_order"]}
 chrono = "*" #"0.2"
 regex = "*" #"0.1"
 lazy_static = "*" #"0.2"
