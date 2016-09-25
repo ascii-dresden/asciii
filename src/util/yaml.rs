@@ -27,7 +27,8 @@ use std::path::Path;
 use std::error::Error;
 
 pub use yaml_rust::Yaml;
-use yaml_rust::{YamlLoader,LinkedHashMap};
+use yaml_rust::YamlLoader;
+use yaml_rust::yaml::Hash as YamlHash;
 use yaml_rust::scanner::ScanError;
 use chrono::*;
 
@@ -116,7 +117,7 @@ pub fn parse_dmy_date_range(date_str:&str) -> Option<Date<UTC>>{
 
 /// Gets `Some(Yaml::Hash)` or `None`.
 //pub fn get_hash<'a>(yaml:&'a Yaml, key:&str) -> Option<&'a BTreeMap<Yaml,Yaml>> {
-pub fn get_hash<'a>(yaml:&'a Yaml, key:&str) -> Option<&'a LinkedHashMap<Yaml,Yaml>> {
+pub fn get_hash<'a>(yaml:&'a Yaml, key:&str) -> Option<&'a YamlHash> {
     get(yaml,key).and_then(|y|y.as_hash())
 }
 

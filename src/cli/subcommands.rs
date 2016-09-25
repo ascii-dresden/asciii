@@ -319,6 +319,7 @@ pub fn show(matches:&ArgMatches){
         show_detail(dir, &search_term, detail);
     } else if matches.is_present("dump"){ dump_yaml(dir, &search_term)
     } else if matches.is_present("json"){ show_json(dir, &search_term)
+    } else if matches.is_present("csv"){ show_csv(dir, &search_term);
     } else if matches.is_present("template"){ show_template(search_term);
     } else { with_projects(dir, search_term, print::show_items) }
 }
@@ -334,6 +335,10 @@ fn show_json(dir:StorageDir, search_term:&str){
 
 fn show_detail(dir:StorageDir, search_term:&str, detail:&str){
     with_projects(dir, search_term, |p| println!("{}", p.get(detail).unwrap()));
+}
+
+fn show_csv(dir:StorageDir, search_term:&str){
+    with_projects(dir, search_term, |p| println!("{}", super::execute(||p.to_csv(&BillType::Invoice))));
 }
 
 #[cfg(not(feature="document_export"))]

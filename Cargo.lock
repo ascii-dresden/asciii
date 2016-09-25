@@ -5,7 +5,6 @@ dependencies = [
  "bill 0.1.0",
  "chrono 0.2.25 (registry+https://github.com/rust-lang/crates.io-index)",
  "clap 2.13.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "claude 0.1.0 (git+https://github.com/hoodie/claude-rs)",
  "clippy 0.0.90 (registry+https://github.com/rust-lang/crates.io-index)",
  "custom_derive 0.1.5 (registry+https://github.com/rust-lang/crates.io-index)",
  "enum_derive 0.1.7 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -77,7 +76,7 @@ dependencies = [
 name = "bill"
 version = "0.1.0"
 dependencies = [
- "claude 0.1.0 (git+https://github.com/hoodie/claude-rs)",
+ "claude 0.1.0",
  "ordered-float 0.2.3 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
@@ -123,10 +122,6 @@ dependencies = [
 [[package]]
 name = "claude"
 version = "0.1.0"
-source = "git+https://github.com/hoodie/claude-rs#0ef1529cf84a193c2625931c248e53e10098cf50"
-dependencies = [
- "rustc-serialize 0.3.19 (registry+https://github.com/rust-lang/crates.io-index)",
-]
 
 [[package]]
 name = "clippy"
@@ -647,7 +642,6 @@ dependencies = [
 "checksum cfg-if 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)" = "de1e760d7b6535af4241fca8bd8adf68e2e7edacc6b29f5d399050c5e48cf88c"
 "checksum chrono 0.2.25 (registry+https://github.com/rust-lang/crates.io-index)" = "9213f7cd7c27e95c2b57c49f0e69b1ea65b27138da84a170133fd21b07659c00"
 "checksum clap 2.13.0 (registry+https://github.com/rust-lang/crates.io-index)" = "2887ae5b606c1fa314b9238e25a8be3fa673378415c32efc5749464f3365ee9d"
-"checksum claude 0.1.0 (git+https://github.com/hoodie/claude-rs)" = "<none>"
 "checksum clippy 0.0.90 (registry+https://github.com/rust-lang/crates.io-index)" = "d19bda68c3db98e3a780342f6101b44312fef20a5f13ce756d1202a35922b01b"
 "checksum clippy_lints 0.0.90 (registry+https://github.com/rust-lang/crates.io-index)" = "3d4ed67c69b9bb35169be2538691d290a3aa0cbfd4b9f0bfb7c221fc1d399a96"
 "checksum cmake 0.1.17 (registry+https://github.com/rust-lang/crates.io-index)" = "dfcf5bcece56ef953b8ea042509e9dcbdfe97820b7e20d86beb53df30ed94978"

@@ -221,6 +221,29 @@ impl Project{
         spec::billing::bills(&self.yaml)
     }
 
+    pub fn to_csv(&self, bill_type:&BillType) -> ProjectResult<String>{
+        use std::fmt::Write;
+        let (offer, invoice) = try!(self.bills());
+        let bill = match *bill_type{ BillType::Offer => offer, BillType::Invoice => invoice };
+        let mut csv_string = String::new();
+        let splitter = ";";
+
+        try!(writeln!(&mut csv_string, "{}", [ "#", "Bezeichnung", "Menge", "EP", "Steuer", "Preis"].join(splitter)));
+
+
+        for (_tax, items) in bill.items_by_tax.iter(){
+            for (index,item) in items.iter().enumerate(){
+                                        try!(write!(&mut csv_string, "{};",  &index.to_string()));
+                                        try!(write!(&mut csv_string, "{};",  item.product.name));
+                                        try!(write!(&mut csv_string, "{};",  item.amount.to_string()));
+                                        try!(write!(&mut csv_string, "{:.2};",  item.product.price.as_float()));
+                                        try!(write!(&mut csv_string, "{:.2};",  item.product.tax));
+                                        try!(write!(&mut csv_string, "{:.2}\n", (item.product.price * item.amount).as_float()));
+            }
+        }
+        Ok(csv_string)
+    }
+
     pub fn wages(&self) -> Option<Currency> {
         if let (Some(total), Some(salary)) = (spec::hours::total(&self.yaml), spec::hours::salary(&self.yaml)){
             Some(total * salary)
