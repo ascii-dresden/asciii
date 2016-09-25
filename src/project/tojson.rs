@@ -35,18 +35,20 @@ impl ToJson for Project{
             s("tax") => tax.into_inner().to_json()
         }.to_json();
 
-        let bill_to_json = |bill:&Bill<Product>| bill.as_items_with_tax().into_iter()
-                                                                     .map(|(tax, item)| item_to_json(item,tax) )
-                                                                     .collect::<Vec<Json>>()
-                                                                     .to_json();
+        let bill_to_json = |bill:&Bill<Product>| bill.as_items_with_tax()
+                                                     .into_iter()
+                                                     .map(|(tax, item)| item_to_json(item,tax) )
+                                                     .collect::<Vec<Json>>()
+                                                     .to_json();
 
-        let taxes_by_tax_to_json = |bill:&Bill<Product>| bill.taxes_by_tax().iter()
-                                                                            .map(|(tax,taxes)| btreemap!{
-                                                                                s("tax") => (tax.into_inner()*100.0).to_json(),
-                                                                                s("taxes") => currency_to_string(&taxes).to_json(),
-                                                                            }.to_json())
-                                                                            .collect::<Vec<Json>>()
-                                                                            .to_json();
+        let taxes_by_tax_to_json = |bill:&Bill<Product>| bill.taxes_by_tax()
+                                                             .iter()
+                                                             .map(|(tax,taxes)| btreemap!{
+                                                                 s("tax") => (tax.into_inner()*100.0).to_json(),
+                                                                 s("taxes") => currency_to_string(&taxes).to_json(),
+                                                             }.to_json())
+                                                             .collect::<Vec<Json>>()
+                                                             .to_json();
 
         let (offer, invoice) = self.bills().unwrap();
 

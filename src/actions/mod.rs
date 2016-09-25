@@ -214,3 +214,17 @@ pub fn spec() -> Result<()>{
     Ok(())
 }
 
+pub fn delete_project_confirmation(selection:Selection) -> Result<()>{
+    let luigi = try!(setup_luigi());
+    debug!("{:?}",selection);
+    with_projects(&luigi, selection.dir, selection.search, |p| {
+        println!("you want me to delete [y/N]{:?}", p.dir());
+        if util::really() {
+            println!("commencing");
+            luigi.delete_project(p);
+            Ok(())
+        }else {
+            try!(Err("nope"))
+        }
+    })
+}

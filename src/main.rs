@@ -69,6 +69,7 @@ fn setup_app(){
      ("open",      Some(sub_m)) => subcommands::open_path(sub_m),
 
      ("make",      Some(sub_m)) => subcommands::make(sub_m),
+     ("delete",    Some(sub_m)) => subcommands::delete(sub_m),
      ("spec",      Some(sub_m)) => subcommands::spec(sub_m),
 
      ("doc",       _          ) => subcommands::doc(),

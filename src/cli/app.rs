@@ -166,6 +166,7 @@ pub fn setup() -> ArgMatches<'static>{
                          .short("n")
                         )
                     )
+
         .subcommand(SubCommand::with_name("csv")
                     .about("Produces a CSV report for a given year")
                     .arg(Arg::with_name("year")
@@ -406,6 +407,28 @@ pub fn setup() -> ArgMatches<'static>{
                          .long("template")
                          .takes_value(true)
                          )
+                   )
+
+        .subcommand(SubCommand::with_name("delete")
+                    .about("Deletes a project")
+
+                    .arg(Arg::with_name("dry-run")
+                         .help("Do not create final output file")
+                         .short("d")
+                         .long("dry")
+                        )
+
+                    .arg(Arg::with_name("search_term")
+                         .help("Search term, possibly event name")
+                         .required(true)
+                         .multiple(true))
+
+                    .arg(Arg::with_name("archive")
+                         .help("list archived projects")
+                         .short("a")
+                         .long("archive")
+                         .takes_value(true)
+                        )
                    )
 
 

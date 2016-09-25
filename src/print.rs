@@ -305,7 +305,7 @@ pub fn show_items(project:&Project){
         );
     table.set_titles( Row::new(vec![cell!(""), cell!("name"), cell!( "amount"), cell!("price"), cell!("cost")]));
     trace!("                   - added a row");
-    for (_tax, items) in bill.items_by_tax.iter_all(){
+    for (_tax, items) in bill.items_by_tax.iter(){
         for (index,item) in items.iter().enumerate(){
             table.add_row( Row::new(vec![
                                     Cell::new(&index.to_string()),

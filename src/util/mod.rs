@@ -24,6 +24,16 @@ pub fn freeze() {
     io::stdin().read_line(&mut String::new()).unwrap();
 }
 
+/// Asks for confirmation
+pub fn really() -> bool {
+    let mut answer = String::new();
+    if io::stdin().read_line(&mut answer).is_err(){ return false; }
+    ["yes", "y",
+    "j", "ja",
+    "oui", "si", "da"]
+        .contains(&answer.trim())
+}
+
 /// Shells out to print directory structure
 pub fn ls(path:&str){
     println!("tree {}", path);

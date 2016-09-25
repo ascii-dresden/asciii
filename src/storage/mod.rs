@@ -384,6 +384,18 @@ impl<L:Storable> Storage<L> {
         Ok(target.to_owned())
     }
 
+    pub fn delete_project(&self, project:&L) -> StorageResult<PathBuf> {
+        self.delete_project_dir(&project.dir())
+    }
+
+    pub fn delete_project_dir(&self, folder:&Path) -> StorageResult<PathBuf> {
+        debug!("$ rm {}", folder.display());
+        match fs::remove_dir_all(folder){
+            Ok(_) => Ok(folder.to_owned()),
+            Err(_) => Err(StorageError::ProjectDoesNotExist)
+        }
+    }
+
     /// Matches StorageDir's content against a term and returns matching project files.
     ///
     /// This only searches by name
@@ -569,6 +581,7 @@ impl<P:Storable> fmt::Debug for Storage<P>{
     }
 }
 
+#[derive(Debug)]
 pub struct Selection<'a>{
     pub search: &'a str,
     pub dir: StorageDir,

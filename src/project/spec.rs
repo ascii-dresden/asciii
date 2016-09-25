@@ -502,7 +502,7 @@ pub mod billing {
         };
 
         if let Some(total) = super::hours::total(&yaml) {
-            offer  .add_item(total, service());
+            offer.add_item(total, service());
             invoice.add_item(total, service());
         }
 

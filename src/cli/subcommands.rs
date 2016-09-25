@@ -375,6 +375,17 @@ pub fn make(m:&ArgMatches) {
     super::execute(||actions::projects_to_tex(dir, search_term, template_name, &bill_type, m.is_present("dry-run"), m.is_present("force")))
 }
 
+fn match_to_selection<'a>(m:&'a ArgMatches) -> Selection<'a>
+{
+    Selection::new(m.value_of("search_term").unwrap(), m.value_of("archive").and_then(|s|s.parse::<i32>().ok()))
+}
+
+/// Command DELETE
+pub fn delete(m:&ArgMatches){
+    let selection = match_to_selection(m);
+    super::execute(||actions::delete_project_confirmation(selection));
+}
+
 #[cfg(not(feature="document_export"))]
 pub fn make(_:&ArgMatches){
     error!("Make functionality not built-in with this release!");
