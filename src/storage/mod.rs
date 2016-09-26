@@ -400,11 +400,14 @@ impl<L:Storable> Storage<L> {
     ///
     /// This only searches by name
     /// TODO return opened `Project`, no need to reopen
+    ///
+    /// # Warning
+    /// Please be adviced that this uses [`Storage::open_projects()`](struct.Storage.html#method.open_projects) and therefore opens all projects.
     pub fn search_projects(&self, directory:StorageDir, search_term:&str) -> StorageResult<Vec<L>> {
         trace!("searching for projects by {:?} in {:?}", search_term, directory);
-        let mut project_paths = try!(self.open_projects(directory));
+        let project_paths = try!(self.open_projects(directory));
         let projects = project_paths
-            .drain(..)
+            .into_iter()
             .filter(|project| project.matches_search(&search_term.to_lowercase()))
             .collect();
         Ok(projects)
@@ -412,7 +415,7 @@ impl<L:Storable> Storage<L> {
 
     /// Matches StorageDir's content against multiple terms and returns matching project files.
     /// TODO add search_multiple_projects_deep
-    pub fn search_multiple_projects(&self, dir:StorageDir, search_terms:&[&str]) -> StorageResult<Vec<L>> {
+    pub fn search_projects_any(&self, dir:StorageDir, search_terms:&[&str]) -> StorageResult<Vec<L>> {
         let mut all_paths = Vec::new();
         for search_term in search_terms{
             let mut paths = try!(self.search_projects(dir, &search_term));
@@ -449,10 +452,12 @@ impl<L:Storable> Storage<L> {
             .ok_or(StorageError::ProjectDoesNotExist)
     }
 
-    // TODO I'm redundant, make me generic
     fn get_project_name(&self, directory:&Path) -> StorageResult<String> {
         let path = try!(self.get_project_file(directory));
-        Ok(path.file_stem().unwrap().to_str().unwrap().to_owned())
+        if let Some(stem) = path.file_stem(){
+            return Ok(stem.to_str().expect("this filename is no valid unicode").to_owned());
+        }
+        Err(StorageError::BadProjectFileName)
     }
 
     fn get_project_dir_from_archive(&self, name:&str, year:Year) -> StorageResult<PathBuf> {
@@ -582,6 +587,7 @@ impl<P:Storable> fmt::Debug for Storage<P>{
 }
 
 #[derive(Debug)]
+#[deprecated(note="was a bad idea, settle for `StorageDir` + search_terms:&[&str]")]
 pub struct Selection<'a>{
     pub search: &'a str,
     pub dir: StorageDir,

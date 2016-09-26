@@ -19,6 +19,7 @@ use super::repo::GitError;
 #[derive(Debug)]
 pub enum StorageError {
     BadChoice, // TODO: this should be a compile error
+    BadProjectFileName,
     NoWorkingDir,
     ProjectFileExists,
     ProjectDirExists,
@@ -45,6 +46,7 @@ impl Error for StorageError{
     fn description(&self) -> &str{
         match *self{
             StorageError::BadChoice                => "The directory you passed cannot be used in this context. You perhaps passed `Templates` instead of `Archive` or `Working`",
+            StorageError::BadProjectFileName       => "The Project file has a broken name.",
             StorageError::NoWorkingDir             => "There is no working directory.",
             StorageError::ProjectFileExists        => "Conflicting Name, you tried to create a project already exists.",
             StorageError::ProjectDirExists         => "Conflicting Name, you tried to create a project for which the project dir already exists.",

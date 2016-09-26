@@ -3,13 +3,13 @@ name = "asciii"
 version = "3.0.0-alpha1"
 authors = ["Hendrik Sollich <hendrik@hoodie.de>"]
 
-#build = "build.rs"
+build = "build.rs"
 
 
 [dependencies]
 
 log = "*" #"0.3"
-env_logger = { version = "0.3", default-features=false} # default feature requires regex
+env_logger = { version = "0.3"} # default feature requires regex
 yaml-rust = {git="https://github.com/hoodie/yaml-rust", branch="future_master"}
 #yaml-rust = {path="../yaml-rust", features=["preserve_order"]}
 chrono = "*" #"0.2"

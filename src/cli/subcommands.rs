@@ -6,6 +6,7 @@ use std::collections::HashMap;
 use open;
 use clap::ArgMatches;
 
+use asciii;
 use asciii::CONFIG;
 use asciii::config;
 use asciii::util;
@@ -16,16 +17,18 @@ use asciii::storage::*;
 use asciii::templater::Templater;
 use asciii::project::Project;
 use asciii::project::spec::VirtualField;
+use asciii::actions::{setup_luigi, setup_luigi_with_git};
 
 #[cfg(feature="document_export")]
 use rustc_serialize::json::ToJson;
 
-use super::{setup_luigi, setup_luigi_with_git, fail};
 use asciii::print;
 use asciii::print::{ListConfig, ListMode};
 //simple_rows, verbose_rows,
 //path_rows, dynamic_rows,
 //print_projects,print_csv};
+
+use super::{execute,fail};
 
 // TODO refactor this into actions module and actual, short subcommands
 
@@ -40,7 +43,7 @@ pub fn new(matches:&ArgMatches){
         .unwrap();
 
     let edit = !matches.is_present("don't edit");
-    let luigi = setup_luigi();
+    let luigi = execute(||setup_luigi());
 
     let mut fill_data:HashMap<&str, String> = HashMap::new();
 
@@ -64,7 +67,7 @@ pub fn new(matches:&ArgMatches){
         fill_data.insert("MANAGER", manager.to_owned());
     }
 
-    let project = super::execute(|| luigi.create_project(project_name, template_name, &fill_data));
+    let project = execute(|| luigi.create_project(project_name, template_name, &fill_data));
     let project_file = project.file();
     if edit {
         util::pass_to_command(&editor, &[project_file]);
@@ -85,6 +88,38 @@ fn decide_mode(simple:bool, verbose:bool, paths:bool,nothing:bool, csv:bool) -> 
     }
 }
 
+/// Produces a list of paths.
+/// This is more general than `with_projects`, as this includes templates too.
+pub fn matches_to_paths(matches:&ArgMatches, luigi:&Storage<Project>) -> Vec<PathBuf>{
+    let search_terms = matches
+        .values_of("search_term")
+        .unwrap()
+        .collect::<Vec<&str>>();
+
+    if matches.is_present("template"){
+        super::execute(||luigi.list_template_files())
+            .into_iter()
+            .filter(|f|{
+                let stem = f.file_stem()
+                    .and_then(OsStr::to_str)
+                    .unwrap_or("");
+                search_terms.contains(&stem)
+            })
+        .collect::<Vec<_>>()
+    } else {
+        let dir = if let Some(archive) = matches.value_of("archive"){
+            StorageDir::Archive(archive.parse::<i32>().unwrap())
+        } else {
+            StorageDir::Working
+        };
+
+        super::execute(||luigi.search_projects_any(dir, &search_terms))
+            .iter()
+            .map(|project|project.dir())
+            .collect::<Vec<_>>()
+
+    }
+}
 
 /// Command LIST
 pub fn list(matches:&ArgMatches){
@@ -159,13 +194,13 @@ pub fn list(matches:&ArgMatches){
 /// which it prints with `print::print_projects()`
 fn list_projects(dir:StorageDir, list_config:&ListConfig){
     let luigi = if CONFIG.get_bool("list/gitstatus"){
-        setup_luigi_with_git()
+        execute(||setup_luigi_with_git())
     } else {
-        setup_luigi()
+        execute(||setup_luigi())
     };
     debug!("listing projects: {}", luigi.working_dir().display());
 
-    let mut projects = super::execute(||luigi.open_projects(dir));
+    let mut projects = execute(||luigi.open_projects(dir));
 
     // filtering, can you read this
     if let Some(ref filters) = list_config.filter_by{
@@ -200,8 +235,8 @@ fn list_projects(dir:StorageDir, list_config:&ListConfig){
 
 /// Command LIST --broken
 fn list_broken_projects(dir:StorageDir){
-    let luigi = setup_luigi();
-    let invalid_files = super::execute(||luigi.list_project_files(dir));
+    let luigi = execute(||setup_luigi());
+    let invalid_files = execute(||luigi.list_project_files(dir));
     let tups = invalid_files
         .iter()
         .filter_map(|dir| Project::open(dir).err().map(|e|(e, dir)) )
@@ -214,17 +249,17 @@ fn list_broken_projects(dir:StorageDir){
 
 /// Command LIST --templates
 fn list_templates(){
-    let luigi = setup_luigi();
+    let luigi = execute(||setup_luigi());
 
-    for name in super::execute(||luigi.list_template_names()){
+    for name in execute(||luigi.list_template_names()){
         println!("{}", name);
     }
 }
 
 /// Command LIST --years
 fn list_years(){
-    let luigi = setup_luigi();
-    let years = super::execute(||luigi.list_years());
+    let luigi = execute(||setup_luigi());
+    let years = execute(||luigi.list_years());
     println!("{:?}", years);
 }
 
@@ -242,7 +277,7 @@ pub fn csv(matches:&ArgMatches){
         .unwrap_or(Local::now().year());
 
     debug!("asciii csv --year {}", year);
-    let csv = super::execute(||actions::csv(year));
+    let csv = execute(||actions::csv(year));
     println!("{}", csv);
 }
 
@@ -267,10 +302,10 @@ pub fn edit(matches:&ArgMatches) {
 }
 
 fn edit_projects(dir:StorageDir, search_terms:&[&str], editor:&Option<&str>){
-    let luigi = setup_luigi();
+    let luigi = execute(||setup_luigi());
     let mut all_projects= Vec::new();
     for search_term in search_terms{
-        let mut paths = super::execute(||luigi.search_projects(dir, search_term));
+        let mut paths = execute(||luigi.search_projects(dir, search_term));
         if paths.is_empty(){
             //println!{"Nothing found for {:?}", search_term}
         } else {
@@ -288,8 +323,8 @@ fn edit_projects(dir:StorageDir, search_terms:&[&str], editor:&Option<&str>){
 
 /// Command EDIT --template
 fn edit_template(name:&str, editor:&Option<&str>){
-    let luigi = setup_luigi();
-    let template_paths = super::execute(||luigi.list_template_files())
+    let luigi = execute(||setup_luigi());
+    let template_paths = execute(||luigi.list_template_files())
         .into_iter() // drain?
         .filter(|f|f.file_stem() .unwrap_or_else(||OsStr::new("")) == name)
         .collect::<Vec<PathBuf>>();
@@ -307,7 +342,7 @@ pub fn show(matches:&ArgMatches){
     };
 
     if matches.is_present("files"){
-        with_projects(dir, search_term,
+        actions::simple_with_projects(dir, &[search_term],
                       |p| {
                           println!("{}: ", p.dir().display());
                           for entry in fs::read_dir(p.dir()).unwrap(){
@@ -321,24 +356,24 @@ pub fn show(matches:&ArgMatches){
     } else if matches.is_present("json"){ show_json(dir, &search_term)
     } else if matches.is_present("csv"){ show_csv(dir, &search_term);
     } else if matches.is_present("template"){ show_template(search_term);
-    } else { with_projects(dir, search_term, print::show_items) }
+    } else { actions::simple_with_projects(dir, &[search_term], print::show_items) }
 }
 
 fn dump_yaml(dir:StorageDir, search_term:&str){
-    with_projects(dir, search_term, |p| println!("{}", p.yaml().dump().unwrap()));
+    actions::simple_with_projects(dir, &[search_term], |p| println!("{}", p.yaml().dump().unwrap()));
 }
 
 #[cfg(feature="document_export")]
 fn show_json(dir:StorageDir, search_term:&str){
-    with_projects(dir, search_term, |p|println!("{}", p.to_json()));
+    actions::simple_with_projects(dir, &[search_term], |p| println!("{}", p.to_json()));
 }
 
 fn show_detail(dir:StorageDir, search_term:&str, detail:&str){
-    with_projects(dir, search_term, |p| println!("{}", p.get(detail).unwrap()));
+    actions::simple_with_projects(dir, &[search_term], |p| println!("{}", p.get(detail).unwrap()));
 }
 
 fn show_csv(dir:StorageDir, search_term:&str){
-    with_projects(dir, search_term, |p| println!("{}", super::execute(||p.to_csv(&BillType::Invoice))));
+    actions::simple_with_projects(dir, &[search_term], |p| println!("{}", execute(||p.to_csv(&BillType::Invoice))));
 }
 
 #[cfg(not(feature="document_export"))]
@@ -350,12 +385,11 @@ fn show_json(_:StorageDir, _:&str){
 /// TODO make this not panic :D
 /// TODO move this to `spec::all_the_things`
 pub fn spec(_:&ArgMatches){
-    super::execute(||actions::spec())
+    execute(||actions::spec())
 }
 
 /// Command MAKE
 #[cfg(feature="document_export")]
-#[allow(unused_variables)]
 pub fn make(m:&ArgMatches) {
     let search_term = m.value_of("search_term").unwrap();
     let template_name = m.value_of("template").unwrap_or("document");
@@ -377,18 +411,18 @@ pub fn make(m:&ArgMatches) {
     i = bill_type
     );
 
-    super::execute(||actions::projects_to_tex(dir, search_term, template_name, &bill_type, m.is_present("dry-run"), m.is_present("force")))
+    execute(||actions::projects_to_tex(dir, search_term, template_name, &bill_type, m.is_present("dry-run"), m.is_present("force")))
 }
 
-fn match_to_selection<'a>(m:&'a ArgMatches) -> Selection<'a>
-{
+
+fn match_to_selection<'a>(m:&'a ArgMatches) -> Selection<'a> {
     Selection::new(m.value_of("search_term").unwrap(), m.value_of("archive").and_then(|s|s.parse::<i32>().ok()))
 }
 
 /// Command DELETE
 pub fn delete(m:&ArgMatches){
     let selection = match_to_selection(m);
-    super::execute(||actions::delete_project_confirmation(selection));
+    execute(||actions::delete_project_confirmation(selection));
 }
 
 #[cfg(not(feature="document_export"))]
@@ -397,20 +431,6 @@ pub fn make(_:&ArgMatches){
     unimplemented!();
 }
 
-#[deprecated(note="use the actions module")]
-fn with_projects<F:Fn(&Project)>(dir:StorageDir, search_term:&str, cb:F){
-    trace!("with_projects({})", search_term);
-    // TODO make this use ProjectList
-    let luigi = setup_luigi();
-    let projects = super::execute(||luigi.search_projects(dir, search_term));
-    if !projects.is_empty(){
-        for project in &projects{
-            cb(project);
-        }
-    } else {
-        fail(format!("Nothing found for {:?}", search_term));
-    }
-}
 
 
 
@@ -418,25 +438,38 @@ fn with_projects<F:Fn(&Project)>(dir:StorageDir, search_term:&str, cb:F){
 
 
 /// Command SHOW --template
+#[deprecated(note="move to ::print")]
 fn show_template(name:&str){
-    let luigi = setup_luigi();
+    let luigi = execute(||setup_luigi());
     let templater = Templater::from_file(&luigi.get_template_file(name).unwrap()).unwrap();
     println!("{:#?}", templater.list_keywords());
 }
 
+fn add_to_git(paths:&[PathBuf]) {
+    let luigi = execute(||setup_luigi_with_git());
+    if !paths.is_empty() {
+        if let Some(repo) = luigi.repository{
+            util::exit(repo.add(&paths));
+        }
+    }
+}
+
 /// TODO make this be have like `edit`, taking multiple names
 pub fn archive(matches:&ArgMatches){
-        let name = matches.value_of("NAME").unwrap();
-        let year = matches.value_of("year")
-            .and_then(|s|s.parse::<i32>().ok());
-        archive_project(name, year, matches.is_present("force"));
+    let name = matches.value_of("NAME").unwrap();
+    let year = matches.value_of("year")
+        .and_then(|s|s.parse::<i32>().ok());
+    trace!("archive({:?},{:?})",name, year);
+    let moved_files = execute(|| actions::archive_project(name, year, matches.is_present("force")));
+    add_to_git(&moved_files);
 }
 
 pub fn unarchive(matches:&ArgMatches){
-        let year = matches.value_of("YEAR").unwrap();
-        let name = matches.value_of("NAME").unwrap();
-        let year = year.parse::<i32>().unwrap_or_else(|e|panic!("can't parse year {:?}, {:?}", year, e));
-        unarchive_project(year, name);
+    let year = matches.value_of("year").unwrap();
+    let year = year.parse::<i32>().unwrap_or_else(|e|panic!("can't parse year {:?}, {:?}", year, e));
+    let search_terms = matches.values_of("name").unwrap().collect::<Vec<_>>();
+    let moved_files = execute(||actions::unarchive_projects(year, &search_terms));
+    add_to_git(&moved_files);
 }
 
 pub fn config(matches:&ArgMatches){
@@ -455,59 +488,11 @@ pub fn config(matches:&ArgMatches){
     else if matches.is_present("default"){ config_show_default(); }
 }
 
-/// Command ARCHIVE <NAME>
-// TODO perhaps move this code out of `::cli`
-fn archive_project(name:&str, manual_year:Option<i32>, force:bool){
-    let luigi = setup_luigi_with_git();
-
-    debug!("using the force: {}", force);
-    if let Ok(projects) = luigi.search_projects(StorageDir::Working, name){
-        if projects.is_empty(){ fail(format!("Nothing found for {:?}", name)); }
-        for project in &projects {
-            if project.is_ready_for_archive().is_ok() || force {
-                let year = manual_year.or(project.year()).unwrap();
-                println!("archiving {} ({})",  project.ident(), project.year().unwrap());
-                let archive_target = super::execute(||luigi.archive_project(project, year));
-
-                if let Some(repo) = luigi.repository{
-                    util::exit(repo.add(&[project.dir(),archive_target]));
-                };
-
-            }
-            else {
-                println!("CANNOT archive {} ({})",
-                project.ident(), project.file().display());
-            }
-        }
-    }
-    else{
-        fail(format!("Nothing found for {:?}", name));
-    }
-}
-
-
-/// Command UNARCHIVW <YEAR> <NAME>
-fn unarchive_project(year:i32, name:&str){
-    let luigi = setup_luigi_with_git();
-    if let Ok(projects) = luigi.search_projects(StorageDir::Archive(year), name){
-        if projects.len() == 1 {
-            let project = projects.get(0).unwrap();
-            println!("{:?}", project.name());
-            let unarchive_target = luigi.unarchive_project(&projects[0]).unwrap();
-            if let Some(repo) = luigi.repository{
-                util::exit(repo.add(&[project.dir(),unarchive_target]));
-            };
-        } else{
-            fail(format!("Ambiguous: multiple matches: {:#?}", projects.iter().map(|p|p.dir()).collect::<Vec<PathBuf>>() ));
-        }
-    }
-}
 
 
 /// Command CONFIG --show
 pub fn config_show(path:&str){
-    println!("{}: {:#?}", path, CONFIG.get(&path)
-             .map(|v|v.dump().unwrap_or(String::from("error")))
+    println!("{}: {:#?}", path, CONFIG.get_to_string(&path)
              .unwrap_or_else(||format!("{} not set", path)));
 }
 
@@ -524,7 +509,7 @@ fn config_show_default(){
 
 /// Command DOC
 pub fn doc(){
-    open::that("http://hoodie.github.io/asciii-rs/").unwrap();
+    open::that(asciii::DOCUMENTATION_URL).unwrap();
 }
 
 /// Command VERSION
@@ -570,21 +555,21 @@ pub fn path<F:Fn(&Path)>(matches:&ArgMatches, action:F){
 
 /// Command LOG
 pub fn git_log(){
-    let luigi = setup_luigi_with_git();
+    let luigi = execute(||setup_luigi_with_git());
     let repo = luigi.repository.unwrap();
     util::exit(repo.log()) // FIXME this does not behave right
 }
 
 /// Command STATUS
 pub fn git_status(){
-    let luigi = setup_luigi_with_git();
+    let luigi = execute(||setup_luigi_with_git());
     let repo = luigi.repository.unwrap();
     util::exit(repo.status()) // FIXME this does not behave right
 }
 
 /// Command COMMIT
 pub fn git_commit(){
-    let luigi = setup_luigi_with_git();
+    let luigi = execute(||setup_luigi_with_git());
     let repo = luigi.repository.unwrap();
     util::exit(repo.commit())
 }
@@ -593,7 +578,7 @@ pub fn git_commit(){
 /// exact replica of `git remote -v`
 #[cfg(not(feature="git_statuses"))]
 pub fn git_remote(){
-    let luigi = setup_luigi_with_git();
+    let luigi = execute(||setup_luigi_with_git());
     luigi.repository.unwrap().remote();
 }
 
@@ -601,7 +586,7 @@ pub fn git_remote(){
 /// exact replica of `git remote -v`
 #[cfg(feature="git_statuses")]
 pub fn git_remote(){
-    let luigi = setup_luigi_with_git();
+    let luigi = execute(||setup_luigi_with_git());
     let repo = luigi.repository.unwrap().repo;
 
     for remote_name in repo.remotes().unwrap().iter(){ // Option<Option<&str>> oh, boy
@@ -619,54 +604,19 @@ pub fn git_remote(){
 }
 
 /// Command ADD
+
 pub fn git_add(matches:&ArgMatches){
-    let luigi = setup_luigi_with_git();
-    let search_terms = matches
-        .values_of("search_term")
-        .unwrap()
-        .collect::<Vec<&str>>();
-
-    debug!("adding {:?}", search_terms);
-
-
-    if matches.is_present("template"){
-        let template_paths = super::execute(||luigi.list_template_files())
-            .iter()
-            .filter(|f|{
-                let stem = f.file_stem()
-                    .and_then(OsStr::to_str)
-                    .unwrap_or("");
-                search_terms.contains(&stem)
-            })
-        .cloned()
-            .collect::<Vec<PathBuf>>();
-        let repo = luigi.repository.unwrap();
-        util::exit(repo.add(&template_paths));
-    }
-
-    else {
-
-        let dir = if let Some(archive) = matches.value_of("archive"){
-            StorageDir::Archive(archive.parse::<i32>().unwrap())
-        } else {
-            StorageDir::Working
-        };
-
-        let projects = luigi.search_multiple_projects(dir, &search_terms)
-            .unwrap()
-            .iter()
-            .map(|project|project.dir())
-            .collect::<Vec<PathBuf>>();
-
-        let repo = luigi.repository.unwrap();
-        util::exit(repo.add(&projects));
-    }
+    let luigi = execute(||setup_luigi_with_git());
+    let paths = matches_to_paths(matches, &luigi);
+    let repo = luigi.repository.unwrap();
+    util::exit(repo.add(&paths));
 }
+
 
 /// Command DIFF
 pub fn git_diff(){
     // TODO this doesn't need _with_git
-    let luigi = setup_luigi_with_git();
+    let luigi = execute(||setup_luigi_with_git());
     let repo = luigi.repository.unwrap();
     util::exit(repo.diff())
 }
@@ -674,29 +624,28 @@ pub fn git_diff(){
 /// Command PULL
 pub fn git_pull(){
     // TODO this doesn't need _with_git
-    let luigi = setup_luigi_with_git();
+    let luigi = execute(||setup_luigi_with_git());
     let repo = luigi.repository.unwrap();
     util::exit(repo.pull())
 }
 
 /// Command PUSH
 pub fn git_push(){
-    let luigi = setup_luigi_with_git();
+    let luigi = execute(||setup_luigi_with_git());
     let repo = luigi.repository.unwrap();
     util::exit(repo.push())
 }
 
 /// Command DIFF
 pub fn git_stash(){
-    let luigi = setup_luigi_with_git();
+    let luigi = execute(||setup_luigi_with_git());
     let repo = luigi.repository.unwrap();
     util::exit(repo.stash())
 }
 
 /// Command DIFF
 pub fn git_stash_pop(){
-    let luigi = setup_luigi_with_git();
+    let luigi = execute(||setup_luigi_with_git());
     let repo = luigi.repository.unwrap();
     util::exit(repo.stash_pop())
 }
-

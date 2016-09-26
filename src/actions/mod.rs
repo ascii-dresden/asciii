@@ -23,7 +23,7 @@ pub mod error;
 use self::error::*;
 
 /// Sets up an instance of `Storage`.
-fn setup_luigi() -> Result<Storage<Project>> {
+pub fn setup_luigi() -> Result<Storage<Project>> {
     trace!("setup_luigi()");
     let working   = try!(::CONFIG.get_str("dirs/working").ok_or("Faulty config: dirs/working does not contain a value"));
     let archive   = try!(::CONFIG.get_str("dirs/archive").ok_or("Faulty config: dirs/archive does not contain a value"));
@@ -32,20 +32,38 @@ fn setup_luigi() -> Result<Storage<Project>> {
     Ok(storage)
 }
 
-fn with_projects<F>(luigi: &Storage<Project>, dir:StorageDir, search_term:&str, cb:F) -> Result<()>
+/// Sets up an instance of `Storage`, with git turned on.
+pub fn setup_luigi_with_git() -> Result<Storage<Project>> {
+    trace!("setup_luigi()");
+    let working   = try!(::CONFIG.get_str("dirs/working").ok_or("Faulty config: dirs/working does not contain a value"));
+    let archive   = try!(::CONFIG.get_str("dirs/archive").ok_or("Faulty config: dirs/archive does not contain a value"));
+    let templates = try!(::CONFIG.get_str("dirs/templates").ok_or("Faulty config: dirs/templates does not contain a value"));
+    let storage   = try!(Storage::new_with_git(util::get_storage_path(), working, archive, templates));
+    Ok(storage)
+}
+
+
+pub fn simple_with_projects<F>(dir:StorageDir, search_terms:&[&str], f:F)
+    where F:Fn(&Project)
+{
+    with_projects(dir, search_terms, |p| {f(p);Ok(())}).unwrap();
+}
+
+/// Helper method that passes projects matching the `search_terms` to the passt closure `f`
+pub fn with_projects<F>(dir:StorageDir, search_terms:&[&str], f:F) -> Result<()>
     where F:Fn(&Project)->Result<()>
 {
-    trace!("with_projects({})", search_term);
-    // TODO make this use ProjectList
-    let projects = try!(luigi.search_projects(dir, search_term));
-    if !projects.is_empty(){
+    trace!("with_projects({:?})", search_terms);
+    let luigi = try!(setup_luigi());
+    let projects = try!(luigi.search_projects_any(dir, search_terms));
+    if !projects.is_empty() {
         for project in &projects{
-            try!(cb(project));
+            try!(f(project));
         }
+        Ok(())
     } else {
-        return Err(format!("Nothing found for {:?}", search_term).into());
+        Err(format!("Nothing found for {:?}", search_terms).into())
     }
-    Ok(())
 }
 
 pub fn csv(year:i32) -> Result<String> {
@@ -55,6 +73,8 @@ pub fn csv(year:i32) -> Result<String> {
     projects_to_csv(&projects)
 }
 
+/// Produces a csv string from a list of `Project`s
+/// TODO this still contains german terms
 pub fn projects_to_csv(projects:&[Project]) -> Result<String>{
     let mut string = String::new();
     let splitter = "\";\"";
@@ -73,12 +93,6 @@ pub fn projects_to_csv(projects:&[Project]) -> Result<String>{
         ].join(splitter)));
     }
     Ok(string)
-}
-
-#[cfg(not(feature="document_export"))]
-pub fn projects_to_tex(_:StorageDir, _:&str, _:&str, _:&Option<BillType>, _:bool, _:bool) -> Result<()> {
-    info!("Sorry, but this version was not built with this functionality.");
-    unimplemented!();
 }
 
 /// Creates the latex files within each projects directory, either for Invoice or Offer.
@@ -105,7 +119,7 @@ pub fn projects_to_tex(dir:StorageDir, search_term:&str, template_name:&str, bil
 
     debug!("template file={:?} exists={}", template_path, template_path.exists());
 
-    with_projects(&luigi, dir, search_term, |p| {
+    with_projects(dir, &[search_term], |p| {
 
         let convert_tool = ::CONFIG.get_str("convert/tool");
         let output_folder = ::CONFIG.get_str("output_path").and_then(util::get_valid_path).expect("Faulty config \"output_path\"");
@@ -185,7 +199,7 @@ fn file_age(path:&Path) -> Result<time::Duration> {
     Ok(try!(accessed.elapsed()))
 }
 
-/// Command SPEC
+/// Testing only, tries to run complete spec on all projects.
 /// TODO make this not panic :D
 /// TODO move this to `spec::all_the_things`
 pub fn spec() -> Result<()> {
@@ -224,7 +238,7 @@ pub fn spec() -> Result<()> {
 pub fn delete_project_confirmation(selection:Selection) -> Result<()> {
     let luigi = try!(setup_luigi());
     debug!("{:?}",selection);
-    with_projects(&luigi, selection.dir, selection.search, |p| {
+    with_projects(selection.dir, &[selection.search], |p| {
         println!("you want me to delete [y/N]{:?}", p.dir());
         if util::really() {
             println!("commencing");
@@ -234,4 +248,44 @@ pub fn delete_project_confirmation(selection:Selection) -> Result<()> {
             try!(Err("nope"))
         }
     })
+}
+
+pub fn archive_project(search_term:&str, manual_year:Option<i32>, force:bool) -> Result<Vec<PathBuf>>{
+    trace!("archive_project({},{:?},{:?})",search_term, manual_year,force);
+    let luigi = try!(setup_luigi_with_git());
+    let mut moved_files = Vec::new();
+    let projects = try!(luigi.search_projects_any(StorageDir::Working, &[search_term]));
+    if projects.is_empty(){
+        return Err("Nothing found".to_string().into());
+    }
+    for project in projects {
+        if force {warn!("you are using --force")};
+        if project.is_ready_for_archive().is_ok() || force {
+            info!("project {:?} is ready to be archived", project.name());
+            let year = manual_year.or(project.year()).unwrap();
+            info!("archiving {} ({})",  project.ident(), project.year().unwrap());
+            let archive_target = try!(luigi.archive_project(&project, year));
+            moved_files.push(project.dir());
+            moved_files.push(archive_target);
+        }
+        else {
+            error!("project {:?} is not ready to be archived", project.name());
+        }
+    };
+    Ok(moved_files)
+}
+
+/// Command UNARCHIVE <YEAR> <NAME>
+/// TODO: return a list of files that have to be updated in git
+pub fn unarchive_projects(year:i32, search_terms:&[&str]) -> Result<Vec<PathBuf>> {
+    let luigi = try!(setup_luigi_with_git());
+    let mut moved_files = Vec::new();
+    let projects = try!(luigi.search_projects_any(StorageDir::Archive(year), search_terms));
+    for project in projects {
+        println!("unarchiving {:?}", project.name());
+        let unarchive_target = luigi.unarchive_project(&project).unwrap();
+        moved_files.push(project.dir());
+        moved_files.push(unarchive_target);
+    };
+    Ok(moved_files)
 }

@@ -351,7 +351,13 @@ impl Storable for Project{
 
     fn name(&self) -> String {
         spec::project::name(self.yaml())
-            .unwrap_or(&format!("unnamed: {:?}", self.file().file_name())).to_owned()
+            .map(|n|n.to_owned())
+            .unwrap_or_else(|| format!("unnamed: {:?}",
+                                       self.dir()
+                                           .file_name()
+                                           .expect("the end was \"..\", but why?")
+                                      )
+                           )
     }
 
     fn date(&self) -> Option<Date<UTC>>{ spec::project::date(self.yaml()) }

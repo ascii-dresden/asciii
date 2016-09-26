@@ -44,7 +44,7 @@ impl GitStatus{
          GitStatus::Conflict        => (color::RED,     None),
          GitStatus::WorkingNew      => (color::GREEN,   None),
          GitStatus::WorkingModified => (color::YELLOW,  None),
-         GitStatus::IndexNew        => (color::RED,     Some(Attr::Bold)),
+         GitStatus::IndexNew        => (color::GREEN,   Some(Attr::Bold)),
          GitStatus::IndexModified   => (color::BLUE,    Some(Attr::Bold)),
          _                          => (color::WHITE,   None)
         }
@@ -60,7 +60,7 @@ impl fmt::Display for GitStatus{
          GitStatus::Current         => write!(f, "+"),
          GitStatus::WorkingNew      => write!(f, "+"),
          GitStatus::WorkingModified => write!(f, "~"),
-         GitStatus::IndexNew        => write!(f, "+"),
+         GitStatus::IndexNew        => write!(f, "✓"),
          GitStatus::IndexModified   => write!(f, "✓"),
          GitStatus::Unknown         => write!(f, "" ),
          _                          => write!(f, "{:?}", self),
@@ -184,7 +184,7 @@ impl Repository {
     }
 
     pub fn add(&self, paths:&[PathBuf]) -> ExitStatus{
-        info!("adding to git\n {:#?}", paths);
+        info!("adding to git\n {:?}", paths);
         let paths:Vec<&str> = paths.iter().filter_map(|p|p.to_str()).collect();
         self.execute_git("add", &paths)
     }

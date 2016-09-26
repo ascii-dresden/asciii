@@ -8,10 +8,10 @@ use std::process::exit;
 use std::fmt::Display;
 use std::error::Error;
 
-use asciii::project::Project;
-use asciii::storage::*;
-use asciii::util;
-use asciii::CONFIG;
+//use asciii::project::Project;
+//use asciii::storage::*;
+//use asciii::util;
+//use asciii::CONFIG;
 
 /// Contains concrete implementation of each subcommand
 pub mod app;
@@ -34,32 +34,6 @@ fn execute<F, S, E:Error>(command:F) -> S where F: FnOnce() -> Result<S, E> {
     }
 }
 
-/// Sets up an instance of `Storage`.
-fn setup_luigi() -> Storage<Project> {
-    trace!("setup_luigi()");
-    let working = CONFIG.get_str("dirs/working")
-                .expect("Faulty config: dirs/working does not contain a value");
-    let archive = CONFIG.get_str("dirs/archive")
-                .expect("Faulty config: dirs/archive does not contain a value");
-    let templates = CONFIG.get_str("dirs/templates")
-                .expect("Faulty config: dirs/templates does not contain a value");
-    execute(|| Storage::new(util::get_storage_path(), working, archive, templates))
-}
-
-/// Sets up an instance of `Storage`, with git turned on.
-fn setup_luigi_with_git() -> Storage<Project> {
-    trace!("setup_luigi_with_git()");
-    let working = CONFIG.get_str("dirs/working")
-                .expect("Faulty config: dirs/working does not contain a value");
-    let archive = CONFIG.get_str("dirs/archive")
-                .expect("Faulty config: dirs/archive does not contain a value");
-    let templates = CONFIG.get_str("dirs/templates")
-                .expect("Faulty config: dirs/templates does not contain a value");
-    execute(||Storage::new_with_git(util::get_storage_path(), working, archive, templates))
-}
-
-
-
 pub mod validators{
     use asciii::util::yaml::parse_dmy_date;
 
@@ -70,3 +44,4 @@ pub mod validators{
         }
     }
 }
+

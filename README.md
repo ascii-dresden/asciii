@@ -48,25 +48,15 @@ Modules are all top-level files and folders in `src/`.
     * [ ] test on windows and mac (https://github.com/japaric/rust-everywhere)
 * [x] build on Raspberry Pi
 * [ ] see if you can `#[inline]` to improve perfomance
-* [ ] break up code into crates
-    * [ ] config
-    * [ ] yaml helpers macro-DSL
-    * [ ] templating
-    * [ ] utilities etc
 
 ### make use if these crates (optional)
 
-* [ ] sparkline
 * [ ] xdg / xdg-basedir
 * [x] env_logger
-* [ ] filetime, for make like features
-* [ ] itertools
-* [ ] multimap
 * [ ] cool faces
 * [x] open
 * [ ] notify-rust
 * [ ] strsim
-* [ ] https://github.com/frewsxcv/afl.rs
 
 
 ## Side Effects

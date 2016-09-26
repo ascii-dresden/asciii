@@ -1,14 +1,17 @@
 use asciii::version;
-#[cfg(feature="document_export")]
+use asciii;
 use super::validators;
 use clap::{App, AppSettings, Arg, ArgMatches, SubCommand};
 
 pub fn setup() -> ArgMatches<'static>{
     App::new("asciii")
-        .author("Hendrik Sollich <hendrik@hoodie.de>")
+        .author(crate_authors!())
         .version(version().as_ref())
         .about("The ascii invoicer III")
         .settings(&[AppSettings::SubcommandRequiredElseHelp,AppSettings::ColoredHelp])
+        .after_help(
+            format!("Documentation at: {}",
+                    asciii::DOCUMENTATION_URL).as_ref())
 
         .subcommand(SubCommand::with_name("doc")
             .about("Opens the online documentation, please read it")
@@ -200,13 +203,14 @@ pub fn setup() -> ArgMatches<'static>{
 
         .subcommand(SubCommand::with_name("unarchive")
                     .about("Move a Project out of the archive")
-                    .arg(Arg::with_name("YEAR")
+                    .arg(Arg::with_name("year")
                          .help("Specify the Archiv")
                          .required(true)
                         )
-                    .arg(Arg::with_name("NAME")
+                    .arg(Arg::with_name("name")
                          .help("The name of the project, duh!")
                          .required(true)
+                         .multiple(true)
                         )
                    )
 

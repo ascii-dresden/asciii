@@ -27,7 +27,7 @@ use std::env;
 use log::{LogRecord, LogLevelFilter};
 use env_logger::LogBuilder;
 
-mod cli;
+pub mod cli;
 use cli::subcommands;
 pub mod manual;
 
@@ -80,6 +80,7 @@ fn setup_app(){
      ("diff",      _          ) => subcommands::git_diff(),
      ("status",    _          ) => subcommands::git_status(),
      ("add",       Some(sub_m)) => subcommands::git_add(sub_m),
+     //("unadd",     Some(sub_m)) => subcommands::git_unadd(sub_m),
      ("commit",    _          ) => subcommands::git_commit(),
      ("push",      _          ) => subcommands::git_push(),
      ("stash",      _          ) => subcommands::git_stash(),

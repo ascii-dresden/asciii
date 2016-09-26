@@ -3,6 +3,7 @@
 //! **For pure user documentation please refer to the [user manual](manual/index.html).**
 //! This contains user and developer documentation together.
 //!
+//! Please check out [cli](cli/index.html) too.
 
 //#![warn(missing_docs,
 //        missing_copy_implementations,
@@ -59,6 +60,10 @@ pub mod templater;
 #[cfg(feature="document_export")] extern crate rustc_serialize;
 #[cfg(feature="document_export")] extern crate handlebars;
 #[cfg(feature="document_export")] pub mod fill_docs;
+
+
+// TODO keep this up to date after move
+pub static DOCUMENTATION_URL: &'static str  = "http://hoodie.github.io/asciii-rs/";
 
 lazy_static!{
     pub static ref CONFIG: config::ConfigReader = config::ConfigReader::new().unwrap();

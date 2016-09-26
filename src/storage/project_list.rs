@@ -5,6 +5,8 @@ use std::ops::{Deref, DerefMut};
 use super::Storable;
 
 /// Wrapper around `Vec<Storable>`
+///
+/// This is produced by [`Storage::open_projects()`](struct.Storage.html#method.open_projects)
 pub struct ProjectList<P: Storable + Sized> {
     pub projects: Vec<P>,
 }
