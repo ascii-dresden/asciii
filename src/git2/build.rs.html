@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="rustdoc">
-    <meta name="description" content="Source to the Rust file `/home/hendrik/.cargo/registry/src/github.com-88ac128001ac3a9a/git2-0.4.3/src/build.rs`.">
+    <meta name="description" content="Source to the Rust file `/home/hendrik/.cargo/registry/src/github.com-1ecc6299db9ec823/git2-0.4.4/src/build.rs`.">
     <meta name="keywords" content="rust, rustlang, rust-lang">
 
     <title>build.rs.html -- source</title>
@@ -511,6 +511,85 @@
 <span id="467">467</span>
 <span id="468">468</span>
 <span id="469">469</span>
+<span id="470">470</span>
+<span id="471">471</span>
+<span id="472">472</span>
+<span id="473">473</span>
+<span id="474">474</span>
+<span id="475">475</span>
+<span id="476">476</span>
+<span id="477">477</span>
+<span id="478">478</span>
+<span id="479">479</span>
+<span id="480">480</span>
+<span id="481">481</span>
+<span id="482">482</span>
+<span id="483">483</span>
+<span id="484">484</span>
+<span id="485">485</span>
+<span id="486">486</span>
+<span id="487">487</span>
+<span id="488">488</span>
+<span id="489">489</span>
+<span id="490">490</span>
+<span id="491">491</span>
+<span id="492">492</span>
+<span id="493">493</span>
+<span id="494">494</span>
+<span id="495">495</span>
+<span id="496">496</span>
+<span id="497">497</span>
+<span id="498">498</span>
+<span id="499">499</span>
+<span id="500">500</span>
+<span id="501">501</span>
+<span id="502">502</span>
+<span id="503">503</span>
+<span id="504">504</span>
+<span id="505">505</span>
+<span id="506">506</span>
+<span id="507">507</span>
+<span id="508">508</span>
+<span id="509">509</span>
+<span id="510">510</span>
+<span id="511">511</span>
+<span id="512">512</span>
+<span id="513">513</span>
+<span id="514">514</span>
+<span id="515">515</span>
+<span id="516">516</span>
+<span id="517">517</span>
+<span id="518">518</span>
+<span id="519">519</span>
+<span id="520">520</span>
+<span id="521">521</span>
+<span id="522">522</span>
+<span id="523">523</span>
+<span id="524">524</span>
+<span id="525">525</span>
+<span id="526">526</span>
+<span id="527">527</span>
+<span id="528">528</span>
+<span id="529">529</span>
+<span id="530">530</span>
+<span id="531">531</span>
+<span id="532">532</span>
+<span id="533">533</span>
+<span id="534">534</span>
+<span id="535">535</span>
+<span id="536">536</span>
+<span id="537">537</span>
+<span id="538">538</span>
+<span id="539">539</span>
+<span id="540">540</span>
+<span id="541">541</span>
+<span id="542">542</span>
+<span id="543">543</span>
+<span id="544">544</span>
+<span id="545">545</span>
+<span id="546">546</span>
+<span id="547">547</span>
+<span id="548">548</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! Builder-pattern objects for configuration various git operations.</span>
 
@@ -520,6 +599,7 @@
 <span class='kw'>use</span> <span class='ident'>libc</span>::{<span class='ident'>c_char</span>, <span class='ident'>size_t</span>, <span class='ident'>c_void</span>, <span class='ident'>c_uint</span>, <span class='ident'>c_int</span>};
 
 <span class='kw'>use</span> {<span class='ident'>raw</span>, <span class='ident'>panic</span>, <span class='ident'>Error</span>, <span class='ident'>Repository</span>, <span class='ident'>FetchOptions</span>, <span class='ident'>IntoCString</span>};
+<span class='kw'>use</span> {<span class='ident'>CheckoutNotificationType</span>, <span class='ident'>DiffFile</span>};
 <span class='kw'>use</span> <span class='ident'>util</span>::{<span class='self'>self</span>, <span class='ident'>Binding</span>};
 
 <span class='doccomment'>/// A builder struct which is used to build configuration for cloning a new git</span>
@@ -546,6 +626,8 @@
     <span class='ident'>disable_filters</span>: <span class='ident'>bool</span>,
     <span class='ident'>checkout_opts</span>: <span class='ident'>u32</span>,
     <span class='ident'>progress</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Progress</span><span class='op'>&lt;</span><span class='lifetime'>&#39;cb</span><span class='op'>&gt;&gt;</span><span class='op'>&gt;</span>,
+    <span class='ident'>notify</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Notify</span><span class='op'>&lt;</span><span class='lifetime'>&#39;cb</span><span class='op'>&gt;&gt;</span><span class='op'>&gt;</span>,
+    <span class='ident'>notify_flags</span>: <span class='ident'>CheckoutNotificationType</span>,
 }
 
 <span class='doccomment'>/// Checkout progress notification callback.</span>
@@ -553,6 +635,16 @@
 <span class='doccomment'>/// The first argument is the path for the notification, the next is the numver</span>
 <span class='doccomment'>/// of completed steps so far, and the final is the total number of steps.</span>
 <span class='kw'>pub</span> <span class='kw'>type</span> <span class='ident'>Progress</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span> <span class='op'>=</span> <span class='ident'>FnMut</span>(<span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='ident'>Path</span><span class='op'>&gt;</span>, <span class='ident'>usize</span>, <span class='ident'>usize</span>) <span class='op'>+</span> <span class='lifetime'>&#39;a</span>;
+
+<span class='doccomment'>/// Checkout notifications callback.</span>
+<span class='doccomment'>///</span>
+<span class='doccomment'>/// The first argument is the notification type, the next is the path for the</span>
+<span class='doccomment'>/// the notification, followed by the baseline diff, target diff, and workdir diff.</span>
+<span class='doccomment'>///</span>
+<span class='doccomment'>/// The callback must return a bool specifying whether the checkout should</span>
+<span class='doccomment'>/// continue.</span>
+<span class='kw'>pub</span> <span class='kw'>type</span> <span class='ident'>Notify</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span> <span class='op'>=</span> <span class='ident'>FnMut</span>(<span class='ident'>CheckoutNotificationType</span>, <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='ident'>Path</span><span class='op'>&gt;</span>, <span class='ident'>DiffFile</span>,
+                            <span class='ident'>DiffFile</span>, <span class='ident'>DiffFile</span>) <span class='op'>-&gt;</span> <span class='ident'>bool</span> <span class='op'>+</span> <span class='lifetime'>&#39;a</span>;
 
 <span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;cb</span><span class='op'>&gt;</span> <span class='ident'>RepoBuilder</span><span class='op'>&lt;</span><span class='lifetime'>&#39;cb</span><span class='op'>&gt;</span> {
     <span class='doccomment'>/// Creates a new repository builder with all of the default configuration.</span>
@@ -562,10 +654,10 @@
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>new</span>() <span class='op'>-&gt;</span> <span class='ident'>RepoBuilder</span><span class='op'>&lt;</span><span class='lifetime'>&#39;cb</span><span class='op'>&gt;</span> {
         ::<span class='ident'>init</span>();
         <span class='ident'>RepoBuilder</span> {
-            <span class='ident'>bare</span>: <span class='boolval'>false</span>,
+            <span class='ident'>bare</span>: <span class='bool-val'>false</span>,
             <span class='ident'>branch</span>: <span class='prelude-val'>None</span>,
-            <span class='ident'>local</span>: <span class='boolval'>true</span>,
-            <span class='ident'>hardlinks</span>: <span class='boolval'>true</span>,
+            <span class='ident'>local</span>: <span class='bool-val'>true</span>,
+            <span class='ident'>hardlinks</span>: <span class='bool-val'>true</span>,
             <span class='ident'>checkout</span>: <span class='prelude-val'>None</span>,
             <span class='ident'>fetch_opts</span>: <span class='prelude-val'>None</span>,
         }
@@ -637,9 +729,9 @@
         }).<span class='ident'>unwrap_or</span>(<span class='number'>0</span> <span class='kw'>as</span> <span class='op'>*</span><span class='kw'>const</span> _);
 
         <span class='ident'>opts</span>.<span class='ident'>local</span> <span class='op'>=</span> <span class='kw'>match</span> (<span class='self'>self</span>.<span class='ident'>local</span>, <span class='self'>self</span>.<span class='ident'>hardlinks</span>) {
-            (<span class='boolval'>true</span>, <span class='boolval'>false</span>) <span class='op'>=&gt;</span> <span class='ident'>raw</span>::<span class='ident'>GIT_CLONE_LOCAL_NO_LINKS</span>,
-            (<span class='boolval'>false</span>, _) <span class='op'>=&gt;</span> <span class='ident'>raw</span>::<span class='ident'>GIT_CLONE_NO_LOCAL</span>,
-            (<span class='boolval'>true</span>, _) <span class='op'>=&gt;</span> <span class='ident'>raw</span>::<span class='ident'>GIT_CLONE_LOCAL_AUTO</span>,
+            (<span class='bool-val'>true</span>, <span class='bool-val'>false</span>) <span class='op'>=&gt;</span> <span class='ident'>raw</span>::<span class='ident'>GIT_CLONE_LOCAL_NO_LINKS</span>,
+            (<span class='bool-val'>false</span>, _) <span class='op'>=&gt;</span> <span class='ident'>raw</span>::<span class='ident'>GIT_CLONE_NO_LOCAL</span>,
+            (<span class='bool-val'>true</span>, _) <span class='op'>=&gt;</span> <span class='ident'>raw</span>::<span class='ident'>GIT_CLONE_LOCAL_AUTO</span>,
         };
         <span class='ident'>opts</span>.<span class='ident'>checkout_opts</span>.<span class='ident'>checkout_strategy</span> <span class='op'>=</span>
             <span class='ident'>raw</span>::<span class='ident'>GIT_CHECKOUT_SAFE</span> <span class='kw'>as</span> <span class='ident'>c_uint</span>;
@@ -672,7 +764,7 @@
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>new</span>() <span class='op'>-&gt;</span> <span class='ident'>CheckoutBuilder</span><span class='op'>&lt;</span><span class='lifetime'>&#39;cb</span><span class='op'>&gt;</span> {
         ::<span class='ident'>init</span>();
         <span class='ident'>CheckoutBuilder</span> {
-            <span class='ident'>disable_filters</span>: <span class='boolval'>false</span>,
+            <span class='ident'>disable_filters</span>: <span class='bool-val'>false</span>,
             <span class='ident'>dir_perm</span>: <span class='prelude-val'>None</span>,
             <span class='ident'>file_perm</span>: <span class='prelude-val'>None</span>,
             <span class='ident'>path_ptrs</span>: <span class='ident'>Vec</span>::<span class='ident'>new</span>(),
@@ -683,6 +775,8 @@
             <span class='ident'>their_label</span>: <span class='prelude-val'>None</span>,
             <span class='ident'>checkout_opts</span>: <span class='ident'>raw</span>::<span class='ident'>GIT_CHECKOUT_SAFE</span> <span class='kw'>as</span> <span class='ident'>u32</span>,
             <span class='ident'>progress</span>: <span class='prelude-val'>None</span>,
+            <span class='ident'>notify</span>: <span class='prelude-val'>None</span>,
+            <span class='ident'>notify_flags</span>: <span class='ident'>CheckoutNotificationType</span>::<span class='ident'>empty</span>(),
         }
     }
 
@@ -720,6 +814,13 @@
             <span class='self'>self</span>.<span class='ident'>checkout_opts</span> <span class='op'>&amp;=</span> <span class='op'>!</span>(<span class='ident'>bit</span> <span class='kw'>as</span> <span class='ident'>u32</span>);
         }
         <span class='self'>self</span>
+    }
+
+    <span class='doccomment'>/// In safe mode, create files that don&#39;t exist.</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// Defaults to false.</span>
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>recreate_missing</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>allow</span>: <span class='ident'>bool</span>) <span class='op'>-&gt;</span> <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>CheckoutBuilder</span><span class='op'>&lt;</span><span class='lifetime'>&#39;cb</span><span class='op'>&gt;</span> {
+        <span class='self'>self</span>.<span class='ident'>flag</span>(<span class='ident'>raw</span>::<span class='ident'>GIT_CHECKOUT_RECREATE_MISSING</span>, <span class='ident'>allow</span>)
     }
 
     <span class='doccomment'>/// In safe mode, apply safe file updates even when there are conflicts</span>
@@ -809,6 +910,16 @@
         <span class='self'>self</span>.<span class='ident'>flag</span>(<span class='ident'>raw</span>::<span class='ident'>GIT_CHECKOUT_CONFLICT_STYLE_MERGE</span>, <span class='ident'>on</span>)
     }
 
+    <span class='doccomment'>/// Specify for which notification types to invoke the notification</span>
+    <span class='doccomment'>/// callback.</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// Defaults to none.</span>
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>notify_on</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>notification_types</span>: <span class='ident'>CheckoutNotificationType</span>)
+                     <span class='op'>-&gt;</span> <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>CheckoutBuilder</span><span class='op'>&lt;</span><span class='lifetime'>&#39;cb</span><span class='op'>&gt;</span> {
+        <span class='self'>self</span>.<span class='ident'>notify_flags</span> <span class='op'>=</span> <span class='ident'>notification_types</span>;
+        <span class='self'>self</span>
+    }
+
     <span class='doccomment'>/// Indicates whether to include common ancestor data in diff3 format files</span>
     <span class='doccomment'>/// for conflicts.</span>
     <span class='doccomment'>///</span>
@@ -884,6 +995,18 @@
         <span class='self'>self</span>
     }
 
+    <span class='doccomment'>/// Set a callback to receive checkout notifications.</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// Callbacks are invoked prior to modifying any files on disk.</span>
+    <span class='doccomment'>/// Returning `false` from the callback will cancel the checkout.</span>
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>notify</span><span class='op'>&lt;</span><span class='ident'>F</span><span class='op'>&gt;</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>cb</span>: <span class='ident'>F</span>) <span class='op'>-&gt;</span> <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>CheckoutBuilder</span><span class='op'>&lt;</span><span class='lifetime'>&#39;cb</span><span class='op'>&gt;</span>
+        <span class='kw'>where</span> <span class='ident'>F</span>: <span class='ident'>FnMut</span>(<span class='ident'>CheckoutNotificationType</span>, <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='ident'>Path</span><span class='op'>&gt;</span>, <span class='ident'>DiffFile</span>,
+                       <span class='ident'>DiffFile</span>, <span class='ident'>DiffFile</span>) <span class='op'>-&gt;</span> <span class='ident'>bool</span> <span class='op'>+</span> <span class='lifetime'>&#39;cb</span>
+    {
+        <span class='self'>self</span>.<span class='ident'>notify</span> <span class='op'>=</span> <span class='prelude-val'>Some</span>(<span class='ident'>Box</span>::<span class='ident'>new</span>(<span class='ident'>cb</span>) <span class='kw'>as</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Notify</span><span class='op'>&lt;</span><span class='lifetime'>&#39;cb</span><span class='op'>&gt;&gt;</span>);
+        <span class='self'>self</span>
+    }
+
     <span class='doccomment'>/// Configure a raw checkout options based on this configuration.</span>
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// This method is unsafe as there is no guarantee that this structure will</span>
@@ -920,6 +1043,12 @@
             <span class='ident'>opts</span>.<span class='ident'>progress_cb</span> <span class='op'>=</span> <span class='prelude-val'>Some</span>(<span class='ident'>f</span>);
             <span class='ident'>opts</span>.<span class='ident'>progress_payload</span> <span class='op'>=</span> <span class='self'>self</span> <span class='kw'>as</span> <span class='op'>*</span><span class='kw-2'>mut</span> _ <span class='kw'>as</span> <span class='op'>*</span><span class='kw-2'>mut</span> _;
         }
+        <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>notify</span>.<span class='ident'>is_some</span>() {
+            <span class='kw'>let</span> <span class='ident'>f</span>: <span class='ident'>raw</span>::<span class='ident'>git_checkout_notify_cb</span> <span class='op'>=</span> <span class='ident'>notify_cb</span>;
+            <span class='ident'>opts</span>.<span class='ident'>notify_cb</span> <span class='op'>=</span> <span class='prelude-val'>Some</span>(<span class='ident'>f</span>);
+            <span class='ident'>opts</span>.<span class='ident'>notify_payload</span> <span class='op'>=</span> <span class='self'>self</span> <span class='kw'>as</span> <span class='op'>*</span><span class='kw-2'>mut</span> _ <span class='kw'>as</span> <span class='op'>*</span><span class='kw-2'>mut</span> _;
+            <span class='ident'>opts</span>.<span class='ident'>notify_flags</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>notify_flags</span>.<span class='ident'>bits</span>() <span class='kw'>as</span> <span class='ident'>c_uint</span>;
+        }
         <span class='ident'>opts</span>.<span class='ident'>checkout_strategy</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>checkout_opts</span> <span class='kw'>as</span> <span class='ident'>c_uint</span>;
     }
 }
@@ -943,12 +1072,41 @@
     });
 }
 
+<span class='kw'>extern</span> <span class='kw'>fn</span> <span class='ident'>notify_cb</span>(<span class='ident'>why</span>: <span class='ident'>raw</span>::<span class='ident'>git_checkout_notify_t</span>,
+                    <span class='ident'>path</span>: <span class='op'>*</span><span class='kw'>const</span> <span class='ident'>c_char</span>,
+                    <span class='ident'>baseline</span>: <span class='op'>*</span><span class='kw'>const</span> <span class='ident'>raw</span>::<span class='ident'>git_diff_file</span>,
+                    <span class='ident'>target</span>: <span class='op'>*</span><span class='kw'>const</span> <span class='ident'>raw</span>::<span class='ident'>git_diff_file</span>,
+                    <span class='ident'>workdir</span>: <span class='op'>*</span><span class='kw'>const</span> <span class='ident'>raw</span>::<span class='ident'>git_diff_file</span>,
+                    <span class='ident'>data</span>: <span class='op'>*</span><span class='kw-2'>mut</span> <span class='ident'>c_void</span>) <span class='op'>-&gt;</span> <span class='ident'>c_int</span> {
+    <span class='comment'>// pack callback etc</span>
+    <span class='ident'>panic</span>::<span class='ident'>wrap</span>(<span class='op'>||</span> <span class='kw'>unsafe</span> {
+        <span class='kw'>let</span> <span class='ident'>payload</span> <span class='op'>=</span> <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='op'>*</span>(<span class='ident'>data</span> <span class='kw'>as</span> <span class='op'>*</span><span class='kw-2'>mut</span> <span class='ident'>CheckoutBuilder</span>);
+        <span class='kw'>let</span> <span class='ident'>callback</span> <span class='op'>=</span> <span class='kw'>match</span> <span class='ident'>payload</span>.<span class='ident'>notify</span> {
+            <span class='prelude-val'>Some</span>(<span class='kw-2'>ref</span> <span class='kw-2'>mut</span> <span class='ident'>c</span>) <span class='op'>=&gt;</span> <span class='ident'>c</span>,
+            <span class='prelude-val'>None</span> <span class='op'>=&gt;</span> <span class='kw'>return</span> <span class='number'>0</span>,
+        };
+        <span class='kw'>let</span> <span class='ident'>path</span> <span class='op'>=</span> <span class='kw'>if</span> <span class='ident'>path</span>.<span class='ident'>is_null</span>() {
+            <span class='prelude-val'>None</span>
+        } <span class='kw'>else</span> {
+            <span class='prelude-val'>Some</span>(<span class='ident'>util</span>::<span class='ident'>bytes2path</span>(<span class='ident'>CStr</span>::<span class='ident'>from_ptr</span>(<span class='ident'>path</span>).<span class='ident'>to_bytes</span>()))
+        };
+
+        <span class='kw'>let</span> <span class='ident'>why</span> <span class='op'>=</span> <span class='ident'>CheckoutNotificationType</span>::<span class='ident'>from_bits_truncate</span>(<span class='ident'>why</span> <span class='kw'>as</span> <span class='ident'>u32</span>);
+        <span class='kw'>let</span> <span class='ident'>keep_going</span> <span class='op'>=</span> <span class='ident'>callback</span>(<span class='ident'>why</span>,
+                                  <span class='ident'>path</span>,
+                                  <span class='ident'>DiffFile</span>::<span class='ident'>from_raw</span>(<span class='ident'>baseline</span>),
+                                  <span class='ident'>DiffFile</span>::<span class='ident'>from_raw</span>(<span class='ident'>target</span>),
+                                  <span class='ident'>DiffFile</span>::<span class='ident'>from_raw</span>(<span class='ident'>workdir</span>));
+        <span class='kw'>if</span> <span class='ident'>keep_going</span> {<span class='number'>0</span>} <span class='kw'>else</span> {<span class='number'>1</span>}
+    }).<span class='ident'>unwrap_or</span>(<span class='number'>2</span>)
+}
+
 <span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>test</span>)]</span>
 <span class='kw'>mod</span> <span class='ident'>tests</span> {
     <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>fs</span>;
     <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>path</span>::<span class='ident'>Path</span>;
     <span class='kw'>use</span> <span class='ident'>tempdir</span>::<span class='ident'>TempDir</span>;
-    <span class='kw'>use</span> <span class='ident'>super</span>::<span class='ident'>RepoBuilder</span>;
+    <span class='kw'>use</span> <span class='kw'>super</span>::<span class='ident'>RepoBuilder</span>;
     <span class='kw'>use</span> <span class='ident'>Repository</span>;
 
     <span class='attribute'>#[<span class='ident'>test</span>]</span>
@@ -971,9 +1129,9 @@
         <span class='kw'>let</span> <span class='ident'>dst</span> <span class='op'>=</span> <span class='ident'>td</span>.<span class='ident'>path</span>().<span class='ident'>join</span>(<span class='string'>&quot;foo&quot;</span>);
         <span class='ident'>RepoBuilder</span>::<span class='ident'>new</span>().<span class='ident'>clone</span>(<span class='kw-2'>&amp;</span><span class='ident'>url</span>, <span class='kw-2'>&amp;</span><span class='ident'>dst</span>).<span class='ident'>unwrap</span>();
         <span class='ident'>fs</span>::<span class='ident'>remove_dir_all</span>(<span class='kw-2'>&amp;</span><span class='ident'>dst</span>).<span class='ident'>unwrap</span>();
-        <span class='ident'>RepoBuilder</span>::<span class='ident'>new</span>().<span class='ident'>local</span>(<span class='boolval'>false</span>).<span class='ident'>clone</span>(<span class='kw-2'>&amp;</span><span class='ident'>url</span>, <span class='kw-2'>&amp;</span><span class='ident'>dst</span>).<span class='ident'>unwrap</span>();
+        <span class='ident'>RepoBuilder</span>::<span class='ident'>new</span>().<span class='ident'>local</span>(<span class='bool-val'>false</span>).<span class='ident'>clone</span>(<span class='kw-2'>&amp;</span><span class='ident'>url</span>, <span class='kw-2'>&amp;</span><span class='ident'>dst</span>).<span class='ident'>unwrap</span>();
         <span class='ident'>fs</span>::<span class='ident'>remove_dir_all</span>(<span class='kw-2'>&amp;</span><span class='ident'>dst</span>).<span class='ident'>unwrap</span>();
-        <span class='ident'>RepoBuilder</span>::<span class='ident'>new</span>().<span class='ident'>local</span>(<span class='boolval'>false</span>).<span class='ident'>hardlinks</span>(<span class='boolval'>false</span>).<span class='ident'>bare</span>(<span class='boolval'>true</span>)
+        <span class='ident'>RepoBuilder</span>::<span class='ident'>new</span>().<span class='ident'>local</span>(<span class='bool-val'>false</span>).<span class='ident'>hardlinks</span>(<span class='bool-val'>false</span>).<span class='ident'>bare</span>(<span class='bool-val'>true</span>)
                           .<span class='ident'>clone</span>(<span class='kw-2'>&amp;</span><span class='ident'>url</span>, <span class='kw-2'>&amp;</span><span class='ident'>dst</span>).<span class='ident'>unwrap</span>();
         <span class='ident'>fs</span>::<span class='ident'>remove_dir_all</span>(<span class='kw-2'>&amp;</span><span class='ident'>dst</span>).<span class='ident'>unwrap</span>();
         <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>RepoBuilder</span>::<span class='ident'>new</span>().<span class='ident'>branch</span>(<span class='string'>&quot;foo&quot;</span>)
@@ -1005,6 +1163,8 @@
                     <dd>Move down in search results</dd>
                     <dt>&#9166;</dt>
                     <dd>Go to active search result</dd>
+                    <dt>+</dt>
+                    <dd>Collapse/expand all sections</dd>
                 </dl>
             </div>
 

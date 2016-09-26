@@ -47,7 +47,7 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-0' class='srclink' href='../src/enum_derive/lib.rs.html#1-735' title='goto source code'>[src]</a></span></h1>
+               </span><a id='src-0' class='srclink' href='../src/enum_derive/lib.rs.html#10-968' title='goto source code'>[src]</a></span></h1>
 <div class='docblock'><p>This crate provides several macros for deriving some useful methods for unitary enums (<em>i.e.</em> enums where variants do not have payloads).</p>
 
 <p>All of these macros are designed to be used with the <a href="https://crates.io/crates/custom_derive"><code>custom_derive</code></a> crate, though they can be used independent of it.</p>
@@ -76,7 +76,7 @@
     (<span class='ident'>Candy</span>::<span class='ident'>FruitRock</span>, <span class='string'>&quot;FruitRock&quot;</span>),
     (<span class='ident'>Candy</span>::<span class='ident'>BoPeeps</span>, <span class='string'>&quot;BoPeeps&quot;</span>),
     (<span class='ident'>Candy</span>::<span class='ident'>LemonSherbert</span>, <span class='string'>&quot;LemonSherbert&quot;</span>),
-]);</pre>
+]);<a class='test-arrow' target='_blank' href=''>Run</a></pre>
 
 <p>Alternately, derive <code>next_variant</code> and <code>prev_variant</code> methods.</p>
 
@@ -97,7 +97,7 @@
 
 <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>Sakigami</span>.<span class='ident'>prev_variant</span>(), <span class='prelude-val'>None</span>);
 <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>Hasugami</span>.<span class='ident'>prev_variant</span>(), <span class='prelude-val'>Some</span>(<span class='ident'>Sakigami</span>));
-<span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>Tsutagami</span>.<span class='ident'>prev_variant</span>(), <span class='prelude-val'>Some</span>(<span class='ident'>Hasugami</span>));</pre>
+<span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>Tsutagami</span>.<span class='ident'>prev_variant</span>(), <span class='prelude-val'>Some</span>(<span class='ident'>Hasugami</span>));<a class='test-arrow' target='_blank' href=''>Run</a></pre>
 
 <h1 id='overview' class='section-header'><a href='#overview'>Overview</a></h1>
 <p>This crate provides macros to derive the following methods for unitary variant enums:</p>
@@ -109,6 +109,8 @@
 <li><code>IterVariantNames</code> derives <code>iter_variant_names()</code>, which returns an iterator over the string names of the variants of the enum in lexical order.</li>
 <li><code>NextVariant</code> derives <code>next_variant(&amp;self)</code>, which returns the next variant, or <code>None</code> when called for the last.</li>
 <li><code>PrevVariant</code> derives <code>prev_variant(&amp;self)</code>, which returns the previous variant, or <code>None</code> when called for the first.</li>
+<li><code>EnumFromInner</code> derives <code>From&lt;T&gt;</code> for each variant&#39;s payload, assuming all variants are unary.</li>
+<li><code>EnumInnerAsTrait</code> derives a method to return a borrowed pointer to the inner value, cast to a trait object.</li>
 </ul>
 
 <p>Both of the <code>IterVariant*</code> macros accept a single deriving form.  Taking <code>IterVariants</code> as an example, it must be invoked like so:</p>
@@ -117,9 +119,23 @@
 <span class='macro'>custom_derive</span><span class='macro'>!</span> {
     <span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>IterVariants</span>(<span class='ident'>GetVariants</span>))]</span>
     <span class='kw'>pub</span> <span class='kw'>enum</span> <span class='ident'>Get</span> { <span class='ident'>Up</span>, <span class='ident'>Down</span>, <span class='ident'>AllAround</span> }
-}</pre>
+}<a class='test-arrow' target='_blank' href=''>Run</a></pre>
 
 <p>The argument is the name of the iterator type that will be generated.  Neither macro imposes any naming requirements, save the obvious: the name must not conflict with any other types.</p>
+
+<p><code>EnumInnerAsTrait</code> accepts a single deriving form that specifies the name of the method to be derived, whether the borrow should be mutable, and the trait of interest.  For example:</p>
+
+<pre class='rust rust-example-rendered'>
+<span class='macro'>custom_derive</span><span class='macro'>!</span> {
+    <span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>EnumInnerAsTrait</span>(<span class='kw'>pub</span> <span class='ident'>as_display</span> <span class='op'>-&gt;</span> <span class='kw-2'>&amp;</span><span class='ident'>std</span>::<span class='ident'>fmt</span>::<span class='ident'>Display</span>))]</span>
+    <span class='kw'>enum</span> <span class='ident'>Value</span> {
+        <span class='ident'>U32</span>(<span class='ident'>u32</span>),
+        <span class='ident'>U64</span>(<span class='ident'>u64</span>),
+    }
+}
+
+<span class='kw'>let</span> <span class='ident'>s</span> <span class='op'>=</span> <span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;{}&quot;</span>, <span class='ident'>Value</span>::<span class='ident'>U64</span>(<span class='number'>42</span>).<span class='ident'>as_display</span>());
+<span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='kw-2'>&amp;</span><span class='ident'>s</span>[..], <span class='string'>&quot;42&quot;</span>);<a class='test-arrow' target='_blank' href=''>Run</a></pre>
 
 <p>The other macros take no arguments.</p>
 
@@ -132,7 +148,7 @@
 <span class='macro'>custom_derive</span><span class='macro'>!</span> {
     <span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Copy</span>, <span class='ident'>Clone</span>, <span class='ident'>Debug</span>, <span class='ident'>IterVariants</span>(<span class='ident'>Vars</span>))]</span>
     <span class='kw'>enum</span> <span class='ident'>ItAintRight</span> { <span class='ident'>BabeNo</span>, <span class='ident'>NoNo</span>, <span class='ident'>BoyBoy</span> }
-}</pre>
+}<a class='test-arrow' target='_blank' href=''>Run</a></pre>
 
 <p>Can also be written as:</p>
 
@@ -140,7 +156,7 @@
 <span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Copy</span>, <span class='ident'>Clone</span>, <span class='ident'>Debug</span>)]</span>
 <span class='kw'>enum</span> <span class='ident'>ItAintRight</span> { <span class='ident'>BabeNo</span>, <span class='ident'>NoNo</span>, <span class='ident'>BoyBoy</span> }
 
-<span class='macro'>IterVariants</span><span class='macro'>!</span> { (<span class='ident'>Vars</span>) <span class='kw'>enum</span> <span class='ident'>ItAintRight</span> { <span class='ident'>BabeNo</span>, <span class='ident'>NoNo</span>, <span class='ident'>BoyBoy</span> } }</pre>
+<span class='macro'>IterVariants</span><span class='macro'>!</span> { (<span class='ident'>Vars</span>) <span class='kw'>enum</span> <span class='ident'>ItAintRight</span> { <span class='ident'>BabeNo</span>, <span class='ident'>NoNo</span>, <span class='ident'>BoyBoy</span> } }<a class='test-arrow' target='_blank' href=''>Run</a></pre>
 
 <h2 id='other-examples' class='section-header'><a href='#other-examples'>Other Examples</a></h2>
 <p>This shows how to use <code>Display</code> and <code>FromStr</code> to perform string round-tripping of enums.</p>
@@ -199,48 +215,62 @@
 <span class='kw'>let</span> <span class='ident'>number</span> <span class='op'>=</span> <span class='number'>42</span>;
 <span class='kw'>let</span> <span class='ident'>troll_number</span> <span class='op'>=</span> <span class='ident'>to_troll</span>(<span class='ident'>number</span>);
 <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>troll_number</span>, <span class='string'>&quot;Lots Lots Many Many Two&quot;</span>);
-<span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>from_troll</span>(<span class='kw-2'>&amp;</span><span class='ident'>troll_number</span>), <span class='prelude-val'>Ok</span>(<span class='ident'>number</span>));</pre>
+<span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>from_troll</span>(<span class='kw-2'>&amp;</span><span class='ident'>troll_number</span>), <span class='prelude-val'>Ok</span>(<span class='ident'>number</span>));<a class='test-arrow' target='_blank' href=''>Run</a></pre>
 </div><h2 id='macros' class='section-header'><a href="#macros">Macros</a></h2>
 <table>
                        <tr class=' module-item'>
-                           <td><a class='macro' href='macro.EnumDisplay!.html'
-                                  title='enum_derive::EnumDisplay!'>EnumDisplay!</a></td>
-                           <td class='docblock short'>
+                           <td><a class='macro' href='macro.EnumDisplay.html'
+                                  title='enum_derive::EnumDisplay'>EnumDisplay</a></td>
+                           <td class='docblock-short'>
                                 
                            </td>
                        </tr>
                        <tr class=' module-item'>
-                           <td><a class='macro' href='macro.EnumFromStr!.html'
-                                  title='enum_derive::EnumFromStr!'>EnumFromStr!</a></td>
-                           <td class='docblock short'>
+                           <td><a class='macro' href='macro.EnumFromInner.html'
+                                  title='enum_derive::EnumFromInner'>EnumFromInner</a></td>
+                           <td class='docblock-short'>
                                 
                            </td>
                        </tr>
                        <tr class=' module-item'>
-                           <td><a class='macro' href='macro.IterVariantNames!.html'
-                                  title='enum_derive::IterVariantNames!'>IterVariantNames!</a></td>
-                           <td class='docblock short'>
+                           <td><a class='macro' href='macro.EnumFromStr.html'
+                                  title='enum_derive::EnumFromStr'>EnumFromStr</a></td>
+                           <td class='docblock-short'>
                                 
                            </td>
                        </tr>
                        <tr class=' module-item'>
-                           <td><a class='macro' href='macro.IterVariants!.html'
-                                  title='enum_derive::IterVariants!'>IterVariants!</a></td>
-                           <td class='docblock short'>
+                           <td><a class='macro' href='macro.EnumInnerAsTrait.html'
+                                  title='enum_derive::EnumInnerAsTrait'>EnumInnerAsTrait</a></td>
+                           <td class='docblock-short'>
                                 
                            </td>
                        </tr>
                        <tr class=' module-item'>
-                           <td><a class='macro' href='macro.NextVariant!.html'
-                                  title='enum_derive::NextVariant!'>NextVariant!</a></td>
-                           <td class='docblock short'>
+                           <td><a class='macro' href='macro.IterVariantNames.html'
+                                  title='enum_derive::IterVariantNames'>IterVariantNames</a></td>
+                           <td class='docblock-short'>
                                 
                            </td>
                        </tr>
                        <tr class=' module-item'>
-                           <td><a class='macro' href='macro.PrevVariant!.html'
-                                  title='enum_derive::PrevVariant!'>PrevVariant!</a></td>
-                           <td class='docblock short'>
+                           <td><a class='macro' href='macro.IterVariants.html'
+                                  title='enum_derive::IterVariants'>IterVariants</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class='macro' href='macro.NextVariant.html'
+                                  title='enum_derive::NextVariant'>NextVariant</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class='macro' href='macro.PrevVariant.html'
+                                  title='enum_derive::PrevVariant'>PrevVariant</a></td>
+                           <td class='docblock-short'>
                                 
                            </td>
                        </tr></table><h2 id='structs' class='section-header'><a href="#structs">Structs</a></h2>
@@ -248,7 +278,7 @@
                        <tr class=' module-item'>
                            <td><a class='struct' href='struct.ParseEnumError.html'
                                   title='enum_derive::ParseEnumError'>ParseEnumError</a></td>
-                           <td class='docblock short'>
+                           <td class='docblock-short'>
                                 <p>This is the error type used for derived implementations of <code>FromStr</code> for unitary enums.</p>
                            </td>
                        </tr></table></section>
@@ -274,6 +304,8 @@
                     <dd>Move down in search results</dd>
                     <dt>&#9166;</dt>
                     <dd>Go to active search result</dd>
+                    <dt>+</dt>
+                    <dd>Collapse/expand all sections</dd>
                 </dl>
             </div>
 

@@ -1,1 +1,1 @@
-initSidebarItems({"fn":[["canceled",""],["date",""],["format",""],["manager",""],["name",""],["validate",""]]});
+initSidebarItems({"fn":[["canceled","Returns the content of `/canceled`"],["date","Wrapper for `super::date::date()`"],["format","Returns the content of `/format`"],["manager","Returns the content of `/manager` or..."],["name","Returns the content of `/event/name` or..."],["validate","Validates if all of the functions in this module return `Some(_)`"]]});

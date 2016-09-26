@@ -47,7 +47,7 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-1870' class='srclink' href='../../src/asciii/src/templater.rs.html#18-42' title='goto source code'>[src]</a></span></h1>
+               </span><a id='src-2778' class='srclink' href='../../src/asciii/src/templater.rs.html#18-42' title='goto source code'>[src]</a></span></h1>
 <pre class='rust trait'>pub trait IsKeyword {
     fn <a href='#tymethod.is_keyword' class='fnname'>is_keyword</a>(&amp;self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a>;
     fn <a href='#tymethod.get_keyword' class='fnname'>get_keyword</a>(&amp;self) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>&gt;;
@@ -60,10 +60,10 @@ Here it is implemented for <code>Deref&lt;Target=str&gt;</code>.</p>
 </div>
             <h2 id='required-methods'>Required Methods</h2>
             <div class='methods'>
-        <h3 id='tymethod.is_keyword' class='method stab '><code>fn <a href='#tymethod.is_keyword' class='fnname'>is_keyword</a>(&amp;self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></code></h3><div class='docblock'><p>Checks if the whole string is a keyword</p>
-</div><h3 id='tymethod.get_keyword' class='method stab '><code>fn <a href='#tymethod.get_keyword' class='fnname'>get_keyword</a>(&amp;self) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>&gt;</code></h3><div class='docblock'><p>Captures keywords from string.</p>
-</div><h3 id='tymethod.list_keywords' class='method stab '><code>fn <a href='#tymethod.list_keywords' class='fnname'>list_keywords</a>(&amp;self) -&gt; <a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>&gt;</code></h3><div class='docblock'><p>Well, it lists the keywords in a string, duh!</p>
-</div><h3 id='tymethod.map_keywords' class='method stab '><code>fn <a href='#tymethod.map_keywords' class='fnname'>map_keywords</a>&lt;F&gt;(&amp;self, closure: F) -&gt; <a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a> <span class='where'>where F: <a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.Fn.html' title='core::ops::Fn'>Fn</a>(&amp;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>) -&gt; <a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a></span></code></h3><div class='docblock'><p>This one is usefull.</p>
+        <h3 id='tymethod.is_keyword' class='method stab '><span id='is_keyword.v' class='invisible'><code>fn <a href='#tymethod.is_keyword' class='fnname'>is_keyword</a>(&amp;self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></code></span></h3><div class='docblock'><p>Checks if the whole string is a keyword</p>
+</div><h3 id='tymethod.get_keyword' class='method stab '><span id='get_keyword.v' class='invisible'><code>fn <a href='#tymethod.get_keyword' class='fnname'>get_keyword</a>(&amp;self) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>&gt;</code></span></h3><div class='docblock'><p>Captures keywords from string.</p>
+</div><h3 id='tymethod.list_keywords' class='method stab '><span id='list_keywords.v' class='invisible'><code>fn <a href='#tymethod.list_keywords' class='fnname'>list_keywords</a>(&amp;self) -&gt; <a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>&gt;</code></span></h3><div class='docblock'><p>Well, it lists the keywords in a string, duh!</p>
+</div><h3 id='tymethod.map_keywords' class='method stab '><span id='map_keywords.v' class='invisible'><code>fn <a href='#tymethod.map_keywords' class='fnname'>map_keywords</a>&lt;F&gt;(&amp;self, closure: F) -&gt; <a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a> <span class='where'>where F: <a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.Fn.html' title='core::ops::Fn'>Fn</a>(&amp;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>) -&gt; <a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a></span></code></span></h3><div class='docblock'><p>This one is usefull.</p>
 
 <p>Takes a clorsure that replaces keywords.
 <strong>Careful</strong>, this replaces either way!
@@ -75,11 +75,12 @@ please place it back where you got it from.</p>
 .<span class='ident'>map_keywords</span><span class='op'>|</span><span class='ident'>keyword</span><span class='op'>|</span> <span class='kw'>match</span> <span class='ident'>data</span>.<span class='ident'>get</span>(<span class='ident'>keyword</span>){
     <span class='prelude-val'>Some</span>(<span class='ident'>content</span>) <span class='op'>=&gt;</span> <span class='ident'>String</span>::<span class='ident'>from</span>(<span class='op'>*</span><span class='ident'>content</span>),
     <span class='prelude-val'>None</span> <span class='op'>=&gt;</span> <span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;__{}__&quot;</span>, <span class='ident'>keyword</span>)
-}</pre>
+}<a class='test-arrow' target='_blank' href=''>Run</a></pre>
 </div></div>
         <h2 id='implementors'>Implementors</h2>
         <ul class='item-list' id='implementors-list'>
-    </ul><script type="text/javascript" async
+    <li><code>impl&lt;U:&nbsp;<a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.Deref.html' title='core::ops::Deref'>Deref</a>&lt;Target=<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>&gt;&gt; IsKeyword for U</code></li>
+</ul><script type="text/javascript" async
                          src="../../implementors/asciii/templater/trait.IsKeyword.js">
                  </script></section>
     <section id='search' class="content hidden"></section>
@@ -104,6 +105,8 @@ please place it back where you got it from.</p>
                     <dd>Move down in search results</dd>
                     <dt>&#9166;</dt>
                     <dd>Go to active search result</dd>
+                    <dt>+</dt>
+                    <dd>Collapse/expand all sections</dd>
                 </dl>
             </div>
 

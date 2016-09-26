@@ -47,21 +47,20 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-2587' class='srclink' href='../src/git2/describe.rs.html#24-27' title='goto source code'>[src]</a></span></h1>
-<pre class='rust struct'>pub struct DescribeFormatOptions {
-    // some fields omitted
-}</pre><div class='docblock'><p>Options which can be used to customize how a description is formatted.</p>
-</div><h2 id='methods'>Methods</h2><h3 class='impl'><code>impl <a class='struct' href='../git2/struct.DescribeFormatOptions.html' title='git2::DescribeFormatOptions'>DescribeFormatOptions</a></code></h3><div class='impl-items'><h4 id='method.new' class='method'><code>fn <a href='#method.new' class='fnname'>new</a>() -&gt; <a class='struct' href='../git2/struct.DescribeFormatOptions.html' title='git2::DescribeFormatOptions'>DescribeFormatOptions</a></code></h4>
+               </span><a id='src-2871' class='srclink' href='../src/git2/describe.rs.html#24-27' title='goto source code'>[src]</a></span></h1>
+<pre class='rust struct'>pub struct DescribeFormatOptions { /* fields omitted */ }</pre><div class='docblock'><p>Options which can be used to customize how a description is formatted.</p>
+</div><h2 id='methods'>Methods</h2><h3 class='impl'><span class='in-band'><code>impl <a class='struct' href='../git2/struct.DescribeFormatOptions.html' title='git2::DescribeFormatOptions'>DescribeFormatOptions</a></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-2896' class='srclink' href='../src/git2/describe.rs.html#57-92' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.new' class='method'><span id='new.v' class='invisible'><code>fn <a href='#method.new' class='fnname'>new</a>() -&gt; <a class='struct' href='../git2/struct.DescribeFormatOptions.html' title='git2::DescribeFormatOptions'>DescribeFormatOptions</a></code></span></h4>
 <div class='docblock'><p>Creates a new blank set of formatting options for a description.</p>
-</div><h4 id='method.abbreviated_size' class='method'><code>fn <a href='#method.abbreviated_size' class='fnname'>abbreviated_size</a>(&amp;mut self, size: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u32.html'>u32</a>) -&gt; &amp;mut Self</code></h4>
+</div><h4 id='method.abbreviated_size' class='method'><span id='abbreviated_size.v' class='invisible'><code>fn <a href='#method.abbreviated_size' class='fnname'>abbreviated_size</a>(&amp;mut self, size: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u32.html'>u32</a>) -&gt; &amp;mut Self</code></span></h4>
 <div class='docblock'><p>Sets the size of the abbreviated commit id to use.</p>
 
 <p>The value is the lower bound for the length of the abbreviated string,
 and the default is 7.</p>
-</div><h4 id='method.always_use_long_format' class='method'><code>fn <a href='#method.always_use_long_format' class='fnname'>always_use_long_format</a>(&amp;mut self, long: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a>) -&gt; &amp;mut Self</code></h4>
+</div><h4 id='method.always_use_long_format' class='method'><span id='always_use_long_format.v' class='invisible'><code>fn <a href='#method.always_use_long_format' class='fnname'>always_use_long_format</a>(&amp;mut self, long: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a>) -&gt; &amp;mut Self</code></span></h4>
 <div class='docblock'><p>Sets whether or not the long format is used even when a shorter name
 could be used.</p>
-</div><h4 id='method.dirty_suffix' class='method'><code>fn <a href='#method.dirty_suffix' class='fnname'>dirty_suffix</a>(&amp;mut self, suffix: &amp;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>) -&gt; &amp;mut Self</code></h4>
+</div><h4 id='method.dirty_suffix' class='method'><span id='dirty_suffix.v' class='invisible'><code>fn <a href='#method.dirty_suffix' class='fnname'>dirty_suffix</a>(&amp;mut self, suffix: &amp;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>) -&gt; &amp;mut Self</code></span></h4>
 <div class='docblock'><p>If the workdir is dirty and this is set, this string will be appended to
 the description string.</p>
 </div></div></section>
@@ -87,6 +86,8 @@ the description string.</p>
                     <dd>Move down in search results</dd>
                     <dt>&#9166;</dt>
                     <dd>Go to active search result</dd>
+                    <dt>+</dt>
+                    <dd>Collapse/expand all sections</dd>
                 </dl>
             </div>
 

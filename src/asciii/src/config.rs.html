@@ -181,8 +181,6 @@
 <span id="137">137</span>
 <span id="138">138</span>
 <span id="139">139</span>
-<span id="140">140</span>
-<span id="141">141</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! Handles config files and default config.</span>
 <span class='doccomment'>//!</span>
@@ -225,8 +223,7 @@
     }
 
     <span class='doccomment'>/// Opens config from `self.path()` and parses Yaml right away.</span>
-    <span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>feature</span> <span class='op'>=</span> <span class='string'>&quot;debug_config&quot;</span>)]</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>new</span> () <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>ConfigReader</span>, <span class='ident'>YamlError</span><span class='op'>&gt;</span> {
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>new</span>() <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>ConfigReader</span>, <span class='ident'>YamlError</span><span class='op'>&gt;</span> {
         <span class='kw'>let</span> <span class='ident'>path</span> <span class='op'>=</span> <span class='ident'>ConfigReader</span>::<span class='ident'>path_home</span>();
         <span class='kw'>let</span> <span class='ident'>config</span> <span class='op'>=</span> <span class='prelude-val'>Ok</span>(<span class='ident'>ConfigReader</span>{
             <span class='ident'>path</span>: <span class='ident'>path</span>.<span class='ident'>to_owned</span>(),
@@ -235,29 +232,11 @@
             <span class='ident'>local</span>:  <span class='ident'>yaml</span>::<span class='ident'>open</span>(<span class='ident'>Path</span>::<span class='ident'>new</span>(<span class='kw-2'>&amp;</span><span class='ident'>DEFAULT_LOCATION</span>)).<span class='ident'>unwrap_or</span>(<span class='ident'>Yaml</span>::<span class='ident'>Null</span>)
         });
 
-        <span class='macro'>println</span><span class='macro'>!</span>(<span class='string'>&quot;CONFIG_DEBUG\n  {default_path:?} exists: {default_exists}\n  {local_path:?} exists: {local_exists}&quot;</span>,
-                 <span class='ident'>default_path</span> <span class='op'>=</span> <span class='ident'>path</span>,
-                 <span class='ident'>default_exists</span><span class='op'>=</span> <span class='ident'>path</span>.<span class='ident'>exists</span>(),
-                 <span class='ident'>local_path</span> <span class='op'>=</span> <span class='ident'>DEFAULT_LOCATION</span>,
-                 <span class='ident'>local_exists</span> <span class='op'>=</span> <span class='ident'>Path</span>::<span class='ident'>new</span>(<span class='kw-2'>&amp;</span><span class='ident'>DEFAULT_LOCATION</span>).<span class='ident'>exists</span>(),
-                 );
+        <span class='macro'>trace</span><span class='macro'>!</span>(<span class='string'>&quot;{default_path:?} exists={default_exists}&quot;</span>, <span class='ident'>default_path</span> <span class='op'>=</span> <span class='ident'>path</span>, <span class='ident'>default_exists</span><span class='op'>=</span> <span class='ident'>path</span>.<span class='ident'>exists</span>());
+        <span class='macro'>trace</span><span class='macro'>!</span>(<span class='string'>&quot;local config: {local_path:?} exists={local_exists}&quot;</span>, <span class='ident'>local_path</span> <span class='op'>=</span> <span class='ident'>DEFAULT_LOCATION</span>, <span class='ident'>local_exists</span> <span class='op'>=</span> <span class='ident'>Path</span>::<span class='ident'>new</span>(<span class='kw-2'>&amp;</span><span class='ident'>DEFAULT_LOCATION</span>).<span class='ident'>exists</span>());
 
         <span class='ident'>config</span>
     }
-
-    <span class='doccomment'>/// Opens config from `self.path()` and parses Yaml right away.</span>
-    <span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>not</span>(<span class='ident'>feature</span> <span class='op'>=</span> <span class='string'>&quot;debug_config&quot;</span>))]</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>new</span> () <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>ConfigReader</span>, <span class='ident'>YamlError</span><span class='op'>&gt;</span> {
-        <span class='kw'>let</span> <span class='ident'>path</span> <span class='op'>=</span> <span class='ident'>ConfigReader</span>::<span class='ident'>path_home</span>();
-        <span class='prelude-val'>Ok</span>(<span class='ident'>ConfigReader</span>{
-            <span class='ident'>path</span>: <span class='ident'>path</span>.<span class='ident'>to_owned</span>(),
-            <span class='ident'>defaults</span>: <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>yaml</span>::<span class='ident'>parse</span>(<span class='kw-2'>&amp;</span><span class='ident'>DEFAULT_CONFIG</span>)),
-            <span class='ident'>custom</span>: <span class='ident'>yaml</span>::<span class='ident'>open</span>(<span class='kw-2'>&amp;</span><span class='ident'>path</span>).<span class='ident'>unwrap_or</span>(<span class='ident'>Yaml</span>::<span class='ident'>Null</span>),
-            <span class='ident'>local</span>:  <span class='ident'>yaml</span>::<span class='ident'>open</span>(<span class='ident'>Path</span>::<span class='ident'>new</span>(<span class='kw-2'>&amp;</span><span class='ident'>DEFAULT_LOCATION</span>)).<span class='ident'>unwrap_or</span>(<span class='ident'>Yaml</span>::<span class='ident'>Null</span>)
-        })
-    }
-
-
 
     <span class='doccomment'>/// Returns whatever it finds in that position</span>
     <span class='doccomment'>///</span>
@@ -266,6 +245,15 @@
         <span class='ident'>yaml</span>::<span class='ident'>get</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>local</span>, <span class='ident'>path</span>)
             .<span class='ident'>or_else</span>(<span class='op'>||</span><span class='ident'>yaml</span>::<span class='ident'>get</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>custom</span>, <span class='ident'>path</span>))
             .<span class='ident'>or_else</span>(<span class='op'>||</span><span class='ident'>yaml</span>::<span class='ident'>get</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>defaults</span>, <span class='ident'>path</span>))
+    }
+
+    <span class='doccomment'>/// Returns the first character.</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// # Panics</span>
+    <span class='doccomment'>/// This panics if nothing is found.</span>
+    <span class='doccomment'>/// You should have a default config for everything that you use.</span>
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>get_char</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>key</span>:<span class='kw-2'>&amp;</span><span class='ident'>str</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>char</span><span class='op'>&gt;</span> {
+        <span class='self'>self</span>.<span class='ident'>get_str</span>(<span class='ident'>key</span>).<span class='ident'>and_then</span>(<span class='op'>|</span><span class='ident'>s</span><span class='op'>|</span><span class='ident'>s</span>.<span class='ident'>chars</span>().<span class='ident'>nth</span>(<span class='number'>0</span>))
     }
 
     <span class='doccomment'>/// Returns the string in the position or an empty string</span>
@@ -285,10 +273,18 @@
     <span class='doccomment'>/// # Panics</span>
     <span class='doccomment'>/// This panics if nothing is found.</span>
     <span class='doccomment'>/// You should have a default config for everything that you use.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>get_as_string</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>key</span>:<span class='kw-2'>&amp;</span><span class='ident'>str</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>String</span><span class='op'>&gt;</span>{
-        <span class='ident'>yaml</span>::<span class='ident'>get_as_string</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>local</span>, <span class='ident'>key</span>)
-            .<span class='ident'>or_else</span>(<span class='op'>||</span><span class='ident'>yaml</span>::<span class='ident'>get_as_string</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>custom</span>, <span class='ident'>key</span>))
-            .<span class='ident'>or_else</span>(<span class='op'>||</span><span class='ident'>yaml</span>::<span class='ident'>get_as_string</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>defaults</span>, <span class='ident'>key</span>))
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>get_to_string</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>key</span>:<span class='kw-2'>&amp;</span><span class='ident'>str</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>String</span><span class='op'>&gt;</span>{
+        <span class='ident'>yaml</span>::<span class='ident'>get_to_string</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>local</span>, <span class='ident'>key</span>)
+            .<span class='ident'>or_else</span>(<span class='op'>||</span><span class='ident'>yaml</span>::<span class='ident'>get_to_string</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>custom</span>, <span class='ident'>key</span>))
+            .<span class='ident'>or_else</span>(<span class='op'>||</span><span class='ident'>yaml</span>::<span class='ident'>get_to_string</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>defaults</span>, <span class='ident'>key</span>))
+            <span class='comment'>//.expect(&amp;format!(&quot;Config file {} in field {} does not contain a value&quot;, DEFAULT_LOCATION, key))</span>
+    }
+
+    <span class='doccomment'>/// Tries to get the config field as float</span>
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>get_f64</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>key</span>:<span class='kw-2'>&amp;</span><span class='ident'>str</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>{
+        <span class='ident'>yaml</span>::<span class='ident'>get_f64</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>local</span>, <span class='ident'>key</span>)
+            .<span class='ident'>or_else</span>(<span class='op'>||</span><span class='ident'>yaml</span>::<span class='ident'>get_f64</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>custom</span>, <span class='ident'>key</span>))
+            .<span class='ident'>or_else</span>(<span class='op'>||</span><span class='ident'>yaml</span>::<span class='ident'>get_f64</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>defaults</span>, <span class='ident'>key</span>))
             <span class='comment'>//.expect(&amp;format!(&quot;Config file {} in field {} does not contain a value&quot;, DEFAULT_LOCATION, key))</span>
     }
 
@@ -349,6 +345,8 @@
                     <dd>Move down in search results</dd>
                     <dt>&#9166;</dt>
                     <dd>Go to active search result</dd>
+                    <dt>+</dt>
+                    <dd>Collapse/expand all sections</dd>
                 </dl>
             </div>
 

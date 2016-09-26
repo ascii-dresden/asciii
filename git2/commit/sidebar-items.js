@@ -1,1 +1,0 @@
-initSidebarItems({"struct":[["Commit","A structure to represent a git [commit][1]"],["Parents","An iterator over the parent commits of a commit."]]});

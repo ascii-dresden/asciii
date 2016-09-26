@@ -47,7 +47,7 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-188' class='srclink' href='../src/libgit2_sys/lib.rs.html#234-245' title='goto source code'>[src]</a></span></h1>
+               </span><a id='src-190' class='srclink' href='../src/libgit2_sys/lib.rs.html#235-246' title='goto source code'>[src]</a></span></h1>
 <pre class='rust struct'>pub struct git_clone_options {
     pub version: <a class='type' href='../libc/type.c_uint.html' title='libc::c_uint'>c_uint</a>,
     pub checkout_opts: <a class='struct' href='../libgit2_sys/struct.git_checkout_options.html' title='libgit2_sys::git_checkout_options'>git_checkout_options</a>,
@@ -59,18 +59,37 @@
     pub repository_cb_payload: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.pointer.html'>*mut </a><a class='enum' href='../libc/enum.c_void.html' title='libc::c_void'>c_void</a>,
     pub remote_cb: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='type' href='../libgit2_sys/type.git_remote_create_cb.html' title='libgit2_sys::git_remote_create_cb'>git_remote_create_cb</a>&gt;,
     pub remote_cb_payload: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.pointer.html'>*mut </a><a class='enum' href='../libc/enum.c_void.html' title='libc::c_void'>c_void</a>,
-}</pre><h2 class='fields'>Fields</h2>
-<table><tr class='stab '>
-                             <td id='structfield.version'><code>version</code></td><td></td></tr><tr class='stab '>
-                             <td id='structfield.checkout_opts'><code>checkout_opts</code></td><td></td></tr><tr class='stab '>
-                             <td id='structfield.fetch_opts'><code>fetch_opts</code></td><td></td></tr><tr class='stab '>
-                             <td id='structfield.bare'><code>bare</code></td><td></td></tr><tr class='stab '>
-                             <td id='structfield.local'><code>local</code></td><td></td></tr><tr class='stab '>
-                             <td id='structfield.checkout_branch'><code>checkout_branch</code></td><td></td></tr><tr class='stab '>
-                             <td id='structfield.repository_cb'><code>repository_cb</code></td><td></td></tr><tr class='stab '>
-                             <td id='structfield.repository_cb_payload'><code>repository_cb_payload</code></td><td></td></tr><tr class='stab '>
-                             <td id='structfield.remote_cb'><code>remote_cb</code></td><td></td></tr><tr class='stab '>
-                             <td id='structfield.remote_cb_payload'><code>remote_cb_payload</code></td><td></td></tr></table></section>
+}</pre><h2 class='fields'>Fields</h2><span id='structfield.version' class='structfield'>
+                           <span id='version.v' class='invisible'>
+                           <code>version: <a class='type' href='../libc/type.c_uint.html' title='libc::c_uint'>c_uint</a></code>
+                           </span></span><span class='stab '></span><span id='structfield.checkout_opts' class='structfield'>
+                           <span id='checkout_opts.v' class='invisible'>
+                           <code>checkout_opts: <a class='struct' href='../libgit2_sys/struct.git_checkout_options.html' title='libgit2_sys::git_checkout_options'>git_checkout_options</a></code>
+                           </span></span><span class='stab '></span><span id='structfield.fetch_opts' class='structfield'>
+                           <span id='fetch_opts.v' class='invisible'>
+                           <code>fetch_opts: <a class='struct' href='../libgit2_sys/struct.git_fetch_options.html' title='libgit2_sys::git_fetch_options'>git_fetch_options</a></code>
+                           </span></span><span class='stab '></span><span id='structfield.bare' class='structfield'>
+                           <span id='bare.v' class='invisible'>
+                           <code>bare: <a class='type' href='../libc/type.c_int.html' title='libc::c_int'>c_int</a></code>
+                           </span></span><span class='stab '></span><span id='structfield.local' class='structfield'>
+                           <span id='local.v' class='invisible'>
+                           <code>local: <a class='type' href='../libgit2_sys/type.git_clone_local_t.html' title='libgit2_sys::git_clone_local_t'>git_clone_local_t</a></code>
+                           </span></span><span class='stab '></span><span id='structfield.checkout_branch' class='structfield'>
+                           <span id='checkout_branch.v' class='invisible'>
+                           <code>checkout_branch: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.pointer.html'>*const </a><a class='type' href='../libc/unix/notbsd/linux/other/b64/x86_64/type.c_char.html' title='libc::unix::notbsd::linux::other::b64::x86_64::c_char'>c_char</a></code>
+                           </span></span><span class='stab '></span><span id='structfield.repository_cb' class='structfield'>
+                           <span id='repository_cb.v' class='invisible'>
+                           <code>repository_cb: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='type' href='../libgit2_sys/type.git_repository_create_cb.html' title='libgit2_sys::git_repository_create_cb'>git_repository_create_cb</a>&gt;</code>
+                           </span></span><span class='stab '></span><span id='structfield.repository_cb_payload' class='structfield'>
+                           <span id='repository_cb_payload.v' class='invisible'>
+                           <code>repository_cb_payload: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.pointer.html'>*mut </a><a class='enum' href='../libc/enum.c_void.html' title='libc::c_void'>c_void</a></code>
+                           </span></span><span class='stab '></span><span id='structfield.remote_cb' class='structfield'>
+                           <span id='remote_cb.v' class='invisible'>
+                           <code>remote_cb: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='type' href='../libgit2_sys/type.git_remote_create_cb.html' title='libgit2_sys::git_remote_create_cb'>git_remote_create_cb</a>&gt;</code>
+                           </span></span><span class='stab '></span><span id='structfield.remote_cb_payload' class='structfield'>
+                           <span id='remote_cb_payload.v' class='invisible'>
+                           <code>remote_cb_payload: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.pointer.html'>*mut </a><a class='enum' href='../libc/enum.c_void.html' title='libc::c_void'>c_void</a></code>
+                           </span></span><span class='stab '></span></section>
     <section id='search' class="content hidden"></section>
 
     <section class="footer"></section>
@@ -93,6 +112,8 @@
                     <dd>Move down in search results</dd>
                     <dt>&#9166;</dt>
                     <dd>Go to active search result</dd>
+                    <dt>+</dt>
+                    <dd>Collapse/expand all sections</dd>
                 </dl>
             </div>
 

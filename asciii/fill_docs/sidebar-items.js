@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["fill_template","Takes a `T:ToJson` and a template path and does it's thing."]]});

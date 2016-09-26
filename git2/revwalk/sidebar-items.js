@@ -1,1 +1,0 @@
-initSidebarItems({"struct":[["Revwalk","A revwalk allows traversal of the commit graph defined by including one or more leaves and excluding one or more roots."]]});

@@ -421,7 +421,7 @@
         }
     }
 
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>fix</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='kw'>Self</span>{
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>fix</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='self'>Self</span>{
         <span class='ident'>Templater</span>{
             <span class='ident'>original</span>: <span class='self'>self</span>.<span class='ident'>filled</span>.<span class='ident'>to_owned</span>(),
             <span class='ident'>filled</span>: <span class='ident'>String</span>::<span class='ident'>new</span>()
@@ -480,7 +480,7 @@
 
 <span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>test</span>)]</span>
 <span class='kw'>mod</span> <span class='ident'>test</span>{
-    <span class='kw'>use</span> <span class='ident'>super</span>::<span class='ident'>Templater</span>;
+    <span class='kw'>use</span> <span class='kw'>super</span>::<span class='ident'>Templater</span>;
     <span class='kw'>const</span> <span class='ident'>TEMPLATE</span>:<span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='ident'>str</span> <span class='op'>=</span> <span class='string'>r##&quot;This tests __TEST__ for __ATTR__ __SUBJ__.&quot;##</span>;
 
    <span class='attribute'>#[<span class='ident'>test</span>]</span>
@@ -513,7 +513,7 @@
                <span class='string'>&quot;TEST&quot;</span> <span class='op'>=&gt;</span> <span class='ident'>String</span>::<span class='ident'>from</span>(<span class='string'>&quot;templates&quot;</span>),
            }).<span class='ident'>complete</span>();
        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>filled_in</span>.<span class='ident'>is_err</span>());
-       <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>filled_in</span>.<span class='ident'>unwrap_err</span>(), <span class='ident'>super</span>::<span class='ident'>TemplateError</span>::<span class='ident'>Incomplete</span>(
+       <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>filled_in</span>.<span class='ident'>unwrap_err</span>(), <span class='kw'>super</span>::<span class='ident'>TemplateError</span>::<span class='ident'>Incomplete</span>(
                <span class='macro'>vec</span><span class='macro'>!</span>[
                <span class='ident'>String</span>::<span class='ident'>from</span>(<span class='string'>&quot;ATTR&quot;</span>),
                <span class='ident'>String</span>::<span class='ident'>from</span>(<span class='string'>&quot;SUBJ&quot;</span>)]
@@ -545,6 +545,8 @@
                     <dd>Move down in search results</dd>
                     <dt>&#9166;</dt>
                     <dd>Go to active search result</dd>
+                    <dt>+</dt>
+                    <dd>Collapse/expand all sections</dd>
                 </dl>
             </div>
 

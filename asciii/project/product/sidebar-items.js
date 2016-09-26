@@ -1,1 +1,1 @@
-initSidebarItems({"enum":[["ProductUnit",""]],"struct":[["InvoiceItem",""],["Product",""]]});
+initSidebarItems({"struct":[["Product","Stores properties of a product."]]});

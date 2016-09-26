@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["Bill",""],["BillItem",""],["Currency","Represents currency through an optional symbol and amount of coin."],["Product",""]],"trait":[["BillProduct",""]],"type":[["Amount",""],["Money",""],["Tax","Representation of Tax value"]]});

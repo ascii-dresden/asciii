@@ -1,1 +1,0 @@
-initSidebarItems({"struct":[["IndexTime","Time structure used in a git index entry."],["Time","Time in a signature"]]});

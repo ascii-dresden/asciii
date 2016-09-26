@@ -1,1 +1,0 @@
-initSidebarItems({"struct":[["Submodule","A structure to represent a git [submodule][1]"]]});

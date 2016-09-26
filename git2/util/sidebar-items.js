@@ -1,1 +1,0 @@
-initSidebarItems({"trait":[["IntoCString","A class of types that can be converted to C strings."]]});

@@ -1,1 +1,0 @@
-initSidebarItems({"struct":[["Refspec","A structure to represent a git [refspec][1]."]]});

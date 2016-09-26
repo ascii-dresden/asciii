@@ -47,63 +47,68 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-380' class='srclink' href='../../../src/asciii/src/project/spec.rs.html#1-446' title='goto source code'>[src]</a></span></h1>
+               </span><a id='src-399' class='srclink' href='../../../src/asciii/src/project/spec.rs.html#1-519' title='goto source code'>[src]</a></span></h1>
 <div class='docblock'><p>Implements the ascii invoicer project file specification.</p>
+
+<p>This does all of the heavy lifting.
+The implementation is separated into sub-modules which take care of separate objectives.
+Most of the functions in these modules take the <code>yaml</code> data directly as reference.
+Each module contains a <code>validate()</code> function which ought to be kept up to date.</p>
 </div><h2 id='modules' class='section-header'><a href="#modules">Modules</a></h2>
 <table>
                        <tr class=' module-item'>
                            <td><a class='mod' href='archive/index.html'
                                   title='asciii::project::spec::archive'>archive</a></td>
-                           <td class='docblock short'>
+                           <td class='docblock-short'>
                                 <p>Stage 3: requirements to archive</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class='mod' href='billing/index.html'
+                                  title='asciii::project::spec::billing'>billing</a></td>
+                           <td class='docblock-short'>
+                                <p>Generates <code>Bill</code>s for offer and invoice.</p>
                            </td>
                        </tr>
                        <tr class=' module-item'>
                            <td><a class='mod' href='client/index.html'
                                   title='asciii::project::spec::client'>client</a></td>
-                           <td class='docblock short'>
+                           <td class='docblock-short'>
                                 <p>Everything about the client</p>
                            </td>
                        </tr>
                        <tr class=' module-item'>
                            <td><a class='mod' href='date/index.html'
                                   title='asciii::project::spec::date'>date</a></td>
-                           <td class='docblock short'>
+                           <td class='docblock-short'>
                                 <p>All kinds of dates</p>
                            </td>
                        </tr>
                        <tr class=' module-item'>
                            <td><a class='mod' href='hours/index.html'
                                   title='asciii::project::spec::hours'>hours</a></td>
-                           <td class='docblock short'>
-                                
+                           <td class='docblock-short'>
+                                <p>Everything related to service hours of a project</p>
                            </td>
                        </tr>
                        <tr class=' module-item'>
                            <td><a class='mod' href='invoice/index.html'
                                   title='asciii::project::spec::invoice'>invoice</a></td>
-                           <td class='docblock short'>
+                           <td class='docblock-short'>
                                 <p>Stage 2: requirements for an invoice</p>
                            </td>
                        </tr>
                        <tr class=' module-item'>
                            <td><a class='mod' href='offer/index.html'
                                   title='asciii::project::spec::offer'>offer</a></td>
-                           <td class='docblock short'>
+                           <td class='docblock-short'>
                                 <p>Stage 1: requirements for an offer</p>
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class='mod' href='products/index.html'
-                                  title='asciii::project::spec::products'>products</a></td>
-                           <td class='docblock short'>
-                                
                            </td>
                        </tr>
                        <tr class=' module-item'>
                            <td><a class='mod' href='project/index.html'
                                   title='asciii::project::spec::project'>project</a></td>
-                           <td class='docblock short'>
+                           <td class='docblock-short'>
                                 <p>Stage 0: the project itself</p>
                            </td>
                        </tr></table><h2 id='structs' class='section-header'><a href="#structs">Structs</a></h2>
@@ -111,14 +116,14 @@
                        <tr class=' module-item'>
                            <td><a class='struct' href='struct.VirtualFieldNames.html'
                                   title='asciii::project::spec::VirtualFieldNames'>VirtualFieldNames</a></td>
-                           <td class='docblock short'>
+                           <td class='docblock-short'>
                                 
                            </td>
                        </tr>
                        <tr class=' module-item'>
                            <td><a class='struct' href='struct.VirtualFields.html'
                                   title='asciii::project::spec::VirtualFields'>VirtualFields</a></td>
-                           <td class='docblock short'>
+                           <td class='docblock-short'>
                                 
                            </td>
                        </tr></table><h2 id='enums' class='section-header'><a href="#enums">Enums</a></h2>
@@ -126,15 +131,16 @@
                        <tr class=' module-item'>
                            <td><a class='enum' href='enum.VirtualField.html'
                                   title='asciii::project::spec::VirtualField'>VirtualField</a></td>
-                           <td class='docblock short'>
-                                
+                           <td class='docblock-short'>
+                                <p><code>Project::get()</code> allows accessing fields within the raw <code>yaml</code> data structure.
+Virtual fields are fields that are not present in the document but computed.</p>
                            </td>
                        </tr></table><h2 id='functions' class='section-header'><a href="#functions">Functions</a></h2>
 <table>
                        <tr class=' module-item'>
                            <td><a class='fn' href='fn.to_currency.html'
                                   title='asciii::project::spec::to_currency'>to_currency</a></td>
-                           <td class='docblock short'>
+                           <td class='docblock-short'>
                                 
                            </td>
                        </tr></table><h2 id='types' class='section-header'><a href="#types">Type Definitions</a></h2>
@@ -142,7 +148,7 @@
                        <tr class=' module-item'>
                            <td><a class='type' href='type.SpecResult.html'
                                   title='asciii::project::spec::SpecResult'>SpecResult</a></td>
-                           <td class='docblock short'>
+                           <td class='docblock-short'>
                                 
                            </td>
                        </tr></table></section>
@@ -168,6 +174,8 @@
                     <dd>Move down in search results</dd>
                     <dt>&#9166;</dt>
                     <dd>Go to active search result</dd>
+                    <dt>+</dt>
+                    <dd>Collapse/expand all sections</dd>
                 </dl>
             </div>
 

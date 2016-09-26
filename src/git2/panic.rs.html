@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="rustdoc">
-    <meta name="description" content="Source to the Rust file `/home/hendrik/.cargo/registry/src/github.com-88ac128001ac3a9a/git2-0.4.3/src/panic.rs`.">
+    <meta name="description" content="Source to the Rust file `/home/hendrik/.cargo/registry/src/github.com-1ecc6299db9ec823/git2-0.4.4/src/panic.rs`.">
     <meta name="keywords" content="rust, rustlang, rust-lang">
 
     <title>panic.rs.html -- source</title>
@@ -106,12 +106,12 @@
 });
 
 <span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>feature</span> <span class='op'>=</span> <span class='string'>&quot;unstable&quot;</span>)]</span>
-<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>wrap</span><span class='op'>&lt;</span><span class='ident'>T</span>, <span class='ident'>F</span>: <span class='ident'>FnOnce</span>() <span class='op'>-&gt;</span> <span class='ident'>T</span> <span class='op'>+</span> ::<span class='ident'>std</span>::<span class='ident'>panic</span>::<span class='ident'>RecoverSafe</span><span class='op'>&gt;</span>(<span class='ident'>f</span>: <span class='ident'>F</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
+<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>wrap</span><span class='op'>&lt;</span><span class='ident'>T</span>, <span class='ident'>F</span>: <span class='ident'>FnOnce</span>() <span class='op'>-&gt;</span> <span class='ident'>T</span> <span class='op'>+</span> ::<span class='ident'>std</span>::<span class='ident'>panic</span>::<span class='ident'>UnwindSafe</span><span class='op'>&gt;</span>(<span class='ident'>f</span>: <span class='ident'>F</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
     <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>panic</span>;
     <span class='kw'>if</span> <span class='ident'>LAST_ERROR</span>.<span class='ident'>with</span>(<span class='op'>|</span><span class='ident'>slot</span><span class='op'>|</span> <span class='ident'>slot</span>.<span class='ident'>borrow</span>().<span class='ident'>is_some</span>()) {
         <span class='kw'>return</span> <span class='prelude-val'>None</span>
     }
-    <span class='kw'>match</span> <span class='ident'>panic</span>::<span class='ident'>recover</span>(<span class='ident'>f</span>) {
+    <span class='kw'>match</span> <span class='ident'>panic</span>::<span class='ident'>catch_unwind</span>(<span class='ident'>f</span>) {
         <span class='prelude-val'>Ok</span>(<span class='ident'>ret</span>) <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='ident'>ret</span>),
         <span class='prelude-val'>Err</span>(<span class='ident'>e</span>) <span class='op'>=&gt;</span> {
             <span class='ident'>LAST_ERROR</span>.<span class='ident'>with</span>(<span class='kw'>move</span> <span class='op'>|</span><span class='ident'>slot</span><span class='op'>|</span> {
@@ -137,9 +137,9 @@
 
         }
     }
-    <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>bomb</span> <span class='op'>=</span> <span class='ident'>Bomb</span> { <span class='ident'>enabled</span>: <span class='boolval'>true</span> };
+    <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>bomb</span> <span class='op'>=</span> <span class='ident'>Bomb</span> { <span class='ident'>enabled</span>: <span class='bool-val'>true</span> };
     <span class='kw'>let</span> <span class='ident'>ret</span> <span class='op'>=</span> <span class='prelude-val'>Some</span>(<span class='ident'>f</span>());
-    <span class='ident'>bomb</span>.<span class='ident'>enabled</span> <span class='op'>=</span> <span class='boolval'>false</span>;
+    <span class='ident'>bomb</span>.<span class='ident'>enabled</span> <span class='op'>=</span> <span class='bool-val'>false</span>;
     <span class='kw'>return</span> <span class='ident'>ret</span>;
 }
 
@@ -177,6 +177,8 @@
                     <dd>Move down in search results</dd>
                     <dt>&#9166;</dt>
                     <dd>Go to active search result</dd>
+                    <dt>+</dt>
+                    <dd>Collapse/expand all sections</dd>
                 </dl>
             </div>
 

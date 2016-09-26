@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="rustdoc">
-    <meta name="description" content="Source to the Rust file `/home/hendrik/.cargo/registry/src/github.com-88ac128001ac3a9a/git2-0.4.3/src/repo.rs`.">
+    <meta name="description" content="Source to the Rust file `/home/hendrik/.cargo/registry/src/github.com-1ecc6299db9ec823/git2-0.4.4/src/repo.rs`.">
     <meta name="keywords" content="rust, rustlang, rust-lang">
 
     <title>repo.rs.html -- source</title>
@@ -2035,6 +2035,174 @@
 <span id="1991">1991</span>
 <span id="1992">1992</span>
 <span id="1993">1993</span>
+<span id="1994">1994</span>
+<span id="1995">1995</span>
+<span id="1996">1996</span>
+<span id="1997">1997</span>
+<span id="1998">1998</span>
+<span id="1999">1999</span>
+<span id="2000">2000</span>
+<span id="2001">2001</span>
+<span id="2002">2002</span>
+<span id="2003">2003</span>
+<span id="2004">2004</span>
+<span id="2005">2005</span>
+<span id="2006">2006</span>
+<span id="2007">2007</span>
+<span id="2008">2008</span>
+<span id="2009">2009</span>
+<span id="2010">2010</span>
+<span id="2011">2011</span>
+<span id="2012">2012</span>
+<span id="2013">2013</span>
+<span id="2014">2014</span>
+<span id="2015">2015</span>
+<span id="2016">2016</span>
+<span id="2017">2017</span>
+<span id="2018">2018</span>
+<span id="2019">2019</span>
+<span id="2020">2020</span>
+<span id="2021">2021</span>
+<span id="2022">2022</span>
+<span id="2023">2023</span>
+<span id="2024">2024</span>
+<span id="2025">2025</span>
+<span id="2026">2026</span>
+<span id="2027">2027</span>
+<span id="2028">2028</span>
+<span id="2029">2029</span>
+<span id="2030">2030</span>
+<span id="2031">2031</span>
+<span id="2032">2032</span>
+<span id="2033">2033</span>
+<span id="2034">2034</span>
+<span id="2035">2035</span>
+<span id="2036">2036</span>
+<span id="2037">2037</span>
+<span id="2038">2038</span>
+<span id="2039">2039</span>
+<span id="2040">2040</span>
+<span id="2041">2041</span>
+<span id="2042">2042</span>
+<span id="2043">2043</span>
+<span id="2044">2044</span>
+<span id="2045">2045</span>
+<span id="2046">2046</span>
+<span id="2047">2047</span>
+<span id="2048">2048</span>
+<span id="2049">2049</span>
+<span id="2050">2050</span>
+<span id="2051">2051</span>
+<span id="2052">2052</span>
+<span id="2053">2053</span>
+<span id="2054">2054</span>
+<span id="2055">2055</span>
+<span id="2056">2056</span>
+<span id="2057">2057</span>
+<span id="2058">2058</span>
+<span id="2059">2059</span>
+<span id="2060">2060</span>
+<span id="2061">2061</span>
+<span id="2062">2062</span>
+<span id="2063">2063</span>
+<span id="2064">2064</span>
+<span id="2065">2065</span>
+<span id="2066">2066</span>
+<span id="2067">2067</span>
+<span id="2068">2068</span>
+<span id="2069">2069</span>
+<span id="2070">2070</span>
+<span id="2071">2071</span>
+<span id="2072">2072</span>
+<span id="2073">2073</span>
+<span id="2074">2074</span>
+<span id="2075">2075</span>
+<span id="2076">2076</span>
+<span id="2077">2077</span>
+<span id="2078">2078</span>
+<span id="2079">2079</span>
+<span id="2080">2080</span>
+<span id="2081">2081</span>
+<span id="2082">2082</span>
+<span id="2083">2083</span>
+<span id="2084">2084</span>
+<span id="2085">2085</span>
+<span id="2086">2086</span>
+<span id="2087">2087</span>
+<span id="2088">2088</span>
+<span id="2089">2089</span>
+<span id="2090">2090</span>
+<span id="2091">2091</span>
+<span id="2092">2092</span>
+<span id="2093">2093</span>
+<span id="2094">2094</span>
+<span id="2095">2095</span>
+<span id="2096">2096</span>
+<span id="2097">2097</span>
+<span id="2098">2098</span>
+<span id="2099">2099</span>
+<span id="2100">2100</span>
+<span id="2101">2101</span>
+<span id="2102">2102</span>
+<span id="2103">2103</span>
+<span id="2104">2104</span>
+<span id="2105">2105</span>
+<span id="2106">2106</span>
+<span id="2107">2107</span>
+<span id="2108">2108</span>
+<span id="2109">2109</span>
+<span id="2110">2110</span>
+<span id="2111">2111</span>
+<span id="2112">2112</span>
+<span id="2113">2113</span>
+<span id="2114">2114</span>
+<span id="2115">2115</span>
+<span id="2116">2116</span>
+<span id="2117">2117</span>
+<span id="2118">2118</span>
+<span id="2119">2119</span>
+<span id="2120">2120</span>
+<span id="2121">2121</span>
+<span id="2122">2122</span>
+<span id="2123">2123</span>
+<span id="2124">2124</span>
+<span id="2125">2125</span>
+<span id="2126">2126</span>
+<span id="2127">2127</span>
+<span id="2128">2128</span>
+<span id="2129">2129</span>
+<span id="2130">2130</span>
+<span id="2131">2131</span>
+<span id="2132">2132</span>
+<span id="2133">2133</span>
+<span id="2134">2134</span>
+<span id="2135">2135</span>
+<span id="2136">2136</span>
+<span id="2137">2137</span>
+<span id="2138">2138</span>
+<span id="2139">2139</span>
+<span id="2140">2140</span>
+<span id="2141">2141</span>
+<span id="2142">2142</span>
+<span id="2143">2143</span>
+<span id="2144">2144</span>
+<span id="2145">2145</span>
+<span id="2146">2146</span>
+<span id="2147">2147</span>
+<span id="2148">2148</span>
+<span id="2149">2149</span>
+<span id="2150">2150</span>
+<span id="2151">2151</span>
+<span id="2152">2152</span>
+<span id="2153">2153</span>
+<span id="2154">2154</span>
+<span id="2155">2155</span>
+<span id="2156">2156</span>
+<span id="2157">2157</span>
+<span id="2158">2158</span>
+<span id="2159">2159</span>
+<span id="2160">2160</span>
+<span id="2161">2161</span>
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>env</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>ffi</span>::{<span class='ident'>CStr</span>, <span class='ident'>CString</span>, <span class='ident'>OsStr</span>};
@@ -2050,7 +2218,7 @@
 <span class='kw'>use</span> {<span class='ident'>AnnotatedCommit</span>, <span class='ident'>MergeOptions</span>, <span class='ident'>SubmoduleIgnore</span>, <span class='ident'>SubmoduleStatus</span>};
 <span class='kw'>use</span> {<span class='ident'>ObjectType</span>, <span class='ident'>Tag</span>, <span class='ident'>Note</span>, <span class='ident'>Notes</span>, <span class='ident'>StatusOptions</span>, <span class='ident'>Statuses</span>, <span class='ident'>Status</span>, <span class='ident'>Revwalk</span>};
 <span class='kw'>use</span> {<span class='ident'>RevparseMode</span>, <span class='ident'>RepositoryInitMode</span>, <span class='ident'>Reflog</span>, <span class='ident'>IntoCString</span>, <span class='ident'>Describe</span>};
-<span class='kw'>use</span> {<span class='ident'>DescribeOptions</span>, <span class='ident'>TreeBuilder</span>, <span class='ident'>Diff</span>, <span class='ident'>DiffOptions</span>};
+<span class='kw'>use</span> {<span class='ident'>DescribeOptions</span>, <span class='ident'>TreeBuilder</span>, <span class='ident'>Diff</span>, <span class='ident'>DiffOptions</span>, <span class='ident'>PackBuilder</span>};
 <span class='kw'>use</span> <span class='ident'>build</span>::{<span class='ident'>RepoBuilder</span>, <span class='ident'>CheckoutBuilder</span>};
 <span class='kw'>use</span> <span class='ident'>string_array</span>::<span class='ident'>StringArray</span>;
 <span class='kw'>use</span> <span class='ident'>oid_array</span>::<span class='ident'>OidArray</span>;
@@ -2164,7 +2332,7 @@
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// The folder must exist prior to invoking this function.</span>
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>init_bare</span><span class='op'>&lt;</span><span class='ident'>P</span>: <span class='ident'>AsRef</span><span class='op'>&lt;</span><span class='ident'>Path</span><span class='op'>&gt;&gt;</span>(<span class='ident'>path</span>: <span class='ident'>P</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>Repository</span>, <span class='ident'>Error</span><span class='op'>&gt;</span> {
-        <span class='ident'>Repository</span>::<span class='ident'>init_opts</span>(<span class='ident'>path</span>, <span class='ident'>RepositoryInitOptions</span>::<span class='ident'>new</span>().<span class='ident'>bare</span>(<span class='boolval'>true</span>))
+        <span class='ident'>Repository</span>::<span class='ident'>init_opts</span>(<span class='ident'>path</span>, <span class='ident'>RepositoryInitOptions</span>::<span class='ident'>new</span>().<span class='ident'>bare</span>(<span class='bool-val'>true</span>))
     }
 
     <span class='doccomment'>/// Creates a new `--bare` repository in the specified folder.</span>
@@ -2277,7 +2445,7 @@
         <span class='kw'>let</span> <span class='ident'>state</span> <span class='op'>=</span> <span class='kw'>unsafe</span> { <span class='ident'>raw</span>::<span class='ident'>git_repository_state</span>(<span class='self'>self</span>.<span class='ident'>raw</span>) };
         <span class='macro'>macro_rules</span><span class='macro'>!</span> <span class='ident'>check</span>( ($(<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>raw</span>:<span class='ident'>ident</span> <span class='op'>=&gt;</span> <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>real</span>:<span class='ident'>ident</span>),<span class='op'>*</span>) <span class='op'>=&gt;</span> (
             $(<span class='kw'>if</span> <span class='ident'>state</span> <span class='op'>==</span> <span class='ident'>raw</span>::<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>raw</span> <span class='kw'>as</span> <span class='ident'>c_int</span> {
-                <span class='ident'>super</span>::<span class='ident'>RepositoryState</span>::<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>real</span>
+                <span class='kw'>super</span>::<span class='ident'>RepositoryState</span>::<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>real</span>
             }) <span class='kw'>else</span> <span class='op'>*</span>
             <span class='kw'>else</span> {
                 <span class='macro'>panic</span><span class='macro'>!</span>(<span class='string'>&quot;unknown repository state: {}&quot;</span>, <span class='ident'>state</span>)
@@ -2312,6 +2480,21 @@
                 <span class='prelude-val'>Some</span>(<span class='ident'>util</span>::<span class='ident'>bytes2path</span>(<span class='ident'>CStr</span>::<span class='ident'>from_ptr</span>(<span class='ident'>ptr</span>).<span class='ident'>to_bytes</span>()))
             }
         }
+    }
+
+    <span class='doccomment'>/// Set the path to the working directory for this repository.</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// If `update_link` is true, create/update the gitlink file in the workdir</span>
+    <span class='doccomment'>/// and set config &quot;core.worktree&quot; (if workdir is not the parent of the .git</span>
+    <span class='doccomment'>/// directory).</span>
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>set_workdir</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>path</span>: <span class='kw-2'>&amp;</span><span class='ident'>Path</span>, <span class='ident'>update_gitlink</span>: <span class='ident'>bool</span>)
+                       <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span>(), <span class='ident'>Error</span><span class='op'>&gt;</span> {
+        <span class='kw'>let</span> <span class='ident'>path</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>path</span>.<span class='ident'>into_c_string</span>());
+        <span class='kw'>unsafe</span> {
+            <span class='macro'>try_call</span><span class='macro'>!</span>(<span class='ident'>raw</span>::<span class='ident'>git_repository_set_workdir</span>(<span class='self'>self</span>.<span class='ident'>raw</span>(), <span class='ident'>path</span>,
+                                                      <span class='ident'>update_gitlink</span>));
+        }
+        <span class='prelude-val'>Ok</span>(())
     }
 
     <span class='doccomment'>/// Get the currently active namespace for this repository.</span>
@@ -2713,6 +2896,13 @@
         }
     }
 
+    <span class='doccomment'>/// Set the Index file for this repository.</span>
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>set_index</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>index</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Index</span>) {
+        <span class='kw'>unsafe</span> {
+            <span class='ident'>raw</span>::<span class='ident'>git_repository_set_index</span>(<span class='self'>self</span>.<span class='ident'>raw</span>(), <span class='ident'>index</span>.<span class='ident'>raw</span>());
+        }
+    }
+
     <span class='doccomment'>/// Get the configuration file for this repository.</span>
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// If a configuration file has not been set, the default config set for the</span>
@@ -2873,6 +3063,57 @@
         }
     }
 
+    <span class='doccomment'>/// Conditionally create new direct reference.</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// A direct reference (also called an object id reference) refers directly</span>
+    <span class='doccomment'>/// to a specific object id (a.k.a. OID or SHA) in the repository.  The id</span>
+    <span class='doccomment'>/// permanently refers to the object (although the reference itself can be</span>
+    <span class='doccomment'>/// moved).  For example, in libgit2 the direct ref &quot;refs/tags/v0.17.0&quot;</span>
+    <span class='doccomment'>/// refers to OID 5b9fac39d8a76b9139667c26a63e6b3f204b3977.</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// The direct reference will be created in the repository and written to</span>
+    <span class='doccomment'>/// the disk.</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// Valid reference names must follow one of two patterns:</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// 1. Top-level names must contain only capital letters and underscores,</span>
+    <span class='doccomment'>///    and must begin and end with a letter.  (e.g.  &quot;HEAD&quot;, &quot;ORIG_HEAD&quot;).</span>
+    <span class='doccomment'>/// 2. Names prefixed with &quot;refs/&quot; can be almost anything.  You must avoid</span>
+    <span class='doccomment'>///    the characters `~`, `^`, `:`, `\\`, `?`, `[`, and `*`, and the</span>
+    <span class='doccomment'>///    sequences &quot;..&quot; and &quot;@{&quot; which have special meaning to revparse.</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// This function will return an error if a reference already exists with</span>
+    <span class='doccomment'>/// the given name unless `force` is true, in which case it will be</span>
+    <span class='doccomment'>/// overwritten.</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// The message for the reflog will be ignored if the reference does not</span>
+    <span class='doccomment'>/// belong in the standard set (HEAD, branches and remote-tracking</span>
+    <span class='doccomment'>/// branches) and it does not have a reflog.</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// It will return GIT_EMODIFIED if the reference&#39;s value at the time of</span>
+    <span class='doccomment'>/// updating does not match the one passed through `current_id` (i.e. if the</span>
+    <span class='doccomment'>/// ref has changed since the user read it).</span>
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>reference_matching</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>,
+                              <span class='ident'>name</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>,
+                              <span class='ident'>id</span>: <span class='ident'>Oid</span>,
+                              <span class='ident'>force</span>: <span class='ident'>bool</span>,
+                              <span class='ident'>current_id</span>: <span class='ident'>Oid</span>,
+                              <span class='ident'>log_message</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>Reference</span>, <span class='ident'>Error</span><span class='op'>&gt;</span> {
+        <span class='kw'>let</span> <span class='ident'>name</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>CString</span>::<span class='ident'>new</span>(<span class='ident'>name</span>));
+        <span class='kw'>let</span> <span class='ident'>log_message</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>CString</span>::<span class='ident'>new</span>(<span class='ident'>log_message</span>));
+        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>raw</span> <span class='op'>=</span> <span class='number'>0</span> <span class='kw'>as</span> <span class='op'>*</span><span class='kw-2'>mut</span> <span class='ident'>raw</span>::<span class='ident'>git_reference</span>;
+        <span class='kw'>unsafe</span> {
+            <span class='macro'>try_call</span><span class='macro'>!</span>(<span class='ident'>raw</span>::<span class='ident'>git_reference_create_matching</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>raw</span>,
+                                                         <span class='self'>self</span>.<span class='ident'>raw</span>(),
+                                                         <span class='ident'>name</span>,
+                                                         <span class='ident'>id</span>.<span class='ident'>raw</span>(),
+                                                         <span class='ident'>force</span>,
+                                                         <span class='ident'>current_id</span>.<span class='ident'>raw</span>(),
+                                                         <span class='ident'>log_message</span>));
+            <span class='prelude-val'>Ok</span>(<span class='ident'>Binding</span>::<span class='ident'>from_raw</span>(<span class='ident'>raw</span>))
+        }
+    }
+
     <span class='doccomment'>/// Create a new symbolic reference.</span>
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// This function will return an error if a reference already exists with</span>
@@ -2890,6 +3131,39 @@
             <span class='macro'>try_call</span><span class='macro'>!</span>(<span class='ident'>raw</span>::<span class='ident'>git_reference_symbolic_create</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>raw</span>, <span class='self'>self</span>.<span class='ident'>raw</span>(),
                                                          <span class='ident'>name</span>, <span class='ident'>target</span>, <span class='ident'>force</span>,
                                                          <span class='ident'>log_message</span>));
+            <span class='prelude-val'>Ok</span>(<span class='ident'>Binding</span>::<span class='ident'>from_raw</span>(<span class='ident'>raw</span>))
+        }
+    }
+
+    <span class='doccomment'>/// Create a new symbolic reference.</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// This function will return an error if a reference already exists with</span>
+    <span class='doccomment'>/// the given name unless force is true, in which case it will be</span>
+    <span class='doccomment'>/// overwritten.</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// It will return GIT_EMODIFIED if the reference&#39;s value at the time of</span>
+    <span class='doccomment'>/// updating does not match the one passed through current_value (i.e. if</span>
+    <span class='doccomment'>/// the ref has changed since the user read it).</span>
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>reference_symbolic_matching</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>,
+                                       <span class='ident'>name</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>,
+                                       <span class='ident'>target</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>,
+                                       <span class='ident'>force</span>: <span class='ident'>bool</span>,
+                                       <span class='ident'>current_value</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>,
+                                       <span class='ident'>log_message</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>)
+                                       <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>Reference</span>, <span class='ident'>Error</span><span class='op'>&gt;</span> {
+        <span class='kw'>let</span> <span class='ident'>name</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>CString</span>::<span class='ident'>new</span>(<span class='ident'>name</span>));
+        <span class='kw'>let</span> <span class='ident'>target</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>CString</span>::<span class='ident'>new</span>(<span class='ident'>target</span>));
+        <span class='kw'>let</span> <span class='ident'>current_value</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>CString</span>::<span class='ident'>new</span>(<span class='ident'>current_value</span>));
+        <span class='kw'>let</span> <span class='ident'>log_message</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>CString</span>::<span class='ident'>new</span>(<span class='ident'>log_message</span>));
+        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>raw</span> <span class='op'>=</span> <span class='number'>0</span> <span class='kw'>as</span> <span class='op'>*</span><span class='kw-2'>mut</span> <span class='ident'>raw</span>::<span class='ident'>git_reference</span>;
+        <span class='kw'>unsafe</span> {
+            <span class='macro'>try_call</span><span class='macro'>!</span>(<span class='ident'>raw</span>::<span class='ident'>git_reference_symbolic_create_matching</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>raw</span>,
+                                                                  <span class='self'>self</span>.<span class='ident'>raw</span>(),
+                                                                  <span class='ident'>name</span>,
+                                                                  <span class='ident'>target</span>,
+                                                                  <span class='ident'>force</span>,
+                                                                  <span class='ident'>current_value</span>,
+                                                                  <span class='ident'>log_message</span>));
             <span class='prelude-val'>Ok</span>(<span class='ident'>Binding</span>::<span class='ident'>from_raw</span>(<span class='ident'>raw</span>))
         }
     }
@@ -3427,6 +3701,24 @@
         <span class='prelude-val'>Ok</span>(())
     }
 
+    <span class='doccomment'>/// Check if the given reference has a reflog.</span>
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>reference_has_log</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>name</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>bool</span>, <span class='ident'>Error</span><span class='op'>&gt;</span> {
+        <span class='kw'>let</span> <span class='ident'>name</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>CString</span>::<span class='ident'>new</span>(<span class='ident'>name</span>));
+        <span class='kw'>let</span> <span class='ident'>ret</span> <span class='op'>=</span> <span class='kw'>unsafe</span> {
+            <span class='macro'>try_call</span><span class='macro'>!</span>(<span class='ident'>raw</span>::<span class='ident'>git_reference_has_log</span>(<span class='self'>self</span>.<span class='ident'>raw</span>, <span class='ident'>name</span>))
+        };
+        <span class='prelude-val'>Ok</span>(<span class='ident'>ret</span> <span class='op'>!=</span> <span class='number'>0</span>)
+    }
+
+    <span class='doccomment'>/// Ensure that the given reference has a reflog.</span>
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>reference_ensure_log</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>name</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span>(), <span class='ident'>Error</span><span class='op'>&gt;</span> {
+        <span class='kw'>let</span> <span class='ident'>name</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>CString</span>::<span class='ident'>new</span>(<span class='ident'>name</span>));
+        <span class='kw'>unsafe</span> {
+            <span class='macro'>try_call</span><span class='macro'>!</span>(<span class='ident'>raw</span>::<span class='ident'>git_reference_ensure_log</span>(<span class='self'>self</span>.<span class='ident'>raw</span>, <span class='ident'>name</span>));
+        }
+        <span class='prelude-val'>Ok</span>(())
+    }
+
     <span class='doccomment'>/// Describes a commit</span>
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// Performs a describe operation on the current commit and the worktree.</span>
@@ -3489,6 +3781,26 @@
                                                   <span class='ident'>old_tree</span>.<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>s</span><span class='op'>|</span> <span class='ident'>s</span>.<span class='ident'>raw</span>()),
                                                   <span class='ident'>index</span>.<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>s</span><span class='op'>|</span> <span class='ident'>s</span>.<span class='ident'>raw</span>()),
                                                   <span class='ident'>opts</span>.<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>s</span><span class='op'>|</span> <span class='ident'>s</span>.<span class='ident'>raw</span>())));
+            <span class='prelude-val'>Ok</span>(<span class='ident'>Binding</span>::<span class='ident'>from_raw</span>(<span class='ident'>ret</span>))
+        }
+    }
+
+    <span class='doccomment'>/// Create a diff between two index objects.</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// The first index will be used for the &quot;old_file&quot; side of the delta, and</span>
+    <span class='doccomment'>/// the second index will be used for the &quot;new_file&quot; side of the delta.</span>
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>diff_index_to_index</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>,
+                               <span class='ident'>old_index</span>: <span class='kw-2'>&amp;</span><span class='ident'>Index</span>,
+                               <span class='ident'>new_index</span>: <span class='kw-2'>&amp;</span><span class='ident'>Index</span>,
+                               <span class='ident'>opts</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>DiffOptions</span><span class='op'>&gt;</span>)
+                               <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>Diff</span>, <span class='ident'>Error</span><span class='op'>&gt;</span> {
+        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>ret</span> <span class='op'>=</span> <span class='number'>0</span> <span class='kw'>as</span> <span class='op'>*</span><span class='kw-2'>mut</span> <span class='ident'>raw</span>::<span class='ident'>git_diff</span>;
+        <span class='kw'>unsafe</span> {
+            <span class='macro'>try_call</span><span class='macro'>!</span>(<span class='ident'>raw</span>::<span class='ident'>git_diff_index_to_index</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>ret</span>,
+                                                   <span class='self'>self</span>.<span class='ident'>raw</span>(),
+                                                   <span class='ident'>old_index</span>.<span class='ident'>raw</span>(),
+                                                   <span class='ident'>new_index</span>.<span class='ident'>raw</span>(),
+                                                   <span class='ident'>opts</span>.<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>s</span><span class='op'>|</span> <span class='ident'>s</span>.<span class='ident'>raw</span>())));
             <span class='prelude-val'>Ok</span>(<span class='ident'>Binding</span>::<span class='ident'>from_raw</span>(<span class='ident'>ret</span>))
         }
     }
@@ -3569,6 +3881,16 @@
             <span class='prelude-val'>Ok</span>(<span class='ident'>Binding</span>::<span class='ident'>from_raw</span>(<span class='ident'>ret</span>))
         }
     }
+
+    <span class='doccomment'>/// Create a PackBuilder</span>
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>packbuilder</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>PackBuilder</span>, <span class='ident'>Error</span><span class='op'>&gt;</span> {
+        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>ret</span> <span class='op'>=</span> <span class='number'>0</span> <span class='kw'>as</span> <span class='op'>*</span><span class='kw-2'>mut</span> <span class='ident'>raw</span>::<span class='ident'>git_packbuilder</span>;
+        <span class='kw'>unsafe</span> {
+            <span class='macro'>try_call</span><span class='macro'>!</span>(<span class='ident'>raw</span>::<span class='ident'>git_packbuilder_new</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>ret</span>, <span class='self'>self</span>.<span class='ident'>raw</span>()));
+            <span class='prelude-val'>Ok</span>(<span class='ident'>Binding</span>::<span class='ident'>from_raw</span>(<span class='ident'>ret</span>))
+        }
+    }
+
 }
 
 <span class='kw'>impl</span> <span class='ident'>Binding</span> <span class='kw'>for</span> <span class='ident'>Repository</span> {
@@ -3901,6 +4223,20 @@
     }
 
     <span class='attribute'>#[<span class='ident'>test</span>]</span>
+    <span class='kw'>fn</span> <span class='ident'>smoke_reference_has_log_ensure_log</span>() {
+        <span class='kw'>let</span> (<span class='ident'>_td</span>, <span class='ident'>repo</span>) <span class='op'>=</span> ::<span class='ident'>test</span>::<span class='ident'>repo_init</span>();
+
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>repo</span>.<span class='ident'>reference_has_log</span>(<span class='string'>&quot;HEAD&quot;</span>).<span class='ident'>unwrap</span>(), <span class='bool-val'>true</span>);
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>repo</span>.<span class='ident'>reference_has_log</span>(<span class='string'>&quot;refs/heads/master&quot;</span>).<span class='ident'>unwrap</span>(), <span class='bool-val'>true</span>);
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>repo</span>.<span class='ident'>reference_has_log</span>(<span class='string'>&quot;NOT_HEAD&quot;</span>).<span class='ident'>unwrap</span>(), <span class='bool-val'>false</span>);
+        <span class='kw'>let</span> <span class='ident'>master_oid</span> <span class='op'>=</span> <span class='ident'>repo</span>.<span class='ident'>revparse_single</span>(<span class='string'>&quot;master&quot;</span>).<span class='ident'>unwrap</span>().<span class='ident'>id</span>();
+        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>repo</span>.<span class='ident'>reference</span>(<span class='string'>&quot;NOT_HEAD&quot;</span>, <span class='ident'>master_oid</span>, <span class='bool-val'>false</span>, <span class='string'>&quot;creating a new branch&quot;</span>).<span class='ident'>is_ok</span>());
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>repo</span>.<span class='ident'>reference_has_log</span>(<span class='string'>&quot;NOT_HEAD&quot;</span>).<span class='ident'>unwrap</span>(), <span class='bool-val'>false</span>);
+        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>repo</span>.<span class='ident'>reference_ensure_log</span>(<span class='string'>&quot;NOT_HEAD&quot;</span>).<span class='ident'>is_ok</span>());
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>repo</span>.<span class='ident'>reference_has_log</span>(<span class='string'>&quot;NOT_HEAD&quot;</span>).<span class='ident'>unwrap</span>(), <span class='bool-val'>true</span>);
+    }
+
+    <span class='attribute'>#[<span class='ident'>test</span>]</span>
     <span class='kw'>fn</span> <span class='ident'>smoke_set_head</span>() {
         <span class='kw'>let</span> (<span class='ident'>_td</span>, <span class='ident'>repo</span>) <span class='op'>=</span> ::<span class='ident'>test</span>::<span class='ident'>repo_init</span>();
 
@@ -3940,8 +4276,8 @@
         <span class='kw'>let</span> <span class='ident'>commit1</span> <span class='op'>=</span> <span class='ident'>repo</span>.<span class='ident'>find_commit</span>(<span class='ident'>oid1</span>).<span class='ident'>unwrap</span>();
         <span class='macro'>println</span><span class='macro'>!</span>(<span class='string'>&quot;created oid1 {:?}&quot;</span>, <span class='ident'>oid1</span>);
 
-        <span class='ident'>repo</span>.<span class='ident'>branch</span>(<span class='string'>&quot;branch_a&quot;</span>, <span class='kw-2'>&amp;</span><span class='ident'>commit1</span>, <span class='boolval'>true</span>).<span class='ident'>unwrap</span>();
-        <span class='ident'>repo</span>.<span class='ident'>branch</span>(<span class='string'>&quot;branch_b&quot;</span>, <span class='kw-2'>&amp;</span><span class='ident'>commit1</span>, <span class='boolval'>true</span>).<span class='ident'>unwrap</span>();
+        <span class='ident'>repo</span>.<span class='ident'>branch</span>(<span class='string'>&quot;branch_a&quot;</span>, <span class='kw-2'>&amp;</span><span class='ident'>commit1</span>, <span class='bool-val'>true</span>).<span class='ident'>unwrap</span>();
+        <span class='ident'>repo</span>.<span class='ident'>branch</span>(<span class='string'>&quot;branch_b&quot;</span>, <span class='kw-2'>&amp;</span><span class='ident'>commit1</span>, <span class='bool-val'>true</span>).<span class='ident'>unwrap</span>();
 
         <span class='comment'>// create commit oid2 on branchA</span>
         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>index</span> <span class='op'>=</span> <span class='ident'>repo</span>.<span class='ident'>index</span>().<span class='ident'>unwrap</span>();
@@ -3990,16 +4326,16 @@
 
         <span class='comment'>// merge bases of (oid4,oid5) should be (oid2,oid3)</span>
         <span class='kw'>let</span> <span class='ident'>merge_bases</span> <span class='op'>=</span> <span class='ident'>repo</span>.<span class='ident'>merge_bases</span>(<span class='ident'>oid4</span>, <span class='ident'>oid5</span>).<span class='ident'>unwrap</span>();
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>found_oid2</span> <span class='op'>=</span> <span class='boolval'>false</span>;
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>found_oid3</span> <span class='op'>=</span> <span class='boolval'>false</span>;
+        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>found_oid2</span> <span class='op'>=</span> <span class='bool-val'>false</span>;
+        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>found_oid3</span> <span class='op'>=</span> <span class='bool-val'>false</span>;
         <span class='kw'>for</span> <span class='ident'>mg</span> <span class='kw'>in</span> <span class='ident'>merge_bases</span>.<span class='ident'>iter</span>() {
             <span class='macro'>println</span><span class='macro'>!</span>(<span class='string'>&quot;found merge base {:?}&quot;</span>, <span class='ident'>mg</span>);
             <span class='kw'>if</span> <span class='ident'>mg</span> <span class='op'>==</span> <span class='kw-2'>&amp;</span><span class='ident'>oid2</span> {
-                <span class='ident'>found_oid2</span> <span class='op'>=</span> <span class='boolval'>true</span>;
+                <span class='ident'>found_oid2</span> <span class='op'>=</span> <span class='bool-val'>true</span>;
             } <span class='kw'>else</span> <span class='kw'>if</span> <span class='ident'>mg</span> <span class='op'>==</span> <span class='kw-2'>&amp;</span><span class='ident'>oid3</span> {
-                <span class='ident'>found_oid3</span> <span class='op'>=</span> <span class='boolval'>true</span>;
+                <span class='ident'>found_oid3</span> <span class='op'>=</span> <span class='bool-val'>true</span>;
             } <span class='kw'>else</span> {
-                <span class='macro'>assert</span><span class='macro'>!</span>(<span class='boolval'>false</span>);
+                <span class='macro'>assert</span><span class='macro'>!</span>(<span class='bool-val'>false</span>);
             }
         }
         <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>found_oid2</span>);
@@ -4053,6 +4389,8 @@
                     <dd>Move down in search results</dd>
                     <dt>&#9166;</dt>
                     <dd>Go to active search result</dd>
+                    <dt>+</dt>
+                    <dd>Collapse/expand all sections</dd>
                 </dl>
             </div>
 

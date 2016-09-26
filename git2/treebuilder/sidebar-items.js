@@ -1,1 +1,0 @@
-initSidebarItems({"struct":[["TreeBuilder","Constructor for in-memory trees"]]});

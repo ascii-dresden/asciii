@@ -47,7 +47,7 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-3375' class='srclink' href='../src/git2/index.rs.html#37-50' title='goto source code'>[src]</a></span></h1>
+               </span><a id='src-3674' class='srclink' href='../src/git2/index.rs.html#37-50' title='goto source code'>[src]</a></span></h1>
 <pre class='rust struct'>pub struct IndexEntry {
     pub ctime: <a class='struct' href='../git2/struct.IndexTime.html' title='git2::IndexTime'>IndexTime</a>,
     pub mtime: <a class='struct' href='../git2/struct.IndexTime.html' title='git2::IndexTime'>IndexTime</a>,
@@ -65,20 +65,43 @@
 
 <p>All fields of an entry are public for modification and inspection. This is
 also how a new index entry is created.</p>
-</div><h2 class='fields'>Fields</h2>
-<table><tr class='stab '>
-                             <td id='structfield.ctime'><code>ctime</code></td><td></td></tr><tr class='stab '>
-                             <td id='structfield.mtime'><code>mtime</code></td><td></td></tr><tr class='stab '>
-                             <td id='structfield.dev'><code>dev</code></td><td></td></tr><tr class='stab '>
-                             <td id='structfield.ino'><code>ino</code></td><td></td></tr><tr class='stab '>
-                             <td id='structfield.mode'><code>mode</code></td><td></td></tr><tr class='stab '>
-                             <td id='structfield.uid'><code>uid</code></td><td></td></tr><tr class='stab '>
-                             <td id='structfield.gid'><code>gid</code></td><td></td></tr><tr class='stab '>
-                             <td id='structfield.file_size'><code>file_size</code></td><td></td></tr><tr class='stab '>
-                             <td id='structfield.id'><code>id</code></td><td></td></tr><tr class='stab '>
-                             <td id='structfield.flags'><code>flags</code></td><td></td></tr><tr class='stab '>
-                             <td id='structfield.flags_extended'><code>flags_extended</code></td><td></td></tr><tr class='stab '>
-                             <td id='structfield.path'><code>path</code></td><td></td></tr></table></section>
+</div><h2 class='fields'>Fields</h2><span id='structfield.ctime' class='structfield'>
+                           <span id='ctime.v' class='invisible'>
+                           <code>ctime: <a class='struct' href='../git2/struct.IndexTime.html' title='git2::IndexTime'>IndexTime</a></code>
+                           </span></span><span class='stab '></span><span id='structfield.mtime' class='structfield'>
+                           <span id='mtime.v' class='invisible'>
+                           <code>mtime: <a class='struct' href='../git2/struct.IndexTime.html' title='git2::IndexTime'>IndexTime</a></code>
+                           </span></span><span class='stab '></span><span id='structfield.dev' class='structfield'>
+                           <span id='dev.v' class='invisible'>
+                           <code>dev: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u32.html'>u32</a></code>
+                           </span></span><span class='stab '></span><span id='structfield.ino' class='structfield'>
+                           <span id='ino.v' class='invisible'>
+                           <code>ino: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u32.html'>u32</a></code>
+                           </span></span><span class='stab '></span><span id='structfield.mode' class='structfield'>
+                           <span id='mode.v' class='invisible'>
+                           <code>mode: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u32.html'>u32</a></code>
+                           </span></span><span class='stab '></span><span id='structfield.uid' class='structfield'>
+                           <span id='uid.v' class='invisible'>
+                           <code>uid: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u32.html'>u32</a></code>
+                           </span></span><span class='stab '></span><span id='structfield.gid' class='structfield'>
+                           <span id='gid.v' class='invisible'>
+                           <code>gid: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u32.html'>u32</a></code>
+                           </span></span><span class='stab '></span><span id='structfield.file_size' class='structfield'>
+                           <span id='file_size.v' class='invisible'>
+                           <code>file_size: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u32.html'>u32</a></code>
+                           </span></span><span class='stab '></span><span id='structfield.id' class='structfield'>
+                           <span id='id.v' class='invisible'>
+                           <code>id: <a class='struct' href='../git2/struct.Oid.html' title='git2::Oid'>Oid</a></code>
+                           </span></span><span class='stab '></span><span id='structfield.flags' class='structfield'>
+                           <span id='flags.v' class='invisible'>
+                           <code>flags: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u16.html'>u16</a></code>
+                           </span></span><span class='stab '></span><span id='structfield.flags_extended' class='structfield'>
+                           <span id='flags_extended.v' class='invisible'>
+                           <code>flags_extended: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u16.html'>u16</a></code>
+                           </span></span><span class='stab '></span><span id='structfield.path' class='structfield'>
+                           <span id='path.v' class='invisible'>
+                           <code>path: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u8.html'>u8</a>&gt;</code>
+                           </span></span><span class='stab '></span></section>
     <section id='search' class="content hidden"></section>
 
     <section class="footer"></section>
@@ -101,6 +124,8 @@ also how a new index entry is created.</p>
                     <dd>Move down in search results</dd>
                     <dt>&#9166;</dt>
                     <dd>Go to active search result</dd>
+                    <dt>+</dt>
+                    <dd>Collapse/expand all sections</dd>
                 </dl>
             </div>
 

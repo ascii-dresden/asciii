@@ -1,1 +1,0 @@
-initSidebarItems({"struct":[["Signature","A Signature is used to indicate authorship of various actions throughout the library."]]});

@@ -47,59 +47,75 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-0' class='srclink' href='../src/asciii/src/lib.rs.html#1-80' title='goto source code'>[src]</a></span></h1>
+               </span><a id='src-0' class='srclink' href='../src/asciii/src/lib.rs.html#1-85' title='goto source code'>[src]</a></span></h1>
 <div class='docblock'><p>Thank you for choosing <code>asciii</code>, the new and improved <code>ascii</code>.</p>
 
 <p><strong>For pure user documentation please refer to the <a href="manual/index.html">user manual</a>.</strong>
 This contains user and developer documentation together.</p>
+
+<p>Please check out <a href="cli/index.html">cli</a> too.</p>
 </div><h2 id='modules' class='section-header'><a href="#modules">Modules</a></h2>
 <table>
                        <tr class=' module-item'>
+                           <td><a class='mod' href='actions/index.html'
+                                  title='asciii::actions'>actions</a></td>
+                           <td class='docblock-short'>
+                                <p>General actions</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
                            <td><a class='mod' href='config/index.html'
                                   title='asciii::config'>config</a></td>
-                           <td class='docblock short'>
+                           <td class='docblock-short'>
                                 <p>Handles config files and default config.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class='mod' href='fill_docs/index.html'
+                                  title='asciii::fill_docs'>fill_docs</a></td>
+                           <td class='docblock-short'>
+                                <p>Fills export templates to create tex documents.</p>
                            </td>
                        </tr>
                        <tr class=' module-item'>
                            <td><a class='mod' href='manual/index.html'
                                   title='asciii::manual'>manual</a></td>
-                           <td class='docblock short'>
+                           <td class='docblock-short'>
                                 <p>The <strong>official asciii Handbook</strong>.</p>
                            </td>
                        </tr>
                        <tr class=' module-item'>
                            <td><a class='mod' href='print/index.html'
                                   title='asciii::print'>print</a></td>
-                           <td class='docblock short'>
+                           <td class='docblock-short'>
                                 <p>All the printing code lives here.</p>
                            </td>
                        </tr>
                        <tr class=' module-item'>
                            <td><a class='mod' href='project/index.html'
                                   title='asciii::project'>project</a></td>
-                           <td class='docblock short'>
+                           <td class='docblock-short'>
                                 <p>Project file parsing and evaluation.</p>
                            </td>
                        </tr>
                        <tr class=' module-item'>
                            <td><a class='mod' href='storage/index.html'
                                   title='asciii::storage'>storage</a></td>
-                           <td class='docblock short'>
+                           <td class='docblock-short'>
                                 <p>Manages file structure of templates, working directory and archives.</p>
                            </td>
                        </tr>
                        <tr class=' module-item'>
                            <td><a class='mod' href='templater/index.html'
                                   title='asciii::templater'>templater</a></td>
-                           <td class='docblock short'>
+                           <td class='docblock-short'>
                                 <p>Simple templating functionality through keyword replacement.</p>
                            </td>
                        </tr>
                        <tr class=' module-item'>
                            <td><a class='mod' href='util/index.html'
                                   title='asciii::util'>util</a></td>
-                           <td class='docblock short'>
+                           <td class='docblock-short'>
                                 <p>Utility functions that are needed all over the places.</p>
                            </td>
                        </tr></table><h2 id='structs' class='section-header'><a href="#structs">Structs</a></h2>
@@ -107,7 +123,23 @@ This contains user and developer documentation together.</p>
                        <tr class=' module-item'>
                            <td><a class='struct' href='struct.CONFIG.html'
                                   title='asciii::CONFIG'>CONFIG</a></td>
-                           <td class='docblock short'>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr></table><h2 id='enums' class='section-header'><a href="#enums">Enums</a></h2>
+<table>
+                       <tr class=' module-item'>
+                           <td><a class='enum' href='enum.BillType.html'
+                                  title='asciii::BillType'>BillType</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr></table><h2 id='statics' class='section-header'><a href="#statics">Statics</a></h2>
+<table>
+                       <tr class=' module-item'>
+                           <td><a class='static' href='static.DOCUMENTATION_URL.html'
+                                  title='asciii::DOCUMENTATION_URL'>DOCUMENTATION_URL</a></td>
+                           <td class='docblock-short'>
                                 
                            </td>
                        </tr></table><h2 id='functions' class='section-header'><a href="#functions">Functions</a></h2>
@@ -115,7 +147,7 @@ This contains user and developer documentation together.</p>
                        <tr class=' module-item'>
                            <td><a class='fn' href='fn.version.html'
                                   title='asciii::version'>version</a></td>
-                           <td class='docblock short'>
+                           <td class='docblock-short'>
                                 <p>Returns library version</p>
                            </td>
                        </tr></table></section>
@@ -141,6 +173,8 @@ This contains user and developer documentation together.</p>
                     <dd>Move down in search results</dd>
                     <dt>&#9166;</dt>
                     <dd>Go to active search result</dd>
+                    <dt>+</dt>
+                    <dd>Collapse/expand all sections</dd>
                 </dl>
             </div>
 

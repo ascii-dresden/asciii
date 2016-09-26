@@ -47,20 +47,29 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-632' class='srclink' href='../src/libgit2_sys/lib.rs.html#715-721' title='goto source code'>[src]</a></span></h1>
+               </span><a id='src-657' class='srclink' href='../src/libgit2_sys/lib.rs.html#749-755' title='goto source code'>[src]</a></span></h1>
 <pre class='rust struct'>pub struct git_config_entry {
     pub name: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.pointer.html'>*const </a><a class='type' href='../libc/unix/notbsd/linux/other/b64/x86_64/type.c_char.html' title='libc::unix::notbsd::linux::other::b64::x86_64::c_char'>c_char</a>,
     pub value: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.pointer.html'>*const </a><a class='type' href='../libc/unix/notbsd/linux/other/b64/x86_64/type.c_char.html' title='libc::unix::notbsd::linux::other::b64::x86_64::c_char'>c_char</a>,
     pub level: <a class='type' href='../libgit2_sys/type.git_config_level_t.html' title='libgit2_sys::git_config_level_t'>git_config_level_t</a>,
-    pub free:  extern "C" fn(<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.pointer.html'>*mut </a><a class='struct' href='../libgit2_sys/struct.git_config_entry.html' title='libgit2_sys::git_config_entry'>git_config_entry</a>),
+    pub free: extern fn(<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.pointer.html'>*mut </a><a class='struct' href='../libgit2_sys/struct.git_config_entry.html' title='libgit2_sys::git_config_entry'>git_config_entry</a>),
     pub payload: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.pointer.html'>*mut </a><a class='enum' href='../libc/enum.c_void.html' title='libc::c_void'>c_void</a>,
-}</pre><h2 class='fields'>Fields</h2>
-<table><tr class='stab '>
-                             <td id='structfield.name'><code>name</code></td><td></td></tr><tr class='stab '>
-                             <td id='structfield.value'><code>value</code></td><td></td></tr><tr class='stab '>
-                             <td id='structfield.level'><code>level</code></td><td></td></tr><tr class='stab '>
-                             <td id='structfield.free'><code>free</code></td><td></td></tr><tr class='stab '>
-                             <td id='structfield.payload'><code>payload</code></td><td></td></tr></table></section>
+}</pre><h2 class='fields'>Fields</h2><span id='structfield.name' class='structfield'>
+                           <span id='name.v' class='invisible'>
+                           <code>name: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.pointer.html'>*const </a><a class='type' href='../libc/unix/notbsd/linux/other/b64/x86_64/type.c_char.html' title='libc::unix::notbsd::linux::other::b64::x86_64::c_char'>c_char</a></code>
+                           </span></span><span class='stab '></span><span id='structfield.value' class='structfield'>
+                           <span id='value.v' class='invisible'>
+                           <code>value: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.pointer.html'>*const </a><a class='type' href='../libc/unix/notbsd/linux/other/b64/x86_64/type.c_char.html' title='libc::unix::notbsd::linux::other::b64::x86_64::c_char'>c_char</a></code>
+                           </span></span><span class='stab '></span><span id='structfield.level' class='structfield'>
+                           <span id='level.v' class='invisible'>
+                           <code>level: <a class='type' href='../libgit2_sys/type.git_config_level_t.html' title='libgit2_sys::git_config_level_t'>git_config_level_t</a></code>
+                           </span></span><span class='stab '></span><span id='structfield.free' class='structfield'>
+                           <span id='free.v' class='invisible'>
+                           <code>free: extern fn(<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.pointer.html'>*mut </a><a class='struct' href='../libgit2_sys/struct.git_config_entry.html' title='libgit2_sys::git_config_entry'>git_config_entry</a>)</code>
+                           </span></span><span class='stab '></span><span id='structfield.payload' class='structfield'>
+                           <span id='payload.v' class='invisible'>
+                           <code>payload: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.pointer.html'>*mut </a><a class='enum' href='../libc/enum.c_void.html' title='libc::c_void'>c_void</a></code>
+                           </span></span><span class='stab '></span></section>
     <section id='search' class="content hidden"></section>
 
     <section class="footer"></section>
@@ -83,6 +92,8 @@
                     <dd>Move down in search results</dd>
                     <dt>&#9166;</dt>
                     <dd>Go to active search result</dd>
+                    <dt>+</dt>
+                    <dd>Collapse/expand all sections</dd>
                 </dl>
             </div>
 

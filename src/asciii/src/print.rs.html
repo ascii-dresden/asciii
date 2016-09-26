@@ -365,22 +365,42 @@
 <span id="321">321</span>
 <span id="322">322</span>
 <span id="323">323</span>
+<span id="324">324</span>
+<span id="325">325</span>
+<span id="326">326</span>
+<span id="327">327</span>
+<span id="328">328</span>
+<span id="329">329</span>
+<span id="330">330</span>
+<span id="331">331</span>
+<span id="332">332</span>
+<span id="333">333</span>
+<span id="334">334</span>
+<span id="335">335</span>
+<span id="336">336</span>
+<span id="337">337</span>
+<span id="338">338</span>
+<span id="339">339</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! All the printing code lives here.</span>
+
+<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>error</span>::<span class='ident'>Error</span>;
 
 <span class='kw'>use</span> <span class='ident'>chrono</span>::<span class='op'>*</span>;
 <span class='kw'>use</span> <span class='ident'>prettytable</span>::<span class='ident'>Table</span>;
 <span class='kw'>use</span> <span class='ident'>prettytable</span>::<span class='ident'>row</span>::<span class='ident'>Row</span>;
 <span class='kw'>use</span> <span class='ident'>prettytable</span>::<span class='ident'>cell</span>::<span class='ident'>Cell</span>;
-<span class='kw'>use</span> <span class='ident'>prettytable</span>::<span class='ident'>format</span>::{<span class='ident'>TableFormat</span>,<span class='ident'>FormatBuilder</span>};
+<span class='kw'>use</span> <span class='ident'>prettytable</span>::<span class='ident'>format</span>::{<span class='ident'>LineSeparator</span>,<span class='ident'>LinePosition</span>,<span class='ident'>FormatBuilder</span>};
 <span class='kw'>use</span> <span class='ident'>term</span>::{<span class='ident'>Attr</span>, <span class='ident'>color</span>};
 
 <span class='kw'>use</span> <span class='ident'>project</span>::<span class='ident'>Project</span>;
 <span class='kw'>use</span> <span class='ident'>storage</span>::<span class='ident'>Storable</span>;
+<span class='kw'>use</span> <span class='ident'>ordered_float</span>::<span class='ident'>OrderedFloat</span>;
+<span class='kw'>use</span> <span class='ident'>bill</span>::<span class='ident'>Currency</span>;
+<span class='kw'>use</span> <span class='ident'>util</span>::<span class='ident'>currency_to_string</span>;
 
 <span class='comment'>//TODO construct table rows way more dynamically</span>
 
-<span class='attribute'>#[<span class='ident'>allow</span>(<span class='ident'>dead_code</span>)]</span>
 <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>print_project</span>(<span class='ident'>_project</span>:<span class='kw-2'>&amp;</span><span class='ident'>Project</span>){
     <span class='macro'>unimplemented</span><span class='macro'>!</span>();
 }
@@ -405,7 +425,7 @@
         <span class='ident'>ListConfig</span>{
             <span class='ident'>mode</span>:         <span class='kw'>if</span> ::<span class='ident'>CONFIG</span>.<span class='ident'>get_bool</span>(<span class='string'>&quot;list/verbose&quot;</span>){ <span class='ident'>ListMode</span>::<span class='ident'>Verbose</span> } <span class='kw'>else</span>{ <span class='ident'>ListMode</span>::<span class='ident'>Simple</span> },
             <span class='ident'>git_status</span>:   ::<span class='ident'>CONFIG</span>.<span class='ident'>get_bool</span>(<span class='string'>&quot;list/gitstatus&quot;</span>),
-            <span class='ident'>show_errors</span>:  <span class='boolval'>false</span>,
+            <span class='ident'>show_errors</span>:  <span class='bool-val'>false</span>,
             <span class='ident'>sort_by</span>:      ::<span class='ident'>CONFIG</span>.<span class='ident'>get_str</span>(<span class='string'>&quot;list/sort&quot;</span>).<span class='ident'>expect</span>(<span class='string'>&quot;Faulty config: list/sort does not contain a value&quot;</span>),
             <span class='ident'>filter_by</span>:    <span class='prelude-val'>None</span>,
             <span class='ident'>use_colors</span>:   ::<span class='ident'>CONFIG</span>.<span class='ident'>get_bool</span>(<span class='string'>&quot;list/colors&quot;</span>),
@@ -414,10 +434,12 @@
     }
 }
 
-<span class='kw'>fn</span> <span class='ident'>result_to_cell</span>(<span class='ident'>res</span>:<span class='kw-2'>&amp;</span><span class='prelude-ty'>Result</span><span class='op'>&lt;</span>(), <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='ident'>str</span><span class='op'>&gt;&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>Cell</span>{
-    <span class='kw'>match</span> <span class='op'>*</span><span class='ident'>res</span>{
-        <span class='prelude-val'>Ok</span>(_)           <span class='op'>=&gt;</span> <span class='ident'>Cell</span>::<span class='ident'>new</span>(<span class='string'>&quot;✓&quot;</span>).<span class='ident'>with_style</span>(<span class='ident'>Attr</span>::<span class='ident'>ForegroundColor</span>(<span class='ident'>color</span>::<span class='ident'>GREEN</span>)), <span class='comment'>// ✗</span>
-        <span class='prelude-val'>Err</span>(<span class='kw-2'>ref</span> <span class='ident'>_errors</span>) <span class='op'>=&gt;</span> <span class='ident'>Cell</span>::<span class='ident'>new</span>(<span class='string'>&quot;✗&quot;</span>).<span class='ident'>with_style</span>(<span class='ident'>Attr</span>::<span class='ident'>ForegroundColor</span>(<span class='ident'>color</span>::<span class='ident'>RED</span>))<span class='comment'>// + &amp;errors.join(&quot;, &quot;) )</span>
+<span class='kw'>fn</span> <span class='ident'>result_to_cell</span>(<span class='ident'>res</span>:<span class='kw-2'>&amp;</span><span class='prelude-ty'>Result</span><span class='op'>&lt;</span>(), <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='ident'>str</span><span class='op'>&gt;&gt;</span>, <span class='ident'>bold</span>:<span class='ident'>bool</span>) <span class='op'>-&gt;</span> <span class='ident'>Cell</span>{
+    <span class='kw'>match</span> (<span class='ident'>res</span>, <span class='ident'>bold</span>){
+        (<span class='kw-2'>&amp;</span><span class='prelude-val'>Ok</span>(_),           <span class='bool-val'>false</span>) <span class='op'>=&gt;</span> <span class='ident'>Cell</span>::<span class='ident'>new</span>(<span class='string'>&quot;✓&quot;</span>).<span class='ident'>with_style</span>(<span class='ident'>Attr</span>::<span class='ident'>ForegroundColor</span>(<span class='ident'>color</span>::<span class='ident'>GREEN</span>)), <span class='comment'>// ✗</span>
+        (<span class='kw-2'>&amp;</span><span class='prelude-val'>Ok</span>(_),           <span class='bool-val'>true</span>)  <span class='op'>=&gt;</span> <span class='ident'>Cell</span>::<span class='ident'>new</span>(<span class='string'>&quot;✓&quot;</span>).<span class='ident'>with_style</span>(<span class='ident'>Attr</span>::<span class='ident'>ForegroundColor</span>(<span class='ident'>color</span>::<span class='ident'>GREEN</span>))
+                                                   .<span class='ident'>with_style</span>(<span class='ident'>Attr</span>::<span class='ident'>Bold</span>), <span class='comment'>// ✗</span>
+        (<span class='kw-2'>&amp;</span><span class='prelude-val'>Err</span>(<span class='kw-2'>ref</span> <span class='ident'>_errors</span>),_)     <span class='op'>=&gt;</span> <span class='ident'>Cell</span>::<span class='ident'>new</span>(<span class='string'>&quot;✗&quot;</span>).<span class='ident'>with_style</span>(<span class='ident'>Attr</span>::<span class='ident'>ForegroundColor</span>(<span class='ident'>color</span>::<span class='ident'>RED</span>))<span class='comment'>// + &amp;errors.join(&quot;, &quot;) )</span>
         <span class='comment'>//&amp;Err(ref errors) =&gt; Cell::new( &amp;format!(&quot;✗ {}&quot;,  &amp;errors.join(&quot;, &quot;) )) .with_style(Attr::ForegroundColor(color::RED))</span>
     }
 }
@@ -438,8 +460,8 @@
             _ <span class='kw'>if</span> <span class='ident'>age</span> <span class='op'>&gt;</span> <span class='number'>28</span>  <span class='op'>=&gt;</span> <span class='string'>&quot;Fm&quot;</span>,
               <span class='number'>1</span> ... <span class='number'>28</span>     <span class='op'>=&gt;</span> <span class='string'>&quot;Fc&quot;</span>,
                     <span class='number'>0</span>      <span class='op'>=&gt;</span> <span class='string'>&quot;Fyb&quot;</span>,
-             <span class='op'>-</span><span class='number'>7</span> ... <span class='number'>0</span>      <span class='op'>=&gt;</span> <span class='string'>&quot;Fr&quot;</span>,
-            <span class='op'>-</span><span class='number'>14</span> ... <span class='op'>-</span><span class='number'>7</span>     <span class='op'>=&gt;</span> <span class='string'>&quot;Fy&quot;</span>,
+             <span class='op'>-</span><span class='number'>7</span> ... <span class='op'>-</span><span class='number'>1</span>     <span class='op'>=&gt;</span> <span class='string'>&quot;Fr&quot;</span>,
+            <span class='op'>-</span><span class='number'>14</span> ... <span class='op'>-</span><span class='number'>8</span>     <span class='op'>=&gt;</span> <span class='string'>&quot;Fy&quot;</span>,
             _ <span class='kw'>if</span> <span class='ident'>age</span> <span class='op'>&lt;</span> <span class='op'>-</span><span class='number'>14</span> <span class='op'>=&gt;</span> <span class='string'>&quot;Fg&quot;</span>,
             _              <span class='op'>=&gt;</span> <span class='string'>&quot;d&quot;</span>
         };
@@ -510,7 +532,7 @@
 
             <span class='ident'>cells</span>.<span class='ident'>push</span>( <span class='ident'>Cell</span>::<span class='ident'>new</span>( <span class='kw-2'>&amp;</span><span class='ident'>status</span>.<span class='ident'>to_string</span>() )
                         .<span class='ident'>with_style</span>( <span class='ident'>Attr</span>::<span class='ident'>ForegroundColor</span>(<span class='ident'>color</span>) )
-                        .<span class='ident'>with_style</span>( <span class='ident'>style</span>.<span class='ident'>unwrap_or_else</span>(<span class='op'>||</span><span class='ident'>Attr</span>::<span class='ident'>Standout</span>(<span class='boolval'>false</span>)) )
+                        .<span class='ident'>with_style</span>( <span class='ident'>style</span>.<span class='ident'>unwrap_or_else</span>(<span class='op'>||</span><span class='ident'>Attr</span>::<span class='ident'>Standout</span>(<span class='bool-val'>false</span>)) )
                       );
 
 
@@ -543,14 +565,16 @@
                     .<span class='ident'>style_spec</span>(<span class='ident'>row_style</span>),
 
                 <span class='comment'>// status &quot;✓  ✓  ✗&quot;</span>
-                <span class='ident'>result_to_cell</span>(<span class='kw-2'>&amp;</span><span class='ident'>validation1</span>),
-                <span class='ident'>result_to_cell</span>(<span class='kw-2'>&amp;</span><span class='ident'>validation2</span>),
-                <span class='ident'>result_to_cell</span>(<span class='kw-2'>&amp;</span><span class='ident'>validation3</span>),
+                <span class='ident'>result_to_cell</span>(<span class='kw-2'>&amp;</span><span class='ident'>validation1</span>, <span class='ident'>project</span>.<span class='ident'>offer_file_exists</span>()),
+                <span class='ident'>result_to_cell</span>(<span class='kw-2'>&amp;</span><span class='ident'>validation2</span>, <span class='ident'>project</span>.<span class='ident'>invoice_file_exists</span>()),
+                <span class='ident'>result_to_cell</span>(<span class='kw-2'>&amp;</span><span class='ident'>validation3</span>, <span class='bool-val'>false</span>),
 
-                <span class='comment'>//cell!(project.sum_invoice().map(|i|i.to_string()).unwrap_or(String::from(&quot;none&quot;))),</span>
+                <span class='comment'>//cell!(output_file_exists(project, Project::offer_file_name)),</span>
+                <span class='comment'>//cell!(output_file_exists(project, Project::invoice_file_name)),</span>
+
+                <span class='macro'>cell</span><span class='macro'>!</span>(<span class='ident'>project</span>.<span class='ident'>sum_sold</span>().<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>i</span><span class='op'>|</span><span class='ident'>currency_to_string</span>(<span class='kw-2'>&amp;</span><span class='ident'>i</span>)).<span class='ident'>unwrap_or</span>(<span class='ident'>String</span>::<span class='ident'>from</span>(<span class='string'>&quot;none&quot;</span>))),
                 <span class='comment'>//cell!(project.wages().map(|i|i.to_string()).unwrap_or(String::from(&quot;none&quot;))),</span>
-                <span class='macro'>cell</span><span class='macro'>!</span>(<span class='ident'>project</span>.<span class='ident'>sum_sold_and_wages</span>().<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>i</span><span class='op'>|</span><span class='ident'>i</span>.<span class='ident'>to_string</span>()).<span class='ident'>unwrap_or</span>(<span class='ident'>String</span>::<span class='ident'>from</span>(<span class='string'>&quot;none&quot;</span>))),
-
+                <span class='comment'>//cell!(project.sum_sold_and_wages().map(|i|i.to_string()).unwrap_or(String::from(&quot;none&quot;))),</span>
             ]);
 
 
@@ -599,9 +623,7 @@
                                         ).<span class='ident'>collect</span>::<span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Cell</span><span class='op'>&gt;&gt;</span>()
                     );
                 <span class='kw'>if</span> <span class='ident'>list_config</span>.<span class='ident'>show_errors</span>{
-                    <span class='kw'>let</span> <span class='ident'>validation</span> <span class='op'>=</span> (<span class='ident'>project</span>.<span class='ident'>valid_stage1</span>(),
-                    <span class='ident'>project</span>.<span class='ident'>valid_stage2</span>(),
-                    <span class='ident'>project</span>.<span class='ident'>valid_stage3</span>());
+                    <span class='kw'>let</span> <span class='ident'>validation</span> <span class='op'>=</span> (<span class='ident'>project</span>.<span class='ident'>valid_stage1</span>(), <span class='ident'>project</span>.<span class='ident'>valid_stage2</span>(), <span class='ident'>project</span>.<span class='ident'>valid_stage3</span>());
 
                     <span class='ident'>cells</span>.<span class='ident'>extend_from_slice</span>( <span class='kw-2'>&amp;</span>[
                                              <span class='comment'>// Errors</span>
@@ -630,60 +652,70 @@
 }
 
 <span class='doccomment'>/// Prints Projects as CSV</span>
+<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>print_csv_year</span>(<span class='ident'>year</span>:<span class='ident'>i32</span>){
+    <span class='kw'>match</span> ::<span class='ident'>actions</span>::<span class='ident'>csv</span>(<span class='ident'>year</span>) {
+        <span class='prelude-val'>Ok</span>(<span class='ident'>csv</span>) <span class='op'>=&gt;</span> <span class='macro'>println</span><span class='macro'>!</span>(<span class='string'>&quot;{}&quot;</span>, <span class='ident'>csv</span>),
+        <span class='prelude-val'>Err</span>(<span class='ident'>err</span>) <span class='op'>=&gt;</span> <span class='macro'>println</span><span class='macro'>!</span>(<span class='string'>&quot;{}&quot;</span>, <span class='ident'>err</span>.<span class='ident'>description</span>())
+    }
+}
+
+<span class='doccomment'>/// Prints Projects as CSV</span>
 <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>print_csv</span>(<span class='ident'>projects</span>:<span class='kw-2'>&amp;</span>[<span class='ident'>Project</span>]){
-    <span class='comment'>// TODO print head</span>
-    <span class='kw'>let</span> <span class='ident'>splitter</span> <span class='op'>=</span> <span class='string'>&quot;;&quot;</span>;
-        <span class='macro'>println</span><span class='macro'>!</span>(<span class='string'>&quot;{}&quot;</span>, [
-                 <span class='string'>&quot;Rnum&quot;</span>,
-                 <span class='string'>&quot;Bezeichnung&quot;</span>,
-                 <span class='string'>&quot;Datum&quot;</span>,
-                 <span class='string'>&quot;Rechnungs&quot;</span>,
-                 <span class='string'>&quot;Betreuer&quot;</span>,
-                 <span class='string'>&quot;Verantwortlich&quot;</span>,
-                 <span class='string'>&quot;Bezahlt am&quot;</span>,
-                 <span class='string'>&quot;Betrag&quot;</span>,
-                 <span class='string'>&quot;Canceled&quot;</span>].<span class='ident'>join</span>(<span class='ident'>splitter</span>));
-    <span class='kw'>for</span> <span class='ident'>project</span> <span class='kw'>in</span> <span class='ident'>projects</span>{
-        <span class='macro'>println</span><span class='macro'>!</span>(<span class='string'>&quot;{}&quot;</span>, [
-            <span class='ident'>project</span>.<span class='ident'>get</span>(<span class='string'>&quot;InvoiceNumber&quot;</span>).<span class='ident'>unwrap_or_else</span>(<span class='ident'>String</span>::<span class='ident'>new</span>),
-            <span class='ident'>project</span>.<span class='ident'>get</span>(<span class='string'>&quot;Name&quot;</span>).<span class='ident'>unwrap_or_else</span>(<span class='ident'>String</span>::<span class='ident'>new</span>),
-            <span class='ident'>project</span>.<span class='ident'>get</span>(<span class='string'>&quot;event/dates/0/begin&quot;</span>).<span class='ident'>unwrap_or_else</span>(<span class='ident'>String</span>::<span class='ident'>new</span>),
-            <span class='ident'>project</span>.<span class='ident'>get</span>(<span class='string'>&quot;invoice/date&quot;</span>).<span class='ident'>unwrap_or_else</span>(<span class='ident'>String</span>::<span class='ident'>new</span>),
-            <span class='ident'>project</span>.<span class='ident'>get</span>(<span class='string'>&quot;Caterers&quot;</span>).<span class='ident'>unwrap_or_else</span>(<span class='ident'>String</span>::<span class='ident'>new</span>),
-            <span class='ident'>project</span>.<span class='ident'>get</span>(<span class='string'>&quot;Responsible&quot;</span>).<span class='ident'>unwrap_or_else</span>(<span class='ident'>String</span>::<span class='ident'>new</span>),
-            <span class='ident'>project</span>.<span class='ident'>get</span>(<span class='string'>&quot;invoice/payed_date&quot;</span>).<span class='ident'>unwrap_or_else</span>(<span class='ident'>String</span>::<span class='ident'>new</span>),
-            <span class='ident'>project</span>.<span class='ident'>get</span>(<span class='string'>&quot;Final&quot;</span>).<span class='ident'>unwrap_or_else</span>(<span class='ident'>String</span>::<span class='ident'>new</span>),
-            <span class='ident'>project</span>.<span class='ident'>canceled_string</span>().<span class='ident'>to_owned</span>()
-        ].<span class='ident'>join</span>(<span class='ident'>splitter</span>));
+    <span class='kw'>match</span> ::<span class='ident'>actions</span>::<span class='ident'>projects_to_csv</span>(<span class='ident'>projects</span>) {
+        <span class='prelude-val'>Ok</span>(<span class='ident'>csv</span>) <span class='op'>=&gt;</span> <span class='macro'>println</span><span class='macro'>!</span>(<span class='string'>&quot;{}&quot;</span>, <span class='ident'>csv</span>),
+        <span class='prelude-val'>Err</span>(<span class='ident'>err</span>) <span class='op'>=&gt;</span> <span class='macro'>println</span><span class='macro'>!</span>(<span class='string'>&quot;{}&quot;</span>, <span class='ident'>err</span>.<span class='ident'>description</span>())
     }
 }
 
 <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>show_items</span>(<span class='ident'>project</span>:<span class='kw-2'>&amp;</span><span class='ident'>Project</span>){
-
+    <span class='macro'>trace</span><span class='macro'>!</span>(<span class='string'>&quot;print::show_items()&quot;</span>);
     <span class='macro'>println</span><span class='macro'>!</span>(<span class='string'>&quot;{}&quot;</span>, <span class='ident'>project</span>.<span class='ident'>name</span>());
 
+    <span class='kw'>let</span> (<span class='ident'>order</span>, <span class='ident'>_invoice</span>) <span class='op'>=</span> <span class='ident'>project</span>.<span class='ident'>bills</span>().<span class='ident'>unwrap</span>();
+    <span class='kw'>let</span> <span class='ident'>bill</span> <span class='op'>=</span> <span class='ident'>order</span>;
+
     <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>table</span> <span class='op'>=</span> <span class='ident'>Table</span>::<span class='ident'>new</span>();
-    <span class='kw'>let</span> <span class='ident'>items</span> <span class='op'>=</span> <span class='ident'>project</span>.<span class='ident'>invoice_items</span>().<span class='ident'>expect</span>(<span class='string'>&quot;problem opening items&quot;</span>);
-    <span class='comment'>//table.set_format(TableFormat::new());</span>
-    <span class='ident'>table</span>.<span class='ident'>add_row</span>( <span class='ident'>Row</span>::<span class='ident'>new</span>(<span class='macro'>vec</span><span class='macro'>!</span>[<span class='macro'>cell</span><span class='macro'>!</span>(<span class='string'>&quot;&quot;</span>), <span class='macro'>cell</span><span class='macro'>!</span>(<span class='string'>&quot;name&quot;</span>), <span class='macro'>cell</span><span class='macro'>!</span>( <span class='string'>&quot;amount&quot;</span>), <span class='macro'>cell</span><span class='macro'>!</span>(<span class='string'>&quot;price&quot;</span>), <span class='macro'>cell</span><span class='macro'>!</span>(<span class='string'>&quot;cost&quot;</span>)]));
-    <span class='kw'>for</span> (<span class='ident'>index</span>,<span class='ident'>item</span>) <span class='kw'>in</span> <span class='ident'>items</span>.<span class='ident'>iter</span>().<span class='ident'>enumerate</span>(){
-        <span class='ident'>table</span>.<span class='ident'>add_row</span>( <span class='ident'>Row</span>::<span class='ident'>new</span>(<span class='macro'>vec</span><span class='macro'>!</span>[
-                                <span class='ident'>Cell</span>::<span class='ident'>new</span>(<span class='kw-2'>&amp;</span><span class='ident'>index</span>.<span class='ident'>to_string</span>()),
-                                <span class='ident'>Cell</span>::<span class='ident'>new</span>(<span class='ident'>item</span>.<span class='ident'>item</span>.<span class='ident'>name</span>),
-                                <span class='ident'>Cell</span>::<span class='ident'>new</span>(<span class='kw-2'>&amp;</span><span class='ident'>item</span>.<span class='ident'>amount_sold</span>.<span class='ident'>to_string</span>()),
-                                <span class='ident'>Cell</span>::<span class='ident'>new</span>(<span class='kw-2'>&amp;</span><span class='ident'>item</span>.<span class='ident'>item</span>.<span class='ident'>price</span>.<span class='ident'>to_string</span>()),
-                                <span class='ident'>Cell</span>::<span class='ident'>new</span>(<span class='kw-2'>&amp;</span>(<span class='ident'>item</span>.<span class='ident'>item</span>.<span class='ident'>price</span> <span class='op'>*</span> <span class='ident'>item</span>.<span class='ident'>amount_sold</span>).<span class='ident'>to_string</span>()),
-        ]));
+    <span class='macro'>trace</span><span class='macro'>!</span>(<span class='string'>&quot;                   - created table&quot;</span>);
+    <span class='comment'>//table.set_format(*format::consts::FORMAT_BORDERS_ONLY);</span>
+    <span class='ident'>table</span>.<span class='ident'>set_format</span>(
+        <span class='ident'>FormatBuilder</span>::<span class='ident'>new</span>()
+        <span class='comment'>//.column_separator(&#39;│&#39;)</span>
+        .<span class='ident'>borders</span>(<span class='string'>&#39;│&#39;</span>)
+        .<span class='ident'>padding</span>(<span class='number'>1</span>, <span class='number'>1</span>)
+        <span class='comment'>//.separators( &amp;[LinePosition::Top],    LineSeparator::new(&#39;─&#39;, &#39;┬&#39;, &#39;┌&#39;, &#39;┐&#39;))</span>
+        <span class='comment'>//.separators( &amp;[LinePosition::Title], LineSeparator::new(&#39;─&#39;, &#39;┴&#39;, &#39;├&#39;, &#39;┤&#39;))</span>
+        .<span class='ident'>separators</span>( <span class='kw-2'>&amp;</span>[<span class='ident'>LinePosition</span>::<span class='ident'>Title</span>], <span class='ident'>LineSeparator</span>::<span class='ident'>new</span>(<span class='string'>&#39;─&#39;</span>, <span class='string'>&#39;─&#39;</span>, <span class='string'>&#39;├&#39;</span>, <span class='string'>&#39;┤&#39;</span>))
+        <span class='comment'>//.separators( &amp;[LinePosition::Intern], format::LineSeparator::new(&#39;─&#39;, &#39;┼&#39;, &#39;├&#39;, &#39;┤&#39;))</span>
+        <span class='comment'>//.separators( &amp;[LinePosition::Bottom], LineSeparator::new(&#39;─&#39;, &#39;┴&#39;, &#39;└&#39;, &#39;┘&#39;))</span>
+        .<span class='ident'>separators</span>( <span class='kw-2'>&amp;</span>[<span class='ident'>LinePosition</span>::<span class='ident'>Top</span>],    <span class='ident'>LineSeparator</span>::<span class='ident'>new</span>(<span class='string'>&#39;─&#39;</span>, <span class='string'>&#39;─&#39;</span>, <span class='string'>&#39;┌&#39;</span>, <span class='string'>&#39;┐&#39;</span>))
+        .<span class='ident'>separators</span>( <span class='kw-2'>&amp;</span>[<span class='ident'>LinePosition</span>::<span class='ident'>Bottom</span>], <span class='ident'>LineSeparator</span>::<span class='ident'>new</span>(<span class='string'>&#39;─&#39;</span>, <span class='string'>&#39;─&#39;</span>, <span class='string'>&#39;└&#39;</span>, <span class='string'>&#39;┘&#39;</span>))
+        .<span class='ident'>build</span>()
+        );
+    <span class='ident'>table</span>.<span class='ident'>set_titles</span>( <span class='ident'>Row</span>::<span class='ident'>new</span>(<span class='macro'>vec</span><span class='macro'>!</span>[<span class='macro'>cell</span><span class='macro'>!</span>(<span class='string'>&quot;&quot;</span>), <span class='macro'>cell</span><span class='macro'>!</span>(<span class='string'>&quot;name&quot;</span>), <span class='macro'>cell</span><span class='macro'>!</span>( <span class='string'>&quot;amount&quot;</span>), <span class='macro'>cell</span><span class='macro'>!</span>(<span class='string'>&quot;price&quot;</span>), <span class='macro'>cell</span><span class='macro'>!</span>(<span class='string'>&quot;cost&quot;</span>)]));
+    <span class='macro'>trace</span><span class='macro'>!</span>(<span class='string'>&quot;                   - added a row&quot;</span>);
+    <span class='kw'>for</span> (<span class='ident'>_tax</span>, <span class='ident'>items</span>) <span class='kw'>in</span> <span class='ident'>bill</span>.<span class='ident'>items_by_tax</span>.<span class='ident'>iter</span>(){
+        <span class='kw'>for</span> (<span class='ident'>index</span>,<span class='ident'>item</span>) <span class='kw'>in</span> <span class='ident'>items</span>.<span class='ident'>iter</span>().<span class='ident'>enumerate</span>(){
+            <span class='ident'>table</span>.<span class='ident'>add_row</span>( <span class='ident'>Row</span>::<span class='ident'>new</span>(<span class='macro'>vec</span><span class='macro'>!</span>[
+                                    <span class='ident'>Cell</span>::<span class='ident'>new</span>(<span class='kw-2'>&amp;</span><span class='ident'>index</span>.<span class='ident'>to_string</span>()),
+                                    <span class='ident'>Cell</span>::<span class='ident'>new</span>(<span class='ident'>item</span>.<span class='ident'>product</span>.<span class='ident'>name</span>),
+                                    <span class='ident'>Cell</span>::<span class='ident'>new</span>(<span class='kw-2'>&amp;</span><span class='ident'>item</span>.<span class='ident'>amount</span>.<span class='ident'>to_string</span>()),
+                                    <span class='ident'>Cell</span>::<span class='ident'>new</span>(<span class='kw-2'>&amp;</span><span class='ident'>currency_to_string</span>(<span class='kw-2'>&amp;</span><span class='ident'>item</span>.<span class='ident'>product</span>.<span class='ident'>price</span>)),
+                                    <span class='ident'>Cell</span>::<span class='ident'>new</span>(<span class='kw-2'>&amp;</span><span class='ident'>currency_to_string</span>(<span class='kw-2'>&amp;</span>(<span class='ident'>item</span>.<span class='ident'>product</span>.<span class='ident'>price</span> <span class='op'>*</span> <span class='ident'>item</span>.<span class='ident'>amount</span>))),
+            ]));
+        }
     }
     <span class='ident'>table</span>.<span class='ident'>printstd</span>();
-    <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>table</span> <span class='op'>=</span> <span class='macro'>table</span><span class='macro'>!</span>{
-        [<span class='string'>&quot;sold &quot;</span>, <span class='ident'>project</span>.<span class='ident'>sum_sold</span>().<span class='ident'>unwrap</span>() ],
-        [<span class='string'>&quot;tax&quot;</span>, <span class='ident'>project</span>.<span class='ident'>tax_sold</span>().<span class='ident'>unwrap</span>() ],
-        [<span class='string'>&quot;sum+tax&quot;</span>, <span class='ident'>project</span>.<span class='ident'>sum_sold_and_taxes</span>().<span class='ident'>unwrap</span>()],
-        [<span class='string'>&quot;sum+wages&quot;</span>, <span class='ident'>project</span>.<span class='ident'>sum_sold_and_wages</span>().<span class='ident'>unwrap</span>()]
-    };
-    <span class='ident'>table</span>.<span class='ident'>set_format</span>(<span class='ident'>TableFormat</span>::<span class='ident'>new</span>());
-    <span class='ident'>table</span>.<span class='ident'>printstd</span>();
+    <span class='macro'>trace</span><span class='macro'>!</span>(<span class='string'>&quot;                   - printed table&quot;</span>);
+    <span class='kw'>let</span> <span class='ident'>taxes</span> <span class='op'>=</span> <span class='ident'>bill</span>.<span class='ident'>taxes_by_tax</span>();
+    <span class='kw'>let</span> <span class='ident'>sums</span> <span class='op'>=</span> <span class='ident'>bill</span>.<span class='ident'>sums_by_tax</span>();
+    <span class='kw'>let</span> <span class='ident'>total</span> <span class='op'>=</span> <span class='ident'>bill</span>.<span class='ident'>total</span>();
+
+    <span class='macro'>println</span><span class='macro'>!</span>(<span class='string'>&quot;Taxes   0% : {}&quot;</span>, <span class='ident'>currency_to_string</span>(<span class='kw-2'>&amp;</span><span class='ident'>taxes</span>.<span class='ident'>get</span>(<span class='kw-2'>&amp;</span><span class='ident'>OrderedFloat</span>(<span class='number'>0.0</span>)).<span class='ident'>unwrap_or</span>(<span class='kw-2'>&amp;</span><span class='ident'>Currency</span>(<span class='prelude-val'>Some</span>(<span class='string'>&#39;€&#39;</span>),<span class='number'>0</span>))));
+    <span class='macro'>println</span><span class='macro'>!</span>(<span class='string'>&quot;     19,0% : {}&quot;</span>, <span class='ident'>currency_to_string</span>(<span class='kw-2'>&amp;</span><span class='ident'>taxes</span>.<span class='ident'>get</span>(<span class='kw-2'>&amp;</span><span class='ident'>OrderedFloat</span>(<span class='number'>0.19</span>)).<span class='ident'>unwrap_or</span>(<span class='kw-2'>&amp;</span><span class='ident'>Currency</span>(<span class='prelude-val'>Some</span>(<span class='string'>&#39;€&#39;</span>),<span class='number'>0</span>))));
+
+    <span class='macro'>println</span><span class='macro'>!</span>(<span class='string'>&quot;Sums    0% : {}&quot;</span>, <span class='ident'>currency_to_string</span>(<span class='kw-2'>&amp;</span><span class='ident'>sums</span>.<span class='ident'>get</span>(<span class='kw-2'>&amp;</span><span class='ident'>OrderedFloat</span>(<span class='number'>0.0</span>)).<span class='ident'>unwrap_or</span>(<span class='kw-2'>&amp;</span><span class='ident'>Currency</span>(<span class='prelude-val'>Some</span>(<span class='string'>&#39;€&#39;</span>),<span class='number'>0</span>))));
+    <span class='macro'>println</span><span class='macro'>!</span>(<span class='string'>&quot;     19,0% : {}&quot;</span>, <span class='ident'>currency_to_string</span>(<span class='kw-2'>&amp;</span><span class='ident'>sums</span>.<span class='ident'>get</span>(<span class='kw-2'>&amp;</span><span class='ident'>OrderedFloat</span>(<span class='number'>0.19</span>)).<span class='ident'>unwrap_or</span>(<span class='kw-2'>&amp;</span><span class='ident'>Currency</span>(<span class='prelude-val'>Some</span>(<span class='string'>&#39;€&#39;</span>),<span class='number'>0</span>))));
+    <span class='macro'>println</span><span class='macro'>!</span>(<span class='string'>&quot;Total        {}&quot;</span>, <span class='ident'>currency_to_string</span>(<span class='kw-2'>&amp;</span><span class='ident'>total</span>));
 
     <span class='comment'>//println!(&quot;{}&quot;, project.sum_offered().unwrap());</span>
     <span class='comment'>//println!(&quot;{}&quot;, project.tax_offered().unwrap());</span>
@@ -713,6 +745,8 @@
                     <dd>Move down in search results</dd>
                     <dt>&#9166;</dt>
                     <dd>Go to active search result</dd>
+                    <dt>+</dt>
+                    <dd>Collapse/expand all sections</dd>
                 </dl>
             </div>
 

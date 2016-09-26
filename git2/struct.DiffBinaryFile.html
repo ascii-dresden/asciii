@@ -47,15 +47,14 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-2702' class='srclink' href='../src/git2/diff.rs.html#85-88' title='goto source code'>[src]</a></span></h1>
-<pre class='rust struct'>pub struct DiffBinaryFile&lt;'a&gt; {
-    // some fields omitted
-}</pre><div class='docblock'><p>The contents of one of the files in a binary diff.</p>
-</div><h2 id='methods'>Methods</h2><h3 class='impl'><code>impl&lt;'a&gt; <a class='struct' href='../git2/struct.DiffBinaryFile.html' title='git2::DiffBinaryFile'>DiffBinaryFile</a>&lt;'a&gt;</code></h3><div class='impl-items'><h4 id='method.kind' class='method'><code>fn <a href='#method.kind' class='fnname'>kind</a>(&amp;self) -&gt; <a class='enum' href='../git2/enum.DiffBinaryKind.html' title='git2::DiffBinaryKind'>DiffBinaryKind</a></code></h4>
+               </span><a id='src-2985' class='srclink' href='../src/git2/diff.rs.html#85-88' title='goto source code'>[src]</a></span></h1>
+<pre class='rust struct'>pub struct DiffBinaryFile&lt;'a&gt; { /* fields omitted */ }</pre><div class='docblock'><p>The contents of one of the files in a binary diff.</p>
+</div><h2 id='methods'>Methods</h2><h3 class='impl'><span class='in-band'><code>impl&lt;'a&gt; <a class='struct' href='../git2/struct.DiffBinaryFile.html' title='git2::DiffBinaryFile'>DiffBinaryFile</a>&lt;'a&gt;</code></span><span class='out-of-band'><div class='ghost'></div><a id='src-3404' class='srclink' href='../src/git2/diff.rs.html#898-917' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.kind' class='method'><span id='kind.v' class='invisible'><code>fn <a href='#method.kind' class='fnname'>kind</a>(&amp;self) -&gt; <a class='enum' href='../git2/enum.DiffBinaryKind.html' title='git2::DiffBinaryKind'>DiffBinaryKind</a></code></span></h4>
 <div class='docblock'><p>The type of binary data for this file</p>
-</div><h4 id='method.data' class='method'><code>fn <a href='#method.data' class='fnname'>data</a>(&amp;self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>&amp;[</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u8.html'>u8</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>]</a></code></h4>
+</div><h4 id='method.data' class='method'><span id='data.v' class='invisible'><code>fn <a href='#method.data' class='fnname'>data</a>(&amp;self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>&amp;[</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u8.html'>u8</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>]</a></code></span></h4>
 <div class='docblock'><p>The binary data, deflated</p>
-</div><h4 id='method.inflated_len' class='method'><code>fn <a href='#method.inflated_len' class='fnname'>inflated_len</a>(&amp;self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a></code></h4>
+</div><h4 id='method.inflated_len' class='method'><span id='inflated_len.v' class='invisible'><code>fn <a href='#method.inflated_len' class='fnname'>inflated_len</a>(&amp;self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a></code></span></h4>
 <div class='docblock'><p>The length of the binary data after inflation</p>
 </div></div></section>
     <section id='search' class="content hidden"></section>
@@ -80,6 +79,8 @@
                     <dd>Move down in search results</dd>
                     <dt>&#9166;</dt>
                     <dd>Go to active search result</dd>
+                    <dt>+</dt>
+                    <dd>Collapse/expand all sections</dd>
                 </dl>
             </div>
 

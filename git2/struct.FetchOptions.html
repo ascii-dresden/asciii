@@ -47,21 +47,20 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-4328' class='srclink' href='../src/git2/remote.rs.html#38-43' title='goto source code'>[src]</a></span></h1>
-<pre class='rust struct'>pub struct FetchOptions&lt;'cb&gt; {
-    // some fields omitted
-}</pre><div class='docblock'><p>Options which can be specified to various fetch operations.</p>
-</div><h2 id='methods'>Methods</h2><h3 class='impl'><code>impl&lt;'cb&gt; <a class='struct' href='../git2/struct.FetchOptions.html' title='git2::FetchOptions'>FetchOptions</a>&lt;'cb&gt;</code></h3><div class='impl-items'><h4 id='method.new' class='method'><code>fn <a href='#method.new' class='fnname'>new</a>() -&gt; <a class='struct' href='../git2/struct.FetchOptions.html' title='git2::FetchOptions'>FetchOptions</a>&lt;'cb&gt;</code></h4>
+               </span><a id='src-4750' class='srclink' href='../src/git2/remote.rs.html#38-43' title='goto source code'>[src]</a></span></h1>
+<pre class='rust struct'>pub struct FetchOptions&lt;'cb&gt; { /* fields omitted */ }</pre><div class='docblock'><p>Options which can be specified to various fetch operations.</p>
+</div><h2 id='methods'>Methods</h2><h3 class='impl'><span class='in-band'><code>impl&lt;'cb&gt; <a class='struct' href='../git2/struct.FetchOptions.html' title='git2::FetchOptions'>FetchOptions</a>&lt;'cb&gt;</code></span><span class='out-of-band'><div class='ghost'></div><a id='src-4929' class='srclink' href='../src/git2/remote.rs.html#302-341' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.new' class='method'><span id='new.v' class='invisible'><code>fn <a href='#method.new' class='fnname'>new</a>() -&gt; <a class='struct' href='../git2/struct.FetchOptions.html' title='git2::FetchOptions'>FetchOptions</a>&lt;'cb&gt;</code></span></h4>
 <div class='docblock'><p>Creates a new blank set of fetch options</p>
-</div><h4 id='method.remote_callbacks' class='method'><code>fn <a href='#method.remote_callbacks' class='fnname'>remote_callbacks</a>(&amp;mut self, cbs: <a class='struct' href='../git2/struct.RemoteCallbacks.html' title='git2::RemoteCallbacks'>RemoteCallbacks</a>&lt;'cb&gt;) -&gt; &amp;mut Self</code></h4>
+</div><h4 id='method.remote_callbacks' class='method'><span id='remote_callbacks.v' class='invisible'><code>fn <a href='#method.remote_callbacks' class='fnname'>remote_callbacks</a>(&amp;mut self, cbs: <a class='struct' href='../git2/struct.RemoteCallbacks.html' title='git2::RemoteCallbacks'>RemoteCallbacks</a>&lt;'cb&gt;) -&gt; &amp;mut Self</code></span></h4>
 <div class='docblock'><p>Set the callbacks to use for the fetch operation.</p>
-</div><h4 id='method.prune' class='method'><code>fn <a href='#method.prune' class='fnname'>prune</a>(&amp;mut self, prune: <a class='enum' href='../git2/enum.FetchPrune.html' title='git2::FetchPrune'>FetchPrune</a>) -&gt; &amp;mut Self</code></h4>
+</div><h4 id='method.prune' class='method'><span id='prune.v' class='invisible'><code>fn <a href='#method.prune' class='fnname'>prune</a>(&amp;mut self, prune: <a class='enum' href='../git2/enum.FetchPrune.html' title='git2::FetchPrune'>FetchPrune</a>) -&gt; &amp;mut Self</code></span></h4>
 <div class='docblock'><p>Set whether to perform a prune after the fetch.</p>
-</div><h4 id='method.update_fetchhead' class='method'><code>fn <a href='#method.update_fetchhead' class='fnname'>update_fetchhead</a>(&amp;mut self, update: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a>) -&gt; &amp;mut Self</code></h4>
+</div><h4 id='method.update_fetchhead' class='method'><span id='update_fetchhead.v' class='invisible'><code>fn <a href='#method.update_fetchhead' class='fnname'>update_fetchhead</a>(&amp;mut self, update: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a>) -&gt; &amp;mut Self</code></span></h4>
 <div class='docblock'><p>Set whether to write the results to FETCH_HEAD.</p>
 
 <p>Defaults to <code>true</code>.</p>
-</div><h4 id='method.download_tags' class='method'><code>fn <a href='#method.download_tags' class='fnname'>download_tags</a>(&amp;mut self, opt: <a class='enum' href='../git2/enum.AutotagOption.html' title='git2::AutotagOption'>AutotagOption</a>) -&gt; &amp;mut Self</code></h4>
+</div><h4 id='method.download_tags' class='method'><span id='download_tags.v' class='invisible'><code>fn <a href='#method.download_tags' class='fnname'>download_tags</a>(&amp;mut self, opt: <a class='enum' href='../git2/enum.AutotagOption.html' title='git2::AutotagOption'>AutotagOption</a>) -&gt; &amp;mut Self</code></span></h4>
 <div class='docblock'><p>Set how to behave regarding tags on the remote, such as auto-downloading
 tags for objects we&#39;re downloading or downloading all of them.</p>
 
@@ -89,6 +88,8 @@ tags for objects we&#39;re downloading or downloading all of them.</p>
                     <dd>Move down in search results</dd>
                     <dt>&#9166;</dt>
                     <dd>Go to active search result</dd>
+                    <dt>+</dt>
+                    <dd>Collapse/expand all sections</dd>
                 </dl>
             </div>
 

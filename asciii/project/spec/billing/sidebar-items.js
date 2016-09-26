@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["bills","Produces two `Bill`s, one for the offer and one for the invoice"]]});

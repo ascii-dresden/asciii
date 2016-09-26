@@ -43,12 +43,12 @@
     </nav>
 
     <section id='main' class="content constant">
-<h1 class='fqn'><span class='in-band'><a href='../index.html'>asciii</a>::<wbr><a href='index.html'>config</a>::<wbr><a class='constant' href=''>DEFAULT_CONFIG</a></span><span class='out-of-band'><span id='render-detail'>
+<h1 class='fqn'><span class='in-band'>Constant <a href='../index.html'>asciii</a>::<wbr><a href='index.html'>config</a>::<wbr><a class='constant' href=''>DEFAULT_CONFIG</a></span><span class='out-of-band'><span id='render-detail'>
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-269' class='srclink' href='../../src/asciii/src/config.rs.html#123' title='goto source code'>[src]</a></span></h1>
-<pre class='rust const'>pub const DEFAULT_CONFIG: &amp;'static <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a><code> = </code><code>include_str!("./default_config.yml")</code></pre><div class='docblock'><p>Default configuration that will be used if a value is not set in yaml file at <code>DEFAULT_LOCATION</code></p>
+               </span><a id='src-318' class='srclink' href='../../src/asciii/src/config.rs.html#121' title='goto source code'>[src]</a></span></h1>
+<pre class='rust const'>pub const DEFAULT_CONFIG: &amp;'static <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a><code> = </code><code>&quot;---\nmanager_name: #\&quot;The Unnamed Manager\&quot;\neditor:       #\&quot;vim -O\&quot;\n\npath: \&quot;~\&quot;\noutput_path: \&quot;.\&quot;\nlist:\n  colors:    false\n  verbose:   false\n  sort:      index\n  gitstatus: false\n\ndirs:\n  storage: projects\n  working: working\n  archive: archive\n  templates: templates\n\ntemplate: default # default template\n\n## CAREFUL HERE\nextensions:\n  project_file: yml\n  project_template: tyml\n  output_file: tex\n  output_template: tex.hbs\n\nconvert:\n  tool: pdflatex\n  output_extension: pdf\n  trash_extensions: [aux,log]\n\n#log_file: ~/.ascii_log # unimplemented\n#calendar_file: invoicer.ics #unimplemented\n\ndefaults:\n  tax: 0.19\n  canceled: false\n  salary: 8.0\n  lang: de\n\ncurrency: \&quot;\u{20ac}\&quot;\n\ngender_matches:\n  herr: male\n  frau: female\n  professor: male\n  professorin: female\n\nlang_addressing:\n  de:\n    male: Sehr geehrter\n    female: Sehr geehrte\n  en:\n    male: Dear\n    female: Dear\n...\n&quot;</code></pre><div class='docblock'><p>Default configuration that will be used if a value is not set in yaml file at <code>DEFAULT_LOCATION</code></p>
 </div></section>
     <section id='search' class="content hidden"></section>
 
@@ -72,6 +72,8 @@
                     <dd>Move down in search results</dd>
                     <dt>&#9166;</dt>
                     <dd>Go to active search result</dd>
+                    <dt>+</dt>
+                    <dd>Collapse/expand all sections</dd>
                 </dl>
             </div>
 

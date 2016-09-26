@@ -47,9 +47,9 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-1121' class='srclink' href='../src/git2/util.rs.html#69-72' title='goto source code'>[src]</a></span></h1>
+               </span><a id='src-1361' class='srclink' href='../src/git2/util.rs.html#69-72' title='goto source code'>[src]</a></span></h1>
 <pre class='rust trait'>pub trait IntoCString {
-    fn <a href='#tymethod.into_c_string' class='fnname'>into_c_string</a>(self) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/std/ffi/c_str/struct.CString.html' title='std::ffi::c_str::CString'>CString</a>, <a class='struct' href='../git2/struct.Error.html' title='git2::Error'>Error</a>&gt;;
+    fn <a href='#tymethod.into_c_string' class='fnname'>into_c_string</a>(self) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/std/ffi/c_str/struct.CString.html' title='std::ffi::c_str::CString'>CString</a>,&nbsp;<a class='struct' href='../git2/struct.Error.html' title='git2::Error'>Error</a>&gt;;
 }</pre><div class='docblock'><p>A class of types that can be converted to C strings.</p>
 
 <p>These types are represented internally as byte slices and it is quite rare
@@ -57,20 +57,20 @@ for them to contain an interior 0 byte.</p>
 </div>
             <h2 id='required-methods'>Required Methods</h2>
             <div class='methods'>
-        <h3 id='tymethod.into_c_string' class='method stab '><code>fn <a href='#tymethod.into_c_string' class='fnname'>into_c_string</a>(self) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/std/ffi/c_str/struct.CString.html' title='std::ffi::c_str::CString'>CString</a>, <a class='struct' href='../git2/struct.Error.html' title='git2::Error'>Error</a>&gt;</code></h3><div class='docblock'><p>Consume this container, converting it into a CString</p>
+        <h3 id='tymethod.into_c_string' class='method stab '><span id='into_c_string.v' class='invisible'><code>fn <a href='#tymethod.into_c_string' class='fnname'>into_c_string</a>(self) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/std/ffi/c_str/struct.CString.html' title='std::ffi::c_str::CString'>CString</a>,&nbsp;<a class='struct' href='../git2/struct.Error.html' title='git2::Error'>Error</a>&gt;</code></span></h3><div class='docblock'><p>Consume this container, converting it into a CString</p>
 </div></div>
         <h2 id='implementors'>Implementors</h2>
         <ul class='item-list' id='implementors-list'>
-    <li><code>impl&lt;'a, T: <a class='trait' href='../git2/trait.IntoCString.html' title='git2::IntoCString'>IntoCString</a> + <a class='trait' href='https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html' title='core::clone::Clone'>Clone</a>&gt; <a class='trait' href='../git2/trait.IntoCString.html' title='git2::IntoCString'>IntoCString</a> for &amp;'a T</code></li>
-<li><code>impl&lt;'a&gt; <a class='trait' href='../git2/trait.IntoCString.html' title='git2::IntoCString'>IntoCString</a> for &amp;'a <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a></code></li>
-<li><code>impl <a class='trait' href='../git2/trait.IntoCString.html' title='git2::IntoCString'>IntoCString</a> for <a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a></code></li>
-<li><code>impl <a class='trait' href='../git2/trait.IntoCString.html' title='git2::IntoCString'>IntoCString</a> for <a class='struct' href='https://doc.rust-lang.org/nightly/std/ffi/c_str/struct.CString.html' title='std::ffi::c_str::CString'>CString</a></code></li>
-<li><code>impl&lt;'a&gt; <a class='trait' href='../git2/trait.IntoCString.html' title='git2::IntoCString'>IntoCString</a> for &amp;'a <a class='struct' href='https://doc.rust-lang.org/nightly/std/path/struct.Path.html' title='std::path::Path'>Path</a></code></li>
-<li><code>impl <a class='trait' href='../git2/trait.IntoCString.html' title='git2::IntoCString'>IntoCString</a> for <a class='struct' href='https://doc.rust-lang.org/nightly/std/path/struct.PathBuf.html' title='std::path::PathBuf'>PathBuf</a></code></li>
-<li><code>impl&lt;'a&gt; <a class='trait' href='../git2/trait.IntoCString.html' title='git2::IntoCString'>IntoCString</a> for &amp;'a <a class='struct' href='https://doc.rust-lang.org/nightly/std/ffi/os_str/struct.OsStr.html' title='std::ffi::os_str::OsStr'>OsStr</a></code></li>
-<li><code>impl <a class='trait' href='../git2/trait.IntoCString.html' title='git2::IntoCString'>IntoCString</a> for <a class='struct' href='https://doc.rust-lang.org/nightly/std/ffi/os_str/struct.OsString.html' title='std::ffi::os_str::OsString'>OsString</a></code></li>
-<li><code>impl&lt;'a&gt; <a class='trait' href='../git2/trait.IntoCString.html' title='git2::IntoCString'>IntoCString</a> for <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>&amp;'a [</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u8.html'>u8</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>]</a></code></li>
-<li><code>impl <a class='trait' href='../git2/trait.IntoCString.html' title='git2::IntoCString'>IntoCString</a> for <a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u8.html'>u8</a>&gt;</code></li>
+    <li><code>impl&lt;'a,&nbsp;T:&nbsp;<a class='trait' href='../git2/trait.IntoCString.html' title='git2::IntoCString'>IntoCString</a> + <a class='trait' href='https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html' title='core::clone::Clone'>Clone</a>&gt; IntoCString for &amp;'a T</code></li>
+<li><code>impl&lt;'a&gt; IntoCString for &amp;'a <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a></code></li>
+<li><code>impl IntoCString for <a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a></code></li>
+<li><code>impl IntoCString for <a class='struct' href='https://doc.rust-lang.org/nightly/std/ffi/c_str/struct.CString.html' title='std::ffi::c_str::CString'>CString</a></code></li>
+<li><code>impl&lt;'a&gt; IntoCString for &amp;'a <a class='struct' href='https://doc.rust-lang.org/nightly/std/path/struct.Path.html' title='std::path::Path'>Path</a></code></li>
+<li><code>impl IntoCString for <a class='struct' href='https://doc.rust-lang.org/nightly/std/path/struct.PathBuf.html' title='std::path::PathBuf'>PathBuf</a></code></li>
+<li><code>impl&lt;'a&gt; IntoCString for &amp;'a <a class='struct' href='https://doc.rust-lang.org/nightly/std/ffi/os_str/struct.OsStr.html' title='std::ffi::os_str::OsStr'>OsStr</a></code></li>
+<li><code>impl IntoCString for <a class='struct' href='https://doc.rust-lang.org/nightly/std/ffi/os_str/struct.OsString.html' title='std::ffi::os_str::OsString'>OsString</a></code></li>
+<li><code>impl&lt;'a&gt; IntoCString for <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>&amp;'a [</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u8.html'>u8</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>]</a></code></li>
+<li><code>impl IntoCString for <a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u8.html'>u8</a>&gt;</code></li>
 </ul><script type="text/javascript" async
                          src="../implementors/git2/trait.IntoCString.js">
                  </script></section>
@@ -96,6 +96,8 @@ for them to contain an interior 0 byte.</p>
                     <dd>Move down in search results</dd>
                     <dt>&#9166;</dt>
                     <dd>Go to active search result</dd>
+                    <dt>+</dt>
+                    <dd>Collapse/expand all sections</dd>
                 </dl>
             </div>
 

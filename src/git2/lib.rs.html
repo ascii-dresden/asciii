@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="rustdoc">
-    <meta name="description" content="Source to the Rust file `/home/hendrik/.cargo/registry/src/github.com-88ac128001ac3a9a/git2-0.4.3/src/lib.rs`.">
+    <meta name="description" content="Source to the Rust file `/home/hendrik/.cargo/registry/src/github.com-1ecc6299db9ec823/git2-0.4.4/src/lib.rs`.">
     <meta name="keywords" content="rust, rustlang, rust-lang">
 
     <title>lib.rs.html -- source</title>
@@ -909,6 +909,54 @@
 <span id="865">865</span>
 <span id="866">866</span>
 <span id="867">867</span>
+<span id="868">868</span>
+<span id="869">869</span>
+<span id="870">870</span>
+<span id="871">871</span>
+<span id="872">872</span>
+<span id="873">873</span>
+<span id="874">874</span>
+<span id="875">875</span>
+<span id="876">876</span>
+<span id="877">877</span>
+<span id="878">878</span>
+<span id="879">879</span>
+<span id="880">880</span>
+<span id="881">881</span>
+<span id="882">882</span>
+<span id="883">883</span>
+<span id="884">884</span>
+<span id="885">885</span>
+<span id="886">886</span>
+<span id="887">887</span>
+<span id="888">888</span>
+<span id="889">889</span>
+<span id="890">890</span>
+<span id="891">891</span>
+<span id="892">892</span>
+<span id="893">893</span>
+<span id="894">894</span>
+<span id="895">895</span>
+<span id="896">896</span>
+<span id="897">897</span>
+<span id="898">898</span>
+<span id="899">899</span>
+<span id="900">900</span>
+<span id="901">901</span>
+<span id="902">902</span>
+<span id="903">903</span>
+<span id="904">904</span>
+<span id="905">905</span>
+<span id="906">906</span>
+<span id="907">907</span>
+<span id="908">908</span>
+<span id="909">909</span>
+<span id="910">910</span>
+<span id="911">911</span>
+<span id="912">912</span>
+<span id="913">913</span>
+<span id="914">914</span>
+<span id="915">915</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! # libgit2 bindings for Rust</span>
 <span class='doccomment'>//!</span>
@@ -979,7 +1027,6 @@
 <span class='attribute'>#<span class='op'>!</span>[<span class='ident'>allow</span>(<span class='ident'>trivial_numeric_casts</span>, <span class='ident'>trivial_casts</span>)]</span>
 <span class='attribute'>#<span class='op'>!</span>[<span class='ident'>deny</span>(<span class='ident'>missing_docs</span>)]</span>
 <span class='attribute'>#<span class='op'>!</span>[<span class='ident'>cfg_attr</span>(<span class='ident'>test</span>, <span class='ident'>deny</span>(<span class='ident'>warnings</span>))]</span>
-<span class='attribute'>#<span class='op'>!</span>[<span class='ident'>cfg_attr</span>(<span class='ident'>feature</span> <span class='op'>=</span> <span class='string'>&quot;unstable&quot;</span>, <span class='ident'>feature</span>(<span class='ident'>recover</span>, <span class='ident'>std_panic</span>))]</span>
 
 <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>libc</span>;
 <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>url</span>;
@@ -1010,6 +1057,7 @@
 <span class='kw'>pub</span> <span class='kw'>use</span> <span class='ident'>note</span>::{<span class='ident'>Note</span>, <span class='ident'>Notes</span>};
 <span class='kw'>pub</span> <span class='kw'>use</span> <span class='ident'>object</span>::<span class='ident'>Object</span>;
 <span class='kw'>pub</span> <span class='kw'>use</span> <span class='ident'>oid</span>::<span class='ident'>Oid</span>;
+<span class='kw'>pub</span> <span class='kw'>use</span> <span class='ident'>packbuilder</span>::{<span class='ident'>PackBuilder</span>, <span class='ident'>PackBuilderStage</span>};
 <span class='kw'>pub</span> <span class='kw'>use</span> <span class='ident'>pathspec</span>::{<span class='ident'>Pathspec</span>, <span class='ident'>PathspecMatchList</span>, <span class='ident'>PathspecFailedEntries</span>};
 <span class='kw'>pub</span> <span class='kw'>use</span> <span class='ident'>pathspec</span>::{<span class='ident'>PathspecDiffEntries</span>, <span class='ident'>PathspecEntries</span>};
 <span class='kw'>pub</span> <span class='kw'>use</span> <span class='ident'>reference</span>::{<span class='ident'>Reference</span>, <span class='ident'>References</span>, <span class='ident'>ReferenceNames</span>};
@@ -1256,9 +1304,7 @@
 }
 
 <span class='macro'>bitflags</span><span class='macro'>!</span> {
-    <span class='attribute'>#[<span class='ident'>doc</span> <span class='op'>=</span> <span class='string'>&quot;
-Orderings that may be specified for Revwalk iteration.
-&quot;</span>]</span>
+    <span class='doccomment'>/// Orderings that may be specified for Revwalk iteration.</span>
     <span class='ident'>flags</span> <span class='ident'>Sort</span>: <span class='ident'>u32</span> {
         <span class='doccomment'>/// Sort the repository contents in no particular ordering.</span>
         <span class='doccomment'>///</span>
@@ -1285,9 +1331,7 @@ Orderings that may be specified for Revwalk iteration.
 }
 
 <span class='macro'>bitflags</span><span class='macro'>!</span> {
-    <span class='attribute'>#[<span class='ident'>doc</span> <span class='op'>=</span> <span class='string'>&quot;
-Types of credentials that can be requested by a credential callback.
-&quot;</span>]</span>
+    <span class='doccomment'>/// Types of credentials that can be requested by a credential callback.</span>
     <span class='ident'>flags</span> <span class='ident'>CredentialType</span>: <span class='ident'>u32</span> {
         <span class='attribute'>#[<span class='ident'>allow</span>(<span class='ident'>missing_docs</span>)]</span>
         <span class='kw'>const</span> <span class='ident'>USER_PASS_PLAINTEXT</span> <span class='op'>=</span> <span class='ident'>raw</span>::<span class='ident'>GIT_CREDTYPE_USERPASS_PLAINTEXT</span> <span class='kw'>as</span> <span class='ident'>u32</span>,
@@ -1307,9 +1351,52 @@ Types of credentials that can be requested by a credential callback.
 }
 
 <span class='macro'>bitflags</span><span class='macro'>!</span> {
-    <span class='attribute'>#[<span class='ident'>doc</span> <span class='op'>=</span> <span class='string'>&quot;
-Flags for APIs that add files matching pathspec
-&quot;</span>]</span>
+    <span class='doccomment'>/// Flags for the `flags` field of an IndexEntry.</span>
+    <span class='ident'>flags</span> <span class='ident'>IndexEntryFlag</span>: <span class='ident'>u16</span> {
+        <span class='doccomment'>/// Set when the `extended_flags` field is valid.</span>
+        <span class='kw'>const</span> <span class='ident'>IDXENTRY_EXTENDED</span> <span class='op'>=</span> <span class='ident'>raw</span>::<span class='ident'>GIT_IDXENTRY_EXTENDED</span> <span class='kw'>as</span> <span class='ident'>u16</span>,
+        <span class='doccomment'>/// &quot;Assume valid&quot; flag</span>
+        <span class='kw'>const</span> <span class='ident'>IDXENTRY_VALID</span> <span class='op'>=</span> <span class='ident'>raw</span>::<span class='ident'>GIT_IDXENTRY_VALID</span> <span class='kw'>as</span> <span class='ident'>u16</span>,
+    }
+}
+
+<span class='macro'>bitflags</span><span class='macro'>!</span> {
+    <span class='doccomment'>/// Flags for the `extended_flags` field of an IndexEntry.</span>
+    <span class='ident'>flags</span> <span class='ident'>IndexEntryExtendedFlag</span>: <span class='ident'>u16</span> {
+        <span class='doccomment'>/// An &quot;intent to add&quot; entry from &quot;git add -N&quot;</span>
+        <span class='kw'>const</span> <span class='ident'>IDXENTRY_INTENT_TO_ADD</span> <span class='op'>=</span> <span class='ident'>raw</span>::<span class='ident'>GIT_IDXENTRY_INTENT_TO_ADD</span> <span class='kw'>as</span> <span class='ident'>u16</span>,
+        <span class='doccomment'>/// Skip the associated worktree file, for sparse checkouts</span>
+        <span class='kw'>const</span> <span class='ident'>IDXENTRY_SKIP_WORKTREE</span> <span class='op'>=</span> <span class='ident'>raw</span>::<span class='ident'>GIT_IDXENTRY_SKIP_WORKTREE</span> <span class='kw'>as</span> <span class='ident'>u16</span>,
+        <span class='doccomment'>/// Reserved for a future on-disk extended flag</span>
+        <span class='kw'>const</span> <span class='ident'>IDXENTRY_EXTENDED2</span> <span class='op'>=</span> <span class='ident'>raw</span>::<span class='ident'>GIT_IDXENTRY_EXTENDED2</span> <span class='kw'>as</span> <span class='ident'>u16</span>,
+
+        <span class='attribute'>#[<span class='ident'>allow</span>(<span class='ident'>missing_docs</span>)]</span>
+        <span class='kw'>const</span> <span class='ident'>IDXENTRY_UPDATE</span> <span class='op'>=</span> <span class='ident'>raw</span>::<span class='ident'>GIT_IDXENTRY_UPDATE</span> <span class='kw'>as</span> <span class='ident'>u16</span>,
+        <span class='attribute'>#[<span class='ident'>allow</span>(<span class='ident'>missing_docs</span>)]</span>
+        <span class='kw'>const</span> <span class='ident'>IDXENTRY_REMOVE</span> <span class='op'>=</span> <span class='ident'>raw</span>::<span class='ident'>GIT_IDXENTRY_REMOVE</span> <span class='kw'>as</span> <span class='ident'>u16</span>,
+        <span class='attribute'>#[<span class='ident'>allow</span>(<span class='ident'>missing_docs</span>)]</span>
+        <span class='kw'>const</span> <span class='ident'>IDXENTRY_UPTODATE</span> <span class='op'>=</span> <span class='ident'>raw</span>::<span class='ident'>GIT_IDXENTRY_UPTODATE</span> <span class='kw'>as</span> <span class='ident'>u16</span>,
+        <span class='attribute'>#[<span class='ident'>allow</span>(<span class='ident'>missing_docs</span>)]</span>
+        <span class='kw'>const</span> <span class='ident'>IDXENTRY_ADDED</span> <span class='op'>=</span> <span class='ident'>raw</span>::<span class='ident'>GIT_IDXENTRY_ADDED</span> <span class='kw'>as</span> <span class='ident'>u16</span>,
+
+        <span class='attribute'>#[<span class='ident'>allow</span>(<span class='ident'>missing_docs</span>)]</span>
+        <span class='kw'>const</span> <span class='ident'>IDXENTRY_HASHED</span> <span class='op'>=</span> <span class='ident'>raw</span>::<span class='ident'>GIT_IDXENTRY_HASHED</span> <span class='kw'>as</span> <span class='ident'>u16</span>,
+        <span class='attribute'>#[<span class='ident'>allow</span>(<span class='ident'>missing_docs</span>)]</span>
+        <span class='kw'>const</span> <span class='ident'>IDXENTRY_UNHASHED</span> <span class='op'>=</span> <span class='ident'>raw</span>::<span class='ident'>GIT_IDXENTRY_UNHASHED</span> <span class='kw'>as</span> <span class='ident'>u16</span>,
+        <span class='attribute'>#[<span class='ident'>allow</span>(<span class='ident'>missing_docs</span>)]</span>
+        <span class='kw'>const</span> <span class='ident'>IDXENTRY_WT_REMOVE</span> <span class='op'>=</span> <span class='ident'>raw</span>::<span class='ident'>GIT_IDXENTRY_WT_REMOVE</span> <span class='kw'>as</span> <span class='ident'>u16</span>,
+        <span class='attribute'>#[<span class='ident'>allow</span>(<span class='ident'>missing_docs</span>)]</span>
+        <span class='kw'>const</span> <span class='ident'>IDXENTRY_CONFLICTED</span> <span class='op'>=</span> <span class='ident'>raw</span>::<span class='ident'>GIT_IDXENTRY_CONFLICTED</span> <span class='kw'>as</span> <span class='ident'>u16</span>,
+
+        <span class='attribute'>#[<span class='ident'>allow</span>(<span class='ident'>missing_docs</span>)]</span>
+        <span class='kw'>const</span> <span class='ident'>IDXENTRY_UNPACKED</span> <span class='op'>=</span> <span class='ident'>raw</span>::<span class='ident'>GIT_IDXENTRY_UNPACKED</span> <span class='kw'>as</span> <span class='ident'>u16</span>,
+        <span class='attribute'>#[<span class='ident'>allow</span>(<span class='ident'>missing_docs</span>)]</span>
+        <span class='kw'>const</span> <span class='ident'>IDXENTRY_NEW_SKIP_WORKTREE</span> <span class='op'>=</span> <span class='ident'>raw</span>::<span class='ident'>GIT_IDXENTRY_NEW_SKIP_WORKTREE</span> <span class='kw'>as</span> <span class='ident'>u16</span>,
+    }
+}
+
+<span class='macro'>bitflags</span><span class='macro'>!</span> {
+    <span class='doccomment'>/// Flags for APIs that add files matching pathspec</span>
     <span class='ident'>flags</span> <span class='ident'>IndexAddOption</span>: <span class='ident'>u32</span> {
         <span class='attribute'>#[<span class='ident'>allow</span>(<span class='ident'>missing_docs</span>)]</span>
         <span class='kw'>const</span> <span class='ident'>ADD_DEFAULT</span> <span class='op'>=</span> <span class='ident'>raw</span>::<span class='ident'>GIT_INDEX_ADD_DEFAULT</span> <span class='kw'>as</span> <span class='ident'>u32</span>,
@@ -1324,9 +1411,7 @@ Flags for APIs that add files matching pathspec
 }
 
 <span class='macro'>bitflags</span><span class='macro'>!</span> {
-    <span class='attribute'>#[<span class='ident'>doc</span> <span class='op'>=</span> <span class='string'>&quot;
-Flags for `Repository::open_ext`
-&quot;</span>]</span>
+    <span class='doccomment'>/// Flags for `Repository::open_ext`</span>
     <span class='ident'>flags</span> <span class='ident'>RepositoryOpenFlags</span>: <span class='ident'>u32</span> {
         <span class='doccomment'>/// Only open the specified path; don&#39;t walk upward searching.</span>
         <span class='kw'>const</span> <span class='ident'>REPOSITORY_OPEN_NO_SEARCH</span> <span class='op'>=</span> <span class='ident'>raw</span>::<span class='ident'>GIT_REPOSITORY_OPEN_NO_SEARCH</span> <span class='kw'>as</span> <span class='ident'>u32</span>,
@@ -1338,9 +1423,7 @@ Flags for `Repository::open_ext`
 }
 
 <span class='macro'>bitflags</span><span class='macro'>!</span> {
-    <span class='attribute'>#[<span class='ident'>doc</span> <span class='op'>=</span> <span class='string'>&quot;
-Flags for the return value of `Repository::revparse`
-&quot;</span>]</span>
+    <span class='doccomment'>/// Flags for the return value of `Repository::revparse`</span>
     <span class='ident'>flags</span> <span class='ident'>RevparseMode</span>: <span class='ident'>u32</span> {
         <span class='doccomment'>/// The spec targeted a single object</span>
         <span class='kw'>const</span> <span class='ident'>REVPARSE_SINGLE</span> <span class='op'>=</span> <span class='ident'>raw</span>::<span class='ident'>GIT_REVPARSE_SINGLE</span> <span class='kw'>as</span> <span class='ident'>u32</span>,
@@ -1378,6 +1461,7 @@ Flags for the return value of `Repository::revparse`
 <span class='kw'>mod</span> <span class='ident'>note</span>;
 <span class='kw'>mod</span> <span class='ident'>object</span>;
 <span class='kw'>mod</span> <span class='ident'>oid</span>;
+<span class='kw'>mod</span> <span class='ident'>packbuilder</span>;
 <span class='kw'>mod</span> <span class='ident'>pathspec</span>;
 <span class='kw'>mod</span> <span class='ident'>reference</span>;
 <span class='kw'>mod</span> <span class='ident'>reflog</span>;
@@ -1529,9 +1613,7 @@ Flags for the return value of `Repository::revparse`
 }
 
 <span class='macro'>bitflags</span><span class='macro'>!</span> {
-    <span class='attribute'>#[<span class='ident'>doc</span> <span class='op'>=</span> <span class='string'>&quot;
-Mode options for RepositoryInitOptions
-&quot;</span>]</span>
+    <span class='doccomment'>/// Mode options for RepositoryInitOptions</span>
     <span class='ident'>flags</span> <span class='ident'>RepositoryInitMode</span>: <span class='ident'>u32</span> {
         <span class='doccomment'>/// Use permissions configured by umask - the default</span>
         <span class='kw'>const</span> <span class='ident'>REPOSITORY_INIT_SHARED_UMASK</span> <span class='op'>=</span>
@@ -1574,48 +1656,46 @@ Mode options for RepositoryInitOptions
 }
 
 <span class='macro'>bitflags</span><span class='macro'>!</span> {
-    <span class='attribute'>#[<span class='ident'>doc</span> <span class='op'>=</span> <span class='string'>r#&quot;
-Return codes for submodule status.
-
-A combination of these flags will be returned to describe the status of a
-submodule.  Depending on the &quot;ignore&quot; property of the submodule, some of
-the flags may never be returned because they indicate changes that are
-supposed to be ignored.
-
-Submodule info is contained in 4 places: the HEAD tree, the index, config
-files (both .git/config and .gitmodules), and the working directory.  Any
-or all of those places might be missing information about the submodule
-depending on what state the repo is in.  We consider all four places to
-build the combination of status flags.
-
-There are four values that are not really status, but give basic info
-about what sources of submodule data are available.  These will be
-returned even if ignore is set to &quot;ALL&quot;.
-
-* IN_HEAD   - superproject head contains submodule
-* IN_INDEX  - superproject index contains submodule
-* IN_CONFIG - superproject gitmodules has submodule
-* IN_WD     - superproject workdir has submodule
-
-The following values will be returned so long as ignore is not &quot;ALL&quot;.
-
-* INDEX_ADDED       - in index, not in head
-* INDEX_DELETED     - in head, not in index
-* INDEX_MODIFIED    - index and head don&#39;t match
-* WD_UNINITIALIZED  - workdir contains empty directory
-* WD_ADDED          - in workdir, not index
-* WD_DELETED        - in index, not workdir
-* WD_MODIFIED       - index and workdir head don&#39;t match
-
-The following can only be returned if ignore is &quot;NONE&quot; or &quot;UNTRACKED&quot;.
-
-* WD_INDEX_MODIFIED - submodule workdir index is dirty
-* WD_WD_MODIFIED    - submodule workdir has modified files
-
-Lastly, the following will only be returned for ignore &quot;NONE&quot;.
-
-* WD_UNTRACKED      - wd contains untracked files
-&quot;#</span>]</span>
+    <span class='doccomment'>/// Return codes for submodule status.</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// A combination of these flags will be returned to describe the status of a</span>
+    <span class='doccomment'>/// submodule.  Depending on the &quot;ignore&quot; property of the submodule, some of</span>
+    <span class='doccomment'>/// the flags may never be returned because they indicate changes that are</span>
+    <span class='doccomment'>/// supposed to be ignored.</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// Submodule info is contained in 4 places: the HEAD tree, the index, config</span>
+    <span class='doccomment'>/// files (both .git/config and .gitmodules), and the working directory.  Any</span>
+    <span class='doccomment'>/// or all of those places might be missing information about the submodule</span>
+    <span class='doccomment'>/// depending on what state the repo is in.  We consider all four places to</span>
+    <span class='doccomment'>/// build the combination of status flags.</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// There are four values that are not really status, but give basic info</span>
+    <span class='doccomment'>/// about what sources of submodule data are available.  These will be</span>
+    <span class='doccomment'>/// returned even if ignore is set to &quot;ALL&quot;.</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// * IN_HEAD   - superproject head contains submodule</span>
+    <span class='doccomment'>/// * IN_INDEX  - superproject index contains submodule</span>
+    <span class='doccomment'>/// * IN_CONFIG - superproject gitmodules has submodule</span>
+    <span class='doccomment'>/// * IN_WD     - superproject workdir has submodule</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// The following values will be returned so long as ignore is not &quot;ALL&quot;.</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// * INDEX_ADDED       - in index, not in head</span>
+    <span class='doccomment'>/// * INDEX_DELETED     - in head, not in index</span>
+    <span class='doccomment'>/// * INDEX_MODIFIED    - index and head don&#39;t match</span>
+    <span class='doccomment'>/// * WD_UNINITIALIZED  - workdir contains empty directory</span>
+    <span class='doccomment'>/// * WD_ADDED          - in workdir, not index</span>
+    <span class='doccomment'>/// * WD_DELETED        - in index, not workdir</span>
+    <span class='doccomment'>/// * WD_MODIFIED       - index and workdir head don&#39;t match</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// The following can only be returned if ignore is &quot;NONE&quot; or &quot;UNTRACKED&quot;.</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// * WD_INDEX_MODIFIED - submodule workdir index is dirty</span>
+    <span class='doccomment'>/// * WD_WD_MODIFIED    - submodule workdir has modified files</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// Lastly, the following will only be returned for ignore &quot;NONE&quot;.</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// * WD_UNTRACKED      - wd contains untracked files</span>
     <span class='ident'>flags</span> <span class='ident'>SubmoduleStatus</span>: <span class='ident'>u32</span> {
         <span class='attribute'>#[<span class='ident'>allow</span>(<span class='ident'>missing_docs</span>)]</span>
         <span class='kw'>const</span> <span class='ident'>SUBMODULE_STATUS_IN_HEAD</span> <span class='op'>=</span>
@@ -1710,6 +1790,22 @@ Lastly, the following will only be returned for ignore &quot;NONE&quot;.
     }
 }
 
+<span class='macro'>bitflags</span><span class='macro'>!</span> {
+    <span class='doccomment'>/// Types of notifications emitted from checkouts.</span>
+    <span class='ident'>flags</span> <span class='ident'>CheckoutNotificationType</span>: <span class='ident'>u32</span> {
+        <span class='doccomment'>/// Notification about a conflict.</span>
+        <span class='kw'>const</span> <span class='ident'>CHECKOUT_NOTIFICATION_CONFLICT</span> <span class='op'>=</span> <span class='ident'>raw</span>::<span class='ident'>GIT_CHECKOUT_NOTIFY_CONFLICT</span> <span class='kw'>as</span> <span class='ident'>u32</span>,
+        <span class='doccomment'>/// Notification about a dirty file.</span>
+        <span class='kw'>const</span> <span class='ident'>CHECKOUT_NOTIFICATION_DIRTY</span> <span class='op'>=</span> <span class='ident'>raw</span>::<span class='ident'>GIT_CHECKOUT_NOTIFY_DIRTY</span> <span class='kw'>as</span> <span class='ident'>u32</span>,
+        <span class='doccomment'>/// Notification about an updated file.</span>
+        <span class='kw'>const</span> <span class='ident'>CHECKOUT_NOTIFICATION_UPDATED</span> <span class='op'>=</span> <span class='ident'>raw</span>::<span class='ident'>GIT_CHECKOUT_NOTIFY_UPDATED</span> <span class='kw'>as</span> <span class='ident'>u32</span>,
+        <span class='doccomment'>/// Notification about an untracked file.</span>
+        <span class='kw'>const</span> <span class='ident'>CHECKOUT_NOTIFICATION_UNTRACKED</span> <span class='op'>=</span> <span class='ident'>raw</span>::<span class='ident'>GIT_CHECKOUT_NOTIFY_UNTRACKED</span> <span class='kw'>as</span> <span class='ident'>u32</span>,
+        <span class='doccomment'>/// Notification about an ignored file.</span>
+        <span class='kw'>const</span> <span class='ident'>CHECKOUT_NOTIFICATION_IGNORED</span> <span class='op'>=</span> <span class='ident'>raw</span>::<span class='ident'>GIT_CHECKOUT_NOTIFY_IGNORED</span> <span class='kw'>as</span> <span class='ident'>u32</span>,
+    }
+}
+
 <span class='doccomment'>/// Possible output formats for diff data</span>
 <span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Copy</span>, <span class='ident'>Clone</span>)]</span>
 <span class='kw'>pub</span> <span class='kw'>enum</span> <span class='ident'>DiffFormat</span> {
@@ -1767,7 +1863,7 @@ Lastly, the following will only be returned for ignore &quot;NONE&quot;.
 
 <span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>test</span>)]</span>
 <span class='kw'>mod</span> <span class='ident'>tests</span> {
-    <span class='kw'>use</span> <span class='ident'>super</span>::<span class='ident'>ObjectType</span>;
+    <span class='kw'>use</span> <span class='kw'>super</span>::<span class='ident'>ObjectType</span>;
 
     <span class='attribute'>#[<span class='ident'>test</span>]</span>
     <span class='kw'>fn</span> <span class='ident'>convert</span>() {
@@ -1801,6 +1897,8 @@ Lastly, the following will only be returned for ignore &quot;NONE&quot;.
                     <dd>Move down in search results</dd>
                     <dt>&#9166;</dt>
                     <dd>Go to active search result</dd>
+                    <dt>+</dt>
+                    <dd>Collapse/expand all sections</dd>
                 </dl>
             </div>
 

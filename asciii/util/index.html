@@ -47,57 +47,78 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-19' class='srclink' href='../../src/asciii/src/util/mod.rs.html#1-101' title='goto source code'>[src]</a></span></h1>
+               </span><a id='src-21' class='srclink' href='../../src/asciii/src/util/mod.rs.html#1-144' title='goto source code'>[src]</a></span></h1>
 <div class='docblock'><p>Utility functions that are needed all over the places.</p>
 </div><h2 id='modules' class='section-header'><a href="#modules">Modules</a></h2>
 <table>
                        <tr class=' module-item'>
                            <td><a class='mod' href='yaml/index.html'
                                   title='asciii::util::yaml'>yaml</a></td>
-                           <td class='docblock short'>
+                           <td class='docblock-short'>
                                 <p>Yaml Utility functions.</p>
                            </td>
                        </tr></table><h2 id='functions' class='section-header'><a href="#functions">Functions</a></h2>
 <table>
                        <tr class=' module-item'>
+                           <td><a class='fn' href='fn.currency_to_string.html'
+                                  title='asciii::util::currency_to_string'>currency_to_string</a></td>
+                           <td class='docblock-short'>
+                                <p>One place to decide how to display currency</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
                            <td><a class='fn' href='fn.exit.html'
                                   title='asciii::util::exit'>exit</a></td>
-                           <td class='docblock short'>
+                           <td class='docblock-short'>
                                 <p>Exits with the exit status of a child process.</p>
                            </td>
                        </tr>
                        <tr class=' module-item'>
                            <td><a class='fn' href='fn.freeze.html'
                                   title='asciii::util::freeze'>freeze</a></td>
-                           <td class='docblock short'>
+                           <td class='docblock-short'>
                                 <p>Freezes the program until for inspection</p>
                            </td>
                        </tr>
                        <tr class=' module-item'>
                            <td><a class='fn' href='fn.get_storage_path.html'
                                   title='asciii::util::get_storage_path'>get_storage_path</a></td>
-                           <td class='docblock short'>
+                           <td class='docblock-short'>
                                 <p>Interprets storage path from config.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class='fn' href='fn.get_valid_path.html'
+                                  title='asciii::util::get_valid_path'>get_valid_path</a></td>
+                           <td class='docblock-short'>
+                                <p>takes a path that could be relative or contains a <code>~</code> and turn it into a path that exists</p>
                            </td>
                        </tr>
                        <tr class=' module-item'>
                            <td><a class='fn' href='fn.ls.html'
                                   title='asciii::util::ls'>ls</a></td>
-                           <td class='docblock short'>
+                           <td class='docblock-short'>
                                 <p>Shells out to print directory structure</p>
                            </td>
                        </tr>
                        <tr class=' module-item'>
-                           <td><a class='fn' href='fn.open_in_editor.html'
-                                  title='asciii::util::open_in_editor'>open_in_editor</a></td>
-                           <td class='docblock short'>
+                           <td><a class='fn' href='fn.pass_to_command.html'
+                                  title='asciii::util::pass_to_command'>pass_to_command</a></td>
+                           <td class='docblock-short'>
                                 <p>Opens the passed paths in the editor set int config.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class='fn' href='fn.really.html'
+                                  title='asciii::util::really'>really</a></td>
+                           <td class='docblock-short'>
+                                <p>Asks for confirmation</p>
                            </td>
                        </tr>
                        <tr class=' module-item'>
                            <td><a class='fn' href='fn.replace_home_tilde.html'
                                   title='asciii::util::replace_home_tilde'>replace_home_tilde</a></td>
-                           <td class='docblock short'>
+                           <td class='docblock-short'>
                                 <p>Replaces <code>~</code> with <code>$HOME</code>, rust stdlib doesn&#39;t do this yet.</p>
                            </td>
                        </tr></table></section>
@@ -123,6 +144,8 @@
                     <dd>Move down in search results</dd>
                     <dt>&#9166;</dt>
                     <dd>Go to active search result</dd>
+                    <dt>+</dt>
+                    <dd>Collapse/expand all sections</dd>
                 </dl>
             </div>
 

@@ -47,7 +47,7 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-267' class='srclink' href='../src/libgit2_sys/lib.rs.html#325-332' title='goto source code'>[src]</a></span></h1>
+               </span><a id='src-269' class='srclink' href='../src/libgit2_sys/lib.rs.html#326-333' title='goto source code'>[src]</a></span></h1>
 <pre class='rust struct'>pub struct git_fetch_options {
     pub version: <a class='type' href='../libc/type.c_int.html' title='libc::c_int'>c_int</a>,
     pub callbacks: <a class='struct' href='../libgit2_sys/struct.git_remote_callbacks.html' title='libgit2_sys::git_remote_callbacks'>git_remote_callbacks</a>,
@@ -55,14 +55,25 @@
     pub update_fetchhead: <a class='type' href='../libc/type.c_int.html' title='libc::c_int'>c_int</a>,
     pub download_tags: <a class='type' href='../libgit2_sys/type.git_remote_autotag_option_t.html' title='libgit2_sys::git_remote_autotag_option_t'>git_remote_autotag_option_t</a>,
     pub custom_headers: <a class='struct' href='../libgit2_sys/struct.git_strarray.html' title='libgit2_sys::git_strarray'>git_strarray</a>,
-}</pre><h2 class='fields'>Fields</h2>
-<table><tr class='stab '>
-                             <td id='structfield.version'><code>version</code></td><td></td></tr><tr class='stab '>
-                             <td id='structfield.callbacks'><code>callbacks</code></td><td></td></tr><tr class='stab '>
-                             <td id='structfield.prune'><code>prune</code></td><td></td></tr><tr class='stab '>
-                             <td id='structfield.update_fetchhead'><code>update_fetchhead</code></td><td></td></tr><tr class='stab '>
-                             <td id='structfield.download_tags'><code>download_tags</code></td><td></td></tr><tr class='stab '>
-                             <td id='structfield.custom_headers'><code>custom_headers</code></td><td></td></tr></table></section>
+}</pre><h2 class='fields'>Fields</h2><span id='structfield.version' class='structfield'>
+                           <span id='version.v' class='invisible'>
+                           <code>version: <a class='type' href='../libc/type.c_int.html' title='libc::c_int'>c_int</a></code>
+                           </span></span><span class='stab '></span><span id='structfield.callbacks' class='structfield'>
+                           <span id='callbacks.v' class='invisible'>
+                           <code>callbacks: <a class='struct' href='../libgit2_sys/struct.git_remote_callbacks.html' title='libgit2_sys::git_remote_callbacks'>git_remote_callbacks</a></code>
+                           </span></span><span class='stab '></span><span id='structfield.prune' class='structfield'>
+                           <span id='prune.v' class='invisible'>
+                           <code>prune: <a class='type' href='../libgit2_sys/type.git_fetch_prune_t.html' title='libgit2_sys::git_fetch_prune_t'>git_fetch_prune_t</a></code>
+                           </span></span><span class='stab '></span><span id='structfield.update_fetchhead' class='structfield'>
+                           <span id='update_fetchhead.v' class='invisible'>
+                           <code>update_fetchhead: <a class='type' href='../libc/type.c_int.html' title='libc::c_int'>c_int</a></code>
+                           </span></span><span class='stab '></span><span id='structfield.download_tags' class='structfield'>
+                           <span id='download_tags.v' class='invisible'>
+                           <code>download_tags: <a class='type' href='../libgit2_sys/type.git_remote_autotag_option_t.html' title='libgit2_sys::git_remote_autotag_option_t'>git_remote_autotag_option_t</a></code>
+                           </span></span><span class='stab '></span><span id='structfield.custom_headers' class='structfield'>
+                           <span id='custom_headers.v' class='invisible'>
+                           <code>custom_headers: <a class='struct' href='../libgit2_sys/struct.git_strarray.html' title='libgit2_sys::git_strarray'>git_strarray</a></code>
+                           </span></span><span class='stab '></span></section>
     <section id='search' class="content hidden"></section>
 
     <section class="footer"></section>
@@ -85,6 +96,8 @@
                     <dd>Move down in search results</dd>
                     <dt>&#9166;</dt>
                     <dd>Go to active search result</dd>
+                    <dt>+</dt>
+                    <dd>Collapse/expand all sections</dd>
                 </dl>
             </div>
 

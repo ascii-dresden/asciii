@@ -47,10 +47,10 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-1520' class='srclink' href='../../src/git2/transport.rs.html#34-53' title='goto source code'>[src]</a></span></h1>
+               </span><a id='src-1788' class='srclink' href='../../src/git2/transport.rs.html#34-53' title='goto source code'>[src]</a></span></h1>
 <pre class='rust trait'>pub trait SmartSubtransport: <a class='trait' href='https://doc.rust-lang.org/nightly/core/marker/trait.Send.html' title='core::marker::Send'>Send</a> + 'static {
-    fn <a href='#tymethod.action' class='fnname'>action</a>(&amp;self, url: &amp;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>, action: <a class='enum' href='../../git2/transport/enum.Service.html' title='git2::transport::Service'>Service</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html' title='alloc::boxed::Box'>Box</a>&lt;<a class='trait' href='../../git2/transport/trait.SmartSubtransportStream.html' title='git2::transport::SmartSubtransportStream'>SmartSubtransportStream</a>&gt;, <a class='struct' href='../../git2/struct.Error.html' title='git2::Error'>Error</a>&gt;;
-    fn <a href='#tymethod.close' class='fnname'>close</a>(&amp;self) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>()</a>, <a class='struct' href='../../git2/struct.Error.html' title='git2::Error'>Error</a>&gt;;
+    fn <a href='#tymethod.action' class='fnname'>action</a>(&amp;self, url: &amp;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>, action: <a class='enum' href='../../git2/transport/enum.Service.html' title='git2::transport::Service'>Service</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html' title='alloc::boxed::Box'>Box</a>&lt;<a class='trait' href='../../git2/transport/trait.SmartSubtransportStream.html' title='git2::transport::SmartSubtransportStream'>SmartSubtransportStream</a>&gt;,&nbsp;<a class='struct' href='../../git2/struct.Error.html' title='git2::Error'>Error</a>&gt;;
+    fn <a href='#tymethod.close' class='fnname'>close</a>(&amp;self) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>()</a>,&nbsp;<a class='struct' href='../../git2/struct.Error.html' title='git2::Error'>Error</a>&gt;;
 }</pre><div class='docblock'><p>Interfaced used by smart transports.</p>
 
 <p>The full-fledged definiton of transports has to deal with lots of
@@ -63,13 +63,13 @@ pull data from a remote.</p>
 </div>
             <h2 id='required-methods'>Required Methods</h2>
             <div class='methods'>
-        <h3 id='tymethod.action' class='method stab '><code>fn <a href='#tymethod.action' class='fnname'>action</a>(&amp;self, url: &amp;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>, action: <a class='enum' href='../../git2/transport/enum.Service.html' title='git2::transport::Service'>Service</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html' title='alloc::boxed::Box'>Box</a>&lt;<a class='trait' href='../../git2/transport/trait.SmartSubtransportStream.html' title='git2::transport::SmartSubtransportStream'>SmartSubtransportStream</a>&gt;, <a class='struct' href='../../git2/struct.Error.html' title='git2::Error'>Error</a>&gt;</code></h3><div class='docblock'><p>Indicates that this subtransport will be performing the specified action
+        <h3 id='tymethod.action' class='method stab '><span id='action.v' class='invisible'><code>fn <a href='#tymethod.action' class='fnname'>action</a>(&amp;self, url: &amp;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>, action: <a class='enum' href='../../git2/transport/enum.Service.html' title='git2::transport::Service'>Service</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html' title='alloc::boxed::Box'>Box</a>&lt;<a class='trait' href='../../git2/transport/trait.SmartSubtransportStream.html' title='git2::transport::SmartSubtransportStream'>SmartSubtransportStream</a>&gt;,&nbsp;<a class='struct' href='../../git2/struct.Error.html' title='git2::Error'>Error</a>&gt;</code></span></h3><div class='docblock'><p>Indicates that this subtransport will be performing the specified action
 on the specified URL.</p>
 
 <p>This function is responsible for making any network connections and
 returns a stream which can be read and written from in order to
 negotiate the git protocol.</p>
-</div><h3 id='tymethod.close' class='method stab '><code>fn <a href='#tymethod.close' class='fnname'>close</a>(&amp;self) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>()</a>, <a class='struct' href='../../git2/struct.Error.html' title='git2::Error'>Error</a>&gt;</code></h3><div class='docblock'><p>Terminates a connection with the remote.</p>
+</div><h3 id='tymethod.close' class='method stab '><span id='close.v' class='invisible'><code>fn <a href='#tymethod.close' class='fnname'>close</a>(&amp;self) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>()</a>,&nbsp;<a class='struct' href='../../git2/struct.Error.html' title='git2::Error'>Error</a>&gt;</code></span></h3><div class='docblock'><p>Terminates a connection with the remote.</p>
 
 <p>Each subtransport is guaranteed a call to close() between calls to
 action(), except for the following tow natural progressions of actions
@@ -107,6 +107,8 @@ against a constant URL.</p>
                     <dd>Move down in search results</dd>
                     <dt>&#9166;</dt>
                     <dd>Go to active search result</dd>
+                    <dt>+</dt>
+                    <dd>Collapse/expand all sections</dd>
                 </dl>
             </div>
 

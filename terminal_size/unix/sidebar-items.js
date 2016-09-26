@@ -1,1 +1,0 @@
-initSidebarItems({"fn":[["terminal_size","Returns the size of the terminal, if available."]]});
