@@ -194,7 +194,7 @@ pub fn verbose_rows(projects:&[Project], list_config:&ListConfig) -> Vec<Row>{
                 //cell!(output_file_exists(project, Project::offer_file_name)),
                 //cell!(output_file_exists(project, Project::invoice_file_name)),
 
-                cell!(project.sum_sold().map(|i|currency_to_string(&i)).unwrap_or(String::from("none"))),
+                cell!(r->project.sum_sold().map(|i|currency_to_string(&i)).unwrap_or(String::from("none"))),
                 //cell!(project.wages().map(|i|i.to_string()).unwrap_or(String::from("none"))),
                 //cell!(project.sum_sold_and_wages().map(|i|i.to_string()).unwrap_or(String::from("none"))),
             ]);
