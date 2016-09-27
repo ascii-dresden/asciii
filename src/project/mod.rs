@@ -43,7 +43,7 @@ mod tojson;
 
 //#[cfg(test)] mod tests;
 
-use self::spec::{SpecResult, VirtualField};
+use self::spec::{SpecResult, ComputedField};
 use self::product::Product;
 
 
@@ -80,7 +80,7 @@ impl Project{
 
     /// wrapper around yaml::get() with replacement
     pub fn get(&self, path:&str) -> Option<String>{
-        VirtualField::from(path).get(self).or_else(||
+        ComputedField::from(path).get(self).or_else(||
             yaml::get_to_string(self.yaml(),path)
         )
     }
@@ -293,7 +293,7 @@ impl Storable for Project{
                 .expect("Faulty config: field defaults/tax does not contain a value"),
             "SALARY"        => ::CONFIG.get_to_string("defaults/salary")
                 .expect("Faulty config: field defaults/salary does not contain a value"),
-            "MANAGER"       => ::CONFIG.get_str("manager_name").unwrap_or("").to_string(),
+            "MANAGER"       => ::CONFIG.get_str("user/name").unwrap_or("").to_string(),
             "DESCRIPTION"   => String::new(),
             "TIME-START"    => String::new(),
             "TIME-END"      => String::new(),

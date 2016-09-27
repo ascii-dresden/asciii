@@ -1,5 +1,6 @@
 ---
-manager_name: #"The Unnamed Manager"
+user:
+  name: #"The Unnamed Manager"
 editor:       #"vim -O"
 
 path: "~"
@@ -42,6 +43,9 @@ defaults:
 currency: "€"
 
 gender_matches:
+  mr: male
+  ms: female
+  mrs: female
   herr: male
   frau: female
   professor: male

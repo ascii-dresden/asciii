@@ -158,9 +158,10 @@ pub fn setup() -> ArgMatches<'static>{
                          .short("b")
                         )
 
-                    .arg(Arg::with_name("virtual_fields")
-                         .help("List all virtual data fields that can be used with --details")
-                         .long("virtual")
+                    .arg(Arg::with_name("computed_fields")
+                         .help("List all computed data fields that can be used with --details")
+                         .long("computed")
+                         .short("c")
                         )
 
                     .arg(Arg::with_name("nothing")

@@ -20,15 +20,15 @@ pub type SpecResult<'a> = Result<(), Vec<&'a str>>;
 /// This is used to get fields that are computed through an ordinary `get("responsible")`
 custom_derive! {
     #[derive(Debug,
-             IterVariants(VirtualFields), IterVariantNames(VirtualFieldNames),
+             IterVariants(ComputedFields), IterVariantNames(ComputedFieldNames),
              EnumFromStr
              )]
     /// `Project::get()` allows accessing fields within the raw `yaml` data structure.
-    /// Virtual fields are fields that are not present in the document but computed.
+    /// Computed fields are fields that are not present in the document but computed.
     ///
-    /// `VirtualFields` is an automatically generated type that allows iterating of the variants of
+    /// `ComputedFields` is an automatically generated type that allows iterating of the variants of
     /// this Enum.
-    pub enum VirtualField{
+    pub enum ComputedField{
         /// Usually `storage`, or in legacy part of `signature`
         Responsible,
         /// Pretty version of `invoice/number`: "`R042`"
@@ -47,27 +47,27 @@ custom_derive! {
     }
 }
 
-impl<'a> From<&'a str> for VirtualField {
-    fn from(s: &'a str) -> VirtualField {
-        s.parse::<VirtualField>().unwrap_or(VirtualField::Invalid)
+impl<'a> From<&'a str> for ComputedField {
+    fn from(s: &'a str) -> ComputedField {
+        s.parse::<ComputedField>().unwrap_or(ComputedField::Invalid)
     }
 }
 
-impl VirtualField {
+impl ComputedField {
     pub fn get(&self, project: &Project) -> Option<String> {
         match *self {
-            VirtualField::Responsible => project::manager(project.yaml()).map(|s| s.to_owned()),
-            VirtualField::OfferNumber => offer::number(project.yaml()),
-            VirtualField::InvoiceNumber => invoice::number_str(project.yaml()),
-            VirtualField::InvoiceNumberLong => invoice::number_long_str(project.yaml()),
-            VirtualField::Name => project::name(project.yaml()).map(|s| s.to_owned()),
-            VirtualField::Final => project.sum_sold().map(|c| currency_to_string(&c)).ok(),
-            VirtualField::Age => project.age().map(|a| format!("{} days", a)),
-            VirtualField::Year => project.date().map(|d| d.year().to_string()),
+            ComputedField::Responsible => project::manager(project.yaml()).map(|s| s.to_owned()),
+            ComputedField::OfferNumber => offer::number(project.yaml()),
+            ComputedField::InvoiceNumber => invoice::number_str(project.yaml()),
+            ComputedField::InvoiceNumberLong => invoice::number_long_str(project.yaml()),
+            ComputedField::Name => project::name(project.yaml()).map(|s| s.to_owned()),
+            ComputedField::Final => project.sum_sold().map(|c| currency_to_string(&c)).ok(),
+            ComputedField::Age => project.age().map(|a| format!("{} days", a)),
+            ComputedField::Year => project.date().map(|d| d.year().to_string()),
 
-            VirtualField::Caterers => hours::caterers_string(project.yaml()),
-            VirtualField::ClientFullName => client::full_name(project.yaml()),
-            VirtualField::Invalid => None,
+            ComputedField::Caterers => hours::caterers_string(project.yaml()),
+            ComputedField::ClientFullName => client::full_name(project.yaml()),
+            ComputedField::Invalid => None,
 
             // _ => None
         }

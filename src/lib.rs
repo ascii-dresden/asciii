@@ -61,6 +61,7 @@ pub mod templater;
 #[cfg(feature="document_export")] extern crate handlebars;
 #[cfg(feature="document_export")] pub mod fill_docs;
 
+pub use yaml_rust::Yaml;
 
 // TODO keep this up to date after move
 pub static DOCUMENTATION_URL: &'static str  = "http://hoodie.github.io/asciii-rs/";

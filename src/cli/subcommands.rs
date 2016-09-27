@@ -16,7 +16,7 @@ use asciii::actions;
 use asciii::storage::*;
 use asciii::templater::Templater;
 use asciii::project::Project;
-use asciii::project::spec::VirtualField;
+use asciii::project::spec::ComputedField;
 use asciii::actions::{setup_luigi, setup_luigi_with_git};
 
 #[cfg(feature="document_export")]
@@ -127,8 +127,8 @@ pub fn list(matches:&ArgMatches){
         list_templates();
     } else if matches.is_present("years"){
         list_years();
-    } else if matches.is_present("virtual_fields"){
-        list_virtual_fields();
+    } else if matches.is_present("computed_fields"){
+        list_computed_fields();
     }
 
     else {
@@ -264,8 +264,8 @@ fn list_years(){
 }
 
 /// Command LIST --virt
-fn list_virtual_fields(){
-    println!("{:?}", VirtualField::iter_variant_names().filter(|v|*v!="Invalid").collect::<Vec<&str>>());
+fn list_computed_fields(){
+    println!("{:?}", ComputedField::iter_variant_names().filter(|v|*v!="Invalid").collect::<Vec<&str>>());
 }
 
 
@@ -369,7 +369,7 @@ fn show_json(dir:StorageDir, search_term:&str){
 }
 
 fn show_detail(dir:StorageDir, search_term:&str, detail:&str){
-    actions::simple_with_projects(dir, &[search_term], |p| println!("{}", p.get(detail).unwrap()));
+    actions::simple_with_projects(dir, &[search_term], |p| println!("{}", p.get(detail).unwrap_or_else(||String::from("Nothing found"))));
 }
 
 fn show_csv(dir:StorageDir, search_term:&str){
@@ -476,14 +476,15 @@ pub fn config(matches:&ArgMatches){
     if let Some(path) = matches.value_of("show"){
         config_show(path);
     }
-    if matches.is_present("location"){
+    if matches.is_present("location") {
         println!("config location: {:?}", config::ConfigReader::path_home())
     }
 
-    else if matches.is_present("edit"){
+    else if matches.is_present("edit") {
         let editor = matches.value_of("editor")
             .or( CONFIG.get("editor").and_then(|e|e.as_str()));
-        config_edit(&editor); }
+        config_edit(&editor);
+    }
 
     else if matches.is_present("default"){ config_show_default(); }
 }

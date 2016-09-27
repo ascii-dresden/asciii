@@ -5,6 +5,8 @@
 //! mistakes or unimplemented material,
 //! please **[file an issue immediately](https://github.com/hoodie/asciii-rs/issues/new)**.
 //!
+//! * [Introduction](#introduction)
+//!
 //! # ascii invoicer
 //!
 //! ## Introduction
@@ -23,9 +25,9 @@
 //!
 //! ### DIY Building
 //!
-//! * rustc ≥ 1.5.0
+//! * rustc ≥ 1.11.0
 //! * cargo
-//! * optionally: for full feature completeness you also need everything to build libgit2 and libssl2
+//! * optionally: for full feature completeness you also need everything to build libgit2
 //!
 //! ### Requirements
 //!

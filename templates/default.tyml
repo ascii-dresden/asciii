@@ -2,9 +2,9 @@
 # vim:set ft=yaml:
 
 client:
-  title:     Herr # Frau, Professor, Professorin
-  first_name: John
-  last_name:  Doe
+  title:     # Herr # Frau # Mr, Ms, Mrs
+  first_name:
+  last_name:
 
   email:
   address: |
@@ -33,6 +33,7 @@ invoice:
   number:     #27
   date:       #required
   payed_date: #required
+  official:   # used if you to set an official invoice number
 
 cataloge:
   product: &kaffee       { name: Kaffee          , price: 2.5  , unit: 1l  }
@@ -64,7 +65,7 @@ hours:
   caterers:
     "unknown" : 0
 
-  wages_date: # when where the wages payed
+  wages_date: # when where the wages payed out
 
 manager: __MANAGER__
 
@@ -74,8 +75,9 @@ manager: __MANAGER__
 
 #messages: # read default-settings.yml on how to overwrite
 
-invoicer_version: __VERSION__
-template: __TEMPLATE__
-format: 2.4.0
+meta:
+  invoicer_version: __VERSION__
+  template: __TEMPLATE__
+  format: 3.0.0
 created: __DATE-CREATED__
 ...

@@ -239,7 +239,7 @@ pub fn delete_project_confirmation(selection:Selection) -> Result<()> {
     let luigi = try!(setup_luigi());
     debug!("{:?}",selection);
     with_projects(selection.dir, &[selection.search], |p| {
-        println!("you want me to delete [y/N]{:?}", p.dir());
+        println!("you want me to delete {:?} [y/N]", p.dir());
         if util::really() {
             println!("commencing");
             try!(luigi.delete_project(p));

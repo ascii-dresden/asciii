@@ -125,8 +125,8 @@ fn simple_reading(){
     assert!(ConfigReader::path_home().exists());
     let config = ConfigReader::new().unwrap();
 
-    assert_eq!(config.get("manager_name").unwrap().as_str().unwrap(),
-               config.get_str("manager_name").unwrap());
+    assert_eq!(config.get("user/name").unwrap().as_str().unwrap(),
+               config.get_str("user/name").unwrap());
 
     assert_eq!(config.get("list/colors").unwrap().as_bool().unwrap(),
                config.get_bool("list/colors"));
