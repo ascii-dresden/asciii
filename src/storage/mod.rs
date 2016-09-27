@@ -520,7 +520,6 @@ impl<L:Storable> Storage<L> {
     pub fn open_projects(&self, directory:StorageDir) -> StorageResult<ProjectList<L>>{
         trace!("OPENING ALL PROJECTS in {:?}-directory", directory);
         match directory {
-            //StorageDir::Year(_) => unimplemented!(),
             StorageDir::Year(year) => {
                 // recursive :D
                 let mut archived = try!(self.open_projects(StorageDir::Archive(year)));

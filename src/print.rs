@@ -17,10 +17,6 @@ use util::currency_to_string;
 
 //TODO construct table rows way more dynamically
 
-pub fn print_project(_project:&Project){
-    unimplemented!();
-}
-
 /// Configuration for this list output.
 #[derive(Debug)]
 pub struct ListConfig<'a>{

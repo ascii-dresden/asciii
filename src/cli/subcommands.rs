@@ -615,16 +615,15 @@ pub fn git_add(matches:&ArgMatches){
 
 
 /// Command DIFF
-pub fn git_diff(){
-    // TODO this doesn't need _with_git
+pub fn git_diff(matches:&ArgMatches){
     let luigi = execute(||setup_luigi_with_git());
+    let paths = matches_to_paths(matches, &luigi);
     let repo = luigi.repository.unwrap();
-    util::exit(repo.diff())
+    util::exit(repo.diff(&paths))
 }
 
 /// Command PULL
 pub fn git_pull(){
-    // TODO this doesn't need _with_git
     let luigi = execute(||setup_luigi_with_git());
     let repo = luigi.repository.unwrap();
     util::exit(repo.pull())
