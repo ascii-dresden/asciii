@@ -7,8 +7,8 @@ use std::io::prelude::*;
 use std::ffi::OsStr;
 use std::fmt::Debug;
 use std::path::{Path, PathBuf};
+use std::error::Error as ErrorTrait;
 use std::collections::HashMap;
-use std::error::Error;
 
 use chrono::*;
 use yaml_rust::Yaml;
@@ -24,7 +24,6 @@ use storage::{Storable,StorageError,StorageResult};
 use storage::repo::GitStatus;
 use templater::Templater;
 
-pub mod product;
 #[export_macro]
 macro_rules! try_some {
     ($expr:expr) => (match $expr {
@@ -33,18 +32,20 @@ macro_rules! try_some {
     });
 }
 
+pub mod product;
 pub mod spec;
 pub mod error;
-
-use self::error::*;
+mod computed_field;
 
 #[cfg(feature="document_export")]
 mod tojson;
 
 //#[cfg(test)] mod tests;
 
-use self::spec::{SpecResult, ComputedField};
+use self::spec::SpecResult;
 use self::product::Product;
+use self::error::{Error,ErrorKind,Result};
+pub use self::computed_field::ComputedField;
 
 
 
@@ -138,7 +139,7 @@ impl Project{
         }
     }
 
-    fn write_to_path<P:AsRef<OsStr> + Debug>(content:&str, target:&P) -> ProjectResult<PathBuf> {
+    fn write_to_path<P:AsRef<OsStr> + Debug>(content:&str, target:&P) -> Result<PathBuf> {
         trace!("writing content ({}bytes) to {:?}", content.len(), target);
         let mut file = try!(File::create(Path::new(target)));
         try!(file.write_all(content.as_bytes()));
@@ -146,23 +147,23 @@ impl Project{
         Ok(Path::new(target).to_owned())
     }
 
-    pub fn write_to_file(&self,content:&str, bill_type:&BillType,ext:&str) -> ProjectResult<PathBuf> {
+    pub fn write_to_file(&self,content:&str, bill_type:&BillType,ext:&str) -> Result<PathBuf> {
         match *bill_type{
             BillType::Offer   => self.write_to_offer_file(content, ext),
             BillType::Invoice => self.write_to_invoice_file(content, ext)
         }
     }
 
-    fn write_to_offer_file(&self,content:&str, ext:&str) -> ProjectResult<PathBuf> {
+    fn write_to_offer_file(&self,content:&str, ext:&str) -> Result<PathBuf> {
         if let Some(target) = self.offer_file_name(ext){
             Self::write_to_path(content, &self.dir().join(&target))
-        } else {Err(ProjectError::CantDetermineTargetFile)}
+        } else {Err(ErrorKind::CantDetermineTargetFile.into())}
     }
 
-    fn write_to_invoice_file(&self,content:&str, ext:&str) -> ProjectResult<PathBuf> {
+    fn write_to_invoice_file(&self,content:&str, ext:&str) -> Result<PathBuf> {
         if let Some(target) = self.invoice_file_name(ext){
             Self::write_to_path(content, &self.dir().join(&target))
-        } else {Err(ProjectError::CantDetermineTargetFile)}
+        } else {Err(ErrorKind::CantDetermineTargetFile.into())}
     }
 
 
@@ -217,11 +218,11 @@ impl Project{
     }
 
     /// Returs a tuple containing both `(Order,` and ` Invoice)`
-    pub fn bills(&self) -> ProductResult<(Bill<Product>, Bill<Product>)>{
-        spec::billing::bills(&self.yaml)
+    pub fn bills(&self) -> Result<(Bill<Product>, Bill<Product>)>{
+        Ok(try!(spec::billing::bills(&self.yaml)))
     }
 
-    pub fn to_csv(&self, bill_type:&BillType) -> ProjectResult<String>{
+    pub fn to_csv(&self, bill_type:&BillType) -> Result<String>{
         use std::fmt::Write;
         let (offer, invoice) = try!(self.bills());
         let bill = match *bill_type{ BillType::Offer => offer, BillType::Invoice => invoice };
@@ -250,7 +251,7 @@ impl Project{
         } else{None}
     }
 
-    pub fn sum_sold(&self) -> ProductResult<Currency> {
+    pub fn sum_sold(&self) -> Result<Currency> {
         let (_,invoice) = try!(self.bills());
         Ok(invoice.total())
     }
@@ -276,7 +277,7 @@ impl From<yaml::YamlError> for StorageError {
 
 impl Storable for Project{
     fn file_extension() -> &'static str {PROJECT_FILE_EXTENSION}
-    fn from_template(project_name:&str,template:&Path, fill: &HashMap<&str,String>) -> Result<Project, StorageError> {
+    fn from_template(project_name:&str,template:&Path, fill: &HashMap<&str,String>) -> StorageResult<Project> {
         let template_name = template.file_stem().unwrap().to_str().unwrap();
 
         let event_date = (Local::today() + Duration::days(14)).format("%d.%m.%Y").to_string();

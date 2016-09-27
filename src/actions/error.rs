@@ -26,7 +26,8 @@ use std::time;
 use std::error::Error as ErrorTrait;
 
 
-use project::error::ProjectError;
+use project;
+//use project::error::ProjectError;
 use storage::error::StorageError;
 
 error_chain!{
@@ -43,7 +44,7 @@ error_chain!{
         fmt::Error, Fmt;
         time::SystemTimeError, Time;
         RenderError, Handlebar;
-        ProjectError, Project;
+        project::error::Error, Project;
         StorageError, Storage;
     }
 

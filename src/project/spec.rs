@@ -5,74 +5,12 @@
 //! Most of the functions in these modules take the `yaml` data directly as reference.
 //! Each module contains a `validate()` function which ought to be kept up to date.
 
-use chrono::Datelike;
 use bill::Currency;
 
 use util::yaml;
 use util::yaml::Yaml;
-use util::currency_to_string;
-use storage::Storable;
-use super::Project;
 
-pub type SpecResult<'a> = Result<(), Vec<&'a str>>;
-
-/// Fields that are accessible but are not directly found in the file format.
-/// This is used to get fields that are computed through an ordinary `get("responsible")`
-custom_derive! {
-    #[derive(Debug,
-             IterVariants(ComputedFields), IterVariantNames(ComputedFieldNames),
-             EnumFromStr
-             )]
-    /// `Project::get()` allows accessing fields within the raw `yaml` data structure.
-    /// Computed fields are fields that are not present in the document but computed.
-    ///
-    /// `ComputedFields` is an automatically generated type that allows iterating of the variants of
-    /// this Enum.
-    pub enum ComputedField{
-        /// Usually `storage`, or in legacy part of `signature`
-        Responsible,
-        /// Pretty version of `invoice/number`: "`R042`"
-        OfferNumber,
-        InvoiceNumber,
-        /// Pretty version of `invoice/number` including year: "`R2016-042`"
-        InvoiceNumberLong,
-        ///Overall Cost Project, including taxes
-        Name,
-        Final,
-        Age,
-        Year,
-        Caterers,
-        ClientFullName,
-        Invalid
-    }
-}
-
-impl<'a> From<&'a str> for ComputedField {
-    fn from(s: &'a str) -> ComputedField {
-        s.parse::<ComputedField>().unwrap_or(ComputedField::Invalid)
-    }
-}
-
-impl ComputedField {
-    pub fn get(&self, project: &Project) -> Option<String> {
-        match *self {
-            ComputedField::Responsible => project::manager(project.yaml()).map(|s| s.to_owned()),
-            ComputedField::OfferNumber => offer::number(project.yaml()),
-            ComputedField::InvoiceNumber => invoice::number_str(project.yaml()),
-            ComputedField::InvoiceNumberLong => invoice::number_long_str(project.yaml()),
-            ComputedField::Name => project::name(project.yaml()).map(|s| s.to_owned()),
-            ComputedField::Final => project.sum_sold().map(|c| currency_to_string(&c)).ok(),
-            ComputedField::Age => project.age().map(|a| format!("{} days", a)),
-            ComputedField::Year => project.date().map(|d| d.year().to_string()),
-
-            ComputedField::Caterers => hours::caterers_string(project.yaml()),
-            ComputedField::ClientFullName => client::full_name(project.yaml()),
-            ComputedField::Invalid => None,
-
-            // _ => None
-        }
-    }
-}
+pub type SpecResult<'a> = ::std::result::Result<(), Vec<&'a str>>;
 
 // TODO there may be cases where an f64 can't be converted into Currency
 pub fn to_currency(f: f64) -> Currency {
@@ -462,22 +400,24 @@ pub mod billing {
 
     use util::yaml;
     use util::yaml::Yaml;
-    use ::project::error::{ProductResult,ProductError};
+    use ::project::error::product::Error;
+    use ::project::error::product::Result;
+    use ::project::error::product::ErrorKind;
     use ::project::product::Product;
 
-    fn item_from_desc_and_value<'y>(desc: &'y Yaml, values: &'y Yaml) -> ProductResult<(BillItem<Product<'y>>,BillItem<Product<'y>>)> {
+    fn item_from_desc_and_value<'y>(desc: &'y Yaml, values: &'y Yaml) -> Result<(BillItem<Product<'y>>,BillItem<Product<'y>>)> {
         let product = try!(Product::from_desc_and_value(desc, values));
 
         let offered = try!(yaml::get_f64(values, "amount")
-                           .ok_or(ProductError::MissingAmount(product.name.to_owned())));
+                           .ok_or(Error::from(ErrorKind::MissingAmount(product.name.to_owned()))));
         let sold = yaml::get_f64(values, "sold");
         let sold = if let Some(returned) = yaml::get_f64(values, "returned") {
             // if "returned", there must be no "sold"
             if sold.is_some() {
-                return Err(ProductError::AmbiguousAmounts(product.name.to_owned()));
+                return Err(ErrorKind::AmbiguousAmounts(product.name.to_owned()).into());
             }
             if returned > offered {
-                return Err(ProductError::TooMuchReturned(product.name.to_owned()));
+                return Err(ErrorKind::TooMuchReturned(product.name.to_owned()).into());
             }
             offered - returned
         } else if let Some(sold) = sold {
@@ -490,7 +430,7 @@ pub mod billing {
     }
 
     /// Produces two `Bill`s, one for the offer and one for the invoice
-    pub fn bills(yaml: &Yaml) -> ProductResult<(Bill<Product>, Bill<Product>)>{
+    pub fn bills(yaml: &Yaml) -> Result<(Bill<Product>, Bill<Product>)>{
         let mut offer: Bill<Product> = Bill::new();
         let mut invoice: Bill<Product> = Bill::new();
 
@@ -506,7 +446,7 @@ pub mod billing {
             invoice.add_item(total, service());
         }
 
-        let raw_products = try!(yaml::get_hash(yaml, "products").ok_or(ProductError::UnknownFormat));
+        let raw_products = try!(yaml::get_hash(yaml, "products").ok_or(Error::from(ErrorKind::UnknownFormat)));
 
         for (desc,values) in raw_products {
             let (offer_item, invoice_item) = try!(item_from_desc_and_value(desc, values));

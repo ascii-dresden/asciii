@@ -16,7 +16,7 @@ use asciii::actions;
 use asciii::storage::*;
 use asciii::templater::Templater;
 use asciii::project::Project;
-use asciii::project::spec::ComputedField;
+use asciii::project::ComputedField;
 use asciii::actions::{setup_luigi, setup_luigi_with_git};
 
 #[cfg(feature="document_export")]

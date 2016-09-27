@@ -6,8 +6,10 @@ use bill::{Currency, BillProduct, Tax};
 use util::yaml;
 use util::yaml::Yaml;
 
-use super::error::{ProductResult,ProductError};
 use super::spec::to_currency;
+use super::error::product::Error as ProductError;
+use super::error::product::ErrorKind;
+use super::error::product::Result as ProductResult;
 
 //#[derive(Debug)] // manually implemented
 /// Stores properties of a product.
@@ -31,8 +33,9 @@ impl<'a> Product<'a>{
             name: name,
             unit: yaml::get_str(values, "unit"),
             price: try!(yaml::get_f64(values, "price")
-                .ok_or(ProductError::InvalidPrice)
-                .map(to_currency)),
+                .map(to_currency)
+                .ok_or(ProductError::from(ErrorKind::InvalidPrice))
+                ),
             tax: yaml::get_f64(values, "tax").unwrap_or(default_tax).into(),
         })
     }
@@ -44,7 +47,7 @@ impl<'a> Product<'a>{
             name: yaml::get_str(desc, "name").unwrap_or("unnamed"),
             unit: yaml::get_str(desc, "unit"),
             price: try!(yaml::get_f64(desc, "price")
-                .ok_or(ProductError::InvalidPrice)
+                .ok_or(ProductError::from(ErrorKind::InvalidPrice))
                 .map(to_currency)),
             tax: yaml::get_f64(desc, "tax").unwrap_or(default_tax).into(),
         })
@@ -54,7 +57,7 @@ impl<'a> Product<'a>{
         match *desc {
             yaml::Yaml::String(ref name) => Self::from_old_format(name, values),
             yaml::Yaml::Hash(_) => Self::from_new_format(desc),
-            _ => Err(ProductError::UnknownFormat),
+            _ => Err(ErrorKind::UnknownFormat.into()),
         }
     }
 }
