@@ -152,7 +152,10 @@ pub fn list(matches:&ArgMatches){
 
             ..Default::default()
         };
-        //println!("list_config: {:#?}", list_config);
+
+        if matches.is_present("colors"){
+            list_config.use_colors = true;
+        }
 
         // list archive of year `archive`
         let dir =
