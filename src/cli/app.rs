@@ -491,7 +491,6 @@ pub fn setup() -> ArgMatches<'static>{
                     .about("git diff")
                     .arg(Arg::with_name("search_term")
                          .help("Search term, possibly event name")
-                         .required(true)
                          .multiple(true)
                         )
                     .arg(Arg::with_name("archive")

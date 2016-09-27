@@ -93,8 +93,8 @@ fn decide_mode(simple:bool, verbose:bool, paths:bool,nothing:bool, csv:bool) -> 
 pub fn matches_to_paths(matches:&ArgMatches, luigi:&Storage<Project>) -> Vec<PathBuf>{
     let search_terms = matches
         .values_of("search_term")
-        .unwrap()
-        .collect::<Vec<&str>>();
+        .map(|v|v.collect::<Vec<&str>>())
+        .unwrap_or_else(Vec::new);
 
     if matches.is_present("template"){
         super::execute(||luigi.list_template_files())
