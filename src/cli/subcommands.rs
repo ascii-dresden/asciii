@@ -153,9 +153,8 @@ pub fn list(matches:&ArgMatches){
             ..Default::default()
         };
 
-        if matches.is_present("colors"){
-            list_config.use_colors = true;
-        }
+        if matches.is_present("colors"){ list_config.use_colors = true; }
+        if matches.is_present("no-colors"){ list_config.use_colors = false; }
 
         // list archive of year `archive`
         let dir =
