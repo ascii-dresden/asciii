@@ -228,6 +228,14 @@ impl Project{
         self.date().map(|date| (Local::today() - date).num_days() )
     }
 
+    pub fn our_bad(&self) -> Option<Duration> {
+        spec::date::our_bad(self.yaml())
+    }
+
+    pub fn their_bad(&self) -> Option<Duration> {
+        spec::date::their_bad(self.yaml())
+    }
+
     /// Returs a tuple containing both `(Order,` and ` Invoice)`
     pub fn bills(&self) -> Result<(Bill<Product>, Bill<Product>)>{
         Ok(try!(spec::billing::bills(&self.yaml)))

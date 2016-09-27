@@ -249,6 +249,23 @@ pub mod date {
         yaml::get_dmy(yaml, "event/dates/0/begin")
     }
 
+    pub fn our_bad(yaml: &Yaml) -> Option<Duration> {
+        let event   = try_some!(event(yaml));
+        let invoice = invoice(yaml).unwrap_or_else(UTC::today);
+        let diff = invoice - event;
+        if diff > Duration::zero() {
+            Some(diff)
+        } else {
+            None
+        }
+    }
+
+    pub fn their_bad(yaml: &Yaml) -> Option<Duration> {
+        let invoice = try_some!(invoice(yaml));
+        let payed   = try_some!(payed(yaml));
+        Some(invoice - payed)
+    }
+
     // TODO packed to deep? Clippy says YES, remove this allow!
     pub type DateRange = (Option<Date<UTC>>, Option<Date<UTC>>);
     pub type DateRanges = Vec<DateRange>;

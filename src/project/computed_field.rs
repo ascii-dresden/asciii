@@ -30,6 +30,8 @@ custom_derive! {
         Name,
         Final,
         Age,
+        OurBad,
+        TheirBad,
         Year,
         Caterers,
         ClientFullName,
@@ -53,6 +55,10 @@ impl ComputedField {
             ComputedField::Name => project::name(project.yaml()).map(|s| s.to_owned()),
             ComputedField::Final => project.sum_sold().map(|c| currency_to_string(&c)).ok(),
             ComputedField::Age => project.age().map(|a| format!("{} days", a)),
+
+            ComputedField::OurBad => project.our_bad()    .map(|a| format!("{} weeks", a.num_weeks().abs())),
+            ComputedField::TheirBad => project.their_bad().map(|a| format!("{} weeks", a.num_weeks().abs())),
+
             ComputedField::Year => project.date().map(|d| d.year().to_string()),
 
             ComputedField::Caterers => hours::caterers_string(project.yaml()),
