@@ -400,9 +400,9 @@ pub mod billing {
 
     use util::yaml;
     use util::yaml::Yaml;
-    use ::project::error::product::Error;
-    use ::project::error::product::Result;
-    use ::project::error::product::ErrorKind;
+    use ::project::product::error::Error;
+    use ::project::product::error::Result;
+    use ::project::product::error::ErrorKind;
     use ::project::product::Product;
 
     fn item_from_desc_and_value<'y>(desc: &'y Yaml, values: &'y Yaml) -> Result<(BillItem<Product<'y>>,BillItem<Product<'y>>)> {

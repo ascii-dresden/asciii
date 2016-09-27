@@ -44,7 +44,7 @@ mod tojson;
 
 use self::spec::SpecResult;
 use self::product::Product;
-use self::error::{Error,ErrorKind,Result};
+use self::error::{ErrorKind,Result};
 pub use self::computed_field::ComputedField;
 
 

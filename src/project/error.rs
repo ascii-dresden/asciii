@@ -3,26 +3,7 @@
 use std::io;
 use std::fmt;
 
-pub mod product{
-    error_chain!{
-        types { }
-        links { }
-        foreign_links { }
-        errors {
-            InvalidPrice {}
-            UnknownFormat {}
-            AmbiguousAmounts(t:String){
-                description("more returned than provided")
-            }
-            MissingAmount(t:String){
-                description("invalid price")
-            }
-            TooMuchReturned(t:String){
-                description("invalid format")
-            }
-        }
-    }
-}
+use super::product;
 
 error_chain!{
     types {
@@ -30,7 +11,7 @@ error_chain!{
     }
 
     links {
-        self::product::Error, self::product::ErrorKind, Product;
+        product::Error, product::ErrorKind, Product;
     }
 
     foreign_links {

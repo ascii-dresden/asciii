@@ -7,9 +7,29 @@ use util::yaml;
 use util::yaml::Yaml;
 
 use super::spec::to_currency;
-use super::error::product::Error as ProductError;
-use super::error::product::ErrorKind;
-use super::error::product::Result as ProductResult;
+pub mod error{
+#![allow(trivial_casts)]
+    error_chain!{
+        types { }
+        links { }
+        foreign_links { }
+        errors {
+            InvalidPrice {}
+            UnknownFormat {}
+            AmbiguousAmounts(t:String){
+                description("more returned than provided")
+            }
+            MissingAmount(t:String){
+                description("invalid price")
+            }
+            TooMuchReturned(t:String){
+                description("invalid format")
+            }
+        }
+    }
+}
+
+pub use self::error::*;
 
 //#[derive(Debug)] // manually implemented
 /// Stores properties of a product.
@@ -26,7 +46,7 @@ pub struct Product<'a> {
 
 
 impl<'a> Product<'a>{
-    pub fn from_old_format<'y>(name: &'y str, values: &'y Yaml) -> ProductResult<Product<'y>> {
+    pub fn from_old_format<'y>(name: &'y str, values: &'y Yaml) -> Result<Product<'y>> {
         let default_tax = ::CONFIG.get_f64("defaults/tax")
             .expect("Faulty config: field defaults/tax does not contain a value");
         Ok(Product {
@@ -34,26 +54,26 @@ impl<'a> Product<'a>{
             unit: yaml::get_str(values, "unit"),
             price: try!(yaml::get_f64(values, "price")
                 .map(to_currency)
-                .ok_or(ProductError::from(ErrorKind::InvalidPrice))
+                .ok_or(Error::from(ErrorKind::InvalidPrice))
                 ),
             tax: yaml::get_f64(values, "tax").unwrap_or(default_tax).into(),
         })
     }
 
-    pub fn from_new_format(desc: &Yaml) -> ProductResult<Product> {
+    pub fn from_new_format(desc: &Yaml) -> Result<Product> {
         let default_tax = ::CONFIG.get_f64("defaults/tax")
             .expect("Faulty config: field defaults/tax does not contain a value");
         Ok(Product {
             name: yaml::get_str(desc, "name").unwrap_or("unnamed"),
             unit: yaml::get_str(desc, "unit"),
             price: try!(yaml::get_f64(desc, "price")
-                .ok_or(ProductError::from(ErrorKind::InvalidPrice))
+                .ok_or(Error::from(ErrorKind::InvalidPrice))
                 .map(to_currency)),
             tax: yaml::get_f64(desc, "tax").unwrap_or(default_tax).into(),
         })
     }
 
-    pub fn from_desc_and_value<'y>(desc: &'y Yaml, values: &'y Yaml) -> ProductResult<Product<'y>> {
+    pub fn from_desc_and_value<'y>(desc: &'y Yaml, values: &'y Yaml) -> Result<Product<'y>> {
         match *desc {
             yaml::Yaml::String(ref name) => Self::from_old_format(name, values),
             yaml::Yaml::Hash(_) => Self::from_new_format(desc),
@@ -67,3 +87,4 @@ impl<'a> BillProduct for Product<'a>{
     fn name(&self) -> String {self.name.to_owned()}
     fn tax(&self) -> Tax {self.tax}
 }
+
