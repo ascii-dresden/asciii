@@ -117,7 +117,8 @@ impl Project{
     pub fn invoice_file_name(&self, extension:&str) -> Option<String>{
         let num = try_some!(spec::invoice::number_str(self.yaml()));
         let name = slug::slugify(try_some!(spec::project::name(self.yaml())));
-        let date = Local::today().format("%Y-%m-%d").to_string();
+        //let date = Local::today().format("%Y-%m-%d").to_string();
+        let date = try_some!(spec::invoice::date(self.yaml())).format("%Y-%m-%d").to_string();
         Some(format!("{} {} {}.{}",num,name,date,extension))
     }
 
@@ -195,7 +196,9 @@ impl Project{
     /// Valid to produce invoice
     ///
     /// Ready to send an **invoice** to the client.
-    pub fn is_ready_for_invoice(&self) -> SpecResult{ spec::invoice::validate(&self.yaml) }
+    pub fn is_ready_for_invoice(&self) -> SpecResult{
+        self.is_ready_for_offer().and(spec::invoice::validate(&self.yaml))
+    }
 
     /// Completely done and in the past.
     ///

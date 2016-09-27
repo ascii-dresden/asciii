@@ -12,6 +12,28 @@ use util::yaml::Yaml;
 
 pub type SpecResult<'a> = ::std::result::Result<(), Vec<&'a str>>;
 
+pub mod error{
+    #![allow(trivial_casts)]
+    error_chain!{
+        types { }
+        links { }
+        foreign_links { }
+        errors {
+            InvalidPrice {}
+            UnknownFormat {}
+            AmbiguousAmounts(t:String){
+                description("more returned than provided")
+            }
+            MissingAmount(t:String){
+                description("invalid price")
+            }
+            TooMuchReturned(t:String){
+                description("invalid format")
+            }
+        }
+    }
+}
+
 // TODO there may be cases where an f64 can't be converted into Currency
 pub fn to_currency(f: f64) -> Currency {
     Currency(::CONFIG.get_char("currency"), (f * 1000.0) as i64) / 10
@@ -101,6 +123,11 @@ pub mod client {
         .or_else(|| yaml::get_str(yaml, "client").and_then(|c|c.lines().nth(0)))
     }
 
+    ///Returns the first word of `client/title`
+    pub fn salute(yaml: &Yaml) -> Option<&str> {
+        title(yaml).and_then(|s|s.split_whitespace().nth(0))
+    }
+
     ///Returns the content of `/client/first_name`
     pub fn first_name(yaml: &Yaml) -> Option<&str> {
         yaml::get_str(yaml, "client/first_name")
@@ -127,7 +154,7 @@ pub mod client {
 
     /// Produces a standard salutation field.
     pub fn addressing(yaml: &Yaml) -> Option<String> {
-        if let Some(title) = title(yaml).and_then(|title| title.split_whitespace().nth(0))
+        if let Some(salute) = salute(yaml).and_then(|salute| salute.split_whitespace().nth(0))
         // only the first word
         {
             let last_name = last_name(yaml);
@@ -136,7 +163,7 @@ pub mod client {
             let lang = ::CONFIG.get_str("defaults/lang")
                 .expect("Faulty config: defaults/lang does not contain a value");
 
-            let gend_path = "gender_matches/".to_owned() + &title.to_lowercase();
+            let gend_path = "gender_matches/".to_owned() + &salute.to_lowercase();
             let gend = ::CONFIG.get_str(&gend_path)
                 .expect(&format!("Faulty config: {} does not contain a value", gend_path));
 
@@ -144,7 +171,7 @@ pub mod client {
             let addr = ::CONFIG.get_str(&addr_path)
                 .expect(&format!("Faulty config: {} does not contain a value", addr_path));
 
-            last_name.and(Some(format!("{} {} {}", addr, title, last_name.unwrap_or(""))))
+            last_name.and(Some(format!("{} {} {}", addr, salute, last_name.unwrap_or(""))))
         } else {
             None
         }
@@ -156,18 +183,11 @@ pub mod client {
                                              &[
                                              //"client/email", // TODO make this a requirement
                                              "client/address",
+                                             "client/title",
                                              "client/last_name",
                                              "client/first_name"
                                              ]);
 
-
-        if let Some(title) = title(yaml) {
-            if title.split_whitespace().count() > 1 {
-                errors.push("client_title");
-            }
-        } else {
-            errors.push("client_title");
-        }
 
         if addressing(yaml).is_none() {
             errors.push("client_addressing");
@@ -289,13 +309,17 @@ pub mod offer {
 pub mod invoice {
     use util::yaml;
     use util::yaml::Yaml;
-    use chrono::Datelike;
+    use chrono::*;
 
     /// plain access to `invoice/number`
     pub fn number(yaml: &Yaml) -> Option<i64> {
         yaml::get_int(yaml, "invoice/number")
         // old spec
         .or_else(|| yaml::get_int(yaml, "rnumber"))
+    }
+
+    pub fn date(yaml: &Yaml) -> Option<Date<UTC>> {
+        super::date::invoice(yaml)
     }
 
     pub fn number_str(yaml: &Yaml) -> Option<String> {

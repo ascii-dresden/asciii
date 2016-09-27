@@ -8,7 +8,7 @@ use util::yaml::Yaml;
 
 use super::spec::to_currency;
 pub mod error{
-#![allow(trivial_casts)]
+    #![allow(trivial_casts)]
     error_chain!{
         types { }
         links { }

@@ -41,13 +41,16 @@ impl ToJson for Project{
                                                      .collect::<Vec<Json>>()
                                                      .to_json();
 
-        let taxes_by_tax_to_json = |bill:&Bill<Product>| bill.taxes_by_tax()
+        let taxes_by_tax_to_json = |bill:&Bill<Product>| bill.all_by_tax()
                                                              .iter()
-                                                             .filter(|&(_,taxes)| taxes.value() > 0)
-                                                             .map(|(tax,taxes)| btreemap!{
-                                                                 s("tax") => (tax.into_inner()*100.0).to_json(),
+                                                             //.filter(|&(_,taxes)| taxes.value() > 0)
+                                                             .map(|(tax, &(sum,taxes))| btreemap!{
+                                                                 s("tax")   => (tax.into_inner()*100.0).to_json(),
+                                                                 s("sum")   => currency_to_string(&sum).to_json(),
                                                                  s("taxes") => currency_to_string(&taxes).to_json(),
+                                                                 s("has_tax")  => (taxes.value() > 0).to_json()
                                                              }.to_json())
+                                                             .rev()
                                                              .collect::<Vec<Json>>()
                                                              .to_json();
 

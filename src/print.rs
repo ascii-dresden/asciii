@@ -63,7 +63,7 @@ fn result_to_cell(res:&Result<(), Vec<&str>>, bold:bool) -> Cell{
 /// create a Style string from the properties of a project
 fn project_to_style(project:&Project) -> &str{
     // can be send as invoice
-    if project.valid_stage2().is_ok(){
+    if project.is_ready_for_invoice().is_ok(){
         return "d"
     }
 
@@ -152,9 +152,9 @@ pub fn verbose_rows(projects:&[Project], list_config:&ListConfig) -> Vec<Row>{
                       );
 
 
-            let validation1 = project.valid_stage1();
-            let validation2 = project.valid_stage2();
-            let validation3 = project.valid_stage3();
+            let validation1 = project.is_ready_for_offer();
+            let validation2 = project.is_ready_for_invoice();
+            let validation3 = project.is_ready_for_archive();
 
             cells.extend_from_slice( &[
                 cell!(r->i+1),
