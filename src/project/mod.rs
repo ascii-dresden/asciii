@@ -106,6 +106,14 @@ impl Project{
         spec::invoice::number_str(self.yaml())
     }
 
+    pub fn payed_by_client(&self) -> bool{
+        spec::date::payed(self.yaml()).is_some()
+    }
+
+    pub fn payed_caterers(&self) -> bool{
+        spec::date::wages(self.yaml()).is_some()
+    }
+
     /// Filename of the offer output file.
     pub fn offer_file_name(&self, extension:&str) -> Option<String>{
         let num = try_some!(spec::offer::number(self.yaml()));

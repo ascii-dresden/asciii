@@ -46,6 +46,15 @@ impl<'a> Default for ListConfig<'a>{
     }
 }
 
+fn payed_to_cell(project:&Project) -> Cell{
+    let sym = ::CONFIG.get_str("currency").expect("Faulty config: currency does not contain a value");
+    match (project.payed_by_client(), project.payed_caterers()) {
+        (false,false) => Cell::new("✗").with_style(Attr::ForegroundColor(color::RED)),
+        (_,   false) => Cell::new(sym).with_style(Attr::ForegroundColor(color::YELLOW)),
+        (_,   true) => Cell::new(sym).with_style(Attr::ForegroundColor(color::GREEN)),
+    }
+}
+
 fn result_to_cell(res:&Result<(), Vec<&str>>, bold:bool) -> Cell{
     match (res, bold){
         (&Ok(_),           false) => Cell::new("✓").with_style(Attr::ForegroundColor(color::GREEN)), // ✗
@@ -179,6 +188,7 @@ pub fn verbose_rows(projects:&[Project], list_config:&ListConfig) -> Vec<Row>{
                 // status "✓  ✓  ✗"
                 result_to_cell(&validation1, project.offer_file_exists()),
                 result_to_cell(&validation2, project.invoice_file_exists()),
+                payed_to_cell(&project),
                 result_to_cell(&validation3, false),
 
                 //cell!(output_file_exists(project, Project::offer_file_name)),

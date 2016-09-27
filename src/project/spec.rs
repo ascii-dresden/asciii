@@ -359,7 +359,7 @@ pub mod archive {
     pub fn validate(yaml: &Yaml) -> super::SpecResult {
         let mut errors = Vec::new();
         if super::date::payed(yaml).is_none() { errors.push("payed_date"); }
-        //if super::date::wages(yaml).is_none(){ errors.push("wages_date");} // TODO validate WAGES_DATE also
+        if super::date::wages(yaml).is_none(){ errors.push("wages_date");} // TODO validate WAGES_DATE also
         if !errors.is_empty() {
             return Err(errors);
         }
