@@ -7,11 +7,14 @@
 {{/partial}}
 
 {{#partial foo}}
-\multicolumn{4}{r}{Netto MwSt.}   & {{total_before_tax}}  \\
+{{#each sums}}{{#if has_tax}}
+\multicolumn{4}{r}{Netto MwSt.}   & {{gross_sum}}  \\ % {{total_before_tax}}
+\multicolumn{4}{r}{+MwSt. {{tax_value}}\%}   & {{tax_sum}}  \\
+{{else}}
+\multicolumn{4}{r}{MwSt. 0\%}  & {{gross_sum}}  \\ % {{total_before_tax}}
+{{/if}}{{/each}}
 
-{{#each sums}}{{#if tax}}\multicolumn{4}{r}{+MwSt. {{tax}}\%}   & {{taxes}}  \\ {{/if}}{{/each}}
-
-\multicolumn{4}{r}{Gesamtpreis}   & {{total}} \\
+\multicolumn{4}{r}{\textbf{Gesamtpreis}}   & {{total}} \\
 \end{tabular}
 \end{center}
 {{/partial}}
@@ -50,11 +53,11 @@
 {{#if ../is_invoice}}
 \Datum               <{{invoice.date}}>
 \Betreff             <Rechnung{{#if invoice.official}}\newline {{invoice.official}}{{/if}}>
-\RechnungsNummer     <{{ invoice.longnumber  }}>
-\AngebotsNummer      {}
+\RechnungsNummer     <{{ invoice.number_long  }}>
+\AngebotsNummer      <{{ offer.number }}>
 {{else}}
 \Datum               <{{offer.date}}>
-\Betreff             <Angebot>
+\Betreff             <AngebotI>
 \RechnungsNummer     {}
 \AngebotsNummer      <{{ offer.number }}>
 {{/if}}
@@ -72,11 +75,15 @@
 \begin{ascii-brief}
 
 
+{{#if ../is_invoice}}
 wir bedanken uns für Ihren Auftrag für das Catering am {{ event.date }} und erlauben uns Ihnen folgende Rechnung zu stellen:
+{{else}}
+hiermit möchten wir Ihnen für die gastronomische Betreuung Ihrer Veranstaltung am {{ event.date }} folgendes Angebot unterbreiten:
+{{/if}}
 
 \begin{center}
 \begin{tabular}{rp{7cm}rrr}
-  \textbf{Nr.} & \textbf{Bezeichnung}&    \textbf{Menge}    &    \textbf{EP}&    \textbf{Preis}    \\
+  \textbf{Nr.} & \textbf{Bezeichnung}&    \textbf{Menge}    &    \textbf{EP}    &    \textbf{Preis}    \\
   \midrule {{#with bills}}
   {{#if ../../is_invoice}}
 {{#with invoice}} {{#block items}}{{/block}} {{/with}}
@@ -89,7 +96,9 @@ wir bedanken uns für Ihren Auftrag für das Catering am {{ event.date }} und er
 {{#if ../is_invoice}} {{#with invoice}}{{#block foo}}{{/block}}{{/with}}
 {{else}} {{#with offer}}{{#block foo}}{{/block}}{{/with}} {{/if}}
 
+{{#if ../is_invoice}}
 Wir bitten um eine Begleichung des Betrags innerhalb von 14 Tagen nach Erhalt der Rechnung.
+{{/if}}
 
 \end{ascii-brief}
 \end{document}

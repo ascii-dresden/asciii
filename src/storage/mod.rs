@@ -585,21 +585,3 @@ impl<P:Storable> fmt::Debug for Storage<P>{
     }
 }
 
-#[derive(Debug)]
-#[deprecated(note="was a bad idea, settle for `StorageDir` + search_terms:&[&str]")]
-pub struct Selection<'a>{
-    pub search: &'a str,
-    pub dir: StorageDir,
-}
-
-impl<'a> Selection<'a>{
-    pub fn new(search:&'a str,archive:Option<i32>) -> Self{
-        Selection{
-            search: search,
-            dir: match archive{
-                Some(year) => StorageDir::Archive(year),
-                None => StorageDir::Working
-            }
-        }
-    }
-}

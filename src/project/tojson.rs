@@ -1,6 +1,6 @@
 use rustc_serialize::json::{ToJson, Json};
 use chrono::*;
-use bill::{Bill, BillItem};
+use bill::{Bill, BillItem, ItemList, Tax};
 use ordered_float::OrderedFloat;
 
 use super::Project;
@@ -14,6 +14,29 @@ fn opt_to_json<T: ::std::fmt::Display>(opt:Option<T>) -> Json{
         Some(t) => Json::String(t.to_string()),
         None    => Json::Null
     }
+}
+
+fn s(s:&str) -> String { String::from(s) }
+
+fn itemlist_to_json(tax:&Tax, list: &ItemList<Product>) -> Json {
+    let gross_sum = list.gross_sum();
+    let tax_sum  = list.tax_sum();
+    let net_sum  = list.net_sum();
+    let map = btreemap!{
+        s("tax_value")   => (tax.into_inner()*100.0).to_json(),
+        s("gross_sum")   => currency_to_string(&gross_sum).to_json(),
+        s("tax_sum") => currency_to_string(&tax_sum).to_json(),
+        s("has_tax")  => (tax_sum.value() > 0).to_json()
+    };
+    map.to_json()
+}
+
+fn taxes_by_tax_to_json(bill: &Bill<Product>) -> Json {
+    bill.iter()
+        .map(|(tax, list)| { itemlist_to_json(tax, list) })
+        .rev()
+        .collect::<Vec<Json>>()
+        .to_json()
 }
 
 impl ToJson for Project{
@@ -31,7 +54,7 @@ impl ToJson for Project{
             s("price") => currency_to_string(&item.product.price).to_json(),
             s("unit") => item.product.unit.unwrap_or_else(||"").to_json(),
             s("amount") => item.amount.to_json(),
-            s("cost") => currency_to_string(&item.sum()).to_json(),
+            s("cost") => currency_to_string(&item.cost()).to_json(),
             s("tax") => tax.into_inner().to_json()
         }.to_json();
 
@@ -41,18 +64,6 @@ impl ToJson for Project{
                                                      .collect::<Vec<Json>>()
                                                      .to_json();
 
-        let taxes_by_tax_to_json = |bill:&Bill<Product>| bill.all_by_tax()
-                                                             .iter()
-                                                             //.filter(|&(_,taxes)| taxes.value() > 0)
-                                                             .map(|(tax, &(sum,taxes))| btreemap!{
-                                                                 s("tax")   => (tax.into_inner()*100.0).to_json(),
-                                                                 s("sum")   => currency_to_string(&sum).to_json(),
-                                                                 s("taxes") => currency_to_string(&taxes).to_json(),
-                                                                 s("has_tax")  => (taxes.value() > 0).to_json()
-                                                             }.to_json())
-                                                             .rev()
-                                                             .collect::<Vec<Json>>()
-                                                             .to_json();
 
         let (offer, invoice) = self.bills().unwrap();
 

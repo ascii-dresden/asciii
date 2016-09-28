@@ -13,7 +13,7 @@ use std::path::{Path,PathBuf};
 
 use util;
 use super::BillType;
-use storage::{Storage,StorageDir,Storable,Selection};
+use storage::{Storage,StorageDir,Storable};
 use project::Project;
 
 #[cfg(feature="document_export")]
@@ -46,16 +46,16 @@ pub fn setup_luigi_with_git() -> Result<Storage<Project>> {
 pub fn simple_with_projects<F>(dir:StorageDir, search_terms:&[&str], f:F)
     where F:Fn(&Project)
 {
-    with_projects(dir, search_terms, |p| {f(p);Ok(())}).unwrap();
+    with_projects(&dir, search_terms, |p| {f(p);Ok(())}).unwrap();
 }
 
 /// Helper method that passes projects matching the `search_terms` to the passt closure `f`
-pub fn with_projects<F>(dir:StorageDir, search_terms:&[&str], f:F) -> Result<()>
+pub fn with_projects<F>(dir:&StorageDir, search_terms:&[&str], f:F) -> Result<()>
     where F:Fn(&Project)->Result<()>
 {
     trace!("with_projects({:?})", search_terms);
     let luigi = try!(setup_luigi());
-    let projects = try!(luigi.search_projects_any(dir, search_terms));
+    let projects = try!(luigi.search_projects_any(*dir, search_terms));
     if !projects.is_empty() {
         for project in &projects{
             try!(f(project));
@@ -69,7 +69,7 @@ pub fn with_projects<F>(dir:StorageDir, search_terms:&[&str], f:F) -> Result<()>
 pub fn csv(year:i32) -> Result<String> {
     let luigi = try!(setup_luigi());
     let mut projects = try!(luigi.open_projects(StorageDir::Year(year)));
-    projects.sort_by(|pa,pb| pa.index().unwrap_or("zzzz".to_owned()).cmp( &pb.index().unwrap_or("zzzz".to_owned())));
+    projects.sort_by(|pa,pb| pa.index().unwrap_or_else(||"zzzz".to_owned()).cmp( &pb.index().unwrap_or("zzzz".to_owned())));
     projects_to_csv(&projects)
 }
 
@@ -119,7 +119,7 @@ pub fn projects_to_tex(dir:StorageDir, search_term:&str, template_name:&str, bil
 
     debug!("template file={:?} exists={}", template_path, template_path.exists());
 
-    with_projects(dir, &[search_term], |p| {
+    with_projects(&dir, &[search_term], |p| {
 
         let convert_tool = ::CONFIG.get_str("convert/tool");
         let output_folder = ::CONFIG.get_str("output_path").and_then(util::get_valid_path).expect("Faulty config \"output_path\"");
@@ -235,17 +235,18 @@ pub fn spec() -> Result<()> {
     Ok(())
 }
 
-pub fn delete_project_confirmation(selection:Selection) -> Result<()> {
+pub fn delete_project_confirmation(dir: &StorageDir, search_term:&str) -> Result<()> {
     let luigi = try!(setup_luigi());
-    debug!("{:?}",selection);
-    with_projects(selection.dir, &[selection.search], |p| {
+    debug!("{:?} in {:?}",search_term, dir);
+    with_projects(&dir, &[search_term], |p| {
         println!("you want me to delete {:?} [y/N]", p.dir());
         if util::really() {
             println!("commencing");
             try!(luigi.delete_project(p));
             Ok(())
         }else {
-            try!(Err("nope"))
+            info!("not deleting {}", p.name());
+            Ok(())
         }
     })
 }

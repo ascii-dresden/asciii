@@ -88,6 +88,21 @@ fn decide_mode(simple:bool, verbose:bool, paths:bool,nothing:bool, csv:bool) -> 
     }
 }
 
+fn matches_to_search<'a>(matches:&'a ArgMatches) -> (Vec<&'a str>, StorageDir) {
+    let search_terms = matches
+        .values_of("search_term")
+        .map(|v|v.collect::<Vec<&str>>())
+        .unwrap_or_else(Vec::new);
+
+    let dir = if let Some(archive) = matches.value_of("archive"){
+        StorageDir::Archive(archive.parse::<i32>().unwrap())
+    } else {
+        StorageDir::Working
+    };
+
+    (search_terms, dir)
+}
+
 /// Produces a list of paths.
 /// This is more general than `with_projects`, as this includes templates too.
 pub fn matches_to_paths(matches:&ArgMatches, luigi:&Storage<Project>) -> Vec<PathBuf>{
@@ -336,15 +351,10 @@ fn edit_template(name:&str, editor:&Option<&str>){
 
 /// Command SHOW
 pub fn show(matches:&ArgMatches){
-    let search_term = matches.value_of("search_term").unwrap();
-
-    let dir = match matches.value_of("archive"){
-        Some(year) => StorageDir::Archive(year.parse::<i32>().unwrap()),
-        _ => StorageDir::Working,
-    };
+    let (search_terms, dir) = matches_to_search(matches);
 
     if matches.is_present("files"){
-        actions::simple_with_projects(dir, &[search_term],
+        actions::simple_with_projects(dir, &search_terms,
                       |p| {
                           println!("{}: ", p.dir().display());
                           for entry in fs::read_dir(p.dir()).unwrap(){
@@ -353,33 +363,33 @@ pub fn show(matches:&ArgMatches){
                       }
                      );
     } else if let Some(detail) = matches.value_of("detail"){
-        show_detail(dir, &search_term, detail);
-    } else if matches.is_present("dump"){ dump_yaml(dir, &search_term)
-    } else if matches.is_present("json"){ show_json(dir, &search_term)
-    } else if matches.is_present("csv"){ show_csv(dir, &search_term);
-    } else if matches.is_present("template"){ show_template(search_term);
-    } else { actions::simple_with_projects(dir, &[search_term], print::show_items) }
+        show_detail(dir, &search_terms, detail);
+    } else if matches.is_present("dump"){ dump_yaml(dir, search_terms.as_slice())
+    } else if matches.is_present("json"){ show_json(dir, search_terms.as_slice())
+    } else if matches.is_present("csv"){  show_csv( dir, search_terms.as_slice());
+    } else if matches.is_present("template"){ show_template(search_terms[0]);
+    } else { actions::simple_with_projects(dir, search_terms.as_slice(), print::show_items) }
 }
 
-fn dump_yaml(dir:StorageDir, search_term:&str){
-    actions::simple_with_projects(dir, &[search_term], |p| println!("{}", p.yaml().dump().unwrap()));
+fn dump_yaml(dir:StorageDir, search_terms:&[&str]){
+    actions::simple_with_projects(dir, &search_terms, |p| println!("{}", p.yaml().dump().unwrap()));
 }
 
 #[cfg(feature="document_export")]
-fn show_json(dir:StorageDir, search_term:&str){
-    actions::simple_with_projects(dir, &[search_term], |p| println!("{}", p.to_json()));
+fn show_json(dir:StorageDir, search_terms:&[&str]){
+    actions::simple_with_projects(dir, &search_terms, |p| println!("{}", p.to_json()));
 }
 
-fn show_detail(dir:StorageDir, search_term:&str, detail:&str){
-    actions::simple_with_projects(dir, &[search_term], |p| println!("{}", p.get(detail).unwrap_or_else(||String::from("Nothing found"))));
+fn show_detail(dir:StorageDir, search_terms:&[&str], detail:&str){
+    actions::simple_with_projects(dir, &search_terms, |p| println!("{}", p.get(detail).unwrap_or_else(||String::from("Nothing found"))));
 }
 
-fn show_csv(dir:StorageDir, search_term:&str){
-    actions::simple_with_projects(dir, &[search_term], |p| println!("{}", execute(||p.to_csv(&BillType::Invoice))));
+fn show_csv(dir:StorageDir, search_terms:&[&str]){
+    actions::simple_with_projects(dir, &search_terms, |p| println!("{}", execute(||p.to_csv(&BillType::Invoice))));
 }
 
 #[cfg(not(feature="document_export"))]
-fn show_json(_:StorageDir, _:&str){
+fn show_json(_:StorageDir, _:&[&str]){
     error!("feature temporarily disabled")
 }
 
@@ -393,7 +403,6 @@ pub fn spec(_:&ArgMatches){
 /// Command MAKE
 #[cfg(feature="document_export")]
 pub fn make(m:&ArgMatches) {
-    let search_term = m.value_of("search_term").unwrap();
     let template_name = m.value_of("template").unwrap_or("document");
     let bill_type = match (m.is_present("offer"),m.is_present("invoice")) {
         (true,true)  => unreachable!("this should have been prevented by clap-rs"),
@@ -401,30 +410,24 @@ pub fn make(m:&ArgMatches) {
         (false,true) => Some(BillType::Invoice),
         (false,false) => None
     };
-    let dir = match m.value_of("archive"){
-        Some(year) => { let year = year.parse::<i32>().unwrap(); StorageDir::Archive(year) },
-        _ => StorageDir::Working
-    };
+    let (search_terms, dir) = matches_to_search(m);
 
     debug!("make {t}({s}/{d:?}, invoice={i:?})",
     d = dir,
-    s = search_term,
+    s = search_terms[0],
     t = template_name,
     i = bill_type
     );
 
-    execute(||actions::projects_to_tex(dir, search_term, template_name, &bill_type, m.is_present("dry-run"), m.is_present("force")))
+    execute(||actions::projects_to_tex(dir, search_terms[0], template_name, &bill_type, m.is_present("dry-run"), m.is_present("force")))
 }
 
 
-fn match_to_selection<'a>(m:&'a ArgMatches) -> Selection<'a> {
-    Selection::new(m.value_of("search_term").unwrap(), m.value_of("archive").and_then(|s|s.parse::<i32>().ok()))
-}
 
 /// Command DELETE
 pub fn delete(m:&ArgMatches){
-    let selection = match_to_selection(m);
-    execute(||actions::delete_project_confirmation(selection));
+    let (search_terms, dir) = matches_to_search(m);
+    execute(||actions::delete_project_confirmation(&dir, search_terms[0]));
 }
 
 #[cfg(not(feature="document_export"))]

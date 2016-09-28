@@ -195,12 +195,6 @@ impl Project{
         offer_validation.and(client_validation).and(project_validation)
     }
 
-    /// Valid project
-    ///
-    /// Ready to send an **invoice** to the client.
-    #[deprecated(note="please use is_ready_for_invoice()")]
-    pub fn valid_stage2(&self) -> SpecResult{ spec::invoice::validate(&self.yaml) }
-
     /// Valid to produce invoice
     ///
     /// Ready to send an **invoice** to the client.
@@ -211,17 +205,12 @@ impl Project{
     /// Completely done and in the past.
     ///
     /// Ready to be **archived**.
-    #[deprecated(note="please use is_ready_for_archive()")]
-    pub fn valid_stage3(&self) -> SpecResult{
+    pub fn is_ready_for_archive(&self) -> SpecResult{
         if self.canceled(){
             Ok(())
         } else {
             spec::archive::validate(&self.yaml)
         }
-    }
-
-    pub fn is_ready_for_archive(&self) -> SpecResult{
-        self.valid_stage3()
     }
 
     pub fn age(&self) -> Option<i64> {

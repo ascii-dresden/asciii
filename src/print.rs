@@ -1,6 +1,7 @@
 //! All the printing code lives here.
 
 use std::error::Error;
+use std::collections::BTreeMap;
 
 use chrono::*;
 use prettytable::Table;
@@ -245,7 +246,7 @@ pub fn dynamic_rows(projects:&[Project], list_config:&ListConfig) -> Vec<Row>{
                                         ).collect::<Vec<Cell>>()
                     );
                 if list_config.show_errors{
-                    let validation = (project.valid_stage1(), project.valid_stage2(), project.valid_stage3());
+                    let validation = (project.is_ready_for_offer(), project.is_ready_for_invoice(), project.is_ready_for_archive());
 
                     cells.extend_from_slice( &[
                                              // Errors
@@ -289,6 +290,20 @@ pub fn print_csv(projects:&[Project]){
     }
 }
 
+fn table_for_arrangement(table:&mut Table){
+    table.set_format(FormatBuilder::new() .padding(0, 0) .build());
+}
+
+fn table_with_borders(table:&mut Table){
+    table.set_format( FormatBuilder::new()
+                      .borders('│').padding(1, 1)
+                      .separators( &[LinePosition::Title], LineSeparator::new('─', '─', '├', '┤'))
+                      .separators( &[LinePosition::Top],    LineSeparator::new('─', '─', '┌', '┐'))
+                      .separators( &[LinePosition::Bottom], LineSeparator::new('─', '─', '└', '┘'))
+                      .build()
+                    );
+}
+
 pub fn show_items(project:&Project){
     trace!("print::show_items()");
     println!("{}", project.name());
@@ -299,36 +314,30 @@ pub fn show_items(project:&Project){
     let mut table = Table::new();
     trace!("                   - created table");
     //table.set_format(*format::consts::FORMAT_BORDERS_ONLY);
-    table.set_format(
-        FormatBuilder::new()
-        //.column_separator('│')
-        .borders('│')
-        .padding(1, 1)
-        //.separators( &[LinePosition::Top],    LineSeparator::new('─', '┬', '┌', '┐'))
-        //.separators( &[LinePosition::Title], LineSeparator::new('─', '┴', '├', '┤'))
-        .separators( &[LinePosition::Title], LineSeparator::new('─', '─', '├', '┤'))
-        //.separators( &[LinePosition::Intern], format::LineSeparator::new('─', '┼', '├', '┤'))
-        //.separators( &[LinePosition::Bottom], LineSeparator::new('─', '┴', '└', '┘'))
-        .separators( &[LinePosition::Top],    LineSeparator::new('─', '─', '┌', '┐'))
-        .separators( &[LinePosition::Bottom], LineSeparator::new('─', '─', '└', '┘'))
-        .build()
-        );
+    table_with_borders(&mut table);
     table.set_titles( Row::new(vec![cell!(""), cell!("name"), cell!( "amount"), cell!("price"), cell!("cost")]));
     trace!("                   - added a row");
-    for (_tax, items) in bill.items_by_tax.iter(){
-        for (index,item) in items.iter().enumerate(){
-            table.add_row( Row::new(vec![
-                                    Cell::new(&index.to_string()),
-                                    Cell::new(item.product.name),
-                                    Cell::new(&item.amount.to_string()),
-                                    Cell::new(&currency_to_string(&item.product.price)),
-                                    Cell::new(&currency_to_string(&(item.product.price * item.amount))),
-            ]));
-        }
+    for (index,item) in bill.as_items().iter().enumerate(){
+        table.add_row(
+            row![ index.to_string(),
+                  item.product.name,
+                  item.amount.to_string(),
+                  currency_to_string(&item.product.price),
+                  r->currency_to_string(&(item.cost()))
+            ]);
     }
+
+    for (&tax, itemlist) in bill.iter() {
+        table.add_row(
+            row!["Kosten" ,"", "", cell!(r->format!("{:?}%",*tax*100f64)), itemlist.gross_sum().postfix()]
+            //row!["Kosten" ,"", "", cell!(r->format!("{:?}%",*tax*100f64)), taxes.postfix()]
+            );
+    }
+
     table.printstd();
+
     trace!("                   - printed table");
-    let taxes = bill.taxes_by_tax();
+    let taxes = bill.iter().map(|(tax, list)| (tax,list.tax_sum())).collect::<BTreeMap<_,_>>();
     let sums = bill.sums_by_tax();
     let total = bill.total();
 
