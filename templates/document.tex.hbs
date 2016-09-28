@@ -8,13 +8,13 @@
 
 {{#partial foo}}
 {{#each sums}}{{#if has_tax}}
-\multicolumn{4}{r}{Netto MwSt.}   & {{gross_sum}}  \\ % {{total_before_tax}}
+\multicolumn{4}{r}{Netto MwSt.}   & {{gross_sum}}  \\ % {{gross_total}}
 \multicolumn{4}{r}{+MwSt. {{tax_value}}\%}   & {{tax_sum}}  \\
 {{else}}
-\multicolumn{4}{r}{MwSt. 0\%}  & {{gross_sum}}  \\ % {{total_before_tax}}
+\multicolumn{4}{r}{MwSt. 0\%}  & {{gross_sum}}  \\ % {{gross_total}}
 {{/if}}{{/each}}
 
-\multicolumn{4}{r}{\textbf{Gesamtpreis}}   & {{total}} \\
+\multicolumn{4}{r}{\textbf{Gesamtpreis}}  & {{net_total}} \\
 \end{tabular}
 \end{center}
 {{/partial}}

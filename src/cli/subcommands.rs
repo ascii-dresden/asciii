@@ -33,7 +33,7 @@ use super::{execute,fail};
 // TODO refactor this into actions module and actual, short subcommands
 
 /// Create NEW Project
-#[deprecated(note="move to asciii::actions")]
+//#[deprecated(note="move to asciii::actions")]
 pub fn new(matches:&ArgMatches){
     let project_name     = matches.value_of("name").expect("You did not pass a \"Name\"!");
     let editor           = CONFIG.get("editor").and_then(|e|e.as_str());
@@ -74,7 +74,7 @@ pub fn new(matches:&ArgMatches){
     }
 }
 
-#[deprecated(note="move to impl ListMode and then to asciii::actions")]
+//#[deprecated(note="move to impl ListMode and then to asciii::actions")]
 fn decide_mode(simple:bool, verbose:bool, paths:bool,nothing:bool, csv:bool) -> ListMode{
     if csv{     ListMode::Csv }
     else if nothing{ ListMode::Nothing }
@@ -350,10 +350,17 @@ fn edit_template(name:&str, editor:&Option<&str>){
 
 
 /// Command SHOW
-pub fn show(matches:&ArgMatches){
-    let (search_terms, dir) = matches_to_search(matches);
+pub fn show(m:&ArgMatches){
+    let (search_terms, dir) = matches_to_search(m);
 
-    if matches.is_present("files"){
+    let bill_type = match (m.is_present("offer"),m.is_present("invoice")) {
+        (true,true)  => unreachable!("this should have been prevented by clap-rs"),
+        (true,false) => BillType::Offer,
+        (false,true) => BillType::Invoice,
+        _            => BillType::Invoice, //TODO be inteligent here ( use date )
+    };
+
+    if m.is_present("files"){
         actions::simple_with_projects(dir, &search_terms,
                       |p| {
                           println!("{}: ", p.dir().display());
@@ -362,13 +369,13 @@ pub fn show(matches:&ArgMatches){
                           }
                       }
                      );
-    } else if let Some(detail) = matches.value_of("detail"){
+    } else if let Some(detail) = m.value_of("detail"){
         show_detail(dir, &search_terms, detail);
-    } else if matches.is_present("dump"){ dump_yaml(dir, search_terms.as_slice())
-    } else if matches.is_present("json"){ show_json(dir, search_terms.as_slice())
-    } else if matches.is_present("csv"){  show_csv( dir, search_terms.as_slice());
-    } else if matches.is_present("template"){ show_template(search_terms[0]);
-    } else { actions::simple_with_projects(dir, search_terms.as_slice(), print::show_items) }
+    } else if m.is_present("dump"){ dump_yaml(dir, search_terms.as_slice())
+    } else if m.is_present("json"){ show_json(dir, search_terms.as_slice())
+    } else if m.is_present("csv"){  show_csv( dir, search_terms.as_slice());
+    } else if m.is_present("template"){ show_template(search_terms[0]);
+    } else { actions::simple_with_projects(dir, search_terms.as_slice(), |p|print::show_items(p,&bill_type)) }
 }
 
 fn dump_yaml(dir:StorageDir, search_terms:&[&str]){
@@ -443,7 +450,6 @@ pub fn make(_:&ArgMatches){
 
 
 /// Command SHOW --template
-#[deprecated(note="move to ::print")]
 fn show_template(name:&str){
     let luigi = execute(||setup_luigi());
     let templater = Templater::from_file(&luigi.get_template_file(name).unwrap()).unwrap();

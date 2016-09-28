@@ -261,7 +261,7 @@ impl Project{
 
     pub fn sum_sold(&self) -> Result<Currency> {
         let (_,invoice) = try!(self.bills());
-        Ok(invoice.total())
+        Ok(invoice.net_total())
     }
 
     pub fn debug(&self) -> DebugProject{

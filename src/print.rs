@@ -1,7 +1,6 @@
 //! All the printing code lives here.
 
 use std::error::Error;
-use std::collections::BTreeMap;
 
 use chrono::*;
 use prettytable::Table;
@@ -9,11 +8,10 @@ use prettytable::row::Row;
 use prettytable::cell::Cell;
 use prettytable::format::{LineSeparator,LinePosition,FormatBuilder};
 use term::{Attr, color};
+use super::BillType;
 
 use project::Project;
 use storage::Storable;
-use ordered_float::OrderedFloat;
-use bill::Currency;
 use util::currency_to_string;
 
 //TODO construct table rows way more dynamically
@@ -304,51 +302,53 @@ fn table_with_borders(table:&mut Table){
                     );
 }
 
-pub fn show_items(project:&Project){
+pub fn show_items(project:&Project, bill_type:&BillType) {
     trace!("print::show_items()");
     println!("{}", project.name());
 
-    let (order, _invoice) = project.bills().unwrap();
-    let bill = order;
+    let (offer, invoice) = project.bills().unwrap();
+
+    let bill = match *bill_type {
+        BillType::Offer => offer,
+        BillType::Invoice => invoice
+    };
 
     let mut table = Table::new();
     trace!("                   - created table");
     //table.set_format(*format::consts::FORMAT_BORDERS_ONLY);
     table_with_borders(&mut table);
-    table.set_titles( Row::new(vec![cell!(""), cell!("name"), cell!( "amount"), cell!("price"), cell!("cost")]));
+    table.set_titles( row![cell!(""), cell!("name"), cell!("amount"), cell!("price"), cell!("cost")]);
     trace!("                   - added a row");
     for (index,item) in bill.as_items().iter().enumerate(){
         table.add_row(
-            row![ index.to_string(),
+            row![ cell!((index+1).to_string()),
                   item.product.name,
-                  item.amount.to_string(),
-                  currency_to_string(&item.product.price),
+                  r->item.amount.to_string(),
+                  r->currency_to_string(&item.product.price),
                   r->currency_to_string(&(item.cost()))
             ]);
     }
 
+    table.add_row( row![cell!("──"), cell!("────"), cell!(r->"────"), cell!(r->"──────"), cell!(r->"───────")]);
     for (&tax, itemlist) in bill.iter() {
-        table.add_row(
-            row!["Kosten" ,"", "", cell!(r->format!("{:?}%",*tax*100f64)), itemlist.gross_sum().postfix()]
-            //row!["Kosten" ,"", "", cell!(r->format!("{:?}%",*tax*100f64)), taxes.postfix()]
-            );
+        table.add_row( row!["",
+                            "",
+                            "",
+                            "",
+                            itemlist.gross_sum().postfix()
+        ]);
+        if itemlist.tax_sum().value() > 0 {
+            table.add_row( row!["",
+                                "",
+                                "",
+                                cell!(r->format!("+{}%",*tax*100f64)),
+                                cell!(r->format!("{}", itemlist.tax_sum().postfix()))
+                                //cell!(r->itemlist.net_sum().postfix())
+            ]);
+        }
     }
+    table.add_row( row!["Total" ,"", "", "", bill.net_total().postfix()]);
 
     table.printstd();
-
-    trace!("                   - printed table");
-    let taxes = bill.iter().map(|(tax, list)| (tax,list.tax_sum())).collect::<BTreeMap<_,_>>();
-    let sums = bill.sums_by_tax();
-    let total = bill.total();
-
-    println!("Taxes   0% : {}", currency_to_string(&taxes.get(&OrderedFloat(0.0)).unwrap_or(&Currency(Some('€'),0))));
-    println!("     19,0% : {}", currency_to_string(&taxes.get(&OrderedFloat(0.19)).unwrap_or(&Currency(Some('€'),0))));
-
-    println!("Sums    0% : {}", currency_to_string(&sums.get(&OrderedFloat(0.0)).unwrap_or(&Currency(Some('€'),0))));
-    println!("     19,0% : {}", currency_to_string(&sums.get(&OrderedFloat(0.19)).unwrap_or(&Currency(Some('€'),0))));
-    println!("Total        {}", currency_to_string(&total));
-
-    //println!("{}", project.sum_offered().unwrap());
-    //println!("{}", project.tax_offered().unwrap());
 
 }

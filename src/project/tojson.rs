@@ -21,7 +21,6 @@ fn s(s:&str) -> String { String::from(s) }
 fn itemlist_to_json(tax:&Tax, list: &ItemList<Product>) -> Json {
     let gross_sum = list.gross_sum();
     let tax_sum  = list.tax_sum();
-    let net_sum  = list.net_sum();
     let map = btreemap!{
         s("tax_value")   => (tax.into_inner()*100.0).to_json(),
         s("gross_sum")   => currency_to_string(&gross_sum).to_json(),
@@ -97,8 +96,8 @@ impl ToJson for Project{
                 s("number") => offer::number(y).to_json(),
                 s("date")   => dmy(spec::date::offer(y)),
                 s("sums")   => taxes_by_tax_to_json(&offer),
-                s("total")  => currency_to_string(&offer.total()).to_json(),
-                s("total_before_tax")  => currency_to_string(&offer.total_before_tax()).to_json(),
+                s("net_total")  => currency_to_string(&offer.net_total()).to_json(),
+                s("gross_total")  => currency_to_string(&offer.gross_total()).to_json(),
             }.to_json(),
 
             s("invoice") => btreemap!{
@@ -107,8 +106,8 @@ impl ToJson for Project{
                 s("number_long") => invoice::number_long_str(y).to_json(),
                 s("official") => invoice::official(y).to_json(),
                 s("sums")   => taxes_by_tax_to_json(&invoice),
-                s("total")  => currency_to_string(&invoice.total()).to_json(),
-                s("total_before_tax")  => currency_to_string(&invoice.total_before_tax()).to_json(),
+                s("net_total")  => currency_to_string(&invoice.net_total()).to_json(),
+                s("gross_total")  => currency_to_string(&invoice.gross_total()).to_json(),
             }.to_json(),
 
             s("hours") => btreemap!{
