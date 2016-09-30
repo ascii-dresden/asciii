@@ -195,8 +195,8 @@ pub fn setup() -> ArgMatches<'static>{
 
         .subcommand(SubCommand::with_name("archive")
                     .about("Move a Project into the archive")
-                    .arg(Arg::with_name("NAME")
-                         .help("The name of the project, duh!")
+                    .arg(Arg::with_name("search terms")
+                         .help("Search terms to match the project")
                          .required(true)
                          .multiple(true)
                         )

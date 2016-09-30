@@ -1,6 +1,7 @@
 //! Contains the `Storable` trait that storable projects must implement.
 //!
 
+use std::{fs,io};
 use std::path::{Path, PathBuf};
 use std::collections::HashMap;
 
@@ -29,6 +30,17 @@ pub trait Storable{
     fn name(&self) -> String;
     fn date(&self) -> Option<Date<UTC>>;
     fn year(&self) -> Option<i32>{ self.date().map(|d|d.year()) }
+
+    /// Deletes the project if the passed in closure returns `true`
+    fn delete_project_dir_if<F>(&self, confirmed:F) -> io::Result<()>
+        where F: Fn()->bool
+    {
+        let folder = self.dir();
+        if confirmed(){
+            debug!("$ rm {}", folder.display());
+            fs::remove_dir_all(&folder)
+        } else {Ok(())}
+    }
 
     /// For sorting
     fn index(&self) -> Option<String>;
@@ -60,4 +72,6 @@ pub trait Storable{
 
     fn matches_filter(&self, key: &str, val: &str) -> bool;
     fn matches_search(&self, term: &str) -> bool;
+
+    fn is_ready_for_archive(&self) -> bool;
 }

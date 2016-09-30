@@ -434,7 +434,7 @@ pub fn make(m:&ArgMatches) {
 /// Command DELETE
 pub fn delete(m:&ArgMatches){
     let (search_terms, dir) = matches_to_search(m);
-    execute(||actions::delete_project_confirmation(&dir, search_terms[0]));
+    execute(||actions::delete_project_confirmation(dir, &search_terms));
 }
 
 #[cfg(not(feature="document_export"))]
@@ -467,11 +467,10 @@ fn add_to_git(paths:&[PathBuf]) {
 
 /// TODO make this be have like `edit`, taking multiple names
 pub fn archive(matches:&ArgMatches){
-    let name = matches.value_of("NAME").unwrap();
-    let year = matches.value_of("year")
-        .and_then(|s|s.parse::<i32>().ok());
-    trace!("archive({:?},{:?})",name, year);
-    let moved_files = execute(|| actions::archive_project(name, year, matches.is_present("force")));
+    let search_terms = matches.values_of("search term").unwrap().collect::<Vec<_>>();
+    let year = matches.value_of("year").and_then(|s|s.parse::<i32>().ok());
+    trace!("archive({:?},{:?})",search_terms, year);
+    let moved_files = execute(|| actions::archive_projects(&search_terms, year, matches.is_present("force")));
     add_to_git(&moved_files);
 }
 

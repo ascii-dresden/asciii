@@ -425,6 +425,10 @@ impl Storable for Project{
         ||
         self.name().to_lowercase().contains(&search)
     }
+
+    fn is_ready_for_archive(&self) -> bool {
+        Project::is_ready_for_archive(self).is_ok()
+    }
 }
 
 impl<'a> From<&'a Project> for DebugProject{

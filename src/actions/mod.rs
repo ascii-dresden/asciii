@@ -13,7 +13,7 @@ use std::path::{Path,PathBuf};
 
 use util;
 use super::BillType;
-use storage::{Storage,StorageDir,Storable};
+use storage::{Storage,StorageDir,Storable,StorageResult};
 use project::Project;
 
 #[cfg(feature="document_export")]
@@ -46,16 +46,19 @@ pub fn setup_luigi_with_git() -> Result<Storage<Project>> {
 pub fn simple_with_projects<F>(dir:StorageDir, search_terms:&[&str], f:F)
     where F:Fn(&Project)
 {
-    with_projects(&dir, search_terms, |p| {f(p);Ok(())}).unwrap();
+    match with_projects(dir, search_terms, |p| {f(p);Ok(())}){
+        Ok(_) => {},
+        Err(e) => error!("{}",e)
+    }
 }
 
 /// Helper method that passes projects matching the `search_terms` to the passt closure `f`
-pub fn with_projects<F>(dir:&StorageDir, search_terms:&[&str], f:F) -> Result<()>
+pub fn with_projects<F>(dir:StorageDir, search_terms:&[&str], f:F) -> Result<()>
     where F:Fn(&Project)->Result<()>
 {
     trace!("with_projects({:?})", search_terms);
     let luigi = try!(setup_luigi());
-    let projects = try!(luigi.search_projects_any(*dir, search_terms));
+    let projects = try!(luigi.search_projects_any(dir, search_terms));
     if !projects.is_empty() {
         for project in &projects{
             try!(f(project));
@@ -119,7 +122,7 @@ pub fn projects_to_tex(dir:StorageDir, search_term:&str, template_name:&str, bil
 
     debug!("template file={:?} exists={}", template_path, template_path.exists());
 
-    with_projects(&dir, &[search_term], |p| {
+    with_projects(dir, &[search_term], |p| {
 
         let convert_tool = ::CONFIG.get_str("convert/tool");
         let output_folder = ::CONFIG.get_str("output_path").and_then(util::get_valid_path).expect("Faulty config \"output_path\"");
@@ -235,58 +238,25 @@ pub fn spec() -> Result<()> {
     Ok(())
 }
 
-pub fn delete_project_confirmation(dir: &StorageDir, search_term:&str) -> Result<()> {
+pub fn delete_project_confirmation(dir: StorageDir, search_terms:&[&str]) -> Result<()> {
     let luigi = try!(setup_luigi());
-    debug!("{:?} in {:?}",search_term, dir);
-    with_projects(&dir, &[search_term], |p| {
-        println!("you want me to delete {:?} [y/N]", p.dir());
-        if util::really() {
-            println!("commencing");
-            try!(luigi.delete_project(p));
-            Ok(())
-        }else {
-            info!("not deleting {}", p.name());
-            Ok(())
-        }
-    })
+    for project in try!(luigi.search_projects_any(dir, search_terms)) {
+        try!(project.delete_project_dir_if(
+                || util::really(&format!("you want me to delete {:?} [y/N]", project.dir()))
+                ))
+    }
+    Ok(())
 }
 
-pub fn archive_project(search_term:&str, manual_year:Option<i32>, force:bool) -> Result<Vec<PathBuf>>{
-    trace!("archive_project({},{:?},{:?})",search_term, manual_year,force);
+pub fn archive_projects(search_terms:&[&str], manual_year:Option<i32>, force:bool) -> Result<Vec<PathBuf>>{
+    trace!("archive_projects matching ({:?},{:?},{:?})", search_terms, manual_year,force);
     let luigi = try!(setup_luigi_with_git());
-    let mut moved_files = Vec::new();
-    let projects = try!(luigi.search_projects_any(StorageDir::Working, &[search_term]));
-    if projects.is_empty(){
-        return Err("Nothing found".to_string().into());
-    }
-    for project in projects {
-        if force {warn!("you are using --force")};
-        if project.is_ready_for_archive().is_ok() || force {
-            info!("project {:?} is ready to be archived", project.name());
-            let year = manual_year.or(project.year()).unwrap();
-            info!("archiving {} ({})",  project.ident(), project.year().unwrap());
-            let archive_target = try!(luigi.archive_project(&project, year));
-            moved_files.push(project.dir());
-            moved_files.push(archive_target);
-        }
-        else {
-            error!("project {:?} is not ready to be archived", project.name());
-        }
-    };
-    Ok(moved_files)
+    Ok(try!( luigi.archive_projects_if(search_terms, manual_year, || true) ))
 }
 
 /// Command UNARCHIVE <YEAR> <NAME>
 /// TODO: return a list of files that have to be updated in git
 pub fn unarchive_projects(year:i32, search_terms:&[&str]) -> Result<Vec<PathBuf>> {
     let luigi = try!(setup_luigi_with_git());
-    let mut moved_files = Vec::new();
-    let projects = try!(luigi.search_projects_any(StorageDir::Archive(year), search_terms));
-    for project in projects {
-        println!("unarchiving {:?}", project.name());
-        let unarchive_target = luigi.unarchive_project(&project).unwrap();
-        moved_files.push(project.dir());
-        moved_files.push(unarchive_target);
-    };
-    Ok(moved_files)
+    Ok(try!( luigi.unarchive_projects(year, search_terms) ))
 }
