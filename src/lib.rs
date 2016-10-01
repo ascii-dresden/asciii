@@ -77,6 +77,15 @@ pub enum BillType{
     Invoice
 }
 
+impl ToString for BillType{
+    fn to_string(&self) -> String {
+        match *self{
+            BillType::Offer => "Offer",
+            BillType::Invoice => "Invoice"
+        }.to_owned()
+    }
+}
+
 /// Returns library version
 ///
 /// Human readable, no semantic versioning.

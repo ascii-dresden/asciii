@@ -304,7 +304,7 @@ fn table_with_borders(table:&mut Table){
 
 pub fn show_items(project:&Project, bill_type:&BillType) {
     trace!("print::show_items()");
-    println!("{}", project.name());
+    println!("{}: {}", bill_type.to_string(), project.name());
 
     let (offer, invoice) = project.bills().unwrap();
 
@@ -317,7 +317,8 @@ pub fn show_items(project:&Project, bill_type:&BillType) {
     trace!("                   - created table");
     //table.set_format(*format::consts::FORMAT_BORDERS_ONLY);
     table_with_borders(&mut table);
-    table.set_titles( row![cell!(""), cell!("name"), cell!("amount"), cell!("price"), cell!("cost")]);
+    //table.set_titles( row![cell!(""), bill_type, cell!(project.name())]);
+    //table.add_row( row![cell!(""), cell!("name"), cell!("amount"), cell!("price"), cell!("cost")]);
     trace!("                   - added a row");
     for (index,item) in bill.as_items().iter().enumerate(){
         table.add_row(
@@ -329,13 +330,13 @@ pub fn show_items(project:&Project, bill_type:&BillType) {
             ]);
     }
 
-    table.add_row( row![cell!("──"), cell!("────"), cell!(r->"────"), cell!(r->"──────"), cell!(r->"───────")]);
+    table.add_row( row![cell!(""), cell!("======="), cell!(r->"======"), cell!(r->"======"), cell!(r->"======")]);
     for (&tax, itemlist) in bill.iter() {
         table.add_row( row!["",
                             "",
                             "",
                             "",
-                            itemlist.gross_sum().postfix()
+                            cell!(r->itemlist.gross_sum().postfix())
         ]);
         if itemlist.tax_sum().value() > 0 {
             table.add_row( row!["",
@@ -347,7 +348,7 @@ pub fn show_items(project:&Project, bill_type:&BillType) {
             ]);
         }
     }
-    table.add_row( row!["Total" ,"", "", "", bill.net_total().postfix()]);
+    table.add_row( row!["", "Total", "", "", bill.net_total().postfix()]);
 
     table.printstd();
 

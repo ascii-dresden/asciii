@@ -25,7 +25,8 @@ pub fn freeze() {
 }
 
 /// Asks for confirmation
-pub fn really() -> bool {
+pub fn really(msg:&str) -> bool {
+    println!("{}", msg);
     let mut answer = String::new();
     if io::stdin().read_line(&mut answer).is_err(){ return false; }
     ["yes", "y",
