@@ -21,8 +21,8 @@ custom_derive! {
     pub enum ComputedField{
         /// Usually `storage`, or in legacy part of `signature`
         Responsible,
-        /// Pretty version of `invoice/number`: "`R042`"
         OfferNumber,
+        /// Pretty version of `invoice/number`: "`R042`"
         InvoiceNumber,
         /// Pretty version of `invoice/number` including year: "`R2016-042`"
         InvoiceNumberLong,
@@ -35,6 +35,11 @@ custom_derive! {
         Year,
         Caterers,
         ClientFullName,
+
+        /// Sorting index
+        SortIndex,
+        Date,
+            
         Invalid
     }
 }
@@ -60,6 +65,8 @@ impl ComputedField {
             ComputedField::TheirBad => project.their_bad().map(|a| format!("{} weeks", a.num_weeks().abs())),
 
             ComputedField::Year => project.date().map(|d| d.year().to_string()),
+            ComputedField::Date => project.date().map(|d| d.format("%Y.%m.%d").to_string()),
+            ComputedField::SortIndex => project.index(),
 
             ComputedField::Caterers => hours::caterers_string(project.yaml()),
             ComputedField::ClientFullName => client::full_name(project.yaml()),

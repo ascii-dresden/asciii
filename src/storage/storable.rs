@@ -16,7 +16,7 @@ pub type FolderPath = Path;
 pub type FilePathBuf = PathBuf;
 pub type FolderPathBuf = PathBuf;
 
-pub trait Storable{
+pub trait Storable:Send+Sync{
     /// opens a projectfolder
     fn open(&FolderPath) -> StorageResult<Self> where Self: Sized;
     fn open_file(&FilePath) -> StorageResult<Self> where Self: Sized;

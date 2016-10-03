@@ -1,6 +1,6 @@
 //! Simple templating functionality through keyword replacement.
 //!
-//! Replaces `__KEYWORDS__` in Strings.
+//! Replaces `##KEYWORDS##` in Strings.
 use std::{io,fmt};
 use std::io::Read;
 use std::fs::File;
@@ -13,7 +13,7 @@ use std::ops::Deref;
 
 /// Simple template style keyword replacement.
 ///
-/// This allows replacing a known set of keywords looking like `__THIS__`.
+/// This allows replacing a known set of keywords looking like `##THIS##`.
 /// Here it is implemented for `Deref<Target=str>`.
 pub trait IsKeyword {
     /// Checks if the whole string is a keyword
@@ -34,16 +34,16 @@ pub trait IsKeyword {
     /// ```ignore
     /// .map_keywords|keyword| match data.get(keyword){
     ///     Some(content) => String::from(*content),
-    ///     None => format!("__{}__", keyword)
+    ///     None => format!("##{}##", keyword)
     /// }
     /// ```
     ///
     fn map_keywords<F>(&self, closure: F) -> String where F:Fn(&str) -> String;// -> Option<String>;
 }
 
-static REGEX: &'static str = r"__([0-9A-Z-]*)__*";
+static REGEX: &'static str = r"##([0-9A-Z-]*)##*";
 
-/// Allows very simplistic `__KEYWORD__` replacement.
+/// Allows very simplistic `##KEYWORD##` replacement.
 impl<U:Deref<Target=str>> IsKeyword for U {
 
     /// Checks if the whole string is a keyword
@@ -77,7 +77,7 @@ impl<U:Deref<Target=str>> IsKeyword for U {
     /// ```ignore
     /// .map_keywords|keyword| match data.get(keyword){
     ///     Some(content) => String::from(*content),
-    ///     None => format!("__{}__", keyword)
+    ///     None => format!("##{}##", keyword)
     /// }
     /// ```
     ///
@@ -144,10 +144,19 @@ impl Templater{
         }
     }
 
+    pub fn fill_in_field(&mut self, field: &str, value: &str) -> &mut Templater {
+        self.fill_template(|keyword|
+                           if keyword == field{
+                               value.to_owned()
+                           } else {
+                               format!("##{}##", keyword)
+                           })
+    }
+
     pub fn fill_in_data(&mut self, data: &HashMap<&str,String>) -> &mut Templater {
         self.fill_template(|keyword| match data.get(keyword){
             Some(content) => content.clone(),
-            None => format!("__{}__", keyword)
+            None => format!("##{}##", keyword)
         })
     }
 
@@ -197,7 +206,7 @@ impl ToOwned for Templater{
 #[cfg(test)]
 mod test{
     use super::Templater;
-    const TEMPLATE:&'static str = r##"This tests __TEST__ for __ATTR__ __SUBJ__."##;
+    const TEMPLATE:&'static str = r##"This tests ##TEST## for ##ATTR## ##SUBJ##."##;
 
    #[test]
    fn complete(){

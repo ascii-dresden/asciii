@@ -1,4 +1,4 @@
---- # asciii document  (version: __VERSION__, template: __TEMPLATE__)
+--- # asciii document  (version: ##VERSION##, template: ##TEMPLATE##)
 # vim:set ft=yaml:
 
 client:
@@ -12,26 +12,26 @@ client:
     01187 Dresden
 
 event:
-  name: __PROJECT-NAME__
+  name: ##PROJECT-NAME##
   location: # might be a list
   dates:
-  - begin: __DATE-EVENT__
+  - begin: ##DATE-EVENT##
     #end:
     times:
-    -  begin: "__TIME-START__"
-       end:   "__TIME-END__"
+    -  begin: "##TIME-START##"
+       end:   "##TIME-END##"
 
   description: |
-    __DESCRIPTION__
+    ##DESCRIPTION##
 
 offer:
-  date: __DATE-CREATED__
+  date: ##DATE-CREATED##
   appendix: 1
 
 invoice:
-  number:     #27
-  date:       #required
-  payed_date: #required
+  number:     ##INVOICE-NUMBER##
+  date:       ##INVOICE-DATE##
+  payed_date: ##PAYED-DATE##
   official:   # used if you to set an official invoice number
 
 cataloge:
@@ -60,23 +60,23 @@ products:
     amount: 4
 
 hours:
-  salary: __SALARY__
+  salary: ##SALARY##
   caterers:
     "unknown" : 0
 
   wages_date: # when where the wages payed out
 
-manager: __MANAGER__
+manager: ##MANAGER##
 
 #canceled: yes
 #lang:
-#tax: __TAX__
+#tax: ##TAX##
 
 #messages: # read default-settings.yml on how to overwrite
 
 meta:
-  invoicer_version: __VERSION__
-  template: __TEMPLATE__
+  invoicer_version: ##VERSION##
+  template: ##TEMPLATE##
   format: 3.0.0
-created: __DATE-CREATED__
+created: ##DATE-CREATED##
 ...

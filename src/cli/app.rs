@@ -137,7 +137,7 @@ pub fn setup() -> ArgMatches<'static>{
                          .conflicts_with("csv")
                         )
                     .arg(Arg::with_name("sort")
-                         .help("sort by [date | index | name | manager]")
+                         .help("sort by")
                          .long("sort")
                          .short("s")
                          .possible_values(&["date",  "index",  "name",  "manager"])
@@ -204,11 +204,13 @@ pub fn setup() -> ArgMatches<'static>{
                     .arg(Arg::with_name("force")
                          .help("Archives the Project, even though it is not completely valid")
                          .long("force")
+                         .short("f")
                         )
 
                     .arg(Arg::with_name("year")
                          .help("Override the year")
                          .long("year")
+                         .short("y")
                          .takes_value(true)
                         )
                    )
@@ -307,6 +309,33 @@ pub fn setup() -> ArgMatches<'static>{
                         )
                     )
 
+        .subcommand(SubCommand::with_name("set")
+                    .aliases(&["ed"])
+                    .about("Set a value in a project")
+                    .arg(Arg::with_name("search_term")
+                         .help("Search term, possibly event name")
+                         .required(true)
+                        )
+
+                    .arg(Arg::with_name("field name")
+                         .help("Which field to set")
+                         .required(true)
+                        )
+
+                    .arg(Arg::with_name("field value")
+                         .help("What to put in the field")
+                        )
+
+                    .arg(Arg::with_name("archive")
+                         .help("Pick an archived project")
+                         .short("a")
+                         .long("archive")
+                         .takes_value(true)
+                        )
+
+
+                   )
+
         .subcommand(SubCommand::with_name("show")
                     .aliases(&["display"])
                     .about("Display a specific project")
@@ -337,6 +366,18 @@ pub fn setup() -> ArgMatches<'static>{
                          .long("archive")
                          .short("a")
                          .takes_value(true)
+                        )
+
+                    .arg(Arg::with_name("empty fields")
+                         .help("shows fields that can still be filled")
+                         .long("empty_fields")
+                         .short("f")
+                        )
+
+                    .arg(Arg::with_name("errors")
+                         .help("Shows the errors in this project")
+                         .long("errors")
+                         .short("e")
                         )
 
                     .arg(Arg::with_name("template")

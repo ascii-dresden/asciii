@@ -22,7 +22,7 @@ use util::yaml;
 use storage::list_path_content;
 use storage::{Storable,StorageError,StorageResult};
 use storage::repo::GitStatus;
-use templater::Templater;
+use templater::{Templater, IsKeyword};
 
 #[export_macro]
 macro_rules! try_some {
@@ -72,10 +72,11 @@ pub struct Project {
     file_path: PathBuf,
     _temp_dir: Option<TempDir>,
     git_status: Option<GitStatus>,
+    file_content: String,
     yaml: Yaml
 }
 
-impl Project{
+impl Project {
     /// Access to inner data
     pub fn yaml(&self) -> &Yaml{ &self.yaml }
 
@@ -205,7 +206,7 @@ impl Project{
     /// Completely done and in the past.
     ///
     /// Ready to be **archived**.
-    pub fn is_ready_for_archive(&self) -> SpecResult{
+    pub fn is_ready_for_archive(&self) -> SpecResult {
         if self.canceled(){
             Ok(())
         } else {
@@ -277,6 +278,35 @@ impl Project{
         }
         buf
     }
+
+    pub fn empty_fields(&self) -> Vec<String>{
+        self.file_content.list_keywords()
+    }
+
+    pub fn replace_field(&self, field:&str, value:&str) -> Result<()> {
+
+        // fills the template
+        let filled = Templater::new(&self.file_content)
+            .fill_in_field(field,value)
+            .finalize()
+            .filled;
+
+        match yaml::parse(&filled){
+            Ok(_) => {
+                let mut file = try!(File::create(self.file()));
+                try!(file.write_all(filled.as_bytes()));
+                try!(file.sync_all());
+                Ok(())
+            },
+            Err(e) => {
+                error!("The resulting document is no valid yaml. SORRY!\n{}\n\n{}",
+                       filled.lines().enumerate().map(|(n,l)| format!("{:>3}. {}\n",n,l)).collect::<String>(), //line numbers :D
+                       e.description());
+                Err(e.into())
+            }
+        }
+    }
+
 }
 
 impl From<yaml::YamlError> for StorageError {
@@ -303,18 +333,18 @@ impl Storable for Project{
             "SALARY"        => ::CONFIG.get_to_string("defaults/salary")
                 .expect("Faulty config: field defaults/salary does not contain a value"),
             "MANAGER"       => ::CONFIG.get_str("user/name").unwrap_or("").to_string(),
-            "DESCRIPTION"   => String::new(),
             "TIME-START"    => String::new(),
             "TIME-END"      => String::new(),
         };
 
         // fills the template
-        let filled = try!(
-            try!(Templater::from_file(template))
+        let filled = try!(Templater::from_file(template))
             .fill_in_data(&fill).fix()
             .fill_in_data(&default_fill)
-            .complete()
-            ).filled;
+            .finalize()
+            .filled;
+
+        debug!("remaining template fields: {:#?}", filled.list_keywords());
 
         // generates a temp file
         let temp_dir  = TempDir::new(project_name).unwrap();
@@ -340,6 +370,7 @@ impl Storable for Project{
             file_path: temp_file,
             _temp_dir: Some(temp_dir), // needs to be kept alive to avoid deletion TODO: try something manually
             git_status: None,
+            file_content: filled,
             yaml: yaml
         })
     }
@@ -407,7 +438,8 @@ impl Storable for Project{
             file_path: file_path.to_owned(),
             _temp_dir: None,
             git_status: None,
-            yaml: try!(yaml::parse(&file_content))
+            yaml: try!(yaml::parse(&file_content)),
+            file_content: file_content,
         })
     }
 

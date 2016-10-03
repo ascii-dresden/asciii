@@ -2,6 +2,7 @@
 
 use std::io;
 use std::fmt;
+use util::yaml;
 
 use super::product;
 
@@ -17,6 +18,7 @@ error_chain!{
     foreign_links {
         io::Error, Io;
         fmt::Error, Fmt;
+        yaml::YamlError, Yaml;
     }
 
     errors {

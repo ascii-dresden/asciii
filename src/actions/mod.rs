@@ -59,14 +59,13 @@ pub fn with_projects<F>(dir:StorageDir, search_terms:&[&str], f:F) -> Result<()>
     trace!("with_projects({:?})", search_terms);
     let luigi = try!(setup_luigi());
     let projects = try!(luigi.search_projects_any(dir, search_terms));
-    if !projects.is_empty() {
-        for project in &projects{
-            try!(f(project));
-        }
-        Ok(())
-    } else {
-        Err(format!("Nothing found for {:?}", search_terms).into())
+    if projects.is_empty() {
+        return Err(format!("Nothing found for {:?}", search_terms).into())
     }
+    for project in &projects{
+        try!(f(project));
+    }
+    Ok(())
 }
 
 pub fn csv(year:i32) -> Result<String> {
@@ -251,7 +250,7 @@ pub fn delete_project_confirmation(dir: StorageDir, search_terms:&[&str]) -> Res
 pub fn archive_projects(search_terms:&[&str], manual_year:Option<i32>, force:bool) -> Result<Vec<PathBuf>>{
     trace!("archive_projects matching ({:?},{:?},{:?})", search_terms, manual_year,force);
     let luigi = try!(setup_luigi_with_git());
-    Ok(try!( luigi.archive_projects_if(search_terms, manual_year, || true) ))
+    Ok(try!( luigi.archive_projects_if(search_terms, manual_year, || force) ))
 }
 
 /// Command UNARCHIVE <YEAR> <NAME>

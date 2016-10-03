@@ -59,6 +59,7 @@ fn setup_app(){
      ("csv",       Some(sub_m)) => subcommands::csv(sub_m),
      ("new",       Some(sub_m)) => subcommands::new(sub_m),
      ("edit",      Some(sub_m)) => subcommands::edit(sub_m),
+     ("set",       Some(sub_m)) => subcommands::set(sub_m),
      ("show",      Some(sub_m)) => subcommands::show(sub_m),
      ("archive",   Some(sub_m)) => subcommands::archive(sub_m),
      ("unarchive", Some(sub_m)) => subcommands::unarchive(sub_m),

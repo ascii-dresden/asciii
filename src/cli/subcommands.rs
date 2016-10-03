@@ -48,22 +48,27 @@ pub fn new(matches:&ArgMatches){
     let mut fill_data:HashMap<&str, String> = HashMap::new();
 
     if let Some(description) = matches.value_of("description"){
+        debug!("Filling in DESCRIPTION");
         fill_data.insert("DESCRIPTION", description.to_owned());
     }
 
     if let Some(date) = matches.value_of("date"){
+        debug!("Filling in DATE-EVENT");
         fill_data.insert("DATE-EVENT", date.to_owned());
     }
 
     if let Some(time) = matches.value_of("time"){
+        debug!("Filling in TIME-START");
         fill_data.insert("TIME-START", time.to_owned());
     }
 
     if let Some(time_end) = matches.value_of("time_end"){
+        debug!("Filling in TIME-END");
         fill_data.insert("TIME-END", time_end.to_owned());
     }
 
     if let Some(manager) = matches.value_of("manager"){
+        debug!("Filling in MANAGER");
         fill_data.insert("MANAGER", manager.to_owned());
     }
 
@@ -348,6 +353,21 @@ fn edit_template(name:&str, editor:&Option<&str>){
     util::pass_to_command(editor, &template_paths);
 }
 
+/// Command SET
+pub fn set(m:&ArgMatches){
+    let field = m.value_of("field name").unwrap().chars().flat_map(|c|c.to_uppercase()).collect::<String>();
+    let value = m.value_of("field value").unwrap();
+    let (search_terms, dir) = matches_to_search(m);
+
+    execute(||actions::with_projects(dir, &search_terms, |project| {
+        if util::really(&format!("do you want to set the field {} in {:?} [y|N]", field, project.name())) {
+            project.replace_field(&field,&value).map_err(|e|e.into())
+        } else {
+            Err("dont want to".into())
+        }
+    }))
+}
+
 
 /// Command SHOW
 pub fn show(m:&ArgMatches){
@@ -371,6 +391,8 @@ pub fn show(m:&ArgMatches){
                      );
     } else if let Some(detail) = m.value_of("detail"){
         show_detail(dir, &search_terms, detail);
+    } else if m.is_present("empty fields"){ show_empty_fields(dir, search_terms.as_slice())
+    } else if m.is_present("errors"){ show_errors(dir, search_terms.as_slice())
     } else if m.is_present("dump"){ dump_yaml(dir, search_terms.as_slice())
     } else if m.is_present("json"){ show_json(dir, search_terms.as_slice())
     } else if m.is_present("csv"){  show_csv( dir, search_terms.as_slice());
@@ -381,6 +403,15 @@ pub fn show(m:&ArgMatches){
 fn dump_yaml(dir:StorageDir, search_terms:&[&str]){
     actions::simple_with_projects(dir, &search_terms, |p| println!("{}", p.yaml().dump().unwrap()));
 }
+
+fn show_errors(dir:StorageDir, search_terms:&[&str]){
+    actions::simple_with_projects(dir, &search_terms, |p| println!("{}: {}", p.name(), p.is_ready_for_archive().err().unwrap_or_else(Vec::new).join(", ")));
+}
+
+fn show_empty_fields(dir:StorageDir, search_terms:&[&str]){
+    actions::simple_with_projects(dir, &search_terms, |p| println!("{}: {}", p.name(), p.empty_fields().join(", ")));
+}
+
 
 #[cfg(feature="document_export")]
 fn show_json(dir:StorageDir, search_terms:&[&str]){
@@ -452,7 +483,8 @@ pub fn make(_:&ArgMatches){
 /// Command SHOW --template
 fn show_template(name:&str){
     let luigi = execute(||setup_luigi());
-    let templater = Templater::from_file(&luigi.get_template_file(name).unwrap()).unwrap();
+    let template = execute(||luigi.get_template_file(name));
+    let templater = execute(||Templater::from_file(&template));
     println!("{:#?}", templater.list_keywords());
 }
 
@@ -467,7 +499,7 @@ fn add_to_git(paths:&[PathBuf]) {
 
 /// TODO make this be have like `edit`, taking multiple names
 pub fn archive(matches:&ArgMatches){
-    let search_terms = matches.values_of("search term").unwrap().collect::<Vec<_>>();
+    let search_terms = matches.values_of("search terms").unwrap().collect::<Vec<_>>();
     let year = matches.value_of("year").and_then(|s|s.parse::<i32>().ok());
     trace!("archive({:?},{:?})",search_terms, year);
     let moved_files = execute(|| actions::archive_projects(&search_terms, year, matches.is_present("force")));
