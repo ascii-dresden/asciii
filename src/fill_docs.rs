@@ -58,12 +58,6 @@ fn inc_helper(_: &Context, h: &Helper, _: &Handlebars, rc: &mut RenderContext) -
     Ok(())
 }
 
-fn path_helper(_: &Context, _: &Helper, _: &Handlebars, rc: &mut RenderContext) -> Result<(), RenderError> {
-    let rendered = rc.get_local_path_root().to_string();
-    try!(rc.writer.write(rendered.into_bytes().as_ref()));
-    Ok(())
-}
-
 fn count_helper(_: &Context, h: &Helper, _: &Handlebars, rc: &mut RenderContext) -> Result<(), RenderError> {
     let count = h.param(0).unwrap().value().as_array().map_or(0, |a|a.len());
     //println!("count_helper{:?}", param);
@@ -85,7 +79,6 @@ pub fn fill_template<E: ToJson, P:AsRef<Path>>(document: &E, bill_type:&BillType
     handlebars.register_escape_fn(no_escape);
     handlebars.register_escape_fn(|data| data.replace("\n", r#"\newline "#));
     handlebars.register_helper("inc",   Box::new(inc_helper));
-    handlebars.register_helper("path",  Box::new(path_helper));
     handlebars.register_helper("count", Box::new(count_helper));
 
     handlebars.register_template_file("document", template_path).unwrap();
