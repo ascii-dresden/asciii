@@ -360,10 +360,14 @@ pub fn set(m:&ArgMatches){
     let (search_terms, dir) = matches_to_search(m);
 
     execute(||actions::with_projects(dir, &search_terms, |project| {
+        println!("{}: {}", project.name(), project.empty_fields().join(", "));
+        if !project.empty_fields().contains(&field) {
+            return Err(format!("{:?} was not found in {}", field, project.name()).into());
+        }
         if util::really(&format!("do you want to set the field {} in {:?} [y|N]", field, project.name())) {
             project.replace_field(&field,&value).map_err(|e|e.into())
         } else {
-            Err("dont want to".into())
+            Err("Don't want to".into())
         }
     }))
 }

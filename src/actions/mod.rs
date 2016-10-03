@@ -241,7 +241,7 @@ pub fn delete_project_confirmation(dir: StorageDir, search_terms:&[&str]) -> Res
     let luigi = try!(setup_luigi());
     for project in try!(luigi.search_projects_any(dir, search_terms)) {
         try!(project.delete_project_dir_if(
-                || util::really(&format!("you want me to delete {:?} [y/N]", project.dir()))
+                || util::really(&format!("you want me to delete {:?} [y/N]", project.dir())) && util::really("really? [y/N]")
                 ))
     }
     Ok(())
