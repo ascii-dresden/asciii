@@ -68,7 +68,12 @@ pub use yaml_rust::Yaml;
 pub static DOCUMENTATION_URL: &'static str  = "http://hoodie.github.io/asciii-rs/";
 
 lazy_static!{
+    /// Static `ConfigReader` to be able to access the configuration from everywhere.
     pub static ref CONFIG: config::ConfigReader = config::ConfigReader::new().unwrap();
+    /// Human readable, no semantic versioning.
+    pub static ref VERSION: String = format!("{} - {}", env!("CARGO_PKG_VERSION"), include_str!("../.most_recent_commit"));
+    /// Hint for app to point at `asciii::DOCUMENTATION_URL`
+    pub static ref DOCHINT: String = format!("Documentation at: {}", DOCUMENTATION_URL);
 }
 
 #[derive(Debug)]
@@ -84,13 +89,4 @@ impl ToString for BillType{
             BillType::Invoice => "Invoice"
         }.to_owned()
     }
-}
-
-/// Returns library version
-///
-/// Human readable, no semantic versioning.
-pub fn version() -> String{
-    format!("{} - {}",
-            env!("CARGO_PKG_VERSION"),
-            include_str!("../.most_recent_commit"))
 }

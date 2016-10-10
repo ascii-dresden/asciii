@@ -131,22 +131,44 @@ impl Project {
         Some(format!("{} {} {}.{}",num,name,date,extension))
     }
 
-    pub fn offer_file_exists(&self) -> bool {
-        let output_folder = ::CONFIG.get_str("output_path").and_then(util::get_valid_path);
-        let convert_ext  = ::CONFIG.get_str("convert/output_extension").expect("Faulty default config");
-        match (output_folder, self.offer_file_name(convert_ext)) {
-            (Some(folder), Some(name)) => folder.join(&name).exists(),
-            _ => false
+    pub fn output_file_exists(&self, bill_type:&BillType) -> bool {
+        match *bill_type{
+            BillType::Offer   => self.offer_file_exists(),
+            BillType::Invoice => self.invoice_file_exists()
         }
     }
 
-    pub fn invoice_file_exists(&self) -> bool {
+    pub fn output_file(&self, bill_type:&BillType) -> Option<PathBuf> {
+        match *bill_type{
+            BillType::Offer   => self.offer_file(),
+            BillType::Invoice => self.invoice_file()
+        }
+    }
+
+    pub fn offer_file(&self) -> Option<PathBuf> {
+        let output_folder = ::CONFIG.get_str("output_path").and_then(util::get_valid_path);
+        let convert_ext  = ::CONFIG.get_str("convert/output_extension").expect("Faulty default config");
+        match (output_folder, self.offer_file_name(convert_ext)) {
+            (Some(folder), Some(name)) => folder.join(&name).into(),
+            _ => None
+        }
+    }
+
+    pub fn invoice_file(&self) -> Option<PathBuf>{
         let output_folder = ::CONFIG.get_str("output_path").and_then(util::get_valid_path);
         let convert_ext  = ::CONFIG.get_str("convert/output_extension").expect("Faulty default config");
         match (output_folder, self.invoice_file_name(convert_ext)) {
-            (Some(folder), Some(name)) => folder.join(&name).exists(),
-            _ => false
+            (Some(folder), Some(name)) => folder.join(&name).into(),
+            _ => None
         }
+    }
+
+    pub fn offer_file_exists(&self) -> bool {
+        self.offer_file().map(|f|f.exists()).unwrap_or(false)
+    }
+
+    pub fn invoice_file_exists(&self) -> bool {
+        self.invoice_file().map(|f|f.exists()).unwrap_or(false)
     }
 
     fn write_to_path<P:AsRef<OsStr> + Debug>(content:&str, target:&P) -> Result<PathBuf> {
@@ -323,7 +345,6 @@ impl Storable for Project{
 
         // fill template with these values
         let default_fill = hashmap!{
-            "VERSION"       => ::version(),
             "TEMPLATE"      => template_name.to_owned(),
             "PROJECT-NAME"  => project_name.to_owned(),
             "DATE-EVENT"    => event_date,
@@ -335,6 +356,7 @@ impl Storable for Project{
             "MANAGER"       => ::CONFIG.get_str("user/name").unwrap_or("").to_string(),
             "TIME-START"    => String::new(),
             "TIME-END"      => String::new(),
+            "VERSION"       => ::VERSION.to_string(),
         };
 
         // fills the template

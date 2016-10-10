@@ -33,15 +33,3 @@ fn execute<F, S, E:Error>(command:F) -> S where F: FnOnce() -> Result<S, E> {
         Err(lerr) => { error!("{}", lerr); exit(1) }
     }
 }
-
-pub mod validators{
-    use asciii::util::yaml::parse_dmy_date;
-
-    pub fn is_dmy(val: String) -> Result<(),String>{
-        match parse_dmy_date(&val){
-            Some(_) => Ok(()),
-            None => Err(String::from("Date Format must be DD.MM.YYYY")),
-        }
-    }
-}
-

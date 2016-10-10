@@ -99,12 +99,7 @@ pub fn projects_to_csv(projects:&[Project]) -> Result<String>{
 
 /// Creates the latex files within each projects directory, either for Invoice or Offer.
 #[cfg(feature="document_export")]
-pub fn projects_to_tex(dir:StorageDir, search_term:&str, template_name:&str, bill_type:&Option<BillType>, dry_run:bool, force:bool) -> Result<()> {
-    let luigi = try!(setup_luigi());
-    //let search_term = "ese";
-    //let template_name = "document";
-    //let dir = StorageDir::Working ;
-
+pub fn project_to_doc(project: &Project, template_name:&str, bill_type:&Option<BillType>, dry_run:bool, force:bool) -> Result<()> {
     let template_ext = ::CONFIG.get_str("extensions/output_template").expect("Faulty default config");
     let output_ext   = ::CONFIG.get_str("extensions/output_file").expect("Faulty default config");
     let convert_ext  = ::CONFIG.get_str("convert/output_extension").expect("Faulty default config");
@@ -115,20 +110,18 @@ pub fn projects_to_tex(dir:StorageDir, search_term:&str, template_name:&str, bil
 
     let mut template_path = PathBuf::new();
 
-    template_path.push(luigi.templates_dir());
+    template_path.push(::CONFIG.get_str("dirs/templates").expect("Faulty config: dirs/templates does not contain a value"));
     template_path.push(template_name);
     template_path.set_extension(template_ext);
 
     debug!("template file={:?} exists={}", template_path, template_path.exists());
 
-    with_projects(dir, &[search_term], |p| {
-
         let convert_tool = ::CONFIG.get_str("convert/tool");
         let output_folder = ::CONFIG.get_str("output_path").and_then(util::get_valid_path).expect("Faulty config \"output_path\"");
 
-        let ready_for_offer = p.is_ready_for_offer();
-        let ready_for_invoice = p.is_ready_for_invoice();
-        let project_file = p.file();
+        let ready_for_offer = project.is_ready_for_offer();
+        let ready_for_invoice = project.is_ready_for_invoice();
+        let project_file = project.file();
 
         // tiny little helper
         let to_local_file = |file:&Path, ext| {
@@ -143,18 +136,18 @@ pub fn projects_to_tex(dir:StorageDir, search_term:&str, template_name:&str, bil
              match (bill_type, ready_for_offer, ready_for_invoice)
         {
             (&Some(Offer),   Ok(_), _     )  |
-            (&None,          Ok(_), Err(_))  => (Some(Offer), Some(p.dir().join(p.offer_file_name(output_ext).expect("this should have been cought by ready_for_offer()")))),
+            (&None,          Ok(_), Err(_))  => (Some(Offer), Some(project.dir().join(project.offer_file_name(output_ext).expect("this should have been cought by ready_for_offer()")))),
             (&Some(Invoice), _,      Ok(_))  |
-            (&None,          _,      Ok(_))  => (Some(Invoice), Some(p.dir().join(p.invoice_file_name(output_ext).expect("this should have been cought by ready_for_invoice()")))),
+            (&None,          _,      Ok(_))  => (Some(Invoice), Some(project.dir().join(project.invoice_file_name(output_ext).expect("this should have been cought by ready_for_invoice()")))),
             (&Some(Offer),   Err(e), _    )  => {error!("cannot create an offer, check out:{:#?}",e);(None,None)},
             (&Some(Invoice), _,      Err(e)) => {error!("cannot create an invoice, check out:{:#?}",e);(None,None)},
             (_,              Err(e), Err(_)) => {error!("Neither an Offer nor an Invoice can be created from this project\n please check out {:#?}", e);(None,None)}
         };
 
-        //debug!("{:?} -> {:?}",(bill_type, p.is_ready_for_offer(), p.is_ready_for_invoice()), (dyn_bill_type, outfile_tex));
+        //debug!("{:?} -> {:?}",(bill_type, project.is_ready_for_offer(), project.is_ready_for_invoice()), (dyn_bill_type, outfile_tex));
 
         if let (Some(outfile), Some(dyn_bill)) = (outfile_tex, dyn_bill_type) {
-            let filled = try!(fill_template(p, &dyn_bill, &template_path));
+            let filled = try!(fill_template(project, &dyn_bill, &template_path));
 
             let pdffile = to_local_file(&outfile, convert_ext);
             let target = output_folder.join(&pdffile);
@@ -169,7 +162,7 @@ pub fn projects_to_tex(dir:StorageDir, search_term:&str, template_name:&str, bil
                 if dry_run{
                     warn!("Dry run! This does not produce any output:\n * {}\n * {}", outfile.display(), pdffile.display());
                 } else {
-                    let outfileb = try!(p.write_to_file(&filled,&dyn_bill,output_ext));
+                    let outfileb = try!(project.write_to_file(&filled,&dyn_bill,output_ext));
                     debug!("{} vs\n        {}", outfile.display(), outfileb.display());
                     util::pass_to_command(&convert_tool, &[&outfileb]);
                 }
@@ -192,7 +185,13 @@ pub fn projects_to_tex(dir:StorageDir, search_term:&str, template_name:&str, bil
         }
 
         Ok(())
-    })
+
+}
+
+/// Creates the latex files within each projects directory, either for Invoice or Offer.
+#[cfg(feature="document_export")]
+pub fn projects_to_doc(dir:StorageDir, search_term:&str, template_name:&str, bill_type:&Option<BillType>, dry_run:bool, force:bool) -> Result<()> {
+    with_projects(dir, &[search_term], |p| project_to_doc(p, template_name, bill_type, dry_run, force) )
 }
 
 fn file_age(path:&Path) -> Result<time::Duration> {

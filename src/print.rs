@@ -288,9 +288,9 @@ pub fn print_csv(projects:&[Project]){
     }
 }
 
-fn table_for_arrangement(table:&mut Table){
-    table.set_format(FormatBuilder::new() .padding(0, 0) .build());
-}
+//fn table_for_arrangement(table:&mut Table){
+//    table.set_format(FormatBuilder::new() .padding(0, 0) .build());
+//}
 
 fn table_with_borders(table:&mut Table){
     table.set_format( FormatBuilder::new()
@@ -326,7 +326,7 @@ pub fn show_items(project:&Project, bill_type:&BillType) {
                   item.product.name,
                   r->item.amount.to_string(),
                   r->currency_to_string(&item.product.price),
-                  r->currency_to_string(&(item.cost()))
+                  r->currency_to_string(&(item.gross()))
             ]);
     }
 

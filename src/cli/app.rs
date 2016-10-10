@@ -1,17 +1,17 @@
-use asciii::version;
 use asciii;
-use super::validators;
 use clap::{App, AppSettings, Arg, ArgMatches, SubCommand};
 
 pub fn setup() -> ArgMatches<'static>{
+    build_cli().get_matches()
+}
+
+pub fn build_cli() -> App<'static, 'static>{
     App::new("asciii")
         .author(crate_authors!())
-        .version(version().as_ref())
+        .version(asciii::VERSION.as_ref())
         .about("The ascii invoicer III")
         .settings(&[AppSettings::SubcommandRequiredElseHelp,AppSettings::ColoredHelp])
-        .after_help(
-            format!("Documentation at: {}",
-                    asciii::DOCUMENTATION_URL).as_ref())
+        .after_help(asciii::DOCUMENTATION_URL)
 
         .subcommand(SubCommand::with_name("doc")
             .about("Opens the online documentation, please read it")
@@ -30,7 +30,7 @@ pub fn setup() -> ArgMatches<'static>{
 
                     .arg(Arg::with_name("date")
                          .help("Manually set the date of the project")
-                         .validator(validators::is_dmy)
+                         //.validator(validators::is_dmy)
                          .takes_value(true))
 
                     .arg(Arg::with_name("description")
@@ -231,36 +231,13 @@ pub fn setup() -> ArgMatches<'static>{
         .subcommand(SubCommand::with_name("path")
                     .about("Show storage path")
                     .arg(Arg::with_name("templates")
-                         .help("Show path to templates instead")
-                         .long("templates")
-                         .short("t")
-                         .conflicts_with("bin")
-                         .conflicts_with("output")
-                        )
-                    .arg(Arg::with_name("output")
-                         .help("Show path to created documents instead")
-                         .long("output")
-                         .short("o")
-                         .conflicts_with("bin")
-                         .conflicts_with("templates")
-                        )
-                    .arg(Arg::with_name("bin")
-                         .help("Show path to current binary instead")
-                         .long("bin")
-                         .short("b")
-                         .conflicts_with("output")
-                         .conflicts_with("templates")
-                        )
-                    )
-
-        .subcommand(SubCommand::with_name("open")
-                    .about("Open storage path")
-                    .arg(Arg::with_name("templates")
                          .help("Open path to templates instead")
                          .long("templates")
                          .short("t")
                          .conflicts_with("output")
                          .conflicts_with("bin")
+                         .conflicts_with("archive")
+                         .conflicts_with("search_term")
                         )
                     .arg(Arg::with_name("output")
                          .help("Open path to created documents instead")
@@ -268,6 +245,8 @@ pub fn setup() -> ArgMatches<'static>{
                          .short("o")
                          .conflicts_with("templates")
                          .conflicts_with("bin")
+                         .conflicts_with("archive")
+                         .conflicts_with("search_term")
                         )
                     .arg(Arg::with_name("bin")
                          .help("Open path to current binary instead")
@@ -275,6 +254,64 @@ pub fn setup() -> ArgMatches<'static>{
                          .short("b")
                          .conflicts_with("templates")
                          .conflicts_with("output")
+                         .conflicts_with("archive")
+                         .conflicts_with("search_term")
+                        )
+                    )
+
+        .subcommand(SubCommand::with_name("open")
+                    .about("Open storage path")
+//                    .arg(Arg::with_name("search_term")
+//                         .help("Search term, possibly event name")
+//                         .multiple(true)
+//                        )
+//
+//                    .arg(Arg::with_name("archive")
+//                         .help("Pick an archived project")
+//                         .short("a")
+//                         .long("archive")
+//                         .takes_value(true)
+//                        )
+//
+//                    .arg(Arg::with_name("invoice")
+//                         .help("Open values resulting invoice file. Makes it if necessary")
+//                         .long("invoice")
+//                         .short("i")
+//                        )
+//
+//                    .arg(Arg::with_name("offer")
+//                         .help("Open values resulting offer file. Makes it if necessary")
+//                         .long("offer")
+//                         .short("o")
+//                        )
+//
+//
+                    .arg(Arg::with_name("templates")
+                         .help("Open path to templates instead")
+                         .long("templates")
+                         .short("t")
+                         .conflicts_with("output")
+                         .conflicts_with("bin")
+                         .conflicts_with("archive")
+                         .conflicts_with("search_term")
+                        )
+                    .arg(Arg::with_name("output")
+                         .help("Open path to created documents instead")
+                         .long("output")
+                         .short("o")
+                         .conflicts_with("templates")
+                         .conflicts_with("bin")
+                         .conflicts_with("archive")
+                         .conflicts_with("search_term")
+                        )
+                    .arg(Arg::with_name("bin")
+                         .help("Open path to current binary instead")
+                         .long("bin")
+                         .short("b")
+                         .conflicts_with("templates")
+                         .conflicts_with("output")
+                         .conflicts_with("archive")
+                         .conflicts_with("search_term")
                         )
                     )
                     //# TODO add --invoice and --offer
@@ -596,6 +633,16 @@ pub fn setup() -> ArgMatches<'static>{
                     .aliases(&["lg", "hist", "history"])
                     .about("Show commit logs")
                    )
-
-    .get_matches()
 }
+
+pub mod validators{
+    use asciii::util::yaml::parse_dmy_date;
+
+    pub fn is_dmy(val: String) -> Result<(),String>{
+        match parse_dmy_date(&val){
+            Some(_) => Ok(()),
+            None => Err(String::from("Date Format must be DD.MM.YYYY")),
+        }
+    }
+}
+

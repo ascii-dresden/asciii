@@ -53,7 +53,7 @@ impl ToJson for Project{
             s("price") => currency_to_string(&item.product.price).to_json(),
             s("unit") => item.product.unit.unwrap_or_else(||"").to_json(),
             s("amount") => item.amount.to_json(),
-            s("cost") => currency_to_string(&item.cost()).to_json(),
+            s("cost") => currency_to_string(&item.gross()).to_json(),
             s("tax") => tax.into_inner().to_json()
         }.to_json();
 

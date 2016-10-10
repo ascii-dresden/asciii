@@ -11,7 +11,6 @@ use asciii::CONFIG;
 use asciii::config;
 use asciii::util;
 use asciii::BillType;
-use asciii::version as asciii_version;
 use asciii::actions;
 use asciii::storage::*;
 use asciii::templater::Templater;
@@ -373,6 +372,15 @@ pub fn set(m:&ArgMatches){
 }
 
 
+fn infer_bill_type(m:&ArgMatches) -> Option<BillType> {
+    match (m.is_present("offer"),m.is_present("invoice")) {
+        (true,true)  => unreachable!("this should have been prevented by clap-rs"),
+        (true,false) => Some(BillType::Offer),
+        (false,true) => Some(BillType::Invoice),
+        (false,false) => None
+    }
+}
+
 /// Command SHOW
 pub fn show(m:&ArgMatches){
     let (search_terms, dir) = matches_to_search(m);
@@ -383,6 +391,7 @@ pub fn show(m:&ArgMatches){
         (false,true) => BillType::Invoice,
         _            => BillType::Invoice, //TODO be inteligent here ( use date )
     };
+
 
     if m.is_present("files"){
         actions::simple_with_projects(dir, &search_terms,
@@ -444,14 +453,9 @@ pub fn spec(_:&ArgMatches){
 
 /// Command MAKE
 #[cfg(feature="document_export")]
-pub fn make(m:&ArgMatches) {
+pub fn make(m:&ArgMatches){
     let template_name = m.value_of("template").unwrap_or("document");
-    let bill_type = match (m.is_present("offer"),m.is_present("invoice")) {
-        (true,true)  => unreachable!("this should have been prevented by clap-rs"),
-        (true,false) => Some(BillType::Offer),
-        (false,true) => Some(BillType::Invoice),
-        (false,false) => None
-    };
+    let bill_type = infer_bill_type(m);
     let (search_terms, dir) = matches_to_search(m);
 
     debug!("make {t}({s}/{d:?}, invoice={i:?})",
@@ -461,7 +465,14 @@ pub fn make(m:&ArgMatches) {
     i = bill_type
     );
 
-    execute(||actions::projects_to_tex(dir, search_terms[0], template_name, &bill_type, m.is_present("dry-run"), m.is_present("force")))
+    execute(|| actions::projects_to_doc(dir,
+                                        search_terms[0],
+                                        template_name,
+                                        &bill_type,
+                                        m.is_present("dry-run"),
+                                        m.is_present("force")
+                                       )
+           );
 }
 
 
@@ -561,14 +572,24 @@ pub fn doc(){
 
 /// Command VERSION
 pub fn version(){
-    println!("{}", asciii_version());
+    println!("{}", *asciii::VERSION);
 }
 
 pub fn show_path(matches:&ArgMatches){path(matches, |path| println!("{}", path.display()))}
 
-pub fn open_path(matches:&ArgMatches){path(matches, |path| {open::that(path).unwrap();})}
+//pub fn open_path(matches:&ArgMatches){path(matches, |path| {open::that(path).unwrap();})}
+pub fn open_path(m:&ArgMatches){
+    if m.is_present("search_term") {
+        let bill_type = infer_bill_type(m);
+        let template_name = "document";
+        let (search_terms, dir) = matches_to_search(m);
+        unimplemented!()
+    } else {
+        path(m, |path| {open::that(path).unwrap();})
+    }
+}
 
-pub fn path<F:Fn(&Path)>(matches:&ArgMatches, action:F){
+pub fn path<F:Fn(&Path)>(m:&ArgMatches, action:F){
     let path = CONFIG.get_str("path").expect("Faulty config: field output_path does not contain a string value");
     let storage_path = CONFIG.get_str("dirs/storage").expect("Faulty config: field output_path does not contain a string value");
     let templates_path = CONFIG.get_str("dirs/templates").expect("Faulty config: field output_path does not contain a string value");
@@ -576,19 +597,19 @@ pub fn path<F:Fn(&Path)>(matches:&ArgMatches, action:F){
 
     let exe = env::current_exe().unwrap();
 
-    if matches.is_present("templates"){
+    if m.is_present("templates") {
         action(&PathBuf::from(path)
                .join(storage_path)
                .join(templates_path
                     ));
     }
-    else if matches.is_present("output"){
+    else if m.is_present("output") {
         action(
             &util::replace_home_tilde(
                 Path::new(output_path)
                 ));
     }
-    else if matches.is_present("bin"){
+    else if m.is_present("bin") {
         action(exe.parent().unwrap());
     }
     else { // default case
