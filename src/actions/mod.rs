@@ -110,81 +110,85 @@ pub fn project_to_doc(project: &Project, template_name:&str, bill_type:&Option<B
 
     let mut template_path = PathBuf::new();
 
+    template_path.push(util::get_storage_path());
     template_path.push(::CONFIG.get_str("dirs/templates").expect("Faulty config: dirs/templates does not contain a value"));
     template_path.push(template_name);
     template_path.set_extension(template_ext);
 
     debug!("template file={:?} exists={}", template_path, template_path.exists());
+    if !template_path.exists() {
+        return Err(format!("Template not found at {}", template_path.display()).into())
+    }
 
-        let convert_tool = ::CONFIG.get_str("convert/tool");
-        let output_folder = ::CONFIG.get_str("output_path").and_then(util::get_valid_path).expect("Faulty config \"output_path\"");
+    let convert_tool = ::CONFIG.get_str("convert/tool");
+    let output_folder = ::CONFIG.get_str("output_path").and_then(util::get_valid_path).expect("Faulty config \"output_path\"");
 
-        let ready_for_offer = project.is_ready_for_offer();
-        let ready_for_invoice = project.is_ready_for_invoice();
-        let project_file = project.file();
+    let ready_for_offer = project.is_ready_for_offer();
+    let ready_for_invoice = project.is_ready_for_invoice();
+    let project_file = project.file();
 
-        // tiny little helper
-        let to_local_file = |file:&Path, ext| {
-            let mut _tmpfile = file.to_owned();
-            _tmpfile.set_extension(ext);
-            Path::new(_tmpfile.file_name().unwrap().into()).to_owned()
-        };
+    // tiny little helper
+    let to_local_file = |file:&Path, ext| {
+        let mut _tmpfile = file.to_owned();
+        _tmpfile.set_extension(ext);
+        Path::new(_tmpfile.file_name().unwrap().into()).to_owned()
+    };
 
-        use BillType::*;
-        let (dyn_bill_type, outfile_tex):
-            (Option<BillType>, Option<PathBuf>) =
-             match (bill_type, ready_for_offer, ready_for_invoice)
-        {
-            (&Some(Offer),   Ok(_), _     )  |
-            (&None,          Ok(_), Err(_))  => (Some(Offer), Some(project.dir().join(project.offer_file_name(output_ext).expect("this should have been cought by ready_for_offer()")))),
-            (&Some(Invoice), _,      Ok(_))  |
-            (&None,          _,      Ok(_))  => (Some(Invoice), Some(project.dir().join(project.invoice_file_name(output_ext).expect("this should have been cought by ready_for_invoice()")))),
-            (&Some(Offer),   Err(e), _    )  => {error!("cannot create an offer, check out:{:#?}",e);(None,None)},
-            (&Some(Invoice), _,      Err(e)) => {error!("cannot create an invoice, check out:{:#?}",e);(None,None)},
-            (_,              Err(e), Err(_)) => {error!("Neither an Offer nor an Invoice can be created from this project\n please check out {:#?}", e);(None,None)}
-        };
+    use BillType::*;
+    let (dyn_bill_type, outfile_tex):
+        (Option<BillType>, Option<PathBuf>) =
+         match (bill_type, ready_for_offer, ready_for_invoice)
+    {
+        (&Some(Offer),   Ok(_), _     )  |
+        (&None,          Ok(_), Err(_))  => (Some(Offer), Some(project.dir().join(project.offer_file_name(output_ext).expect("this should have been cought by ready_for_offer()")))),
+        (&Some(Invoice), _,      Ok(_))  |
+        (&None,          _,      Ok(_))  => (Some(Invoice), Some(project.dir().join(project.invoice_file_name(output_ext).expect("this should have been cought by ready_for_invoice()")))),
+        (&Some(Offer),   Err(e), _    )  => {error!("cannot create an offer, check out:{:#?}",e);(None,None)},
+        (&Some(Invoice), _,      Err(e)) => {error!("cannot create an invoice, check out:{:#?}",e);(None,None)},
+        (_,              Err(e), Err(_)) => {error!("Neither an Offer nor an Invoice can be created from this project\n please check out {:#?}", e);(None,None)}
+    };
 
-        //debug!("{:?} -> {:?}",(bill_type, project.is_ready_for_offer(), project.is_ready_for_invoice()), (dyn_bill_type, outfile_tex));
+    //debug!("{:?} -> {:?}",(bill_type, project.is_ready_for_offer(), project.is_ready_for_invoice()), (dyn_bill_type, outfile_tex));
 
-        if let (Some(outfile), Some(dyn_bill)) = (outfile_tex, dyn_bill_type) {
-            let filled = try!(fill_template(project, &dyn_bill, &template_path));
+    if let (Some(outfile), Some(dyn_bill)) = (outfile_tex, dyn_bill_type) {
+        let filled = try!(fill_template(project, &dyn_bill, &template_path));
 
-            let pdffile = to_local_file(&outfile, convert_ext);
-            let target = output_folder.join(&pdffile);
+        let pdffile = to_local_file(&outfile, convert_ext);
+        let target = output_folder.join(&pdffile);
 
-            // ok, so apparently we can create a tex file, so lets do it
-            if !force && target.exists() && try!(file_age(&target)) < try!(file_age(&project_file)){
-                // no wait, nothing has changed, so lets save ourselves the work
-                info!("nothing to be done, {} is younger than {}\n       use -f if you don't agree", target.display(), project_file.display());
+        // ok, so apparently we can create a tex file, so lets do it
+        if !force && target.exists() && try!(file_age(&target)) < try!(file_age(&project_file)){
+            // no wait, nothing has changed, so lets save ourselves the work
+            info!("nothing to be done, {} is younger than {}\n       use -f if you don't agree", target.display(), project_file.display());
+        } else {
+            // \o/ we created a tex file
+
+            if dry_run{
+                warn!("Dry run! This does not produce any output:\n * {}\n * {}", outfile.display(), pdffile.display());
             } else {
-                // \o/ we created a tex file
-
-                if dry_run{
-                    warn!("Dry run! This does not produce any output:\n * {}\n * {}", outfile.display(), pdffile.display());
-                } else {
-                    let outfileb = try!(project.write_to_file(&filled,&dyn_bill,output_ext));
-                    debug!("{} vs\n        {}", outfile.display(), outfileb.display());
-                    util::pass_to_command(&convert_tool, &[&outfileb]);
+                let outfileb = try!(project.write_to_file(&filled,&dyn_bill,output_ext));
+                debug!("{} vs\n        {}", outfile.display(), outfileb.display());
+                util::pass_to_command(&convert_tool, &[&outfileb]);
+            }
+            // clean up expected trash files
+            for trash_ext in trash_exts.iter().filter_map(|x|*x){
+                let trash_file = to_local_file(&outfile, trash_ext);
+                if  trash_file.exists() {
+                    try!(fs::remove_file(&trash_file));
+                    debug!("just deleted: {}", trash_file.display())
                 }
-                // clean up expected trash files
-                for trash_ext in trash_exts.iter().filter_map(|x|*x){
-                    let trash_file = to_local_file(&outfile, trash_ext);
-                    if  trash_file.exists() {
-                        try!(fs::remove_file(&trash_file));
-                        debug!("just deleted: {}", trash_file.display())
-                    }
-                    else {
-                        debug!("I expected there to be a {}, but there wasn't any ?", trash_file.display())
-                    }
-                }
-                if pdffile.exists(){
-                    debug!("now there is be a {:?} -> {:?}", pdffile, target);
-                    try!(fs::rename(&pdffile, &target));
+                else {
+                    debug!("I expected there to be a {}, but there wasn't any ?", trash_file.display())
                 }
             }
+            if pdffile.exists(){
+                debug!("now there is be a {:?} -> {:?}", pdffile, target);
+                try!(fs::rename(&pdffile, &target));
+            }
         }
+    }
 
-        Ok(())
+    Ok(())
 
 }
 
