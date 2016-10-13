@@ -79,18 +79,18 @@ pub fn csv(year:i32) -> Result<String> {
 /// TODO this still contains german terms
 pub fn projects_to_csv(projects:&[Project]) -> Result<String>{
     let mut string = String::new();
-    let splitter = "\";\"";
-    try!(writeln!(&mut string, "\"{}\"", [ "Rnum", "Bezeichnung", "Datum", "Rechnungs", "Betreuer", "Verantwortlich", "Bezahlt am", "Betrag", "Canceled"].join(splitter)));
+    let splitter = ";";
+    try!(writeln!(&mut string, "{}", [ "Rnum", "Bezeichnung", "Datum", "Rechnungsdatum", "Betreuer", "Verantwortlich", "Bezahlt am", "Betrag", "Canceled"].join(splitter)));
     for project in projects{
-        try!(writeln!(&mut string, "\"{}\"", [
-                 project.get("InvoiceNumber").unwrap_or_else(String::new),
-                 project.get("Name").unwrap_or_else(String::new),
-                 project.get("event/dates/0/begin").unwrap_or_else(String::new),
-                 project.get("invoice/date").unwrap_or_else(String::new),
-                 project.get("Caterers").unwrap_or_else(String::new),
-                 project.get("Responsible").unwrap_or_else(String::new),
-                 project.get("invoice/payed_date").unwrap_or_else(String::new),
-                 project.get("Final").unwrap_or_else(String::new),
+        try!(writeln!(&mut string, "{}", [
+                 project.get("InvoiceNumber").unwrap_or_else(|| String::from(r#""""#)),
+                 project.get("Name").unwrap_or_else(|| String::from(r#""""#)),
+                 project.get("event/dates/0/begin").unwrap_or_else(|| String::from(r#""""#)),
+                 project.get("invoice/date").unwrap_or_else(|| String::from(r#""""#)),
+                 project.get("Caterers").unwrap_or_else(|| String::from(r#""""#)),
+                 project.get("Responsible").unwrap_or_else(|| String::from(r#""""#)),
+                 project.get("invoice/payed_date").unwrap_or_else(|| String::from(r#""""#)),
+                 project.get("Final").unwrap_or_else(|| String::from(r#""""#)),
                  project.canceled_string().to_owned()
         ].join(splitter)));
     }
