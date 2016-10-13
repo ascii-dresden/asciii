@@ -3,6 +3,9 @@ use chrono::*;
 use bill::{Bill, BillItem, ItemList, Tax};
 use ordered_float::OrderedFloat;
 
+use std::process;
+use std::error::Error;
+
 use super::Project;
 use super::product::Product;
 use super::spec;
@@ -25,7 +28,7 @@ fn itemlist_to_json(tax:&Tax, list: &ItemList<Product>) -> Json {
         s("tax_value")   => (tax.into_inner()*100.0).to_json(),
         s("gross_sum")   => currency_to_string(&gross_sum).to_json(),
         s("tax_sum") => currency_to_string(&tax_sum).to_json(),
-        s("has_tax")  => (tax_sum.value() > 0).to_json()
+        s("has_tax")  => (tax.into_inner() > 0f64).to_json()
     };
     map.to_json()
 }
@@ -64,7 +67,13 @@ impl ToJson for Project{
                                                      .to_json();
 
 
-        let (offer, invoice) = self.bills().unwrap();
+        let (offer,invoice) = match self.bills() {
+            Ok(bills) => bills,
+            Err(err) => {
+                error!("Cannot create Bill {}", err.description());
+                process::exit(1);
+            },
+        };
 
         let map = btreemap!{
             //String::from("adressing") => ,
