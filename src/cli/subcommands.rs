@@ -5,6 +5,7 @@ use std::collections::HashMap;
 
 use open;
 use clap::ArgMatches;
+use chrono::*;
 
 use asciii;
 use asciii::CONFIG;
@@ -98,11 +99,31 @@ fn matches_to_search<'a>(matches:&'a ArgMatches) -> (Vec<&'a str>, StorageDir) {
         .map(|v|v.collect::<Vec<&str>>())
         .unwrap_or_else(Vec::new);
 
-    let dir = if let Some(archive) = matches.value_of("archive"){
-        StorageDir::Archive(archive.parse::<i32>().unwrap())
-    } else {
-        StorageDir::Working
-    };
+    debug!("matches_to_search: --archive={:?}", matches.value_of("archive"));
+
+
+    let dir =
+        if matches.is_present("archive"){
+            let archive_year = matches.value_of("archive")
+                .and_then(|y|y.parse::<i32>().ok())
+                .unwrap_or(UTC::today().year());
+            StorageDir::Archive(archive_year)
+        }
+
+        else if matches.is_present("year"){
+            let year = matches.value_of("year")
+                .and_then(|y|y.parse::<i32>().ok())
+                .unwrap_or(UTC::today().year());
+            StorageDir::Year(year)
+        }
+
+        // or list all, but sort by date
+        else if matches.is_present("all"){
+            // sort by date on --all of not overriden
+            StorageDir::All }
+
+        // or list normal
+        else { StorageDir::Working };
 
     (search_terms, dir)
 }
@@ -177,14 +198,18 @@ pub fn list(matches:&ArgMatches){
 
         // list archive of year `archive`
         let dir =
-            if let Some(archive_year) = matches.value_of("archive"){
-                let archive = archive_year.parse::<i32>().unwrap();
-                StorageDir::Archive(archive)
+            if matches.is_present("archive"){
+                let archive_year = matches.value_of("archive")
+                    .and_then(|y|y.parse::<i32>().ok())
+                    .unwrap_or(UTC::today().year());
+                StorageDir::Archive(archive_year)
             }
 
-            else if let Some(archive_year) = matches.value_of("year"){
-                let archive = archive_year.parse::<i32>().unwrap();
-                StorageDir::Year(archive)
+            else if matches.is_present("year"){
+                let year = matches.value_of("year")
+                    .and_then(|y|y.parse::<i32>().ok())
+                    .unwrap_or(UTC::today().year());
+                StorageDir::Year(year)
             }
 
             // or list all, but sort by date
@@ -580,9 +605,9 @@ pub fn show_path(matches:&ArgMatches){path(matches, |path| println!("{}", path.d
 //pub fn open_path(matches:&ArgMatches){path(matches, |path| {open::that(path).unwrap();})}
 pub fn open_path(m:&ArgMatches){
     if m.is_present("search_term") {
-        let bill_type = infer_bill_type(m);
-        let template_name = "document";
-        let (search_terms, dir) = matches_to_search(m);
+        //let bill_type = infer_bill_type(m);
+        //let template_name = "document";
+        //let (search_terms, dir) = matches_to_search(m);
         unimplemented!()
     } else {
         path(m, |path| {open::that(path).unwrap();})
