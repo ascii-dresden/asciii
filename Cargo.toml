@@ -8,28 +8,28 @@ build = "build.rs"
 
 [dependencies]
 
-log = "*" #"0.3"
+log = "0.3"
 env_logger = { version = "0.3"} # default feature requires regex
 yaml-rust = {git="https://github.com/hoodie/yaml-rust", branch="future_master"}
 #yaml-rust = "0.3"
-chrono = "*" #"0.2"
-regex = "*" #"0.1"
-lazy_static = "*" #"0.2"
-maplit = "*" #"0.1"
-clap = "*"
-enum_derive = "*" #"0.1"
-custom_derive = "*" #"0.1"
-open = "*" #"1.1"
-ordered-float = "*"
+chrono = "0.2"
+regex = "0.1"
+lazy_static = "0.2"
+maplit = "0.1"
+clap = "2"
+enum_derive = "0.1"
+custom_derive = "0.1"
+open = "1.1"
+ordered-float = "0.2"
 error-chain = "0.5"
 
 bill = {git="https://github.com/hoodie/bill-rs"}
 
-slug = "*" #"0.1"
-tempdir = "*" #"0.3"
+slug = "0.1"
+tempdir = "0.3"
 
 term = "0.4"
-prettytable-rs = { version = "0.6", default-features=false}
+prettytable-rs = { version = "0.6"}
 
 # feature: lints
 clippy = {version = "*", optional = true}
@@ -37,7 +37,6 @@ clippy = {version = "*", optional = true}
 
 # feature: document_export
 handlebars = {version = "*", optional = true}
-#handlebars = {git = "https://github.com/sunng87/handlebars-rust", optional = true, rev="910af7cb"}
 rustc-serialize = {version = "*", optional = true}
 
 # feature: git_statuses
