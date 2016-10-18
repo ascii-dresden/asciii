@@ -439,7 +439,7 @@ pub fn show(m:&ArgMatches){
 }
 
 fn dump_yaml(dir:StorageDir, search_terms:&[&str]){
-    actions::simple_with_projects(dir, &search_terms, |p| println!("{}", p.yaml().dump().unwrap()));
+    actions::simple_with_projects(dir, &search_terms, |p| println!("{}", p.dump_yaml()));
 }
 
 fn show_errors(dir:StorageDir, search_terms:&[&str]){
