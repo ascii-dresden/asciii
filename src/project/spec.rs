@@ -484,16 +484,18 @@ pub mod billing {
         };
 
         if let Some(total) = super::hours::total(&yaml) {
-            offer.add_item(total, service());
-            invoice.add_item(total, service());
+            if total.is_normal() {
+                offer.add_item(total, service());
+                invoice.add_item(total, service());
+            }
         }
 
         let raw_products = try!(yaml::get_hash(yaml, "products").ok_or(Error::from(ErrorKind::UnknownFormat)));
 
         for (desc,values) in raw_products {
             let (offer_item, invoice_item) = try!(item_from_desc_and_value(desc, values));
-            offer.add(offer_item);
-            invoice.add(invoice_item);
+            if offer_item.amount.is_normal()   { offer.add(offer_item); }
+            if invoice_item.amount.is_normal() { invoice.add(invoice_item); }
         }
 
         Ok((offer,invoice))
