@@ -263,7 +263,7 @@ impl Project {
         try!(writeln!(&mut csv_string, "{}", [ "#", "Bezeichnung", "Menge", "EP", "Steuer", "Preis"].join(splitter)));
 
 
-        for (_tax, items) in bill.items_by_tax.iter(){
+        for items in bill.items_by_tax.values(){
             for (index,item) in items.iter().enumerate(){
                                         try!(write!(&mut csv_string, "{};",  &index.to_string()));
                                         try!(write!(&mut csv_string, "{};",  item.product.name));

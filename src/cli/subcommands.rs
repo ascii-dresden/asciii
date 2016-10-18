@@ -43,7 +43,7 @@ pub fn new(matches:&ArgMatches){
         .unwrap();
 
     let edit = !matches.is_present("don't edit");
-    let luigi = execute(||setup_luigi());
+    let luigi = execute(setup_luigi);
 
     let mut fill_data:HashMap<&str, String> = HashMap::new();
 
@@ -240,9 +240,9 @@ pub fn list(matches:&ArgMatches){
 /// which it prints with `print::print_projects()`
 fn list_projects(dir:StorageDir, list_config:&ListConfig){
     let luigi = if CONFIG.get_bool("list/gitstatus"){
-        execute(||setup_luigi_with_git())
+        execute(setup_luigi_with_git)
     } else {
-        execute(||setup_luigi())
+        execute(setup_luigi)
     };
     debug!("listing projects: {}", luigi.working_dir().display());
 
@@ -281,7 +281,7 @@ fn list_projects(dir:StorageDir, list_config:&ListConfig){
 
 /// Command LIST --broken
 fn list_broken_projects(dir:StorageDir){
-    let luigi = execute(||setup_luigi());
+    let luigi = execute(setup_luigi);
     let invalid_files = execute(||luigi.list_project_files(dir));
     let tups = invalid_files
         .iter()
@@ -295,7 +295,7 @@ fn list_broken_projects(dir:StorageDir){
 
 /// Command LIST --templates
 fn list_templates(){
-    let luigi = execute(||setup_luigi());
+    let luigi = execute(setup_luigi);
 
     for name in execute(||luigi.list_template_names()){
         println!("{}", name);
@@ -304,7 +304,7 @@ fn list_templates(){
 
 /// Command LIST --years
 fn list_years(){
-    let luigi = execute(||setup_luigi());
+    let luigi = execute(setup_luigi);
     let years = execute(||luigi.list_years());
     println!("{:?}", years);
 }
@@ -348,7 +348,7 @@ pub fn edit(matches:&ArgMatches) {
 }
 
 fn edit_projects(dir:StorageDir, search_terms:&[&str], editor:&Option<&str>){
-    let luigi = execute(||setup_luigi());
+    let luigi = execute(setup_luigi);
     let mut all_projects= Vec::new();
     for search_term in search_terms{
         let mut paths = execute(||luigi.search_projects(dir, search_term));
@@ -369,7 +369,7 @@ fn edit_projects(dir:StorageDir, search_terms:&[&str], editor:&Option<&str>){
 
 /// Command EDIT --template
 fn edit_template(name:&str, editor:&Option<&str>){
-    let luigi = execute(||setup_luigi());
+    let luigi = execute(setup_luigi);
     let template_paths = execute(||luigi.list_template_files())
         .into_iter() // drain?
         .filter(|f|f.file_stem() .unwrap_or_else(||OsStr::new("")) == name)
@@ -413,7 +413,7 @@ pub fn show(m:&ArgMatches){
     let bill_type = match (m.is_present("offer"),m.is_present("invoice")) {
         (true,true)  => unreachable!("this should have been prevented by clap-rs"),
         (true,false) => BillType::Offer,
-        (false,true) => BillType::Invoice,
+      //(false,true) => BillType::Invoice,
         _            => BillType::Invoice, //TODO be inteligent here ( use date )
     };
 
@@ -522,7 +522,7 @@ pub fn make(_:&ArgMatches){
 
 /// Command SHOW --template
 fn show_template(name:&str){
-    let luigi = execute(||setup_luigi());
+    let luigi = execute(setup_luigi);
     let template = execute(||luigi.get_template_file(name));
     let templater = execute(||Templater::from_file(&template));
     println!("{:#?}", templater.list_keywords());
