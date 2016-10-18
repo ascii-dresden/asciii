@@ -1,6 +1,7 @@
 use std::path::{Path,PathBuf};
 use std::ffi::OsStr;
 use std::{env,fs};
+use std::io::Write;
 use std::collections::HashMap;
 
 use open;
@@ -562,6 +563,27 @@ pub fn config(matches:&ArgMatches){
         println!("config location: {:?}", config::ConfigReader::path_home())
     }
 
+    else if matches.is_present("init") {
+        let local = config::ConfigReader::path_home();
+        println!("config location: {:?}", local);
+        if local.exists(){
+            error!("{:?} already exists, can't overwrite", local);
+        } else {
+            if let Ok(mut file) = fs::File::create(local){
+                for line in config::DEFAULT_CONFIG.lines()
+                    .take_while(|l| !l.contains("BREAK"))
+                    {
+                        file.write_fmt(format_args!("{}\n", line))
+                            .expect("cannot write this line to the config file");
+                    }
+                let editor = matches.value_of("editor")
+                    .or( CONFIG.get("user/editor").and_then(|e|e.as_str()));
+                config_edit(&editor);
+            }
+        }
+
+    }
+
     else if matches.is_present("edit") {
         let editor = matches.value_of("editor")
             .or( CONFIG.get("user/editor").and_then(|e|e.as_str()));
@@ -581,7 +603,12 @@ pub fn config_show(path:&str){
 
 /// Command CONFIG --edit
 fn config_edit(editor:&Option<&str>){
-    util::pass_to_command(editor, &[&CONFIG.path]);
+    let local = config::ConfigReader::path_home();
+    if local.exists(){
+        util::pass_to_command(editor, &[&CONFIG.path]);
+    } else {
+        error!("Cannot open {:?}, run `asciii config --init` to create it.", local)
+    }
 }
 
 /// Command CONFIG --default

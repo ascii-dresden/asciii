@@ -19,7 +19,7 @@ dirs:
 
 template: default # default template
 
-## CAREFUL HERE
+## CAREFUL HERE BREAK everything below here will not be copied over
 extensions:
   project_file: yml
   project_template: tyml
