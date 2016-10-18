@@ -1,9 +1,9 @@
 ---
 user:
   name: #"The Unnamed Manager"
-editor: #"vim -O"
+  editor: #"vim -O"
 
-path: "~"
+path: ~/asciii_projects
 output_path: "."
 list:
   colors:    false

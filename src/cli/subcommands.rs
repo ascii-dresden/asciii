@@ -36,7 +36,7 @@ use super::{execute,fail};
 //#[deprecated(note="move to asciii::actions")]
 pub fn new(matches:&ArgMatches){
     let project_name     = matches.value_of("name").expect("You did not pass a \"Name\"!");
-    let editor           = CONFIG.get("editor").and_then(|e|e.as_str());
+    let editor           = CONFIG.get("user/editor").and_then(|e|e.as_str());
 
     let template_name = matches.value_of("template")
         .or( CONFIG.get("template").unwrap().as_str())
@@ -334,7 +334,7 @@ pub fn edit(matches:&ArgMatches) {
     let search_terms = matches.values_of("search_term").unwrap().collect::<Vec<&str>>();
 
     let editor = matches.value_of("editor")
-        .or( CONFIG.get("editor").and_then(|e|e.as_str()));
+        .or( CONFIG.get("user/editor").and_then(|e|e.as_str()));
 
     if matches.is_present("template"){
         edit_template(search_term, &editor);
@@ -564,7 +564,7 @@ pub fn config(matches:&ArgMatches){
 
     else if matches.is_present("edit") {
         let editor = matches.value_of("editor")
-            .or( CONFIG.get("editor").and_then(|e|e.as_str()));
+            .or( CONFIG.get("user/editor").and_then(|e|e.as_str()));
         config_edit(&editor);
     }
 
