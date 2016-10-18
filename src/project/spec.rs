@@ -79,7 +79,8 @@ pub mod project {
 
     ///Returns the content of `/format`
     pub fn format(yaml: &Yaml) -> Option<&str> {
-        yaml::get_str(yaml, "format")
+        yaml::get_str(yaml, "meta/format")
+            .or_else(||yaml::get_str(yaml, "format"))
     }
 
     ///Returns the content of `/canceled`
