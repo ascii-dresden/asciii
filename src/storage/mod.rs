@@ -90,6 +90,9 @@ pub enum StorageDir {
 
 /// Basically `ls`, returns a list of paths.
 pub fn list_path_content(path:&Path) -> StorageResult<Vec<PathBuf>> {
+    if !path.exists() {
+        error!("Path does not exist: {}", path.display());
+    }
     Ok(try!(fs::read_dir(path))
         .filter_map(|entry| entry.ok())
         .map(|entry| entry.path())
@@ -135,6 +138,27 @@ impl<L:Storable> Storage<L> {
             repository: Some(try!(Repository::new(root.as_ref()))),
             .. try!{Self::new(root,working,archive,template)}
         })
+    }
+
+    /// creates empty folder structure if necessary
+    pub fn bootstrap(&self) -> StorageResult<()> {
+        if !self.root_dir().exists() {
+            warn!("Creating {:?}", self.root_dir());
+            try!(fs::create_dir_all(self.root_dir()));
+        }
+        if !self.working_dir().exists() {
+            warn!("Creating {:?}", self.working_dir());
+            try!(fs::create_dir_all(self.working_dir()));
+        }
+        if !self.archive_dir().exists() {
+            warn!("Creating {:?}", self.archive_dir());
+            try!(fs::create_dir_all(self.archive_dir()));
+        }
+        if !self.templates_dir().exists() {
+            warn!("Creating {:?}", self.templates_dir());
+            try!(fs::create_dir_all(self.templates_dir()));
+        }
+        Ok(())
     }
 
     /// Getter for Storage::storage.
@@ -485,7 +509,11 @@ impl<L:Storable> Storage<L> {
         trace!("listing project folders in {:?}-directory", directory);
         match directory{
             StorageDir::Working       => list_path_content(self.working_dir()),
-            StorageDir::Archive(year) => list_path_content(&self.archive_dir().join(year.to_string())),
+            StorageDir::Archive(year) => {
+                let path = self.archive_dir().join(year.to_string());
+                let list = list_path_content(&path).unwrap_or_else(|_| Vec::new());
+                Ok(list)
+            },
             StorageDir::All           => {
                 let mut all:Vec<PathBuf> = Vec::new();
                 for year in try!(self.list_years()){
