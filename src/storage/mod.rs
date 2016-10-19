@@ -509,7 +509,11 @@ impl<L:Storable> Storage<L> {
         trace!("listing project folders in {:?}-directory", directory);
         match directory{
             StorageDir::Working       => list_path_content(self.working_dir()),
-            StorageDir::Archive(year) => list_path_content(&self.archive_dir().join(year.to_string())),
+            StorageDir::Archive(year) => {
+                let path = self.archive_dir().join(year.to_string());
+                let list = list_path_content(&path).unwrap_or_else(|_| Vec::new());
+                Ok(list)
+            },
             StorageDir::All           => {
                 let mut all:Vec<PathBuf> = Vec::new();
                 for year in try!(self.list_years()){
