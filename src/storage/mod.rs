@@ -90,6 +90,9 @@ pub enum StorageDir {
 
 /// Basically `ls`, returns a list of paths.
 pub fn list_path_content(path:&Path) -> StorageResult<Vec<PathBuf>> {
+    if !path.exists() {
+        error!("Path does not exist: {}", path.display());
+    }
     Ok(try!(fs::read_dir(path))
         .filter_map(|entry| entry.ok())
         .map(|entry| entry.path())
