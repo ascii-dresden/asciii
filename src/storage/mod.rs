@@ -140,6 +140,27 @@ impl<L:Storable> Storage<L> {
         })
     }
 
+    /// creates empty folder structure if necessary
+    pub fn bootstrap(&self) -> StorageResult<()> {
+        if !self.root_dir().exists() {
+            warn!("Creating {:?}", self.root_dir());
+            try!(fs::create_dir_all(self.root_dir()));
+        }
+        if !self.working_dir().exists() {
+            warn!("Creating {:?}", self.working_dir());
+            try!(fs::create_dir_all(self.working_dir()));
+        }
+        if !self.archive_dir().exists() {
+            warn!("Creating {:?}", self.archive_dir());
+            try!(fs::create_dir_all(self.archive_dir()));
+        }
+        if !self.templates_dir().exists() {
+            warn!("Creating {:?}", self.templates_dir());
+            try!(fs::create_dir_all(self.templates_dir()));
+        }
+        Ok(())
+    }
+
     /// Getter for Storage::storage.
     pub fn root_dir(&self) -> &Path{
         self.root.as_ref()
