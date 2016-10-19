@@ -26,7 +26,7 @@ pub fn freeze() {
 
 /// Asks for confirmation
 pub fn really(msg:&str) -> bool {
-    print!("{} ", msg);
+    println!("{} ", msg);
     let mut answer = String::new();
     if io::stdin().read_line(&mut answer).is_err(){ return false; }
     ["yes", "y",
@@ -70,9 +70,9 @@ pub fn pass_to_command<T:AsRef<OsStr>>(editor:&Option<&str>, paths:&[T]){
 
     if paths.is_empty() {
         warn!("non of the provided paths could be found")
-    } else if paths.len() > 4{
-        println!("you are a about to open {} files\n{:#?}", paths.len(), paths);
     } else if let Some(ref editor) = *editor {
+    if paths.len() < 5 || really (&format!("you are about to open {} files\n{:#?}\nAre you sure about this?", paths.len(), paths))
+    {
         let editor_config = editor
             .split_whitespace()
             .collect::<Vec<&str>>();
@@ -89,6 +89,7 @@ pub fn pass_to_command<T:AsRef<OsStr>>(editor:&Option<&str>, paths:&[T]){
             .status()
             .unwrap_or_else(|e| { panic!("failed to execute process: {}", e) });
 
+    }
     } else {
         for path in paths{
             open::that(path).unwrap();
