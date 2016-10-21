@@ -398,6 +398,7 @@ pub fn set(m:&ArgMatches){
 }
 
 
+#[cfg(feature="document_export")]
 fn infer_bill_type(m:&ArgMatches) -> Option<BillType> {
     match (m.is_present("offer"),m.is_present("invoice")) {
         (true,true)  => unreachable!("this should have been prevented by clap-rs"),

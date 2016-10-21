@@ -61,6 +61,7 @@ impl<'a> Product<'a>{
     }
 
     pub fn from_new_format(desc: &Yaml) -> Result<Product> {
+        //TODO read default tax from document
         let default_tax = ::CONFIG.get_f64("defaults/tax")
             .expect("Faulty config: field defaults/tax does not contain a value");
         Ok(Product {

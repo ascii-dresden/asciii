@@ -40,16 +40,23 @@ impl ConfigReader{
 
     /// Opens config from `self.path()` and parses Yaml right away.
     pub fn new() -> Result<ConfigReader, YamlError> {
-        let path = ConfigReader::path_home();
+        let home_path = ConfigReader::path_home();
+        let local_path = Path::new(DEFAULT_LOCATION);
+
         let config = Ok(ConfigReader{
-            path: path.to_owned(),
+            path: home_path.to_owned(),
             defaults: try!(yaml::parse(&DEFAULT_CONFIG)),
-            custom: yaml::open(&path).unwrap_or(Yaml::Null),
-            local:  yaml::open(Path::new(&DEFAULT_LOCATION)).unwrap_or(Yaml::Null)
+            custom: yaml::open(&home_path).unwrap_or(Yaml::Null),
+            local:  yaml::open(&local_path).unwrap_or(Yaml::Null)
         });
 
-        trace!("{default_path:?} exists={default_exists}", default_path = path, default_exists= path.exists());
-        trace!("local config: {local_path:?} exists={local_exists}", local_path = DEFAULT_LOCATION, local_exists = Path::new(&DEFAULT_LOCATION).exists());
+        if !home_path.exists(){
+            error!("{} does not exist, falling back to defaults", home_path.display())
+        }
+
+        if local_path.exists(){
+            warn!("{} exists, this overrides defaults and user settings", local_path.display())
+        }
 
         config
     }

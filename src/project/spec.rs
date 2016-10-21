@@ -479,7 +479,7 @@ pub mod billing {
         let service = || Product {
             name: "Service",
             unit: Some("h"),
-            tax: ::ordered_float::OrderedFloat(0f64),
+            tax: ::ordered_float::OrderedFloat(0f64), // TODO this ought to be in the config
             price: super::hours::salary(&yaml).unwrap()
         };
 

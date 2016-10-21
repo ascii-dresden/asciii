@@ -29,6 +29,7 @@ pub fn setup_luigi() -> Result<Storage<Project>> {
     let archive   = try!(::CONFIG.get_str("dirs/archive").ok_or("Faulty config: dirs/archive does not contain a value"));
     let templates = try!(::CONFIG.get_str("dirs/templates").ok_or("Faulty config: dirs/templates does not contain a value"));
     let storage   = try!(Storage::new(util::get_storage_path(), working, archive, templates));
+    try!(storage.health_check());
     Ok(storage)
 }
 
@@ -39,6 +40,7 @@ pub fn setup_luigi_with_git() -> Result<Storage<Project>> {
     let archive   = try!(::CONFIG.get_str("dirs/archive").ok_or("Faulty config: dirs/archive does not contain a value"));
     let templates = try!(::CONFIG.get_str("dirs/templates").ok_or("Faulty config: dirs/templates does not contain a value"));
     let storage   = try!(Storage::new_with_git(util::get_storage_path(), working, archive, templates));
+    try!(storage.health_check());
     Ok(storage)
 }
 
