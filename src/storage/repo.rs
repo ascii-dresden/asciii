@@ -217,7 +217,7 @@ impl Repository {
     }
 
     pub fn pull(&self) -> ExitStatus{
-        self.execute_git("pull", &["origin", "master"])
+        self.execute_git("pull", &["origin", "master", "--rebase"])
     }
 
     pub fn remote(&self) -> ExitStatus{
