@@ -437,7 +437,7 @@ pub fn show(m:&ArgMatches){
     } else if m.is_present("json"){ show_json(dir, search_terms.as_slice())
     } else if m.is_present("csv"){  show_csv( dir, search_terms.as_slice());
     } else if m.is_present("template"){ show_template(search_terms[0]);
-    } else { actions::simple_with_projects(dir, search_terms.as_slice(), |p|print::show_items(p,&bill_type)) }
+    } else { actions::simple_with_projects(dir, search_terms.as_slice(), |p|print::show_details(p,&bill_type)) }
 }
 
 fn dump_yaml(dir:StorageDir, search_terms:&[&str]){

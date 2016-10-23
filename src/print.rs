@@ -302,8 +302,8 @@ fn table_with_borders(table:&mut Table){
                     );
 }
 
-pub fn show_items(project:&Project, bill_type:&BillType) {
-    trace!("print::show_items()");
+pub fn show_details(project:&Project, bill_type:&BillType) {
+    trace!("print::show_details()");
     println!("{}: {}", bill_type.to_string(), project.name());
 
     let (offer, invoice) = project.bills().unwrap();
@@ -351,5 +351,14 @@ pub fn show_items(project:&Project, bill_type:&BillType) {
     table.add_row( row!["", "Total", "", "", bill.net_total().postfix()]);
 
     table.printstd();
+
+    // show times
+    if let Some(events) = project.events() {
+        for event in events {
+            println!("{}", event);
+        }
+    }
+
+    println!("{}", project.caterers());
 
 }
