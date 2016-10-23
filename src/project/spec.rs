@@ -271,18 +271,101 @@ pub mod date {
     pub type DateRange = (Option<Date<UTC>>, Option<Date<UTC>>);
     pub type DateRanges = Vec<DateRange>;
 
-    /// Produces a list of `DateRange`s for the event.
-    pub fn events(yaml: &Yaml) -> Option<DateRanges> {
-        yaml::get(yaml, "event/dates/")
-            .and_then(|e| e.as_vec())
-            .map(|v| {
-                v.iter()
-                    .map(|e| {
-                        (yaml::get_dmy(e, "begin"),
-                         yaml::get_dmy(e, "end").or_else(|| yaml::get_dmy(e, "begin")))
+    #[derive(Debug)]
+    pub struct EventTime{
+        start: NaiveTime,
+        end:   NaiveTime
+    }
+
+    #[derive(Debug)]
+    pub struct Event{
+        begin: Date<UTC>,
+        end: Date<UTC>,
+        times: Vec<EventTime>
+    }
+
+    use std::fmt;
+    impl fmt::Display for Event {
+        fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+            try!(
+                if self.begin == self.end { writeln!(f, "start: {}", self.begin) }
+                else { writeln!(f, "start: {}\nend:  {}", self.begin, self.end) }
+                );
+            for time in &self.times {
+                try!(
+                    if time.start == time.end { writeln!(f, " * {}", time.start) }
+                    else { writeln!(f, " * {} - {}", time.start, time.end) }
+                    )
+            }
+            Ok(())
+        }
+    }
+
+
+    fn naive_time_from_str(string:&str) -> Option<NaiveTime> {
+        let t:Vec<u32> = string
+            .splitn(2, |p| p == '.' || p == ':')
+            .map(|s|s.parse().unwrap_or(0))
+            .collect();
+
+        if let (Some(h),m) = (t.get(0),t.get(1).unwrap_or(&0)){
+            if *h < 24 && *m < 60 {
+                return Some(NaiveTime::from_hms(*h,*m,0))
+            }
+        }
+
+        None
+    }
+
+    #[test]
+    fn test_naive_time_from_str() {
+        assert_eq!(Some(NaiveTime::from_hms(9,15,0)), naive_time_from_str("9.15"));
+        assert_eq!(Some(NaiveTime::from_hms(9,0,0)),  naive_time_from_str("9."));
+        assert_eq!(Some(NaiveTime::from_hms(9,0,0)),  naive_time_from_str("9"));
+        assert_eq!(Some(NaiveTime::from_hms(23,0,0)), naive_time_from_str("23.0"));
+        assert_eq!(Some(NaiveTime::from_hms(23,59,0)), naive_time_from_str("23.59"));
+        assert_eq!(None, naive_time_from_str("24.0"));
+        assert_eq!(None, naive_time_from_str("25.0"));
+        assert_eq!(None, naive_time_from_str("0.60"));
+
+        assert_eq!(Some(NaiveTime::from_hms(9,15,0)), naive_time_from_str("9:15"));
+        assert_eq!(Some(NaiveTime::from_hms(9,0,0)),  naive_time_from_str("9:"));
+        assert_eq!(Some(NaiveTime::from_hms(9,0,0)),  naive_time_from_str("9"));
+        assert_eq!(Some(NaiveTime::from_hms(23,0,0)), naive_time_from_str("23:0"));
+    }
+
+    fn times(yaml: &Yaml) -> Option<Vec<EventTime>> {
+        let times = try_some!(yaml::get(yaml, "times").and_then(|l|l.as_vec()));
+        times.into_iter()
+            .map(|h| {
+                let begin = yaml::get_str(h, "begin").or(Some("00.00")).and_then(naive_time_from_str);
+                let end   = yaml::get_str(h, "end").and_then(naive_time_from_str).or(begin);
+                if let (Some(begin),Some(end)) = (begin,end) {
+                    Some( EventTime{
+                        start: begin,
+                        end: end
                     })
-                    .collect::<Vec<(Option<Date<UTC>>, Option<Date<UTC>>)>>()
+                } else { None }
             })
+        .collect()
+    }
+
+    /// Produces a list of `DateRange`s for the event.
+    pub fn events(yaml: &Yaml) -> Option<Vec<Event>> {
+        let dates = try_some!(yaml::get(yaml, "event/dates/").and_then(|a| a.as_vec()));
+        dates.into_iter()
+            .map(|h| {
+                let begin = try_some!(yaml::get_dmy(h, "begin"));
+                let end = yaml::get_dmy(h, "end");
+                //let times = yaml::get(h, "times").as_vec;
+                //trace!("{:#?}", times);
+                Some( Event{
+                    begin: begin,
+                    end: end.unwrap_or(begin),
+                    times: times(h).unwrap_or_else(Vec::new)
+                })
+            })
+        .collect()
     }
 }
 

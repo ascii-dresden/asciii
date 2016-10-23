@@ -43,6 +43,7 @@ mod tojson;
 //#[cfg(test)] mod tests;
 
 use self::spec::SpecResult;
+use self::spec::date::Event;
 use self::product::Product;
 use self::error::{ErrorKind,Result};
 pub use self::computed_field::ComputedField;
@@ -103,6 +104,10 @@ impl Project {
         else {""}
     }
 
+    pub fn events(&self) -> Option<Vec<Event>> {
+        spec::date::events(&self.yaml())
+    }
+
     pub fn invoice_num(&self) -> Option<String>{
         spec::invoice::number_str(self.yaml())
     }
@@ -113,6 +118,10 @@ impl Project {
 
     pub fn payed_caterers(&self) -> bool{
         spec::date::wages(self.yaml()).is_some()
+    }
+
+    pub fn caterers(&self) -> String {
+        spec::hours::caterers_string(self.yaml()).unwrap_or_else(String::new)
     }
 
     /// Filename of the offer output file.
