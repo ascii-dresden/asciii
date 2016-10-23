@@ -318,6 +318,29 @@ impl<L:Storable> Storage<L> {
         Ok(project)
     }
 
+    /// Moves a project folder from `/working` dir to `/archive/$year`.
+    ///
+    /// Returns path to new storage dir in archive.
+    #[cfg(test)]
+    pub fn archive_project_by_name(&self, name:&str, year:Year, prefix:Option<String>) -> StorageResult<PathBuf> {
+        info!("archiving project by name {:?} into archive for {}", name, year);
+        trace!("prefix {:?}", prefix);
+
+        let slugged_name = slugify(name);
+        let name_in_archive = match prefix{
+            Some(prefix) => format!("{}_{}", prefix, slugged_name),
+                    None => slugged_name
+        };
+
+        let archive = try!(self.create_archive(year));
+        let project_folder = try!(self.get_project_dir(name, StorageDir::Working));
+        let target = archive.join(&name_in_archive);
+        trace!(" moving file into {:?}", target);
+
+        try!(fs::rename(&project_folder, &target));
+
+        Ok(target)
+    }
 
     /// Moves a project folder from `/working` dir to `/archive/$year`.
     /// Also adds the project.prefix() to the folder name.

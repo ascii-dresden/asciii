@@ -49,8 +49,9 @@ impl Storable for TestProject{
             temp_dir: None
         })
     }
-    fn matches_filter(&self, _key: &str, _val: &str) -> bool{false}
+    fn matches_filter(&self, _key: &str, _val: &str) -> bool {false}
     fn matches_search(&self, _term: &str) -> bool {false}
+    fn is_ready_for_archive(&self) -> bool {true}
 
 }
 
