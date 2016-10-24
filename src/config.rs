@@ -91,6 +91,15 @@ impl ConfigReader{
             //.expect(&format!("Config file {} in field {} does not contain a string value", DEFAULT_LOCATION, key))
     }
 
+    pub fn get_strs(&self, key:&str) -> Option<Vec<&str>> {
+        try_some!(self.get(key))
+            .as_vec()
+            .map(|v| v.iter()
+                      .filter_map(|s|s.as_str())
+                      .collect()
+                )
+    }
+
     /// Returns the string in the position or an empty string
     ///
     /// # Panics

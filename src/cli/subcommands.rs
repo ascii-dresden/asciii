@@ -181,13 +181,19 @@ pub fn list(matches:&ArgMatches){
             matches.is_present("csv")
             );
 
+        let extra_details = matches.values_of("details").map(|v|v.collect::<Vec<&str>>());
+        let config_details = CONFIG.get_strs("list/extra_details");
+
+        println!("extra details: {:?}", extra_details);
+        println!("config details: {:?}", config_details);
+
         let mut list_config = ListConfig{
             sort_by:   matches.value_of("sort")
                               .unwrap_or_else(||CONFIG.get_str("list/sort")
                                               .expect("Faulty config: field list/sort does not contain a string value")
                                              ),
             mode:      list_mode,
-            details:   matches.values_of("details").map(|v|v.collect::<Vec<&str>>()),
+            details:   extra_details.or(config_details),
             filter_by: matches.values_of("filter").map(|v|v.collect::<Vec<&str>>()),
             show_errors: matches.is_present("errors"),
 

@@ -39,7 +39,6 @@ custom_derive! {
         /// Sorting index
         SortIndex,
         Date,
-            
         Invalid
     }
 }
