@@ -198,13 +198,21 @@ impl Repository {
         self.execute_git("status", &[])
     }
 
+    pub fn checkout (&self) -> ExitStatus{
+        self.execute_git("check out", &["origin", "master"])
+    }
+
+    pub fn clean(&self, paths:&[PathBuf]) -> ExitStatus{
+        self.execute_git("clean", &["-d", "--force"])
+    }
+
     /// TODO not yet functional
     pub fn stash(&self) -> ExitStatus{
-        self.execute_git("stash", &["origin", "master"])
+        self.execute_git("stash", &[])
     }
 
     pub fn stash_pop(&self) -> ExitStatus{
-        self.execute_git("stash pop", &["origin", "master"])
+        self.execute_git("stash", &["pop"])
     }
 
     pub fn push(&self) -> ExitStatus{

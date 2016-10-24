@@ -759,11 +759,19 @@ pub fn git_push(){
     util::exit(repo.push())
 }
 
-/// Command DIFF
-pub fn git_stash(){
+///// Command STASH
+//pub fn git_stash(){
+//    let luigi = execute(||setup_luigi_with_git());
+//    let repo = luigi.repository.unwrap();
+//    util::exit(repo.stash())
+//}
+
+/// Command CLEAN
+pub fn git_clean(matches:&ArgMatches){
     let luigi = execute(||setup_luigi_with_git());
+    let paths = matches_to_paths(matches, &luigi);
     let repo = luigi.repository.unwrap();
-    util::exit(repo.stash())
+    util::exit(repo.clean(&paths))
 }
 
 /// Command DIFF
