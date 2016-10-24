@@ -1,15 +1,14 @@
+extern crate chrono;
 use std::process::{Command,Output};
 
-//#[macro_use] extern crate clap;
-//use clap::Shell;
-//include!("src/cli/app.rs");
-//fn gen_completions(){
-//    let mut app = build_cli();
-//    app.gen_completions("asciii",
-//                        Shell::Bash,
-//                        ".")
-//
-//}
+#[macro_use] extern crate clap;
+use clap::Shell;
+include!("src/cli/app.rs");
+fn gen_completions(){
+    let mut app = build_cli();
+    app.gen_completions("asciii", Shell::Bash, ".");
+    //app.gen_completions("asciii", Shell::Zsh, ".");
+}
 
 fn execute_git(command:&str, args:&[&str]) -> Output{
     let workdir = ".";
@@ -40,5 +39,5 @@ fn gen_commit_file(){
 
 fn main(){
     gen_commit_file();
-    //gen_completions();
+    gen_completions();
 }

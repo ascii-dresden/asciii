@@ -1,4 +1,4 @@
-use asciii;
+//use asciii;
 use clap::{App, AppSettings, Arg, ArgMatches, SubCommand};
 
 pub fn setup() -> ArgMatches<'static>{
@@ -8,10 +8,10 @@ pub fn setup() -> ArgMatches<'static>{
 pub fn build_cli() -> App<'static, 'static>{
     App::new("asciii")
         .author(crate_authors!())
-        .version(asciii::VERSION.as_ref())
+        //.version(asciii::VERSION.as_ref())
         .about("The ascii invoicer III")
         .settings(&[AppSettings::SubcommandRequiredElseHelp,AppSettings::ColoredHelp])
-        .after_help(asciii::DOCUMENTATION_URL)
+        //.after_help(asciii::DOCUMENTATION_URL)
 
         .subcommand(SubCommand::with_name("doc")
             .about("Opens the online documentation, please read it")
@@ -645,7 +645,20 @@ pub fn build_cli() -> App<'static, 'static>{
 }
 
 pub mod validators{
-    use asciii::util::yaml::parse_dmy_date;
+    use chrono::*;
+
+    /// Interprets `"25.12.2016"` as date.
+    /// duplicate from asciii::yaml::parse_dmy_date
+    fn parse_dmy_date(date_str:&str) -> Option<Date<UTC>>{
+        let date = date_str.split('.')
+            .map(|f|f.parse().unwrap_or(0))
+            .collect::<Vec<i32>>();
+        if date[0] > 0 {
+            return UTC.ymd_opt(date[2], date[1] as u32, date[0] as u32).single()
+        }
+        None
+    }
+
 
     pub fn is_dmy(val: String) -> Result<(),String>{
         match parse_dmy_date(&val){

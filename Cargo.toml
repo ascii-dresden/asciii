@@ -61,3 +61,4 @@ name = "asciii"
 
 [build-dependencies]
 clap = "2"
+chrono = "0.2"
