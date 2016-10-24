@@ -13,7 +13,7 @@
 
 
 use std::path::{Path,PathBuf};
-use std::env::home_dir;
+use std::env::{home_dir,current_dir};
 use util::yaml;
 use util::yaml::{Yaml, YamlError};
 
@@ -54,8 +54,10 @@ impl ConfigReader{
             error!("{} does not exist, falling back to defaults", home_path.display())
         }
 
-        if local_path.exists(){
-            warn!("{} exists, this overrides defaults and user settings", local_path.display())
+        if let (Some(home_dir),Ok(current_dir)) = (home_dir(), current_dir()) {
+            if local_path.exists() && current_dir != home_dir {
+                warn!("{} exists, this overrides defaults and user settings", local_path.display())
+            }
         }
 
         config
@@ -80,10 +82,6 @@ impl ConfigReader{
     }
 
     /// Returns the string in the position or an empty string
-    ///
-    /// # Panics
-    /// This panics if nothing is found.
-    /// You should have a default config for everything that you use.
     pub fn get_str(&self, key:&str) -> Option<&str> {
         yaml::get_str(&self.local, key)
             .or_else(||yaml::get_str(&self.custom, key))
@@ -91,6 +89,7 @@ impl ConfigReader{
             //.expect(&format!("Config file {} in field {} does not contain a string value", DEFAULT_LOCATION, key))
     }
 
+    /// Returns the a vec of &strs if possible
     pub fn get_strs(&self, key:&str) -> Option<Vec<&str>> {
         try_some!(self.get(key))
             .as_vec()
