@@ -775,11 +775,20 @@ pub fn git_push(){
     util::exit(repo.push())
 }
 
-/// Command DIFF
+/// Command STASH
 pub fn git_stash(){
     let luigi = execute(||setup_luigi_with_git());
     let repo = luigi.repository.unwrap();
     util::exit(repo.stash())
+}
+
+/// Command CLEANUP
+pub fn git_cleanup(matches:&ArgMatches){
+    let luigi = execute(||setup_luigi_with_git());
+    let paths = matches_to_paths(matches, &luigi);
+    let repo = luigi.repository.unwrap();
+    repo.checkout(&paths); // TODO implement `.and()` for exitstatus
+    util::exit(repo.cleanup(&paths))
 }
 
 /// Command DIFF

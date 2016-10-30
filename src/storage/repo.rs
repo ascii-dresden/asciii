@@ -167,69 +167,80 @@ impl Repository {
         GitStatus::Unknown
     }
 
-    fn execute_git(&self, command:&str, args:&[&str]) -> ExitStatus{
+    fn execute_git(&self, command:&str, args:&[&str], paths: &[PathBuf]) -> ExitStatus{
         let gitdir  = self.workdir.join(".git");
-        debug!("{:#?}", Command::new("git")
+        debug!("{:?}", Command::new("git")
                  .args(&["--work-tree", self.workdir.to_str().unwrap()])
                  .args(&["--git-dir",   gitdir.to_str().unwrap()])
-                 .arg(command).args(args));
+                 .arg(command)
+                 .args(args)
+                 .args(paths)
+                 );
 
         Command::new("git")
             .args(&["--work-tree", self.workdir.to_str().unwrap()])
             .args(&["--git-dir",   gitdir.to_str().unwrap()])
             .arg(command)
             .args(args)
+            .args(paths)
             .status()
             .unwrap_or_else(|e| { panic!("failed to execute process: {}", e) })
     }
 
     pub fn add(&self, paths:&[PathBuf]) -> ExitStatus{
         info!("adding to git\n {:?}", paths);
-        let paths:Vec<&str> = paths.iter().filter_map(|p|p.to_str()).collect();
-        self.execute_git("add", &paths)
+        self.execute_git("add", &[], paths)
     }
 
     pub fn commit(&self) -> ExitStatus{
         // TODO override git editor with asciii editor
-        self.execute_git("commit", &[])
+        self.execute_git("commit", &[], &[])
     }
 
     pub fn status(&self) -> ExitStatus{
-        self.execute_git("status", &[])
+        self.execute_git("status", &[], &[])
+    }
+
+    pub fn checkout(&self, paths:&[PathBuf]) -> ExitStatus{
+        self.execute_git("checkout", &[], paths)
+    }
+
+    pub fn cleanup(&self, paths:&[PathBuf]) -> ExitStatus{
+        self.execute_git("clean", &["-d", "--force"], paths)
     }
 
     /// TODO not yet functional
     pub fn stash(&self) -> ExitStatus{
-        self.execute_git("stash", &["origin", "master"])
+        self.execute_git("stash", &[], &[])
     }
 
     pub fn stash_pop(&self) -> ExitStatus{
-        self.execute_git("stash pop", &["origin", "master"])
+        self.execute_git("stash", &["pop"], &[])
     }
 
     pub fn push(&self) -> ExitStatus{
-        self.execute_git("push", &["origin", "master"])
+        self.execute_git("push", &["origin", "master"], &[])
     }
 
     pub fn diff(&self,paths:&[PathBuf]) -> ExitStatus{
         let paths:Vec<&str> = paths.iter().filter_map(|p|p.to_str()).collect();
-        self.execute_git("diff", &paths)
+        self.execute_git("diff", &paths, &[])
     }
 
     pub fn pull(&self) -> ExitStatus{
-        self.execute_git("pull", &["origin", "master"])
+        self.execute_git("pull", &["origin", "master"], &[])
     }
 
     pub fn pull_rebase(&self) -> ExitStatus{
-        self.execute_git("pull", &["origin", "master", "--rebase"])
+        self.execute_git("pull", &["origin", "master", "--rebase"], &[])
     }
 
     pub fn remote(&self) -> ExitStatus{
-        self.execute_git("remote", &[])
+        self.execute_git("remote", &[], &[])
     }
 
     pub fn log(&self) -> ExitStatus{
-        self.execute_git("log", &[])
+        self.execute_git("log", &[], &[])
     }
 }
 
