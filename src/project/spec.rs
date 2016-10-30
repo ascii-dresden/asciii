@@ -263,7 +263,7 @@ pub mod date {
 
     pub fn their_bad(yaml: &Yaml) -> Option<Duration> {
         let invoice = try_some!(invoice(yaml));
-        let payed   = try_some!(payed(yaml));
+        let payed   = payed(yaml).unwrap_or_else(UTC::today);
         Some(invoice - payed)
     }
 
