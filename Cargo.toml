@@ -1,6 +1,6 @@
 [package]
 name = "asciii"
-version = "3.0.0-RC2"
+version = "3.0.0-RC3"
 authors = ["Hendrik Sollich <hendrik@hoodie.de>"]
 
 build = "build.rs"
