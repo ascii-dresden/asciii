@@ -199,10 +199,10 @@ impl Repository {
     }
 
     pub fn checkout (&self) -> ExitStatus{
-        self.execute_git("check out", &["origin", "master"])
+        self.execute_git("checkout", &["origin", "master"])
     }
 
-    pub fn clean(&self, paths:&[PathBuf]) -> ExitStatus{
+    pub fn cleanup(&self, paths:&[PathBuf]) -> ExitStatus{
         self.execute_git("clean", &["-d", "--force"])
     }
 

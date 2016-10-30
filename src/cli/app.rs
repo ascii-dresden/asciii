@@ -583,10 +583,10 @@ pub fn build_cli() -> App<'static, 'static>{
         .subcommand(SubCommand::with_name("pull")
                     .about("Pull and merge new commits from remote")
                    )
-        
+
         .subcommand(SubCommand::with_name("diff")
                     .about("git diff")
-                    .arg(Arg::with_name("seach_term")
+                    .arg(Arg::with_name("search_term")
                          .help("Search term, possibly event name")
                          .multiple(true)
                         )
@@ -604,9 +604,9 @@ pub fn build_cli() -> App<'static, 'static>{
                         )
                    )
 
-        .subcommand(SubCommand::with_name("clean")
-                    .about("cleans changes and untrack files in project folder")
-                    .arg(Arg::with_name("seach_term")
+        .subcommand(SubCommand::with_name("cleanun")
+                    .about("cleans changes and untracked files in project folder")
+                    .arg(Arg::with_name("search_term")
                          .help("Search term, possibly event name")
                          .multiple(true)
                         )

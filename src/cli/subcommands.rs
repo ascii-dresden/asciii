@@ -766,11 +766,12 @@ pub fn git_push(){
 //    util::exit(repo.stash())
 //}
 
-/// Command CLEAN
-pub fn git_clean(matches:&ArgMatches){
+/// Command CLEANUP
+pub fn git_cleanup(matches:&ArgMatches){
     let luigi = execute(||setup_luigi_with_git());
     let paths = matches_to_paths(matches, &luigi);
     let repo = luigi.repository.unwrap();
+    util::exit(repo.checkout(&paths))
     util::exit(repo.clean(&paths))
 }
 
