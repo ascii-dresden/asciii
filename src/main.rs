@@ -76,8 +76,10 @@ fn setup_app(){
      ("doc",       _          ) => subcommands::doc(),
      ("version",   _          ) => subcommands::version(),
 
+     ("dues",      Some(sub_m)) => subcommands::dues(sub_m),
+
      ("remote",    _          ) => subcommands::git_remote(),
-     ("pull",      _          ) => subcommands::git_pull(),
+     ("pull",      Some(sub_m)) => subcommands::git_pull(sub_m),
      ("diff",      Some(sub_m)) => subcommands::git_diff(sub_m),
      ("status",    _          ) => subcommands::git_status(),
      ("add",       Some(sub_m)) => subcommands::git_add(sub_m),

@@ -575,13 +575,36 @@ pub fn build_cli() -> App<'static, 'static>{
                     .about("Show your name from config")
                    )
 
+        .subcommand(SubCommand::with_name("dues")
+                    .about("Experimental: open does")
+
+                    .arg(Arg::with_name("invoices")
+                         .help("Show unpayed wages")
+                         .long("invoices")
+                         .short("i")
+                        )
+
+                    .arg(Arg::with_name("wages")
+                         .help("Show unpayed wages")
+                         .long("wages")
+                         .short("w")
+                         .conflicts_with("invoices")
+                        )
+
+                   )
+
         //# GIT STUFF
         .subcommand(SubCommand::with_name("status")
                     .aliases(&["st"])
                     .about("Show the working tree status")
                    )
+
         .subcommand(SubCommand::with_name("pull")
                     .about("Pull and merge new commits from remote")
+                    .arg(Arg::with_name("rebase")
+                         .help("git pull with --rebase")
+                         .long("rebase")
+                        )
                    )
         .subcommand(SubCommand::with_name("diff")
                     .about("git diff")

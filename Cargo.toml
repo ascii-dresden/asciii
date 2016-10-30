@@ -20,7 +20,7 @@ clap = "2"
 enum_derive = "0.1"
 custom_derive = "0.1"
 open = "1.1"
-ordered-float = "0.2"
+ordered-float = "0.3"
 error-chain = "0.5"
 
 bill = {git="https://github.com/hoodie/bill-rs"}

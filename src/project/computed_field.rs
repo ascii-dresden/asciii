@@ -35,6 +35,7 @@ custom_derive! {
         Year,
         Caterers,
         ClientFullName,
+        Wages,
 
         /// Sorting index
         SortIndex,
@@ -67,9 +68,10 @@ impl ComputedField {
             ComputedField::Date => project.date().map(|d| d.format("%Y.%m.%d").to_string()),
             ComputedField::SortIndex => project.index(),
 
-            ComputedField::Caterers => hours::caterers_string(project.yaml()),
+            ComputedField::Caterers       => hours::caterers_string(project.yaml()),
             ComputedField::ClientFullName => client::full_name(project.yaml()),
-            ComputedField::Invalid => None,
+            ComputedField::Wages          => project.wages().map(|c| currency_to_string(&c)),
+            ComputedField::Invalid        => None,
 
             // _ => None
         }

@@ -5,6 +5,7 @@
 
 
 use chrono::*;
+use bill::Currency;
 
 use std::{env,fs};
 use std::time;
@@ -92,7 +93,7 @@ pub fn projects_to_csv(projects:&[Project]) -> Result<String>{
                  project.get("Caterers").unwrap_or_else(|| String::from(r#""""#)),
                  project.get("Responsible").unwrap_or_else(|| String::from(r#""""#)),
                  project.get("invoice/payed_date").unwrap_or_else(|| String::from(r#""""#)),
-                 project.get("Final").unwrap_or_else(|| String::from(r#""""#)),
+                 project.sum_sold().map(|c|c.value().to_string()).unwrap_or_else(|_| String::from(r#""""#)),
                  project.canceled_string().to_owned()
         ].join(splitter)));
     }
@@ -205,6 +206,28 @@ fn file_age(path:&Path) -> Result<time::Duration> {
     let accessed = try!(metadata.accessed());
     Ok(try!(accessed.elapsed()))
 }
+
+/// Command DUES
+pub fn open_wages() -> Result<Currency>{
+    let luigi = try!(setup_luigi());
+    let projects = try!(luigi.open_projects(StorageDir::Working));
+    Ok(projects.iter()
+        .filter(|p| !p.canceled() && p.age().unwrap_or(0) > 0)
+        .filter_map(|p| p.wages())
+        .fold(Currency::default(), |acc, x| acc + x))
+}
+
+
+/// Command DUES
+pub fn open_payments() -> Result<Currency>{
+    let luigi = try!(setup_luigi());
+    let projects = try!(luigi.open_projects(StorageDir::Working));
+    Ok(projects.iter()
+       .filter(|p| !p.canceled() && !p.payed_by_client() && p.age().unwrap_or(0) > 0)
+       .filter_map(|p| p.sum_sold().ok())
+       .fold(Currency::default(), |acc, x| acc + x))
+}
+
 
 /// Testing only, tries to run complete spec on all projects.
 /// TODO make this not panic :D

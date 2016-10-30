@@ -631,6 +631,18 @@ pub fn version(){
     println!("{}", *asciii::VERSION);
 }
 
+/// Command DUES
+pub fn dues(matches:&ArgMatches){
+    let dues = if matches.is_present("wages") {
+        actions::open_wages()
+    } else {
+        actions::open_payments()
+    };
+    if let Ok(dues) = dues {
+        println!("{}", dues.postfix());
+    }
+}
+
 pub fn show_path(matches:&ArgMatches){path(matches, |path| println!("{}", path.display()))}
 
 //pub fn open_path(matches:&ArgMatches){path(matches, |path| {open::that(path).unwrap();})}
@@ -728,7 +740,6 @@ pub fn git_remote(){
 }
 
 /// Command ADD
-
 pub fn git_add(matches:&ArgMatches){
     let luigi = execute(||setup_luigi_with_git());
     let paths = matches_to_paths(matches, &luigi);
@@ -746,10 +757,15 @@ pub fn git_diff(matches:&ArgMatches){
 }
 
 /// Command PULL
-pub fn git_pull(){
+pub fn git_pull(matches:&ArgMatches){
     let luigi = execute(||setup_luigi_with_git());
     let repo = luigi.repository.unwrap();
-    util::exit(repo.pull())
+
+    if matches.is_present("rebase"){
+        util::exit(repo.pull_rebase())
+    } else {
+        util::exit(repo.pull())
+    }
 }
 
 /// Command PUSH
