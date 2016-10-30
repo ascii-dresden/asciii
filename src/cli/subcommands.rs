@@ -787,8 +787,18 @@ pub fn git_cleanup(matches:&ArgMatches){
     let luigi = execute(||setup_luigi_with_git());
     let paths = matches_to_paths(matches, &luigi);
     let repo = luigi.repository.unwrap();
-    repo.checkout(&paths); // TODO implement `.and()` for exitstatus
-    util::exit(repo.cleanup(&paths))
+    // TODO implement `.and()` for exitstatus
+
+    if util::really(&format!("Do you really want to reset any changes you made to:\n {:?}\n[y|N]", paths))
+    {
+        let checkout_status = repo.checkout(&paths);
+        if checkout_status.success() {
+            util::exit(repo.clean(&paths))
+        } else {
+            debug!("clean checkout was no success");
+            util::exit(checkout_status)
+        }
+    }
 }
 
 /// Command DIFF

@@ -205,7 +205,7 @@ impl Repository {
         self.execute_git("checkout", &[], paths)
     }
 
-    pub fn cleanup(&self, paths:&[PathBuf]) -> ExitStatus{
+    pub fn clean(&self, paths:&[PathBuf]) -> ExitStatus{
         self.execute_git("clean", &["-d", "--force"], paths)
     }
 
