@@ -387,7 +387,8 @@ fn edit_template(name: &str, editor: &Option<&str>) {
 
 /// Command SET
 pub fn set(m: &ArgMatches) {
-    let field = execute(|| m.value_of("field name"))
+    let field = m.value_of("field name")
+                            .unwrap()
                             .chars()
                             .flat_map(|c| c.to_uppercase())
                             .collect::<String>();
