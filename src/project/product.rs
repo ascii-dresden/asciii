@@ -14,7 +14,11 @@ pub mod error{
         links { }
         foreign_links { }
         errors {
-            InvalidPrice {}
+            InvalidPrice (product:String){
+                description("A product has either no or an invalid price.")
+                display("Invalid price in {}", product)
+            }
+
             UnknownFormat {}
             AmbiguousAmounts(t:String){
                 description("more returned than provided")
@@ -54,7 +58,7 @@ impl<'a> Product<'a>{
             unit: yaml::get_str(values, "unit"),
             price: try!(yaml::get_f64(values, "price")
                 .map(to_currency)
-                .ok_or(Error::from(ErrorKind::InvalidPrice))
+                .ok_or_else(||Error::from(ErrorKind::InvalidPrice(name.to_string())))
                 ),
             tax: yaml::get_f64(values, "tax").unwrap_or(default_tax).into(),
         })
@@ -64,11 +68,12 @@ impl<'a> Product<'a>{
         //TODO read default tax from document
         let default_tax = ::CONFIG.get_f64("defaults/tax")
             .expect("Faulty config: field defaults/tax does not contain a value");
+        let name = yaml::get_str(desc, "name").unwrap_or("unnamed");
         Ok(Product {
-            name: yaml::get_str(desc, "name").unwrap_or("unnamed"),
+            name: name,
             unit: yaml::get_str(desc, "unit"),
             price: try!(yaml::get_f64(desc, "price")
-                .ok_or(Error::from(ErrorKind::InvalidPrice))
+                .ok_or_else(||Error::from(ErrorKind::InvalidPrice(name.to_string())))
                 .map(to_currency)),
             tax: yaml::get_f64(desc, "tax").unwrap_or(default_tax).into(),
         })

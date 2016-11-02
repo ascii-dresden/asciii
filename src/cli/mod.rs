@@ -26,10 +26,15 @@ pub fn fail<T:Display>(message:T) -> !{
 }
 
 /// Execute a command returning a `StorageError`
-/// TODO make this a `try!` like macro
-fn execute<F, S, E:Error>(command:F) -> S where F: FnOnce() -> Result<S, E> {
+pub fn execute<F, S, E:Error>(command:F) -> S where F: FnOnce() -> Result<S, E> {
     match command(){
         Ok(s) => s,
-        Err(lerr) => { error!("{}", lerr); exit(1) }
+        Err(lerr) => {
+            error!("{}", lerr);
+            if let Some(cause) = lerr.cause() {
+                println!("caused by {}", cause);
+            }
+            exit(1)
+        }
     }
 }

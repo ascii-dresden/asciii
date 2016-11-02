@@ -1,11 +1,11 @@
 use asciii;
 use clap::{App, AppSettings, Arg, ArgMatches, SubCommand};
 
-pub fn setup() -> ArgMatches<'static>{
+pub fn setup() -> ArgMatches<'static> {
     build_cli().get_matches()
 }
 
-pub fn build_cli() -> App<'static, 'static>{
+pub fn build_cli() -> App<'static, 'static> {
     App::new("asciii")
         .author(crate_authors!())
         .version(asciii::VERSION.as_ref())
@@ -689,14 +689,13 @@ pub fn build_cli() -> App<'static, 'static>{
                    )
 }
 
-pub mod validators{
+pub mod validators {
     use asciii::util::yaml::parse_dmy_date;
 
-    pub fn is_dmy(val: String) -> Result<(),String>{
-        match parse_dmy_date(&val){
+    pub fn is_dmy(val: String) -> Result<(), String> {
+        match parse_dmy_date(&val) {
             Some(_) => Ok(()),
             None => Err(String::from("Date Format must be DD.MM.YYYY")),
         }
     }
 }
-

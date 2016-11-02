@@ -70,7 +70,7 @@ impl ToJson for Project{
         let (offer,invoice) = match self.bills() {
             Ok(bills) => bills,
             Err(err) => {
-                error!("Cannot create Bill {}", err.description());
+                error!("Cannot create Bill because: {}", err.description());
                 process::exit(1);
             },
         };

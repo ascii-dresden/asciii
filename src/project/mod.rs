@@ -258,7 +258,7 @@ impl Project {
     }
 
     /// Returs a tuple containing both `(Order,` and ` Invoice)`
-    pub fn bills(&self) -> Result<(Bill<Product>, Bill<Product>)>{
+    pub fn bills(&self) -> Result<(Bill<Product>, Bill<Product>)> {
         Ok(try!(spec::billing::bills(&self.yaml)))
     }
 

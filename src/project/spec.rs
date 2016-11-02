@@ -12,28 +12,6 @@ use util::yaml::Yaml;
 
 pub type SpecResult<'a> = ::std::result::Result<(), Vec<&'a str>>;
 
-pub mod error{
-    #![allow(trivial_casts)]
-    error_chain!{
-        types { }
-        links { }
-        foreign_links { }
-        errors {
-            InvalidPrice {}
-            UnknownFormat {}
-            AmbiguousAmounts(t:String){
-                description("more returned than provided")
-            }
-            MissingAmount(t:String){
-                description("invalid price")
-            }
-            TooMuchReturned(t:String){
-                description("invalid format")
-            }
-        }
-    }
-}
-
 // TODO there may be cases where an f64 can't be converted into Currency
 pub fn to_currency(f: f64) -> Currency {
     Currency(::CONFIG.get_char("currency"), (f * 1000.0) as i64) / 10
@@ -492,6 +470,16 @@ pub mod hours {
         //.or_else(|| )
     }
 
+    //pub fn total_salary(yaml: &Yaml) -> SpecResult<(f64,Currency)> {
+    //    let salary = salary(yaml);
+    //    let total = total(yaml);
+    //    match (salary, total) {
+    //        (Some(0), Some(t)) if t > 0  => Err(),
+    //        (None, Some(_)) => Err(),
+    //        (Some(s), Some(t)) => Ok((t,s))
+    //    }
+    //}
+
     /// Nicely formated list of caterers with their respective service hours
     pub fn caterers_string(yaml: &Yaml) -> Option<String> {
         caterers(yaml).map(|v| {
@@ -521,7 +509,7 @@ pub mod hours {
 
 /// Generates `Bill`s for offer and invoice.
 pub mod billing {
-    use bill::{BillItem, Bill};
+    use bill::{BillItem, Bill,Currency};
 
     use util::yaml;
     use util::yaml::Yaml;
@@ -563,7 +551,7 @@ pub mod billing {
             name: "Service",
             unit: Some("h"),
             tax: ::ordered_float::OrderedFloat(0f64), // TODO this ought to be in the config
-            price: super::hours::salary(&yaml).unwrap()
+            price: super::hours::salary(&yaml).unwrap_or(Currency(None,0))
         };
 
         if let Some(total) = super::hours::total(&yaml) {

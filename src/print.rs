@@ -306,7 +306,13 @@ pub fn show_details(project:&Project, bill_type:&BillType) {
     trace!("print::show_details()");
     println!("{}: {}", bill_type.to_string(), project.name());
 
-    let (offer, invoice) = project.bills().unwrap();
+    let (offer, invoice) = match project.bills() {
+        Ok(tuple) => tuple,
+        Err(e) => {
+            error!("{}", e);
+            return
+        }
+    };
 
     let bill = match *bill_type {
         BillType::Offer => offer,
