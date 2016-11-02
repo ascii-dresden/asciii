@@ -10,8 +10,7 @@ build = "build.rs"
 
 log = "0.3"
 env_logger = { version = "0.3"} # default feature requires regex
-yaml-rust = {git="https://github.com/hoodie/yaml-rust", branch="future_master"}
-#yaml-rust = "0.3"
+yaml-rust = {version = "0.3", features = ["preserve_order"]}
 chrono = "0.2"
 regex = "0.1"
 lazy_static = "0.2"
@@ -32,7 +31,6 @@ term = "0.4"
 prettytable-rs = { version = "0.6"}
 
 # feature: lints
-clippy = {version = "*", optional = true}
 #herbie-lint = {version = "*", optional = true}
 
 # feature: document_export
@@ -49,7 +47,6 @@ default = ["document_export", "git_statuses"]
 document_export = ["rustc-serialize", "handlebars"]
 git_statuses = ["git2"]
 nightly = []
-lints = ["clippy"]
 
 [profile.release]
 lto = true
