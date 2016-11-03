@@ -75,7 +75,7 @@ pub fn build_cli() -> App<'static, 'static> {
                     )
 
         .subcommand(SubCommand::with_name("list")
-                    .aliases(&["ls", "dir", "l", "lsit"])
+                    .aliases(&["ls", "dir", "la", "l", "lsit"])
                     .about("List Projects")
                     .arg(Arg::with_name("archive")
                          .help("list archived projects of a specific year, defaults to the current year")
