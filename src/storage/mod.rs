@@ -399,6 +399,21 @@ impl<L:Storable> Storage<L> {
         Ok(moved_files)
     }
 
+    pub fn delete_project_if<F>(&self, project:&L, confirmed:F) -> StorageResult<()>
+        where F: Fn() -> bool
+    {
+        debug!("deleting {}", project.dir().display());
+        try!(project.delete_project_dir_if(confirmed));
+        if let Some(ref repo) = self.repository {
+            if !repo.add(&[project.dir()]).success() {
+                debug!("adding {} to git", project.dir().display());
+                return Err(StorageError::GitProcessFailed);
+            }
+        }
+        Ok(())
+    }
+
+
     /// Moves projects found through `search_terms` from the `year` back to the `Working` directory.
     ///
     /// Returns list of old and new paths.

@@ -266,9 +266,9 @@ pub fn spec() -> Result<()> {
 }
 
 pub fn delete_project_confirmation(dir: StorageDir, search_terms:&[&str]) -> Result<()> {
-    let luigi = try!(setup_luigi());
+    let luigi = try!(setup_luigi_with_git());
     for project in try!(luigi.search_projects_any(dir, search_terms)) {
-        try!(project.delete_project_dir_if(
+        try!(luigi.delete_project_if(&project,
                 || util::really(&format!("you want me to delete {:?} [y/N]", project.dir())) && util::really("really? [y/N]")
                 ))
     }

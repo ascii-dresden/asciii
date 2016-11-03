@@ -28,6 +28,7 @@ pub enum StorageError {
     InvalidDirStructure,
     ParseError(YamlError), // TODO: Make ParseError more generic
     TemplateNotFound,
+    GitProcessFailed,
     Git(GitError),
     Io(io::Error),
     Template(TemplateError),
@@ -55,6 +56,7 @@ impl Error for StorageError{
             StorageError::InvalidDirStructure      => "The filestructure under storage path does not correspond with the configuration.",
             StorageError::ParseError(ref inner)    => inner.description(),
             StorageError::TemplateNotFound         => "The described template file does not exist.",
+            StorageError::GitProcessFailed         => "Calling `git` failed",
             StorageError::Git(ref inner)           => inner.description(),
             StorageError::Io(ref inner)            => inner.description(),
             StorageError::Template(ref inner)      => inner.description(),
