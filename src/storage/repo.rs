@@ -46,6 +46,7 @@ impl GitStatus{
          GitStatus::WorkingModified => (color::YELLOW,  None),
          GitStatus::IndexNew        => (color::GREEN,   Some(Attr::Bold)),
          GitStatus::IndexModified   => (color::BLUE,    Some(Attr::Bold)),
+         GitStatus::IndexDeleted    => (color::RED,     None),
          _                          => (color::WHITE,   None)
         }
     }
@@ -56,12 +57,13 @@ impl fmt::Display for GitStatus{
 // X ✘ ✓
         match *self{
         // => write!(f, "{:?}", self)
-         GitStatus::Conflict        => write!(f, "X"),
+         GitStatus::Conflict        => write!(f, "~"),
          GitStatus::Current         => write!(f, "+"),
          GitStatus::WorkingNew      => write!(f, "+"),
          GitStatus::WorkingModified => write!(f, "~"),
          GitStatus::IndexNew        => write!(f, "✓"),
          GitStatus::IndexModified   => write!(f, "✓"),
+         GitStatus::IndexDeleted    => write!(f, "✘"),
          GitStatus::Unknown         => write!(f, "" ),
          _                          => write!(f, "{:?}", self),
 

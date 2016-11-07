@@ -20,7 +20,8 @@ use super::BillType;
 use util;
 use util::yaml;
 use storage::list_path_content;
-use storage::{Storable,StorageError,StorageResult};
+use storage::{Storable,StorageResult};
+use storage::ErrorKind as StorageErrorKind;
 use storage::repo::GitStatus;
 use templater::{Templater, IsKeyword};
 
@@ -340,9 +341,9 @@ impl Project {
 
 }
 
-impl From<yaml::YamlError> for StorageError {
-    fn from(yerror: yaml::YamlError) -> StorageError{ StorageError::ParseError(yerror) }
-}
+//impl From<yaml::YamlError> for StorageError {
+//    fn from(yerror: yaml::YamlError) -> StorageError{ StorageError::ParseError(yerror) }
+//}
 
 impl Storable for Project{
     fn file_extension() -> &'static str {PROJECT_FILE_EXTENSION}
@@ -455,7 +456,7 @@ impl Storable for Project{
         let file_path = try!(try!(list_path_content(folder_path)).iter()
             .filter(|f|f.extension().unwrap_or(&OsStr::new("")) == PROJECT_FILE_EXTENSION)
             .nth(0).map(|b|b.to_owned())
-            .ok_or(StorageError::ProjectDoesNotExist));
+            .ok_or(StorageErrorKind::ProjectDoesNotExist));
         Self::open_file(&file_path)
     }
 
