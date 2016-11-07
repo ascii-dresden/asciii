@@ -531,6 +531,7 @@ pub fn build_cli() -> App<'static, 'static> {
                          .help("list archived projects")
                          .short("a")
                          .long("archive")
+                         .min_values(0)
                          .takes_value(true)
                         )
                     //.arg(Arg::with_name("template")
