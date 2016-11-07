@@ -2,8 +2,9 @@
 name = "asciii"
 version = "3.0.0-RC3"
 authors = ["Hendrik Sollich <hendrik@hoodie.de>"]
+license = "MIT/Apache-2.0"
 
-build = "build.rs"
+#build = "build.rs"
 
 
 [dependencies]

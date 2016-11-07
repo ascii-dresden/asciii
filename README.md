@@ -1,70 +1,38 @@
 # asciii-rs
 
-The advanced but simple commandline interface to invoice invocation.
+The **a**dvanced but **s**imple **c**ommandline **i**nterface for **i**nvoice **i**nvocation.
 
 Here I rewrite the original [ascii-invoicer](http://github.com/ascii-dresden/ascii-invoicer) in Rust. Why? Because!
 
-## Status
+## Introduction
 
-This has evolved from a technical experiment into a full blown rewrite,
-I'm currently working on restoring full functionality and release the first version with the number [3.0.0](https://github.com/hoodie/asciii-rs/milestones/3.0.0).
-
-This should hopefully run smoothly on the same platforms that ascii 2 currently runs on.
+The ascii-invoicer is a command-line tool that manages projects and stores them not in a database but in a folder structure. New projects can be created from templates and are stored in a working directory. Projects can be archived, each year will have its own archive. A project consists of a folder containing a yaml file describing it and a number of attached files, such tex files. Projects can contain products and personal. You can create preliminary offers and invoices from your projects.
 
 
-## Build
+## Installation
 
-Just plain old `cargo build` will do.
+### Archlinux
+You can install the package `asciii-git` from the AUR.
 
-### Features
+### Using cargo
+Just plain old `cargo install --git https://github.com/hoodie/asciii-rs` will do.
 
-Currently a few things are only build-features.
-Use `cargo build --features lints` to build with [clippy](https://github.com/Manishearth/rust-clippy).
-Use `cargo build --features nightly` to use nightly features:
-  * currently only system allocators
+### Requirements
 
-Use `cargo build --features debug` to enable debug prints, this is sorta deprecated, it is only necessary to debug config, because is initialized by lazy_static before even the logger is set up.
-
-### Release
-To build a release ready version use `cargo build --release`.
-
-### Chores
-
-* `cargo build` and `cargo test` against every new rustc
-* run `cargo outdated` regularly
+You need at least `rustc`, `cargo`, `cmake` and `git` to run this.
 
 
-## Logging
+## Usage
+After installation simply run `asciii` and it will present you with a list of possible subcommands. `asciii help list` will give you a comprehensive explanation of  what `asciii list` does.
 
-asciii uses rust [env_logger](http://doc.rust-lang.org/log/env_logger).
+You can also run `asciii doc` which will take you to the complete [online user and development documentation](http://hoodie.github.io/asciii-rs/asciii/manual/index.html).
+Further information may be found in the [README of version 2.5](https://github.com/ascii-dresden/ascii-invoicer/blob/master/README.md)
+
+
+### Logging
+
+`asciii` uses Rusts [env_logger](http://doc.rust-lang.org/log/env_logger).
 To enable logging you have to set `ASCIII_LOG=debug`.
 Besides `debug`, you can also use `trace`, `warn` or `error`.
 You can enable logging per-module logging like this: `ASCIII_LOG=storage=debug`.
 Modules are all top-level files and folders in `src/`.
-
-## Technical TODO
-
-* [ ] setup CI
-    * [ ] test on windows and mac (https://github.com/japaric/rust-everywhere)
-* [x] build on Raspberry Pi
-* [ ] see if you can `#[inline]` to improve perfomance
-
-### make use if these crates (optional)
-
-* [ ] xdg / xdg-basedir
-* [x] env_logger
-* [ ] cool faces
-* [x] open
-* [ ] notify-rust
-* [ ] strsim
-
-
-## Side Effects
-
-While working on this I had the chance to also contribute to a number of crates that asciii depends on.
-These include:
-
-* [prettytables-rs](https://github.com/phsym/prettytable-rs/)
-* [yaml-rust](https://github.com/chyh1990/yaml-rust)
-* [currency](https://github.com/Tahler/rust-lang-currency)
-* [open-rs](https://github.com/byron/open-rs)
