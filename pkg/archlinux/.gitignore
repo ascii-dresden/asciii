@@ -1,0 +1,6 @@
+*.tar*
+*.db*
+src
+pkg
+asciii-rs
+asciii-files
