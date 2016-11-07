@@ -30,11 +30,14 @@ pub fn build_cli() -> App<'static, 'static> {
 
                     .arg(Arg::with_name("date")
                          .help("Manually set the date of the project")
-                         //.validator(validators::is_dmy)
+                         .validator(validators::is_dmy)
+                         .short("d")
+                         .long("date")
                          .takes_value(true))
 
                     .arg(Arg::with_name("description")
                          .help("Override the description of the project")
+                         .long("desc")
                          .takes_value(true))
 
                     .arg(Arg::with_name("template")
@@ -530,6 +533,11 @@ pub fn build_cli() -> App<'static, 'static> {
                          .long("archive")
                          .takes_value(true)
                         )
+                    //.arg(Arg::with_name("template")
+                    //     .help("A template")
+                    //     .short("t")
+                    //     .long("template")
+                    //    )
                    )
 
 

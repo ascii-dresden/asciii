@@ -345,7 +345,7 @@ pub fn edit(matches: &ArgMatches) {
         .or(CONFIG.get("user/editor").and_then(|e| e.as_str()));
 
     if matches.is_present("template") {
-        edit_template(search_term, &editor);
+        with_templates(search_term, |template_paths:&[PathBuf]| util::pass_to_command(&editor, template_paths));
 
     } else if let Some(archive) = matches.value_of("archive") {
         let archive = archive.parse::<i32>().unwrap();
@@ -376,13 +376,15 @@ fn edit_projects(dir: StorageDir, search_terms: &[&str], editor: &Option<&str>) 
 }
 
 /// Command EDIT --template
-fn edit_template(name: &str, editor: &Option<&str>) {
+fn with_templates<F>(name: &str, action: F)
+    where F: FnOnce(&[PathBuf])
+{
     let luigi = execute(setup_luigi);
     let template_paths = execute(||luigi.list_template_files())
         .into_iter() // drain?
         .filter(|f|f.file_stem() .unwrap_or_else(||OsStr::new("")) == name)
         .collect::<Vec<PathBuf>>();
-    util::pass_to_command(editor, &template_paths);
+    action(template_paths.as_slice());
 }
 
 /// Command SET
@@ -530,7 +532,11 @@ pub fn make(m: &ArgMatches) {
 /// Command DELETE
 pub fn delete(m: &ArgMatches) {
     let (search_terms, dir) = matches_to_search(m);
-    execute(|| actions::delete_project_confirmation(dir, &search_terms));
+    if m.is_present("template") {
+        unimplemented!();
+    } else {
+        execute(|| actions::delete_project_confirmation(dir, &search_terms));
+    }
 }
 
 #[cfg(not(feature="document_export"))]
