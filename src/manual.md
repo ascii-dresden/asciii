@@ -25,13 +25,16 @@ You can create preliminary offers and invoices from your projects.
 
 ## Installation
 
-Get a current binary from github (TODO) or build it for your platform.
+### Archlinux User Repository
+
+You find the AUR package [asciii-git](https://aur.archlinux.org/packages/asciii-git), or contact me personally about the inofficial repo with the binary packages.
+Debian and Windows packages are on the way.
 
 ### Build Requirements
 
 * rustc ≥ 1.11.0
 * cargo
-* optionally: for full feature completeness you also need everything to build libgit2
+* optionally: for full feature completeness you also need cmake to build libgit2
 
 Just run `cargo build --release` or `cargo install --path .`
 
@@ -59,12 +62,15 @@ asciii show NAMES                   # Shows information about a project in diffe
 
 ### Project Life-Cycle
 
+
 ```bash
 asciii new NAME                     # Creating a new project
 asciii edit NAMES                   # Edit project
-// asciii offer NAMES                  # Create an offer from project
-// asciii invoice NAMES                # Create an invoice from project
-asciii make NAME
+asciii make NAME                    # Creates an Offer
+
+asciii edit NAMES                   # Edit project
+asciii make NAME                    # Creates an Invoice
+
 asciii archive NAME                 # Move project to archive
 asciii unarchive YEAR NAME          # reopen an archived project
 asciii delete NAME                  # If you really have to
@@ -76,6 +82,7 @@ asciii delete NAME                  # If you really have to
 asciii add NAMES
 asciii commit
 asciii pull / push
+asciii cleanup
 asciii status, log, diff, stash, pop
 ```
 
@@ -167,7 +174,7 @@ client:
     01187 Dresden
 ```
 
-**TODO MARKER**
+The event files can be filled
 
 ```yaml
 event:
