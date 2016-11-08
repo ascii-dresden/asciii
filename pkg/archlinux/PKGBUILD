@@ -1,11 +1,11 @@
 # Maintainer: Hendrik Sollich <hendrik@hoodie.de>
 _pkgname=asciii
 pkgname=${_pkgname}
-pkgver=3.0.0rc.259 # auto
+pkgver=3.0.0rc.261 # auto
 pkgrel=1
 #makedepends=('rust' 'cargo' 'cmake')
 arch=('i686' 'x86_64')
-source=("git+https://github.com/hoodie/asciii-rs.git")
+source=("git+https://github.com/ascii-dresden/asciii-rs.git")
 md5sums=('SKIP')
 replaces=('asciii-git')
 license=('MIT/Apache-2.0')

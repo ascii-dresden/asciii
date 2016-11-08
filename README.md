@@ -15,7 +15,7 @@ The ascii-invoicer is a command-line tool that manages projects and stores them 
 You can install the package `asciii-git` from the AUR.
 
 ### Using cargo
-Just plain old `cargo install --git https://github.com/hoodie/asciii-rs` will do.
+Just plain old `cargo install --git https://github.com/ascii-dresden/asciii-rs` will do.
 
 ### Requirements
 
@@ -25,7 +25,7 @@ You need at least `rustc`, `cargo`, `cmake` and `git` to run this.
 ## Usage
 After installation simply run `asciii` and it will present you with a list of possible subcommands. `asciii help list` will give you a comprehensive explanation of  what `asciii list` does.
 
-You can also run `asciii doc` which will take you to the complete [online user and development documentation](http://hoodie.github.io/asciii-rs/asciii/manual/index.html).
+You can also run `asciii doc` which will take you to the complete [online user and development documentation](http://ascii-dresden.github.io/asciii-rs/doc).
 Further information may be found in the [README of version 2.5](https://github.com/ascii-dresden/ascii-invoicer/blob/master/README.md)
 
 
