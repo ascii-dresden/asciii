@@ -47,7 +47,7 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-2244' class='srclink' href='../../src/asciii/src/actions/mod.rs.html#1-291' title='goto source code'>[src]</a></span></h1>
+               </span><a id='src-1442' class='srclink' href='../../src/asciii/src/actions/mod.rs.html#1-290' title='goto source code'>[src]</a></span></h1>
 <div class='docblock'><p>General actions</p>
 </div><h2 id='modules' class='section-header'><a href="#modules">Modules</a></h2>
 <table>
@@ -60,8 +60,8 @@
                        </tr></table><h2 id='functions' class='section-header'><a href="#functions">Functions</a></h2>
 <table>
                        <tr class=' module-item'>
-                           <td><a class='fn' href='fn.archive_project.html'
-                                  title='asciii::actions::archive_project'>archive_project</a></td>
+                           <td><a class='fn' href='fn.archive_projects.html'
+                                  title='asciii::actions::archive_projects'>archive_projects</a></td>
                            <td class='docblock-short'>
                                 
                            </td>
@@ -81,6 +81,27 @@
                            </td>
                        </tr>
                        <tr class=' module-item'>
+                           <td><a class='fn' href='fn.open_payments.html'
+                                  title='asciii::actions::open_payments'>open_payments</a></td>
+                           <td class='docblock-short'>
+                                <p>Command DUES</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class='fn' href='fn.open_wages.html'
+                                  title='asciii::actions::open_wages'>open_wages</a></td>
+                           <td class='docblock-short'>
+                                <p>Command DUES</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class='fn' href='fn.project_to_doc.html'
+                                  title='asciii::actions::project_to_doc'>project_to_doc</a></td>
+                           <td class='docblock-short'>
+                                <p>Creates the latex files within each projects directory, either for Invoice or Offer.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
                            <td><a class='fn' href='fn.projects_to_csv.html'
                                   title='asciii::actions::projects_to_csv'>projects_to_csv</a></td>
                            <td class='docblock-short'>
@@ -89,8 +110,8 @@ TODO this still contains german terms</p>
                            </td>
                        </tr>
                        <tr class=' module-item'>
-                           <td><a class='fn' href='fn.projects_to_tex.html'
-                                  title='asciii::actions::projects_to_tex'>projects_to_tex</a></td>
+                           <td><a class='fn' href='fn.projects_to_doc.html'
+                                  title='asciii::actions::projects_to_doc'>projects_to_doc</a></td>
                            <td class='docblock-short'>
                                 <p>Creates the latex files within each projects directory, either for Invoice or Offer.</p>
                            </td>
@@ -137,7 +158,8 @@ TODO: return a list of files that have to be updated in git</p>
                            <td><a class='fn' href='fn.with_projects.html'
                                   title='asciii::actions::with_projects'>with_projects</a></td>
                            <td class='docblock-short'>
-                                <p>Helper method that passes projects matching the <code>search_terms</code> to the passt closure <code>f</code></p>
+                                <p>Helper method that passes projects matching the <code>search_terms</code> to the passt closure <code>f</code>
+TODO Really move this to <code>Storage</code></p>
                            </td>
                        </tr></table></section>
     <section id='search' class="content hidden"></section>
@@ -195,11 +217,9 @@ TODO: return a list of files that have to be updated in git</p>
     <script>
         window.rootPath = "../../";
         window.currentCrate = "asciii";
-        window.playgroundUrl = "";
     </script>
     <script src="../../jquery.js"></script>
     <script src="../../main.js"></script>
-    
     <script defer src="../../search-index.js"></script>
 </body>
 </html>

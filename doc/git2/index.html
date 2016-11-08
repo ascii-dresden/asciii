@@ -47,7 +47,7 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-0' class='srclink' href='../src/git2/lib.rs.html#1-915' title='goto source code'>[src]</a></span></h1>
+               </span><a id='src-0' class='srclink' href='../src/git2/lib.rs.html#1-917' title='goto source code'>[src]</a></span></h1>
 <div class='docblock'>
 <h1 id='libgit2-bindings-for-rust' class='section-header'><a href='#libgit2-bindings-for-rust'>libgit2 bindings for Rust</a></h1>
 <p>This library contains bindings to the <a href="https://libgit2.github.com/">libgit2</a> C library which is used
@@ -74,7 +74,7 @@ already exist.</p>
 <span class='kw'>let</span> <span class='ident'>repo</span> <span class='op'>=</span> <span class='kw'>match</span> <span class='ident'>Repository</span>::<span class='ident'>init</span>(<span class='string'>&quot;/path/to/a/repo&quot;</span>) {
     <span class='prelude-val'>Ok</span>(<span class='ident'>repo</span>) <span class='op'>=&gt;</span> <span class='ident'>repo</span>,
     <span class='prelude-val'>Err</span>(<span class='ident'>e</span>) <span class='op'>=&gt;</span> <span class='macro'>panic</span><span class='macro'>!</span>(<span class='string'>&quot;failed to init: {}&quot;</span>, <span class='ident'>e</span>),
-};<a class='test-arrow' target='_blank' href=''>Run</a></pre>
+};</pre>
 
 <h3 id='opening-an-existing-repository' class='section-header'><a href='#opening-an-existing-repository'>Opening an existing repository</a></h3>
 <pre class='rust rust-example-rendered'>
@@ -83,7 +83,7 @@ already exist.</p>
 <span class='kw'>let</span> <span class='ident'>repo</span> <span class='op'>=</span> <span class='kw'>match</span> <span class='ident'>Repository</span>::<span class='ident'>open</span>(<span class='string'>&quot;/path/to/a/repo&quot;</span>) {
     <span class='prelude-val'>Ok</span>(<span class='ident'>repo</span>) <span class='op'>=&gt;</span> <span class='ident'>repo</span>,
     <span class='prelude-val'>Err</span>(<span class='ident'>e</span>) <span class='op'>=&gt;</span> <span class='macro'>panic</span><span class='macro'>!</span>(<span class='string'>&quot;failed to open: {}&quot;</span>, <span class='ident'>e</span>),
-};<a class='test-arrow' target='_blank' href=''>Run</a></pre>
+};</pre>
 
 <h3 id='cloning-an-existing-repository' class='section-header'><a href='#cloning-an-existing-repository'>Cloning an existing repository</a></h3>
 <pre class='rust rust-example-rendered'>
@@ -93,7 +93,7 @@ already exist.</p>
 <span class='kw'>let</span> <span class='ident'>repo</span> <span class='op'>=</span> <span class='kw'>match</span> <span class='ident'>Repository</span>::<span class='ident'>clone</span>(<span class='ident'>url</span>, <span class='string'>&quot;/path/to/a/repo&quot;</span>) {
     <span class='prelude-val'>Ok</span>(<span class='ident'>repo</span>) <span class='op'>=&gt;</span> <span class='ident'>repo</span>,
     <span class='prelude-val'>Err</span>(<span class='ident'>e</span>) <span class='op'>=&gt;</span> <span class='macro'>panic</span><span class='macro'>!</span>(<span class='string'>&quot;failed to clone: {}&quot;</span>, <span class='ident'>e</span>),
-};<a class='test-arrow' target='_blank' href=''>Run</a></pre>
+};</pre>
 
 <h2 id='working-with-a-repository' class='section-header'><a href='#working-with-a-repository'>Working with a <code>Repository</code></a></h2>
 <p>All deriviative objects, references, etc are attached to the lifetime of the
@@ -523,6 +523,13 @@ structures.</p>
                                   title='git2::Progress'>Progress</a></td>
                            <td class='docblock-short'>
                                 <p>Struct representing the progress by an in-flight transfer.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class='struct' href='struct.ProxyOptions.html'
+                                  title='git2::ProxyOptions'>ProxyOptions</a></td>
+                           <td class='docblock-short'>
+                                <p>Options which can be specified to various fetch operations.</p>
                            </td>
                        </tr>
                        <tr class=' module-item'>
@@ -1608,11 +1615,9 @@ lines starting with that character.</p>
     <script>
         window.rootPath = "../";
         window.currentCrate = "git2";
-        window.playgroundUrl = "";
     </script>
     <script src="../jquery.js"></script>
     <script src="../main.js"></script>
-    
     <script defer src="../search-index.js"></script>
 </body>
 </html>

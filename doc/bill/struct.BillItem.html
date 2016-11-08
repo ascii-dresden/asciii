@@ -47,19 +47,25 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-59' class='srclink' href='../src/bill/lib.rs.html#56-59' title='goto source code'>[src]</a></span></h1>
+               </span><a id='src-169' class='srclink' href='../src/bill/item.rs.html#5-8' title='goto source code'>[src]</a></span></h1>
 <pre class='rust struct'>pub struct BillItem&lt;P&gt; {
     pub amount: <a class='type' href='../bill/type.Amount.html' title='bill::Amount'>Amount</a>,
     pub product: P,
-}</pre><h2 class='fields'>Fields</h2><span id='structfield.amount' class='structfield'>
+}</pre><div class='docblock'><p>Mapps a <code>BillProduct</code> to an amount.</p>
+</div><h2 class='fields'>Fields</h2><span id='structfield.amount' class='structfield'>
                            <span id='amount.v' class='invisible'>
                            <code>amount: <a class='type' href='../bill/type.Amount.html' title='bill::Amount'>Amount</a></code>
                            </span></span><span class='stab '></span><span id='structfield.product' class='structfield'>
                            <span id='product.v' class='invisible'>
                            <code>product: P</code>
-                           </span></span><span class='stab '></span><h2 id='methods'>Methods</h2><h3 class='impl'><span class='in-band'><code>impl&lt;P:&nbsp;<a class='trait' href='../bill/trait.BillProduct.html' title='bill::BillProduct'>BillProduct</a>&gt; <a class='struct' href='../bill/struct.BillItem.html' title='bill::BillItem'>BillItem</a>&lt;P&gt;</code></span><span class='out-of-band'><div class='ghost'></div><a id='src-71' class='srclink' href='../src/bill/lib.rs.html#61-67' title='goto source code'>[src]</a></span></h3>
-<div class='impl-items'><h4 id='method.sum' class='method'><span id='sum.v' class='invisible'><code>fn <a href='#method.sum' class='fnname'>sum</a>(&amp;self) -&gt; <a class='type' href='../bill/type.Money.html' title='bill::Money'>Money</a></code></span></h4>
-</div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><span class='in-band'><code>impl&lt;P:&nbsp;<a class='trait' href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html' title='core::fmt::Debug'>Debug</a>&gt; <a class='trait' href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html' title='core::fmt::Debug'>Debug</a> for <a class='struct' href='../bill/struct.BillItem.html' title='bill::BillItem'>BillItem</a>&lt;P&gt;</code></span><span class='out-of-band'><div class='ghost'></div><a id='src-63' class='srclink' href='../src/bill/lib.rs.html#55' title='goto source code'>[src]</a></span></h3>
+                           </span></span><span class='stab '></span><h2 id='methods'>Methods</h2><h3 class='impl'><span class='in-band'><code>impl&lt;P:&nbsp;<a class='trait' href='../bill/trait.BillProduct.html' title='bill::BillProduct'>BillProduct</a>&gt; <a class='struct' href='../bill/struct.BillItem.html' title='bill::BillItem'>BillItem</a>&lt;P&gt;</code></span><span class='out-of-band'><div class='ghost'></div><a id='src-70' class='srclink' href='../src/bill/item.rs.html#10-25' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.gross' class='method'><span id='gross.v' class='invisible'><code>fn <a href='#method.gross' class='fnname'>gross</a>(&amp;self) -&gt; <a class='type' href='../bill/type.Money.html' title='bill::Money'>Money</a></code></span></h4>
+<div class='docblock'><p><code>price * amount</code></p>
+</div><h4 id='method.tax' class='method'><span id='tax.v' class='invisible'><code>fn <a href='#method.tax' class='fnname'>tax</a>(&amp;self) -&gt; <a class='type' href='../bill/type.Money.html' title='bill::Money'>Money</a></code></span></h4>
+<div class='docblock'><p><code>price * tax * amount</code>, tax being less than 1.0</p>
+</div><h4 id='method.net' class='method'><span id='net.v' class='invisible'><code>fn <a href='#method.net' class='fnname'>net</a>(&amp;self) -&gt; <a class='type' href='../bill/type.Money.html' title='bill::Money'>Money</a></code></span></h4>
+<div class='docblock'><p><code>gross + tax</code></p>
+</div></div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><span class='in-band'><code>impl&lt;P:&nbsp;<a class='trait' href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html' title='core::fmt::Debug'>Debug</a>&gt; <a class='trait' href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html' title='core::fmt::Debug'>Debug</a> for <a class='struct' href='../bill/struct.BillItem.html' title='bill::BillItem'>BillItem</a>&lt;P&gt;</code></span><span class='out-of-band'><div class='ghost'></div><a id='src-173' class='srclink' href='../src/bill/item.rs.html#4' title='goto source code'>[src]</a></span></h3>
 <div class='impl-items'><h4 id='method.fmt' class='method'><span id='fmt.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html#tymethod.fmt' class='fnname'>fmt</a>(&amp;self, __arg_0: &amp;mut <a class='struct' href='https://doc.rust-lang.org/nightly/core/fmt/struct.Formatter.html' title='core::fmt::Formatter'>Formatter</a>) -&gt; <a class='type' href='https://doc.rust-lang.org/nightly/core/fmt/type.Result.html' title='core::fmt::Result'>Result</a></code></span></h4>
 <div class='docblock'><p>Formats the value using the given formatter.</p>
 </div></div></section>
@@ -118,11 +124,9 @@
     <script>
         window.rootPath = "../";
         window.currentCrate = "bill";
-        window.playgroundUrl = "";
     </script>
     <script src="../jquery.js"></script>
     <script src="../main.js"></script>
-    
     <script defer src="../search-index.js"></script>
 </body>
 </html>

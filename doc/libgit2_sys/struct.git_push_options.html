@@ -47,11 +47,12 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-719' class='srclink' href='../src/libgit2_sys/lib.rs.html#837-842' title='goto source code'>[src]</a></span></h1>
+               </span><a id='src-286' class='srclink' href='../src/libgit2_sys/lib.rs.html#841-847' title='goto source code'>[src]</a></span></h1>
 <pre class='rust struct'>pub struct git_push_options {
     pub version: <a class='type' href='../libc/type.c_uint.html' title='libc::c_uint'>c_uint</a>,
     pub pb_parallelism: <a class='type' href='../libc/type.c_uint.html' title='libc::c_uint'>c_uint</a>,
     pub callbacks: <a class='struct' href='../libgit2_sys/struct.git_remote_callbacks.html' title='libgit2_sys::git_remote_callbacks'>git_remote_callbacks</a>,
+    pub proxy_opts: <a class='struct' href='../libgit2_sys/struct.git_proxy_options.html' title='libgit2_sys::git_proxy_options'>git_proxy_options</a>,
     pub custom_headers: <a class='struct' href='../libgit2_sys/struct.git_strarray.html' title='libgit2_sys::git_strarray'>git_strarray</a>,
 }</pre><h2 class='fields'>Fields</h2><span id='structfield.version' class='structfield'>
                            <span id='version.v' class='invisible'>
@@ -62,6 +63,9 @@
                            </span></span><span class='stab '></span><span id='structfield.callbacks' class='structfield'>
                            <span id='callbacks.v' class='invisible'>
                            <code>callbacks: <a class='struct' href='../libgit2_sys/struct.git_remote_callbacks.html' title='libgit2_sys::git_remote_callbacks'>git_remote_callbacks</a></code>
+                           </span></span><span class='stab '></span><span id='structfield.proxy_opts' class='structfield'>
+                           <span id='proxy_opts.v' class='invisible'>
+                           <code>proxy_opts: <a class='struct' href='../libgit2_sys/struct.git_proxy_options.html' title='libgit2_sys::git_proxy_options'>git_proxy_options</a></code>
                            </span></span><span class='stab '></span><span id='structfield.custom_headers' class='structfield'>
                            <span id='custom_headers.v' class='invisible'>
                            <code>custom_headers: <a class='struct' href='../libgit2_sys/struct.git_strarray.html' title='libgit2_sys::git_strarray'>git_strarray</a></code>
@@ -121,11 +125,9 @@
     <script>
         window.rootPath = "../";
         window.currentCrate = "libgit2_sys";
-        window.playgroundUrl = "";
     </script>
     <script src="../jquery.js"></script>
     <script src="../main.js"></script>
-    
     <script defer src="../search-index.js"></script>
 </body>
 </html>

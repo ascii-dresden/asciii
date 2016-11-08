@@ -1,5 +1,5 @@
 (function() {var implementors = {};
-implementors["chrono"] = [];
+implementors["chrono"] = [];implementors["asciii"] = [];implementors["asciii"] = [];implementors["asciii"] = [];
 
             if (window.register_implementors) {
                 window.register_implementors(implementors);

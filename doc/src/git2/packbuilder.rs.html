@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="rustdoc">
-    <meta name="description" content="Source to the Rust file `/home/hendrik/.cargo/registry/src/github.com-1ecc6299db9ec823/git2-0.4.4/src/packbuilder.rs`.">
+    <meta name="description" content="Source to the Rust file `/home/hendrik/.cargo/registry/src/github.com-1ecc6299db9ec823/git2-0.5.0/src/packbuilder.rs`.">
     <meta name="keywords" content="rust, rustlang, rust-lang">
 
     <title>packbuilder.rs.html -- source</title>
@@ -567,12 +567,12 @@
 
     <span class='doccomment'>/// Get the total number of objects the packbuilder will write out.</span>
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>object_count</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>usize</span> {
-        <span class='kw'>unsafe</span> { <span class='ident'>raw</span>::<span class='ident'>git_packbuilder_object_count</span>(<span class='self'>self</span>.<span class='ident'>raw</span>) <span class='kw'>as</span> <span class='ident'>usize</span> }
+        <span class='kw'>unsafe</span> { <span class='ident'>raw</span>::<span class='ident'>git_packbuilder_object_count</span>(<span class='self'>self</span>.<span class='ident'>raw</span>) }
     }
 
     <span class='doccomment'>/// Get the number of objects the packbuilder has already written out.</span>
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>written</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>usize</span> {
-        <span class='kw'>unsafe</span> { <span class='ident'>raw</span>::<span class='ident'>git_packbuilder_written</span>(<span class='self'>self</span>.<span class='ident'>raw</span>) <span class='kw'>as</span> <span class='ident'>usize</span> }
+        <span class='kw'>unsafe</span> { <span class='ident'>raw</span>::<span class='ident'>git_packbuilder_written</span>(<span class='self'>self</span>.<span class='ident'>raw</span>) }
     }
 
     <span class='doccomment'>/// Get the packfile&#39;s hash. A packfile&#39;s name is derived from the sorted</span>
@@ -872,11 +872,9 @@
     <script>
         window.rootPath = "../../";
         window.currentCrate = "git2";
-        window.playgroundUrl = "";
     </script>
     <script src="../../jquery.js"></script>
     <script src="../../main.js"></script>
-    
     <script defer src="../../search-index.js"></script>
 </body>
 </html>

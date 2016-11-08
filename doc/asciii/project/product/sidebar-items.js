@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["Product","Stores properties of a product."]]});
+initSidebarItems({"mod":[["error",""]],"struct":[["Product","Stores properties of a product."]]});

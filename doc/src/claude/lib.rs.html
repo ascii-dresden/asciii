@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="rustdoc">
-    <meta name="description" content="Source to the Rust file `/home/hendrik/.cargo/git/checkouts/claude-rs-375b470962c7a716/master/src/lib.rs`.">
+    <meta name="description" content="Source to the Rust file `/home/hendrik/.cargo/registry/src/github.com-1ecc6299db9ec823/claude-0.1.0/src/lib.rs`.">
     <meta name="keywords" content="rust, rustlang, rust-lang">
 
     <title>lib.rs.html -- source</title>
@@ -194,29 +194,19 @@
 <span id="150">150</span>
 <span id="151">151</span>
 <span id="152">152</span>
-<span id="153">153</span>
-<span id="154">154</span>
-<span id="155">155</span>
-<span id="156">156</span>
-<span id="157">157</span>
 </pre><pre class='rust '>
-<span class='doccomment'>//! This provides a simple type that encodes a currency.</span>
+<span class='doccomment'>//! This provides a simple type to calculate with monetary values.</span>
 
 <span class='attribute'>#<span class='op'>!</span>[<span class='ident'>deny</span>(
-<span class='comment'>//    missing_docs,</span>
-<span class='comment'>//    trivial_casts,</span>
-<span class='comment'>//    trivial_numeric_casts,</span>
-<span class='comment'>//    unstable_features,</span>
-<span class='comment'>//    unused_import_braces,</span>
-<span class='comment'>//    unused_qualifications</span>
+    <span class='ident'>missing_docs</span>,
+    <span class='ident'>trivial_casts</span>,
+    <span class='ident'>trivial_numeric_casts</span>,
+    <span class='ident'>unstable_features</span>,
+    <span class='ident'>unused_import_braces</span>,
+    <span class='ident'>unused_qualifications</span>
     )]</span>
 
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>default</span>::<span class='ident'>Default</span>;
-
-<span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>feature</span><span class='op'>=</span><span class='string'>&quot;parsing&quot;</span>)]</span> <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>regex</span>;
-<span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>feature</span><span class='op'>=</span><span class='string'>&quot;unstable&quot;</span>)]</span> <span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>sum</span>;
-<span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>feature</span><span class='op'>=</span><span class='string'>&quot;tojson&quot;</span>)]</span> <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>rustc_serialize</span>;
-<span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>feature</span><span class='op'>=</span><span class='string'>&quot;tojson&quot;</span>)]</span> <span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>tojson</span>;
 
 <span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>display</span>;
 <span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>math</span>;
@@ -233,7 +223,7 @@
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// # Examples</span>
     <span class='doccomment'>/// ```</span>
-    <span class='doccomment'>/// use currency::Currency;</span>
+    <span class='doccomment'>/// use claude::Currency;</span>
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// let mut c = Currency::new();</span>
     <span class='doccomment'>/// ```</span>
@@ -251,7 +241,7 @@
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// # Examples</span>
     <span class='doccomment'>/// ```</span>
-    <span class='doccomment'>/// use currency::Currency;</span>
+    <span class='doccomment'>/// use claude::Currency;</span>
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// assert!(Currency::from_string(&quot;$4.32&quot;)  == Some(Currency(Some(&#39;$&#39;), 432)));</span>
     <span class='doccomment'>/// assert!(Currency::from_string(&quot;-$4.32&quot;) == Some(Currency(Some(&#39;$&#39;), -432)));</span>
@@ -352,7 +342,7 @@
     <span class='ident'>currency</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>Currency</span>
 }
 
-<span class='doccomment'>/// Implements `Display` with the currency symbol at the end.</span>
+<span class='doccomment'>/// Implements `Display` with the currency symbol at the front.</span>
 <span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>Prefix</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span>{
     <span class='ident'>currency</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>Currency</span>
 }
@@ -414,11 +404,9 @@
     <script>
         window.rootPath = "../../";
         window.currentCrate = "claude";
-        window.playgroundUrl = "";
     </script>
     <script src="../../jquery.js"></script>
     <script src="../../main.js"></script>
-    
     <script defer src="../../search-index.js"></script>
 </body>
 </html>

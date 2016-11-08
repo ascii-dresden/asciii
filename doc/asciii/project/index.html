@@ -47,7 +47,7 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-320' class='srclink' href='../../src/asciii/src/project/mod.rs.html#1-465' title='goto source code'>[src]</a></span></h1>
+               </span><a id='src-257' class='srclink' href='../../src/asciii/src/project/mod.rs.html#1-542' title='goto source code'>[src]</a></span></h1>
 <div class='docblock'><p>Project file parsing and evaluation.</p>
 
 <p>This module implements all functionality of a project.</p>
@@ -57,7 +57,7 @@
                            <td><a class='mod' href='error/index.html'
                                   title='asciii::project::error'>error</a></td>
                            <td class='docblock-short'>
-                                <p>contains <code>ProjectResult</code> and <code>ProjectError</code>, <code>ProductResult</code> and <code>ProductError</code>.</p>
+                                
                            </td>
                        </tr>
                        <tr class=' module-item'>
@@ -88,6 +88,15 @@ All of the calculating is done by <code>extern crate bill</code>.</p>
                                   title='asciii::project::Project'>Project</a></td>
                            <td class='docblock-short'>
                                 <p>Represents a Project.</p>
+                           </td>
+                       </tr></table><h2 id='enums' class='section-header'><a href="#enums">Enums</a></h2>
+<table>
+                       <tr class=' module-item'>
+                           <td><a class='enum' href='enum.ComputedField.html'
+                                  title='asciii::project::ComputedField'>ComputedField</a></td>
+                           <td class='docblock-short'>
+                                <p><code>Project::get()</code> allows accessing fields within the raw <code>yaml</code> data structure.
+Computed fields are fields that are not present in the document but computed.</p>
                            </td>
                        </tr></table></section>
     <section id='search' class="content hidden"></section>
@@ -145,11 +154,9 @@ All of the calculating is done by <code>extern crate bill</code>.</p>
     <script>
         window.rootPath = "../../";
         window.currentCrate = "asciii";
-        window.playgroundUrl = "";
     </script>
     <script src="../../jquery.js"></script>
     <script src="../../main.js"></script>
-    
     <script defer src="../../search-index.js"></script>
 </body>
 </html>

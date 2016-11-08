@@ -97,28 +97,53 @@
 <span id="53">53</span>
 <span id="54">54</span>
 <span id="55">55</span>
+<span id="56">56</span>
+<span id="57">57</span>
+<span id="58">58</span>
+<span id="59">59</span>
+<span id="60">60</span>
+<span id="61">61</span>
+<span id="62">62</span>
+<span id="63">63</span>
+<span id="64">64</span>
+<span id="65">65</span>
+<span id="66">66</span>
+<span id="67">67</span>
+<span id="68">68</span>
 </pre><pre class='rust '>
 <span class='attribute'>#<span class='op'>!</span>[<span class='ident'>allow</span>(<span class='ident'>trivial_casts</span>)]</span>
 
 
 <span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>not</span>(<span class='ident'>feature</span><span class='op'>=</span><span class='string'>&quot;document_export&quot;</span>))]</span>
-<span class='kw'>mod</span> <span class='ident'>fake_error</span>{
+<span class='kw'>mod</span> <span class='ident'>fake_error</span> {
     <span class='doccomment'>//! this is not to be used, it only satisfies error_chain in case the `document_export` feature</span>
     <span class='doccomment'>//! isn&#39;t used</span>
     <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>error</span>::<span class='ident'>Error</span>;
     <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>fmt</span>;
     <span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Debug</span>)]</span>
     <span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>RenderError</span>;
-    <span class='kw'>impl</span> <span class='ident'>fmt</span>::<span class='ident'>Display</span> <span class='kw'>for</span> <span class='ident'>RenderError</span>{ <span class='kw'>fn</span> <span class='ident'>fmt</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>f</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>fmt</span>::<span class='ident'>Formatter</span>) <span class='op'>-&gt;</span> <span class='ident'>fmt</span>::<span class='prelude-ty'>Result</span>{
-        <span class='kw'>match</span> <span class='self'>self</span>.<span class='ident'>cause</span>() { <span class='prelude-val'>None</span> <span class='op'>=&gt;</span> <span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;{}&quot;</span>, <span class='self'>self</span>.<span class='ident'>description</span>(),), <span class='prelude-val'>Some</span>(<span class='ident'>cause</span>) <span class='op'>=&gt;</span> <span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;{}&quot;</span>, <span class='ident'>cause</span>) } } }
-    <span class='kw'>impl</span> <span class='ident'>Error</span> <span class='kw'>for</span> <span class='ident'>RenderError</span>{
-        <span class='kw'>fn</span> <span class='ident'>description</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>)<span class='op'>-&gt;</span><span class='kw-2'>&amp;</span><span class='ident'>str</span>{<span class='string'>&quot;unimplemented&quot;</span>}
-        <span class='kw'>fn</span> <span class='ident'>cause</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='ident'>Error</span><span class='op'>&gt;</span>{<span class='prelude-val'>None</span>}
+    <span class='kw'>impl</span> <span class='ident'>fmt</span>::<span class='ident'>Display</span> <span class='kw'>for</span> <span class='ident'>RenderError</span> {
+        <span class='kw'>fn</span> <span class='ident'>fmt</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>f</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>fmt</span>::<span class='ident'>Formatter</span>) <span class='op'>-&gt;</span> <span class='ident'>fmt</span>::<span class='prelude-ty'>Result</span> {
+            <span class='kw'>match</span> <span class='self'>self</span>.<span class='ident'>cause</span>() {
+                <span class='prelude-val'>None</span> <span class='op'>=&gt;</span> <span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;{}&quot;</span>, <span class='self'>self</span>.<span class='ident'>description</span>(),),
+                <span class='prelude-val'>Some</span>(<span class='ident'>cause</span>) <span class='op'>=&gt;</span> <span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;{}&quot;</span>, <span class='ident'>cause</span>),
+            }
+        }
+    }
+    <span class='kw'>impl</span> <span class='ident'>Error</span> <span class='kw'>for</span> <span class='ident'>RenderError</span> {
+        <span class='kw'>fn</span> <span class='ident'>description</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='kw-2'>&amp;</span><span class='ident'>str</span> {
+            <span class='string'>&quot;unimplemented&quot;</span>
+        }
+        <span class='kw'>fn</span> <span class='ident'>cause</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='ident'>Error</span><span class='op'>&gt;</span> {
+            <span class='prelude-val'>None</span>
+        }
     }
 }
 
-<span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>feature</span><span class='op'>=</span><span class='string'>&quot;document_export&quot;</span>)]</span> <span class='kw'>use</span> <span class='ident'>handlebars</span>::<span class='ident'>RenderError</span>;
-<span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>not</span>(<span class='ident'>feature</span><span class='op'>=</span><span class='string'>&quot;document_export&quot;</span>))]</span> <span class='kw'>use</span> <span class='self'>self</span>::<span class='ident'>fake_error</span>::<span class='ident'>RenderError</span>;
+<span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>feature</span><span class='op'>=</span><span class='string'>&quot;document_export&quot;</span>)]</span>
+<span class='kw'>use</span> <span class='ident'>handlebars</span>::<span class='ident'>RenderError</span>;
+<span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>not</span>(<span class='ident'>feature</span><span class='op'>=</span><span class='string'>&quot;document_export&quot;</span>))]</span>
+<span class='kw'>use</span> <span class='self'>self</span>::<span class='ident'>fake_error</span>::<span class='ident'>RenderError</span>;
 
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>io</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>fmt</span>;
@@ -126,7 +151,8 @@
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>error</span>::<span class='ident'>Error</span> <span class='kw'>as</span> <span class='ident'>ErrorTrait</span>;
 
 
-<span class='kw'>use</span> <span class='ident'>project</span>::<span class='ident'>error</span>::<span class='ident'>ProjectError</span>;
+<span class='kw'>use</span> <span class='ident'>project</span>;
+<span class='comment'>// use project::error::ProjectError;</span>
 <span class='kw'>use</span> <span class='ident'>storage</span>::<span class='ident'>error</span>::<span class='ident'>StorageError</span>;
 
 <span class='macro'>error_chain</span><span class='macro'>!</span>{
@@ -143,7 +169,7 @@
         <span class='ident'>fmt</span>::<span class='ident'>Error</span>, <span class='ident'>Fmt</span>;
         <span class='ident'>time</span>::<span class='ident'>SystemTimeError</span>, <span class='ident'>Time</span>;
         <span class='ident'>RenderError</span>, <span class='ident'>Handlebar</span>;
-        <span class='ident'>ProjectError</span>, <span class='ident'>Project</span>;
+        <span class='ident'>project</span>::<span class='ident'>error</span>::<span class='ident'>Error</span>, <span class='ident'>Project</span>;
         <span class='ident'>StorageError</span>, <span class='ident'>Storage</span>;
     }
 
@@ -210,11 +236,9 @@
     <script>
         window.rootPath = "../../../../";
         window.currentCrate = "asciii";
-        window.playgroundUrl = "";
     </script>
     <script src="../../../../jquery.js"></script>
     <script src="../../../../main.js"></script>
-    
     <script defer src="../../../../search-index.js"></script>
 </body>
 </html>

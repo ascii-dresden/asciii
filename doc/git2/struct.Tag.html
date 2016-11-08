@@ -47,9 +47,9 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-6634' class='srclink' href='../src/git2/tag.rs.html#11-14' title='goto source code'>[src]</a></span></h1>
+               </span><a id='src-4532' class='srclink' href='../src/git2/tag.rs.html#11-14' title='goto source code'>[src]</a></span></h1>
 <pre class='rust struct'>pub struct Tag&lt;'repo&gt; { /* fields omitted */ }</pre><div class='docblock'><p>A structure to represent a git <a href="http://git-scm.com/book/en/Git-Basics-Tagging">tag</a></p>
-</div><h2 id='methods'>Methods</h2><h3 class='impl'><span class='in-band'><code>impl&lt;'repo&gt; <a class='struct' href='../git2/struct.Tag.html' title='git2::Tag'>Tag</a>&lt;'repo&gt;</code></span><span class='out-of-band'><div class='ghost'></div><a id='src-6638' class='srclink' href='../src/git2/tag.rs.html#16-107' title='goto source code'>[src]</a></span></h3>
+</div><h2 id='methods'>Methods</h2><h3 class='impl'><span class='in-band'><code>impl&lt;'repo&gt; <a class='struct' href='../git2/struct.Tag.html' title='git2::Tag'>Tag</a>&lt;'repo&gt;</code></span><span class='out-of-band'><div class='ghost'></div><a id='src-4536' class='srclink' href='../src/git2/tag.rs.html#16-107' title='goto source code'>[src]</a></span></h3>
 <div class='impl-items'><h4 id='method.id' class='method'><span id='id.v' class='invisible'><code>fn <a href='#method.id' class='fnname'>id</a>(&amp;self) -&gt; <a class='struct' href='../git2/struct.Oid.html' title='git2::Oid'>Oid</a></code></span></h4>
 <div class='docblock'><p>Get the id (SHA1) of a repository tag</p>
 </div><h4 id='method.message' class='method'><span id='message.v' class='invisible'><code>fn <a href='#method.message' class='fnname'>message</a>(&amp;self) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;&amp;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>&gt;</code></span></h4>
@@ -66,13 +66,13 @@
 <p>Returns None if it is not valid utf8</p>
 </div><h4 id='method.name_bytes' class='method'><span id='name_bytes.v' class='invisible'><code>fn <a href='#method.name_bytes' class='fnname'>name_bytes</a>(&amp;self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>&amp;[</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u8.html'>u8</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>]</a></code></span></h4>
 <div class='docblock'><p>Get the name of a tag</p>
-</div><h4 id='method.peel' class='method'><span id='peel.v' class='invisible'><code>fn <a href='#method.peel' class='fnname'>peel</a>(&amp;self) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='struct' href='../git2/struct.Object.html' title='git2::Object'>Object</a>&lt;'repo&gt;,&nbsp;<a class='struct' href='../git2/struct.Error.html' title='git2::Error'>Error</a>&gt;</code></span></h4>
+</div><h4 id='method.peel' class='method'><span id='peel.v' class='invisible'><code>fn <a href='#method.peel' class='fnname'>peel</a>(&amp;self) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='struct' href='../git2/struct.Object.html' title='git2::Object'>Object</a>&lt;'repo&gt;, <a class='struct' href='../git2/struct.Error.html' title='git2::Error'>Error</a>&gt;</code></span></h4>
 <div class='docblock'><p>Recursively peel a tag until a non tag git_object is found</p>
 </div><h4 id='method.tagger' class='method'><span id='tagger.v' class='invisible'><code>fn <a href='#method.tagger' class='fnname'>tagger</a>(&amp;self) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='struct' href='../git2/struct.Signature.html' title='git2::Signature'>Signature</a>&gt;</code></span></h4>
 <div class='docblock'><p>Get the tagger (author) of a tag</p>
 
 <p>If the author is unspecified, then <code>None</code> is returned.</p>
-</div><h4 id='method.target' class='method'><span id='target.v' class='invisible'><code>fn <a href='#method.target' class='fnname'>target</a>(&amp;self) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='struct' href='../git2/struct.Object.html' title='git2::Object'>Object</a>&lt;'repo&gt;,&nbsp;<a class='struct' href='../git2/struct.Error.html' title='git2::Error'>Error</a>&gt;</code></span></h4>
+</div><h4 id='method.target' class='method'><span id='target.v' class='invisible'><code>fn <a href='#method.target' class='fnname'>target</a>(&amp;self) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='struct' href='../git2/struct.Object.html' title='git2::Object'>Object</a>&lt;'repo&gt;, <a class='struct' href='../git2/struct.Error.html' title='git2::Error'>Error</a>&gt;</code></span></h4>
 <div class='docblock'><p>Get the tagged object of a tag</p>
 
 <p>This method performs a repository lookup for the given object and
@@ -85,7 +85,7 @@ returns it</p>
 <div class='docblock'><p>Casts this Tag to be usable as an <code>Object</code></p>
 </div><h4 id='method.into_object' class='method'><span id='into_object.v' class='invisible'><code>fn <a href='#method.into_object' class='fnname'>into_object</a>(self) -&gt; <a class='struct' href='../git2/struct.Object.html' title='git2::Object'>Object</a>&lt;'repo&gt;</code></span></h4>
 <div class='docblock'><p>Consumes Tag to be returned as an <code>Object</code></p>
-</div></div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><span class='in-band'><code>impl&lt;'repo&gt; <a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.Drop.html' title='core::ops::Drop'>Drop</a> for <a class='struct' href='../git2/struct.Tag.html' title='git2::Tag'>Tag</a>&lt;'repo&gt;</code></span><span class='out-of-band'><div class='ghost'></div><a id='src-6686' class='srclink' href='../src/git2/tag.rs.html#117-121' title='goto source code'>[src]</a></span></h3>
+</div></div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><span class='in-band'><code>impl&lt;'repo&gt; <a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.Drop.html' title='core::ops::Drop'>Drop</a> for <a class='struct' href='../git2/struct.Tag.html' title='git2::Tag'>Tag</a>&lt;'repo&gt;</code></span><span class='out-of-band'><div class='ghost'></div><a id='src-4574' class='srclink' href='../src/git2/tag.rs.html#117-121' title='goto source code'>[src]</a></span></h3>
 <div class='impl-items'><h4 id='method.drop' class='method'><span id='drop.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/ops/trait.Drop.html#tymethod.drop' class='fnname'>drop</a>(&amp;mut self)</code></span></h4>
 <div class='docblock'><p>A method called when the value goes out of scope. <a href="https://doc.rust-lang.org/nightly/core/ops/trait.Drop.html#tymethod.drop">Read more</a></p>
 </div></div></section>
@@ -144,11 +144,9 @@ returns it</p>
     <script>
         window.rootPath = "../";
         window.currentCrate = "git2";
-        window.playgroundUrl = "";
     </script>
     <script src="../jquery.js"></script>
     <script src="../main.js"></script>
-    
     <script defer src="../search-index.js"></script>
 </body>
 </html>

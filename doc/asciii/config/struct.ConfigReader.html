@@ -47,7 +47,7 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-253' class='srclink' href='../../src/asciii/src/config.rs.html#25-31' title='goto source code'>[src]</a></span></h1>
+               </span><a id='src-1820' class='srclink' href='../../src/asciii/src/config.rs.html#25-31' title='goto source code'>[src]</a></span></h1>
 <pre class='rust struct'>pub struct ConfigReader {
     pub path: <a class='struct' href='https://doc.rust-lang.org/nightly/std/path/struct.PathBuf.html' title='std::path::PathBuf'>PathBuf</a>,
     // some fields omitted
@@ -56,10 +56,10 @@
                            <span id='path.v' class='invisible'>
                            <code>path: <a class='struct' href='https://doc.rust-lang.org/nightly/std/path/struct.PathBuf.html' title='std::path::PathBuf'>PathBuf</a></code>
                            </span></span><span class='stab '></span><div class='docblock'><p>Path of config file</p>
-</div><h2 id='methods'>Methods</h2><h3 class='impl'><span class='in-band'><code>impl <a class='struct' href='../../asciii/config/struct.ConfigReader.html' title='asciii::config::ConfigReader'>ConfigReader</a></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-267' class='srclink' href='../../src/asciii/src/config.rs.html#33-118' title='goto source code'>[src]</a></span></h3>
+</div><h2 id='methods'>Methods</h2><h3 class='impl'><span class='in-band'><code>impl <a class='struct' href='../../asciii/config/struct.ConfigReader.html' title='asciii::config::ConfigReader'>ConfigReader</a></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-209' class='srclink' href='../../src/asciii/src/config.rs.html#33-133' title='goto source code'>[src]</a></span></h3>
 <div class='impl-items'><h4 id='method.path_home' class='method'><span id='path_home.v' class='invisible'><code>fn <a href='#method.path_home' class='fnname'>path_home</a>() -&gt; <a class='struct' href='https://doc.rust-lang.org/nightly/std/path/struct.PathBuf.html' title='std::path::PathBuf'>PathBuf</a></code></span></h4>
 <div class='docblock'><p>The Path of the config file.</p>
-</div><h4 id='method.new' class='method'><span id='new.v' class='invisible'><code>fn <a href='#method.new' class='fnname'>new</a>() -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='struct' href='../../asciii/config/struct.ConfigReader.html' title='asciii::config::ConfigReader'>ConfigReader</a>,&nbsp;<a class='enum' href='../../asciii/util/yaml/enum.YamlError.html' title='asciii::util::yaml::YamlError'>YamlError</a>&gt;</code></span></h4>
+</div><h4 id='method.new' class='method'><span id='new.v' class='invisible'><code>fn <a href='#method.new' class='fnname'>new</a>() -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='struct' href='../../asciii/config/struct.ConfigReader.html' title='asciii::config::ConfigReader'>ConfigReader</a>, <a class='enum' href='../../asciii/util/yaml/enum.YamlError.html' title='asciii::util::yaml::YamlError'>YamlError</a>&gt;</code></span></h4>
 <div class='docblock'><p>Opens config from <code>self.path()</code> and parses Yaml right away.</p>
 </div><h4 id='method.get' class='method'><span id='get.v' class='invisible'><code>fn <a href='#method.get' class='fnname'>get</a>(&amp;self, path: &amp;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;&amp;<a class='enum' href='../../asciii/util/yaml/enum.Yaml.html' title='asciii::util::yaml::Yaml'>Yaml</a>&gt;</code></span></h4>
 <div class='docblock'><p>Returns whatever it finds in that position</p>
@@ -73,14 +73,12 @@
 You should have a default config for everything that you use.</p>
 </div><h4 id='method.get_str' class='method'><span id='get_str.v' class='invisible'><code>fn <a href='#method.get_str' class='fnname'>get_str</a>(&amp;self, key: &amp;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;&amp;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>&gt;</code></span></h4>
 <div class='docblock'><p>Returns the string in the position or an empty string</p>
-
-<h1 id='panics-1' class='section-header'><a href='#panics-1'>Panics</a></h1>
-<p>This panics if nothing is found.
-You should have a default config for everything that you use.</p>
+</div><h4 id='method.get_strs' class='method'><span id='get_strs.v' class='invisible'><code>fn <a href='#method.get_strs' class='fnname'>get_strs</a>(&amp;self, key: &amp;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;&amp;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>&gt;&gt;</code></span></h4>
+<div class='docblock'><p>Returns the a vec of &amp;strs if possible</p>
 </div><h4 id='method.get_to_string' class='method'><span id='get_to_string.v' class='invisible'><code>fn <a href='#method.get_to_string' class='fnname'>get_to_string</a>(&amp;self, key: &amp;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>&gt;</code></span></h4>
 <div class='docblock'><p>Returns the string in the position or an empty string</p>
 
-<h1 id='panics-2' class='section-header'><a href='#panics-2'>Panics</a></h1>
+<h1 id='panics-1' class='section-header'><a href='#panics-1'>Panics</a></h1>
 <p>This panics if nothing is found.
 You should have a default config for everything that you use.</p>
 </div><h4 id='method.get_f64' class='method'><span id='get_f64.v' class='invisible'><code>fn <a href='#method.get_f64' class='fnname'>get_f64</a>(&amp;self, key: &amp;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a>&gt;</code></span></h4>
@@ -88,10 +86,10 @@ You should have a default config for everything that you use.</p>
 </div><h4 id='method.get_bool' class='method'><span id='get_bool.v' class='invisible'><code>fn <a href='#method.get_bool' class='fnname'>get_bool</a>(&amp;self, key: &amp;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></code></span></h4>
 <div class='docblock'><p>Returns the boolean in the position or <code>false</code></p>
 
-<h1 id='panics-3' class='section-header'><a href='#panics-3'>Panics</a></h1>
+<h1 id='panics-2' class='section-header'><a href='#panics-2'>Panics</a></h1>
 <p>This panics if nothing is found.
 You should have a default config for everything that you use.</p>
-</div></div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><span class='in-band'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html' title='core::fmt::Debug'>Debug</a> for <a class='struct' href='../../asciii/config/struct.ConfigReader.html' title='asciii::config::ConfigReader'>ConfigReader</a></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-258' class='srclink' href='../../src/asciii/src/config.rs.html#24' title='goto source code'>[src]</a></span></h3>
+</div></div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><span class='in-band'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html' title='core::fmt::Debug'>Debug</a> for <a class='struct' href='../../asciii/config/struct.ConfigReader.html' title='asciii::config::ConfigReader'>ConfigReader</a></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-1825' class='srclink' href='../../src/asciii/src/config.rs.html#24' title='goto source code'>[src]</a></span></h3>
 <div class='impl-items'><h4 id='method.fmt' class='method'><span id='fmt.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html#tymethod.fmt' class='fnname'>fmt</a>(&amp;self, __arg_0: &amp;mut <a class='struct' href='https://doc.rust-lang.org/nightly/core/fmt/struct.Formatter.html' title='core::fmt::Formatter'>Formatter</a>) -&gt; <a class='type' href='https://doc.rust-lang.org/nightly/core/fmt/type.Result.html' title='core::fmt::Result'>Result</a></code></span></h4>
 <div class='docblock'><p>Formats the value using the given formatter.</p>
 </div></div></section>
@@ -150,11 +148,9 @@ You should have a default config for everything that you use.</p>
     <script>
         window.rootPath = "../../";
         window.currentCrate = "asciii";
-        window.playgroundUrl = "";
     </script>
     <script src="../../jquery.js"></script>
     <script src="../../main.js"></script>
-    
     <script defer src="../../search-index.js"></script>
 </body>
 </html>

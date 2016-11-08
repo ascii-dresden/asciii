@@ -47,10 +47,10 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-1422' class='srclink' href='../../src/git2/build.rs.html#14-21' title='goto source code'>[src]</a></span></h1>
+               </span><a id='src-262' class='srclink' href='../../src/git2/build.rs.html#14-21' title='goto source code'>[src]</a></span></h1>
 <pre class='rust struct'>pub struct RepoBuilder&lt;'cb&gt; { /* fields omitted */ }</pre><div class='docblock'><p>A builder struct which is used to build configuration for cloning a new git
 repository.</p>
-</div><h2 id='methods'>Methods</h2><h3 class='impl'><span class='in-band'><code>impl&lt;'cb&gt; <a class='struct' href='../../git2/build/struct.RepoBuilder.html' title='git2::build::RepoBuilder'>RepoBuilder</a>&lt;'cb&gt;</code></span><span class='out-of-band'><div class='ghost'></div><a id='src-1449' class='srclink' href='../../src/git2/build.rs.html#56-166' title='goto source code'>[src]</a></span></h3>
+</div><h2 id='methods'>Methods</h2><h3 class='impl'><span class='in-band'><code>impl&lt;'cb&gt; <a class='struct' href='../../git2/build/struct.RepoBuilder.html' title='git2::build::RepoBuilder'>RepoBuilder</a>&lt;'cb&gt;</code></span><span class='out-of-band'><div class='ghost'></div><a id='src-289' class='srclink' href='../../src/git2/build.rs.html#56-166' title='goto source code'>[src]</a></span></h3>
 <div class='impl-items'><h4 id='method.new' class='method'><span id='new.v' class='invisible'><code>fn <a href='#method.new' class='fnname'>new</a>() -&gt; <a class='struct' href='../../git2/build/struct.RepoBuilder.html' title='git2::build::RepoBuilder'>RepoBuilder</a>&lt;'cb&gt;</code></span></h4>
 <div class='docblock'><p>Creates a new repository builder with all of the default configuration.</p>
 
@@ -72,15 +72,15 @@ paths.</p>
 </div><h4 id='method.hardlinks' class='method'><span id='hardlinks.v' class='invisible'><code>fn <a href='#method.hardlinks' class='fnname'>hardlinks</a>(&amp;mut self, links: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a>) -&gt; &amp;mut <a class='struct' href='../../git2/build/struct.RepoBuilder.html' title='git2::build::RepoBuilder'>RepoBuilder</a>&lt;'cb&gt;</code></span></h4>
 <div class='docblock'><p>Set the flag for whether hardlinks are used when using a local git-aware
 transport mechanism.</p>
-</div><h4 id='method.with_checkout' class='method'><span id='with_checkout.v' class='invisible'><code>fn <a href='#method.with_checkout' class='fnname'>with_checkout</a>(&amp;mut self, checkout: <a class='struct' href='../../git2/build/struct.CheckoutBuilder.html' title='git2::build::CheckoutBuilder'>CheckoutBuilder</a>&lt;'cb&gt;) -&gt; &amp;mut <a class='struct' href='../../git2/build/struct.RepoBuilder.html' title='git2::build::RepoBuilder'>RepoBuilder</a>&lt;'cb&gt;</code></span></h4>
+</div><h4 id='method.with_checkout' class='method'><span id='with_checkout.v' class='invisible'><code>fn <a href='#method.with_checkout' class='fnname'>with_checkout</a>(&amp;mut self,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; checkout: <a class='struct' href='../../git2/build/struct.CheckoutBuilder.html' title='git2::build::CheckoutBuilder'>CheckoutBuilder</a>&lt;'cb&gt;)<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -&gt; &amp;mut <a class='struct' href='../../git2/build/struct.RepoBuilder.html' title='git2::build::RepoBuilder'>RepoBuilder</a>&lt;'cb&gt;</code></span></h4>
 <div class='docblock'><p>Configure the checkout which will be performed by consuming a checkout
 builder.</p>
-</div><h4 id='method.fetch_options' class='method'><span id='fetch_options.v' class='invisible'><code>fn <a href='#method.fetch_options' class='fnname'>fetch_options</a>(&amp;mut self, fetch_opts: <a class='struct' href='../../git2/struct.FetchOptions.html' title='git2::FetchOptions'>FetchOptions</a>&lt;'cb&gt;) -&gt; &amp;mut <a class='struct' href='../../git2/build/struct.RepoBuilder.html' title='git2::build::RepoBuilder'>RepoBuilder</a>&lt;'cb&gt;</code></span></h4>
+</div><h4 id='method.fetch_options' class='method'><span id='fetch_options.v' class='invisible'><code>fn <a href='#method.fetch_options' class='fnname'>fetch_options</a>(&amp;mut self,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; fetch_opts: <a class='struct' href='../../git2/struct.FetchOptions.html' title='git2::FetchOptions'>FetchOptions</a>&lt;'cb&gt;)<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -&gt; &amp;mut <a class='struct' href='../../git2/build/struct.RepoBuilder.html' title='git2::build::RepoBuilder'>RepoBuilder</a>&lt;'cb&gt;</code></span></h4>
 <div class='docblock'><p>Options which control the fetch, including callbacks.</p>
 
 <p>The callbacks are used for reporting fetch progress, and for acquiring
 credentials in the event they are needed.</p>
-</div><h4 id='method.clone' class='method'><span id='clone.v' class='invisible'><code>fn <a href='#method.clone' class='fnname'>clone</a>(&amp;mut self, url: &amp;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>, into: &amp;<a class='struct' href='https://doc.rust-lang.org/nightly/std/path/struct.Path.html' title='std::path::Path'>Path</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='struct' href='../../git2/struct.Repository.html' title='git2::Repository'>Repository</a>,&nbsp;<a class='struct' href='../../git2/struct.Error.html' title='git2::Error'>Error</a>&gt;</code></span></h4>
+</div><h4 id='method.clone' class='method'><span id='clone.v' class='invisible'><code>fn <a href='#method.clone' class='fnname'>clone</a>(&amp;mut self, url: &amp;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>, into: &amp;<a class='struct' href='https://doc.rust-lang.org/nightly/std/path/struct.Path.html' title='std::path::Path'>Path</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='struct' href='../../git2/struct.Repository.html' title='git2::Repository'>Repository</a>, <a class='struct' href='../../git2/struct.Error.html' title='git2::Error'>Error</a>&gt;</code></span></h4>
 <div class='docblock'><p>Clone a remote repository.</p>
 
 <p>This will use the options configured so far to clone the specified url
@@ -141,11 +141,9 @@ into the specified local path.</p>
     <script>
         window.rootPath = "../../";
         window.currentCrate = "git2";
-        window.playgroundUrl = "";
     </script>
     <script src="../../jquery.js"></script>
     <script src="../../main.js"></script>
-    
     <script defer src="../../search-index.js"></script>
 </body>
 </html>

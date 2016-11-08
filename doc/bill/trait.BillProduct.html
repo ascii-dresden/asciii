@@ -47,15 +47,24 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-44' class='srclink' href='../src/bill/lib.rs.html#43-47' title='goto source code'>[src]</a></span></h1>
+               </span><a id='src-52' class='srclink' href='../src/bill/product.rs.html#34-47' title='goto source code'>[src]</a></span></h1>
 <pre class='rust trait'>pub trait BillProduct {
     fn <a href='#tymethod.price' class='fnname'>price</a>(&amp;self) -&gt; <a class='type' href='../bill/type.Money.html' title='bill::Money'>Money</a>;
     fn <a href='#tymethod.name' class='fnname'>name</a>(&amp;self) -&gt; <a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>;
     fn <a href='#tymethod.tax' class='fnname'>tax</a>(&amp;self) -&gt; <a class='type' href='../bill/type.Tax.html' title='bill::Tax'>Tax</a>;
-}</pre>
+}</pre><div class='docblock'><p>Describes one particular product.
+Amount is handled by <code>BillItem</code></p>
+</div>
             <h2 id='required-methods'>Required Methods</h2>
             <div class='methods'>
-        <h3 id='tymethod.price' class='method stab '><span id='price.v' class='invisible'><code>fn <a href='#tymethod.price' class='fnname'>price</a>(&amp;self) -&gt; <a class='type' href='../bill/type.Money.html' title='bill::Money'>Money</a></code></span></h3><h3 id='tymethod.name' class='method stab '><span id='name.v' class='invisible'><code>fn <a href='#tymethod.name' class='fnname'>name</a>(&amp;self) -&gt; <a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a></code></span></h3><h3 id='tymethod.tax' class='method stab '><span id='tax.v' class='invisible'><code>fn <a href='#tymethod.tax' class='fnname'>tax</a>(&amp;self) -&gt; <a class='type' href='../bill/type.Tax.html' title='bill::Tax'>Tax</a></code></span></h3></div>
+        <h3 id='tymethod.price' class='method stab '><span id='price.v' class='invisible'><code>fn <a href='#tymethod.price' class='fnname'>price</a>(&amp;self) -&gt; <a class='type' href='../bill/type.Money.html' title='bill::Money'>Money</a></code></span></h3><div class='docblock'><p>Price in Money</p>
+</div><h3 id='tymethod.name' class='method stab '><span id='name.v' class='invisible'><code>fn <a href='#tymethod.name' class='fnname'>name</a>(&amp;self) -&gt; <a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a></code></span></h3><div class='docblock'><p>A <a href="https://en.wikipedia.org/wiki/Name">name</a> is a term used for identification.</p>
+</div><h3 id='tymethod.tax' class='method stab '><span id='tax.v' class='invisible'><code>fn <a href='#tymethod.tax' class='fnname'>tax</a>(&amp;self) -&gt; <a class='type' href='../bill/type.Tax.html' title='bill::Tax'>Tax</a></code></span></h3><div class='docblock'><p>Tax</p>
+
+<blockquote>
+<p>A <a href="https://en.wikipedia.org/wiki/Tax">tax</a> (from the Latin <a href="https://en.wiktionary.org/wiki/en:taxo#Latin">taxo</a>) is a financial charge or other levy imposed upon a taxpayer (an individual or legal entity) by a state or the functional equivalent of a state to fund various public expenditures.</p>
+</blockquote>
+</div></div>
         <h2 id='implementors'>Implementors</h2>
         <ul class='item-list' id='implementors-list'>
     <li><code>impl&lt;'a&gt; BillProduct for <a class='struct' href='../bill/struct.Product.html' title='bill::Product'>Product</a>&lt;'a&gt;</code></li>
@@ -117,11 +126,9 @@
     <script>
         window.rootPath = "../";
         window.currentCrate = "bill";
-        window.playgroundUrl = "";
     </script>
     <script src="../jquery.js"></script>
     <script src="../main.js"></script>
-    
     <script defer src="../search-index.js"></script>
 </body>
 </html>

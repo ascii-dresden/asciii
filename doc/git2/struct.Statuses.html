@@ -47,12 +47,12 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-6414' class='srclink' href='../src/git2/status.rs.html#40-45' title='goto source code'>[src]</a></span></h1>
+               </span><a id='src-4330' class='srclink' href='../src/git2/status.rs.html#40-45' title='goto source code'>[src]</a></span></h1>
 <pre class='rust struct'>pub struct Statuses&lt;'repo&gt; { /* fields omitted */ }</pre><div class='docblock'><p>A container for a list of status information about a repository.</p>
 
 <p>Each instances appears as a if it were a collection, having a length and
 allowing indexing as well as provding an iterator.</p>
-</div><h2 id='methods'>Methods</h2><h3 class='impl'><span class='in-band'><code>impl&lt;'repo&gt; <a class='struct' href='../git2/struct.Statuses.html' title='git2::Statuses'>Statuses</a>&lt;'repo&gt;</code></span><span class='out-of-band'><div class='ghost'></div><a id='src-6498' class='srclink' href='../src/git2/status.rs.html#236-262' title='goto source code'>[src]</a></span></h3>
+</div><h2 id='methods'>Methods</h2><h3 class='impl'><span class='in-band'><code>impl&lt;'repo&gt; <a class='struct' href='../git2/struct.Statuses.html' title='git2::Statuses'>Statuses</a>&lt;'repo&gt;</code></span><span class='out-of-band'><div class='ghost'></div><a id='src-4408' class='srclink' href='../src/git2/status.rs.html#236-262' title='goto source code'>[src]</a></span></h3>
 <div class='impl-items'><h4 id='method.get' class='method'><span id='get.v' class='invisible'><code>fn <a href='#method.get' class='fnname'>get</a>(&amp;self, index: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='struct' href='../git2/struct.StatusEntry.html' title='git2::StatusEntry'>StatusEntry</a>&gt;</code></span></h4>
 <div class='docblock'><p>Gets a status entry from this list at the specified index.</p>
 
@@ -64,7 +64,7 @@ allowing indexing as well as provding an iterator.</p>
 when the status list was created), this can return 0.</p>
 </div><h4 id='method.iter' class='method'><span id='iter.v' class='invisible'><code>fn <a href='#method.iter' class='fnname'>iter</a>(&amp;self) -&gt; <a class='struct' href='../git2/struct.StatusIter.html' title='git2::StatusIter'>StatusIter</a></code></span></h4>
 <div class='docblock'><p>Returns an iterator over the statuses in this list.</p>
-</div></div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><span class='in-band'><code>impl&lt;'repo&gt; <a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.Drop.html' title='core::ops::Drop'>Drop</a> for <a class='struct' href='../git2/struct.Statuses.html' title='git2::Statuses'>Statuses</a>&lt;'repo&gt;</code></span><span class='out-of-band'><div class='ghost'></div><a id='src-6515' class='srclink' href='../src/git2/status.rs.html#272-276' title='goto source code'>[src]</a></span></h3>
+</div></div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><span class='in-band'><code>impl&lt;'repo&gt; <a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.Drop.html' title='core::ops::Drop'>Drop</a> for <a class='struct' href='../git2/struct.Statuses.html' title='git2::Statuses'>Statuses</a>&lt;'repo&gt;</code></span><span class='out-of-band'><div class='ghost'></div><a id='src-4425' class='srclink' href='../src/git2/status.rs.html#272-276' title='goto source code'>[src]</a></span></h3>
 <div class='impl-items'><h4 id='method.drop' class='method'><span id='drop.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/ops/trait.Drop.html#tymethod.drop' class='fnname'>drop</a>(&amp;mut self)</code></span></h4>
 <div class='docblock'><p>A method called when the value goes out of scope. <a href="https://doc.rust-lang.org/nightly/core/ops/trait.Drop.html#tymethod.drop">Read more</a></p>
 </div></div></section>
@@ -123,11 +123,9 @@ when the status list was created), this can return 0.</p>
     <script>
         window.rootPath = "../";
         window.currentCrate = "git2";
-        window.playgroundUrl = "";
     </script>
     <script src="../jquery.js"></script>
     <script src="../main.js"></script>
-    
     <script defer src="../search-index.js"></script>
 </body>
 </html>

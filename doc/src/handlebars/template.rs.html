@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="rustdoc">
-    <meta name="description" content="Source to the Rust file `/home/hendrik/.cargo/git/checkouts/handlebars-rust-6b5b431bf9aaa55b/910af7cb/src/template.rs`.">
+    <meta name="description" content="Source to the Rust file `/home/hendrik/.cargo/registry/src/github.com-1ecc6299db9ec823/handlebars-0.22.0/src/template.rs`.">
     <meta name="keywords" content="rust, rustlang, rust-lang">
 
     <title>template.rs.html -- source</title>
@@ -886,11 +886,119 @@
 <span id="842">842</span>
 <span id="843">843</span>
 <span id="844">844</span>
+<span id="845">845</span>
+<span id="846">846</span>
+<span id="847">847</span>
+<span id="848">848</span>
+<span id="849">849</span>
+<span id="850">850</span>
+<span id="851">851</span>
+<span id="852">852</span>
+<span id="853">853</span>
+<span id="854">854</span>
+<span id="855">855</span>
+<span id="856">856</span>
+<span id="857">857</span>
+<span id="858">858</span>
+<span id="859">859</span>
+<span id="860">860</span>
+<span id="861">861</span>
+<span id="862">862</span>
+<span id="863">863</span>
+<span id="864">864</span>
+<span id="865">865</span>
+<span id="866">866</span>
+<span id="867">867</span>
+<span id="868">868</span>
+<span id="869">869</span>
+<span id="870">870</span>
+<span id="871">871</span>
+<span id="872">872</span>
+<span id="873">873</span>
+<span id="874">874</span>
+<span id="875">875</span>
+<span id="876">876</span>
+<span id="877">877</span>
+<span id="878">878</span>
+<span id="879">879</span>
+<span id="880">880</span>
+<span id="881">881</span>
+<span id="882">882</span>
+<span id="883">883</span>
+<span id="884">884</span>
+<span id="885">885</span>
+<span id="886">886</span>
+<span id="887">887</span>
+<span id="888">888</span>
+<span id="889">889</span>
+<span id="890">890</span>
+<span id="891">891</span>
+<span id="892">892</span>
+<span id="893">893</span>
+<span id="894">894</span>
+<span id="895">895</span>
+<span id="896">896</span>
+<span id="897">897</span>
+<span id="898">898</span>
+<span id="899">899</span>
+<span id="900">900</span>
+<span id="901">901</span>
+<span id="902">902</span>
+<span id="903">903</span>
+<span id="904">904</span>
+<span id="905">905</span>
+<span id="906">906</span>
+<span id="907">907</span>
+<span id="908">908</span>
+<span id="909">909</span>
+<span id="910">910</span>
+<span id="911">911</span>
+<span id="912">912</span>
+<span id="913">913</span>
+<span id="914">914</span>
+<span id="915">915</span>
+<span id="916">916</span>
+<span id="917">917</span>
+<span id="918">918</span>
+<span id="919">919</span>
+<span id="920">920</span>
+<span id="921">921</span>
+<span id="922">922</span>
+<span id="923">923</span>
+<span id="924">924</span>
+<span id="925">925</span>
+<span id="926">926</span>
+<span id="927">927</span>
+<span id="928">928</span>
+<span id="929">929</span>
+<span id="930">930</span>
+<span id="931">931</span>
+<span id="932">932</span>
+<span id="933">933</span>
+<span id="934">934</span>
+<span id="935">935</span>
+<span id="936">936</span>
+<span id="937">937</span>
+<span id="938">938</span>
+<span id="939">939</span>
+<span id="940">940</span>
+<span id="941">941</span>
+<span id="942">942</span>
+<span id="943">943</span>
+<span id="944">944</span>
+<span id="945">945</span>
+<span id="946">946</span>
+<span id="947">947</span>
+<span id="948">948</span>
+<span id="949">949</span>
+<span id="950">950</span>
+<span id="951">951</span>
+<span id="952">952</span>
+<span id="953">953</span>
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>slice</span>::<span class='ident'>Iter</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>iter</span>::<span class='ident'>Peekable</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>convert</span>::<span class='ident'>From</span>;
-<span class='comment'>// use std::fmt;</span>
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>collections</span>::{<span class='ident'>BTreeMap</span>, <span class='ident'>VecDeque</span>};
 <span class='kw'>use</span> <span class='ident'>pest</span>::<span class='ident'>prelude</span>::<span class='op'>*</span>;
 
@@ -903,10 +1011,9 @@
 
 <span class='kw'>use</span> <span class='ident'>grammar</span>::{<span class='ident'>Rdp</span>, <span class='ident'>Rule</span>};
 
-<span class='kw'>use</span> <span class='ident'>TemplateError</span>;
+<span class='kw'>use</span> <span class='ident'>error</span>::{<span class='ident'>TemplateError</span>, <span class='ident'>TemplateErrorReason</span>};
 
-<span class='kw'>use</span> <span class='self'>self</span>::<span class='ident'>TemplateElement</span>::{<span class='ident'>RawString</span>, <span class='ident'>Expression</span>, <span class='ident'>HelperExpression</span>, <span class='ident'>HTMLExpression</span>, <span class='ident'>HelperBlock</span>,
-                            <span class='ident'>Comment</span>};
+<span class='kw'>use</span> <span class='self'>self</span>::<span class='ident'>TemplateElement</span>::<span class='op'>*</span>;
 
 <span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>PartialEq</span>, <span class='ident'>Clone</span>, <span class='ident'>Debug</span>)]</span>
 <span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>TemplateMapping</span>(<span class='kw'>pub</span> <span class='ident'>usize</span>, <span class='kw'>pub</span> <span class='ident'>usize</span>);
@@ -990,6 +1097,14 @@
     }
 }
 
+<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>PartialEq</span>, <span class='ident'>Clone</span>, <span class='ident'>Debug</span>)]</span>
+<span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>Directive</span> {
+    <span class='kw'>pub</span> <span class='ident'>name</span>: <span class='ident'>Parameter</span>,
+    <span class='kw'>pub</span> <span class='ident'>params</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Parameter</span><span class='op'>&gt;</span>,
+    <span class='kw'>pub</span> <span class='ident'>hash</span>: <span class='ident'>BTreeMap</span><span class='op'>&lt;</span><span class='ident'>String</span>, <span class='ident'>Parameter</span><span class='op'>&gt;</span>,
+    <span class='kw'>pub</span> <span class='ident'>template</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Template</span><span class='op'>&gt;</span>,
+}
+
 <span class='kw'>impl</span> <span class='ident'>Parameter</span> {
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>as_name</span>(<span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>String</span><span class='op'>&gt;</span> {
         <span class='kw'>if</span> <span class='kw'>let</span> <span class='ident'>Parameter</span>::<span class='ident'>Name</span>(<span class='ident'>n</span>) <span class='op'>=</span> <span class='self'>self</span> {
@@ -1002,7 +1117,7 @@
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>parse</span>(<span class='ident'>s</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>Parameter</span>, <span class='ident'>TemplateError</span><span class='op'>&gt;</span> {
         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>parser</span> <span class='op'>=</span> <span class='ident'>Rdp</span>::<span class='ident'>new</span>(<span class='ident'>StringInput</span>::<span class='ident'>new</span>(<span class='ident'>s</span>));
         <span class='kw'>if</span> <span class='op'>!</span><span class='ident'>parser</span>.<span class='ident'>parameter</span>() {
-            <span class='kw'>return</span> <span class='prelude-val'>Err</span>(<span class='ident'>TemplateError</span>::<span class='ident'>InvalidParam</span>(<span class='ident'>s</span>.<span class='ident'>to_owned</span>()));
+            <span class='kw'>return</span> <span class='prelude-val'>Err</span>(<span class='ident'>TemplateError</span>::<span class='ident'>of</span>(<span class='ident'>TemplateErrorReason</span>::<span class='ident'>InvalidParam</span>(<span class='ident'>s</span>.<span class='ident'>to_owned</span>())));
         }
 
         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>it</span> <span class='op'>=</span> <span class='ident'>parser</span>.<span class='ident'>queue</span>().<span class='ident'>iter</span>().<span class='ident'>peekable</span>();
@@ -1048,7 +1163,7 @@
             }))
         } <span class='kw'>else</span> {
             <span class='comment'>// line/col no</span>
-            <span class='prelude-val'>Err</span>(<span class='ident'>TemplateError</span>::<span class='ident'>NestedSubexpression</span>(<span class='number'>0</span>, <span class='number'>0</span>))
+            <span class='prelude-val'>Err</span>(<span class='ident'>TemplateError</span>::<span class='ident'>of</span>(<span class='ident'>TemplateErrorReason</span>::<span class='ident'>NestedSubexpression</span>))
         }
     }
 
@@ -1059,7 +1174,7 @@
                       <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>Parameter</span>, <span class='ident'>TemplateError</span><span class='op'>&gt;</span> {
         <span class='kw'>let</span> <span class='ident'>name_node</span> <span class='op'>=</span> <span class='ident'>it</span>.<span class='ident'>next</span>().<span class='ident'>unwrap</span>();
         <span class='kw'>match</span> <span class='ident'>name_node</span>.<span class='ident'>rule</span> {
-            <span class='ident'>Rule</span>::<span class='ident'>identifier</span> <span class='op'>|</span> <span class='ident'>Rule</span>::<span class='ident'>reference</span> <span class='op'>=&gt;</span> {
+            <span class='ident'>Rule</span>::<span class='ident'>identifier</span> <span class='op'>|</span> <span class='ident'>Rule</span>::<span class='ident'>reference</span> <span class='op'>|</span> <span class='ident'>Rule</span>::<span class='ident'>invert_tag_item</span> <span class='op'>=&gt;</span> {
                 <span class='prelude-val'>Ok</span>(<span class='ident'>Parameter</span>::<span class='ident'>Name</span>(<span class='ident'>source</span>[<span class='ident'>name_node</span>.<span class='ident'>start</span>..<span class='ident'>name_node</span>.<span class='ident'>end</span>].<span class='ident'>to_owned</span>()))
             }
             <span class='ident'>Rule</span>::<span class='ident'>subexpression</span> <span class='op'>=&gt;</span> {
@@ -1208,12 +1323,24 @@
         })
     }
 
+    <span class='attribute'>#[<span class='ident'>inline</span>]</span>
+    <span class='kw'>fn</span> <span class='ident'>remove_previous_whitespace</span>(<span class='ident'>template_stack</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>VecDeque</span><span class='op'>&lt;</span><span class='ident'>Template</span><span class='op'>&gt;</span>) {
+        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>t</span> <span class='op'>=</span> <span class='ident'>template_stack</span>.<span class='ident'>front_mut</span>().<span class='ident'>unwrap</span>();
+        <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Some</span>(<span class='ident'>el</span>) <span class='op'>=</span> <span class='ident'>t</span>.<span class='ident'>elements</span>.<span class='ident'>pop</span>() {
+            <span class='kw'>if</span> <span class='kw'>let</span> <span class='ident'>RawString</span>(<span class='kw-2'>ref</span> <span class='ident'>text</span>) <span class='op'>=</span> <span class='ident'>el</span> {
+                <span class='ident'>t</span>.<span class='ident'>elements</span>.<span class='ident'>push</span>(<span class='ident'>RawString</span>(<span class='ident'>text</span>.<span class='ident'>trim_right</span>().<span class='ident'>to_owned</span>()));
+            } <span class='kw'>else</span> {
+                <span class='ident'>t</span>.<span class='ident'>elements</span>.<span class='ident'>push</span>(<span class='ident'>el</span>);
+            }
+        }
+    }
+
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>compile2</span><span class='op'>&lt;</span><span class='ident'>S</span>: <span class='ident'>AsRef</span><span class='op'>&lt;</span><span class='ident'>str</span><span class='op'>&gt;&gt;</span>(<span class='ident'>source</span>: <span class='ident'>S</span>, <span class='ident'>mapping</span>: <span class='ident'>bool</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>Template</span>, <span class='ident'>TemplateError</span><span class='op'>&gt;</span> {
         <span class='kw'>let</span> <span class='ident'>source</span> <span class='op'>=</span> <span class='ident'>source</span>.<span class='ident'>as_ref</span>();
         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>helper_stack</span>: <span class='ident'>VecDeque</span><span class='op'>&lt;</span><span class='ident'>HelperTemplate</span><span class='op'>&gt;</span> <span class='op'>=</span> <span class='ident'>VecDeque</span>::<span class='ident'>new</span>();
+        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>directive_stack</span>: <span class='ident'>VecDeque</span><span class='op'>&lt;</span><span class='ident'>Directive</span><span class='op'>&gt;</span> <span class='op'>=</span> <span class='ident'>VecDeque</span>::<span class='ident'>new</span>();
         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>template_stack</span>: <span class='ident'>VecDeque</span><span class='op'>&lt;</span><span class='ident'>Template</span><span class='op'>&gt;</span> <span class='op'>=</span> <span class='ident'>VecDeque</span>::<span class='ident'>new</span>();
 
-        <span class='comment'>// let mut omit_pre_ws = false;</span>
         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>omit_pro_ws</span> <span class='op'>=</span> <span class='bool-val'>false</span>;
 
         <span class='kw'>let</span> <span class='ident'>input</span> <span class='op'>=</span> <span class='ident'>StringInput</span>::<span class='ident'>new</span>(<span class='ident'>source</span>);
@@ -1222,7 +1349,7 @@
         <span class='kw'>if</span> <span class='op'>!</span><span class='ident'>parser</span>.<span class='ident'>handlebars</span>() {
             <span class='kw'>let</span> (_, <span class='ident'>pos</span>) <span class='op'>=</span> <span class='ident'>parser</span>.<span class='ident'>expected</span>();
             <span class='kw'>let</span> (<span class='ident'>line_no</span>, <span class='ident'>col_no</span>) <span class='op'>=</span> <span class='ident'>parser</span>.<span class='ident'>input</span>().<span class='ident'>line_col</span>(<span class='ident'>pos</span>);
-            <span class='kw'>return</span> <span class='prelude-val'>Err</span>(<span class='ident'>TemplateError</span>::<span class='ident'>InvalidSyntax</span>(<span class='ident'>line_no</span>, <span class='ident'>col_no</span>));
+            <span class='kw'>return</span> <span class='prelude-val'>Err</span>(<span class='ident'>TemplateError</span>::<span class='ident'>of</span>(<span class='ident'>TemplateErrorReason</span>::<span class='ident'>InvalidSyntax</span>).<span class='ident'>at</span>(<span class='ident'>line_no</span>, <span class='ident'>col_no</span>));
         }
 
         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>it</span> <span class='op'>=</span> <span class='ident'>parser</span>.<span class='ident'>queue</span>().<span class='ident'>iter</span>().<span class='ident'>peekable</span>();
@@ -1261,37 +1388,58 @@
                         <span class='ident'>t</span>.<span class='ident'>push_element</span>(<span class='ident'>RawString</span>(<span class='ident'>text</span>.<span class='ident'>to_owned</span>()), <span class='ident'>line_no</span>, <span class='ident'>col_no</span>);
                     }
                     <span class='ident'>Rule</span>::<span class='ident'>helper_block_start</span> <span class='op'>|</span>
-                    <span class='ident'>Rule</span>::<span class='ident'>raw_block_start</span> <span class='op'>=&gt;</span> {
+                    <span class='ident'>Rule</span>::<span class='ident'>raw_block_start</span> <span class='op'>|</span>
+                    <span class='ident'>Rule</span>::<span class='ident'>directive_block_start</span> <span class='op'>|</span>
+                    <span class='ident'>Rule</span>::<span class='ident'>partial_block_start</span> <span class='op'>=&gt;</span> {
                         <span class='kw'>let</span> <span class='ident'>exp</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>Template</span>::<span class='ident'>parse_expression</span>(<span class='ident'>source</span>, <span class='ident'>it</span>.<span class='ident'>by_ref</span>(), <span class='ident'>token</span>.<span class='ident'>end</span>));
-                        <span class='kw'>let</span> <span class='ident'>helper_template</span> <span class='op'>=</span> <span class='ident'>HelperTemplate</span> {
-                            <span class='ident'>name</span>: <span class='ident'>exp</span>.<span class='ident'>name</span>.<span class='ident'>as_name</span>().<span class='ident'>unwrap</span>(),
-                            <span class='ident'>params</span>: <span class='ident'>exp</span>.<span class='ident'>params</span>,
-                            <span class='ident'>hash</span>: <span class='ident'>exp</span>.<span class='ident'>hash</span>,
-                            <span class='ident'>block_param</span>: <span class='ident'>exp</span>.<span class='ident'>block_param</span>,
-                            <span class='ident'>block</span>: <span class='bool-val'>true</span>,
-                            <span class='ident'>template</span>: <span class='prelude-val'>None</span>,
-                            <span class='ident'>inverse</span>: <span class='prelude-val'>None</span>,
-                        };
-                        <span class='ident'>helper_stack</span>.<span class='ident'>push_front</span>(<span class='ident'>helper_template</span>);
 
-                        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>t</span> <span class='op'>=</span> <span class='ident'>template_stack</span>.<span class='ident'>front_mut</span>().<span class='ident'>unwrap</span>();
-                        <span class='kw'>if</span> <span class='ident'>exp</span>.<span class='ident'>omit_pre_ws</span> {
-                            <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Some</span>(<span class='ident'>el</span>) <span class='op'>=</span> <span class='ident'>t</span>.<span class='ident'>elements</span>.<span class='ident'>pop</span>() {
-                                <span class='kw'>if</span> <span class='kw'>let</span> <span class='ident'>RawString</span>(<span class='kw-2'>ref</span> <span class='ident'>text</span>) <span class='op'>=</span> <span class='ident'>el</span> {
-                                    <span class='ident'>t</span>.<span class='ident'>elements</span>.<span class='ident'>push</span>(<span class='ident'>RawString</span>(<span class='ident'>text</span>.<span class='ident'>trim_right</span>().<span class='ident'>to_owned</span>()));
-                                } <span class='kw'>else</span> {
-                                    <span class='ident'>t</span>.<span class='ident'>elements</span>.<span class='ident'>push</span>(<span class='ident'>el</span>);
-                                }
+                        <span class='kw'>match</span> <span class='ident'>token</span>.<span class='ident'>rule</span> {
+                            <span class='ident'>Rule</span>::<span class='ident'>helper_block_start</span> <span class='op'>|</span>
+                            <span class='ident'>Rule</span>::<span class='ident'>raw_block_start</span> <span class='op'>=&gt;</span> {
+                                <span class='kw'>let</span> <span class='ident'>helper_template</span> <span class='op'>=</span> <span class='ident'>HelperTemplate</span> {
+                                    <span class='ident'>name</span>: <span class='ident'>exp</span>.<span class='ident'>name</span>.<span class='ident'>as_name</span>().<span class='ident'>unwrap</span>(),
+                                    <span class='ident'>params</span>: <span class='ident'>exp</span>.<span class='ident'>params</span>,
+                                    <span class='ident'>hash</span>: <span class='ident'>exp</span>.<span class='ident'>hash</span>,
+                                    <span class='ident'>block_param</span>: <span class='ident'>exp</span>.<span class='ident'>block_param</span>,
+                                    <span class='ident'>block</span>: <span class='bool-val'>true</span>,
+                                    <span class='ident'>template</span>: <span class='prelude-val'>None</span>,
+                                    <span class='ident'>inverse</span>: <span class='prelude-val'>None</span>,
+                                };
+                                <span class='ident'>helper_stack</span>.<span class='ident'>push_front</span>(<span class='ident'>helper_template</span>);
                             }
+                            <span class='ident'>Rule</span>::<span class='ident'>directive_block_start</span> <span class='op'>|</span>
+                            <span class='ident'>Rule</span>::<span class='ident'>partial_block_start</span> <span class='op'>=&gt;</span> {
+                                <span class='kw'>let</span> <span class='ident'>directive</span> <span class='op'>=</span> <span class='ident'>Directive</span> {
+                                    <span class='ident'>name</span>: <span class='ident'>exp</span>.<span class='ident'>name</span>,
+                                    <span class='ident'>params</span>: <span class='ident'>exp</span>.<span class='ident'>params</span>,
+                                    <span class='ident'>hash</span>: <span class='ident'>exp</span>.<span class='ident'>hash</span>,
+                                    <span class='ident'>template</span>: <span class='prelude-val'>None</span>,
+                                };
+                                <span class='ident'>directive_stack</span>.<span class='ident'>push_front</span>(<span class='ident'>directive</span>);
+                            }
+                            _ <span class='op'>=&gt;</span> <span class='macro'>unreachable</span><span class='macro'>!</span>(),
                         }
 
+                        <span class='kw'>if</span> <span class='ident'>exp</span>.<span class='ident'>omit_pre_ws</span> {
+                            <span class='ident'>Template</span>::<span class='ident'>remove_previous_whitespace</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>template_stack</span>);
+                        }
                         <span class='ident'>omit_pro_ws</span> <span class='op'>=</span> <span class='ident'>exp</span>.<span class='ident'>omit_pro_ws</span>;
 
+                        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>t</span> <span class='op'>=</span> <span class='ident'>template_stack</span>.<span class='ident'>front_mut</span>().<span class='ident'>unwrap</span>();
                         <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Some</span>(<span class='kw-2'>ref</span> <span class='kw-2'>mut</span> <span class='ident'>maps</span>) <span class='op'>=</span> <span class='ident'>t</span>.<span class='ident'>mapping</span> {
                             <span class='ident'>maps</span>.<span class='ident'>push</span>(<span class='ident'>TemplateMapping</span>(<span class='ident'>line_no</span>, <span class='ident'>col_no</span>));
                         }
                     }
                     <span class='ident'>Rule</span>::<span class='ident'>invert_tag</span> <span class='op'>=&gt;</span> {
+                        <span class='comment'>// hack: invert_tag structure is similar to ExpressionSpec, so I</span>
+                        <span class='comment'>// use it here to represent the data</span>
+                        <span class='kw'>let</span> <span class='ident'>exp</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>Template</span>::<span class='ident'>parse_expression</span>(<span class='ident'>source</span>, <span class='ident'>it</span>.<span class='ident'>by_ref</span>(), <span class='ident'>token</span>.<span class='ident'>end</span>));
+
+                        <span class='kw'>if</span> <span class='ident'>exp</span>.<span class='ident'>omit_pre_ws</span> {
+                            <span class='ident'>Template</span>::<span class='ident'>remove_previous_whitespace</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>template_stack</span>);
+                        }
+                        <span class='ident'>omit_pro_ws</span> <span class='op'>=</span> <span class='ident'>exp</span>.<span class='ident'>omit_pro_ws</span>;
+
                         <span class='kw'>let</span> <span class='ident'>t</span> <span class='op'>=</span> <span class='ident'>template_stack</span>.<span class='ident'>pop_front</span>().<span class='ident'>unwrap</span>();
                         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>h</span> <span class='op'>=</span> <span class='ident'>helper_stack</span>.<span class='ident'>front_mut</span>().<span class='ident'>unwrap</span>();
                         <span class='ident'>h</span>.<span class='ident'>template</span> <span class='op'>=</span> <span class='prelude-val'>Some</span>(<span class='ident'>t</span>);
@@ -1305,104 +1453,103 @@
                         <span class='ident'>t</span>.<span class='ident'>push_element</span>(<span class='ident'>RawString</span>(<span class='ident'>text</span>.<span class='ident'>to_owned</span>()), <span class='ident'>line_no</span>, <span class='ident'>col_no</span>);
                         <span class='ident'>template_stack</span>.<span class='ident'>push_front</span>(<span class='ident'>t</span>);
                     }
+                    <span class='ident'>Rule</span>::<span class='ident'>expression</span> <span class='op'>|</span>
+                    <span class='ident'>Rule</span>::<span class='ident'>html_expression</span> <span class='op'>|</span>
+                    <span class='ident'>Rule</span>::<span class='ident'>helper_expression</span> <span class='op'>|</span>
+                    <span class='ident'>Rule</span>::<span class='ident'>directive_expression</span> <span class='op'>|</span>
+                    <span class='ident'>Rule</span>::<span class='ident'>partial_expression</span> <span class='op'>|</span>
                     <span class='ident'>Rule</span>::<span class='ident'>helper_block_end</span> <span class='op'>|</span>
-                    <span class='ident'>Rule</span>::<span class='ident'>raw_block_end</span> <span class='op'>=&gt;</span> {
+                    <span class='ident'>Rule</span>::<span class='ident'>raw_block_end</span> <span class='op'>|</span>
+                    <span class='ident'>Rule</span>::<span class='ident'>directive_block_end</span> <span class='op'>|</span>
+                    <span class='ident'>Rule</span>::<span class='ident'>partial_block_end</span> <span class='op'>=&gt;</span> {
                         <span class='kw'>let</span> <span class='ident'>exp</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>Template</span>::<span class='ident'>parse_expression</span>(<span class='ident'>source</span>, <span class='ident'>it</span>.<span class='ident'>by_ref</span>(), <span class='ident'>token</span>.<span class='ident'>end</span>));
-
                         <span class='kw'>if</span> <span class='ident'>exp</span>.<span class='ident'>omit_pre_ws</span> {
-                            <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>t</span> <span class='op'>=</span> <span class='ident'>template_stack</span>.<span class='ident'>front_mut</span>().<span class='ident'>unwrap</span>();
-                            <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Some</span>(<span class='ident'>el</span>) <span class='op'>=</span> <span class='ident'>t</span>.<span class='ident'>elements</span>.<span class='ident'>pop</span>() {
-                                <span class='kw'>if</span> <span class='kw'>let</span> <span class='ident'>RawString</span>(<span class='kw-2'>ref</span> <span class='ident'>text</span>) <span class='op'>=</span> <span class='ident'>el</span> {
-                                    <span class='ident'>t</span>.<span class='ident'>elements</span>.<span class='ident'>push</span>(<span class='ident'>RawString</span>(<span class='ident'>text</span>.<span class='ident'>trim_right</span>().<span class='ident'>to_owned</span>()));
-                                } <span class='kw'>else</span> {
-                                    <span class='ident'>t</span>.<span class='ident'>elements</span>.<span class='ident'>push</span>(<span class='ident'>el</span>);
-                                }
-                            }
-                        }
-                        <span class='ident'>omit_pro_ws</span> <span class='op'>=</span> <span class='ident'>exp</span>.<span class='ident'>omit_pro_ws</span>;
-
-                        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>h</span> <span class='op'>=</span> <span class='ident'>helper_stack</span>.<span class='ident'>pop_front</span>().<span class='ident'>unwrap</span>();
-                        <span class='kw'>let</span> <span class='ident'>close_tag_name</span> <span class='op'>=</span> <span class='ident'>exp</span>.<span class='ident'>name</span>.<span class='ident'>as_name</span>().<span class='ident'>unwrap</span>();
-                        <span class='kw'>if</span> <span class='ident'>h</span>.<span class='ident'>name</span> <span class='op'>==</span> <span class='ident'>close_tag_name</span> {
-                            <span class='kw'>let</span> <span class='ident'>prev_t</span> <span class='op'>=</span> <span class='ident'>template_stack</span>.<span class='ident'>pop_front</span>().<span class='ident'>unwrap</span>();
-                            <span class='kw'>if</span> <span class='ident'>h</span>.<span class='ident'>template</span>.<span class='ident'>is_some</span>() {
-                                <span class='ident'>h</span>.<span class='ident'>inverse</span> <span class='op'>=</span> <span class='prelude-val'>Some</span>(<span class='ident'>prev_t</span>);
-                            } <span class='kw'>else</span> {
-                                <span class='ident'>h</span>.<span class='ident'>template</span> <span class='op'>=</span> <span class='prelude-val'>Some</span>(<span class='ident'>prev_t</span>);
-                            }
-                            <span class='kw'>let</span> <span class='ident'>t</span> <span class='op'>=</span> <span class='ident'>template_stack</span>.<span class='ident'>front_mut</span>().<span class='ident'>unwrap</span>();
-                            <span class='ident'>t</span>.<span class='ident'>elements</span>.<span class='ident'>push</span>(<span class='ident'>HelperBlock</span>(<span class='ident'>h</span>));
-                        } <span class='kw'>else</span> {
-                            <span class='kw'>return</span> <span class='prelude-val'>Err</span>(<span class='ident'>TemplateError</span>::<span class='ident'>MismatchingClosedHelper</span>(<span class='ident'>line_no</span>,
-                                                                              <span class='ident'>col_no</span>,
-                                                                              <span class='ident'>h</span>.<span class='ident'>name</span>,
-                                                                              <span class='ident'>close_tag_name</span>));
-                        }
-                    }
-                    <span class='ident'>Rule</span>::<span class='ident'>expression</span> <span class='op'>=&gt;</span> {
-                        <span class='comment'>// expression or helper expression</span>
-                        <span class='comment'>// ( identifier | subexpression )</span>
-                        <span class='kw'>let</span> <span class='ident'>exp</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>Template</span>::<span class='ident'>parse_expression</span>(<span class='ident'>source</span>, <span class='ident'>it</span>.<span class='ident'>by_ref</span>(), <span class='ident'>token</span>.<span class='ident'>end</span>));
-                        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>t</span> <span class='op'>=</span> <span class='ident'>template_stack</span>.<span class='ident'>front_mut</span>().<span class='ident'>unwrap</span>();
-                        <span class='kw'>if</span> <span class='ident'>exp</span>.<span class='ident'>omit_pre_ws</span> {
-                            <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Some</span>(<span class='ident'>el</span>) <span class='op'>=</span> <span class='ident'>t</span>.<span class='ident'>elements</span>.<span class='ident'>pop</span>() {
-                                <span class='kw'>if</span> <span class='kw'>let</span> <span class='ident'>RawString</span>(<span class='kw-2'>ref</span> <span class='ident'>text</span>) <span class='op'>=</span> <span class='ident'>el</span> {
-                                    <span class='ident'>t</span>.<span class='ident'>elements</span>.<span class='ident'>push</span>(<span class='ident'>RawString</span>(<span class='ident'>text</span>.<span class='ident'>trim_right</span>().<span class='ident'>to_owned</span>()));
-                                } <span class='kw'>else</span> {
-                                    <span class='ident'>t</span>.<span class='ident'>elements</span>.<span class='ident'>push</span>(<span class='ident'>el</span>);
-                                }
-                            }
+                            <span class='ident'>Template</span>::<span class='ident'>remove_previous_whitespace</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>template_stack</span>);
                         }
 
                         <span class='ident'>omit_pro_ws</span> <span class='op'>=</span> <span class='ident'>exp</span>.<span class='ident'>omit_pro_ws</span>;
 
-                        <span class='kw'>let</span> <span class='ident'>el</span> <span class='op'>=</span> <span class='ident'>Expression</span>(<span class='ident'>exp</span>.<span class='ident'>name</span>);
-                        <span class='ident'>t</span>.<span class='ident'>push_element</span>(<span class='ident'>el</span>, <span class='ident'>line_no</span>, <span class='ident'>col_no</span>);
-                    }
-                    <span class='ident'>Rule</span>::<span class='ident'>html_expression</span> <span class='op'>=&gt;</span> {
-                        <span class='comment'>// expression or helper expression</span>
-                        <span class='comment'>// ( identifier | subexpression )</span>
-                        <span class='kw'>let</span> <span class='ident'>exp</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>Template</span>::<span class='ident'>parse_expression</span>(<span class='ident'>source</span>, <span class='ident'>it</span>.<span class='ident'>by_ref</span>(), <span class='ident'>token</span>.<span class='ident'>end</span>));
-                        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>t</span> <span class='op'>=</span> <span class='ident'>template_stack</span>.<span class='ident'>front_mut</span>().<span class='ident'>unwrap</span>();
-                        <span class='kw'>if</span> <span class='ident'>exp</span>.<span class='ident'>omit_pre_ws</span> {
-                            <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Some</span>(<span class='ident'>el</span>) <span class='op'>=</span> <span class='ident'>t</span>.<span class='ident'>elements</span>.<span class='ident'>pop</span>() {
-                                <span class='kw'>if</span> <span class='kw'>let</span> <span class='ident'>RawString</span>(<span class='kw-2'>ref</span> <span class='ident'>text</span>) <span class='op'>=</span> <span class='ident'>el</span> {
-                                    <span class='ident'>t</span>.<span class='ident'>elements</span>.<span class='ident'>push</span>(<span class='ident'>RawString</span>(<span class='ident'>text</span>.<span class='ident'>trim_right</span>().<span class='ident'>to_owned</span>()));
+                        <span class='kw'>match</span> <span class='ident'>token</span>.<span class='ident'>rule</span> {
+                            <span class='ident'>Rule</span>::<span class='ident'>expression</span> <span class='op'>=&gt;</span> {
+                                <span class='kw'>let</span> <span class='ident'>el</span> <span class='op'>=</span> <span class='ident'>Expression</span>(<span class='ident'>exp</span>.<span class='ident'>name</span>);
+                                <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>t</span> <span class='op'>=</span> <span class='ident'>template_stack</span>.<span class='ident'>front_mut</span>().<span class='ident'>unwrap</span>();
+                                <span class='ident'>t</span>.<span class='ident'>push_element</span>(<span class='ident'>el</span>, <span class='ident'>line_no</span>, <span class='ident'>col_no</span>);
+                            }
+                            <span class='ident'>Rule</span>::<span class='ident'>html_expression</span> <span class='op'>=&gt;</span> {
+                                <span class='kw'>let</span> <span class='ident'>el</span> <span class='op'>=</span> <span class='ident'>HTMLExpression</span>(<span class='ident'>exp</span>.<span class='ident'>name</span>);
+                                <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>t</span> <span class='op'>=</span> <span class='ident'>template_stack</span>.<span class='ident'>front_mut</span>().<span class='ident'>unwrap</span>();
+                                <span class='ident'>t</span>.<span class='ident'>push_element</span>(<span class='ident'>el</span>, <span class='ident'>line_no</span>, <span class='ident'>col_no</span>);
+                            }
+                            <span class='ident'>Rule</span>::<span class='ident'>helper_expression</span> <span class='op'>=&gt;</span> {
+                                <span class='kw'>let</span> <span class='ident'>helper_template</span> <span class='op'>=</span> <span class='ident'>HelperTemplate</span> {
+                                    <span class='ident'>name</span>: <span class='ident'>exp</span>.<span class='ident'>name</span>.<span class='ident'>as_name</span>().<span class='ident'>unwrap</span>(),
+                                    <span class='ident'>params</span>: <span class='ident'>exp</span>.<span class='ident'>params</span>,
+                                    <span class='ident'>hash</span>: <span class='ident'>exp</span>.<span class='ident'>hash</span>,
+                                    <span class='ident'>block_param</span>: <span class='ident'>exp</span>.<span class='ident'>block_param</span>,
+                                    <span class='ident'>block</span>: <span class='bool-val'>false</span>,
+                                    <span class='ident'>template</span>: <span class='prelude-val'>None</span>,
+                                    <span class='ident'>inverse</span>: <span class='prelude-val'>None</span>,
+                                };
+                                <span class='kw'>let</span> <span class='ident'>el</span> <span class='op'>=</span> <span class='ident'>HelperExpression</span>(<span class='ident'>helper_template</span>);
+                                <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>t</span> <span class='op'>=</span> <span class='ident'>template_stack</span>.<span class='ident'>front_mut</span>().<span class='ident'>unwrap</span>();
+                                <span class='ident'>t</span>.<span class='ident'>push_element</span>(<span class='ident'>el</span>, <span class='ident'>line_no</span>, <span class='ident'>col_no</span>);
+                            }
+                            <span class='ident'>Rule</span>::<span class='ident'>directive_expression</span> <span class='op'>|</span>
+                            <span class='ident'>Rule</span>::<span class='ident'>partial_expression</span> <span class='op'>=&gt;</span> {
+                                <span class='kw'>let</span> <span class='ident'>directive</span> <span class='op'>=</span> <span class='ident'>Directive</span> {
+                                    <span class='ident'>name</span>: <span class='ident'>exp</span>.<span class='ident'>name</span>,
+                                    <span class='ident'>params</span>: <span class='ident'>exp</span>.<span class='ident'>params</span>,
+                                    <span class='ident'>hash</span>: <span class='ident'>exp</span>.<span class='ident'>hash</span>,
+                                    <span class='ident'>template</span>: <span class='prelude-val'>None</span>,
+                                };
+                                <span class='kw'>let</span> <span class='ident'>el</span> <span class='op'>=</span> <span class='kw'>if</span> <span class='ident'>token</span>.<span class='ident'>rule</span> <span class='op'>==</span> <span class='ident'>Rule</span>::<span class='ident'>directive_expression</span> {
+                                    <span class='ident'>DirectiveExpression</span>(<span class='ident'>directive</span>)
                                 } <span class='kw'>else</span> {
-                                    <span class='ident'>t</span>.<span class='ident'>elements</span>.<span class='ident'>push</span>(<span class='ident'>el</span>);
+                                    <span class='ident'>PartialExpression</span>(<span class='ident'>directive</span>)
+                                };
+                                <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>t</span> <span class='op'>=</span> <span class='ident'>template_stack</span>.<span class='ident'>front_mut</span>().<span class='ident'>unwrap</span>();
+                                <span class='ident'>t</span>.<span class='ident'>push_element</span>(<span class='ident'>el</span>, <span class='ident'>line_no</span>, <span class='ident'>col_no</span>);
+                            }
+                            <span class='ident'>Rule</span>::<span class='ident'>helper_block_end</span> <span class='op'>|</span>
+                            <span class='ident'>Rule</span>::<span class='ident'>raw_block_end</span> <span class='op'>=&gt;</span> {
+                                <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>h</span> <span class='op'>=</span> <span class='ident'>helper_stack</span>.<span class='ident'>pop_front</span>().<span class='ident'>unwrap</span>();
+                                <span class='kw'>let</span> <span class='ident'>close_tag_name</span> <span class='op'>=</span> <span class='ident'>exp</span>.<span class='ident'>name</span>.<span class='ident'>as_name</span>().<span class='ident'>unwrap</span>();
+                                <span class='kw'>if</span> <span class='ident'>h</span>.<span class='ident'>name</span> <span class='op'>==</span> <span class='ident'>close_tag_name</span> {
+                                    <span class='kw'>let</span> <span class='ident'>prev_t</span> <span class='op'>=</span> <span class='ident'>template_stack</span>.<span class='ident'>pop_front</span>().<span class='ident'>unwrap</span>();
+                                    <span class='kw'>if</span> <span class='ident'>h</span>.<span class='ident'>template</span>.<span class='ident'>is_some</span>() {
+                                        <span class='ident'>h</span>.<span class='ident'>inverse</span> <span class='op'>=</span> <span class='prelude-val'>Some</span>(<span class='ident'>prev_t</span>);
+                                    } <span class='kw'>else</span> {
+                                        <span class='ident'>h</span>.<span class='ident'>template</span> <span class='op'>=</span> <span class='prelude-val'>Some</span>(<span class='ident'>prev_t</span>);
+                                    }
+                                    <span class='kw'>let</span> <span class='ident'>t</span> <span class='op'>=</span> <span class='ident'>template_stack</span>.<span class='ident'>front_mut</span>().<span class='ident'>unwrap</span>();
+                                    <span class='ident'>t</span>.<span class='ident'>elements</span>.<span class='ident'>push</span>(<span class='ident'>HelperBlock</span>(<span class='ident'>h</span>));
+                                } <span class='kw'>else</span> {
+                                    <span class='kw'>return</span> <span class='prelude-val'>Err</span>(<span class='ident'>TemplateError</span>::<span class='ident'>of</span>(
+                                        <span class='ident'>TemplateErrorReason</span>::<span class='ident'>MismatchingClosedHelper</span>(
+                                            <span class='ident'>h</span>.<span class='ident'>name</span>, <span class='ident'>close_tag_name</span>)).<span class='ident'>at</span>(<span class='ident'>line_no</span>, <span class='ident'>col_no</span>));
                                 }
                             }
-                        }
-                        <span class='ident'>omit_pro_ws</span> <span class='op'>=</span> <span class='ident'>exp</span>.<span class='ident'>omit_pro_ws</span>;
-
-                        <span class='kw'>let</span> <span class='ident'>el</span> <span class='op'>=</span> <span class='ident'>HTMLExpression</span>(<span class='ident'>exp</span>.<span class='ident'>name</span>);
-                        <span class='ident'>t</span>.<span class='ident'>push_element</span>(<span class='ident'>el</span>, <span class='ident'>line_no</span>, <span class='ident'>col_no</span>);
-                    }
-                    <span class='ident'>Rule</span>::<span class='ident'>helper_expression</span> <span class='op'>=&gt;</span> {
-                        <span class='kw'>let</span> <span class='ident'>exp</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>Template</span>::<span class='ident'>parse_expression</span>(<span class='ident'>source</span>, <span class='ident'>it</span>.<span class='ident'>by_ref</span>(), <span class='ident'>token</span>.<span class='ident'>end</span>));
-                        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>t</span> <span class='op'>=</span> <span class='ident'>template_stack</span>.<span class='ident'>front_mut</span>().<span class='ident'>unwrap</span>();
-                        <span class='kw'>if</span> <span class='ident'>exp</span>.<span class='ident'>omit_pre_ws</span> {
-                            <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Some</span>(<span class='ident'>el</span>) <span class='op'>=</span> <span class='ident'>t</span>.<span class='ident'>elements</span>.<span class='ident'>pop</span>() {
-                                <span class='kw'>if</span> <span class='kw'>let</span> <span class='ident'>RawString</span>(<span class='kw-2'>ref</span> <span class='ident'>text</span>) <span class='op'>=</span> <span class='ident'>el</span> {
-                                    <span class='ident'>t</span>.<span class='ident'>elements</span>.<span class='ident'>push</span>(<span class='ident'>RawString</span>(<span class='ident'>text</span>.<span class='ident'>trim_right</span>().<span class='ident'>to_owned</span>()));
+                            <span class='ident'>Rule</span>::<span class='ident'>directive_block_end</span> <span class='op'>|</span>
+                            <span class='ident'>Rule</span>::<span class='ident'>partial_block_end</span> <span class='op'>=&gt;</span> {
+                                <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>d</span> <span class='op'>=</span> <span class='ident'>directive_stack</span>.<span class='ident'>pop_front</span>().<span class='ident'>unwrap</span>();
+                                <span class='kw'>let</span> <span class='ident'>close_tag_name</span> <span class='op'>=</span> <span class='ident'>exp</span>.<span class='ident'>name</span>;
+                                <span class='kw'>if</span> <span class='ident'>d</span>.<span class='ident'>name</span> <span class='op'>==</span> <span class='ident'>close_tag_name</span> {
+                                    <span class='kw'>let</span> <span class='ident'>prev_t</span> <span class='op'>=</span> <span class='ident'>template_stack</span>.<span class='ident'>pop_front</span>().<span class='ident'>unwrap</span>();
+                                    <span class='ident'>d</span>.<span class='ident'>template</span> <span class='op'>=</span> <span class='prelude-val'>Some</span>(<span class='ident'>prev_t</span>);
+                                    <span class='kw'>let</span> <span class='ident'>t</span> <span class='op'>=</span> <span class='ident'>template_stack</span>.<span class='ident'>front_mut</span>().<span class='ident'>unwrap</span>();
+                                    <span class='kw'>if</span> <span class='ident'>token</span>.<span class='ident'>rule</span> <span class='op'>==</span> <span class='ident'>Rule</span>::<span class='ident'>directive_block_end</span> {
+                                        <span class='ident'>t</span>.<span class='ident'>elements</span>.<span class='ident'>push</span>(<span class='ident'>DirectiveBlock</span>(<span class='ident'>d</span>));
+                                    } <span class='kw'>else</span> {
+                                        <span class='ident'>t</span>.<span class='ident'>elements</span>.<span class='ident'>push</span>(<span class='ident'>PartialBlock</span>(<span class='ident'>d</span>));
+                                    }
                                 } <span class='kw'>else</span> {
-                                    <span class='ident'>t</span>.<span class='ident'>elements</span>.<span class='ident'>push</span>(<span class='ident'>el</span>);
+                                    <span class='kw'>return</span> <span class='prelude-val'>Err</span>(<span class='ident'>TemplateError</span>::<span class='ident'>of</span>(
+                                        <span class='ident'>TemplateErrorReason</span>::<span class='ident'>MismatchingClosedDirective</span>(
+                                            <span class='ident'>d</span>.<span class='ident'>name</span>, <span class='ident'>close_tag_name</span>)).<span class='ident'>at</span>(<span class='ident'>line_no</span>, <span class='ident'>col_no</span>));
                                 }
                             }
+                            _ <span class='op'>=&gt;</span> <span class='macro'>unreachable</span><span class='macro'>!</span>(),
                         }
-                        <span class='ident'>omit_pro_ws</span> <span class='op'>=</span> <span class='ident'>exp</span>.<span class='ident'>omit_pro_ws</span>;
-
-                        <span class='kw'>let</span> <span class='ident'>helper_template</span> <span class='op'>=</span> <span class='ident'>HelperTemplate</span> {
-                            <span class='ident'>name</span>: <span class='ident'>exp</span>.<span class='ident'>name</span>.<span class='ident'>as_name</span>().<span class='ident'>unwrap</span>(),
-                            <span class='ident'>params</span>: <span class='ident'>exp</span>.<span class='ident'>params</span>,
-                            <span class='ident'>hash</span>: <span class='ident'>exp</span>.<span class='ident'>hash</span>,
-                            <span class='ident'>block_param</span>: <span class='ident'>exp</span>.<span class='ident'>block_param</span>,
-                            <span class='ident'>block</span>: <span class='bool-val'>false</span>,
-                            <span class='ident'>template</span>: <span class='prelude-val'>None</span>,
-                            <span class='ident'>inverse</span>: <span class='prelude-val'>None</span>,
-                        };
-                        <span class='kw'>let</span> <span class='ident'>el</span> <span class='op'>=</span> <span class='ident'>HelperExpression</span>(<span class='ident'>helper_template</span>);
-                        <span class='ident'>t</span>.<span class='ident'>push_element</span>(<span class='ident'>el</span>, <span class='ident'>line_no</span>, <span class='ident'>col_no</span>);
                     }
                     <span class='ident'>Rule</span>::<span class='ident'>hbs_comment</span> <span class='op'>=&gt;</span> {
                         <span class='kw'>let</span> <span class='ident'>text</span> <span class='op'>=</span> <span class='ident'>parser</span>.<span class='ident'>input</span>().<span class='ident'>slice</span>(<span class='ident'>token</span>.<span class='ident'>start</span> <span class='op'>+</span> <span class='number'>3</span>, <span class='ident'>token</span>.<span class='ident'>end</span> <span class='op'>-</span> <span class='number'>2</span>);
@@ -1431,9 +1578,13 @@
                                             <span class='ident'>name</span>: <span class='ident'>String</span>,
                                             <span class='ident'>mapping</span>: <span class='ident'>bool</span>)
                                             <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>Template</span>, <span class='ident'>TemplateError</span><span class='op'>&gt;</span> {
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>t</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>Template</span>::<span class='ident'>compile2</span>(<span class='ident'>source</span>, <span class='ident'>mapping</span>));
-        <span class='ident'>t</span>.<span class='ident'>name</span> <span class='op'>=</span> <span class='prelude-val'>Some</span>(<span class='ident'>name</span>);
-        <span class='prelude-val'>Ok</span>(<span class='ident'>t</span>)
+        <span class='kw'>match</span> <span class='ident'>Template</span>::<span class='ident'>compile2</span>(<span class='ident'>source</span>, <span class='ident'>mapping</span>) {
+            <span class='prelude-val'>Ok</span>(<span class='kw-2'>mut</span> <span class='ident'>t</span>) <span class='op'>=&gt;</span> {
+                <span class='ident'>t</span>.<span class='ident'>name</span> <span class='op'>=</span> <span class='prelude-val'>Some</span>(<span class='ident'>name</span>);
+                <span class='prelude-val'>Ok</span>(<span class='ident'>t</span>)
+            }
+            <span class='prelude-val'>Err</span>(<span class='ident'>e</span>) <span class='op'>=&gt;</span> <span class='prelude-val'>Err</span>(<span class='ident'>e</span>.<span class='ident'>in_template</span>(<span class='ident'>name</span>)),
+        }
     }
 }
 
@@ -1444,6 +1595,10 @@
     <span class='ident'>HTMLExpression</span>(<span class='ident'>Parameter</span>),
     <span class='ident'>HelperExpression</span>(<span class='ident'>HelperTemplate</span>),
     <span class='ident'>HelperBlock</span>(<span class='ident'>HelperTemplate</span>),
+    <span class='ident'>DirectiveExpression</span>(<span class='ident'>Directive</span>),
+    <span class='ident'>DirectiveBlock</span>(<span class='ident'>Directive</span>),
+    <span class='ident'>PartialExpression</span>(<span class='ident'>Directive</span>),
+    <span class='ident'>PartialBlock</span>(<span class='ident'>Directive</span>),
     <span class='ident'>Comment</span>(<span class='ident'>String</span>),
 }
 
@@ -1504,7 +1659,8 @@
 
     <span class='kw'>let</span> <span class='ident'>t</span> <span class='op'>=</span> <span class='ident'>Template</span>::<span class='ident'>compile</span>(<span class='ident'>source</span>.<span class='ident'>to_string</span>());
 
-    <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>t</span>.<span class='ident'>unwrap_err</span>(), <span class='ident'>TemplateError</span>::<span class='ident'>InvalidSyntax</span>(<span class='number'>4</span>, <span class='number'>5</span>));
+    <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>t</span>.<span class='ident'>unwrap_err</span>(),
+               <span class='ident'>TemplateError</span>::<span class='ident'>of</span>(<span class='ident'>TemplateErrorReason</span>::<span class='ident'>InvalidSyntax</span>).<span class='ident'>at</span>(<span class='number'>4</span>, <span class='number'>5</span>));
 }
 
 <span class='attribute'>#[<span class='ident'>test</span>]</span>
@@ -1588,6 +1744,18 @@
     <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>t</span>.<span class='ident'>elements</span>[<span class='number'>0</span>], <span class='ident'>RawString</span>(<span class='string'>&quot;hello~&quot;</span>.<span class='ident'>to_string</span>()));
     <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>t</span>.<span class='ident'>elements</span>[<span class='number'>1</span>], <span class='ident'>Expression</span>(<span class='ident'>Parameter</span>::<span class='ident'>Name</span>(<span class='string'>&quot;world&quot;</span>.<span class='ident'>into</span>())));
     <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>t</span>.<span class='ident'>elements</span>[<span class='number'>2</span>], <span class='ident'>RawString</span>(<span class='string'>&quot;!&quot;</span>.<span class='ident'>to_string</span>()));
+
+    <span class='kw'>let</span> <span class='ident'>t2</span> <span class='op'>=</span> <span class='ident'>Template</span>::<span class='ident'>compile</span>(<span class='string'>&quot;{{#if true}}1  {{~ else ~}} 2 {{~/if}}&quot;</span>.<span class='ident'>to_string</span>()).<span class='ident'>ok</span>().<span class='ident'>unwrap</span>();
+    <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>t2</span>.<span class='ident'>elements</span>.<span class='ident'>len</span>(), <span class='number'>1</span>);
+    <span class='kw'>match</span> <span class='ident'>t2</span>.<span class='ident'>elements</span>[<span class='number'>0</span>] {
+        <span class='ident'>HelperBlock</span>(<span class='kw-2'>ref</span> <span class='ident'>h</span>) <span class='op'>=&gt;</span> {
+            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>h</span>.<span class='ident'>template</span>.<span class='ident'>as_ref</span>().<span class='ident'>unwrap</span>().<span class='ident'>elements</span>[<span class='number'>0</span>],
+                       <span class='ident'>RawString</span>(<span class='string'>&quot;1&quot;</span>.<span class='ident'>to_string</span>()));
+            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>h</span>.<span class='ident'>inverse</span>.<span class='ident'>as_ref</span>().<span class='ident'>unwrap</span>().<span class='ident'>elements</span>[<span class='number'>0</span>],
+                       <span class='ident'>RawString</span>(<span class='string'>&quot;2&quot;</span>.<span class='ident'>to_string</span>()));
+        }
+        _ <span class='op'>=&gt;</span> <span class='macro'>unreachable</span><span class='macro'>!</span>(),
+    }
 }
 
 <span class='attribute'>#[<span class='ident'>test</span>]</span>
@@ -1596,8 +1764,8 @@
     <span class='kw'>for</span> <span class='ident'>s</span> <span class='kw'>in</span> <span class='ident'>sources</span>.<span class='ident'>iter</span>() {
         <span class='kw'>let</span> <span class='ident'>result</span> <span class='op'>=</span> <span class='ident'>Template</span>::<span class='ident'>compile</span>(<span class='ident'>s</span>.<span class='ident'>to_owned</span>());
         <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Err</span>(<span class='ident'>e</span>) <span class='op'>=</span> <span class='ident'>result</span> {
-            <span class='kw'>match</span> <span class='ident'>e</span> {
-                <span class='ident'>TemplateError</span>::<span class='ident'>InvalidSyntax</span>(_, _) <span class='op'>=&gt;</span> {}
+            <span class='kw'>match</span> <span class='ident'>e</span>.<span class='ident'>reason</span> {
+                <span class='ident'>TemplateErrorReason</span>::<span class='ident'>InvalidSyntax</span> <span class='op'>=&gt;</span> {}
                 _ <span class='op'>=&gt;</span> {
                     <span class='macro'>panic</span><span class='macro'>!</span>(<span class='string'>&quot;Unexpected error type {}&quot;</span>, <span class='ident'>e</span>);
                 }
@@ -1731,6 +1899,56 @@
         <span class='prelude-val'>Err</span>(<span class='ident'>e</span>) <span class='op'>=&gt;</span> <span class='macro'>panic</span><span class='macro'>!</span>(<span class='string'>&quot;{}&quot;</span>, <span class='ident'>e</span>),
     }
 }
+
+<span class='attribute'>#[<span class='ident'>test</span>]</span>
+<span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>feature</span><span class='op'>=</span><span class='string'>&quot;partial4&quot;</span>)]</span>
+<span class='kw'>fn</span> <span class='ident'>test_directive</span>() {
+    <span class='kw'>match</span> <span class='ident'>Template</span>::<span class='ident'>compile</span>(<span class='string'>&quot;hello {{* ssh}} world&quot;</span>) {
+        <span class='prelude-val'>Err</span>(<span class='ident'>e</span>) <span class='op'>=&gt;</span> <span class='macro'>panic</span><span class='macro'>!</span>(<span class='string'>&quot;{}&quot;</span>, <span class='ident'>e</span>),
+        <span class='prelude-val'>Ok</span>(<span class='ident'>t</span>) <span class='op'>=&gt;</span> {
+            <span class='kw'>if</span> <span class='kw'>let</span> <span class='ident'>DirectiveExpression</span>(<span class='kw-2'>ref</span> <span class='ident'>de</span>) <span class='op'>=</span> <span class='ident'>t</span>.<span class='ident'>elements</span>[<span class='number'>1</span>] {
+                <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>de</span>.<span class='ident'>name</span>, <span class='ident'>Parameter</span>::<span class='ident'>Name</span>(<span class='string'>&quot;ssh&quot;</span>.<span class='ident'>to_owned</span>()));
+                <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>de</span>.<span class='ident'>template</span>, <span class='prelude-val'>None</span>);
+            }
+        }
+    }
+
+    <span class='kw'>match</span> <span class='ident'>Template</span>::<span class='ident'>compile</span>(<span class='string'>&quot;hello {{&gt; ssh}} world&quot;</span>) {
+        <span class='prelude-val'>Err</span>(<span class='ident'>e</span>) <span class='op'>=&gt;</span> <span class='macro'>panic</span><span class='macro'>!</span>(<span class='string'>&quot;{}&quot;</span>, <span class='ident'>e</span>),
+        <span class='prelude-val'>Ok</span>(<span class='ident'>t</span>) <span class='op'>=&gt;</span> {
+            <span class='kw'>if</span> <span class='kw'>let</span> <span class='ident'>PartialExpression</span>(<span class='kw-2'>ref</span> <span class='ident'>de</span>) <span class='op'>=</span> <span class='ident'>t</span>.<span class='ident'>elements</span>[<span class='number'>1</span>] {
+                <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>de</span>.<span class='ident'>name</span>, <span class='ident'>Parameter</span>::<span class='ident'>Name</span>(<span class='string'>&quot;ssh&quot;</span>.<span class='ident'>to_owned</span>()));
+                <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>de</span>.<span class='ident'>template</span>, <span class='prelude-val'>None</span>);
+            }
+        }
+    }
+
+    <span class='kw'>match</span> <span class='ident'>Template</span>::<span class='ident'>compile</span>(<span class='string'>&quot;{{#*inline \&quot;hello\&quot;}}expand to hello{{/inline}}{{&gt; hello}}&quot;</span>) {
+        <span class='prelude-val'>Err</span>(<span class='ident'>e</span>) <span class='op'>=&gt;</span> <span class='macro'>panic</span><span class='macro'>!</span>(<span class='string'>&quot;{}&quot;</span>, <span class='ident'>e</span>),
+        <span class='prelude-val'>Ok</span>(<span class='ident'>t</span>) <span class='op'>=&gt;</span> {
+            <span class='kw'>if</span> <span class='kw'>let</span> <span class='ident'>DirectiveBlock</span>(<span class='kw-2'>ref</span> <span class='ident'>db</span>) <span class='op'>=</span> <span class='ident'>t</span>.<span class='ident'>elements</span>[<span class='number'>0</span>] {
+                <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>db</span>.<span class='ident'>name</span>, <span class='ident'>Parameter</span>::<span class='ident'>Name</span>(<span class='string'>&quot;inline&quot;</span>.<span class='ident'>to_owned</span>()));
+                <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>db</span>.<span class='ident'>params</span>[<span class='number'>0</span>],
+                           <span class='ident'>Parameter</span>::<span class='ident'>Literal</span>(<span class='ident'>Json</span>::<span class='ident'>String</span>(<span class='string'>&quot;hello&quot;</span>.<span class='ident'>to_owned</span>())));
+                <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>db</span>.<span class='ident'>template</span>.<span class='ident'>as_ref</span>().<span class='ident'>unwrap</span>().<span class='ident'>elements</span>[<span class='number'>0</span>],
+                           <span class='ident'>TemplateElement</span>::<span class='ident'>RawString</span>(<span class='string'>&quot;expand to hello&quot;</span>.<span class='ident'>to_owned</span>()));
+            }
+        }
+    }
+
+    <span class='kw'>match</span> <span class='ident'>Template</span>::<span class='ident'>compile</span>(<span class='string'>&quot;{{#&gt; layout \&quot;hello\&quot;}}expand to hello{{/layout}}{{&gt; hello}}&quot;</span>) {
+        <span class='prelude-val'>Err</span>(<span class='ident'>e</span>) <span class='op'>=&gt;</span> <span class='macro'>panic</span><span class='macro'>!</span>(<span class='string'>&quot;{}&quot;</span>, <span class='ident'>e</span>),
+        <span class='prelude-val'>Ok</span>(<span class='ident'>t</span>) <span class='op'>=&gt;</span> {
+            <span class='kw'>if</span> <span class='kw'>let</span> <span class='ident'>PartialBlock</span>(<span class='kw-2'>ref</span> <span class='ident'>db</span>) <span class='op'>=</span> <span class='ident'>t</span>.<span class='ident'>elements</span>[<span class='number'>0</span>] {
+                <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>db</span>.<span class='ident'>name</span>, <span class='ident'>Parameter</span>::<span class='ident'>Name</span>(<span class='string'>&quot;layout&quot;</span>.<span class='ident'>to_owned</span>()));
+                <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>db</span>.<span class='ident'>params</span>[<span class='number'>0</span>],
+                           <span class='ident'>Parameter</span>::<span class='ident'>Literal</span>(<span class='ident'>Json</span>::<span class='ident'>String</span>(<span class='string'>&quot;hello&quot;</span>.<span class='ident'>to_owned</span>())));
+                <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>db</span>.<span class='ident'>template</span>.<span class='ident'>as_ref</span>().<span class='ident'>unwrap</span>().<span class='ident'>elements</span>[<span class='number'>0</span>],
+                           <span class='ident'>TemplateElement</span>::<span class='ident'>RawString</span>(<span class='string'>&quot;expand to hello&quot;</span>.<span class='ident'>to_owned</span>()));
+            }
+        }
+    }
+}
 </pre>
 </section>
     <section id='search' class="content hidden"></section>
@@ -1788,11 +2006,9 @@
     <script>
         window.rootPath = "../../";
         window.currentCrate = "handlebars";
-        window.playgroundUrl = "";
     </script>
     <script src="../../jquery.js"></script>
     <script src="../../main.js"></script>
-    
     <script defer src="../../search-index.js"></script>
 </body>
 </html>

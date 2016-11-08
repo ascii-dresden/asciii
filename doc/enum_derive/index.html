@@ -76,7 +76,7 @@
     (<span class='ident'>Candy</span>::<span class='ident'>FruitRock</span>, <span class='string'>&quot;FruitRock&quot;</span>),
     (<span class='ident'>Candy</span>::<span class='ident'>BoPeeps</span>, <span class='string'>&quot;BoPeeps&quot;</span>),
     (<span class='ident'>Candy</span>::<span class='ident'>LemonSherbert</span>, <span class='string'>&quot;LemonSherbert&quot;</span>),
-]);<a class='test-arrow' target='_blank' href=''>Run</a></pre>
+]);</pre>
 
 <p>Alternately, derive <code>next_variant</code> and <code>prev_variant</code> methods.</p>
 
@@ -97,7 +97,7 @@
 
 <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>Sakigami</span>.<span class='ident'>prev_variant</span>(), <span class='prelude-val'>None</span>);
 <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>Hasugami</span>.<span class='ident'>prev_variant</span>(), <span class='prelude-val'>Some</span>(<span class='ident'>Sakigami</span>));
-<span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>Tsutagami</span>.<span class='ident'>prev_variant</span>(), <span class='prelude-val'>Some</span>(<span class='ident'>Hasugami</span>));<a class='test-arrow' target='_blank' href=''>Run</a></pre>
+<span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>Tsutagami</span>.<span class='ident'>prev_variant</span>(), <span class='prelude-val'>Some</span>(<span class='ident'>Hasugami</span>));</pre>
 
 <h1 id='overview' class='section-header'><a href='#overview'>Overview</a></h1>
 <p>This crate provides macros to derive the following methods for unitary variant enums:</p>
@@ -119,7 +119,7 @@
 <span class='macro'>custom_derive</span><span class='macro'>!</span> {
     <span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>IterVariants</span>(<span class='ident'>GetVariants</span>))]</span>
     <span class='kw'>pub</span> <span class='kw'>enum</span> <span class='ident'>Get</span> { <span class='ident'>Up</span>, <span class='ident'>Down</span>, <span class='ident'>AllAround</span> }
-}<a class='test-arrow' target='_blank' href=''>Run</a></pre>
+}</pre>
 
 <p>The argument is the name of the iterator type that will be generated.  Neither macro imposes any naming requirements, save the obvious: the name must not conflict with any other types.</p>
 
@@ -135,7 +135,7 @@
 }
 
 <span class='kw'>let</span> <span class='ident'>s</span> <span class='op'>=</span> <span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;{}&quot;</span>, <span class='ident'>Value</span>::<span class='ident'>U64</span>(<span class='number'>42</span>).<span class='ident'>as_display</span>());
-<span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='kw-2'>&amp;</span><span class='ident'>s</span>[..], <span class='string'>&quot;42&quot;</span>);<a class='test-arrow' target='_blank' href=''>Run</a></pre>
+<span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='kw-2'>&amp;</span><span class='ident'>s</span>[..], <span class='string'>&quot;42&quot;</span>);</pre>
 
 <p>The other macros take no arguments.</p>
 
@@ -148,7 +148,7 @@
 <span class='macro'>custom_derive</span><span class='macro'>!</span> {
     <span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Copy</span>, <span class='ident'>Clone</span>, <span class='ident'>Debug</span>, <span class='ident'>IterVariants</span>(<span class='ident'>Vars</span>))]</span>
     <span class='kw'>enum</span> <span class='ident'>ItAintRight</span> { <span class='ident'>BabeNo</span>, <span class='ident'>NoNo</span>, <span class='ident'>BoyBoy</span> }
-}<a class='test-arrow' target='_blank' href=''>Run</a></pre>
+}</pre>
 
 <p>Can also be written as:</p>
 
@@ -156,7 +156,7 @@
 <span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Copy</span>, <span class='ident'>Clone</span>, <span class='ident'>Debug</span>)]</span>
 <span class='kw'>enum</span> <span class='ident'>ItAintRight</span> { <span class='ident'>BabeNo</span>, <span class='ident'>NoNo</span>, <span class='ident'>BoyBoy</span> }
 
-<span class='macro'>IterVariants</span><span class='macro'>!</span> { (<span class='ident'>Vars</span>) <span class='kw'>enum</span> <span class='ident'>ItAintRight</span> { <span class='ident'>BabeNo</span>, <span class='ident'>NoNo</span>, <span class='ident'>BoyBoy</span> } }<a class='test-arrow' target='_blank' href=''>Run</a></pre>
+<span class='macro'>IterVariants</span><span class='macro'>!</span> { (<span class='ident'>Vars</span>) <span class='kw'>enum</span> <span class='ident'>ItAintRight</span> { <span class='ident'>BabeNo</span>, <span class='ident'>NoNo</span>, <span class='ident'>BoyBoy</span> } }</pre>
 
 <h2 id='other-examples' class='section-header'><a href='#other-examples'>Other Examples</a></h2>
 <p>This shows how to use <code>Display</code> and <code>FromStr</code> to perform string round-tripping of enums.</p>
@@ -215,7 +215,7 @@
 <span class='kw'>let</span> <span class='ident'>number</span> <span class='op'>=</span> <span class='number'>42</span>;
 <span class='kw'>let</span> <span class='ident'>troll_number</span> <span class='op'>=</span> <span class='ident'>to_troll</span>(<span class='ident'>number</span>);
 <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>troll_number</span>, <span class='string'>&quot;Lots Lots Many Many Two&quot;</span>);
-<span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>from_troll</span>(<span class='kw-2'>&amp;</span><span class='ident'>troll_number</span>), <span class='prelude-val'>Ok</span>(<span class='ident'>number</span>));<a class='test-arrow' target='_blank' href=''>Run</a></pre>
+<span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>from_troll</span>(<span class='kw-2'>&amp;</span><span class='ident'>troll_number</span>), <span class='prelude-val'>Ok</span>(<span class='ident'>number</span>));</pre>
 </div><h2 id='macros' class='section-header'><a href="#macros">Macros</a></h2>
 <table>
                        <tr class=' module-item'>
@@ -337,11 +337,9 @@
     <script>
         window.rootPath = "../";
         window.currentCrate = "enum_derive";
-        window.playgroundUrl = "";
     </script>
     <script src="../jquery.js"></script>
     <script src="../main.js"></script>
-    
     <script defer src="../search-index.js"></script>
 </body>
 </html>

@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="rustdoc">
-    <meta name="description" content="Source to the Rust file `/home/hendrik/.cargo/git/checkouts/handlebars-rust-6b5b431bf9aaa55b/910af7cb/src/helpers/helper_each.rs`.">
+    <meta name="description" content="Source to the Rust file `/home/hendrik/.cargo/registry/src/github.com-1ecc6299db9ec823/handlebars-0.22.0/src/helpers/helper_each.rs`.">
     <meta name="keywords" content="rust, rustlang, rust-lang">
 
     <title>helper_each.rs.html -- source</title>
@@ -360,6 +360,34 @@
 <span id="316">316</span>
 <span id="317">317</span>
 <span id="318">318</span>
+<span id="319">319</span>
+<span id="320">320</span>
+<span id="321">321</span>
+<span id="322">322</span>
+<span id="323">323</span>
+<span id="324">324</span>
+<span id="325">325</span>
+<span id="326">326</span>
+<span id="327">327</span>
+<span id="328">328</span>
+<span id="329">329</span>
+<span id="330">330</span>
+<span id="331">331</span>
+<span id="332">332</span>
+<span id="333">333</span>
+<span id="334">334</span>
+<span id="335">335</span>
+<span id="336">336</span>
+<span id="337">337</span>
+<span id="338">338</span>
+<span id="339">339</span>
+<span id="340">340</span>
+<span id="341">341</span>
+<span id="342">342</span>
+<span id="343">343</span>
+<span id="344">344</span>
+<span id="345">345</span>
+<span id="346">346</span>
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>collections</span>::<span class='ident'>BTreeMap</span>;
 
@@ -401,7 +429,7 @@
                         <span class='kw'>for</span> <span class='ident'>i</span> <span class='kw'>in</span> <span class='number'>0</span>..<span class='ident'>len</span> {
                             <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>local_rc</span> <span class='op'>=</span> <span class='ident'>rc</span>.<span class='ident'>derive</span>();
                             <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Some</span>(<span class='kw-2'>ref</span> <span class='ident'>p</span>) <span class='op'>=</span> <span class='ident'>local_path_root</span> {
-                                <span class='ident'>local_rc</span>.<span class='ident'>set_local_path_root</span>(<span class='ident'>p</span>.<span class='ident'>clone</span>());
+                                <span class='ident'>local_rc</span>.<span class='ident'>push_local_path_root</span>(<span class='ident'>p</span>.<span class='ident'>clone</span>());
                             }
 
                             <span class='ident'>local_rc</span>.<span class='ident'>set_local_var</span>(<span class='string'>&quot;@first&quot;</span>.<span class='ident'>to_string</span>(), <span class='ident'>to_json</span>(<span class='kw-2'>&amp;</span>(<span class='ident'>i</span> <span class='op'>==</span> <span class='number'>0usize</span>)));
@@ -428,6 +456,10 @@
                             <span class='kw'>if</span> <span class='ident'>h</span>.<span class='ident'>block_param</span>().<span class='ident'>is_some</span>() {
                                 <span class='ident'>local_rc</span>.<span class='ident'>pop_block_context</span>();
                             }
+
+                            <span class='kw'>if</span> <span class='ident'>local_path_root</span>.<span class='ident'>is_some</span>() {
+                                <span class='ident'>local_rc</span>.<span class='ident'>pop_local_path_root</span>();
+                            }
                         }
                         <span class='prelude-val'>Ok</span>(())
                     }
@@ -436,7 +468,7 @@
                         <span class='kw'>for</span> <span class='ident'>k</span> <span class='kw'>in</span> <span class='ident'>obj</span>.<span class='ident'>keys</span>() {
                             <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>local_rc</span> <span class='op'>=</span> <span class='ident'>rc</span>.<span class='ident'>derive</span>();
                             <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Some</span>(<span class='kw-2'>ref</span> <span class='ident'>p</span>) <span class='op'>=</span> <span class='ident'>local_path_root</span> {
-                                <span class='ident'>local_rc</span>.<span class='ident'>set_local_path_root</span>(<span class='ident'>p</span>.<span class='ident'>clone</span>());
+                                <span class='ident'>local_rc</span>.<span class='ident'>push_local_path_root</span>(<span class='ident'>p</span>.<span class='ident'>clone</span>());
                             }
                             <span class='ident'>local_rc</span>.<span class='ident'>set_local_var</span>(<span class='string'>&quot;@first&quot;</span>.<span class='ident'>to_string</span>(), <span class='ident'>to_json</span>(<span class='kw-2'>&amp;</span><span class='ident'>first</span>));
                             <span class='kw'>if</span> <span class='ident'>first</span> {
@@ -464,6 +496,10 @@
 
                             <span class='kw'>if</span> <span class='ident'>h</span>.<span class='ident'>block_param</span>().<span class='ident'>is_some</span>() {
                                 <span class='ident'>local_rc</span>.<span class='ident'>pop_block_context</span>();
+                            }
+
+                            <span class='kw'>if</span> <span class='ident'>local_path_root</span>.<span class='ident'>is_some</span>() {
+                                <span class='ident'>local_rc</span>.<span class='ident'>pop_local_path_root</span>();
                             }
                         }
 
@@ -494,6 +530,7 @@
 <span class='kw'>mod</span> <span class='ident'>test</span> {
     <span class='kw'>use</span> <span class='ident'>template</span>::<span class='ident'>Template</span>;
     <span class='kw'>use</span> <span class='ident'>registry</span>::<span class='ident'>Registry</span>;
+    <span class='kw'>use</span> <span class='ident'>context</span>::<span class='ident'>to_json</span>;
 
     <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>collections</span>::<span class='ident'>BTreeMap</span>;
 
@@ -658,7 +695,6 @@
             <span class='string'>&quot;a&quot;</span>.<span class='ident'>to_string</span>() <span class='op'>=&gt;</span> <span class='macro'>vec</span><span class='macro'>!</span>[<span class='number'>1</span>,<span class='number'>2</span>,<span class='number'>3</span>,<span class='number'>4</span>,<span class='number'>5</span>]
         };
         <span class='kw'>let</span> <span class='ident'>r0</span> <span class='op'>=</span> <span class='ident'>handlebars</span>.<span class='ident'>render</span>(<span class='string'>&quot;t0&quot;</span>, <span class='kw-2'>&amp;</span><span class='ident'>m1</span>).<span class='ident'>unwrap</span>();
-        <span class='macro'>println</span><span class='macro'>!</span>(<span class='string'>&quot;render: {}&quot;</span>, <span class='ident'>r0</span>);
         <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>r0</span>, <span class='string'>&quot;12345&quot;</span>);
     }
 
@@ -677,6 +713,26 @@
         };
         <span class='kw'>let</span> <span class='ident'>r0</span> <span class='op'>=</span> <span class='ident'>handlebars</span>.<span class='ident'>render</span>(<span class='string'>&quot;t0&quot;</span>, <span class='kw-2'>&amp;</span><span class='ident'>m</span>);
         <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>r0</span>.<span class='ident'>ok</span>().<span class='ident'>unwrap</span>(), <span class='string'>&quot;ftp:21|http:80|&quot;</span>.<span class='ident'>to_string</span>());
+    }
+
+    <span class='attribute'>#[<span class='ident'>test</span>]</span>
+    <span class='kw'>fn</span> <span class='ident'>test_nested_each_with_path_ups</span>() {
+        <span class='kw'>let</span> <span class='ident'>t0</span> <span class='op'>=</span> <span class='ident'>Template</span>::<span class='ident'>compile</span>(<span class='string'>&quot;{{#each a.b}}{{#each c}}{{../../d}}{{/each}}{{/each}}&quot;</span>
+                                       .<span class='ident'>to_string</span>())
+                     .<span class='ident'>ok</span>()
+                     .<span class='ident'>unwrap</span>();
+        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>handlebars</span> <span class='op'>=</span> <span class='ident'>Registry</span>::<span class='ident'>new</span>();
+        <span class='ident'>handlebars</span>.<span class='ident'>register_template</span>(<span class='string'>&quot;t0&quot;</span>, <span class='ident'>t0</span>);
+
+        <span class='kw'>let</span> <span class='ident'>data</span> <span class='op'>=</span> <span class='macro'>btreemap</span><span class='macro'>!</span> {
+            <span class='string'>&quot;a&quot;</span>.<span class='ident'>to_string</span>() <span class='op'>=&gt;</span> <span class='ident'>to_json</span>(<span class='kw-2'>&amp;</span><span class='macro'>btreemap</span><span class='macro'>!</span> {
+                <span class='string'>&quot;b&quot;</span>.<span class='ident'>to_string</span>() <span class='op'>=&gt;</span> <span class='macro'>vec</span><span class='macro'>!</span>[<span class='macro'>btreemap</span><span class='macro'>!</span>{<span class='string'>&quot;c&quot;</span>.<span class='ident'>to_string</span>() <span class='op'>=&gt;</span> <span class='macro'>vec</span><span class='macro'>!</span>[<span class='number'>1</span>]}]
+            }),
+            <span class='string'>&quot;d&quot;</span>.<span class='ident'>to_string</span>() <span class='op'>=&gt;</span> <span class='ident'>to_json</span>(<span class='kw-2'>&amp;</span><span class='number'>1</span>)
+        };
+
+        <span class='kw'>let</span> <span class='ident'>r0</span> <span class='op'>=</span> <span class='ident'>handlebars</span>.<span class='ident'>render</span>(<span class='string'>&quot;t0&quot;</span>, <span class='kw-2'>&amp;</span><span class='ident'>data</span>);
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>r0</span>.<span class='ident'>ok</span>().<span class='ident'>unwrap</span>(), <span class='string'>&quot;1&quot;</span>.<span class='ident'>to_string</span>());
     }
 }
 </pre>
@@ -736,11 +792,9 @@
     <script>
         window.rootPath = "../../../";
         window.currentCrate = "handlebars";
-        window.playgroundUrl = "";
     </script>
     <script src="../../../jquery.js"></script>
     <script src="../../../main.js"></script>
-    
     <script defer src="../../../search-index.js"></script>
 </body>
 </html>

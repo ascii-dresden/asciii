@@ -47,7 +47,7 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-207' class='srclink' href='../src/pest/grammar.rs.html#122-637' title='goto source code'>[src]</a></span></h1>
+               </span><a id='src-204' class='srclink' href='../src/pest/grammar.rs.html#122-637' title='goto source code'>[src]</a></span></h1>
 <pre class='rust macro'>
 <span class='macro'>macro_rules</span><span class='macro'>!</span> <span class='ident'>grammar</span> {
     ( @<span class='ident'>assoc</span> <span class='op'>&lt;</span> $( <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>ts</span>:<span class='ident'>tt</span> )<span class='op'>*</span> ) <span class='op'>=&gt;</span> { ... };
@@ -95,7 +95,7 @@
     ( @<span class='ident'>process</span> <span class='bool-val'>true</span> <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>slf</span>:<span class='ident'>ident</span> [ <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>a</span>:<span class='ident'>tt</span> $( <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>tail</span>:<span class='ident'>tt</span> )<span class='op'>*</span> ] [ <span class='op'>*</span> $( <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>optail</span>:<span class='ident'>tt</span> )<span class='op'>*</span> ] ) <span class='op'>=&gt;</span> { ... };
     ( @<span class='ident'>process</span> <span class='bool-val'>false</span> <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>slf</span>:<span class='ident'>ident</span> [ <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>a</span>:<span class='ident'>tt</span> $( <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>tail</span>:<span class='ident'>tt</span> )<span class='op'>*</span> ] [ <span class='op'>+</span> $( <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>optail</span>:<span class='ident'>tt</span> )<span class='op'>*</span> ] ) <span class='op'>=&gt;</span> { ... };
     ( @<span class='ident'>process</span> <span class='bool-val'>true</span> <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>slf</span>:<span class='ident'>ident</span> [ <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>a</span>:<span class='ident'>tt</span> $( <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>tail</span>:<span class='ident'>tt</span> )<span class='op'>*</span> ] [ <span class='op'>+</span> $( <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>optail</span>:<span class='ident'>tt</span> )<span class='op'>*</span> ] ) <span class='op'>=&gt;</span> { ... };
-    ( @<span class='ident'>process</span> <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>atomic</span>:<span class='ident'>tt</span> <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>slf</span>:<span class='ident'>ident</span> [ <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>a</span>:<span class='ident'>tt</span> $( <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>tail</span>:<span class='ident'>tt</span> )<span class='op'>*</span> ] [ ? $( <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>optail</span>:<span class='ident'>tt</span> )<span class='op'>*</span> ] ) <span class='op'>=&gt;</span> { ... };
+    ( @<span class='ident'>process</span> <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>atomic</span>:<span class='ident'>tt</span> <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>slf</span>:<span class='ident'>ident</span> [ <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>a</span>:<span class='ident'>tt</span> $( <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>tail</span>:<span class='ident'>tt</span> )<span class='op'>*</span> ] [ <span class='question-mark'>?</span> $( <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>optail</span>:<span class='ident'>tt</span> )<span class='op'>*</span> ] ) <span class='op'>=&gt;</span> { ... };
     ( @<span class='ident'>process</span> <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>atomic</span>:<span class='ident'>tt</span> <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>slf</span>:<span class='ident'>ident</span> [ <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>a</span>:<span class='ident'>tt</span> $( <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>tail</span>:<span class='ident'>tt</span> )<span class='op'>*</span> ] [ <span class='ident'>_pres</span> $( <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>optail</span>:<span class='ident'>tt</span> )<span class='op'>*</span> ] ) <span class='op'>=&gt;</span> { ... };
     ( @<span class='ident'>process</span> <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>atomic</span>:<span class='ident'>tt</span> <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>slf</span>:<span class='ident'>ident</span> [ <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>a</span>:<span class='ident'>tt</span> $( <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>tail</span>:<span class='ident'>tt</span> )<span class='op'>*</span> ] [ <span class='ident'>_abs</span> $( <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>optail</span>:<span class='ident'>tt</span> )<span class='op'>*</span> ] ) <span class='op'>=&gt;</span> { ... };
     ( @<span class='ident'>process</span> <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>_atomic</span>:<span class='ident'>tt</span> <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>slf</span>:<span class='ident'>ident</span> [] [ <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>single</span>:<span class='ident'>tt</span> ] ) <span class='op'>=&gt;</span> { ... };
@@ -139,7 +139,7 @@ are predefined rules.</p>
 subrules may create.</p>
 
 <pre class='rust rust-example-rendered'>
-<span class='ident'>one</span> <span class='op'>=</span> { <span class='ident'>two</span> }<a class='test-arrow' target='_blank' href=''>Run</a></pre>
+<span class='ident'>one</span> <span class='op'>=</span> { <span class='ident'>two</span> }</pre>
 
 <p>If the above rule matches and <code>two</code> is a normal rule as well, the queue of <code>Token</code>s will
 contain <code>Token { rule: Rule::one, ... }, Token { rule: Rule::two, ... }</code>.</p>
@@ -153,7 +153,7 @@ or <code>comment</code> between rules and sub-rules, and any sub-rules of an ato
 in <a href="trait.Parser#tymethod.expected"><code>Parser::expected</code></a>.</p>
 
 <pre class='rust rust-example-rendered'>
-<span class='ident'>ab</span> <span class='op'>=</span> @{ <span class='ident'>a</span> ~ <span class='ident'>b</span> }<a class='test-arrow' target='_blank' href=''>Run</a></pre>
+<span class='ident'>ab</span> <span class='op'>=</span> @{ <span class='ident'>a</span> ~ <span class='ident'>b</span> }</pre>
 
 <p>In the rule above, there cannot be anything between <code>a</code> and <code>b</code> for <code>ab</code> to match. This rule
 has a <em>cascading</em> effect, so any rules called from an atomic rule will also be atomic while
@@ -166,7 +166,7 @@ matched inside of <code>ab</code>.</p>
 <a href="trait.Parser#tymethod.expected"><code>Parser::expected</code></a>.</p>
 
 <pre class='rust rust-example-rendered'>
-<span class='ident'>whitespace</span> <span class='op'>=</span> _{ [<span class='string'>&quot; &quot;</span>] }<a class='test-arrow' target='_blank' href=''>Run</a></pre>
+<span class='ident'>whitespace</span> <span class='op'>=</span> _{ [<span class='string'>&quot; &quot;</span>] }</pre>
 
 <p>Unlike atomic rules, silent rules are <em>not cascading</em>. A rule inside a silent rule will not be
 silent unless it&#39;s explicitly stated.</p>
@@ -233,7 +233,7 @@ silent unless it&#39;s explicitly stated.</p>
     <span class='ident'>addition</span>       <span class='op'>=</span> {  <span class='ident'>plus</span>  <span class='op'>|</span> <span class='ident'>minus</span> }
     <span class='ident'>multiplication</span> <span class='op'>=</span> {  <span class='ident'>times</span> <span class='op'>|</span> <span class='ident'>slash</span> }
     <span class='ident'>power</span>          <span class='op'>=</span> {<span class='op'>&lt;</span> <span class='ident'>pow</span> } <span class='comment'>// &lt; for right-associativity</span>
-}<a class='test-arrow' target='_blank' href=''>Run</a></pre>
+}</pre>
 
 <p>The first part of the precedence climbing rule is the primary expression that comes between
 braces. It&#39;s followed by any number of rules, each rule having a precedence higher than the
@@ -243,15 +243,15 @@ previous one. The <code>&lt;</code> denote right-associativity, the default bein
 <pre class='rust rust-example-rendered'>
 <span class='macro'>impl_rdp</span><span class='macro'>!</span> {
     <span class='macro'>grammar</span><span class='macro'>!</span> {
-        <span class='ident'>expression</span> <span class='op'>=</span> _{ <span class='ident'>paren</span> ~ <span class='ident'>expression</span>? }
-        <span class='ident'>paren</span>      <span class='op'>=</span>  { [<span class='string'>&quot;(&quot;</span>] ~ <span class='ident'>expression</span>? ~ [<span class='string'>&quot;)&quot;</span>] }
+        <span class='ident'>expression</span> <span class='op'>=</span> _{ <span class='ident'>paren</span> ~ <span class='ident'>expression</span><span class='question-mark'>?</span> }
+        <span class='ident'>paren</span>      <span class='op'>=</span>  { [<span class='string'>&quot;(&quot;</span>] ~ <span class='ident'>expression</span><span class='question-mark'>?</span> ~ [<span class='string'>&quot;)&quot;</span>] }
     }
 }
 
 <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>parser</span> <span class='op'>=</span> <span class='ident'>Rdp</span>::<span class='ident'>new</span>(<span class='ident'>StringInput</span>::<span class='ident'>new</span>(<span class='string'>&quot;(())((())())()&quot;</span>));
 
 <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>parser</span>.<span class='ident'>expression</span>());
-<span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>parser</span>.<span class='ident'>end</span>());<a class='test-arrow' target='_blank' href=''>Run</a></pre>
+<span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>parser</span>.<span class='ident'>end</span>());</pre>
 </div></section>
     <section id='search' class="content hidden"></section>
 
@@ -308,11 +308,9 @@ previous one. The <code>&lt;</code> denote right-associativity, the default bein
     <script>
         window.rootPath = "../";
         window.currentCrate = "pest";
-        window.playgroundUrl = "";
     </script>
     <script src="../jquery.js"></script>
     <script src="../main.js"></script>
-    
     <script defer src="../search-index.js"></script>
 </body>
 </html>

@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="rustdoc">
+    <meta name="description" content="API documentation for the Rust `ComputedField` enum in crate `asciii`.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, ComputedField">
+
+    <title>asciii::project::ComputedField - Rust</title>
+
+    <link rel="stylesheet" type="text/css" href="../../rustdoc.css">
+    <link rel="stylesheet" type="text/css" href="../../main.css">
+    
+
+    
+    
+</head>
+<body class="rustdoc">
+    <!--[if lte IE 8]>
+    <div class="warning">
+        This old browser is unsupported and will most likely display funky
+        things.
+    </div>
+    <![endif]-->
+
+    
+
+    <nav class="sidebar">
+        
+        <p class='location'><a href='../index.html'>asciii</a>::<wbr><a href='index.html'>project</a></p><script>window.sidebarCurrent = {name: 'ComputedField', ty: 'enum', relpath: ''};</script><script defer src="sidebar-items.js"></script>
+    </nav>
+
+    <nav class="sub">
+        <form class="search-form js-only">
+            <div class="search-container">
+                <input class="search-input" name="search"
+                       autocomplete="off"
+                       placeholder="Click or press ‘S’ to search, ‘?’ for more options…"
+                       type="search">
+            </div>
+        </form>
+    </nav>
+
+    <section id='main' class="content enum">
+<h1 class='fqn'><span class='in-band'>Enum <a href='../index.html'>asciii</a>::<wbr><a href='index.html'>project</a>::<wbr><a class='enum' href=''>ComputedField</a></span><span class='out-of-band'><span id='render-detail'>
+                   <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                       [<span class='inner'>&#x2212;</span>]
+                   </a>
+               </span></span></h1>
+<pre class='rust enum'>pub enum ComputedField {
+    Responsible,
+    OfferNumber,
+    InvoiceNumber,
+    InvoiceNumberLong,
+    Name,
+    Final,
+    Age,
+    OurBad,
+    TheirBad,
+    Year,
+    Caterers,
+    ClientFullName,
+    Wages,
+    SortIndex,
+    Date,
+    Invalid,
+}</pre><div class='docblock'><p><code>Project::get()</code> allows accessing fields within the raw <code>yaml</code> data structure.
+Computed fields are fields that are not present in the document but computed.</p>
+
+<p><code>ComputedFields</code> is an automatically generated type that allows iterating of the variants of
+this Enum.</p>
+</div><h2 class='variants'>Variants</h2>
+<span id='variant.Responsible' class='variant'><span id='Responsible.v' class='invisible'><code>Responsible</code></span></span><div class='docblock'><p>Usually <code>storage</code>, or in legacy part of <code>signature</code></p>
+</div><span id='variant.OfferNumber' class='variant'><span id='OfferNumber.v' class='invisible'><code>OfferNumber</code></span></span><span id='variant.InvoiceNumber' class='variant'><span id='InvoiceNumber.v' class='invisible'><code>InvoiceNumber</code></span></span><div class='docblock'><p>Pretty version of <code>invoice/number</code>: &quot;<code>R042</code>&quot;</p>
+</div><span id='variant.InvoiceNumberLong' class='variant'><span id='InvoiceNumberLong.v' class='invisible'><code>InvoiceNumberLong</code></span></span><div class='docblock'><p>Pretty version of <code>invoice/number</code> including year: &quot;<code>R2016-042</code>&quot;</p>
+</div><span id='variant.Name' class='variant'><span id='Name.v' class='invisible'><code>Name</code></span></span><div class='docblock'><p>Overall Cost Project, including taxes</p>
+</div><span id='variant.Final' class='variant'><span id='Final.v' class='invisible'><code>Final</code></span></span><span id='variant.Age' class='variant'><span id='Age.v' class='invisible'><code>Age</code></span></span><span id='variant.OurBad' class='variant'><span id='OurBad.v' class='invisible'><code>OurBad</code></span></span><span id='variant.TheirBad' class='variant'><span id='TheirBad.v' class='invisible'><code>TheirBad</code></span></span><span id='variant.Year' class='variant'><span id='Year.v' class='invisible'><code>Year</code></span></span><span id='variant.Caterers' class='variant'><span id='Caterers.v' class='invisible'><code>Caterers</code></span></span><span id='variant.ClientFullName' class='variant'><span id='ClientFullName.v' class='invisible'><code>ClientFullName</code></span></span><span id='variant.Wages' class='variant'><span id='Wages.v' class='invisible'><code>Wages</code></span></span><span id='variant.SortIndex' class='variant'><span id='SortIndex.v' class='invisible'><code>SortIndex</code></span></span><div class='docblock'><p>Sorting index</p>
+</div><span id='variant.Date' class='variant'><span id='Date.v' class='invisible'><code>Date</code></span></span><span id='variant.Invalid' class='variant'><span id='Invalid.v' class='invisible'><code>Invalid</code></span></span><h2 id='methods'>Methods</h2><h3 class='impl'><span class='in-band'><code>impl <a class='enum' href='../../asciii/project/enum.ComputedField.html' title='asciii::project::ComputedField'>ComputedField</a></code></span><span class='out-of-band'></span></h3>
+<div class='impl-items'><h4 id='method.iter_variants' class='method'><span id='iter_variants.v' class='invisible'><code>fn <a href='#method.iter_variants' class='fnname'>iter_variants</a>() -&gt; ComputedFields</code></span></h4>
+</div><h3 class='impl'><span class='in-band'><code>impl <a class='enum' href='../../asciii/project/enum.ComputedField.html' title='asciii::project::ComputedField'>ComputedField</a></code></span><span class='out-of-band'></span></h3>
+<div class='impl-items'><h4 id='method.iter_variant_names' class='method'><span id='iter_variant_names.v' class='invisible'><code>fn <a href='#method.iter_variant_names' class='fnname'>iter_variant_names</a>() -&gt; ComputedFieldNames</code></span></h4>
+</div><h3 class='impl'><span class='in-band'><code>impl <a class='enum' href='../../asciii/project/enum.ComputedField.html' title='asciii::project::ComputedField'>ComputedField</a></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-577' class='srclink' href='../../src/asciii/src/project/computed_field.rs.html#53-79' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.get' class='method'><span id='get.v' class='invisible'><code>fn <a href='#method.get' class='fnname'>get</a>(&amp;self, project: &amp;<a class='struct' href='../../asciii/project/struct.Project.html' title='asciii::project::Project'>Project</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>&gt;</code></span></h4>
+</div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><span class='in-band'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html' title='core::fmt::Debug'>Debug</a> for <a class='enum' href='../../asciii/project/enum.ComputedField.html' title='asciii::project::ComputedField'>ComputedField</a></code></span><span class='out-of-band'></span></h3>
+<div class='impl-items'><h4 id='method.fmt' class='method'><span id='fmt.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html#tymethod.fmt' class='fnname'>fmt</a>(&amp;self, __arg_0: &amp;mut <a class='struct' href='https://doc.rust-lang.org/nightly/core/fmt/struct.Formatter.html' title='core::fmt::Formatter'>Formatter</a>) -&gt; <a class='type' href='https://doc.rust-lang.org/nightly/core/fmt/type.Result.html' title='core::fmt::Result'>Result</a></code></span></h4>
+<div class='docblock'><p>Formats the value using the given formatter.</p>
+</div></div><h3 class='impl'><span class='in-band'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/str/trait.FromStr.html' title='core::str::FromStr'>FromStr</a> for <a class='enum' href='../../asciii/project/enum.ComputedField.html' title='asciii::project::ComputedField'>ComputedField</a></code></span><span class='out-of-band'></span></h3>
+<div class='impl-items'><h4 id='associatedtype.Err' class='type'><span id='Err.t' class='invisible'><code>type <a href='https://doc.rust-lang.org/nightly/core/str/trait.FromStr.html#associatedtype.Err' class='type'>Err</a> = <a class='struct' href='../../enum_derive/struct.ParseEnumError.html' title='enum_derive::ParseEnumError'>ParseEnumError</a></code></span></h4>
+<div class='docblock'><p>The associated error which can be returned from parsing.</p>
+</div><h4 id='method.from_str' class='method'><span id='from_str.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/str/trait.FromStr.html#tymethod.from_str' class='fnname'>from_str</a>(s: &amp;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;Self, Self::Err&gt;</code></span></h4>
+<div class='docblock'><p>Parses a string <code>s</code> to return a value of this type. <a href="https://doc.rust-lang.org/nightly/core/str/trait.FromStr.html#tymethod.from_str">Read more</a></p>
+</div></div><h3 class='impl'><span class='in-band'><code>impl&lt;'a&gt; <a class='trait' href='https://doc.rust-lang.org/nightly/core/convert/trait.From.html' title='core::convert::From'>From</a>&lt;&amp;'a <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>&gt; for <a class='enum' href='../../asciii/project/enum.ComputedField.html' title='asciii::project::ComputedField'>ComputedField</a></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-573' class='srclink' href='../../src/asciii/src/project/computed_field.rs.html#47-51' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.from' class='method'><span id='from.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/convert/trait.From.html#tymethod.from' class='fnname'>from</a>(s: &amp;'a <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>) -&gt; <a class='enum' href='../../asciii/project/enum.ComputedField.html' title='asciii::project::ComputedField'>ComputedField</a></code></span></h4>
+<div class='docblock'><p>Performs the conversion.</p>
+</div></div></section>
+    <section id='search' class="content hidden"></section>
+
+    <section class="footer"></section>
+
+    <aside id="help" class="hidden">
+        <div>
+            <h1 class="hidden">Help</h1>
+
+            <div class="shortcuts">
+                <h2>Keyboard Shortcuts</h2>
+
+                <dl>
+                    <dt>?</dt>
+                    <dd>Show this help dialog</dd>
+                    <dt>S</dt>
+                    <dd>Focus the search field</dd>
+                    <dt>&larrb;</dt>
+                    <dd>Move up in search results</dd>
+                    <dt>&rarrb;</dt>
+                    <dd>Move down in search results</dd>
+                    <dt>&#9166;</dt>
+                    <dd>Go to active search result</dd>
+                    <dt>+</dt>
+                    <dd>Collapse/expand all sections</dd>
+                </dl>
+            </div>
+
+            <div class="infos">
+                <h2>Search Tricks</h2>
+
+                <p>
+                    Prefix searches with a type followed by a colon (e.g.
+                    <code>fn:</code>) to restrict the search to a given type.
+                </p>
+
+                <p>
+                    Accepted types are: <code>fn</code>, <code>mod</code>,
+                    <code>struct</code>, <code>enum</code>,
+                    <code>trait</code>, <code>type</code>, <code>macro</code>,
+                    and <code>const</code>.
+                </p>
+
+                <p>
+                    Search functions by type signature (e.g.
+                    <code>vec -> usize</code> or <code>* -> vec</code>)
+                </p>
+            </div>
+        </div>
+    </aside>
+
+    
+
+    <script>
+        window.rootPath = "../../";
+        window.currentCrate = "asciii";
+    </script>
+    <script src="../../jquery.js"></script>
+    <script src="../../main.js"></script>
+    <script defer src="../../search-index.js"></script>
+</body>
+</html>

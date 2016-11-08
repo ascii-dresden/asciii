@@ -138,7 +138,6 @@
 <span id="94">94</span>
 <span id="95">95</span>
 <span id="96">96</span>
-<span id="97">97</span>
 </pre><pre class='rust '>
 <span class='attribute'>#<span class='op'>!</span>[<span class='ident'>allow</span>(<span class='ident'>unknown_lints</span>)]</span>
 <span class='attribute'>#<span class='op'>!</span>[<span class='ident'>allow</span>(<span class='ident'>needless_borrow</span>)]</span>
@@ -205,7 +204,7 @@
      (<span class='string'>&quot;archive&quot;</span>,   <span class='prelude-val'>Some</span>(<span class='ident'>sub_m</span>)) <span class='op'>=&gt;</span> <span class='ident'>subcommands</span>::<span class='ident'>archive</span>(<span class='ident'>sub_m</span>),
      (<span class='string'>&quot;unarchive&quot;</span>, <span class='prelude-val'>Some</span>(<span class='ident'>sub_m</span>)) <span class='op'>=&gt;</span> <span class='ident'>subcommands</span>::<span class='ident'>unarchive</span>(<span class='ident'>sub_m</span>),
      (<span class='string'>&quot;config&quot;</span>,    <span class='prelude-val'>Some</span>(<span class='ident'>sub_m</span>)) <span class='op'>=&gt;</span> <span class='ident'>subcommands</span>::<span class='ident'>config</span>(<span class='ident'>sub_m</span>),
-     (<span class='string'>&quot;whoami&quot;</span>,    _          ) <span class='op'>=&gt;</span> <span class='ident'>subcommands</span>::<span class='ident'>config_show</span>(<span class='string'>&quot;manager_name&quot;</span>),
+     (<span class='string'>&quot;whoami&quot;</span>,    _          ) <span class='op'>=&gt;</span> <span class='ident'>subcommands</span>::<span class='ident'>config_show</span>(<span class='string'>&quot;user/name&quot;</span>),
 
      (<span class='string'>&quot;path&quot;</span>,      <span class='prelude-val'>Some</span>(<span class='ident'>sub_m</span>)) <span class='op'>=&gt;</span> <span class='ident'>subcommands</span>::<span class='ident'>show_path</span>(<span class='ident'>sub_m</span>),
      (<span class='string'>&quot;open&quot;</span>,      <span class='prelude-val'>Some</span>(<span class='ident'>sub_m</span>)) <span class='op'>=&gt;</span> <span class='ident'>subcommands</span>::<span class='ident'>open_path</span>(<span class='ident'>sub_m</span>),
@@ -236,7 +235,6 @@
     <span class='ident'>setup_log</span>();
     <span class='ident'>setup_app</span>();
 }
-
 </pre>
 </section>
     <section id='search' class="content hidden"></section>

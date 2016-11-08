@@ -571,18 +571,26 @@
 <span id="527">527</span>
 <span id="528">528</span>
 <span id="529">529</span>
+<span id="530">530</span>
+<span id="531">531</span>
+<span id="532">532</span>
+<span id="533">533</span>
+<span id="534">534</span>
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>asciii</span>::<span class='ident'>version</span>;
-<span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>feature</span><span class='op'>=</span><span class='string'>&quot;document_export&quot;</span>)]</span>
+<span class='kw'>use</span> <span class='ident'>asciii</span>;
 <span class='kw'>use</span> <span class='kw'>super</span>::<span class='ident'>validators</span>;
 <span class='kw'>use</span> <span class='ident'>clap</span>::{<span class='ident'>App</span>, <span class='ident'>AppSettings</span>, <span class='ident'>Arg</span>, <span class='ident'>ArgMatches</span>, <span class='ident'>SubCommand</span>};
 
 <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>setup</span>() <span class='op'>-&gt;</span> <span class='ident'>ArgMatches</span><span class='op'>&lt;</span><span class='lifetime'>&#39;static</span><span class='op'>&gt;</span>{
     <span class='ident'>App</span>::<span class='ident'>new</span>(<span class='string'>&quot;asciii&quot;</span>)
-        .<span class='ident'>author</span>(<span class='string'>&quot;Hendrik Sollich &lt;hendrik@hoodie.de&gt;&quot;</span>)
+        .<span class='ident'>author</span>(<span class='macro'>crate_authors</span><span class='macro'>!</span>())
         .<span class='ident'>version</span>(<span class='ident'>version</span>().<span class='ident'>as_ref</span>())
         .<span class='ident'>about</span>(<span class='string'>&quot;The ascii invoicer III&quot;</span>)
         .<span class='ident'>settings</span>(<span class='kw-2'>&amp;</span>[<span class='ident'>AppSettings</span>::<span class='ident'>SubcommandRequiredElseHelp</span>,<span class='ident'>AppSettings</span>::<span class='ident'>ColoredHelp</span>])
+        .<span class='ident'>after_help</span>(
+            <span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;Documentation at: {}&quot;</span>,
+                    <span class='ident'>asciii</span>::<span class='ident'>DOCUMENTATION_URL</span>).<span class='ident'>as_ref</span>())
 
         .<span class='ident'>subcommand</span>(<span class='ident'>SubCommand</span>::<span class='ident'>with_name</span>(<span class='string'>&quot;doc&quot;</span>)
             .<span class='ident'>about</span>(<span class='string'>&quot;Opens the online documentation, please read it&quot;</span>)
@@ -729,9 +737,10 @@
                          .<span class='ident'>short</span>(<span class='string'>&quot;b&quot;</span>)
                         )
 
-                    .<span class='ident'>arg</span>(<span class='ident'>Arg</span>::<span class='ident'>with_name</span>(<span class='string'>&quot;virtual_fields&quot;</span>)
-                         .<span class='ident'>help</span>(<span class='string'>&quot;List all virtual data fields that can be used with --details&quot;</span>)
-                         .<span class='ident'>long</span>(<span class='string'>&quot;virtual&quot;</span>)
+                    .<span class='ident'>arg</span>(<span class='ident'>Arg</span>::<span class='ident'>with_name</span>(<span class='string'>&quot;computed_fields&quot;</span>)
+                         .<span class='ident'>help</span>(<span class='string'>&quot;List all computed data fields that can be used with --details&quot;</span>)
+                         .<span class='ident'>long</span>(<span class='string'>&quot;computed&quot;</span>)
+                         .<span class='ident'>short</span>(<span class='string'>&quot;c&quot;</span>)
                         )
 
                     .<span class='ident'>arg</span>(<span class='ident'>Arg</span>::<span class='ident'>with_name</span>(<span class='string'>&quot;nothing&quot;</span>)
@@ -774,13 +783,14 @@
 
         .<span class='ident'>subcommand</span>(<span class='ident'>SubCommand</span>::<span class='ident'>with_name</span>(<span class='string'>&quot;unarchive&quot;</span>)
                     .<span class='ident'>about</span>(<span class='string'>&quot;Move a Project out of the archive&quot;</span>)
-                    .<span class='ident'>arg</span>(<span class='ident'>Arg</span>::<span class='ident'>with_name</span>(<span class='string'>&quot;YEAR&quot;</span>)
+                    .<span class='ident'>arg</span>(<span class='ident'>Arg</span>::<span class='ident'>with_name</span>(<span class='string'>&quot;year&quot;</span>)
                          .<span class='ident'>help</span>(<span class='string'>&quot;Specify the Archiv&quot;</span>)
                          .<span class='ident'>required</span>(<span class='bool-val'>true</span>)
                         )
-                    .<span class='ident'>arg</span>(<span class='ident'>Arg</span>::<span class='ident'>with_name</span>(<span class='string'>&quot;NAME&quot;</span>)
+                    .<span class='ident'>arg</span>(<span class='ident'>Arg</span>::<span class='ident'>with_name</span>(<span class='string'>&quot;name&quot;</span>)
                          .<span class='ident'>help</span>(<span class='string'>&quot;The name of the project, duh!&quot;</span>)
                          .<span class='ident'>required</span>(<span class='bool-val'>true</span>)
+                         .<span class='ident'>multiple</span>(<span class='bool-val'>true</span>)
                         )
                    )
 

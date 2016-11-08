@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="rustdoc">
-    <meta name="description" content="Source to the Rust file `/home/hendrik/.cargo/git/checkouts/claude-rs-375b470962c7a716/master/src/display.rs`.">
+    <meta name="description" content="Source to the Rust file `/home/hendrik/.cargo/registry/src/github.com-1ecc6299db9ec823/claude-0.1.0/src/display.rs`.">
     <meta name="keywords" content="rust, rustlang, rust-lang">
 
     <title>display.rs.html -- source</title>
@@ -139,16 +139,16 @@
 <span class='macro'>impl_deref_to_currency</span><span class='macro'>!</span>(<span class='ident'>Postfix</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span>);
 <span class='macro'>impl_deref_to_currency</span><span class='macro'>!</span>(<span class='ident'>Prefix</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span>);
 
-<span class='doccomment'>/// Allows Currencies to be displayed as Strings. The format includes no comma delimiting with a</span>
-<span class='doccomment'>/// two digit precision decimal.</span>
+<span class='doccomment'>/// Allows Currencies to be displayed as Strings.</span>
+<span class='doccomment'>/// The format includes no comma delimiting with a two digit precision decimal.</span>
 <span class='doccomment'>///</span>
 <span class='doccomment'>/// # Examples</span>
 <span class='doccomment'>/// ```</span>
-<span class='doccomment'>/// use currency::Currency;</span>
+<span class='doccomment'>/// use claude::Currency;</span>
 <span class='doccomment'>///</span>
-<span class='doccomment'>/// assert!(Currency(None, 1210).to_string() == &quot;12,10&quot;);</span>
+<span class='doccomment'>/// assert!(Currency(None, 1210).postfix().to_string() == &quot;12,10&quot;);</span>
 <span class='doccomment'>///</span>
-<span class='doccomment'>/// println!(&quot;{}&quot;, Currency(Some(&#39;€&#39;), 100099));</span>
+<span class='doccomment'>/// println!(&quot;{}&quot;, Currency(Some(&#39;€&#39;), 100099).postfix());</span>
 <span class='doccomment'>/// ```</span>
 <span class='doccomment'>/// The last line prints the following:</span>
 <span class='doccomment'>/// ```text</span>
@@ -170,12 +170,12 @@
 <span class='doccomment'>///</span>
 <span class='doccomment'>/// # Examples</span>
 <span class='doccomment'>/// ```</span>
-<span class='doccomment'>/// use currency::Currency;</span>
+<span class='doccomment'>/// use claude::Currency;</span>
 <span class='doccomment'>///</span>
-<span class='doccomment'>/// assert!(Currency(Some(&#39;$&#39;), 1210).to_string() == &quot;$12.10&quot;);</span>
-<span class='doccomment'>/// assert!(Currency(None, 1210).to_string() == &quot;12.10&quot;);</span>
+<span class='doccomment'>/// assert!(Currency(Some(&#39;$&#39;), 1210).prefix().to_string() == &quot;$12.10&quot;);</span>
+<span class='doccomment'>/// assert!(Currency(None, 1210).prefix().to_string() == &quot;12.10&quot;);</span>
 <span class='doccomment'>///</span>
-<span class='doccomment'>/// println!(&quot;{}&quot;, Currency(Some(&#39;$&#39;), 100099));</span>
+<span class='doccomment'>/// println!(&quot;{}&quot;, Currency(Some(&#39;$&#39;), 100099).prefix());</span>
 <span class='doccomment'>/// ```</span>
 <span class='doccomment'>/// The last line prints the following:</span>
 <span class='doccomment'>/// ```text</span>
@@ -248,11 +248,9 @@
     <script>
         window.rootPath = "../../";
         window.currentCrate = "claude";
-        window.playgroundUrl = "";
     </script>
     <script src="../../jquery.js"></script>
     <script src="../../main.js"></script>
-    
     <script defer src="../../search-index.js"></script>
 </body>
 </html>

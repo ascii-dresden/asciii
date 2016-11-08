@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="rustdoc">
-    <meta name="description" content="Source to the Rust file `/home/hendrik/.cargo/git/checkouts/handlebars-rust-6b5b431bf9aaa55b/910af7cb/src/context.rs`.">
+    <meta name="description" content="Source to the Rust file `/home/hendrik/.cargo/registry/src/github.com-1ecc6299db9ec823/handlebars-0.22.0/src/context.rs`.">
     <meta name="keywords" content="rust, rustlang, rust-lang">
 
     <title>context.rs.html -- source</title>
@@ -520,23 +520,50 @@
 <span id="476">476</span>
 <span id="477">477</span>
 <span id="478">478</span>
+<span id="479">479</span>
+<span id="480">480</span>
+<span id="481">481</span>
+<span id="482">482</span>
+<span id="483">483</span>
+<span id="484">484</span>
+<span id="485">485</span>
+<span id="486">486</span>
+<span id="487">487</span>
+<span id="488">488</span>
+<span id="489">489</span>
+<span id="490">490</span>
+<span id="491">491</span>
+<span id="492">492</span>
+<span id="493">493</span>
+<span id="494">494</span>
+<span id="495">495</span>
+<span id="496">496</span>
+<span id="497">497</span>
+<span id="498">498</span>
+<span id="499">499</span>
+<span id="500">500</span>
+<span id="501">501</span>
+<span id="502">502</span>
+<span id="503">503</span>
+<span id="504">504</span>
+<span id="505">505</span>
+<span id="506">506</span>
+<span id="507">507</span>
+<span id="508">508</span>
+<span id="509">509</span>
 </pre><pre class='rust '>
 <span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>all</span>(<span class='ident'>feature</span> <span class='op'>=</span> <span class='string'>&quot;rustc_ser_type&quot;</span>, <span class='ident'>not</span>(<span class='ident'>feature</span> <span class='op'>=</span> <span class='string'>&quot;serde_type&quot;</span>)))]</span>
 <span class='kw'>use</span> <span class='ident'>serialize</span>::<span class='ident'>json</span>::{<span class='ident'>Json</span>, <span class='ident'>ToJson</span>};
 
 <span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>feature</span> <span class='op'>=</span> <span class='string'>&quot;serde_type&quot;</span>)]</span>
-<span class='kw'>use</span> <span class='ident'>serde</span>::<span class='ident'>ser</span>::<span class='ident'>Serialize</span>;
-<span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>feature</span> <span class='op'>=</span> <span class='string'>&quot;serde_type&quot;</span>)]</span>
-<span class='kw'>use</span> <span class='ident'>serde_json</span>::<span class='ident'>value</span>::{<span class='self'>self</span>, <span class='ident'>Value</span> <span class='kw'>as</span> <span class='ident'>Json</span>};
+<span class='kw'>use</span> <span class='ident'>serde_json</span>::<span class='ident'>value</span>::{<span class='ident'>Value</span> <span class='kw'>as</span> <span class='ident'>Json</span>, <span class='ident'>ToJson</span>};
 
-<span class='kw'>use</span> <span class='ident'>regex</span>::<span class='ident'>Regex</span>;
+<span class='kw'>use</span> <span class='ident'>pest</span>::<span class='ident'>prelude</span>::<span class='op'>*</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>collections</span>::{<span class='ident'>VecDeque</span>, <span class='ident'>BTreeMap</span>};
 
-<span class='macro'>lazy_static</span><span class='macro'>!</span> {
-    <span class='kw'>static</span> <span class='kw-2'>ref</span> <span class='ident'>KEY_MATCHER</span>: <span class='ident'>Regex</span> <span class='op'>=</span> <span class='ident'>Regex</span>::<span class='ident'>new</span>(<span class='string'>r&quot;\[.*\]$&quot;</span>).<span class='ident'>unwrap</span>();
-    <span class='kw'>static</span> <span class='kw-2'>ref</span> <span class='ident'>QUOT_MATCHER</span>: <span class='ident'>Regex</span> <span class='op'>=</span> <span class='ident'>Regex</span>::<span class='ident'>new</span>(<span class='string'>&quot;[&#39;\&quot;](.*?)[&#39;\&quot;]&quot;</span>).<span class='ident'>unwrap</span>();
-    <span class='kw'>static</span> <span class='kw-2'>ref</span> <span class='ident'>DEFAULT_VALUE</span>: <span class='ident'>Json</span> <span class='op'>=</span> <span class='ident'>Json</span>::<span class='ident'>Null</span>;
-}
+<span class='kw'>use</span> <span class='ident'>grammar</span>::{<span class='ident'>Rdp</span>, <span class='ident'>Rule</span>};
+
+<span class='kw'>static</span> <span class='ident'>DEFAULT_VALUE</span>: <span class='ident'>Json</span> <span class='op'>=</span> <span class='ident'>Json</span>::<span class='ident'>Null</span>;
 
 <span class='kw'>pub</span> <span class='kw'>type</span> <span class='ident'>Object</span> <span class='op'>=</span> <span class='ident'>BTreeMap</span><span class='op'>&lt;</span><span class='ident'>String</span>, <span class='ident'>Json</span><span class='op'>&gt;</span>;
 
@@ -548,22 +575,64 @@
 }
 
 <span class='attribute'>#[<span class='ident'>inline</span>]</span>
-<span class='kw'>fn</span> <span class='ident'>parse_json_visitor</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span>(<span class='ident'>path_stack</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>VecDeque</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>str</span><span class='op'>&gt;</span>, <span class='ident'>path</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>str</span>) {
-    <span class='kw'>for</span> <span class='ident'>p</span> <span class='kw'>in</span> (<span class='op'>*</span><span class='ident'>path</span>).<span class='ident'>split</span>(<span class='string'>&#39;/&#39;</span>) {
-        <span class='kw'>match</span> <span class='ident'>p</span> {
-            <span class='string'>&quot;.&quot;</span> <span class='op'>|</span> <span class='string'>&quot;&quot;</span> <span class='op'>=&gt;</span> {
-                <span class='kw'>continue</span>;
-            }
-            <span class='string'>&quot;..&quot;</span> <span class='op'>=&gt;</span> {
-                <span class='ident'>path_stack</span>.<span class='ident'>pop_back</span>();
-            }
-            _ <span class='op'>=&gt;</span> {
-                <span class='kw'>for</span> <span class='ident'>dot_p</span> <span class='kw'>in</span> <span class='ident'>p</span>.<span class='ident'>split</span>(<span class='string'>&#39;.&#39;</span>) {
-                    <span class='ident'>path_stack</span>.<span class='ident'>push_back</span>(<span class='ident'>dot_p</span>);
+<span class='kw'>fn</span> <span class='ident'>parse_json_visitor_inner</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span>(<span class='ident'>path_stack</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>VecDeque</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>str</span><span class='op'>&gt;</span>, <span class='ident'>path</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>str</span>) {
+    <span class='kw'>let</span> <span class='ident'>path_in</span> <span class='op'>=</span> <span class='ident'>StringInput</span>::<span class='ident'>new</span>(<span class='ident'>path</span>);
+    <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>parser</span> <span class='op'>=</span> <span class='ident'>Rdp</span>::<span class='ident'>new</span>(<span class='ident'>path_in</span>);
+
+    <span class='kw'>if</span> <span class='ident'>parser</span>.<span class='ident'>path</span>() {
+        <span class='kw'>for</span> <span class='ident'>seg</span> <span class='kw'>in</span> <span class='ident'>parser</span>.<span class='ident'>queue</span>().<span class='ident'>iter</span>() {
+            <span class='kw'>match</span> <span class='ident'>seg</span>.<span class='ident'>rule</span> {
+                <span class='ident'>Rule</span>::<span class='ident'>path_var</span> <span class='op'>|</span> <span class='ident'>Rule</span>::<span class='ident'>path_idx</span> <span class='op'>|</span> <span class='ident'>Rule</span>::<span class='ident'>path_key</span> <span class='op'>=&gt;</span> {}
+                <span class='ident'>Rule</span>::<span class='ident'>path_up</span> <span class='op'>=&gt;</span> {
+                    <span class='ident'>path_stack</span>.<span class='ident'>pop_back</span>();
                 }
+                <span class='ident'>Rule</span>::<span class='ident'>path_id</span> <span class='op'>|</span> <span class='ident'>Rule</span>::<span class='ident'>path_raw_id</span> <span class='op'>|</span> <span class='ident'>Rule</span>::<span class='ident'>path_num_id</span> <span class='op'>=&gt;</span> {
+                    <span class='kw'>let</span> <span class='ident'>id</span> <span class='op'>=</span> <span class='kw-2'>&amp;</span><span class='ident'>path</span>[<span class='ident'>seg</span>.<span class='ident'>start</span>..<span class='ident'>seg</span>.<span class='ident'>end</span>];
+                    <span class='ident'>path_stack</span>.<span class='ident'>push_back</span>(<span class='ident'>id</span>);
+                }
+                _ <span class='op'>=&gt;</span> {}
             }
         }
     }
+}
+
+<span class='attribute'>#[<span class='ident'>inline</span>]</span>
+<span class='kw'>fn</span> <span class='ident'>parse_json_visitor</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span>(<span class='ident'>path_stack</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>VecDeque</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>str</span><span class='op'>&gt;</span>,
+                          <span class='ident'>base_path</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>str</span>,
+                          <span class='ident'>path_context</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>VecDeque</span><span class='op'>&lt;</span><span class='ident'>String</span><span class='op'>&gt;</span>,
+                          <span class='ident'>relative_path</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>str</span>) {
+    <span class='kw'>let</span> <span class='ident'>path_in</span> <span class='op'>=</span> <span class='ident'>StringInput</span>::<span class='ident'>new</span>(<span class='ident'>relative_path</span>);
+    <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>parser</span> <span class='op'>=</span> <span class='ident'>Rdp</span>::<span class='ident'>new</span>(<span class='ident'>path_in</span>);
+
+    <span class='kw'>if</span> <span class='ident'>parser</span>.<span class='ident'>path</span>() {
+        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>path_context_depth</span>: <span class='ident'>i64</span> <span class='op'>=</span> <span class='op'>-</span><span class='number'>1</span>;
+
+        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>iter</span> <span class='op'>=</span> <span class='ident'>parser</span>.<span class='ident'>queue</span>().<span class='ident'>iter</span>();
+        <span class='kw'>loop</span> {
+            <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Some</span>(<span class='ident'>sg</span>) <span class='op'>=</span> <span class='ident'>iter</span>.<span class='ident'>next</span>() {
+                <span class='kw'>if</span> <span class='ident'>sg</span>.<span class='ident'>rule</span> <span class='op'>==</span> <span class='ident'>Rule</span>::<span class='ident'>path_up</span> {
+                    <span class='ident'>path_context_depth</span> <span class='op'>+=</span> <span class='number'>1</span>;
+                } <span class='kw'>else</span> {
+                    <span class='kw'>break</span>;
+                }
+            } <span class='kw'>else</span> {
+                <span class='kw'>break</span>;
+            }
+        }
+
+        <span class='kw'>if</span> <span class='ident'>path_context_depth</span> <span class='op'>&gt;=</span> <span class='number'>0</span> {
+            <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Some</span>(<span class='ident'>context_base_path</span>) <span class='op'>=</span> <span class='ident'>path_context</span>.<span class='ident'>get</span>(<span class='ident'>path_context_depth</span> <span class='kw'>as</span> <span class='ident'>usize</span>) {
+                <span class='ident'>parse_json_visitor_inner</span>(<span class='ident'>path_stack</span>, <span class='ident'>context_base_path</span>);
+            } <span class='kw'>else</span> {
+                <span class='ident'>parse_json_visitor_inner</span>(<span class='ident'>path_stack</span>, <span class='ident'>base_path</span>);
+            }
+        } <span class='kw'>else</span> {
+            <span class='ident'>parse_json_visitor_inner</span>(<span class='ident'>path_stack</span>, <span class='ident'>base_path</span>);
+        }
+
+        <span class='ident'>parse_json_visitor_inner</span>(<span class='ident'>path_stack</span>, <span class='ident'>relative_path</span>);
+    }
+    <span class='comment'>// TODO: report invalid path</span>
 }
 
 <span class='kw'>fn</span> <span class='ident'>merge_json</span>(<span class='ident'>base</span>: <span class='kw-2'>&amp;</span><span class='ident'>Json</span>, <span class='ident'>addition</span>: <span class='kw-2'>&amp;</span><span class='ident'>Object</span>) <span class='op'>-&gt;</span> <span class='ident'>Json</span> {
@@ -589,16 +658,9 @@
         <span class='ident'>Context</span> { <span class='ident'>data</span>: <span class='ident'>Json</span>::<span class='ident'>Null</span> }
     }
 
-    <span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>all</span>(<span class='ident'>feature</span> <span class='op'>=</span> <span class='string'>&quot;rustc_ser_type&quot;</span>, <span class='ident'>not</span>(<span class='ident'>feature</span> <span class='op'>=</span> <span class='string'>&quot;serde_type&quot;</span>)))]</span>
     <span class='doccomment'>/// Create a context with given data</span>
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>wraps</span><span class='op'>&lt;</span><span class='ident'>T</span>: <span class='ident'>ToJson</span><span class='op'>&gt;</span>(<span class='ident'>e</span>: <span class='kw-2'>&amp;</span><span class='ident'>T</span>) <span class='op'>-&gt;</span> <span class='ident'>Context</span> {
         <span class='ident'>Context</span> { <span class='ident'>data</span>: <span class='ident'>e</span>.<span class='ident'>to_json</span>() }
-    }
-
-    <span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>feature</span> <span class='op'>=</span> <span class='string'>&quot;serde_type&quot;</span>)]</span>
-    <span class='doccomment'>/// Create a context with given data</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>wraps</span><span class='op'>&lt;</span><span class='ident'>T</span>: <span class='ident'>Serialize</span><span class='op'>&gt;</span>(<span class='ident'>e</span>: <span class='kw-2'>&amp;</span><span class='ident'>T</span>) <span class='op'>-&gt;</span> <span class='ident'>Context</span> {
-        <span class='ident'>Context</span> { <span class='ident'>data</span>: <span class='ident'>value</span>::<span class='ident'>to_value</span>(<span class='ident'>e</span>) }
     }
 
     <span class='doccomment'>/// Extend current context with another JSON object</span>
@@ -615,51 +677,28 @@
     <span class='doccomment'>/// and set relative path to helper argument or so.</span>
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// If you want to navigate from top level, set the base path to `&quot;.&quot;`</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>navigate</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>base_path</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>, <span class='ident'>relative_path</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>) <span class='op'>-&gt;</span> <span class='kw-2'>&amp;</span><span class='ident'>Json</span> {
-        <span class='macro'>debug</span><span class='macro'>!</span>(<span class='string'>&quot;visiting path: {:?}/{:?}&quot;</span>, <span class='ident'>base_path</span>, <span class='ident'>relative_path</span>);
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>navigate</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>,
+                    <span class='ident'>base_path</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>,
+                    <span class='ident'>path_context</span>: <span class='kw-2'>&amp;</span><span class='ident'>VecDeque</span><span class='op'>&lt;</span><span class='ident'>String</span><span class='op'>&gt;</span>,
+                    <span class='ident'>relative_path</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>)
+                    <span class='op'>-&gt;</span> <span class='kw-2'>&amp;</span><span class='ident'>Json</span> {
         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>path_stack</span>: <span class='ident'>VecDeque</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='ident'>str</span><span class='op'>&gt;</span> <span class='op'>=</span> <span class='ident'>VecDeque</span>::<span class='ident'>new</span>();
-        <span class='ident'>parse_json_visitor</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>path_stack</span>, <span class='ident'>base_path</span>);
-        <span class='ident'>parse_json_visitor</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>path_stack</span>, <span class='ident'>relative_path</span>);
+        <span class='ident'>parse_json_visitor</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>path_stack</span>, <span class='ident'>base_path</span>, <span class='ident'>path_context</span>, <span class='ident'>relative_path</span>);
 
         <span class='kw'>let</span> <span class='ident'>paths</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='ident'>str</span><span class='op'>&gt;</span> <span class='op'>=</span> <span class='ident'>path_stack</span>.<span class='ident'>iter</span>().<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>x</span><span class='op'>|</span> <span class='op'>*</span><span class='ident'>x</span>).<span class='ident'>collect</span>();
         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>data</span>: <span class='kw-2'>&amp;</span><span class='ident'>Json</span> <span class='op'>=</span> <span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>data</span>;
         <span class='kw'>for</span> <span class='ident'>p</span> <span class='kw'>in</span> <span class='ident'>paths</span>.<span class='ident'>iter</span>() {
-            <span class='kw'>match</span> <span class='ident'>KEY_MATCHER</span>.<span class='ident'>find</span>(<span class='op'>*</span><span class='ident'>p</span>) {
-                <span class='prelude-val'>Some</span>((<span class='ident'>s</span>, _)) <span class='op'>=&gt;</span> {
-                    <span class='kw'>let</span> <span class='ident'>arr</span> <span class='op'>=</span> <span class='kw-2'>&amp;</span><span class='ident'>p</span>[..<span class='ident'>s</span>];
-                    <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>idx</span> <span class='op'>=</span> <span class='kw-2'>&amp;</span><span class='ident'>p</span>[<span class='ident'>s</span> <span class='op'>+</span> <span class='number'>1</span>..<span class='ident'>p</span>.<span class='ident'>len</span>() <span class='op'>-</span> <span class='number'>1</span>];
-                    <span class='ident'>idx</span> <span class='op'>=</span> <span class='ident'>QUOT_MATCHER</span>.<span class='ident'>captures</span>(<span class='ident'>idx</span>).<span class='ident'>and_then</span>(<span class='op'>|</span><span class='ident'>c</span><span class='op'>|</span> <span class='ident'>c</span>.<span class='ident'>at</span>(<span class='number'>1</span>)).<span class='ident'>unwrap_or</span>(<span class='ident'>idx</span>);
-
-                    <span class='kw'>let</span> <span class='ident'>root</span> <span class='op'>=</span> <span class='kw'>match</span> <span class='ident'>arr</span> {
-                        <span class='string'>&quot;this&quot;</span> <span class='op'>|</span> <span class='string'>&quot;&quot;</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='ident'>data</span>),
-                        _ <span class='op'>=&gt;</span> <span class='ident'>data</span>.<span class='ident'>find</span>(<span class='ident'>arr</span>),
-                    };
-
-                    <span class='ident'>data</span> <span class='op'>=</span> <span class='kw'>match</span> <span class='ident'>root</span> {
-                        <span class='prelude-val'>Some</span>(<span class='ident'>d</span>) <span class='op'>=&gt;</span> {
-                            <span class='kw'>match</span> <span class='op'>*</span><span class='ident'>d</span> {
-                                <span class='ident'>Json</span>::<span class='ident'>Array</span>(<span class='kw-2'>ref</span> <span class='ident'>l</span>) <span class='op'>=&gt;</span> {
-                                    <span class='ident'>idx</span>.<span class='ident'>parse</span>::<span class='op'>&lt;</span><span class='ident'>usize</span><span class='op'>&gt;</span>()
-                                       .<span class='ident'>and_then</span>(<span class='op'>|</span><span class='ident'>idx_u</span><span class='op'>|</span> <span class='prelude-val'>Ok</span>(<span class='ident'>l</span>.<span class='ident'>get</span>(<span class='ident'>idx_u</span>).<span class='ident'>unwrap_or</span>(<span class='kw-2'>&amp;</span><span class='ident'>DEFAULT_VALUE</span>)))
-                                       .<span class='ident'>unwrap_or</span>(<span class='kw-2'>&amp;</span><span class='ident'>DEFAULT_VALUE</span>)
-                                }
-                                <span class='ident'>Json</span>::<span class='ident'>Object</span>(<span class='kw-2'>ref</span> <span class='ident'>m</span>) <span class='op'>=&gt;</span> <span class='ident'>m</span>.<span class='ident'>get</span>(<span class='ident'>idx</span>).<span class='ident'>unwrap_or</span>(<span class='kw-2'>&amp;</span><span class='ident'>DEFAULT_VALUE</span>),
-                                _ <span class='op'>=&gt;</span> <span class='kw-2'>&amp;</span><span class='ident'>DEFAULT_VALUE</span>,
-                            }
-                        }
-                        <span class='prelude-val'>None</span> <span class='op'>=&gt;</span> <span class='kw-2'>&amp;</span><span class='ident'>DEFAULT_VALUE</span>,
-                    };
+            <span class='kw'>if</span> <span class='op'>*</span><span class='ident'>p</span> <span class='op'>==</span> <span class='string'>&quot;this&quot;</span> <span class='op'>&amp;&amp;</span> (<span class='op'>!</span><span class='ident'>data</span>.<span class='ident'>is_object</span>() <span class='op'>||</span> <span class='ident'>data</span>.<span class='ident'>find</span>(<span class='string'>&quot;this&quot;</span>).<span class='ident'>is_none</span>()) {
+                <span class='kw'>continue</span>;
+            }
+            <span class='ident'>data</span> <span class='op'>=</span> <span class='kw'>match</span> <span class='op'>*</span><span class='ident'>data</span> {
+                <span class='ident'>Json</span>::<span class='ident'>Array</span>(<span class='kw-2'>ref</span> <span class='ident'>l</span>) <span class='op'>=&gt;</span> {
+                    <span class='ident'>p</span>.<span class='ident'>parse</span>::<span class='op'>&lt;</span><span class='ident'>usize</span><span class='op'>&gt;</span>()
+                     .<span class='ident'>and_then</span>(<span class='op'>|</span><span class='ident'>idx_u</span><span class='op'>|</span> <span class='prelude-val'>Ok</span>(<span class='ident'>l</span>.<span class='ident'>get</span>(<span class='ident'>idx_u</span>).<span class='ident'>unwrap_or</span>(<span class='kw-2'>&amp;</span><span class='ident'>DEFAULT_VALUE</span>)))
+                     .<span class='ident'>unwrap_or</span>(<span class='kw-2'>&amp;</span><span class='ident'>DEFAULT_VALUE</span>)
                 }
-                <span class='prelude-val'>None</span> <span class='op'>=&gt;</span> {
-                    <span class='ident'>data</span> <span class='op'>=</span> <span class='ident'>data</span>.<span class='ident'>find</span>(<span class='op'>*</span><span class='ident'>p</span>)
-                               .<span class='ident'>unwrap_or_else</span>(<span class='op'>||</span> {
-                                   <span class='kw'>if</span> <span class='op'>*</span><span class='ident'>p</span> <span class='op'>==</span> <span class='string'>&quot;this&quot;</span> {
-                                       <span class='ident'>data</span>
-                                   } <span class='kw'>else</span> {
-                                       <span class='kw-2'>&amp;</span><span class='ident'>DEFAULT_VALUE</span>
-                                   }
-                               });
-                }
+                <span class='ident'>Json</span>::<span class='ident'>Object</span>(<span class='kw-2'>ref</span> <span class='ident'>m</span>) <span class='op'>=&gt;</span> <span class='ident'>m</span>.<span class='ident'>get</span>(<span class='op'>*</span><span class='ident'>p</span>).<span class='ident'>unwrap_or</span>(<span class='kw-2'>&amp;</span><span class='ident'>DEFAULT_VALUE</span>),
+                _ <span class='op'>=&gt;</span> <span class='kw-2'>&amp;</span><span class='ident'>DEFAULT_VALUE</span>,
             }
         }
         <span class='ident'>data</span>
@@ -701,18 +740,20 @@
     }
 }
 
-<span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>all</span>(<span class='ident'>feature</span> <span class='op'>=</span> <span class='string'>&quot;rustc_ser_type&quot;</span>, <span class='ident'>not</span>(<span class='ident'>feature</span> <span class='op'>=</span> <span class='string'>&quot;serde_type&quot;</span>)))]</span>
 <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>to_json</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>(<span class='ident'>src</span>: <span class='kw-2'>&amp;</span><span class='ident'>T</span>) <span class='op'>-&gt;</span> <span class='ident'>Json</span>
     <span class='kw'>where</span> <span class='ident'>T</span>: <span class='ident'>ToJson</span>
 {
     <span class='ident'>src</span>.<span class='ident'>to_json</span>()
 }
 
+<span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>all</span>(<span class='ident'>feature</span> <span class='op'>=</span> <span class='string'>&quot;rustc_ser_type&quot;</span>, <span class='ident'>not</span>(<span class='ident'>feature</span> <span class='op'>=</span> <span class='string'>&quot;serde_type&quot;</span>)))]</span>
+<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>as_string</span>(<span class='ident'>src</span>: <span class='kw-2'>&amp;</span><span class='ident'>Json</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='ident'>str</span><span class='op'>&gt;</span> {
+    <span class='ident'>src</span>.<span class='ident'>as_string</span>()
+}
+
 <span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>feature</span> <span class='op'>=</span> <span class='string'>&quot;serde_type&quot;</span>)]</span>
-<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>to_json</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>(<span class='ident'>src</span>: <span class='kw-2'>&amp;</span><span class='ident'>T</span>) <span class='op'>-&gt;</span> <span class='ident'>Json</span>
-    <span class='kw'>where</span> <span class='ident'>T</span>: <span class='ident'>Serialize</span>
-{
-    <span class='ident'>value</span>::<span class='ident'>to_value</span>(<span class='ident'>src</span>)
+<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>as_string</span>(<span class='ident'>src</span>: <span class='kw-2'>&amp;</span><span class='ident'>Json</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='ident'>str</span><span class='op'>&gt;</span> {
+    <span class='ident'>src</span>.<span class='ident'>as_str</span>()
 }
 
 <span class='kw'>impl</span> <span class='ident'>JsonTruthy</span> <span class='kw'>for</span> <span class='ident'>Json</span> {
@@ -737,9 +778,8 @@
 <span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>feature</span> <span class='op'>=</span> <span class='string'>&quot;serde_type&quot;</span>)]</span>
 <span class='kw'>mod</span> <span class='ident'>test</span> {
     <span class='kw'>use</span> <span class='ident'>context</span>::{<span class='ident'>JsonRender</span>, <span class='ident'>Context</span>};
-    <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>collections</span>::<span class='ident'>BTreeMap</span>;
-    <span class='kw'>use</span> <span class='ident'>serde_json</span>::<span class='ident'>value</span>::{<span class='self'>self</span>, <span class='ident'>Value</span> <span class='kw'>as</span> <span class='ident'>Json</span>};
-    <span class='kw'>use</span> <span class='ident'>serde</span>::<span class='ident'>ser</span>::{<span class='ident'>Serialize</span>, <span class='ident'>Serializer</span>};
+    <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>collections</span>::{<span class='ident'>VecDeque</span>, <span class='ident'>BTreeMap</span>};
+    <span class='kw'>use</span> <span class='ident'>serde_json</span>::<span class='ident'>value</span>::{<span class='self'>self</span>, <span class='ident'>Value</span> <span class='kw'>as</span> <span class='ident'>Json</span>, <span class='ident'>ToJson</span>};
 
     <span class='attribute'>#[<span class='ident'>test</span>]</span>
     <span class='kw'>fn</span> <span class='ident'>test_json_render</span>() {
@@ -754,14 +794,12 @@
         <span class='ident'>country</span>: <span class='ident'>String</span>,
     }
 
-    <span class='kw'>impl</span> <span class='ident'>Serialize</span> <span class='kw'>for</span> <span class='ident'>Address</span> {
-        <span class='kw'>fn</span> <span class='ident'>serialize</span><span class='op'>&lt;</span><span class='ident'>S</span><span class='op'>&gt;</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>serializer</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>S</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span>(), <span class='ident'>S</span>::<span class='ident'>Error</span><span class='op'>&gt;</span>
-            <span class='kw'>where</span> <span class='ident'>S</span>: <span class='ident'>Serializer</span>
-        {
+    <span class='kw'>impl</span> <span class='ident'>ToJson</span> <span class='kw'>for</span> <span class='ident'>Address</span> {
+        <span class='kw'>fn</span> <span class='ident'>to_json</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>Json</span> {
             <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>m</span> <span class='op'>=</span> <span class='ident'>BTreeMap</span>::<span class='ident'>new</span>();
-            <span class='ident'>m</span>.<span class='ident'>insert</span>(<span class='string'>&quot;city&quot;</span>.<span class='ident'>to_string</span>(), <span class='ident'>value</span>::<span class='ident'>to_value</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>city</span>));
-            <span class='ident'>m</span>.<span class='ident'>insert</span>(<span class='string'>&quot;country&quot;</span>.<span class='ident'>to_string</span>(), <span class='ident'>value</span>::<span class='ident'>to_value</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>country</span>));
-            <span class='ident'>m</span>.<span class='ident'>serialize</span>(<span class='ident'>serializer</span>)
+            <span class='ident'>m</span>.<span class='ident'>insert</span>(<span class='string'>&quot;city&quot;</span>.<span class='ident'>to_string</span>(), <span class='self'>self</span>.<span class='ident'>city</span>.<span class='ident'>to_json</span>());
+            <span class='ident'>m</span>.<span class='ident'>insert</span>(<span class='string'>&quot;country&quot;</span>.<span class='ident'>to_string</span>(), <span class='self'>self</span>.<span class='ident'>country</span>.<span class='ident'>to_json</span>());
+            <span class='ident'>m</span>.<span class='ident'>to_json</span>()
         }
     }
 
@@ -772,16 +810,14 @@
         <span class='ident'>titles</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>String</span><span class='op'>&gt;</span>,
     }
 
-    <span class='kw'>impl</span> <span class='ident'>Serialize</span> <span class='kw'>for</span> <span class='ident'>Person</span> {
-        <span class='kw'>fn</span> <span class='ident'>serialize</span><span class='op'>&lt;</span><span class='ident'>S</span><span class='op'>&gt;</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>serializer</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>S</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span>(), <span class='ident'>S</span>::<span class='ident'>Error</span><span class='op'>&gt;</span>
-            <span class='kw'>where</span> <span class='ident'>S</span>: <span class='ident'>Serializer</span>
-        {
+    <span class='kw'>impl</span> <span class='ident'>ToJson</span> <span class='kw'>for</span> <span class='ident'>Person</span> {
+        <span class='kw'>fn</span> <span class='ident'>to_json</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>Json</span> {
             <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>m</span> <span class='op'>=</span> <span class='ident'>BTreeMap</span>::<span class='ident'>new</span>();
-            <span class='ident'>m</span>.<span class='ident'>insert</span>(<span class='string'>&quot;name&quot;</span>.<span class='ident'>to_string</span>(), <span class='ident'>value</span>::<span class='ident'>to_value</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>name</span>));
-            <span class='ident'>m</span>.<span class='ident'>insert</span>(<span class='string'>&quot;age&quot;</span>.<span class='ident'>to_string</span>(), <span class='ident'>value</span>::<span class='ident'>to_value</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>age</span>));
-            <span class='ident'>m</span>.<span class='ident'>insert</span>(<span class='string'>&quot;addr&quot;</span>.<span class='ident'>to_string</span>(), <span class='ident'>value</span>::<span class='ident'>to_value</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>addr</span>));
-            <span class='ident'>m</span>.<span class='ident'>insert</span>(<span class='string'>&quot;titles&quot;</span>.<span class='ident'>to_string</span>(), <span class='ident'>value</span>::<span class='ident'>to_value</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>titles</span>));
-            <span class='ident'>m</span>.<span class='ident'>serialize</span>(<span class='ident'>serializer</span>)
+            <span class='ident'>m</span>.<span class='ident'>insert</span>(<span class='string'>&quot;name&quot;</span>.<span class='ident'>to_string</span>(), <span class='self'>self</span>.<span class='ident'>name</span>.<span class='ident'>to_json</span>());
+            <span class='ident'>m</span>.<span class='ident'>insert</span>(<span class='string'>&quot;age&quot;</span>.<span class='ident'>to_string</span>(), <span class='self'>self</span>.<span class='ident'>age</span>.<span class='ident'>to_json</span>());
+            <span class='ident'>m</span>.<span class='ident'>insert</span>(<span class='string'>&quot;addr&quot;</span>.<span class='ident'>to_string</span>(), <span class='self'>self</span>.<span class='ident'>addr</span>.<span class='ident'>to_json</span>());
+            <span class='ident'>m</span>.<span class='ident'>insert</span>(<span class='string'>&quot;titles&quot;</span>.<span class='ident'>to_string</span>(), <span class='self'>self</span>.<span class='ident'>titles</span>.<span class='ident'>to_json</span>());
+            <span class='ident'>m</span>.<span class='ident'>to_json</span>()
         }
     }
 
@@ -789,7 +825,8 @@
     <span class='kw'>fn</span> <span class='ident'>test_render</span>() {
         <span class='kw'>let</span> <span class='ident'>v</span> <span class='op'>=</span> <span class='string'>&quot;hello&quot;</span>;
         <span class='kw'>let</span> <span class='ident'>ctx</span> <span class='op'>=</span> <span class='ident'>Context</span>::<span class='ident'>wraps</span>(<span class='kw-2'>&amp;</span><span class='ident'>v</span>.<span class='ident'>to_string</span>());
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>ctx</span>.<span class='ident'>navigate</span>(<span class='string'>&quot;.&quot;</span>, <span class='string'>&quot;this&quot;</span>).<span class='ident'>render</span>(), <span class='ident'>v</span>.<span class='ident'>to_string</span>());
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>ctx</span>.<span class='ident'>navigate</span>(<span class='string'>&quot;.&quot;</span>, <span class='kw-2'>&amp;</span><span class='ident'>VecDeque</span>::<span class='ident'>new</span>(), <span class='string'>&quot;this&quot;</span>).<span class='ident'>render</span>(),
+                   <span class='ident'>v</span>.<span class='ident'>to_string</span>());
     }
 
     <span class='attribute'>#[<span class='ident'>test</span>]</span>
@@ -807,27 +844,28 @@
         };
 
         <span class='kw'>let</span> <span class='ident'>ctx</span> <span class='op'>=</span> <span class='ident'>Context</span>::<span class='ident'>wraps</span>(<span class='kw-2'>&amp;</span><span class='ident'>person</span>);
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>ctx</span>.<span class='ident'>navigate</span>(<span class='string'>&quot;.&quot;</span>, <span class='string'>&quot;./name/../addr/country&quot;</span>).<span class='ident'>render</span>(),
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>ctx</span>.<span class='ident'>navigate</span>(<span class='string'>&quot;.&quot;</span>, <span class='kw-2'>&amp;</span><span class='ident'>VecDeque</span>::<span class='ident'>new</span>(), <span class='string'>&quot;./name/../addr/country&quot;</span>).<span class='ident'>render</span>(),
                    <span class='string'>&quot;China&quot;</span>.<span class='ident'>to_string</span>());
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>ctx</span>.<span class='ident'>navigate</span>(<span class='string'>&quot;.&quot;</span>, <span class='string'>&quot;addr.[country]&quot;</span>).<span class='ident'>render</span>(),
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>ctx</span>.<span class='ident'>navigate</span>(<span class='string'>&quot;.&quot;</span>, <span class='kw-2'>&amp;</span><span class='ident'>VecDeque</span>::<span class='ident'>new</span>(), <span class='string'>&quot;addr.[country]&quot;</span>).<span class='ident'>render</span>(),
                    <span class='string'>&quot;China&quot;</span>.<span class='ident'>to_string</span>());
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>ctx</span>.<span class='ident'>navigate</span>(<span class='string'>&quot;.&quot;</span>, <span class='string'>&quot;addr.[\&quot;country\&quot;]&quot;</span>).<span class='ident'>render</span>(),
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>ctx</span>.<span class='ident'>navigate</span>(<span class='string'>&quot;.&quot;</span>, <span class='kw-2'>&amp;</span><span class='ident'>VecDeque</span>::<span class='ident'>new</span>(), <span class='string'>&quot;addr.[\&quot;country\&quot;]&quot;</span>).<span class='ident'>render</span>(),
                    <span class='string'>&quot;China&quot;</span>.<span class='ident'>to_string</span>());
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>ctx</span>.<span class='ident'>navigate</span>(<span class='string'>&quot;.&quot;</span>, <span class='string'>&quot;addr.[&#39;country&#39;]&quot;</span>).<span class='ident'>render</span>(),
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>ctx</span>.<span class='ident'>navigate</span>(<span class='string'>&quot;.&quot;</span>, <span class='kw-2'>&amp;</span><span class='ident'>VecDeque</span>::<span class='ident'>new</span>(), <span class='string'>&quot;addr.[&#39;country&#39;]&quot;</span>).<span class='ident'>render</span>(),
                    <span class='string'>&quot;China&quot;</span>.<span class='ident'>to_string</span>());
 
         <span class='kw'>let</span> <span class='ident'>v</span> <span class='op'>=</span> <span class='bool-val'>true</span>;
         <span class='kw'>let</span> <span class='ident'>ctx2</span> <span class='op'>=</span> <span class='ident'>Context</span>::<span class='ident'>wraps</span>(<span class='kw-2'>&amp;</span><span class='ident'>v</span>);
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>ctx2</span>.<span class='ident'>navigate</span>(<span class='string'>&quot;.&quot;</span>, <span class='string'>&quot;this&quot;</span>).<span class='ident'>render</span>(), <span class='string'>&quot;true&quot;</span>.<span class='ident'>to_string</span>());
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>ctx2</span>.<span class='ident'>navigate</span>(<span class='string'>&quot;.&quot;</span>, <span class='kw-2'>&amp;</span><span class='ident'>VecDeque</span>::<span class='ident'>new</span>(), <span class='string'>&quot;this&quot;</span>).<span class='ident'>render</span>(),
+                   <span class='string'>&quot;true&quot;</span>.<span class='ident'>to_string</span>());
 
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>ctx</span>.<span class='ident'>navigate</span>(<span class='string'>&quot;.&quot;</span>, <span class='string'>&quot;titles[0]&quot;</span>).<span class='ident'>render</span>(),
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>ctx</span>.<span class='ident'>navigate</span>(<span class='string'>&quot;.&quot;</span>, <span class='kw-2'>&amp;</span><span class='ident'>VecDeque</span>::<span class='ident'>new</span>(), <span class='string'>&quot;titles[0]&quot;</span>).<span class='ident'>render</span>(),
                    <span class='string'>&quot;programmer&quot;</span>.<span class='ident'>to_string</span>());
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>ctx</span>.<span class='ident'>navigate</span>(<span class='string'>&quot;.&quot;</span>, <span class='string'>&quot;titles.[0]&quot;</span>).<span class='ident'>render</span>(),
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>ctx</span>.<span class='ident'>navigate</span>(<span class='string'>&quot;.&quot;</span>, <span class='kw-2'>&amp;</span><span class='ident'>VecDeque</span>::<span class='ident'>new</span>(), <span class='string'>&quot;titles.[0]&quot;</span>).<span class='ident'>render</span>(),
                    <span class='string'>&quot;programmer&quot;</span>.<span class='ident'>to_string</span>());
 
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>ctx</span>.<span class='ident'>navigate</span>(<span class='string'>&quot;.&quot;</span>, <span class='string'>&quot;titles[0]/../age&quot;</span>).<span class='ident'>render</span>(),
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>ctx</span>.<span class='ident'>navigate</span>(<span class='string'>&quot;.&quot;</span>, <span class='kw-2'>&amp;</span><span class='ident'>VecDeque</span>::<span class='ident'>new</span>(), <span class='string'>&quot;titles[0]/../../age&quot;</span>).<span class='ident'>render</span>(),
                    <span class='string'>&quot;27&quot;</span>.<span class='ident'>to_string</span>());
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>ctx</span>.<span class='ident'>navigate</span>(<span class='string'>&quot;.&quot;</span>, <span class='string'>&quot;this.titles[0]/../age&quot;</span>).<span class='ident'>render</span>(),
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>ctx</span>.<span class='ident'>navigate</span>(<span class='string'>&quot;.&quot;</span>, <span class='kw-2'>&amp;</span><span class='ident'>VecDeque</span>::<span class='ident'>new</span>(), <span class='string'>&quot;this.titles[0]/../../age&quot;</span>).<span class='ident'>render</span>(),
                    <span class='string'>&quot;27&quot;</span>.<span class='ident'>to_string</span>());
 
     }
@@ -843,8 +881,10 @@
         <span class='ident'>map_without_this</span>.<span class='ident'>insert</span>(<span class='string'>&quot;age&quot;</span>.<span class='ident'>to_string</span>(), <span class='ident'>value</span>::<span class='ident'>to_value</span>(<span class='kw-2'>&amp;</span><span class='number'>4usize</span>));
         <span class='kw'>let</span> <span class='ident'>ctx2</span> <span class='op'>=</span> <span class='ident'>Context</span>::<span class='ident'>wraps</span>(<span class='kw-2'>&amp;</span><span class='ident'>map_without_this</span>);
 
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>ctx1</span>.<span class='ident'>navigate</span>(<span class='string'>&quot;.&quot;</span>, <span class='string'>&quot;this&quot;</span>).<span class='ident'>render</span>(), <span class='string'>&quot;hello&quot;</span>.<span class='ident'>to_owned</span>());
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>ctx2</span>.<span class='ident'>navigate</span>(<span class='string'>&quot;.&quot;</span>, <span class='string'>&quot;age&quot;</span>).<span class='ident'>render</span>(), <span class='string'>&quot;4&quot;</span>.<span class='ident'>to_owned</span>());
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>ctx1</span>.<span class='ident'>navigate</span>(<span class='string'>&quot;.&quot;</span>, <span class='kw-2'>&amp;</span><span class='ident'>VecDeque</span>::<span class='ident'>new</span>(), <span class='string'>&quot;this&quot;</span>).<span class='ident'>render</span>(),
+                   <span class='string'>&quot;hello&quot;</span>.<span class='ident'>to_owned</span>());
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>ctx2</span>.<span class='ident'>navigate</span>(<span class='string'>&quot;.&quot;</span>, <span class='kw-2'>&amp;</span><span class='ident'>VecDeque</span>::<span class='ident'>new</span>(), <span class='string'>&quot;age&quot;</span>).<span class='ident'>render</span>(),
+                   <span class='string'>&quot;4&quot;</span>.<span class='ident'>to_owned</span>());
     }
 
     <span class='attribute'>#[<span class='ident'>test</span>]</span>
@@ -860,12 +900,16 @@
         <span class='ident'>hash</span>.<span class='ident'>insert</span>(<span class='string'>&quot;tag&quot;</span>.<span class='ident'>to_owned</span>(), <span class='ident'>value</span>::<span class='ident'>to_value</span>(<span class='kw-2'>&amp;</span><span class='string'>&quot;h1&quot;</span>));
 
         <span class='kw'>let</span> <span class='ident'>ctx_a1</span> <span class='op'>=</span> <span class='ident'>ctx1</span>.<span class='ident'>extend</span>(<span class='kw-2'>&amp;</span><span class='ident'>hash</span>);
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>ctx_a1</span>.<span class='ident'>navigate</span>(<span class='string'>&quot;.&quot;</span>, <span class='string'>&quot;age&quot;</span>).<span class='ident'>render</span>(), <span class='string'>&quot;4&quot;</span>.<span class='ident'>to_owned</span>());
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>ctx_a1</span>.<span class='ident'>navigate</span>(<span class='string'>&quot;.&quot;</span>, <span class='string'>&quot;tag&quot;</span>).<span class='ident'>render</span>(), <span class='string'>&quot;h1&quot;</span>.<span class='ident'>to_owned</span>());
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>ctx_a1</span>.<span class='ident'>navigate</span>(<span class='string'>&quot;.&quot;</span>, <span class='kw-2'>&amp;</span><span class='ident'>VecDeque</span>::<span class='ident'>new</span>(), <span class='string'>&quot;age&quot;</span>).<span class='ident'>render</span>(),
+                   <span class='string'>&quot;4&quot;</span>.<span class='ident'>to_owned</span>());
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>ctx_a1</span>.<span class='ident'>navigate</span>(<span class='string'>&quot;.&quot;</span>, <span class='kw-2'>&amp;</span><span class='ident'>VecDeque</span>::<span class='ident'>new</span>(), <span class='string'>&quot;tag&quot;</span>).<span class='ident'>render</span>(),
+                   <span class='string'>&quot;h1&quot;</span>.<span class='ident'>to_owned</span>());
 
         <span class='kw'>let</span> <span class='ident'>ctx_a2</span> <span class='op'>=</span> <span class='ident'>ctx2</span>.<span class='ident'>extend</span>(<span class='kw-2'>&amp;</span><span class='ident'>hash</span>);
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>ctx_a2</span>.<span class='ident'>navigate</span>(<span class='string'>&quot;.&quot;</span>, <span class='string'>&quot;this&quot;</span>).<span class='ident'>render</span>(), <span class='string'>&quot;hello&quot;</span>.<span class='ident'>to_owned</span>());
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>ctx_a2</span>.<span class='ident'>navigate</span>(<span class='string'>&quot;.&quot;</span>, <span class='string'>&quot;tag&quot;</span>).<span class='ident'>render</span>(), <span class='string'>&quot;h1&quot;</span>.<span class='ident'>to_owned</span>());
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>ctx_a2</span>.<span class='ident'>navigate</span>(<span class='string'>&quot;.&quot;</span>, <span class='kw-2'>&amp;</span><span class='ident'>VecDeque</span>::<span class='ident'>new</span>(), <span class='string'>&quot;this&quot;</span>).<span class='ident'>render</span>(),
+                   <span class='string'>&quot;hello&quot;</span>.<span class='ident'>to_owned</span>());
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>ctx_a2</span>.<span class='ident'>navigate</span>(<span class='string'>&quot;.&quot;</span>, <span class='kw-2'>&amp;</span><span class='ident'>VecDeque</span>::<span class='ident'>new</span>(), <span class='string'>&quot;tag&quot;</span>).<span class='ident'>render</span>(),
+                   <span class='string'>&quot;h1&quot;</span>.<span class='ident'>to_owned</span>());
     }
 }
 
@@ -873,7 +917,7 @@
 <span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>all</span>(<span class='ident'>feature</span> <span class='op'>=</span> <span class='string'>&quot;rustc_ser_type&quot;</span>, <span class='ident'>not</span>(<span class='ident'>feature</span> <span class='op'>=</span> <span class='string'>&quot;serde_type&quot;</span>)))]</span>
 <span class='kw'>mod</span> <span class='ident'>test</span> {
     <span class='kw'>use</span> <span class='ident'>context</span>::{<span class='ident'>JsonRender</span>, <span class='ident'>Context</span>};
-    <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>collections</span>::<span class='ident'>BTreeMap</span>;
+    <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>collections</span>::{<span class='ident'>VecDeque</span>, <span class='ident'>BTreeMap</span>};
     <span class='kw'>use</span> <span class='ident'>serialize</span>::<span class='ident'>json</span>::{<span class='ident'>Json</span>, <span class='ident'>ToJson</span>};
 
     <span class='attribute'>#[<span class='ident'>test</span>]</span>
@@ -920,7 +964,18 @@
     <span class='kw'>fn</span> <span class='ident'>test_render</span>() {
         <span class='kw'>let</span> <span class='ident'>v</span> <span class='op'>=</span> <span class='string'>&quot;hello&quot;</span>;
         <span class='kw'>let</span> <span class='ident'>ctx</span> <span class='op'>=</span> <span class='ident'>Context</span>::<span class='ident'>wraps</span>(<span class='kw-2'>&amp;</span><span class='ident'>v</span>.<span class='ident'>to_string</span>());
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>ctx</span>.<span class='ident'>navigate</span>(<span class='string'>&quot;.&quot;</span>, <span class='string'>&quot;this&quot;</span>).<span class='ident'>render</span>(), <span class='ident'>v</span>.<span class='ident'>to_string</span>());
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>ctx</span>.<span class='ident'>navigate</span>(<span class='string'>&quot;.&quot;</span>, <span class='kw-2'>&amp;</span><span class='ident'>VecDeque</span>::<span class='ident'>new</span>(), <span class='string'>&quot;this&quot;</span>).<span class='ident'>render</span>(),
+                   <span class='ident'>v</span>.<span class='ident'>to_string</span>());
+    }
+
+    <span class='attribute'>#[<span class='ident'>test</span>]</span>
+    <span class='kw'>fn</span> <span class='ident'>test_key_name_with_this</span>() {
+        <span class='kw'>let</span> <span class='ident'>m</span> <span class='op'>=</span> <span class='macro'>btreemap</span><span class='macro'>!</span>{
+            <span class='string'>&quot;this_name&quot;</span>.<span class='ident'>to_string</span>() <span class='op'>=&gt;</span> <span class='string'>&quot;the_value&quot;</span>.<span class='ident'>to_string</span>()
+        };
+        <span class='kw'>let</span> <span class='ident'>ctx</span> <span class='op'>=</span> <span class='ident'>Context</span>::<span class='ident'>wraps</span>(<span class='kw-2'>&amp;</span><span class='ident'>m</span>);
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>ctx</span>.<span class='ident'>navigate</span>(<span class='string'>&quot;.&quot;</span>, <span class='kw-2'>&amp;</span><span class='ident'>VecDeque</span>::<span class='ident'>new</span>(), <span class='string'>&quot;this_name&quot;</span>).<span class='ident'>render</span>(),
+                   <span class='string'>&quot;the_value&quot;</span>.<span class='ident'>to_string</span>());
     }
 
     <span class='attribute'>#[<span class='ident'>test</span>]</span>
@@ -938,27 +993,28 @@
         };
 
         <span class='kw'>let</span> <span class='ident'>ctx</span> <span class='op'>=</span> <span class='ident'>Context</span>::<span class='ident'>wraps</span>(<span class='kw-2'>&amp;</span><span class='ident'>person</span>);
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>ctx</span>.<span class='ident'>navigate</span>(<span class='string'>&quot;.&quot;</span>, <span class='string'>&quot;./name/../addr/country&quot;</span>).<span class='ident'>render</span>(),
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>ctx</span>.<span class='ident'>navigate</span>(<span class='string'>&quot;.&quot;</span>, <span class='kw-2'>&amp;</span><span class='ident'>VecDeque</span>::<span class='ident'>new</span>(), <span class='string'>&quot;./name/../addr/country&quot;</span>).<span class='ident'>render</span>(),
                    <span class='string'>&quot;China&quot;</span>.<span class='ident'>to_string</span>());
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>ctx</span>.<span class='ident'>navigate</span>(<span class='string'>&quot;.&quot;</span>, <span class='string'>&quot;addr.[country]&quot;</span>).<span class='ident'>render</span>(),
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>ctx</span>.<span class='ident'>navigate</span>(<span class='string'>&quot;.&quot;</span>, <span class='kw-2'>&amp;</span><span class='ident'>VecDeque</span>::<span class='ident'>new</span>(), <span class='string'>&quot;addr.[country]&quot;</span>).<span class='ident'>render</span>(),
                    <span class='string'>&quot;China&quot;</span>.<span class='ident'>to_string</span>());
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>ctx</span>.<span class='ident'>navigate</span>(<span class='string'>&quot;.&quot;</span>, <span class='string'>&quot;addr.[\&quot;country\&quot;]&quot;</span>).<span class='ident'>render</span>(),
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>ctx</span>.<span class='ident'>navigate</span>(<span class='string'>&quot;.&quot;</span>, <span class='kw-2'>&amp;</span><span class='ident'>VecDeque</span>::<span class='ident'>new</span>(), <span class='string'>&quot;addr.[\&quot;country\&quot;]&quot;</span>).<span class='ident'>render</span>(),
                    <span class='string'>&quot;China&quot;</span>.<span class='ident'>to_string</span>());
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>ctx</span>.<span class='ident'>navigate</span>(<span class='string'>&quot;.&quot;</span>, <span class='string'>&quot;addr.[&#39;country&#39;]&quot;</span>).<span class='ident'>render</span>(),
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>ctx</span>.<span class='ident'>navigate</span>(<span class='string'>&quot;.&quot;</span>, <span class='kw-2'>&amp;</span><span class='ident'>VecDeque</span>::<span class='ident'>new</span>(), <span class='string'>&quot;addr.[&#39;country&#39;]&quot;</span>).<span class='ident'>render</span>(),
                    <span class='string'>&quot;China&quot;</span>.<span class='ident'>to_string</span>());
 
         <span class='kw'>let</span> <span class='ident'>v</span> <span class='op'>=</span> <span class='bool-val'>true</span>;
         <span class='kw'>let</span> <span class='ident'>ctx2</span> <span class='op'>=</span> <span class='ident'>Context</span>::<span class='ident'>wraps</span>(<span class='kw-2'>&amp;</span><span class='ident'>v</span>);
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>ctx2</span>.<span class='ident'>navigate</span>(<span class='string'>&quot;.&quot;</span>, <span class='string'>&quot;this&quot;</span>).<span class='ident'>render</span>(), <span class='string'>&quot;true&quot;</span>.<span class='ident'>to_string</span>());
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>ctx2</span>.<span class='ident'>navigate</span>(<span class='string'>&quot;.&quot;</span>, <span class='kw-2'>&amp;</span><span class='ident'>VecDeque</span>::<span class='ident'>new</span>(), <span class='string'>&quot;this&quot;</span>).<span class='ident'>render</span>(),
+                   <span class='string'>&quot;true&quot;</span>.<span class='ident'>to_string</span>());
 
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>ctx</span>.<span class='ident'>navigate</span>(<span class='string'>&quot;.&quot;</span>, <span class='string'>&quot;titles[0]&quot;</span>).<span class='ident'>render</span>(),
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>ctx</span>.<span class='ident'>navigate</span>(<span class='string'>&quot;.&quot;</span>, <span class='kw-2'>&amp;</span><span class='ident'>VecDeque</span>::<span class='ident'>new</span>(), <span class='string'>&quot;titles[0]&quot;</span>).<span class='ident'>render</span>(),
                    <span class='string'>&quot;programmer&quot;</span>.<span class='ident'>to_string</span>());
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>ctx</span>.<span class='ident'>navigate</span>(<span class='string'>&quot;.&quot;</span>, <span class='string'>&quot;titles.[0]&quot;</span>).<span class='ident'>render</span>(),
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>ctx</span>.<span class='ident'>navigate</span>(<span class='string'>&quot;.&quot;</span>, <span class='kw-2'>&amp;</span><span class='ident'>VecDeque</span>::<span class='ident'>new</span>(), <span class='string'>&quot;titles.[0]&quot;</span>).<span class='ident'>render</span>(),
                    <span class='string'>&quot;programmer&quot;</span>.<span class='ident'>to_string</span>());
 
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>ctx</span>.<span class='ident'>navigate</span>(<span class='string'>&quot;.&quot;</span>, <span class='string'>&quot;titles[0]/../age&quot;</span>).<span class='ident'>render</span>(),
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>ctx</span>.<span class='ident'>navigate</span>(<span class='string'>&quot;.&quot;</span>, <span class='kw-2'>&amp;</span><span class='ident'>VecDeque</span>::<span class='ident'>new</span>(), <span class='string'>&quot;titles[0]/../../age&quot;</span>).<span class='ident'>render</span>(),
                    <span class='string'>&quot;27&quot;</span>.<span class='ident'>to_string</span>());
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>ctx</span>.<span class='ident'>navigate</span>(<span class='string'>&quot;.&quot;</span>, <span class='string'>&quot;this.titles[0]/../age&quot;</span>).<span class='ident'>render</span>(),
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>ctx</span>.<span class='ident'>navigate</span>(<span class='string'>&quot;.&quot;</span>, <span class='kw-2'>&amp;</span><span class='ident'>VecDeque</span>::<span class='ident'>new</span>(), <span class='string'>&quot;this.titles[0]/../../age&quot;</span>).<span class='ident'>render</span>(),
                    <span class='string'>&quot;27&quot;</span>.<span class='ident'>to_string</span>());
 
     }
@@ -974,8 +1030,10 @@
         <span class='ident'>map_without_this</span>.<span class='ident'>insert</span>(<span class='string'>&quot;age&quot;</span>.<span class='ident'>to_string</span>(), <span class='number'>4usize</span>.<span class='ident'>to_json</span>());
         <span class='kw'>let</span> <span class='ident'>ctx2</span> <span class='op'>=</span> <span class='ident'>Context</span>::<span class='ident'>wraps</span>(<span class='kw-2'>&amp;</span><span class='ident'>map_without_this</span>);
 
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>ctx1</span>.<span class='ident'>navigate</span>(<span class='string'>&quot;.&quot;</span>, <span class='string'>&quot;this&quot;</span>).<span class='ident'>render</span>(), <span class='string'>&quot;hello&quot;</span>.<span class='ident'>to_owned</span>());
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>ctx2</span>.<span class='ident'>navigate</span>(<span class='string'>&quot;.&quot;</span>, <span class='string'>&quot;age&quot;</span>).<span class='ident'>render</span>(), <span class='string'>&quot;4&quot;</span>.<span class='ident'>to_owned</span>());
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>ctx1</span>.<span class='ident'>navigate</span>(<span class='string'>&quot;.&quot;</span>, <span class='kw-2'>&amp;</span><span class='ident'>VecDeque</span>::<span class='ident'>new</span>(), <span class='string'>&quot;this&quot;</span>).<span class='ident'>render</span>(),
+                   <span class='string'>&quot;hello&quot;</span>.<span class='ident'>to_owned</span>());
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>ctx2</span>.<span class='ident'>navigate</span>(<span class='string'>&quot;.&quot;</span>, <span class='kw-2'>&amp;</span><span class='ident'>VecDeque</span>::<span class='ident'>new</span>(), <span class='string'>&quot;age&quot;</span>).<span class='ident'>render</span>(),
+                   <span class='string'>&quot;4&quot;</span>.<span class='ident'>to_owned</span>());
     }
 
     <span class='attribute'>#[<span class='ident'>test</span>]</span>
@@ -991,12 +1049,16 @@
         <span class='ident'>hash</span>.<span class='ident'>insert</span>(<span class='string'>&quot;tag&quot;</span>.<span class='ident'>to_owned</span>(), <span class='string'>&quot;h1&quot;</span>.<span class='ident'>to_json</span>());
 
         <span class='kw'>let</span> <span class='ident'>ctx_a1</span> <span class='op'>=</span> <span class='ident'>ctx1</span>.<span class='ident'>extend</span>(<span class='kw-2'>&amp;</span><span class='ident'>hash</span>);
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>ctx_a1</span>.<span class='ident'>navigate</span>(<span class='string'>&quot;.&quot;</span>, <span class='string'>&quot;age&quot;</span>).<span class='ident'>render</span>(), <span class='string'>&quot;4&quot;</span>.<span class='ident'>to_owned</span>());
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>ctx_a1</span>.<span class='ident'>navigate</span>(<span class='string'>&quot;.&quot;</span>, <span class='string'>&quot;tag&quot;</span>).<span class='ident'>render</span>(), <span class='string'>&quot;h1&quot;</span>.<span class='ident'>to_owned</span>());
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>ctx_a1</span>.<span class='ident'>navigate</span>(<span class='string'>&quot;.&quot;</span>, <span class='kw-2'>&amp;</span><span class='ident'>VecDeque</span>::<span class='ident'>new</span>(), <span class='string'>&quot;age&quot;</span>).<span class='ident'>render</span>(),
+                   <span class='string'>&quot;4&quot;</span>.<span class='ident'>to_owned</span>());
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>ctx_a1</span>.<span class='ident'>navigate</span>(<span class='string'>&quot;.&quot;</span>, <span class='kw-2'>&amp;</span><span class='ident'>VecDeque</span>::<span class='ident'>new</span>(), <span class='string'>&quot;tag&quot;</span>).<span class='ident'>render</span>(),
+                   <span class='string'>&quot;h1&quot;</span>.<span class='ident'>to_owned</span>());
 
         <span class='kw'>let</span> <span class='ident'>ctx_a2</span> <span class='op'>=</span> <span class='ident'>ctx2</span>.<span class='ident'>extend</span>(<span class='kw-2'>&amp;</span><span class='ident'>hash</span>);
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>ctx_a2</span>.<span class='ident'>navigate</span>(<span class='string'>&quot;.&quot;</span>, <span class='string'>&quot;this&quot;</span>).<span class='ident'>render</span>(), <span class='string'>&quot;hello&quot;</span>.<span class='ident'>to_owned</span>());
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>ctx_a2</span>.<span class='ident'>navigate</span>(<span class='string'>&quot;.&quot;</span>, <span class='string'>&quot;tag&quot;</span>).<span class='ident'>render</span>(), <span class='string'>&quot;h1&quot;</span>.<span class='ident'>to_owned</span>());
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>ctx_a2</span>.<span class='ident'>navigate</span>(<span class='string'>&quot;.&quot;</span>, <span class='kw-2'>&amp;</span><span class='ident'>VecDeque</span>::<span class='ident'>new</span>(), <span class='string'>&quot;this&quot;</span>).<span class='ident'>render</span>(),
+                   <span class='string'>&quot;hello&quot;</span>.<span class='ident'>to_owned</span>());
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>ctx_a2</span>.<span class='ident'>navigate</span>(<span class='string'>&quot;.&quot;</span>, <span class='kw-2'>&amp;</span><span class='ident'>VecDeque</span>::<span class='ident'>new</span>(), <span class='string'>&quot;tag&quot;</span>).<span class='ident'>render</span>(),
+                   <span class='string'>&quot;h1&quot;</span>.<span class='ident'>to_owned</span>());
     }
 }
 </pre>
@@ -1056,11 +1118,9 @@
     <script>
         window.rootPath = "../../";
         window.currentCrate = "handlebars";
-        window.playgroundUrl = "";
     </script>
     <script src="../../jquery.js"></script>
     <script src="../../main.js"></script>
-    
     <script defer src="../../search-index.js"></script>
 </body>
 </html>

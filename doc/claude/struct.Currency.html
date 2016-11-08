@@ -47,20 +47,20 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-95' class='srclink' href='../src/claude/lib.rs.html#27' title='goto source code'>[src]</a></span></h1>
+               </span><a id='src-118' class='srclink' href='../src/claude/lib.rs.html#22' title='goto source code'>[src]</a></span></h1>
 <pre class='rust struct'>pub struct Currency(pub <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.char.html'>char</a>&gt;, pub <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i64.html'>i64</a>);</pre><div class='docblock'><p>Represents currency through an optional symbol and amount of coin.</p>
 
 <p>Each 100 coins results in a banknote. (100 is formatted as 1.00)
 The currency will be formatted as such: <code>Currency(Some(&#39;$&#39;), 432)</code> ==&gt; &quot;$4.32&quot;</p>
-</div><h2 id='methods'>Methods</h2><h3 class='impl'><span class='in-band'><code>impl <a class='struct' href='../claude/struct.Currency.html' title='claude::Currency'>Currency</a></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-170' class='srclink' href='../src/claude/lib.rs.html#29-130' title='goto source code'>[src]</a></span></h3>
+</div><h2 id='methods'>Methods</h2><h3 class='impl'><span class='in-band'><code>impl <a class='struct' href='../claude/struct.Currency.html' title='claude::Currency'>Currency</a></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-63' class='srclink' href='../src/claude/lib.rs.html#24-125' title='goto source code'>[src]</a></span></h3>
 <div class='impl-items'><h4 id='method.new' class='method'><span id='new.v' class='invisible'><code>fn <a href='#method.new' class='fnname'>new</a>() -&gt; <a class='struct' href='../claude/struct.Currency.html' title='claude::Currency'>Currency</a></code></span></h4>
 <div class='docblock'><p>Creates a blank Currency as Currency(None, 0)</p>
 
 <h1 id='examples' class='section-header'><a href='#examples'>Examples</a></h1>
 <pre class='rust rust-example-rendered'>
-<span class='kw'>use</span> <span class='ident'>currency</span>::<span class='ident'>Currency</span>;
+<span class='kw'>use</span> <span class='ident'>claude</span>::<span class='ident'>Currency</span>;
 
-<span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>c</span> <span class='op'>=</span> <span class='ident'>Currency</span>::<span class='ident'>new</span>();<a class='test-arrow' target='_blank' href=''>Run</a></pre>
+<span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>c</span> <span class='op'>=</span> <span class='ident'>Currency</span>::<span class='ident'>new</span>();</pre>
 </div><h4 id='method.postfix' class='method'><span id='postfix.v' class='invisible'><code>fn <a href='#method.postfix' class='fnname'>postfix</a>(&amp;self) -&gt; <a class='struct' href='../claude/struct.Postfix.html' title='claude::Postfix'>Postfix</a></code></span></h4>
 <div class='docblock'><p>Returns an object that implements <code>Display</code> for different methods of printing currency.</p>
 </div><h4 id='method.prefix' class='method'><span id='prefix.v' class='invisible'><code>fn <a href='#method.prefix' class='fnname'>prefix</a>(&amp;self) -&gt; <a class='struct' href='../claude/struct.Prefix.html' title='claude::Prefix'>Prefix</a></code></span></h4>
@@ -79,7 +79,7 @@ The currency will be formatted as such: <code>Currency(Some(&#39;$&#39;), 432)</
 <pre class='rust rust-example-rendered'>
 <span class='kw'>let</span> <span class='ident'>n</span> <span class='op'>=</span> <span class='op'>-</span><span class='number'>0b1000_0000i8</span>;
 
-<span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>n</span>.<span class='ident'>count_ones</span>(), <span class='number'>1</span>);<a class='test-arrow' target='_blank' href=''>Run</a></pre>
+<span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>n</span>.<span class='ident'>count_ones</span>(), <span class='number'>1</span>);</pre>
 </div><h4 id='method.count_zeros' class='method'><span id='count_zeros.v' class='invisible'><code>fn <a href='#method.count_zeros' class='fnname'>count_zeros</a>(self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u32.html'>u32</a></code><div class='since' title='Stable since Rust version 1.0.0'>1.0.0</div></span></h4>
 <div class='docblock'><p>Returns the number of zeros in the binary representation of <code>self</code>.</p>
 
@@ -89,7 +89,7 @@ The currency will be formatted as such: <code>Currency(Some(&#39;$&#39;), 432)</
 <pre class='rust rust-example-rendered'>
 <span class='kw'>let</span> <span class='ident'>n</span> <span class='op'>=</span> <span class='op'>-</span><span class='number'>0b1000_0000i8</span>;
 
-<span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>n</span>.<span class='ident'>count_zeros</span>(), <span class='number'>7</span>);<a class='test-arrow' target='_blank' href=''>Run</a></pre>
+<span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>n</span>.<span class='ident'>count_zeros</span>(), <span class='number'>7</span>);</pre>
 </div><h4 id='method.leading_zeros' class='method'><span id='leading_zeros.v' class='invisible'><code>fn <a href='#method.leading_zeros' class='fnname'>leading_zeros</a>(self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u32.html'>u32</a></code><div class='since' title='Stable since Rust version 1.0.0'>1.0.0</div></span></h4>
 <div class='docblock'><p>Returns the number of leading zeros in the binary representation
 of <code>self</code>.</p>
@@ -100,7 +100,7 @@ of <code>self</code>.</p>
 <pre class='rust rust-example-rendered'>
 <span class='kw'>let</span> <span class='ident'>n</span> <span class='op'>=</span> <span class='op'>-</span><span class='number'>1i16</span>;
 
-<span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>n</span>.<span class='ident'>leading_zeros</span>(), <span class='number'>0</span>);<a class='test-arrow' target='_blank' href=''>Run</a></pre>
+<span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>n</span>.<span class='ident'>leading_zeros</span>(), <span class='number'>0</span>);</pre>
 </div><h4 id='method.trailing_zeros' class='method'><span id='trailing_zeros.v' class='invisible'><code>fn <a href='#method.trailing_zeros' class='fnname'>trailing_zeros</a>(self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u32.html'>u32</a></code><div class='since' title='Stable since Rust version 1.0.0'>1.0.0</div></span></h4>
 <div class='docblock'><p>Returns the number of trailing zeros in the binary representation
 of <code>self</code>.</p>
@@ -111,7 +111,7 @@ of <code>self</code>.</p>
 <pre class='rust rust-example-rendered'>
 <span class='kw'>let</span> <span class='ident'>n</span> <span class='op'>=</span> <span class='op'>-</span><span class='number'>4i8</span>;
 
-<span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>n</span>.<span class='ident'>trailing_zeros</span>(), <span class='number'>2</span>);<a class='test-arrow' target='_blank' href=''>Run</a></pre>
+<span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>n</span>.<span class='ident'>trailing_zeros</span>(), <span class='number'>2</span>);</pre>
 </div><h4 id='method.rotate_left' class='method'><span id='rotate_left.v' class='invisible'><code>fn <a href='#method.rotate_left' class='fnname'>rotate_left</a>(self, n: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u32.html'>u32</a>) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i64.html'>i64</a></code><div class='since' title='Stable since Rust version 1.0.0'>1.0.0</div></span></h4>
 <div class='docblock'><p>Shifts the bits to the left by a specified amount, <code>n</code>,
 wrapping the truncated bits to the end of the resulting integer.</p>
@@ -125,7 +125,7 @@ wrapping the truncated bits to the end of the resulting integer.</p>
 <span class='kw'>let</span> <span class='ident'>n</span> <span class='op'>=</span> <span class='number'>0x0123456789ABCDEFi64</span>;
 <span class='kw'>let</span> <span class='ident'>m</span> <span class='op'>=</span> <span class='op'>-</span><span class='number'>0x76543210FEDCBA99i64</span>;
 
-<span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>n</span>.<span class='ident'>rotate_left</span>(<span class='number'>32</span>), <span class='ident'>m</span>);<a class='test-arrow' target='_blank' href=''>Run</a></pre>
+<span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>n</span>.<span class='ident'>rotate_left</span>(<span class='number'>32</span>), <span class='ident'>m</span>);</pre>
 </div><h4 id='method.rotate_right' class='method'><span id='rotate_right.v' class='invisible'><code>fn <a href='#method.rotate_right' class='fnname'>rotate_right</a>(self, n: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u32.html'>u32</a>) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i64.html'>i64</a></code><div class='since' title='Stable since Rust version 1.0.0'>1.0.0</div></span></h4>
 <div class='docblock'><p>Shifts the bits to the right by a specified amount, <code>n</code>,
 wrapping the truncated bits to the beginning of the resulting
@@ -140,7 +140,7 @@ integer.</p>
 <span class='kw'>let</span> <span class='ident'>n</span> <span class='op'>=</span> <span class='number'>0x0123456789ABCDEFi64</span>;
 <span class='kw'>let</span> <span class='ident'>m</span> <span class='op'>=</span> <span class='op'>-</span><span class='number'>0xFEDCBA987654322i64</span>;
 
-<span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>n</span>.<span class='ident'>rotate_right</span>(<span class='number'>4</span>), <span class='ident'>m</span>);<a class='test-arrow' target='_blank' href=''>Run</a></pre>
+<span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>n</span>.<span class='ident'>rotate_right</span>(<span class='number'>4</span>), <span class='ident'>m</span>);</pre>
 </div><h4 id='method.swap_bytes' class='method'><span id='swap_bytes.v' class='invisible'><code>fn <a href='#method.swap_bytes' class='fnname'>swap_bytes</a>(self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i64.html'>i64</a></code><div class='since' title='Stable since Rust version 1.0.0'>1.0.0</div></span></h4>
 <div class='docblock'><p>Reverses the byte order of the integer.</p>
 
@@ -151,7 +151,7 @@ integer.</p>
 <span class='kw'>let</span> <span class='ident'>n</span> <span class='op'>=</span>  <span class='number'>0x0123456789ABCDEFi64</span>;
 <span class='kw'>let</span> <span class='ident'>m</span> <span class='op'>=</span> <span class='op'>-</span><span class='number'>0x1032547698BADCFFi64</span>;
 
-<span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>n</span>.<span class='ident'>swap_bytes</span>(), <span class='ident'>m</span>);<a class='test-arrow' target='_blank' href=''>Run</a></pre>
+<span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>n</span>.<span class='ident'>swap_bytes</span>(), <span class='ident'>m</span>);</pre>
 </div><h4 id='method.to_be' class='method'><span id='to_be.v' class='invisible'><code>fn <a href='#method.to_be' class='fnname'>to_be</a>(self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i64.html'>i64</a></code><div class='since' title='Stable since Rust version 1.0.0'>1.0.0</div></span></h4>
 <div class='docblock'><p>Converts <code>self</code> to big endian from the target&#39;s endianness.</p>
 
@@ -168,7 +168,7 @@ swapped.</p>
     <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>n</span>.<span class='ident'>to_be</span>(), <span class='ident'>n</span>)
 } <span class='kw'>else</span> {
     <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>n</span>.<span class='ident'>to_be</span>(), <span class='ident'>n</span>.<span class='ident'>swap_bytes</span>())
-}<a class='test-arrow' target='_blank' href=''>Run</a></pre>
+}</pre>
 </div><h4 id='method.to_le' class='method'><span id='to_le.v' class='invisible'><code>fn <a href='#method.to_le' class='fnname'>to_le</a>(self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i64.html'>i64</a></code><div class='since' title='Stable since Rust version 1.0.0'>1.0.0</div></span></h4>
 <div class='docblock'><p>Converts <code>self</code> to little endian from the target&#39;s endianness.</p>
 
@@ -185,7 +185,7 @@ swapped.</p>
     <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>n</span>.<span class='ident'>to_le</span>(), <span class='ident'>n</span>)
 } <span class='kw'>else</span> {
     <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>n</span>.<span class='ident'>to_le</span>(), <span class='ident'>n</span>.<span class='ident'>swap_bytes</span>())
-}<a class='test-arrow' target='_blank' href=''>Run</a></pre>
+}</pre>
 </div><h4 id='method.checked_add' class='method'><span id='checked_add.v' class='invisible'><code>fn <a href='#method.checked_add' class='fnname'>checked_add</a>(self, other: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i64.html'>i64</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i64.html'>i64</a>&gt;</code><div class='since' title='Stable since Rust version 1.0.0'>1.0.0</div></span></h4>
 <div class='docblock'><p>Checked integer addition. Computes <code>self + other</code>, returning <code>None</code>
 if overflow occurred.</p>
@@ -195,7 +195,7 @@ if overflow occurred.</p>
 
 <pre class='rust rust-example-rendered'>
 <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='number'>7i16</span>.<span class='ident'>checked_add</span>(<span class='number'>32760</span>), <span class='prelude-val'>Some</span>(<span class='number'>32767</span>));
-<span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='number'>8i16</span>.<span class='ident'>checked_add</span>(<span class='number'>32760</span>), <span class='prelude-val'>None</span>);<a class='test-arrow' target='_blank' href=''>Run</a></pre>
+<span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='number'>8i16</span>.<span class='ident'>checked_add</span>(<span class='number'>32760</span>), <span class='prelude-val'>None</span>);</pre>
 </div><h4 id='method.checked_sub' class='method'><span id='checked_sub.v' class='invisible'><code>fn <a href='#method.checked_sub' class='fnname'>checked_sub</a>(self, other: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i64.html'>i64</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i64.html'>i64</a>&gt;</code><div class='since' title='Stable since Rust version 1.0.0'>1.0.0</div></span></h4>
 <div class='docblock'><p>Checked integer subtraction. Computes <code>self - other</code>, returning
 <code>None</code> if underflow occurred.</p>
@@ -205,7 +205,7 @@ if overflow occurred.</p>
 
 <pre class='rust rust-example-rendered'>
 <span class='macro'>assert_eq</span><span class='macro'>!</span>((<span class='op'>-</span><span class='number'>127i8</span>).<span class='ident'>checked_sub</span>(<span class='number'>1</span>), <span class='prelude-val'>Some</span>(<span class='op'>-</span><span class='number'>128</span>));
-<span class='macro'>assert_eq</span><span class='macro'>!</span>((<span class='op'>-</span><span class='number'>128i8</span>).<span class='ident'>checked_sub</span>(<span class='number'>1</span>), <span class='prelude-val'>None</span>);<a class='test-arrow' target='_blank' href=''>Run</a></pre>
+<span class='macro'>assert_eq</span><span class='macro'>!</span>((<span class='op'>-</span><span class='number'>128i8</span>).<span class='ident'>checked_sub</span>(<span class='number'>1</span>), <span class='prelude-val'>None</span>);</pre>
 </div><h4 id='method.checked_mul' class='method'><span id='checked_mul.v' class='invisible'><code>fn <a href='#method.checked_mul' class='fnname'>checked_mul</a>(self, other: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i64.html'>i64</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i64.html'>i64</a>&gt;</code><div class='since' title='Stable since Rust version 1.0.0'>1.0.0</div></span></h4>
 <div class='docblock'><p>Checked integer multiplication. Computes <code>self * other</code>, returning
 <code>None</code> if underflow or overflow occurred.</p>
@@ -215,7 +215,7 @@ if overflow occurred.</p>
 
 <pre class='rust rust-example-rendered'>
 <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='number'>6i8</span>.<span class='ident'>checked_mul</span>(<span class='number'>21</span>), <span class='prelude-val'>Some</span>(<span class='number'>126</span>));
-<span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='number'>6i8</span>.<span class='ident'>checked_mul</span>(<span class='number'>22</span>), <span class='prelude-val'>None</span>);<a class='test-arrow' target='_blank' href=''>Run</a></pre>
+<span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='number'>6i8</span>.<span class='ident'>checked_mul</span>(<span class='number'>22</span>), <span class='prelude-val'>None</span>);</pre>
 </div><h4 id='method.checked_div' class='method'><span id='checked_div.v' class='invisible'><code>fn <a href='#method.checked_div' class='fnname'>checked_div</a>(self, other: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i64.html'>i64</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i64.html'>i64</a>&gt;</code><div class='since' title='Stable since Rust version 1.0.0'>1.0.0</div></span></h4>
 <div class='docblock'><p>Checked integer division. Computes <code>self / other</code>, returning <code>None</code>
 if <code>other == 0</code> or the operation results in underflow or overflow.</p>
@@ -226,7 +226,7 @@ if <code>other == 0</code> or the operation results in underflow or overflow.</p
 <pre class='rust rust-example-rendered'>
 <span class='macro'>assert_eq</span><span class='macro'>!</span>((<span class='op'>-</span><span class='number'>127i8</span>).<span class='ident'>checked_div</span>(<span class='op'>-</span><span class='number'>1</span>), <span class='prelude-val'>Some</span>(<span class='number'>127</span>));
 <span class='macro'>assert_eq</span><span class='macro'>!</span>((<span class='op'>-</span><span class='number'>128i8</span>).<span class='ident'>checked_div</span>(<span class='op'>-</span><span class='number'>1</span>), <span class='prelude-val'>None</span>);
-<span class='macro'>assert_eq</span><span class='macro'>!</span>((<span class='number'>1i8</span>).<span class='ident'>checked_div</span>(<span class='number'>0</span>), <span class='prelude-val'>None</span>);<a class='test-arrow' target='_blank' href=''>Run</a></pre>
+<span class='macro'>assert_eq</span><span class='macro'>!</span>((<span class='number'>1i8</span>).<span class='ident'>checked_div</span>(<span class='number'>0</span>), <span class='prelude-val'>None</span>);</pre>
 </div><h4 id='method.checked_rem' class='method'><span id='checked_rem.v' class='invisible'><code>fn <a href='#method.checked_rem' class='fnname'>checked_rem</a>(self, other: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i64.html'>i64</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i64.html'>i64</a>&gt;</code><div class='since' title='Stable since Rust version 1.7.0'>1.7.0</div></span></h4>
 <div class='docblock'><p>Checked integer remainder. Computes <code>self % other</code>, returning <code>None</code>
 if <code>other == 0</code> or the operation results in underflow or overflow.</p>
@@ -239,7 +239,7 @@ if <code>other == 0</code> or the operation results in underflow or overflow.</p
 
 <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='number'>5i32</span>.<span class='ident'>checked_rem</span>(<span class='number'>2</span>), <span class='prelude-val'>Some</span>(<span class='number'>1</span>));
 <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='number'>5i32</span>.<span class='ident'>checked_rem</span>(<span class='number'>0</span>), <span class='prelude-val'>None</span>);
-<span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>i32</span>::<span class='ident'>MIN</span>.<span class='ident'>checked_rem</span>(<span class='op'>-</span><span class='number'>1</span>), <span class='prelude-val'>None</span>);<a class='test-arrow' target='_blank' href=''>Run</a></pre>
+<span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>i32</span>::<span class='ident'>MIN</span>.<span class='ident'>checked_rem</span>(<span class='op'>-</span><span class='number'>1</span>), <span class='prelude-val'>None</span>);</pre>
 </div><h4 id='method.checked_neg' class='method'><span id='checked_neg.v' class='invisible'><code>fn <a href='#method.checked_neg' class='fnname'>checked_neg</a>(self) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i64.html'>i64</a>&gt;</code><div class='since' title='Stable since Rust version 1.7.0'>1.7.0</div></span></h4>
 <div class='docblock'><p>Checked negation. Computes <code>-self</code>, returning <code>None</code> if <code>self == MIN</code>.</p>
 
@@ -250,7 +250,7 @@ if <code>other == 0</code> or the operation results in underflow or overflow.</p
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>i32</span>;
 
 <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='number'>5i32</span>.<span class='ident'>checked_neg</span>(), <span class='prelude-val'>Some</span>(<span class='op'>-</span><span class='number'>5</span>));
-<span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>i32</span>::<span class='ident'>MIN</span>.<span class='ident'>checked_neg</span>(), <span class='prelude-val'>None</span>);<a class='test-arrow' target='_blank' href=''>Run</a></pre>
+<span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>i32</span>::<span class='ident'>MIN</span>.<span class='ident'>checked_neg</span>(), <span class='prelude-val'>None</span>);</pre>
 </div><h4 id='method.checked_shl' class='method'><span id='checked_shl.v' class='invisible'><code>fn <a href='#method.checked_shl' class='fnname'>checked_shl</a>(self, rhs: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u32.html'>u32</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i64.html'>i64</a>&gt;</code><div class='since' title='Stable since Rust version 1.7.0'>1.7.0</div></span></h4>
 <div class='docblock'><p>Checked shift left. Computes <code>self &lt;&lt; rhs</code>, returning <code>None</code>
 if <code>rhs</code> is larger than or equal to the number of bits in <code>self</code>.</p>
@@ -260,7 +260,7 @@ if <code>rhs</code> is larger than or equal to the number of bits in <code>self<
 
 <pre class='rust rust-example-rendered'>
 <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='number'>0x10i32</span>.<span class='ident'>checked_shl</span>(<span class='number'>4</span>), <span class='prelude-val'>Some</span>(<span class='number'>0x100</span>));
-<span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='number'>0x10i32</span>.<span class='ident'>checked_shl</span>(<span class='number'>33</span>), <span class='prelude-val'>None</span>);<a class='test-arrow' target='_blank' href=''>Run</a></pre>
+<span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='number'>0x10i32</span>.<span class='ident'>checked_shl</span>(<span class='number'>33</span>), <span class='prelude-val'>None</span>);</pre>
 </div><h4 id='method.checked_shr' class='method'><span id='checked_shr.v' class='invisible'><code>fn <a href='#method.checked_shr' class='fnname'>checked_shr</a>(self, rhs: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u32.html'>u32</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i64.html'>i64</a>&gt;</code><div class='since' title='Stable since Rust version 1.7.0'>1.7.0</div></span></h4>
 <div class='docblock'><p>Checked shift right. Computes <code>self &gt;&gt; rhs</code>, returning <code>None</code>
 if <code>rhs</code> is larger than or equal to the number of bits in <code>self</code>.</p>
@@ -270,20 +270,19 @@ if <code>rhs</code> is larger than or equal to the number of bits in <code>self<
 
 <pre class='rust rust-example-rendered'>
 <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='number'>0x10i32</span>.<span class='ident'>checked_shr</span>(<span class='number'>4</span>), <span class='prelude-val'>Some</span>(<span class='number'>0x1</span>));
-<span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='number'>0x10i32</span>.<span class='ident'>checked_shr</span>(<span class='number'>33</span>), <span class='prelude-val'>None</span>);<a class='test-arrow' target='_blank' href=''>Run</a></pre>
-</div><h4 id='method.checked_abs' class='method'><span id='checked_abs.v' class='invisible'><code>fn <a href='#method.checked_abs' class='fnname'>checked_abs</a>(self) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i64.html'>i64</a>&gt;</code></span></h4>
-<div class='stability'><em class='stab unstable'>Unstable (<code>no_panic_abs</code>)</em></div><div class='docblock'><p>Checked absolute value. Computes <code>self.abs()</code>, returning <code>None</code> if
+<span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='number'>0x10i32</span>.<span class='ident'>checked_shr</span>(<span class='number'>33</span>), <span class='prelude-val'>None</span>);</pre>
+</div><h4 id='method.checked_abs' class='method'><span id='checked_abs.v' class='invisible'><code>fn <a href='#method.checked_abs' class='fnname'>checked_abs</a>(self) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i64.html'>i64</a>&gt;</code><div class='since' title='Stable since Rust version 1.13.0'>1.13.0</div></span></h4>
+<div class='docblock'><p>Checked absolute value. Computes <code>self.abs()</code>, returning <code>None</code> if
 <code>self == MIN</code>.</p>
 
 <h1 id='examples-18' class='section-header'><a href='#examples-18'>Examples</a></h1>
 <p>Basic usage:</p>
 
 <pre class='rust rust-example-rendered'>
-
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>i32</span>;
 
 <span class='macro'>assert_eq</span><span class='macro'>!</span>((<span class='op'>-</span><span class='number'>5i32</span>).<span class='ident'>checked_abs</span>(), <span class='prelude-val'>Some</span>(<span class='number'>5</span>));
-<span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>i32</span>::<span class='ident'>MIN</span>.<span class='ident'>checked_abs</span>(), <span class='prelude-val'>None</span>);<a class='test-arrow' target='_blank' href=''>Run</a></pre>
+<span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>i32</span>::<span class='ident'>MIN</span>.<span class='ident'>checked_abs</span>(), <span class='prelude-val'>None</span>);</pre>
 </div><h4 id='method.saturating_add' class='method'><span id='saturating_add.v' class='invisible'><code>fn <a href='#method.saturating_add' class='fnname'>saturating_add</a>(self, other: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i64.html'>i64</a>) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i64.html'>i64</a></code><div class='since' title='Stable since Rust version 1.0.0'>1.0.0</div></span></h4>
 <div class='docblock'><p>Saturating integer addition. Computes <code>self + other</code>, saturating at
 the numeric bounds instead of overflowing.</p>
@@ -293,7 +292,7 @@ the numeric bounds instead of overflowing.</p>
 
 <pre class='rust rust-example-rendered'>
 <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='number'>100i8</span>.<span class='ident'>saturating_add</span>(<span class='number'>1</span>), <span class='number'>101</span>);
-<span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='number'>100i8</span>.<span class='ident'>saturating_add</span>(<span class='number'>127</span>), <span class='number'>127</span>);<a class='test-arrow' target='_blank' href=''>Run</a></pre>
+<span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='number'>100i8</span>.<span class='ident'>saturating_add</span>(<span class='number'>127</span>), <span class='number'>127</span>);</pre>
 </div><h4 id='method.saturating_sub' class='method'><span id='saturating_sub.v' class='invisible'><code>fn <a href='#method.saturating_sub' class='fnname'>saturating_sub</a>(self, other: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i64.html'>i64</a>) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i64.html'>i64</a></code><div class='since' title='Stable since Rust version 1.0.0'>1.0.0</div></span></h4>
 <div class='docblock'><p>Saturating integer subtraction. Computes <code>self - other</code>, saturating
 at the numeric bounds instead of overflowing.</p>
@@ -303,7 +302,7 @@ at the numeric bounds instead of overflowing.</p>
 
 <pre class='rust rust-example-rendered'>
 <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='number'>100i8</span>.<span class='ident'>saturating_sub</span>(<span class='number'>127</span>), <span class='op'>-</span><span class='number'>27</span>);
-<span class='macro'>assert_eq</span><span class='macro'>!</span>((<span class='op'>-</span><span class='number'>100i8</span>).<span class='ident'>saturating_sub</span>(<span class='number'>127</span>), <span class='op'>-</span><span class='number'>128</span>);<a class='test-arrow' target='_blank' href=''>Run</a></pre>
+<span class='macro'>assert_eq</span><span class='macro'>!</span>((<span class='op'>-</span><span class='number'>100i8</span>).<span class='ident'>saturating_sub</span>(<span class='number'>127</span>), <span class='op'>-</span><span class='number'>128</span>);</pre>
 </div><h4 id='method.saturating_mul' class='method'><span id='saturating_mul.v' class='invisible'><code>fn <a href='#method.saturating_mul' class='fnname'>saturating_mul</a>(self, other: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i64.html'>i64</a>) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i64.html'>i64</a></code><div class='since' title='Stable since Rust version 1.7.0'>1.7.0</div></span></h4>
 <div class='docblock'><p>Saturating integer multiplication. Computes <code>self * other</code>,
 saturating at the numeric bounds instead of overflowing.</p>
@@ -316,7 +315,7 @@ saturating at the numeric bounds instead of overflowing.</p>
 
 <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='number'>100i32</span>.<span class='ident'>saturating_mul</span>(<span class='number'>127</span>), <span class='number'>12700</span>);
 <span class='macro'>assert_eq</span><span class='macro'>!</span>((<span class='number'>1i32</span> <span class='op'>&lt;&lt;</span> <span class='number'>23</span>).<span class='ident'>saturating_mul</span>(<span class='number'>1</span> <span class='op'>&lt;&lt;</span> <span class='number'>23</span>), <span class='ident'>i32</span>::<span class='ident'>MAX</span>);
-<span class='macro'>assert_eq</span><span class='macro'>!</span>((<span class='op'>-</span><span class='number'>1i32</span> <span class='op'>&lt;&lt;</span> <span class='number'>23</span>).<span class='ident'>saturating_mul</span>(<span class='number'>1</span> <span class='op'>&lt;&lt;</span> <span class='number'>23</span>), <span class='ident'>i32</span>::<span class='ident'>MIN</span>);<a class='test-arrow' target='_blank' href=''>Run</a></pre>
+<span class='macro'>assert_eq</span><span class='macro'>!</span>((<span class='op'>-</span><span class='number'>1i32</span> <span class='op'>&lt;&lt;</span> <span class='number'>23</span>).<span class='ident'>saturating_mul</span>(<span class='number'>1</span> <span class='op'>&lt;&lt;</span> <span class='number'>23</span>), <span class='ident'>i32</span>::<span class='ident'>MIN</span>);</pre>
 </div><h4 id='method.wrapping_add' class='method'><span id='wrapping_add.v' class='invisible'><code>fn <a href='#method.wrapping_add' class='fnname'>wrapping_add</a>(self, rhs: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i64.html'>i64</a>) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i64.html'>i64</a></code><div class='since' title='Stable since Rust version 1.0.0'>1.0.0</div></span></h4>
 <div class='docblock'><p>Wrapping (modular) addition. Computes <code>self + other</code>,
 wrapping around at the boundary of the type.</p>
@@ -326,7 +325,7 @@ wrapping around at the boundary of the type.</p>
 
 <pre class='rust rust-example-rendered'>
 <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='number'>100i8</span>.<span class='ident'>wrapping_add</span>(<span class='number'>27</span>), <span class='number'>127</span>);
-<span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='number'>100i8</span>.<span class='ident'>wrapping_add</span>(<span class='number'>127</span>), <span class='op'>-</span><span class='number'>29</span>);<a class='test-arrow' target='_blank' href=''>Run</a></pre>
+<span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='number'>100i8</span>.<span class='ident'>wrapping_add</span>(<span class='number'>127</span>), <span class='op'>-</span><span class='number'>29</span>);</pre>
 </div><h4 id='method.wrapping_sub' class='method'><span id='wrapping_sub.v' class='invisible'><code>fn <a href='#method.wrapping_sub' class='fnname'>wrapping_sub</a>(self, rhs: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i64.html'>i64</a>) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i64.html'>i64</a></code><div class='since' title='Stable since Rust version 1.0.0'>1.0.0</div></span></h4>
 <div class='docblock'><p>Wrapping (modular) subtraction. Computes <code>self - other</code>,
 wrapping around at the boundary of the type.</p>
@@ -336,7 +335,7 @@ wrapping around at the boundary of the type.</p>
 
 <pre class='rust rust-example-rendered'>
 <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='number'>0i8</span>.<span class='ident'>wrapping_sub</span>(<span class='number'>127</span>), <span class='op'>-</span><span class='number'>127</span>);
-<span class='macro'>assert_eq</span><span class='macro'>!</span>((<span class='op'>-</span><span class='number'>2i8</span>).<span class='ident'>wrapping_sub</span>(<span class='number'>127</span>), <span class='number'>127</span>);<a class='test-arrow' target='_blank' href=''>Run</a></pre>
+<span class='macro'>assert_eq</span><span class='macro'>!</span>((<span class='op'>-</span><span class='number'>2i8</span>).<span class='ident'>wrapping_sub</span>(<span class='number'>127</span>), <span class='number'>127</span>);</pre>
 </div><h4 id='method.wrapping_mul' class='method'><span id='wrapping_mul.v' class='invisible'><code>fn <a href='#method.wrapping_mul' class='fnname'>wrapping_mul</a>(self, rhs: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i64.html'>i64</a>) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i64.html'>i64</a></code><div class='since' title='Stable since Rust version 1.0.0'>1.0.0</div></span></h4>
 <div class='docblock'><p>Wrapping (modular) multiplication. Computes <code>self * other</code>, wrapping around at the boundary of the type.</p>
 
@@ -345,7 +344,7 @@ wrapping around at the boundary of the type.</p>
 
 <pre class='rust rust-example-rendered'>
 <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='number'>10i8</span>.<span class='ident'>wrapping_mul</span>(<span class='number'>12</span>), <span class='number'>120</span>);
-<span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='number'>11i8</span>.<span class='ident'>wrapping_mul</span>(<span class='number'>12</span>), <span class='op'>-</span><span class='number'>124</span>);<a class='test-arrow' target='_blank' href=''>Run</a></pre>
+<span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='number'>11i8</span>.<span class='ident'>wrapping_mul</span>(<span class='number'>12</span>), <span class='op'>-</span><span class='number'>124</span>);</pre>
 </div><h4 id='method.wrapping_div' class='method'><span id='wrapping_div.v' class='invisible'><code>fn <a href='#method.wrapping_div' class='fnname'>wrapping_div</a>(self, rhs: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i64.html'>i64</a>) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i64.html'>i64</a></code><div class='since' title='Stable since Rust version 1.2.0'>1.2.0</div></span></h4>
 <div class='docblock'><p>Wrapping (modular) division. Computes <code>self / other</code>,
 wrapping around at the boundary of the type.</p>
@@ -365,7 +364,7 @@ itself.</p>
 
 <pre class='rust rust-example-rendered'>
 <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='number'>100u8</span>.<span class='ident'>wrapping_div</span>(<span class='number'>10</span>), <span class='number'>10</span>);
-<span class='macro'>assert_eq</span><span class='macro'>!</span>((<span class='op'>-</span><span class='number'>128i8</span>).<span class='ident'>wrapping_div</span>(<span class='op'>-</span><span class='number'>1</span>), <span class='op'>-</span><span class='number'>128</span>);<a class='test-arrow' target='_blank' href=''>Run</a></pre>
+<span class='macro'>assert_eq</span><span class='macro'>!</span>((<span class='op'>-</span><span class='number'>128i8</span>).<span class='ident'>wrapping_div</span>(<span class='op'>-</span><span class='number'>1</span>), <span class='op'>-</span><span class='number'>128</span>);</pre>
 </div><h4 id='method.wrapping_rem' class='method'><span id='wrapping_rem.v' class='invisible'><code>fn <a href='#method.wrapping_rem' class='fnname'>wrapping_rem</a>(self, rhs: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i64.html'>i64</a>) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i64.html'>i64</a></code><div class='since' title='Stable since Rust version 1.2.0'>1.2.0</div></span></h4>
 <div class='docblock'><p>Wrapping (modular) remainder. Computes <code>self % other</code>,
 wrapping around at the boundary of the type.</p>
@@ -382,7 +381,7 @@ minimal value). In such a case, this function returns <code>0</code>.</p>
 
 <pre class='rust rust-example-rendered'>
 <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='number'>100i8</span>.<span class='ident'>wrapping_rem</span>(<span class='number'>10</span>), <span class='number'>0</span>);
-<span class='macro'>assert_eq</span><span class='macro'>!</span>((<span class='op'>-</span><span class='number'>128i8</span>).<span class='ident'>wrapping_rem</span>(<span class='op'>-</span><span class='number'>1</span>), <span class='number'>0</span>);<a class='test-arrow' target='_blank' href=''>Run</a></pre>
+<span class='macro'>assert_eq</span><span class='macro'>!</span>((<span class='op'>-</span><span class='number'>128i8</span>).<span class='ident'>wrapping_rem</span>(<span class='op'>-</span><span class='number'>1</span>), <span class='number'>0</span>);</pre>
 </div><h4 id='method.wrapping_neg' class='method'><span id='wrapping_neg.v' class='invisible'><code>fn <a href='#method.wrapping_neg' class='fnname'>wrapping_neg</a>(self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i64.html'>i64</a></code><div class='since' title='Stable since Rust version 1.2.0'>1.2.0</div></span></h4>
 <div class='docblock'><p>Wrapping (modular) negation. Computes <code>-self</code>,
 wrapping around at the boundary of the type.</p>
@@ -398,7 +397,7 @@ a case, this function returns <code>MIN</code> itself.</p>
 
 <pre class='rust rust-example-rendered'>
 <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='number'>100i8</span>.<span class='ident'>wrapping_neg</span>(), <span class='op'>-</span><span class='number'>100</span>);
-<span class='macro'>assert_eq</span><span class='macro'>!</span>((<span class='op'>-</span><span class='number'>128i8</span>).<span class='ident'>wrapping_neg</span>(), <span class='op'>-</span><span class='number'>128</span>);<a class='test-arrow' target='_blank' href=''>Run</a></pre>
+<span class='macro'>assert_eq</span><span class='macro'>!</span>((<span class='op'>-</span><span class='number'>128i8</span>).<span class='ident'>wrapping_neg</span>(), <span class='op'>-</span><span class='number'>128</span>);</pre>
 </div><h4 id='method.wrapping_shl' class='method'><span id='wrapping_shl.v' class='invisible'><code>fn <a href='#method.wrapping_shl' class='fnname'>wrapping_shl</a>(self, rhs: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u32.html'>u32</a>) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i64.html'>i64</a></code><div class='since' title='Stable since Rust version 1.2.0'>1.2.0</div></span></h4>
 <div class='docblock'><p>Panic-free bitwise shift-left; yields <code>self &lt;&lt; mask(rhs)</code>,
 where <code>mask</code> removes any high-order bits of <code>rhs</code> that
@@ -416,7 +415,7 @@ be what you want instead.</p>
 
 <pre class='rust rust-example-rendered'>
 <span class='macro'>assert_eq</span><span class='macro'>!</span>((<span class='op'>-</span><span class='number'>1i8</span>).<span class='ident'>wrapping_shl</span>(<span class='number'>7</span>), <span class='op'>-</span><span class='number'>128</span>);
-<span class='macro'>assert_eq</span><span class='macro'>!</span>((<span class='op'>-</span><span class='number'>1i8</span>).<span class='ident'>wrapping_shl</span>(<span class='number'>8</span>), <span class='op'>-</span><span class='number'>1</span>);<a class='test-arrow' target='_blank' href=''>Run</a></pre>
+<span class='macro'>assert_eq</span><span class='macro'>!</span>((<span class='op'>-</span><span class='number'>1i8</span>).<span class='ident'>wrapping_shl</span>(<span class='number'>8</span>), <span class='op'>-</span><span class='number'>1</span>);</pre>
 </div><h4 id='method.wrapping_shr' class='method'><span id='wrapping_shr.v' class='invisible'><code>fn <a href='#method.wrapping_shr' class='fnname'>wrapping_shr</a>(self, rhs: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u32.html'>u32</a>) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i64.html'>i64</a></code><div class='since' title='Stable since Rust version 1.2.0'>1.2.0</div></span></h4>
 <div class='docblock'><p>Panic-free bitwise shift-right; yields <code>self &gt;&gt; mask(rhs)</code>,
 where <code>mask</code> removes any high-order bits of <code>rhs</code> that
@@ -434,9 +433,9 @@ be what you want instead.</p>
 
 <pre class='rust rust-example-rendered'>
 <span class='macro'>assert_eq</span><span class='macro'>!</span>((<span class='op'>-</span><span class='number'>128i8</span>).<span class='ident'>wrapping_shr</span>(<span class='number'>7</span>), <span class='op'>-</span><span class='number'>1</span>);
-<span class='macro'>assert_eq</span><span class='macro'>!</span>((<span class='op'>-</span><span class='number'>128i8</span>).<span class='ident'>wrapping_shr</span>(<span class='number'>8</span>), <span class='op'>-</span><span class='number'>128</span>);<a class='test-arrow' target='_blank' href=''>Run</a></pre>
-</div><h4 id='method.wrapping_abs' class='method'><span id='wrapping_abs.v' class='invisible'><code>fn <a href='#method.wrapping_abs' class='fnname'>wrapping_abs</a>(self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i64.html'>i64</a></code></span></h4>
-<div class='stability'><em class='stab unstable'>Unstable (<code>no_panic_abs</code>)</em></div><div class='docblock'><p>Wrapping (modular) absolute value. Computes <code>self.abs()</code>,
+<span class='macro'>assert_eq</span><span class='macro'>!</span>((<span class='op'>-</span><span class='number'>128i8</span>).<span class='ident'>wrapping_shr</span>(<span class='number'>8</span>), <span class='op'>-</span><span class='number'>128</span>);</pre>
+</div><h4 id='method.wrapping_abs' class='method'><span id='wrapping_abs.v' class='invisible'><code>fn <a href='#method.wrapping_abs' class='fnname'>wrapping_abs</a>(self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i64.html'>i64</a></code><div class='since' title='Stable since Rust version 1.13.0'>1.13.0</div></span></h4>
+<div class='docblock'><p>Wrapping (modular) absolute value. Computes <code>self.abs()</code>,
 wrapping around at the boundary of the type.</p>
 
 <p>The only case where such wrapping can occur is when one takes
@@ -448,11 +447,10 @@ type. In such a case, this function returns <code>MIN</code> itself.</p>
 <p>Basic usage:</p>
 
 <pre class='rust rust-example-rendered'>
-
 <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='number'>100i8</span>.<span class='ident'>wrapping_abs</span>(), <span class='number'>100</span>);
 <span class='macro'>assert_eq</span><span class='macro'>!</span>((<span class='op'>-</span><span class='number'>100i8</span>).<span class='ident'>wrapping_abs</span>(), <span class='number'>100</span>);
 <span class='macro'>assert_eq</span><span class='macro'>!</span>((<span class='op'>-</span><span class='number'>128i8</span>).<span class='ident'>wrapping_abs</span>(), <span class='op'>-</span><span class='number'>128</span>);
-<span class='macro'>assert_eq</span><span class='macro'>!</span>((<span class='op'>-</span><span class='number'>128i8</span>).<span class='ident'>wrapping_abs</span>() <span class='kw'>as</span> <span class='ident'>u8</span>, <span class='number'>128</span>);<a class='test-arrow' target='_blank' href=''>Run</a></pre>
+<span class='macro'>assert_eq</span><span class='macro'>!</span>((<span class='op'>-</span><span class='number'>128i8</span>).<span class='ident'>wrapping_abs</span>() <span class='kw'>as</span> <span class='ident'>u8</span>, <span class='number'>128</span>);</pre>
 </div><h4 id='method.overflowing_add' class='method'><span id='overflowing_add.v' class='invisible'><code>fn <a href='#method.overflowing_add' class='fnname'>overflowing_add</a>(self, rhs: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i64.html'>i64</a>) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>(</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i64.html'>i64</a>, <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>)</a></code><div class='since' title='Stable since Rust version 1.7.0'>1.7.0</div></span></h4>
 <div class='docblock'><p>Calculates <code>self</code> + <code>rhs</code></p>
 
@@ -467,7 +465,7 @@ have occurred then the wrapped value is returned.</p>
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>i32</span>;
 
 <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='number'>5i32</span>.<span class='ident'>overflowing_add</span>(<span class='number'>2</span>), (<span class='number'>7</span>, <span class='bool-val'>false</span>));
-<span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>i32</span>::<span class='ident'>MAX</span>.<span class='ident'>overflowing_add</span>(<span class='number'>1</span>), (<span class='ident'>i32</span>::<span class='ident'>MIN</span>, <span class='bool-val'>true</span>));<a class='test-arrow' target='_blank' href=''>Run</a></pre>
+<span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>i32</span>::<span class='ident'>MAX</span>.<span class='ident'>overflowing_add</span>(<span class='number'>1</span>), (<span class='ident'>i32</span>::<span class='ident'>MIN</span>, <span class='bool-val'>true</span>));</pre>
 </div><h4 id='method.overflowing_sub' class='method'><span id='overflowing_sub.v' class='invisible'><code>fn <a href='#method.overflowing_sub' class='fnname'>overflowing_sub</a>(self, rhs: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i64.html'>i64</a>) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>(</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i64.html'>i64</a>, <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>)</a></code><div class='since' title='Stable since Rust version 1.7.0'>1.7.0</div></span></h4>
 <div class='docblock'><p>Calculates <code>self</code> - <code>rhs</code></p>
 
@@ -482,7 +480,7 @@ have occurred then the wrapped value is returned.</p>
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>i32</span>;
 
 <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='number'>5i32</span>.<span class='ident'>overflowing_sub</span>(<span class='number'>2</span>), (<span class='number'>3</span>, <span class='bool-val'>false</span>));
-<span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>i32</span>::<span class='ident'>MIN</span>.<span class='ident'>overflowing_sub</span>(<span class='number'>1</span>), (<span class='ident'>i32</span>::<span class='ident'>MAX</span>, <span class='bool-val'>true</span>));<a class='test-arrow' target='_blank' href=''>Run</a></pre>
+<span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>i32</span>::<span class='ident'>MIN</span>.<span class='ident'>overflowing_sub</span>(<span class='number'>1</span>), (<span class='ident'>i32</span>::<span class='ident'>MAX</span>, <span class='bool-val'>true</span>));</pre>
 </div><h4 id='method.overflowing_mul' class='method'><span id='overflowing_mul.v' class='invisible'><code>fn <a href='#method.overflowing_mul' class='fnname'>overflowing_mul</a>(self, rhs: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i64.html'>i64</a>) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>(</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i64.html'>i64</a>, <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>)</a></code><div class='since' title='Stable since Rust version 1.7.0'>1.7.0</div></span></h4>
 <div class='docblock'><p>Calculates the multiplication of <code>self</code> and <code>rhs</code>.</p>
 
@@ -495,7 +493,7 @@ overflow would have occurred then the wrapped value is returned.</p>
 
 <pre class='rust rust-example-rendered'>
 <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='number'>5i32</span>.<span class='ident'>overflowing_mul</span>(<span class='number'>2</span>), (<span class='number'>10</span>, <span class='bool-val'>false</span>));
-<span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='number'>1_000_000_000i32</span>.<span class='ident'>overflowing_mul</span>(<span class='number'>10</span>), (<span class='number'>1410065408</span>, <span class='bool-val'>true</span>));<a class='test-arrow' target='_blank' href=''>Run</a></pre>
+<span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='number'>1_000_000_000i32</span>.<span class='ident'>overflowing_mul</span>(<span class='number'>10</span>), (<span class='number'>1410065408</span>, <span class='bool-val'>true</span>));</pre>
 </div><h4 id='method.overflowing_div' class='method'><span id='overflowing_div.v' class='invisible'><code>fn <a href='#method.overflowing_div' class='fnname'>overflowing_div</a>(self, rhs: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i64.html'>i64</a>) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>(</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i64.html'>i64</a>, <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>)</a></code><div class='since' title='Stable since Rust version 1.7.0'>1.7.0</div></span></h4>
 <div class='docblock'><p>Calculates the divisor when <code>self</code> is divided by <code>rhs</code>.</p>
 
@@ -513,7 +511,7 @@ occur then self is returned.</p>
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>i32</span>;
 
 <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='number'>5i32</span>.<span class='ident'>overflowing_div</span>(<span class='number'>2</span>), (<span class='number'>2</span>, <span class='bool-val'>false</span>));
-<span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>i32</span>::<span class='ident'>MIN</span>.<span class='ident'>overflowing_div</span>(<span class='op'>-</span><span class='number'>1</span>), (<span class='ident'>i32</span>::<span class='ident'>MIN</span>, <span class='bool-val'>true</span>));<a class='test-arrow' target='_blank' href=''>Run</a></pre>
+<span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>i32</span>::<span class='ident'>MIN</span>.<span class='ident'>overflowing_div</span>(<span class='op'>-</span><span class='number'>1</span>), (<span class='ident'>i32</span>::<span class='ident'>MIN</span>, <span class='bool-val'>true</span>));</pre>
 </div><h4 id='method.overflowing_rem' class='method'><span id='overflowing_rem.v' class='invisible'><code>fn <a href='#method.overflowing_rem' class='fnname'>overflowing_rem</a>(self, rhs: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i64.html'>i64</a>) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>(</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i64.html'>i64</a>, <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>)</a></code><div class='since' title='Stable since Rust version 1.7.0'>1.7.0</div></span></h4>
 <div class='docblock'><p>Calculates the remainder when <code>self</code> is divided by <code>rhs</code>.</p>
 
@@ -531,7 +529,7 @@ overflow would occur then 0 is returned.</p>
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>i32</span>;
 
 <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='number'>5i32</span>.<span class='ident'>overflowing_rem</span>(<span class='number'>2</span>), (<span class='number'>1</span>, <span class='bool-val'>false</span>));
-<span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>i32</span>::<span class='ident'>MIN</span>.<span class='ident'>overflowing_rem</span>(<span class='op'>-</span><span class='number'>1</span>), (<span class='number'>0</span>, <span class='bool-val'>true</span>));<a class='test-arrow' target='_blank' href=''>Run</a></pre>
+<span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>i32</span>::<span class='ident'>MIN</span>.<span class='ident'>overflowing_rem</span>(<span class='op'>-</span><span class='number'>1</span>), (<span class='number'>0</span>, <span class='bool-val'>true</span>));</pre>
 </div><h4 id='method.overflowing_neg' class='method'><span id='overflowing_neg.v' class='invisible'><code>fn <a href='#method.overflowing_neg' class='fnname'>overflowing_neg</a>(self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>(</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i64.html'>i64</a>, <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>)</a></code><div class='since' title='Stable since Rust version 1.7.0'>1.7.0</div></span></h4>
 <div class='docblock'><p>Negates self, overflowing if this is equal to the minimum value.</p>
 
@@ -548,7 +546,7 @@ overflow happening.</p>
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>i32</span>;
 
 <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='number'>2i32</span>.<span class='ident'>overflowing_neg</span>(), (<span class='op'>-</span><span class='number'>2</span>, <span class='bool-val'>false</span>));
-<span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>i32</span>::<span class='ident'>MIN</span>.<span class='ident'>overflowing_neg</span>(), (<span class='ident'>i32</span>::<span class='ident'>MIN</span>, <span class='bool-val'>true</span>));<a class='test-arrow' target='_blank' href=''>Run</a></pre>
+<span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>i32</span>::<span class='ident'>MIN</span>.<span class='ident'>overflowing_neg</span>(), (<span class='ident'>i32</span>::<span class='ident'>MIN</span>, <span class='bool-val'>true</span>));</pre>
 </div><h4 id='method.overflowing_shl' class='method'><span id='overflowing_shl.v' class='invisible'><code>fn <a href='#method.overflowing_shl' class='fnname'>overflowing_shl</a>(self, rhs: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u32.html'>u32</a>) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>(</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i64.html'>i64</a>, <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>)</a></code><div class='since' title='Stable since Rust version 1.7.0'>1.7.0</div></span></h4>
 <div class='docblock'><p>Shifts self left by <code>rhs</code> bits.</p>
 
@@ -563,7 +561,7 @@ used to perform the shift.</p>
 
 <pre class='rust rust-example-rendered'>
 <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='number'>0x10i32</span>.<span class='ident'>overflowing_shl</span>(<span class='number'>4</span>), (<span class='number'>0x100</span>, <span class='bool-val'>false</span>));
-<span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='number'>0x10i32</span>.<span class='ident'>overflowing_shl</span>(<span class='number'>36</span>), (<span class='number'>0x100</span>, <span class='bool-val'>true</span>));<a class='test-arrow' target='_blank' href=''>Run</a></pre>
+<span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='number'>0x10i32</span>.<span class='ident'>overflowing_shl</span>(<span class='number'>36</span>), (<span class='number'>0x100</span>, <span class='bool-val'>true</span>));</pre>
 </div><h4 id='method.overflowing_shr' class='method'><span id='overflowing_shr.v' class='invisible'><code>fn <a href='#method.overflowing_shr' class='fnname'>overflowing_shr</a>(self, rhs: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u32.html'>u32</a>) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>(</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i64.html'>i64</a>, <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>)</a></code><div class='since' title='Stable since Rust version 1.7.0'>1.7.0</div></span></h4>
 <div class='docblock'><p>Shifts self right by <code>rhs</code> bits.</p>
 
@@ -578,9 +576,9 @@ used to perform the shift.</p>
 
 <pre class='rust rust-example-rendered'>
 <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='number'>0x10i32</span>.<span class='ident'>overflowing_shr</span>(<span class='number'>4</span>), (<span class='number'>0x1</span>, <span class='bool-val'>false</span>));
-<span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='number'>0x10i32</span>.<span class='ident'>overflowing_shr</span>(<span class='number'>36</span>), (<span class='number'>0x1</span>, <span class='bool-val'>true</span>));<a class='test-arrow' target='_blank' href=''>Run</a></pre>
-</div><h4 id='method.overflowing_abs' class='method'><span id='overflowing_abs.v' class='invisible'><code>fn <a href='#method.overflowing_abs' class='fnname'>overflowing_abs</a>(self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>(</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i64.html'>i64</a>, <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>)</a></code></span></h4>
-<div class='stability'><em class='stab unstable'>Unstable (<code>no_panic_abs</code>)</em></div><div class='docblock'><p>Computes the absolute value of <code>self</code>.</p>
+<span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='number'>0x10i32</span>.<span class='ident'>overflowing_shr</span>(<span class='number'>36</span>), (<span class='number'>0x1</span>, <span class='bool-val'>true</span>));</pre>
+</div><h4 id='method.overflowing_abs' class='method'><span id='overflowing_abs.v' class='invisible'><code>fn <a href='#method.overflowing_abs' class='fnname'>overflowing_abs</a>(self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>(</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i64.html'>i64</a>, <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>)</a></code><div class='since' title='Stable since Rust version 1.13.0'>1.13.0</div></span></h4>
+<div class='docblock'><p>Computes the absolute value of <code>self</code>.</p>
 
 <p>Returns a tuple of the absolute version of self along with a
 boolean indicating whether an overflow happened. If self is the
@@ -592,10 +590,9 @@ an overflow happening.</p>
 <p>Basic usage:</p>
 
 <pre class='rust rust-example-rendered'>
-
 <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='number'>10i8</span>.<span class='ident'>overflowing_abs</span>(), (<span class='number'>10</span>,<span class='bool-val'>false</span>));
 <span class='macro'>assert_eq</span><span class='macro'>!</span>((<span class='op'>-</span><span class='number'>10i8</span>).<span class='ident'>overflowing_abs</span>(), (<span class='number'>10</span>,<span class='bool-val'>false</span>));
-<span class='macro'>assert_eq</span><span class='macro'>!</span>((<span class='op'>-</span><span class='number'>128i8</span>).<span class='ident'>overflowing_abs</span>(), (<span class='op'>-</span><span class='number'>128</span>,<span class='bool-val'>true</span>));<a class='test-arrow' target='_blank' href=''>Run</a></pre>
+<span class='macro'>assert_eq</span><span class='macro'>!</span>((<span class='op'>-</span><span class='number'>128i8</span>).<span class='ident'>overflowing_abs</span>(), (<span class='op'>-</span><span class='number'>128</span>,<span class='bool-val'>true</span>));</pre>
 </div><h4 id='method.pow' class='method'><span id='pow.v' class='invisible'><code>fn <a href='#method.pow' class='fnname'>pow</a>(self, exp: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u32.html'>u32</a>) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i64.html'>i64</a></code><div class='since' title='Stable since Rust version 1.0.0'>1.0.0</div></span></h4>
 <div class='docblock'><p>Raises self to the power of <code>exp</code>, using exponentiation by squaring.</p>
 
@@ -605,7 +602,7 @@ an overflow happening.</p>
 <pre class='rust rust-example-rendered'>
 <span class='kw'>let</span> <span class='ident'>x</span>: <span class='ident'>i32</span> <span class='op'>=</span> <span class='number'>2</span>; <span class='comment'>// or any other integer type</span>
 
-<span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>x</span>.<span class='ident'>pow</span>(<span class='number'>4</span>), <span class='number'>16</span>);<a class='test-arrow' target='_blank' href=''>Run</a></pre>
+<span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>x</span>.<span class='ident'>pow</span>(<span class='number'>4</span>), <span class='number'>16</span>);</pre>
 </div><h4 id='method.abs' class='method'><span id='abs.v' class='invisible'><code>fn <a href='#method.abs' class='fnname'>abs</a>(self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i64.html'>i64</a></code><div class='since' title='Stable since Rust version 1.0.0'>1.0.0</div></span></h4>
 <div class='docblock'><p>Computes the absolute value of <code>self</code>.</p>
 
@@ -620,7 +617,7 @@ optimized code will return <code>i32::min_value()</code> without a panic.</p>
 
 <pre class='rust rust-example-rendered'>
 <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='number'>10i8</span>.<span class='ident'>abs</span>(), <span class='number'>10</span>);
-<span class='macro'>assert_eq</span><span class='macro'>!</span>((<span class='op'>-</span><span class='number'>10i8</span>).<span class='ident'>abs</span>(), <span class='number'>10</span>);<a class='test-arrow' target='_blank' href=''>Run</a></pre>
+<span class='macro'>assert_eq</span><span class='macro'>!</span>((<span class='op'>-</span><span class='number'>10i8</span>).<span class='ident'>abs</span>(), <span class='number'>10</span>);</pre>
 </div><h4 id='method.signum' class='method'><span id='signum.v' class='invisible'><code>fn <a href='#method.signum' class='fnname'>signum</a>(self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i64.html'>i64</a></code><div class='since' title='Stable since Rust version 1.0.0'>1.0.0</div></span></h4>
 <div class='docblock'><p>Returns a number representing sign of <code>self</code>.</p>
 
@@ -636,7 +633,7 @@ optimized code will return <code>i32::min_value()</code> without a panic.</p>
 <pre class='rust rust-example-rendered'>
 <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='number'>10i8</span>.<span class='ident'>signum</span>(), <span class='number'>1</span>);
 <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='number'>0i8</span>.<span class='ident'>signum</span>(), <span class='number'>0</span>);
-<span class='macro'>assert_eq</span><span class='macro'>!</span>((<span class='op'>-</span><span class='number'>10i8</span>).<span class='ident'>signum</span>(), <span class='op'>-</span><span class='number'>1</span>);<a class='test-arrow' target='_blank' href=''>Run</a></pre>
+<span class='macro'>assert_eq</span><span class='macro'>!</span>((<span class='op'>-</span><span class='number'>10i8</span>).<span class='ident'>signum</span>(), <span class='op'>-</span><span class='number'>1</span>);</pre>
 </div><h4 id='method.is_positive' class='method'><span id='is_positive.v' class='invisible'><code>fn <a href='#method.is_positive' class='fnname'>is_positive</a>(self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></code><div class='since' title='Stable since Rust version 1.0.0'>1.0.0</div></span></h4>
 <div class='docblock'><p>Returns <code>true</code> if <code>self</code> is positive and <code>false</code> if the number
 is zero or negative.</p>
@@ -646,7 +643,7 @@ is zero or negative.</p>
 
 <pre class='rust rust-example-rendered'>
 <span class='macro'>assert</span><span class='macro'>!</span>(<span class='number'>10i8</span>.<span class='ident'>is_positive</span>());
-<span class='macro'>assert</span><span class='macro'>!</span>(<span class='op'>!</span>(<span class='op'>-</span><span class='number'>10i8</span>).<span class='ident'>is_positive</span>());<a class='test-arrow' target='_blank' href=''>Run</a></pre>
+<span class='macro'>assert</span><span class='macro'>!</span>(<span class='op'>!</span>(<span class='op'>-</span><span class='number'>10i8</span>).<span class='ident'>is_positive</span>());</pre>
 </div><h4 id='method.is_negative' class='method'><span id='is_negative.v' class='invisible'><code>fn <a href='#method.is_negative' class='fnname'>is_negative</a>(self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></code><div class='since' title='Stable since Rust version 1.0.0'>1.0.0</div></span></h4>
 <div class='docblock'><p>Returns <code>true</code> if <code>self</code> is negative and <code>false</code> if the number
 is zero or positive.</p>
@@ -656,8 +653,8 @@ is zero or positive.</p>
 
 <pre class='rust rust-example-rendered'>
 <span class='macro'>assert</span><span class='macro'>!</span>((<span class='op'>-</span><span class='number'>10i8</span>).<span class='ident'>is_negative</span>());
-<span class='macro'>assert</span><span class='macro'>!</span>(<span class='op'>!</span><span class='number'>10i8</span>.<span class='ident'>is_negative</span>());<a class='test-arrow' target='_blank' href=''>Run</a></pre>
-</div></div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><span class='in-band'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.Add.html' title='core::ops::Add'>Add</a> for <a class='struct' href='../claude/struct.Currency.html' title='claude::Currency'>Currency</a></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-55' class='srclink' href='../src/claude/math.rs.html#10-23' title='goto source code'>[src]</a></span></h3>
+<span class='macro'>assert</span><span class='macro'>!</span>(<span class='op'>!</span><span class='number'>10i8</span>.<span class='ident'>is_negative</span>());</pre>
+</div></div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><span class='in-band'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.Add.html' title='core::ops::Add'>Add</a> for <a class='struct' href='../claude/struct.Currency.html' title='claude::Currency'>Currency</a></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-28' class='srclink' href='../src/claude/math.rs.html#10-23' title='goto source code'>[src]</a></span></h3>
 <div class='docblock'><p>Overloads the &#39;+&#39; operator for Currency objects.</p>
 
 <h1 id='panics-4' class='section-header'><a href='#panics-4'>Panics</a></h1>
@@ -666,7 +663,7 @@ is zero or positive.</p>
 <div class='docblock'><p>The resulting type after applying the <code>+</code> operator</p>
 </div><h4 id='method.add' class='method'><span id='add.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/ops/trait.Add.html#tymethod.add' class='fnname'>add</a>(self, rhs: <a class='struct' href='../claude/struct.Currency.html' title='claude::Currency'>Currency</a>) -&gt; <a class='struct' href='../claude/struct.Currency.html' title='claude::Currency'>Currency</a></code></span></h4>
 <div class='docblock'><p>The method for the <code>+</code> operator</p>
-</div></div><h3 class='impl'><span class='in-band'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.Sub.html' title='core::ops::Sub'>Sub</a> for <a class='struct' href='../claude/struct.Currency.html' title='claude::Currency'>Currency</a></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-64' class='srclink' href='../src/claude/math.rs.html#30-41' title='goto source code'>[src]</a></span></h3>
+</div></div><h3 class='impl'><span class='in-band'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.Sub.html' title='core::ops::Sub'>Sub</a> for <a class='struct' href='../claude/struct.Currency.html' title='claude::Currency'>Currency</a></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-33' class='srclink' href='../src/claude/math.rs.html#30-41' title='goto source code'>[src]</a></span></h3>
 <div class='docblock'><p>Overloads the &#39;-&#39; operator for Currency objects.</p>
 
 <h1 id='panics-5' class='section-header'><a href='#panics-5'>Panics</a></h1>
@@ -676,7 +673,7 @@ Currency&#39;s symbol.</p>
 <div class='docblock'><p>The resulting type after applying the <code>-</code> operator</p>
 </div><h4 id='method.sub' class='method'><span id='sub.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/ops/trait.Sub.html#tymethod.sub' class='fnname'>sub</a>(self, rhs: <a class='struct' href='../claude/struct.Currency.html' title='claude::Currency'>Currency</a>) -&gt; <a class='struct' href='../claude/struct.Currency.html' title='claude::Currency'>Currency</a></code></span></h4>
 <div class='docblock'><p>The method for the <code>-</code> operator</p>
-</div></div><h3 class='impl'><span class='in-band'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.Mul.html' title='core::ops::Mul'>Mul</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i64.html'>i64</a>&gt; for <a class='struct' href='../claude/struct.Currency.html' title='claude::Currency'>Currency</a></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-70' class='srclink' href='../src/claude/math.rs.html#46-53' title='goto source code'>[src]</a></span></h3>
+</div></div><h3 class='impl'><span class='in-band'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.Mul.html' title='core::ops::Mul'>Mul</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i64.html'>i64</a>&gt; for <a class='struct' href='../claude/struct.Currency.html' title='claude::Currency'>Currency</a></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-38' class='srclink' href='../src/claude/math.rs.html#46-53' title='goto source code'>[src]</a></span></h3>
 <div class='docblock'><p>Overloads the &#39;*&#39; operator for Currency objects.</p>
 
 <p>Allows a Currency to be multiplied by an i64.</p>
@@ -684,13 +681,13 @@ Currency&#39;s symbol.</p>
 <div class='docblock'><p>The resulting type after applying the <code>*</code> operator</p>
 </div><h4 id='method.mul' class='method'><span id='mul.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/ops/trait.Mul.html#tymethod.mul' class='fnname'>mul</a>(self, rhs: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i64.html'>i64</a>) -&gt; <a class='struct' href='../claude/struct.Currency.html' title='claude::Currency'>Currency</a></code></span></h4>
 <div class='docblock'><p>The method for the <code>*</code> operator</p>
-</div></div><h3 class='impl'><span class='in-band'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.Mul.html' title='core::ops::Mul'>Mul</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a>&gt; for <a class='struct' href='../claude/struct.Currency.html' title='claude::Currency'>Currency</a></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-80' class='srclink' href='../src/claude/math.rs.html#69-76' title='goto source code'>[src]</a></span></h3>
+</div></div><h3 class='impl'><span class='in-band'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.Mul.html' title='core::ops::Mul'>Mul</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a>&gt; for <a class='struct' href='../claude/struct.Currency.html' title='claude::Currency'>Currency</a></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-48' class='srclink' href='../src/claude/math.rs.html#69-76' title='goto source code'>[src]</a></span></h3>
 <div class='docblock'><p>Multiplies with float, probably not a good idea, help appreciated.</p>
 </div><div class='impl-items'><h4 id='associatedtype.Output-3' class='type'><span id='Output.t-3' class='invisible'><code>type <a href='https://doc.rust-lang.org/nightly/core/ops/trait.Mul.html#associatedtype.Output' class='type'>Output</a> = <a class='struct' href='../claude/struct.Currency.html' title='claude::Currency'>Currency</a></code></span></h4>
 <div class='docblock'><p>The resulting type after applying the <code>*</code> operator</p>
 </div><h4 id='method.mul-1' class='method'><span id='mul.v-1' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/ops/trait.Mul.html#tymethod.mul' class='fnname'>mul</a>(self, rhs: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a>) -&gt; <a class='struct' href='../claude/struct.Currency.html' title='claude::Currency'>Currency</a></code></span></h4>
 <div class='docblock'><p>The method for the <code>*</code> operator</p>
-</div></div><h3 class='impl'><span class='in-band'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.Div.html' title='core::ops::Div'>Div</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i64.html'>i64</a>&gt; for <a class='struct' href='../claude/struct.Currency.html' title='claude::Currency'>Currency</a></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-90' class='srclink' href='../src/claude/math.rs.html#90-97' title='goto source code'>[src]</a></span></h3>
+</div></div><h3 class='impl'><span class='in-band'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.Div.html' title='core::ops::Div'>Div</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i64.html'>i64</a>&gt; for <a class='struct' href='../claude/struct.Currency.html' title='claude::Currency'>Currency</a></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-58' class='srclink' href='../src/claude/math.rs.html#90-97' title='goto source code'>[src]</a></span></h3>
 <div class='docblock'><p>Overloads the &#39;/&#39; operator for Currency objects.</p>
 
 <p>Allows a Currency to be divided by an i64.</p>
@@ -698,21 +695,21 @@ Currency&#39;s symbol.</p>
 <div class='docblock'><p>The resulting type after applying the <code>/</code> operator</p>
 </div><h4 id='method.div' class='method'><span id='div.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/ops/trait.Div.html#tymethod.div' class='fnname'>div</a>(self, rhs: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i64.html'>i64</a>) -&gt; <a class='struct' href='../claude/struct.Currency.html' title='claude::Currency'>Currency</a></code></span></h4>
 <div class='docblock'><p>The method for the <code>/</code> operator</p>
-</div></div><h3 class='impl'><span class='in-band'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/marker/trait.Copy.html' title='core::marker::Copy'>Copy</a> for <a class='struct' href='../claude/struct.Currency.html' title='claude::Currency'>Currency</a></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-99' class='srclink' href='../src/claude/lib.rs.html#26' title='goto source code'>[src]</a></span></h3>
-<div class='impl-items'></div><h3 class='impl'><span class='in-band'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html' title='core::clone::Clone'>Clone</a> for <a class='struct' href='../claude/struct.Currency.html' title='claude::Currency'>Currency</a></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-100' class='srclink' href='../src/claude/lib.rs.html#26' title='goto source code'>[src]</a></span></h3>
+</div></div><h3 class='impl'><span class='in-band'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/marker/trait.Copy.html' title='core::marker::Copy'>Copy</a> for <a class='struct' href='../claude/struct.Currency.html' title='claude::Currency'>Currency</a></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-122' class='srclink' href='../src/claude/lib.rs.html#21' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'></div><h3 class='impl'><span class='in-band'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html' title='core::clone::Clone'>Clone</a> for <a class='struct' href='../claude/struct.Currency.html' title='claude::Currency'>Currency</a></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-123' class='srclink' href='../src/claude/lib.rs.html#21' title='goto source code'>[src]</a></span></h3>
 <div class='impl-items'><h4 id='method.clone' class='method'><span id='clone.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#tymethod.clone' class='fnname'>clone</a>(&amp;self) -&gt; <a class='struct' href='../claude/struct.Currency.html' title='claude::Currency'>Currency</a></code></span></h4>
 <div class='docblock'><p>Returns a copy of the value. <a href="https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#tymethod.clone">Read more</a></p>
 </div><h4 id='method.clone_from' class='method'><span id='clone_from.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#method.clone_from' class='fnname'>clone_from</a>(&amp;mut self, source: &amp;Self)</code><div class='since' title='Stable since Rust version 1.0.0'>1.0.0</div></span></h4>
 <div class='docblock'><p>Performs copy-assignment from <code>source</code>. <a href="https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#method.clone_from">Read more</a></p>
-</div></div><h3 class='impl'><span class='in-band'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html' title='core::fmt::Debug'>Debug</a> for <a class='struct' href='../claude/struct.Currency.html' title='claude::Currency'>Currency</a></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-105' class='srclink' href='../src/claude/lib.rs.html#26' title='goto source code'>[src]</a></span></h3>
+</div></div><h3 class='impl'><span class='in-band'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html' title='core::fmt::Debug'>Debug</a> for <a class='struct' href='../claude/struct.Currency.html' title='claude::Currency'>Currency</a></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-126' class='srclink' href='../src/claude/lib.rs.html#21' title='goto source code'>[src]</a></span></h3>
 <div class='impl-items'><h4 id='method.fmt' class='method'><span id='fmt.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html#tymethod.fmt' class='fnname'>fmt</a>(&amp;self, __arg_0: &amp;mut <a class='struct' href='https://doc.rust-lang.org/nightly/core/fmt/struct.Formatter.html' title='core::fmt::Formatter'>Formatter</a>) -&gt; <a class='type' href='https://doc.rust-lang.org/nightly/core/fmt/type.Result.html' title='core::fmt::Result'>Result</a></code></span></h4>
 <div class='docblock'><p>Formats the value using the given formatter.</p>
-</div></div><h3 class='impl'><span class='in-band'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/cmp/trait.PartialEq.html' title='core::cmp::PartialEq'>PartialEq</a> for <a class='struct' href='../claude/struct.Currency.html' title='claude::Currency'>Currency</a></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-112' class='srclink' href='../src/claude/lib.rs.html#26' title='goto source code'>[src]</a></span></h3>
+</div></div><h3 class='impl'><span class='in-band'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/cmp/trait.PartialEq.html' title='core::cmp::PartialEq'>PartialEq</a> for <a class='struct' href='../claude/struct.Currency.html' title='claude::Currency'>Currency</a></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-133' class='srclink' href='../src/claude/lib.rs.html#21' title='goto source code'>[src]</a></span></h3>
 <div class='impl-items'><h4 id='method.eq' class='method'><span id='eq.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/cmp/trait.PartialEq.html#tymethod.eq' class='fnname'>eq</a>(&amp;self, __arg_0: &amp;<a class='struct' href='../claude/struct.Currency.html' title='claude::Currency'>Currency</a>) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></code></span></h4>
 <div class='docblock'><p>This method tests for <code>self</code> and <code>other</code> values to be equal, and is used by <code>==</code>. <a href="https://doc.rust-lang.org/nightly/core/cmp/trait.PartialEq.html#tymethod.eq">Read more</a></p>
 </div><h4 id='method.ne' class='method'><span id='ne.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/cmp/trait.PartialEq.html#method.ne' class='fnname'>ne</a>(&amp;self, __arg_0: &amp;<a class='struct' href='../claude/struct.Currency.html' title='claude::Currency'>Currency</a>) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></code></span></h4>
 <div class='docblock'><p>This method tests for <code>!=</code>.</p>
-</div></div><h3 class='impl'><span class='in-band'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/cmp/trait.PartialOrd.html' title='core::cmp::PartialOrd'>PartialOrd</a> for <a class='struct' href='../claude/struct.Currency.html' title='claude::Currency'>Currency</a></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-127' class='srclink' href='../src/claude/lib.rs.html#26' title='goto source code'>[src]</a></span></h3>
+</div></div><h3 class='impl'><span class='in-band'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/cmp/trait.PartialOrd.html' title='core::cmp::PartialOrd'>PartialOrd</a> for <a class='struct' href='../claude/struct.Currency.html' title='claude::Currency'>Currency</a></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-148' class='srclink' href='../src/claude/lib.rs.html#21' title='goto source code'>[src]</a></span></h3>
 <div class='impl-items'><h4 id='method.partial_cmp' class='method'><span id='partial_cmp.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/cmp/trait.PartialOrd.html#tymethod.partial_cmp' class='fnname'>partial_cmp</a>(&amp;self, __arg_0: &amp;<a class='struct' href='../claude/struct.Currency.html' title='claude::Currency'>Currency</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='enum' href='https://doc.rust-lang.org/nightly/core/cmp/enum.Ordering.html' title='core::cmp::Ordering'>Ordering</a>&gt;</code></span></h4>
 <div class='docblock'><p>This method returns an ordering between <code>self</code> and <code>other</code> values if one exists. <a href="https://doc.rust-lang.org/nightly/core/cmp/trait.PartialOrd.html#tymethod.partial_cmp">Read more</a></p>
 </div><h4 id='method.lt' class='method'><span id='lt.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/cmp/trait.PartialOrd.html#method.lt' class='fnname'>lt</a>(&amp;self, __arg_0: &amp;<a class='struct' href='../claude/struct.Currency.html' title='claude::Currency'>Currency</a>) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></code></span></h4>
@@ -723,14 +720,14 @@ Currency&#39;s symbol.</p>
 <div class='docblock'><p>This method tests greater than (for <code>self</code> and <code>other</code>) and is used by the <code>&gt;</code> operator. <a href="https://doc.rust-lang.org/nightly/core/cmp/trait.PartialOrd.html#method.gt">Read more</a></p>
 </div><h4 id='method.ge' class='method'><span id='ge.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/cmp/trait.PartialOrd.html#method.ge' class='fnname'>ge</a>(&amp;self, __arg_0: &amp;<a class='struct' href='../claude/struct.Currency.html' title='claude::Currency'>Currency</a>) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></code></span></h4>
 <div class='docblock'><p>This method tests greater than or equal to (for <code>self</code> and <code>other</code>) and is used by the <code>&gt;=</code> operator. <a href="https://doc.rust-lang.org/nightly/core/cmp/trait.PartialOrd.html#method.ge">Read more</a></p>
-</div></div><h3 class='impl'><span class='in-band'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/cmp/trait.Eq.html' title='core::cmp::Eq'>Eq</a> for <a class='struct' href='../claude/struct.Currency.html' title='claude::Currency'>Currency</a></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-165' class='srclink' href='../src/claude/lib.rs.html#26' title='goto source code'>[src]</a></span></h3>
-<div class='impl-items'></div><h3 class='impl'><span class='in-band'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.Deref.html' title='core::ops::Deref'>Deref</a> for <a class='struct' href='../claude/struct.Currency.html' title='claude::Currency'>Currency</a></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-181' class='srclink' href='../src/claude/lib.rs.html#134-139' title='goto source code'>[src]</a></span></h3>
+</div></div><h3 class='impl'><span class='in-band'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/cmp/trait.Eq.html' title='core::cmp::Eq'>Eq</a> for <a class='struct' href='../claude/struct.Currency.html' title='claude::Currency'>Currency</a></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-186' class='srclink' href='../src/claude/lib.rs.html#21' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'></div><h3 class='impl'><span class='in-band'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.Deref.html' title='core::ops::Deref'>Deref</a> for <a class='struct' href='../claude/struct.Currency.html' title='claude::Currency'>Currency</a></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-74' class='srclink' href='../src/claude/lib.rs.html#129-134' title='goto source code'>[src]</a></span></h3>
 <div class='docblock'><p>Required for <code>DerefMut</code></p>
 </div><div class='impl-items'><h4 id='associatedtype.Target' class='type'><span id='Target.t' class='invisible'><code>type <a href='https://doc.rust-lang.org/nightly/core/ops/trait.Deref.html#associatedtype.Target' class='type'>Target</a> = <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i64.html'>i64</a></code></span></h4>
 <div class='docblock'><p>The resulting type after dereferencing</p>
 </div><h4 id='method.deref' class='method'><span id='deref.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/ops/trait.Deref.html#tymethod.deref' class='fnname'>deref</a>(&amp;self) -&gt; &amp;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i64.html'>i64</a></code></span></h4>
 <div class='docblock'><p>The method called to dereference a value</p>
-</div></div><h3 class='impl'><span class='in-band'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/default/trait.Default.html' title='core::default::Default'>Default</a> for <a class='struct' href='../claude/struct.Currency.html' title='claude::Currency'>Currency</a></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-185' class='srclink' href='../src/claude/lib.rs.html#142-146' title='goto source code'>[src]</a></span></h3>
+</div></div><h3 class='impl'><span class='in-band'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/default/trait.Default.html' title='core::default::Default'>Default</a> for <a class='struct' href='../claude/struct.Currency.html' title='claude::Currency'>Currency</a></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-78' class='srclink' href='../src/claude/lib.rs.html#137-141' title='goto source code'>[src]</a></span></h3>
 <div class='impl-items'><h4 id='method.default' class='method'><span id='default.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/default/trait.Default.html#tymethod.default' class='fnname'>default</a>() -&gt; Self</code></span></h4>
 <div class='docblock'><p>Returns the &quot;default value&quot; for a type. <a href="https://doc.rust-lang.org/nightly/core/default/trait.Default.html#tymethod.default">Read more</a></p>
 </div></div></section>
@@ -789,11 +786,9 @@ Currency&#39;s symbol.</p>
     <script>
         window.rootPath = "../";
         window.currentCrate = "claude";
-        window.playgroundUrl = "";
     </script>
     <script src="../jquery.js"></script>
     <script src="../main.js"></script>
-    
     <script defer src="../search-index.js"></script>
 </body>
 </html>

@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["ComputedField","`Project::get()` allows accessing fields within the raw `yaml` data structure. Computed fields are fields that are not present in the document but computed."]],"struct":[["ComputedFieldNames",""],["ComputedFields",""]]});

@@ -49,14 +49,14 @@
                    </a>
                </span></span></h1>
 <pre class='rust trait'>pub trait ChainErr&lt;T&gt; {
-    fn <a href='#tymethod.chain_err' class='fnname'>chain_err</a>&lt;F,&nbsp;EK&gt;(self, callback: F) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;T,&nbsp;<a class='struct' href='../../../asciii/actions/error/struct.Error.html' title='asciii::actions::error::Error'>Error</a>&gt; <span class='where'>where F: <a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.FnOnce.html' title='core::ops::FnOnce'>FnOnce</a>() -&gt; EK, EK: <a class='trait' href='https://doc.rust-lang.org/nightly/core/convert/trait.Into.html' title='core::convert::Into'>Into</a>&lt;<a class='enum' href='../../../asciii/actions/error/enum.ErrorKind.html' title='asciii::actions::error::ErrorKind'>ErrorKind</a>&gt;</span>;
+    fn <a href='#tymethod.chain_err' class='fnname'>chain_err</a>&lt;F, EK&gt;(self, callback: F) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;T, <a class='struct' href='../../../asciii/actions/error/struct.Error.html' title='asciii::actions::error::Error'>Error</a>&gt; <span class='where'>where F: <a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.FnOnce.html' title='core::ops::FnOnce'>FnOnce</a>() -&gt; EK, EK: <a class='trait' href='https://doc.rust-lang.org/nightly/core/convert/trait.Into.html' title='core::convert::Into'>Into</a>&lt;<a class='enum' href='../../../asciii/actions/error/enum.ErrorKind.html' title='asciii::actions::error::ErrorKind'>ErrorKind</a>&gt;</span>;
 }</pre>
             <h2 id='required-methods'>Required Methods</h2>
             <div class='methods'>
-        <h3 id='tymethod.chain_err' class='method stab '><span id='chain_err.v' class='invisible'><code>fn <a href='#tymethod.chain_err' class='fnname'>chain_err</a>&lt;F,&nbsp;EK&gt;(self, callback: F) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;T,&nbsp;<a class='struct' href='../../../asciii/actions/error/struct.Error.html' title='asciii::actions::error::Error'>Error</a>&gt; <span class='where'>where F: <a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.FnOnce.html' title='core::ops::FnOnce'>FnOnce</a>() -&gt; EK, EK: <a class='trait' href='https://doc.rust-lang.org/nightly/core/convert/trait.Into.html' title='core::convert::Into'>Into</a>&lt;<a class='enum' href='../../../asciii/actions/error/enum.ErrorKind.html' title='asciii::actions::error::ErrorKind'>ErrorKind</a>&gt;</span></code></span></h3></div>
+        <h3 id='tymethod.chain_err' class='method stab '><span id='chain_err.v' class='invisible'><code>fn <a href='#tymethod.chain_err' class='fnname'>chain_err</a>&lt;F, EK&gt;(self, callback: F) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;T, <a class='struct' href='../../../asciii/actions/error/struct.Error.html' title='asciii::actions::error::Error'>Error</a>&gt; <span class='where'>where F: <a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.FnOnce.html' title='core::ops::FnOnce'>FnOnce</a>() -&gt; EK, EK: <a class='trait' href='https://doc.rust-lang.org/nightly/core/convert/trait.Into.html' title='core::convert::Into'>Into</a>&lt;<a class='enum' href='../../../asciii/actions/error/enum.ErrorKind.html' title='asciii::actions::error::ErrorKind'>ErrorKind</a>&gt;</span></code></span></h3></div>
         <h2 id='implementors'>Implementors</h2>
         <ul class='item-list' id='implementors-list'>
-    <li><code>impl&lt;T,&nbsp;E&gt; ChainErr&lt;T&gt; for <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;T,&nbsp;E&gt; <span class='where'>where E: <a class='trait' href='https://doc.rust-lang.org/nightly/std/error/trait.Error.html' title='std::error::Error'>Error</a> + <a class='trait' href='https://doc.rust-lang.org/nightly/core/marker/trait.Send.html' title='core::marker::Send'>Send</a> + 'static</span></code></li>
+    <li><code>impl&lt;T, E&gt; ChainErr&lt;T&gt; for <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;T, E&gt; <span class='where'>where E: <a class='trait' href='https://doc.rust-lang.org/nightly/std/error/trait.Error.html' title='std::error::Error'>Error</a> + <a class='trait' href='https://doc.rust-lang.org/nightly/core/marker/trait.Send.html' title='core::marker::Send'>Send</a> + 'static</span></code></li>
 </ul><script type="text/javascript" async
                          src="../../../implementors/asciii/actions/error/trait.ChainErr.js">
                  </script></section>
@@ -115,11 +115,9 @@
     <script>
         window.rootPath = "../../../";
         window.currentCrate = "asciii";
-        window.playgroundUrl = "";
     </script>
     <script src="../../../jquery.js"></script>
     <script src="../../../main.js"></script>
-    
     <script defer src="../../../search-index.js"></script>
 </body>
 </html>

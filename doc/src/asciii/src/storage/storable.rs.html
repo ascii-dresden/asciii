@@ -105,10 +105,25 @@
 <span id="61">61</span>
 <span id="62">62</span>
 <span id="63">63</span>
+<span id="64">64</span>
+<span id="65">65</span>
+<span id="66">66</span>
+<span id="67">67</span>
+<span id="68">68</span>
+<span id="69">69</span>
+<span id="70">70</span>
+<span id="71">71</span>
+<span id="72">72</span>
+<span id="73">73</span>
+<span id="74">74</span>
+<span id="75">75</span>
+<span id="76">76</span>
+<span id="77">77</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! Contains the `Storable` trait that storable projects must implement.</span>
 <span class='doccomment'>//!</span>
 
+<span class='kw'>use</span> <span class='ident'>std</span>::{<span class='ident'>fs</span>,<span class='ident'>io</span>};
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>path</span>::{<span class='ident'>Path</span>, <span class='ident'>PathBuf</span>};
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>collections</span>::<span class='ident'>HashMap</span>;
 
@@ -123,7 +138,7 @@
 <span class='kw'>pub</span> <span class='kw'>type</span> <span class='ident'>FilePathBuf</span> <span class='op'>=</span> <span class='ident'>PathBuf</span>;
 <span class='kw'>pub</span> <span class='kw'>type</span> <span class='ident'>FolderPathBuf</span> <span class='op'>=</span> <span class='ident'>PathBuf</span>;
 
-<span class='kw'>pub</span> <span class='kw'>trait</span> <span class='ident'>Storable</span>{
+<span class='kw'>pub</span> <span class='kw'>trait</span> <span class='ident'>Storable</span>:<span class='ident'>Send</span><span class='op'>+</span><span class='ident'>Sync</span>{
     <span class='doccomment'>/// opens a projectfolder</span>
     <span class='kw'>fn</span> <span class='ident'>open</span>(<span class='kw-2'>&amp;</span><span class='ident'>FolderPath</span>) <span class='op'>-&gt;</span> <span class='ident'>StorageResult</span><span class='op'>&lt;</span><span class='self'>Self</span><span class='op'>&gt;</span> <span class='kw'>where</span> <span class='self'>Self</span>: <span class='ident'>Sized</span>;
     <span class='kw'>fn</span> <span class='ident'>open_file</span>(<span class='kw-2'>&amp;</span><span class='ident'>FilePath</span>) <span class='op'>-&gt;</span> <span class='ident'>StorageResult</span><span class='op'>&lt;</span><span class='self'>Self</span><span class='op'>&gt;</span> <span class='kw'>where</span> <span class='self'>Self</span>: <span class='ident'>Sized</span>;
@@ -137,6 +152,17 @@
     <span class='kw'>fn</span> <span class='ident'>name</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>String</span>;
     <span class='kw'>fn</span> <span class='ident'>date</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Date</span><span class='op'>&lt;</span><span class='ident'>UTC</span><span class='op'>&gt;&gt;</span>;
     <span class='kw'>fn</span> <span class='ident'>year</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>i32</span><span class='op'>&gt;</span>{ <span class='self'>self</span>.<span class='ident'>date</span>().<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>d</span><span class='op'>|</span><span class='ident'>d</span>.<span class='ident'>year</span>()) }
+
+    <span class='doccomment'>/// Deletes the project if the passed in closure returns `true`</span>
+    <span class='kw'>fn</span> <span class='ident'>delete_project_dir_if</span><span class='op'>&lt;</span><span class='ident'>F</span><span class='op'>&gt;</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>confirmed</span>:<span class='ident'>F</span>) <span class='op'>-&gt;</span> <span class='ident'>io</span>::<span class='prelude-ty'>Result</span><span class='op'>&lt;</span>()<span class='op'>&gt;</span>
+        <span class='kw'>where</span> <span class='ident'>F</span>: <span class='ident'>Fn</span>()<span class='op'>-&gt;</span><span class='ident'>bool</span>
+    {
+        <span class='kw'>let</span> <span class='ident'>folder</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>dir</span>();
+        <span class='kw'>if</span> <span class='ident'>confirmed</span>(){
+            <span class='macro'>debug</span><span class='macro'>!</span>(<span class='string'>&quot;$ rm {}&quot;</span>, <span class='ident'>folder</span>.<span class='ident'>display</span>());
+            <span class='ident'>fs</span>::<span class='ident'>remove_dir_all</span>(<span class='kw-2'>&amp;</span><span class='ident'>folder</span>)
+        } <span class='kw'>else</span> {<span class='prelude-val'>Ok</span>(())}
+    }
 
     <span class='doccomment'>/// For sorting</span>
     <span class='kw'>fn</span> <span class='ident'>index</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>String</span><span class='op'>&gt;</span>;
@@ -168,6 +194,8 @@
 
     <span class='kw'>fn</span> <span class='ident'>matches_filter</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>key</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>, <span class='ident'>val</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>) <span class='op'>-&gt;</span> <span class='ident'>bool</span>;
     <span class='kw'>fn</span> <span class='ident'>matches_search</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>term</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>) <span class='op'>-&gt;</span> <span class='ident'>bool</span>;
+
+    <span class='kw'>fn</span> <span class='ident'>is_ready_for_archive</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>bool</span>;
 }
 </pre>
 </section>
@@ -226,11 +254,9 @@
     <script>
         window.rootPath = "../../../../";
         window.currentCrate = "asciii";
-        window.playgroundUrl = "";
     </script>
     <script src="../../../../jquery.js"></script>
     <script src="../../../../main.js"></script>
-    
     <script defer src="../../../../search-index.js"></script>
 </body>
 </html>

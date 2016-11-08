@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="rustdoc">
-    <meta name="description" content="Source to the Rust file `/home/hendrik/.cargo/registry/src/github.com-1ecc6299db9ec823/git2-0.4.4/src/lib.rs`.">
+    <meta name="description" content="Source to the Rust file `/home/hendrik/.cargo/registry/src/github.com-1ecc6299db9ec823/git2-0.5.0/src/lib.rs`.">
     <meta name="keywords" content="rust, rustlang, rust-lang">
 
     <title>lib.rs.html -- source</title>
@@ -957,6 +957,8 @@
 <span id="913">913</span>
 <span id="914">914</span>
 <span id="915">915</span>
+<span id="916">916</span>
+<span id="917">917</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! # libgit2 bindings for Rust</span>
 <span class='doccomment'>//!</span>
@@ -1048,11 +1050,11 @@
 <span class='kw'>pub</span> <span class='kw'>use</span> <span class='ident'>cred</span>::{<span class='ident'>Cred</span>, <span class='ident'>CredentialHelper</span>};
 <span class='kw'>pub</span> <span class='kw'>use</span> <span class='ident'>describe</span>::{<span class='ident'>Describe</span>, <span class='ident'>DescribeFormatOptions</span>, <span class='ident'>DescribeOptions</span>};
 <span class='kw'>pub</span> <span class='kw'>use</span> <span class='ident'>diff</span>::{<span class='ident'>Diff</span>, <span class='ident'>DiffDelta</span>, <span class='ident'>DiffFile</span>, <span class='ident'>DiffOptions</span>, <span class='ident'>Deltas</span>};
-<span class='kw'>pub</span> <span class='kw'>use</span> <span class='ident'>diff</span>::{<span class='ident'>DiffLine</span>, <span class='ident'>DiffHunk</span>, <span class='ident'>DiffStats</span>, <span class='ident'>DiffFindOptions</span>};
 <span class='kw'>pub</span> <span class='kw'>use</span> <span class='ident'>diff</span>::{<span class='ident'>DiffBinary</span>, <span class='ident'>DiffBinaryFile</span>, <span class='ident'>DiffBinaryKind</span>};
-<span class='kw'>pub</span> <span class='kw'>use</span> <span class='ident'>merge</span>::{<span class='ident'>AnnotatedCommit</span>, <span class='ident'>MergeOptions</span>};
+<span class='kw'>pub</span> <span class='kw'>use</span> <span class='ident'>diff</span>::{<span class='ident'>DiffLine</span>, <span class='ident'>DiffHunk</span>, <span class='ident'>DiffStats</span>, <span class='ident'>DiffFindOptions</span>};
 <span class='kw'>pub</span> <span class='kw'>use</span> <span class='ident'>error</span>::<span class='ident'>Error</span>;
 <span class='kw'>pub</span> <span class='kw'>use</span> <span class='ident'>index</span>::{<span class='ident'>Index</span>, <span class='ident'>IndexEntry</span>, <span class='ident'>IndexEntries</span>, <span class='ident'>IndexMatchedPath</span>};
+<span class='kw'>pub</span> <span class='kw'>use</span> <span class='ident'>merge</span>::{<span class='ident'>AnnotatedCommit</span>, <span class='ident'>MergeOptions</span>};
 <span class='kw'>pub</span> <span class='kw'>use</span> <span class='ident'>message</span>::{<span class='ident'>message_prettify</span>, <span class='ident'>DEFAULT_COMMENT_CHAR</span>};
 <span class='kw'>pub</span> <span class='kw'>use</span> <span class='ident'>note</span>::{<span class='ident'>Note</span>, <span class='ident'>Notes</span>};
 <span class='kw'>pub</span> <span class='kw'>use</span> <span class='ident'>object</span>::<span class='ident'>Object</span>;
@@ -1060,6 +1062,7 @@
 <span class='kw'>pub</span> <span class='kw'>use</span> <span class='ident'>packbuilder</span>::{<span class='ident'>PackBuilder</span>, <span class='ident'>PackBuilderStage</span>};
 <span class='kw'>pub</span> <span class='kw'>use</span> <span class='ident'>pathspec</span>::{<span class='ident'>Pathspec</span>, <span class='ident'>PathspecMatchList</span>, <span class='ident'>PathspecFailedEntries</span>};
 <span class='kw'>pub</span> <span class='kw'>use</span> <span class='ident'>pathspec</span>::{<span class='ident'>PathspecDiffEntries</span>, <span class='ident'>PathspecEntries</span>};
+<span class='kw'>pub</span> <span class='kw'>use</span> <span class='ident'>proxy_options</span>::<span class='ident'>ProxyOptions</span>;
 <span class='kw'>pub</span> <span class='kw'>use</span> <span class='ident'>reference</span>::{<span class='ident'>Reference</span>, <span class='ident'>References</span>, <span class='ident'>ReferenceNames</span>};
 <span class='kw'>pub</span> <span class='kw'>use</span> <span class='ident'>reflog</span>::{<span class='ident'>Reflog</span>, <span class='ident'>ReflogEntry</span>, <span class='ident'>ReflogIter</span>};
 <span class='kw'>pub</span> <span class='kw'>use</span> <span class='ident'>refspec</span>::<span class='ident'>Refspec</span>;
@@ -1305,7 +1308,7 @@
 
 <span class='macro'>bitflags</span><span class='macro'>!</span> {
     <span class='doccomment'>/// Orderings that may be specified for Revwalk iteration.</span>
-    <span class='ident'>flags</span> <span class='ident'>Sort</span>: <span class='ident'>u32</span> {
+    <span class='kw'>pub</span> <span class='ident'>flags</span> <span class='ident'>Sort</span>: <span class='ident'>u32</span> {
         <span class='doccomment'>/// Sort the repository contents in no particular ordering.</span>
         <span class='doccomment'>///</span>
         <span class='doccomment'>/// This sorting is arbitrary, implementation-specific, and subject to</span>
@@ -1332,7 +1335,7 @@
 
 <span class='macro'>bitflags</span><span class='macro'>!</span> {
     <span class='doccomment'>/// Types of credentials that can be requested by a credential callback.</span>
-    <span class='ident'>flags</span> <span class='ident'>CredentialType</span>: <span class='ident'>u32</span> {
+    <span class='kw'>pub</span> <span class='ident'>flags</span> <span class='ident'>CredentialType</span>: <span class='ident'>u32</span> {
         <span class='attribute'>#[<span class='ident'>allow</span>(<span class='ident'>missing_docs</span>)]</span>
         <span class='kw'>const</span> <span class='ident'>USER_PASS_PLAINTEXT</span> <span class='op'>=</span> <span class='ident'>raw</span>::<span class='ident'>GIT_CREDTYPE_USERPASS_PLAINTEXT</span> <span class='kw'>as</span> <span class='ident'>u32</span>,
         <span class='attribute'>#[<span class='ident'>allow</span>(<span class='ident'>missing_docs</span>)]</span>
@@ -1352,7 +1355,7 @@
 
 <span class='macro'>bitflags</span><span class='macro'>!</span> {
     <span class='doccomment'>/// Flags for the `flags` field of an IndexEntry.</span>
-    <span class='ident'>flags</span> <span class='ident'>IndexEntryFlag</span>: <span class='ident'>u16</span> {
+    <span class='kw'>pub</span> <span class='ident'>flags</span> <span class='ident'>IndexEntryFlag</span>: <span class='ident'>u16</span> {
         <span class='doccomment'>/// Set when the `extended_flags` field is valid.</span>
         <span class='kw'>const</span> <span class='ident'>IDXENTRY_EXTENDED</span> <span class='op'>=</span> <span class='ident'>raw</span>::<span class='ident'>GIT_IDXENTRY_EXTENDED</span> <span class='kw'>as</span> <span class='ident'>u16</span>,
         <span class='doccomment'>/// &quot;Assume valid&quot; flag</span>
@@ -1362,7 +1365,7 @@
 
 <span class='macro'>bitflags</span><span class='macro'>!</span> {
     <span class='doccomment'>/// Flags for the `extended_flags` field of an IndexEntry.</span>
-    <span class='ident'>flags</span> <span class='ident'>IndexEntryExtendedFlag</span>: <span class='ident'>u16</span> {
+    <span class='kw'>pub</span> <span class='ident'>flags</span> <span class='ident'>IndexEntryExtendedFlag</span>: <span class='ident'>u16</span> {
         <span class='doccomment'>/// An &quot;intent to add&quot; entry from &quot;git add -N&quot;</span>
         <span class='kw'>const</span> <span class='ident'>IDXENTRY_INTENT_TO_ADD</span> <span class='op'>=</span> <span class='ident'>raw</span>::<span class='ident'>GIT_IDXENTRY_INTENT_TO_ADD</span> <span class='kw'>as</span> <span class='ident'>u16</span>,
         <span class='doccomment'>/// Skip the associated worktree file, for sparse checkouts</span>
@@ -1397,7 +1400,7 @@
 
 <span class='macro'>bitflags</span><span class='macro'>!</span> {
     <span class='doccomment'>/// Flags for APIs that add files matching pathspec</span>
-    <span class='ident'>flags</span> <span class='ident'>IndexAddOption</span>: <span class='ident'>u32</span> {
+    <span class='kw'>pub</span> <span class='ident'>flags</span> <span class='ident'>IndexAddOption</span>: <span class='ident'>u32</span> {
         <span class='attribute'>#[<span class='ident'>allow</span>(<span class='ident'>missing_docs</span>)]</span>
         <span class='kw'>const</span> <span class='ident'>ADD_DEFAULT</span> <span class='op'>=</span> <span class='ident'>raw</span>::<span class='ident'>GIT_INDEX_ADD_DEFAULT</span> <span class='kw'>as</span> <span class='ident'>u32</span>,
         <span class='attribute'>#[<span class='ident'>allow</span>(<span class='ident'>missing_docs</span>)]</span>
@@ -1412,7 +1415,7 @@
 
 <span class='macro'>bitflags</span><span class='macro'>!</span> {
     <span class='doccomment'>/// Flags for `Repository::open_ext`</span>
-    <span class='ident'>flags</span> <span class='ident'>RepositoryOpenFlags</span>: <span class='ident'>u32</span> {
+    <span class='kw'>pub</span> <span class='ident'>flags</span> <span class='ident'>RepositoryOpenFlags</span>: <span class='ident'>u32</span> {
         <span class='doccomment'>/// Only open the specified path; don&#39;t walk upward searching.</span>
         <span class='kw'>const</span> <span class='ident'>REPOSITORY_OPEN_NO_SEARCH</span> <span class='op'>=</span> <span class='ident'>raw</span>::<span class='ident'>GIT_REPOSITORY_OPEN_NO_SEARCH</span> <span class='kw'>as</span> <span class='ident'>u32</span>,
         <span class='doccomment'>/// Search across filesystem boundaries.</span>
@@ -1424,7 +1427,7 @@
 
 <span class='macro'>bitflags</span><span class='macro'>!</span> {
     <span class='doccomment'>/// Flags for the return value of `Repository::revparse`</span>
-    <span class='ident'>flags</span> <span class='ident'>RevparseMode</span>: <span class='ident'>u32</span> {
+    <span class='kw'>pub</span> <span class='ident'>flags</span> <span class='ident'>RevparseMode</span>: <span class='ident'>u32</span> {
         <span class='doccomment'>/// The spec targeted a single object</span>
         <span class='kw'>const</span> <span class='ident'>REVPARSE_SINGLE</span> <span class='op'>=</span> <span class='ident'>raw</span>::<span class='ident'>GIT_REVPARSE_SINGLE</span> <span class='kw'>as</span> <span class='ident'>u32</span>,
         <span class='doccomment'>/// The spec targeted a range of commits</span>
@@ -1454,15 +1457,16 @@
 <span class='kw'>mod</span> <span class='ident'>cred</span>;
 <span class='kw'>mod</span> <span class='ident'>describe</span>;
 <span class='kw'>mod</span> <span class='ident'>diff</span>;
-<span class='kw'>mod</span> <span class='ident'>merge</span>;
 <span class='kw'>mod</span> <span class='ident'>error</span>;
 <span class='kw'>mod</span> <span class='ident'>index</span>;
+<span class='kw'>mod</span> <span class='ident'>merge</span>;
 <span class='kw'>mod</span> <span class='ident'>message</span>;
 <span class='kw'>mod</span> <span class='ident'>note</span>;
 <span class='kw'>mod</span> <span class='ident'>object</span>;
 <span class='kw'>mod</span> <span class='ident'>oid</span>;
 <span class='kw'>mod</span> <span class='ident'>packbuilder</span>;
 <span class='kw'>mod</span> <span class='ident'>pathspec</span>;
+<span class='kw'>mod</span> <span class='ident'>proxy_options</span>;
 <span class='kw'>mod</span> <span class='ident'>reference</span>;
 <span class='kw'>mod</span> <span class='ident'>reflog</span>;
 <span class='kw'>mod</span> <span class='ident'>refspec</span>;
@@ -1579,7 +1583,7 @@
     <span class='doccomment'>/// represents the status of file in the index relative to the HEAD, and the</span>
     <span class='doccomment'>/// `STATUS_WT_*` set of flags represent the status of the file in the</span>
     <span class='doccomment'>/// working directory relative to the index.</span>
-    <span class='ident'>flags</span> <span class='ident'>Status</span>: <span class='ident'>u32</span> {
+    <span class='kw'>pub</span> <span class='ident'>flags</span> <span class='ident'>Status</span>: <span class='ident'>u32</span> {
         <span class='attribute'>#[<span class='ident'>allow</span>(<span class='ident'>missing_docs</span>)]</span>
         <span class='kw'>const</span> <span class='ident'>STATUS_CURRENT</span> <span class='op'>=</span> <span class='ident'>raw</span>::<span class='ident'>GIT_STATUS_CURRENT</span> <span class='kw'>as</span> <span class='ident'>u32</span>,
 
@@ -1614,7 +1618,7 @@
 
 <span class='macro'>bitflags</span><span class='macro'>!</span> {
     <span class='doccomment'>/// Mode options for RepositoryInitOptions</span>
-    <span class='ident'>flags</span> <span class='ident'>RepositoryInitMode</span>: <span class='ident'>u32</span> {
+    <span class='kw'>pub</span> <span class='ident'>flags</span> <span class='ident'>RepositoryInitMode</span>: <span class='ident'>u32</span> {
         <span class='doccomment'>/// Use permissions configured by umask - the default</span>
         <span class='kw'>const</span> <span class='ident'>REPOSITORY_INIT_SHARED_UMASK</span> <span class='op'>=</span>
                     <span class='ident'>raw</span>::<span class='ident'>GIT_REPOSITORY_INIT_SHARED_UMASK</span> <span class='kw'>as</span> <span class='ident'>u32</span>,
@@ -1696,7 +1700,7 @@
     <span class='doccomment'>/// Lastly, the following will only be returned for ignore &quot;NONE&quot;.</span>
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// * WD_UNTRACKED      - wd contains untracked files</span>
-    <span class='ident'>flags</span> <span class='ident'>SubmoduleStatus</span>: <span class='ident'>u32</span> {
+    <span class='kw'>pub</span> <span class='ident'>flags</span> <span class='ident'>SubmoduleStatus</span>: <span class='ident'>u32</span> {
         <span class='attribute'>#[<span class='ident'>allow</span>(<span class='ident'>missing_docs</span>)]</span>
         <span class='kw'>const</span> <span class='ident'>SUBMODULE_STATUS_IN_HEAD</span> <span class='op'>=</span>
                 <span class='ident'>raw</span>::<span class='ident'>GIT_SUBMODULE_STATUS_IN_HEAD</span> <span class='kw'>as</span> <span class='ident'>u32</span>,
@@ -1763,7 +1767,7 @@
 
 <span class='macro'>bitflags</span><span class='macro'>!</span> {
     <span class='doccomment'>/// ...</span>
-    <span class='ident'>flags</span> <span class='ident'>PathspecFlags</span>: <span class='ident'>u32</span> {
+    <span class='kw'>pub</span> <span class='ident'>flags</span> <span class='ident'>PathspecFlags</span>: <span class='ident'>u32</span> {
         <span class='doccomment'>/// Use the default pathspec matching configuration.</span>
         <span class='kw'>const</span> <span class='ident'>PATHSPEC_DEFAULT</span> <span class='op'>=</span> <span class='ident'>raw</span>::<span class='ident'>GIT_PATHSPEC_DEFAULT</span> <span class='kw'>as</span> <span class='ident'>u32</span>,
         <span class='doccomment'>/// Force matching to ignore case, otherwise matching will use native</span>
@@ -1792,7 +1796,7 @@
 
 <span class='macro'>bitflags</span><span class='macro'>!</span> {
     <span class='doccomment'>/// Types of notifications emitted from checkouts.</span>
-    <span class='ident'>flags</span> <span class='ident'>CheckoutNotificationType</span>: <span class='ident'>u32</span> {
+    <span class='kw'>pub</span> <span class='ident'>flags</span> <span class='ident'>CheckoutNotificationType</span>: <span class='ident'>u32</span> {
         <span class='doccomment'>/// Notification about a conflict.</span>
         <span class='kw'>const</span> <span class='ident'>CHECKOUT_NOTIFICATION_CONFLICT</span> <span class='op'>=</span> <span class='ident'>raw</span>::<span class='ident'>GIT_CHECKOUT_NOTIFY_CONFLICT</span> <span class='kw'>as</span> <span class='ident'>u32</span>,
         <span class='doccomment'>/// Notification about a dirty file.</span>
@@ -1823,7 +1827,7 @@
 
 <span class='macro'>bitflags</span><span class='macro'>!</span> {
     <span class='doccomment'>/// Formatting options for diff stats</span>
-    <span class='ident'>flags</span> <span class='ident'>DiffStatsFormat</span>: <span class='ident'>raw</span>::<span class='ident'>git_diff_stats_format_t</span> {
+    <span class='kw'>pub</span> <span class='ident'>flags</span> <span class='ident'>DiffStatsFormat</span>: <span class='ident'>raw</span>::<span class='ident'>git_diff_stats_format_t</span> {
         <span class='doccomment'>/// Don&#39;t generate any stats</span>
         <span class='kw'>const</span> <span class='ident'>DIFF_STATS_NONE</span> <span class='op'>=</span> <span class='ident'>raw</span>::<span class='ident'>GIT_DIFF_STATS_NONE</span>,
         <span class='doccomment'>/// Equivalent of `--stat` in git</span>
@@ -1930,11 +1934,9 @@
     <script>
         window.rootPath = "../../";
         window.currentCrate = "git2";
-        window.playgroundUrl = "";
     </script>
     <script src="../../jquery.js"></script>
     <script src="../../main.js"></script>
-    
     <script defer src="../../search-index.js"></script>
 </body>
 </html>

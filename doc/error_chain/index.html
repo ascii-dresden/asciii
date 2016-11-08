@@ -119,29 +119,29 @@ it can&#39;t implement <code>PartialEq</code> for easy comparisons.</li>
 <p>Write this at the top of your crate:</p>
 
 <pre class='rust rust-example-rendered'>
-<span class='attribute'>#<span class='op'>!</span>[<span class='ident'>recursion_limit</span> <span class='op'>=</span> <span class='string'>&quot;1024&quot;</span>]</span>;<a class='test-arrow' target='_blank' href=''>Run</a></pre>
+<span class='attribute'>#<span class='op'>!</span>[<span class='ident'>recursion_limit</span> <span class='op'>=</span> <span class='string'>&quot;1024&quot;</span>]</span>;</pre>
 
 <p>Again near the top of your crate, import the <code>error_chain</code> crate and its macros:</p>
 
 <pre class='rust rust-example-rendered'>
 <span class='attribute'>#[<span class='ident'>macro_use</span>]</span>
-<span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>error_chain</span>;<a class='test-arrow' target='_blank' href=''>Run</a></pre>
+<span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>error_chain</span>;</pre>
 
 <p>Add an <code>errors</code> module to your crate:</p>
 
 <pre class='rust rust-example-rendered'>
-<span class='kw'>mod</span> <span class='ident'>errors</span>;<a class='test-arrow' target='_blank' href=''>Run</a></pre>
+<span class='kw'>mod</span> <span class='ident'>errors</span>;</pre>
 
 <p>Add a file for that module called <code>errors.rs</code> and put this inside:</p>
 
 <pre class='rust rust-example-rendered'>
-<span class='macro'>error_chain</span><span class='macro'>!</span> { }<a class='test-arrow' target='_blank' href=''>Run</a></pre>
+<span class='macro'>error_chain</span><span class='macro'>!</span> { }</pre>
 
 <p>That&#39;s the setup. Now when writing modules for your crate,
 import everything from the <code>errors</code> module:</p>
 
 <pre class='rust rust-example-rendered'>
-<span class='kw'>use</span> <span class='ident'>errors</span>::<span class='op'>*</span>;<a class='test-arrow' target='_blank' href=''>Run</a></pre>
+<span class='kw'>use</span> <span class='ident'>errors</span>::<span class='op'>*</span>;</pre>
 
 <p>Create functions that return <code>Result</code>, which is defined by
 the <code>error_chain!</code> macro, and start chaining errors!</p>
@@ -152,7 +152,7 @@ the <code>error_chain!</code> macro, and start chaining errors!</p>
     <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>file</span>.<span class='ident'>write_str</span>(<span class='string'>&quot;important&quot;</span>).<span class='ident'>chain_err</span>(<span class='op'>||</span> <span class='string'>&quot;couldn&#39;t write file&quot;</span>));
 
     <span class='prelude-val'>Ok</span>(())
-}<a class='test-arrow' target='_blank' href=''>Run</a></pre>
+}</pre>
 
 <h2 id='declaring-error-types' class='section-header'><a href='#declaring-error-types'>Declaring error types</a></h2>
 <p>Generally, you define one family of error types per crate, though
@@ -204,7 +204,7 @@ define an <code>errors</code> module and inside it call <code>error_chain!</code
             <span class='ident'>display</span>(<span class='string'>&quot;invalid toolchain name: &#39;{}&#39;&quot;</span>, <span class='ident'>t</span>)
         }
     }
-}<a class='test-arrow' target='_blank' href=''>Run</a></pre>
+}</pre>
 
 <p>Each section, <code>types</code>, <code>links</code>, <code>foreign_links</code>, and <code>errors</code> may
 be omitted if it is empty.</p>
@@ -240,7 +240,7 @@ following:</p>
     <span class='ident'>Utils</span>(<span class='ident'>rustup_utils</span>::<span class='ident'>ErrorKind</span>),
     <span class='ident'>Temp</span>,
     <span class='ident'>InvalidToolchainName</span>(<span class='ident'>String</span>),
-}<a class='test-arrow' target='_blank' href=''>Run</a></pre>
+}</pre>
 
 <p>This is the basic error structure. You can see that <code>ErrorKind</code>
 has been populated in a variety of ways. All <code>ErrorKind</code>s get a
@@ -266,14 +266,14 @@ arise frequently.</p>
 <pre class='rust rust-example-rendered'>
 <span class='kw'>fn</span> <span class='ident'>foo</span>() <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span>()<span class='op'>&gt;</span> {
     <span class='prelude-val'>Err</span>(<span class='string'>&quot;foo error!&quot;</span>.<span class='ident'>into</span>())
-}<a class='test-arrow' target='_blank' href=''>Run</a></pre>
+}</pre>
 
 <p>Introducing new error chains, with an <code>ErrorKind</code>:</p>
 
 <pre class='rust rust-example-rendered'>
 <span class='kw'>fn</span> <span class='ident'>foo</span>() <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span>()<span class='op'>&gt;</span> {
     <span class='prelude-val'>Err</span>(<span class='ident'>ErrorKind</span>::<span class='ident'>FooError</span>.<span class='ident'>into</span>())
-}<a class='test-arrow' target='_blank' href=''>Run</a></pre>
+}</pre>
 
 <p>Note that the return type is the typedef <code>Result</code>, which is
 defined by the macro as <code>pub type Result&lt;T&gt; = ::std::result::Result&lt;T, Error&gt;</code>. Note that in both cases
@@ -293,14 +293,14 @@ below is equivalent to the previous:</p>
 
 <span class='kw'>fn</span> <span class='ident'>bar</span>() <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span>()<span class='op'>&gt;</span> {
     <span class='prelude-val'>Ok</span>(<span class='macro'>try</span><span class='macro'>!</span>(<span class='prelude-val'>Err</span>(<span class='string'>&quot;bogus!&quot;</span>)))
-}<a class='test-arrow' target='_blank' href=''>Run</a></pre>
+}</pre>
 
 <h2 id='chaining-errors' class='section-header'><a href='#chaining-errors'>Chaining errors</a></h2>
 <p>To extend the error chain:</p>
 
 <pre class='rust rust-example-rendered'>
 <span class='kw'>use</span> <span class='ident'>errors</span>::<span class='ident'>ChainErr</span>;
-<span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>do_something</span>().<span class='ident'>chain_err</span>(<span class='op'>||</span> <span class='string'>&quot;something went wrong&quot;</span>));<a class='test-arrow' target='_blank' href=''>Run</a></pre>
+<span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>do_something</span>().<span class='ident'>chain_err</span>(<span class='op'>||</span> <span class='string'>&quot;something went wrong&quot;</span>));</pre>
 
 <p><code>chain_err</code> can be called on any <code>Result</code> type where the contained
 error type implements <code>std::error::Error + Send + &#39;static</code>.  If
@@ -433,11 +433,9 @@ in the generated error implementations.</p>
     <script>
         window.rootPath = "../";
         window.currentCrate = "error_chain";
-        window.playgroundUrl = "";
     </script>
     <script src="../jquery.js"></script>
     <script src="../main.js"></script>
-    
     <script defer src="../search-index.js"></script>
 </body>
 </html>

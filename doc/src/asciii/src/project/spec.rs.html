@@ -561,6 +561,61 @@
 <span id="517">517</span>
 <span id="518">518</span>
 <span id="519">519</span>
+<span id="520">520</span>
+<span id="521">521</span>
+<span id="522">522</span>
+<span id="523">523</span>
+<span id="524">524</span>
+<span id="525">525</span>
+<span id="526">526</span>
+<span id="527">527</span>
+<span id="528">528</span>
+<span id="529">529</span>
+<span id="530">530</span>
+<span id="531">531</span>
+<span id="532">532</span>
+<span id="533">533</span>
+<span id="534">534</span>
+<span id="535">535</span>
+<span id="536">536</span>
+<span id="537">537</span>
+<span id="538">538</span>
+<span id="539">539</span>
+<span id="540">540</span>
+<span id="541">541</span>
+<span id="542">542</span>
+<span id="543">543</span>
+<span id="544">544</span>
+<span id="545">545</span>
+<span id="546">546</span>
+<span id="547">547</span>
+<span id="548">548</span>
+<span id="549">549</span>
+<span id="550">550</span>
+<span id="551">551</span>
+<span id="552">552</span>
+<span id="553">553</span>
+<span id="554">554</span>
+<span id="555">555</span>
+<span id="556">556</span>
+<span id="557">557</span>
+<span id="558">558</span>
+<span id="559">559</span>
+<span id="560">560</span>
+<span id="561">561</span>
+<span id="562">562</span>
+<span id="563">563</span>
+<span id="564">564</span>
+<span id="565">565</span>
+<span id="566">566</span>
+<span id="567">567</span>
+<span id="568">568</span>
+<span id="569">569</span>
+<span id="570">570</span>
+<span id="571">571</span>
+<span id="572">572</span>
+<span id="573">573</span>
+<span id="574">574</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! Implements the ascii invoicer project file specification.</span>
 <span class='doccomment'>//!</span>
@@ -569,74 +624,12 @@
 <span class='doccomment'>//! Most of the functions in these modules take the `yaml` data directly as reference.</span>
 <span class='doccomment'>//! Each module contains a `validate()` function which ought to be kept up to date.</span>
 
-<span class='kw'>use</span> <span class='ident'>chrono</span>::<span class='ident'>Datelike</span>;
 <span class='kw'>use</span> <span class='ident'>bill</span>::<span class='ident'>Currency</span>;
 
 <span class='kw'>use</span> <span class='ident'>util</span>::<span class='ident'>yaml</span>;
 <span class='kw'>use</span> <span class='ident'>util</span>::<span class='ident'>yaml</span>::<span class='ident'>Yaml</span>;
-<span class='kw'>use</span> <span class='ident'>util</span>::<span class='ident'>currency_to_string</span>;
-<span class='kw'>use</span> <span class='ident'>storage</span>::<span class='ident'>Storable</span>;
-<span class='kw'>use</span> <span class='kw'>super</span>::<span class='ident'>Project</span>;
 
-<span class='kw'>pub</span> <span class='kw'>type</span> <span class='ident'>SpecResult</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span> <span class='op'>=</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span>(), <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>str</span><span class='op'>&gt;&gt;</span>;
-
-<span class='doccomment'>/// Fields that are accessible but are not directly found in the file format.</span>
-<span class='doccomment'>/// This is used to get fields that are computed through an ordinary `get(&quot;responsible&quot;)`</span>
-<span class='macro'>custom_derive</span><span class='macro'>!</span> {
-    <span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Debug</span>,
-             <span class='ident'>IterVariants</span>(<span class='ident'>VirtualFields</span>), <span class='ident'>IterVariantNames</span>(<span class='ident'>VirtualFieldNames</span>),
-             <span class='ident'>EnumFromStr</span>
-             )]</span>
-    <span class='doccomment'>/// `Project::get()` allows accessing fields within the raw `yaml` data structure.</span>
-    <span class='doccomment'>/// Virtual fields are fields that are not present in the document but computed.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// `VirtualFields` is an automatically generated type that allows iterating of the variants of</span>
-    <span class='doccomment'>/// this Enum.</span>
-    <span class='kw'>pub</span> <span class='kw'>enum</span> <span class='ident'>VirtualField</span>{
-        <span class='doccomment'>/// Usually `storage`, or in legacy part of `signature`</span>
-        <span class='ident'>Responsible</span>,
-        <span class='doccomment'>/// Pretty version of `invoice/number`: &quot;`R042`&quot;</span>
-        <span class='ident'>OfferNumber</span>,
-        <span class='ident'>InvoiceNumber</span>,
-        <span class='doccomment'>/// Pretty version of `invoice/number` including year: &quot;`R2016-042`&quot;</span>
-        <span class='ident'>InvoiceNumberLong</span>,
-        <span class='doccomment'>///Overall Cost Project, including taxes</span>
-        <span class='ident'>Name</span>,
-        <span class='ident'>Final</span>,
-        <span class='ident'>Age</span>,
-        <span class='ident'>Year</span>,
-        <span class='ident'>Caterers</span>,
-        <span class='ident'>ClientFullName</span>,
-        <span class='ident'>Invalid</span>
-    }
-}
-
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span> <span class='ident'>From</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>str</span><span class='op'>&gt;</span> <span class='kw'>for</span> <span class='ident'>VirtualField</span> {
-    <span class='kw'>fn</span> <span class='ident'>from</span>(<span class='ident'>s</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>str</span>) <span class='op'>-&gt;</span> <span class='ident'>VirtualField</span> {
-        <span class='ident'>s</span>.<span class='ident'>parse</span>::<span class='op'>&lt;</span><span class='ident'>VirtualField</span><span class='op'>&gt;</span>().<span class='ident'>unwrap_or</span>(<span class='ident'>VirtualField</span>::<span class='ident'>Invalid</span>)
-    }
-}
-
-<span class='kw'>impl</span> <span class='ident'>VirtualField</span> {
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>get</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>project</span>: <span class='kw-2'>&amp;</span><span class='ident'>Project</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>String</span><span class='op'>&gt;</span> {
-        <span class='kw'>match</span> <span class='op'>*</span><span class='self'>self</span> {
-            <span class='ident'>VirtualField</span>::<span class='ident'>Responsible</span> <span class='op'>=&gt;</span> <span class='ident'>project</span>::<span class='ident'>manager</span>(<span class='ident'>project</span>.<span class='ident'>yaml</span>()).<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>s</span><span class='op'>|</span> <span class='ident'>s</span>.<span class='ident'>to_owned</span>()),
-            <span class='ident'>VirtualField</span>::<span class='ident'>OfferNumber</span> <span class='op'>=&gt;</span> <span class='ident'>offer</span>::<span class='ident'>number</span>(<span class='ident'>project</span>.<span class='ident'>yaml</span>()),
-            <span class='ident'>VirtualField</span>::<span class='ident'>InvoiceNumber</span> <span class='op'>=&gt;</span> <span class='ident'>invoice</span>::<span class='ident'>number_str</span>(<span class='ident'>project</span>.<span class='ident'>yaml</span>()),
-            <span class='ident'>VirtualField</span>::<span class='ident'>InvoiceNumberLong</span> <span class='op'>=&gt;</span> <span class='ident'>invoice</span>::<span class='ident'>number_long_str</span>(<span class='ident'>project</span>.<span class='ident'>yaml</span>()),
-            <span class='ident'>VirtualField</span>::<span class='ident'>Name</span> <span class='op'>=&gt;</span> <span class='ident'>project</span>::<span class='ident'>name</span>(<span class='ident'>project</span>.<span class='ident'>yaml</span>()).<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>s</span><span class='op'>|</span> <span class='ident'>s</span>.<span class='ident'>to_owned</span>()),
-            <span class='ident'>VirtualField</span>::<span class='ident'>Final</span> <span class='op'>=&gt;</span> <span class='ident'>project</span>.<span class='ident'>sum_sold</span>().<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>c</span><span class='op'>|</span> <span class='ident'>currency_to_string</span>(<span class='kw-2'>&amp;</span><span class='ident'>c</span>)).<span class='ident'>ok</span>(),
-            <span class='ident'>VirtualField</span>::<span class='ident'>Age</span> <span class='op'>=&gt;</span> <span class='ident'>project</span>.<span class='ident'>age</span>().<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>a</span><span class='op'>|</span> <span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;{} days&quot;</span>, <span class='ident'>a</span>)),
-            <span class='ident'>VirtualField</span>::<span class='ident'>Year</span> <span class='op'>=&gt;</span> <span class='ident'>project</span>.<span class='ident'>date</span>().<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>d</span><span class='op'>|</span> <span class='ident'>d</span>.<span class='ident'>year</span>().<span class='ident'>to_string</span>()),
-
-            <span class='ident'>VirtualField</span>::<span class='ident'>Caterers</span> <span class='op'>=&gt;</span> <span class='ident'>hours</span>::<span class='ident'>caterers_string</span>(<span class='ident'>project</span>.<span class='ident'>yaml</span>()),
-            <span class='ident'>VirtualField</span>::<span class='ident'>ClientFullName</span> <span class='op'>=&gt;</span> <span class='ident'>client</span>::<span class='ident'>full_name</span>(<span class='ident'>project</span>.<span class='ident'>yaml</span>()),
-            <span class='ident'>VirtualField</span>::<span class='ident'>Invalid</span> <span class='op'>=&gt;</span> <span class='prelude-val'>None</span>,
-
-            <span class='comment'>// _ =&gt; None</span>
-        }
-    }
-}
+<span class='kw'>pub</span> <span class='kw'>type</span> <span class='ident'>SpecResult</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span> <span class='op'>=</span> ::<span class='ident'>std</span>::<span class='ident'>result</span>::<span class='prelude-ty'>Result</span><span class='op'>&lt;</span>(), <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>str</span><span class='op'>&gt;&gt;</span>;
 
 <span class='comment'>// TODO there may be cases where an f64 can&#39;t be converted into Currency</span>
 <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>to_currency</span>(<span class='ident'>f</span>: <span class='ident'>f64</span>) <span class='op'>-&gt;</span> <span class='ident'>Currency</span> {
@@ -683,7 +676,8 @@
 
     <span class='doccomment'>///Returns the content of `/format`</span>
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>format</span>(<span class='ident'>yaml</span>: <span class='kw-2'>&amp;</span><span class='ident'>Yaml</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='ident'>str</span><span class='op'>&gt;</span> {
-        <span class='ident'>yaml</span>::<span class='ident'>get_str</span>(<span class='ident'>yaml</span>, <span class='string'>&quot;format&quot;</span>)
+        <span class='ident'>yaml</span>::<span class='ident'>get_str</span>(<span class='ident'>yaml</span>, <span class='string'>&quot;meta/format&quot;</span>)
+            .<span class='ident'>or_else</span>(<span class='op'>||</span><span class='ident'>yaml</span>::<span class='ident'>get_str</span>(<span class='ident'>yaml</span>, <span class='string'>&quot;format&quot;</span>))
     }
 
     <span class='doccomment'>///Returns the content of `/canceled`</span>
@@ -727,6 +721,11 @@
         .<span class='ident'>or_else</span>(<span class='op'>||</span> <span class='ident'>yaml</span>::<span class='ident'>get_str</span>(<span class='ident'>yaml</span>, <span class='string'>&quot;client&quot;</span>).<span class='ident'>and_then</span>(<span class='op'>|</span><span class='ident'>c</span><span class='op'>|</span><span class='ident'>c</span>.<span class='ident'>lines</span>().<span class='ident'>nth</span>(<span class='number'>0</span>)))
     }
 
+    <span class='doccomment'>///Returns the first word of `client/title`</span>
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>salute</span>(<span class='ident'>yaml</span>: <span class='kw-2'>&amp;</span><span class='ident'>Yaml</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='ident'>str</span><span class='op'>&gt;</span> {
+        <span class='ident'>title</span>(<span class='ident'>yaml</span>).<span class='ident'>and_then</span>(<span class='op'>|</span><span class='ident'>s</span><span class='op'>|</span><span class='ident'>s</span>.<span class='ident'>split_whitespace</span>().<span class='ident'>nth</span>(<span class='number'>0</span>))
+    }
+
     <span class='doccomment'>///Returns the content of `/client/first_name`</span>
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>first_name</span>(<span class='ident'>yaml</span>: <span class='kw-2'>&amp;</span><span class='ident'>Yaml</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='ident'>str</span><span class='op'>&gt;</span> {
         <span class='ident'>yaml</span>::<span class='ident'>get_str</span>(<span class='ident'>yaml</span>, <span class='string'>&quot;client/first_name&quot;</span>)
@@ -753,7 +752,7 @@
 
     <span class='doccomment'>/// Produces a standard salutation field.</span>
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>addressing</span>(<span class='ident'>yaml</span>: <span class='kw-2'>&amp;</span><span class='ident'>Yaml</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>String</span><span class='op'>&gt;</span> {
-        <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Some</span>(<span class='ident'>title</span>) <span class='op'>=</span> <span class='ident'>title</span>(<span class='ident'>yaml</span>).<span class='ident'>and_then</span>(<span class='op'>|</span><span class='ident'>title</span><span class='op'>|</span> <span class='ident'>title</span>.<span class='ident'>split_whitespace</span>().<span class='ident'>nth</span>(<span class='number'>0</span>))
+        <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Some</span>(<span class='ident'>salute</span>) <span class='op'>=</span> <span class='ident'>salute</span>(<span class='ident'>yaml</span>).<span class='ident'>and_then</span>(<span class='op'>|</span><span class='ident'>salute</span><span class='op'>|</span> <span class='ident'>salute</span>.<span class='ident'>split_whitespace</span>().<span class='ident'>nth</span>(<span class='number'>0</span>))
         <span class='comment'>// only the first word</span>
         {
             <span class='kw'>let</span> <span class='ident'>last_name</span> <span class='op'>=</span> <span class='ident'>last_name</span>(<span class='ident'>yaml</span>);
@@ -762,7 +761,7 @@
             <span class='kw'>let</span> <span class='ident'>lang</span> <span class='op'>=</span> ::<span class='ident'>CONFIG</span>.<span class='ident'>get_str</span>(<span class='string'>&quot;defaults/lang&quot;</span>)
                 .<span class='ident'>expect</span>(<span class='string'>&quot;Faulty config: defaults/lang does not contain a value&quot;</span>);
 
-            <span class='kw'>let</span> <span class='ident'>gend_path</span> <span class='op'>=</span> <span class='string'>&quot;gender_matches/&quot;</span>.<span class='ident'>to_owned</span>() <span class='op'>+</span> <span class='kw-2'>&amp;</span><span class='ident'>title</span>.<span class='ident'>to_lowercase</span>();
+            <span class='kw'>let</span> <span class='ident'>gend_path</span> <span class='op'>=</span> <span class='string'>&quot;gender_matches/&quot;</span>.<span class='ident'>to_owned</span>() <span class='op'>+</span> <span class='kw-2'>&amp;</span><span class='ident'>salute</span>.<span class='ident'>to_lowercase</span>();
             <span class='kw'>let</span> <span class='ident'>gend</span> <span class='op'>=</span> ::<span class='ident'>CONFIG</span>.<span class='ident'>get_str</span>(<span class='kw-2'>&amp;</span><span class='ident'>gend_path</span>)
                 .<span class='ident'>expect</span>(<span class='kw-2'>&amp;</span><span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;Faulty config: {} does not contain a value&quot;</span>, <span class='ident'>gend_path</span>));
 
@@ -770,7 +769,7 @@
             <span class='kw'>let</span> <span class='ident'>addr</span> <span class='op'>=</span> ::<span class='ident'>CONFIG</span>.<span class='ident'>get_str</span>(<span class='kw-2'>&amp;</span><span class='ident'>addr_path</span>)
                 .<span class='ident'>expect</span>(<span class='kw-2'>&amp;</span><span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;Faulty config: {} does not contain a value&quot;</span>, <span class='ident'>addr_path</span>));
 
-            <span class='ident'>last_name</span>.<span class='ident'>and</span>(<span class='prelude-val'>Some</span>(<span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;{} {} {}&quot;</span>, <span class='ident'>addr</span>, <span class='ident'>title</span>, <span class='ident'>last_name</span>.<span class='ident'>unwrap_or</span>(<span class='string'>&quot;&quot;</span>))))
+            <span class='ident'>last_name</span>.<span class='ident'>and</span>(<span class='prelude-val'>Some</span>(<span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;{} {} {}&quot;</span>, <span class='ident'>addr</span>, <span class='ident'>salute</span>, <span class='ident'>last_name</span>.<span class='ident'>unwrap_or</span>(<span class='string'>&quot;&quot;</span>))))
         } <span class='kw'>else</span> {
             <span class='prelude-val'>None</span>
         }
@@ -782,18 +781,11 @@
                                              <span class='kw-2'>&amp;</span>[
                                              <span class='comment'>//&quot;client/email&quot;, // TODO make this a requirement</span>
                                              <span class='string'>&quot;client/address&quot;</span>,
+                                             <span class='string'>&quot;client/title&quot;</span>,
                                              <span class='string'>&quot;client/last_name&quot;</span>,
                                              <span class='string'>&quot;client/first_name&quot;</span>
                                              ]);
 
-
-        <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Some</span>(<span class='ident'>title</span>) <span class='op'>=</span> <span class='ident'>title</span>(<span class='ident'>yaml</span>) {
-            <span class='kw'>if</span> <span class='ident'>title</span>.<span class='ident'>split_whitespace</span>().<span class='ident'>count</span>() <span class='op'>&gt;</span> <span class='number'>1</span> {
-                <span class='ident'>errors</span>.<span class='ident'>push</span>(<span class='string'>&quot;client_title&quot;</span>);
-            }
-        } <span class='kw'>else</span> {
-            <span class='ident'>errors</span>.<span class='ident'>push</span>(<span class='string'>&quot;client_title&quot;</span>);
-        }
 
         <span class='kw'>if</span> <span class='ident'>addressing</span>(<span class='ident'>yaml</span>).<span class='ident'>is_none</span>() {
             <span class='ident'>errors</span>.<span class='ident'>push</span>(<span class='string'>&quot;client_addressing&quot;</span>);
@@ -855,22 +847,122 @@
         <span class='ident'>yaml</span>::<span class='ident'>get_dmy</span>(<span class='ident'>yaml</span>, <span class='string'>&quot;event/dates/0/begin&quot;</span>)
     }
 
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>our_bad</span>(<span class='ident'>yaml</span>: <span class='kw-2'>&amp;</span><span class='ident'>Yaml</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Duration</span><span class='op'>&gt;</span> {
+        <span class='kw'>let</span> <span class='ident'>event</span>   <span class='op'>=</span> <span class='macro'>try_some</span><span class='macro'>!</span>(<span class='ident'>event</span>(<span class='ident'>yaml</span>));
+        <span class='kw'>let</span> <span class='ident'>invoice</span> <span class='op'>=</span> <span class='ident'>invoice</span>(<span class='ident'>yaml</span>).<span class='ident'>unwrap_or_else</span>(<span class='ident'>UTC</span>::<span class='ident'>today</span>);
+        <span class='kw'>let</span> <span class='ident'>diff</span> <span class='op'>=</span> <span class='ident'>invoice</span> <span class='op'>-</span> <span class='ident'>event</span>;
+        <span class='kw'>if</span> <span class='ident'>diff</span> <span class='op'>&gt;</span> <span class='ident'>Duration</span>::<span class='ident'>zero</span>() {
+            <span class='prelude-val'>Some</span>(<span class='ident'>diff</span>)
+        } <span class='kw'>else</span> {
+            <span class='prelude-val'>None</span>
+        }
+    }
+
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>their_bad</span>(<span class='ident'>yaml</span>: <span class='kw-2'>&amp;</span><span class='ident'>Yaml</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Duration</span><span class='op'>&gt;</span> {
+        <span class='kw'>let</span> <span class='ident'>invoice</span> <span class='op'>=</span> <span class='macro'>try_some</span><span class='macro'>!</span>(<span class='ident'>invoice</span>(<span class='ident'>yaml</span>));
+        <span class='kw'>let</span> <span class='ident'>payed</span>   <span class='op'>=</span> <span class='ident'>payed</span>(<span class='ident'>yaml</span>).<span class='ident'>unwrap_or_else</span>(<span class='ident'>UTC</span>::<span class='ident'>today</span>);
+        <span class='prelude-val'>Some</span>(<span class='ident'>invoice</span> <span class='op'>-</span> <span class='ident'>payed</span>)
+    }
+
     <span class='comment'>// TODO packed to deep? Clippy says YES, remove this allow!</span>
     <span class='kw'>pub</span> <span class='kw'>type</span> <span class='ident'>DateRange</span> <span class='op'>=</span> (<span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Date</span><span class='op'>&lt;</span><span class='ident'>UTC</span><span class='op'>&gt;&gt;</span>, <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Date</span><span class='op'>&lt;</span><span class='ident'>UTC</span><span class='op'>&gt;&gt;</span>);
     <span class='kw'>pub</span> <span class='kw'>type</span> <span class='ident'>DateRanges</span> <span class='op'>=</span> <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>DateRange</span><span class='op'>&gt;</span>;
 
-    <span class='doccomment'>/// Produces a list of `DateRange`s for the event.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>events</span>(<span class='ident'>yaml</span>: <span class='kw-2'>&amp;</span><span class='ident'>Yaml</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>DateRanges</span><span class='op'>&gt;</span> {
-        <span class='ident'>yaml</span>::<span class='ident'>get</span>(<span class='ident'>yaml</span>, <span class='string'>&quot;event/dates/&quot;</span>)
-            .<span class='ident'>and_then</span>(<span class='op'>|</span><span class='ident'>e</span><span class='op'>|</span> <span class='ident'>e</span>.<span class='ident'>as_vec</span>())
-            .<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>v</span><span class='op'>|</span> {
-                <span class='ident'>v</span>.<span class='ident'>iter</span>()
-                    .<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>e</span><span class='op'>|</span> {
-                        (<span class='ident'>yaml</span>::<span class='ident'>get_dmy</span>(<span class='ident'>e</span>, <span class='string'>&quot;begin&quot;</span>),
-                         <span class='ident'>yaml</span>::<span class='ident'>get_dmy</span>(<span class='ident'>e</span>, <span class='string'>&quot;end&quot;</span>).<span class='ident'>or_else</span>(<span class='op'>||</span> <span class='ident'>yaml</span>::<span class='ident'>get_dmy</span>(<span class='ident'>e</span>, <span class='string'>&quot;begin&quot;</span>)))
+    <span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Debug</span>)]</span>
+    <span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>EventTime</span>{
+        <span class='ident'>start</span>: <span class='ident'>NaiveTime</span>,
+        <span class='ident'>end</span>:   <span class='ident'>NaiveTime</span>
+    }
+
+    <span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Debug</span>)]</span>
+    <span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>Event</span>{
+        <span class='ident'>begin</span>: <span class='ident'>Date</span><span class='op'>&lt;</span><span class='ident'>UTC</span><span class='op'>&gt;</span>,
+        <span class='ident'>end</span>: <span class='ident'>Date</span><span class='op'>&lt;</span><span class='ident'>UTC</span><span class='op'>&gt;</span>,
+        <span class='ident'>times</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>EventTime</span><span class='op'>&gt;</span>
+    }
+
+    <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>fmt</span>;
+    <span class='kw'>impl</span> <span class='ident'>fmt</span>::<span class='ident'>Display</span> <span class='kw'>for</span> <span class='ident'>Event</span> {
+        <span class='kw'>fn</span> <span class='ident'>fmt</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>f</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>fmt</span>::<span class='ident'>Formatter</span>) <span class='op'>-&gt;</span> <span class='ident'>fmt</span>::<span class='prelude-ty'>Result</span> {
+            <span class='macro'>try</span><span class='macro'>!</span>(
+                <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>begin</span> <span class='op'>==</span> <span class='self'>self</span>.<span class='ident'>end</span> { <span class='macro'>writeln</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;start: {}&quot;</span>, <span class='self'>self</span>.<span class='ident'>begin</span>) }
+                <span class='kw'>else</span> { <span class='macro'>writeln</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;start: {}\nend:  {}&quot;</span>, <span class='self'>self</span>.<span class='ident'>begin</span>, <span class='self'>self</span>.<span class='ident'>end</span>) }
+                );
+            <span class='kw'>for</span> <span class='ident'>time</span> <span class='kw'>in</span> <span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>times</span> {
+                <span class='macro'>try</span><span class='macro'>!</span>(
+                    <span class='kw'>if</span> <span class='ident'>time</span>.<span class='ident'>start</span> <span class='op'>==</span> <span class='ident'>time</span>.<span class='ident'>end</span> { <span class='macro'>writeln</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot; * {}&quot;</span>, <span class='ident'>time</span>.<span class='ident'>start</span>) }
+                    <span class='kw'>else</span> { <span class='macro'>writeln</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot; * {} - {}&quot;</span>, <span class='ident'>time</span>.<span class='ident'>start</span>, <span class='ident'>time</span>.<span class='ident'>end</span>) }
+                    )
+            }
+            <span class='prelude-val'>Ok</span>(())
+        }
+    }
+
+
+    <span class='kw'>fn</span> <span class='ident'>naive_time_from_str</span>(<span class='ident'>string</span>:<span class='kw-2'>&amp;</span><span class='ident'>str</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>NaiveTime</span><span class='op'>&gt;</span> {
+        <span class='kw'>let</span> <span class='ident'>t</span>:<span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u32</span><span class='op'>&gt;</span> <span class='op'>=</span> <span class='ident'>string</span>
+            .<span class='ident'>splitn</span>(<span class='number'>2</span>, <span class='op'>|</span><span class='ident'>p</span><span class='op'>|</span> <span class='ident'>p</span> <span class='op'>==</span> <span class='string'>&#39;.&#39;</span> <span class='op'>||</span> <span class='ident'>p</span> <span class='op'>==</span> <span class='string'>&#39;:&#39;</span>)
+            .<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>s</span><span class='op'>|</span><span class='ident'>s</span>.<span class='ident'>parse</span>().<span class='ident'>unwrap_or</span>(<span class='number'>0</span>))
+            .<span class='ident'>collect</span>();
+
+        <span class='kw'>if</span> <span class='kw'>let</span> (<span class='prelude-val'>Some</span>(<span class='ident'>h</span>),<span class='ident'>m</span>) <span class='op'>=</span> (<span class='ident'>t</span>.<span class='ident'>get</span>(<span class='number'>0</span>),<span class='ident'>t</span>.<span class='ident'>get</span>(<span class='number'>1</span>).<span class='ident'>unwrap_or</span>(<span class='kw-2'>&amp;</span><span class='number'>0</span>)){
+            <span class='kw'>if</span> <span class='op'>*</span><span class='ident'>h</span> <span class='op'>&lt;</span> <span class='number'>24</span> <span class='op'>&amp;&amp;</span> <span class='op'>*</span><span class='ident'>m</span> <span class='op'>&lt;</span> <span class='number'>60</span> {
+                <span class='kw'>return</span> <span class='prelude-val'>Some</span>(<span class='ident'>NaiveTime</span>::<span class='ident'>from_hms</span>(<span class='op'>*</span><span class='ident'>h</span>,<span class='op'>*</span><span class='ident'>m</span>,<span class='number'>0</span>))
+            }
+        }
+
+        <span class='prelude-val'>None</span>
+    }
+
+    <span class='attribute'>#[<span class='ident'>test</span>]</span>
+    <span class='kw'>fn</span> <span class='ident'>test_naive_time_from_str</span>() {
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='prelude-val'>Some</span>(<span class='ident'>NaiveTime</span>::<span class='ident'>from_hms</span>(<span class='number'>9</span>,<span class='number'>15</span>,<span class='number'>0</span>)), <span class='ident'>naive_time_from_str</span>(<span class='string'>&quot;9.15&quot;</span>));
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='prelude-val'>Some</span>(<span class='ident'>NaiveTime</span>::<span class='ident'>from_hms</span>(<span class='number'>9</span>,<span class='number'>0</span>,<span class='number'>0</span>)),  <span class='ident'>naive_time_from_str</span>(<span class='string'>&quot;9.&quot;</span>));
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='prelude-val'>Some</span>(<span class='ident'>NaiveTime</span>::<span class='ident'>from_hms</span>(<span class='number'>9</span>,<span class='number'>0</span>,<span class='number'>0</span>)),  <span class='ident'>naive_time_from_str</span>(<span class='string'>&quot;9&quot;</span>));
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='prelude-val'>Some</span>(<span class='ident'>NaiveTime</span>::<span class='ident'>from_hms</span>(<span class='number'>23</span>,<span class='number'>0</span>,<span class='number'>0</span>)), <span class='ident'>naive_time_from_str</span>(<span class='string'>&quot;23.0&quot;</span>));
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='prelude-val'>Some</span>(<span class='ident'>NaiveTime</span>::<span class='ident'>from_hms</span>(<span class='number'>23</span>,<span class='number'>59</span>,<span class='number'>0</span>)), <span class='ident'>naive_time_from_str</span>(<span class='string'>&quot;23.59&quot;</span>));
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='prelude-val'>None</span>, <span class='ident'>naive_time_from_str</span>(<span class='string'>&quot;24.0&quot;</span>));
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='prelude-val'>None</span>, <span class='ident'>naive_time_from_str</span>(<span class='string'>&quot;25.0&quot;</span>));
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='prelude-val'>None</span>, <span class='ident'>naive_time_from_str</span>(<span class='string'>&quot;0.60&quot;</span>));
+
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='prelude-val'>Some</span>(<span class='ident'>NaiveTime</span>::<span class='ident'>from_hms</span>(<span class='number'>9</span>,<span class='number'>15</span>,<span class='number'>0</span>)), <span class='ident'>naive_time_from_str</span>(<span class='string'>&quot;9:15&quot;</span>));
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='prelude-val'>Some</span>(<span class='ident'>NaiveTime</span>::<span class='ident'>from_hms</span>(<span class='number'>9</span>,<span class='number'>0</span>,<span class='number'>0</span>)),  <span class='ident'>naive_time_from_str</span>(<span class='string'>&quot;9:&quot;</span>));
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='prelude-val'>Some</span>(<span class='ident'>NaiveTime</span>::<span class='ident'>from_hms</span>(<span class='number'>9</span>,<span class='number'>0</span>,<span class='number'>0</span>)),  <span class='ident'>naive_time_from_str</span>(<span class='string'>&quot;9&quot;</span>));
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='prelude-val'>Some</span>(<span class='ident'>NaiveTime</span>::<span class='ident'>from_hms</span>(<span class='number'>23</span>,<span class='number'>0</span>,<span class='number'>0</span>)), <span class='ident'>naive_time_from_str</span>(<span class='string'>&quot;23:0&quot;</span>));
+    }
+
+    <span class='kw'>fn</span> <span class='ident'>times</span>(<span class='ident'>yaml</span>: <span class='kw-2'>&amp;</span><span class='ident'>Yaml</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>EventTime</span><span class='op'>&gt;&gt;</span> {
+        <span class='kw'>let</span> <span class='ident'>times</span> <span class='op'>=</span> <span class='macro'>try_some</span><span class='macro'>!</span>(<span class='ident'>yaml</span>::<span class='ident'>get</span>(<span class='ident'>yaml</span>, <span class='string'>&quot;times&quot;</span>).<span class='ident'>and_then</span>(<span class='op'>|</span><span class='ident'>l</span><span class='op'>|</span><span class='ident'>l</span>.<span class='ident'>as_vec</span>()));
+        <span class='ident'>times</span>.<span class='ident'>into_iter</span>()
+            .<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>h</span><span class='op'>|</span> {
+                <span class='kw'>let</span> <span class='ident'>begin</span> <span class='op'>=</span> <span class='ident'>yaml</span>::<span class='ident'>get_str</span>(<span class='ident'>h</span>, <span class='string'>&quot;begin&quot;</span>).<span class='ident'>or</span>(<span class='prelude-val'>Some</span>(<span class='string'>&quot;00.00&quot;</span>)).<span class='ident'>and_then</span>(<span class='ident'>naive_time_from_str</span>);
+                <span class='kw'>let</span> <span class='ident'>end</span>   <span class='op'>=</span> <span class='ident'>yaml</span>::<span class='ident'>get_str</span>(<span class='ident'>h</span>, <span class='string'>&quot;end&quot;</span>).<span class='ident'>and_then</span>(<span class='ident'>naive_time_from_str</span>).<span class='ident'>or</span>(<span class='ident'>begin</span>);
+                <span class='kw'>if</span> <span class='kw'>let</span> (<span class='prelude-val'>Some</span>(<span class='ident'>begin</span>),<span class='prelude-val'>Some</span>(<span class='ident'>end</span>)) <span class='op'>=</span> (<span class='ident'>begin</span>,<span class='ident'>end</span>) {
+                    <span class='prelude-val'>Some</span>( <span class='ident'>EventTime</span>{
+                        <span class='ident'>start</span>: <span class='ident'>begin</span>,
+                        <span class='ident'>end</span>: <span class='ident'>end</span>
                     })
-                    .<span class='ident'>collect</span>::<span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span>(<span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Date</span><span class='op'>&lt;</span><span class='ident'>UTC</span><span class='op'>&gt;&gt;</span>, <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Date</span><span class='op'>&lt;</span><span class='ident'>UTC</span><span class='op'>&gt;&gt;</span>)<span class='op'>&gt;&gt;</span>()
+                } <span class='kw'>else</span> { <span class='prelude-val'>None</span> }
             })
+        .<span class='ident'>collect</span>()
+    }
+
+    <span class='doccomment'>/// Produces a list of `DateRange`s for the event.</span>
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>events</span>(<span class='ident'>yaml</span>: <span class='kw-2'>&amp;</span><span class='ident'>Yaml</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Event</span><span class='op'>&gt;&gt;</span> {
+        <span class='kw'>let</span> <span class='ident'>dates</span> <span class='op'>=</span> <span class='macro'>try_some</span><span class='macro'>!</span>(<span class='ident'>yaml</span>::<span class='ident'>get</span>(<span class='ident'>yaml</span>, <span class='string'>&quot;event/dates/&quot;</span>).<span class='ident'>and_then</span>(<span class='op'>|</span><span class='ident'>a</span><span class='op'>|</span> <span class='ident'>a</span>.<span class='ident'>as_vec</span>()));
+        <span class='ident'>dates</span>.<span class='ident'>into_iter</span>()
+            .<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>h</span><span class='op'>|</span> {
+                <span class='kw'>let</span> <span class='ident'>begin</span> <span class='op'>=</span> <span class='macro'>try_some</span><span class='macro'>!</span>(<span class='ident'>yaml</span>::<span class='ident'>get_dmy</span>(<span class='ident'>h</span>, <span class='string'>&quot;begin&quot;</span>));
+                <span class='kw'>let</span> <span class='ident'>end</span> <span class='op'>=</span> <span class='ident'>yaml</span>::<span class='ident'>get_dmy</span>(<span class='ident'>h</span>, <span class='string'>&quot;end&quot;</span>);
+                <span class='comment'>//let times = yaml::get(h, &quot;times&quot;).as_vec;</span>
+                <span class='comment'>//trace!(&quot;{:#?}&quot;, times);</span>
+                <span class='prelude-val'>Some</span>( <span class='ident'>Event</span>{
+                    <span class='ident'>begin</span>: <span class='ident'>begin</span>,
+                    <span class='ident'>end</span>: <span class='ident'>end</span>.<span class='ident'>unwrap_or</span>(<span class='ident'>begin</span>),
+                    <span class='ident'>times</span>: <span class='ident'>times</span>(<span class='ident'>h</span>).<span class='ident'>unwrap_or_else</span>(<span class='ident'>Vec</span>::<span class='ident'>new</span>)
+                })
+            })
+        .<span class='ident'>collect</span>()
     }
 }
 
@@ -915,13 +1007,17 @@
 <span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>invoice</span> {
     <span class='kw'>use</span> <span class='ident'>util</span>::<span class='ident'>yaml</span>;
     <span class='kw'>use</span> <span class='ident'>util</span>::<span class='ident'>yaml</span>::<span class='ident'>Yaml</span>;
-    <span class='kw'>use</span> <span class='ident'>chrono</span>::<span class='ident'>Datelike</span>;
+    <span class='kw'>use</span> <span class='ident'>chrono</span>::<span class='op'>*</span>;
 
     <span class='doccomment'>/// plain access to `invoice/number`</span>
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>number</span>(<span class='ident'>yaml</span>: <span class='kw-2'>&amp;</span><span class='ident'>Yaml</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>i64</span><span class='op'>&gt;</span> {
         <span class='ident'>yaml</span>::<span class='ident'>get_int</span>(<span class='ident'>yaml</span>, <span class='string'>&quot;invoice/number&quot;</span>)
         <span class='comment'>// old spec</span>
         .<span class='ident'>or_else</span>(<span class='op'>||</span> <span class='ident'>yaml</span>::<span class='ident'>get_int</span>(<span class='ident'>yaml</span>, <span class='string'>&quot;rnumber&quot;</span>))
+    }
+
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>date</span>(<span class='ident'>yaml</span>: <span class='kw-2'>&amp;</span><span class='ident'>Yaml</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Date</span><span class='op'>&lt;</span><span class='ident'>UTC</span><span class='op'>&gt;&gt;</span> {
+        <span class='kw'>super</span>::<span class='ident'>date</span>::<span class='ident'>invoice</span>(<span class='ident'>yaml</span>)
     }
 
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>number_str</span>(<span class='ident'>yaml</span>: <span class='kw-2'>&amp;</span><span class='ident'>Yaml</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>String</span><span class='op'>&gt;</span> {
@@ -961,7 +1057,7 @@
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>validate</span>(<span class='ident'>yaml</span>: <span class='kw-2'>&amp;</span><span class='ident'>Yaml</span>) <span class='op'>-&gt;</span> <span class='kw'>super</span>::<span class='ident'>SpecResult</span> {
         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>errors</span> <span class='op'>=</span> <span class='ident'>Vec</span>::<span class='ident'>new</span>();
         <span class='kw'>if</span> <span class='kw'>super</span>::<span class='ident'>date</span>::<span class='ident'>payed</span>(<span class='ident'>yaml</span>).<span class='ident'>is_none</span>() { <span class='ident'>errors</span>.<span class='ident'>push</span>(<span class='string'>&quot;payed_date&quot;</span>); }
-        <span class='comment'>//if super::date::wages(yaml).is_none(){ errors.push(&quot;wages_date&quot;);} // TODO validate WAGES_DATE also</span>
+        <span class='kw'>if</span> <span class='kw'>super</span>::<span class='ident'>date</span>::<span class='ident'>wages</span>(<span class='ident'>yaml</span>).<span class='ident'>is_none</span>(){ <span class='ident'>errors</span>.<span class='ident'>push</span>(<span class='string'>&quot;wages_date&quot;</span>);} <span class='comment'>// TODO validate WAGES_DATE also</span>
         <span class='kw'>if</span> <span class='op'>!</span><span class='ident'>errors</span>.<span class='ident'>is_empty</span>() {
             <span class='kw'>return</span> <span class='prelude-val'>Err</span>(<span class='ident'>errors</span>);
         }
@@ -993,6 +1089,16 @@
         <span class='comment'>//.or_else(|| )</span>
     }
 
+    <span class='comment'>//pub fn total_salary(yaml: &amp;Yaml) -&gt; SpecResult&lt;(f64,Currency)&gt; {</span>
+    <span class='comment'>//    let salary = salary(yaml);</span>
+    <span class='comment'>//    let total = total(yaml);</span>
+    <span class='comment'>//    match (salary, total) {</span>
+    <span class='comment'>//        (Some(0), Some(t)) if t &gt; 0  =&gt; Err(),</span>
+    <span class='comment'>//        (None, Some(_)) =&gt; Err(),</span>
+    <span class='comment'>//        (Some(s), Some(t)) =&gt; Ok((t,s))</span>
+    <span class='comment'>//    }</span>
+    <span class='comment'>//}</span>
+
     <span class='doccomment'>/// Nicely formated list of caterers with their respective service hours</span>
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>caterers_string</span>(<span class='ident'>yaml</span>: <span class='kw-2'>&amp;</span><span class='ident'>Yaml</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>String</span><span class='op'>&gt;</span> {
         <span class='ident'>caterers</span>(<span class='ident'>yaml</span>).<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>v</span><span class='op'>|</span> {
@@ -1022,26 +1128,28 @@
 
 <span class='doccomment'>/// Generates `Bill`s for offer and invoice.</span>
 <span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>billing</span> {
-    <span class='kw'>use</span> <span class='ident'>bill</span>::{<span class='ident'>BillItem</span>, <span class='ident'>Bill</span>};
+    <span class='kw'>use</span> <span class='ident'>bill</span>::{<span class='ident'>BillItem</span>, <span class='ident'>Bill</span>,<span class='ident'>Currency</span>};
 
     <span class='kw'>use</span> <span class='ident'>util</span>::<span class='ident'>yaml</span>;
     <span class='kw'>use</span> <span class='ident'>util</span>::<span class='ident'>yaml</span>::<span class='ident'>Yaml</span>;
-    <span class='kw'>use</span> ::<span class='ident'>project</span>::<span class='ident'>error</span>::{<span class='ident'>ProductResult</span>,<span class='ident'>ProductError</span>};
+    <span class='kw'>use</span> ::<span class='ident'>project</span>::<span class='ident'>product</span>::<span class='ident'>error</span>::<span class='ident'>Error</span>;
+    <span class='kw'>use</span> ::<span class='ident'>project</span>::<span class='ident'>product</span>::<span class='ident'>error</span>::<span class='prelude-ty'>Result</span>;
+    <span class='kw'>use</span> ::<span class='ident'>project</span>::<span class='ident'>product</span>::<span class='ident'>error</span>::<span class='ident'>ErrorKind</span>;
     <span class='kw'>use</span> ::<span class='ident'>project</span>::<span class='ident'>product</span>::<span class='ident'>Product</span>;
 
-    <span class='kw'>fn</span> <span class='ident'>item_from_desc_and_value</span><span class='op'>&lt;</span><span class='lifetime'>&#39;y</span><span class='op'>&gt;</span>(<span class='ident'>desc</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;y</span> <span class='ident'>Yaml</span>, <span class='ident'>values</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;y</span> <span class='ident'>Yaml</span>) <span class='op'>-&gt;</span> <span class='ident'>ProductResult</span><span class='op'>&lt;</span>(<span class='ident'>BillItem</span><span class='op'>&lt;</span><span class='ident'>Product</span><span class='op'>&lt;</span><span class='lifetime'>&#39;y</span><span class='op'>&gt;&gt;</span>,<span class='ident'>BillItem</span><span class='op'>&lt;</span><span class='ident'>Product</span><span class='op'>&lt;</span><span class='lifetime'>&#39;y</span><span class='op'>&gt;&gt;</span>)<span class='op'>&gt;</span> {
+    <span class='kw'>fn</span> <span class='ident'>item_from_desc_and_value</span><span class='op'>&lt;</span><span class='lifetime'>&#39;y</span><span class='op'>&gt;</span>(<span class='ident'>desc</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;y</span> <span class='ident'>Yaml</span>, <span class='ident'>values</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;y</span> <span class='ident'>Yaml</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span>(<span class='ident'>BillItem</span><span class='op'>&lt;</span><span class='ident'>Product</span><span class='op'>&lt;</span><span class='lifetime'>&#39;y</span><span class='op'>&gt;&gt;</span>,<span class='ident'>BillItem</span><span class='op'>&lt;</span><span class='ident'>Product</span><span class='op'>&lt;</span><span class='lifetime'>&#39;y</span><span class='op'>&gt;&gt;</span>)<span class='op'>&gt;</span> {
         <span class='kw'>let</span> <span class='ident'>product</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>Product</span>::<span class='ident'>from_desc_and_value</span>(<span class='ident'>desc</span>, <span class='ident'>values</span>));
 
         <span class='kw'>let</span> <span class='ident'>offered</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>yaml</span>::<span class='ident'>get_f64</span>(<span class='ident'>values</span>, <span class='string'>&quot;amount&quot;</span>)
-                           .<span class='ident'>ok_or</span>(<span class='ident'>ProductError</span>::<span class='ident'>MissingAmount</span>(<span class='ident'>product</span>.<span class='ident'>name</span>.<span class='ident'>to_owned</span>())));
+                           .<span class='ident'>ok_or</span>(<span class='ident'>Error</span>::<span class='ident'>from</span>(<span class='ident'>ErrorKind</span>::<span class='ident'>MissingAmount</span>(<span class='ident'>product</span>.<span class='ident'>name</span>.<span class='ident'>to_owned</span>()))));
         <span class='kw'>let</span> <span class='ident'>sold</span> <span class='op'>=</span> <span class='ident'>yaml</span>::<span class='ident'>get_f64</span>(<span class='ident'>values</span>, <span class='string'>&quot;sold&quot;</span>);
         <span class='kw'>let</span> <span class='ident'>sold</span> <span class='op'>=</span> <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Some</span>(<span class='ident'>returned</span>) <span class='op'>=</span> <span class='ident'>yaml</span>::<span class='ident'>get_f64</span>(<span class='ident'>values</span>, <span class='string'>&quot;returned&quot;</span>) {
             <span class='comment'>// if &quot;returned&quot;, there must be no &quot;sold&quot;</span>
             <span class='kw'>if</span> <span class='ident'>sold</span>.<span class='ident'>is_some</span>() {
-                <span class='kw'>return</span> <span class='prelude-val'>Err</span>(<span class='ident'>ProductError</span>::<span class='ident'>AmbiguousAmounts</span>(<span class='ident'>product</span>.<span class='ident'>name</span>.<span class='ident'>to_owned</span>()));
+                <span class='kw'>return</span> <span class='prelude-val'>Err</span>(<span class='ident'>ErrorKind</span>::<span class='ident'>AmbiguousAmounts</span>(<span class='ident'>product</span>.<span class='ident'>name</span>.<span class='ident'>to_owned</span>()).<span class='ident'>into</span>());
             }
             <span class='kw'>if</span> <span class='ident'>returned</span> <span class='op'>&gt;</span> <span class='ident'>offered</span> {
-                <span class='kw'>return</span> <span class='prelude-val'>Err</span>(<span class='ident'>ProductError</span>::<span class='ident'>TooMuchReturned</span>(<span class='ident'>product</span>.<span class='ident'>name</span>.<span class='ident'>to_owned</span>()));
+                <span class='kw'>return</span> <span class='prelude-val'>Err</span>(<span class='ident'>ErrorKind</span>::<span class='ident'>TooMuchReturned</span>(<span class='ident'>product</span>.<span class='ident'>name</span>.<span class='ident'>to_owned</span>()).<span class='ident'>into</span>());
             }
             <span class='ident'>offered</span> <span class='op'>-</span> <span class='ident'>returned</span>
         } <span class='kw'>else</span> <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Some</span>(<span class='ident'>sold</span>) <span class='op'>=</span> <span class='ident'>sold</span> {
@@ -1054,28 +1162,30 @@
     }
 
     <span class='doccomment'>/// Produces two `Bill`s, one for the offer and one for the invoice</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>bills</span>(<span class='ident'>yaml</span>: <span class='kw-2'>&amp;</span><span class='ident'>Yaml</span>) <span class='op'>-&gt;</span> <span class='ident'>ProductResult</span><span class='op'>&lt;</span>(<span class='ident'>Bill</span><span class='op'>&lt;</span><span class='ident'>Product</span><span class='op'>&gt;</span>, <span class='ident'>Bill</span><span class='op'>&lt;</span><span class='ident'>Product</span><span class='op'>&gt;</span>)<span class='op'>&gt;</span>{
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>bills</span>(<span class='ident'>yaml</span>: <span class='kw-2'>&amp;</span><span class='ident'>Yaml</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span>(<span class='ident'>Bill</span><span class='op'>&lt;</span><span class='ident'>Product</span><span class='op'>&gt;</span>, <span class='ident'>Bill</span><span class='op'>&lt;</span><span class='ident'>Product</span><span class='op'>&gt;</span>)<span class='op'>&gt;</span>{
         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>offer</span>: <span class='ident'>Bill</span><span class='op'>&lt;</span><span class='ident'>Product</span><span class='op'>&gt;</span> <span class='op'>=</span> <span class='ident'>Bill</span>::<span class='ident'>new</span>();
         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>invoice</span>: <span class='ident'>Bill</span><span class='op'>&lt;</span><span class='ident'>Product</span><span class='op'>&gt;</span> <span class='op'>=</span> <span class='ident'>Bill</span>::<span class='ident'>new</span>();
 
         <span class='kw'>let</span> <span class='ident'>service</span> <span class='op'>=</span> <span class='op'>||</span> <span class='ident'>Product</span> {
             <span class='ident'>name</span>: <span class='string'>&quot;Service&quot;</span>,
             <span class='ident'>unit</span>: <span class='prelude-val'>Some</span>(<span class='string'>&quot;h&quot;</span>),
-            <span class='ident'>tax</span>: ::<span class='ident'>ordered_float</span>::<span class='ident'>OrderedFloat</span>(<span class='number'>0f64</span>),
-            <span class='ident'>price</span>: <span class='kw'>super</span>::<span class='ident'>hours</span>::<span class='ident'>salary</span>(<span class='kw-2'>&amp;</span><span class='ident'>yaml</span>).<span class='ident'>unwrap</span>()
+            <span class='ident'>tax</span>: ::<span class='ident'>ordered_float</span>::<span class='ident'>OrderedFloat</span>(<span class='number'>0f64</span>), <span class='comment'>// TODO this ought to be in the config</span>
+            <span class='ident'>price</span>: <span class='kw'>super</span>::<span class='ident'>hours</span>::<span class='ident'>salary</span>(<span class='kw-2'>&amp;</span><span class='ident'>yaml</span>).<span class='ident'>unwrap_or</span>(<span class='ident'>Currency</span>(<span class='prelude-val'>None</span>,<span class='number'>0</span>))
         };
 
         <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Some</span>(<span class='ident'>total</span>) <span class='op'>=</span> <span class='kw'>super</span>::<span class='ident'>hours</span>::<span class='ident'>total</span>(<span class='kw-2'>&amp;</span><span class='ident'>yaml</span>) {
-            <span class='ident'>offer</span>.<span class='ident'>add_item</span>(<span class='ident'>total</span>, <span class='ident'>service</span>());
-            <span class='ident'>invoice</span>.<span class='ident'>add_item</span>(<span class='ident'>total</span>, <span class='ident'>service</span>());
+            <span class='kw'>if</span> <span class='ident'>total</span>.<span class='ident'>is_normal</span>() {
+                <span class='ident'>offer</span>.<span class='ident'>add_item</span>(<span class='ident'>total</span>, <span class='ident'>service</span>());
+                <span class='ident'>invoice</span>.<span class='ident'>add_item</span>(<span class='ident'>total</span>, <span class='ident'>service</span>());
+            }
         }
 
-        <span class='kw'>let</span> <span class='ident'>raw_products</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>yaml</span>::<span class='ident'>get_hash</span>(<span class='ident'>yaml</span>, <span class='string'>&quot;products&quot;</span>).<span class='ident'>ok_or</span>(<span class='ident'>ProductError</span>::<span class='ident'>UnknownFormat</span>));
+        <span class='kw'>let</span> <span class='ident'>raw_products</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>yaml</span>::<span class='ident'>get_hash</span>(<span class='ident'>yaml</span>, <span class='string'>&quot;products&quot;</span>).<span class='ident'>ok_or</span>(<span class='ident'>Error</span>::<span class='ident'>from</span>(<span class='ident'>ErrorKind</span>::<span class='ident'>UnknownFormat</span>)));
 
         <span class='kw'>for</span> (<span class='ident'>desc</span>,<span class='ident'>values</span>) <span class='kw'>in</span> <span class='ident'>raw_products</span> {
             <span class='kw'>let</span> (<span class='ident'>offer_item</span>, <span class='ident'>invoice_item</span>) <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>item_from_desc_and_value</span>(<span class='ident'>desc</span>, <span class='ident'>values</span>));
-            <span class='ident'>offer</span>.<span class='ident'>add</span>(<span class='ident'>offer_item</span>);
-            <span class='ident'>invoice</span>.<span class='ident'>add</span>(<span class='ident'>invoice_item</span>);
+            <span class='kw'>if</span> <span class='ident'>offer_item</span>.<span class='ident'>amount</span>.<span class='ident'>is_normal</span>()   { <span class='ident'>offer</span>.<span class='ident'>add</span>(<span class='ident'>offer_item</span>); }
+            <span class='kw'>if</span> <span class='ident'>invoice_item</span>.<span class='ident'>amount</span>.<span class='ident'>is_normal</span>() { <span class='ident'>invoice</span>.<span class='ident'>add</span>(<span class='ident'>invoice_item</span>); }
         }
 
         <span class='prelude-val'>Ok</span>((<span class='ident'>offer</span>,<span class='ident'>invoice</span>))
@@ -1138,11 +1248,9 @@
     <script>
         window.rootPath = "../../../../";
         window.currentCrate = "asciii";
-        window.playgroundUrl = "";
     </script>
     <script src="../../../../jquery.js"></script>
     <script src="../../../../main.js"></script>
-    
     <script defer src="../../../../search-index.js"></script>
 </body>
 </html>

@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="rustdoc">
-    <meta name="description" content="Source to the Rust file `/home/hendrik/.cargo/registry/src/github.com-1ecc6299db9ec823/libgit2-sys-0.4.5/lib.rs`.">
+    <meta name="description" content="Source to the Rust file `/home/hendrik/.cargo/registry/src/github.com-1ecc6299db9ec823/libgit2-sys-0.5.1/lib.rs`.">
     <meta name="keywords" content="rust, rustlang, rust-lang">
 
     <title>lib.rs.html -- source</title>
@@ -2602,6 +2602,33 @@
 <span id="2558">2558</span>
 <span id="2559">2559</span>
 <span id="2560">2560</span>
+<span id="2561">2561</span>
+<span id="2562">2562</span>
+<span id="2563">2563</span>
+<span id="2564">2564</span>
+<span id="2565">2565</span>
+<span id="2566">2566</span>
+<span id="2567">2567</span>
+<span id="2568">2568</span>
+<span id="2569">2569</span>
+<span id="2570">2570</span>
+<span id="2571">2571</span>
+<span id="2572">2572</span>
+<span id="2573">2573</span>
+<span id="2574">2574</span>
+<span id="2575">2575</span>
+<span id="2576">2576</span>
+<span id="2577">2577</span>
+<span id="2578">2578</span>
+<span id="2579">2579</span>
+<span id="2580">2580</span>
+<span id="2581">2581</span>
+<span id="2582">2582</span>
+<span id="2583">2583</span>
+<span id="2584">2584</span>
+<span id="2585">2585</span>
+<span id="2586">2586</span>
+<span id="2587">2587</span>
 </pre><pre class='rust '>
 <span class='attribute'>#<span class='op'>!</span>[<span class='ident'>doc</span>(<span class='ident'>html_root_url</span> <span class='op'>=</span> <span class='string'>&quot;http://alexcrichton.com/git2-rs&quot;</span>)]</span>
 <span class='attribute'>#<span class='op'>!</span>[<span class='ident'>allow</span>(<span class='ident'>non_camel_case_types</span>)]</span>
@@ -2609,6 +2636,8 @@
 <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>libc</span>;
 <span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>feature</span> <span class='op'>=</span> <span class='string'>&quot;ssh&quot;</span>)]</span>
 <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>libssh2_sys</span> <span class='kw'>as</span> <span class='ident'>libssh2</span>;
+<span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>feature</span> <span class='op'>=</span> <span class='string'>&quot;curl&quot;</span>)]</span>
+<span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>curl_sys</span>;
 <span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>all</span>(<span class='ident'>unix</span>, <span class='ident'>not</span>(<span class='ident'>target_os</span> <span class='op'>=</span> <span class='string'>&quot;macos&quot;</span>), <span class='ident'>not</span>(<span class='ident'>target_os</span> <span class='op'>=</span> <span class='string'>&quot;ios&quot;</span>), <span class='ident'>feature</span> <span class='op'>=</span> <span class='string'>&quot;https&quot;</span>))]</span>
 <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>openssl_sys</span> <span class='kw'>as</span> <span class='ident'>openssl</span>;
 <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>libz_sys</span> <span class='kw'>as</span> <span class='ident'>libz</span>;
@@ -2623,6 +2652,7 @@
 <span class='kw'>pub</span> <span class='kw'>const</span> <span class='ident'>GIT_REMOTE_CALLBACKS_VERSION</span>: <span class='ident'>c_uint</span> <span class='op'>=</span> <span class='number'>1</span>;
 <span class='kw'>pub</span> <span class='kw'>const</span> <span class='ident'>GIT_STATUS_OPTIONS_VERSION</span>: <span class='ident'>c_uint</span> <span class='op'>=</span> <span class='number'>1</span>;
 <span class='kw'>pub</span> <span class='kw'>const</span> <span class='ident'>GIT_BLAME_OPTIONS_VERSION</span>: <span class='ident'>c_uint</span> <span class='op'>=</span> <span class='number'>1</span>;
+<span class='kw'>pub</span> <span class='kw'>const</span> <span class='ident'>GIT_PROXY_OPTIONS_VERSION</span>: <span class='ident'>c_uint</span> <span class='op'>=</span> <span class='number'>1</span>;
 
 <span class='macro'>macro_rules</span><span class='macro'>!</span> <span class='ident'>git_enum</span> {
     (<span class='kw'>pub</span> <span class='kw'>enum</span> <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>name</span>:<span class='ident'>ident</span> { $(<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>variants</span>:<span class='ident'>tt</span>)<span class='op'>*</span> }) <span class='op'>=&gt;</span> {
@@ -2934,6 +2964,7 @@
     <span class='kw'>pub</span> <span class='ident'>prune</span>: <span class='ident'>git_fetch_prune_t</span>,
     <span class='kw'>pub</span> <span class='ident'>update_fetchhead</span>: <span class='ident'>c_int</span>,
     <span class='kw'>pub</span> <span class='ident'>download_tags</span>: <span class='ident'>git_remote_autotag_option_t</span>,
+    <span class='kw'>pub</span> <span class='ident'>proxy_opts</span>: <span class='ident'>git_proxy_options</span>,
     <span class='kw'>pub</span> <span class='ident'>custom_headers</span>: <span class='ident'>git_strarray</span>,
 }
 
@@ -3443,6 +3474,7 @@
     <span class='kw'>pub</span> <span class='ident'>version</span>: <span class='ident'>c_uint</span>,
     <span class='kw'>pub</span> <span class='ident'>pb_parallelism</span>: <span class='ident'>c_uint</span>,
     <span class='kw'>pub</span> <span class='ident'>callbacks</span>: <span class='ident'>git_remote_callbacks</span>,
+    <span class='kw'>pub</span> <span class='ident'>proxy_opts</span>: <span class='ident'>git_proxy_options</span>,
     <span class='kw'>pub</span> <span class='ident'>custom_headers</span>: <span class='ident'>git_strarray</span>,
 }
 
@@ -3724,6 +3756,7 @@
 
 <span class='attribute'>#[<span class='ident'>repr</span>(<span class='ident'>C</span>)]</span>
 <span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>git_diff_binary</span> {
+    <span class='kw'>pub</span> <span class='ident'>contains_data</span>: <span class='ident'>c_uint</span>,
     <span class='kw'>pub</span> <span class='ident'>old_file</span>: <span class='ident'>git_diff_binary_file</span>,
     <span class='kw'>pub</span> <span class='ident'>new_file</span>: <span class='ident'>git_diff_binary_file</span>,
 }
@@ -3752,6 +3785,7 @@
     <span class='kw'>pub</span> <span class='ident'>target_limit</span>: <span class='ident'>c_uint</span>,
     <span class='kw'>pub</span> <span class='ident'>metric</span>: <span class='op'>*</span><span class='kw-2'>mut</span> <span class='ident'>git_diff_similarity_metric</span>,
     <span class='kw'>pub</span> <span class='ident'>recursion_limit</span>: <span class='ident'>c_uint</span>,
+    <span class='kw'>pub</span> <span class='ident'>default_driver</span>: <span class='op'>*</span><span class='kw'>const</span> <span class='ident'>c_char</span>,
     <span class='kw'>pub</span> <span class='ident'>file_favor</span>: <span class='ident'>git_merge_file_favor_t</span>,
     <span class='kw'>pub</span> <span class='ident'>file_flags</span>: <span class='ident'>git_merge_file_flag_t</span>,
 }
@@ -3806,6 +3840,7 @@
                            <span class='op'>*</span><span class='kw'>const</span> <span class='ident'>c_char</span>,
                            <span class='ident'>git_cred_acquire_cb</span>,
                            <span class='op'>*</span><span class='kw-2'>mut</span> <span class='ident'>c_void</span>,
+                           <span class='op'>*</span><span class='kw'>const</span> <span class='ident'>git_proxy_options</span>,
                            <span class='ident'>c_int</span>, <span class='ident'>c_int</span>) <span class='op'>-&gt;</span> <span class='ident'>c_int</span>,
     <span class='kw'>pub</span> <span class='ident'>ls</span>: <span class='kw'>extern</span> <span class='kw'>fn</span>(<span class='op'>*</span><span class='kw-2'>mut</span> <span class='op'>*</span><span class='kw-2'>mut</span> <span class='op'>*</span><span class='kw'>const</span> <span class='ident'>git_remote_head</span>,
                       <span class='op'>*</span><span class='kw-2'>mut</span> <span class='ident'>size_t</span>,
@@ -3827,6 +3862,24 @@
     <span class='kw'>pub</span> <span class='ident'>cancel</span>: <span class='kw'>extern</span> <span class='kw'>fn</span>(<span class='op'>*</span><span class='kw-2'>mut</span> <span class='ident'>git_transport</span>),
     <span class='kw'>pub</span> <span class='ident'>close</span>: <span class='kw'>extern</span> <span class='kw'>fn</span>(<span class='op'>*</span><span class='kw-2'>mut</span> <span class='ident'>git_transport</span>) <span class='op'>-&gt;</span> <span class='ident'>c_int</span>,
     <span class='kw'>pub</span> <span class='ident'>free</span>: <span class='kw'>extern</span> <span class='kw'>fn</span>(<span class='op'>*</span><span class='kw-2'>mut</span> <span class='ident'>git_transport</span>),
+}
+
+<span class='attribute'>#[<span class='ident'>repr</span>(<span class='ident'>C</span>)]</span>
+<span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>git_proxy_options</span> {
+    <span class='kw'>pub</span> <span class='ident'>version</span>: <span class='ident'>c_uint</span>,
+    <span class='kw'>pub</span> <span class='ident'>kind</span>: <span class='ident'>git_proxy_t</span>,
+    <span class='kw'>pub</span> <span class='ident'>url</span>: <span class='op'>*</span><span class='kw'>const</span> <span class='ident'>c_char</span>,
+    <span class='kw'>pub</span> <span class='ident'>credentials</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>git_cred_acquire_cb</span><span class='op'>&gt;</span>,
+    <span class='kw'>pub</span> <span class='ident'>certificate_check</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>git_transport_certificate_check_cb</span><span class='op'>&gt;</span>,
+    <span class='kw'>pub</span> <span class='ident'>payload</span>: <span class='op'>*</span><span class='kw-2'>mut</span> <span class='ident'>c_void</span>,
+}
+
+<span class='macro'>git_enum</span><span class='macro'>!</span> {
+    <span class='kw'>pub</span> <span class='kw'>enum</span> <span class='ident'>git_proxy_t</span> {
+        <span class='ident'>GIT_PROXY_NONE</span> <span class='op'>=</span> <span class='number'>0</span>,
+        <span class='ident'>GIT_PROXY_AUTO</span> <span class='op'>=</span> <span class='number'>1</span>,
+        <span class='ident'>GIT_PROXY_SPECIFIED</span> <span class='op'>=</span> <span class='number'>2</span>,
+    }
 }
 
 <span class='macro'>git_enum</span><span class='macro'>!</span> {
@@ -4152,6 +4205,7 @@
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>git_remote_connect</span>(<span class='ident'>remote</span>: <span class='op'>*</span><span class='kw-2'>mut</span> <span class='ident'>git_remote</span>,
                               <span class='ident'>dir</span>: <span class='ident'>git_direction</span>,
                               <span class='ident'>callbacks</span>: <span class='op'>*</span><span class='kw'>const</span> <span class='ident'>git_remote_callbacks</span>,
+                              <span class='ident'>proxy_opts</span>: <span class='op'>*</span><span class='kw'>const</span> <span class='ident'>git_proxy_options</span>,
                               <span class='ident'>custom_headers</span>: <span class='op'>*</span><span class='kw'>const</span> <span class='ident'>git_strarray</span>) <span class='op'>-&gt;</span> <span class='ident'>c_int</span>;
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>git_remote_connected</span>(<span class='ident'>remote</span>: <span class='op'>*</span><span class='kw'>const</span> <span class='ident'>git_remote</span>) <span class='op'>-&gt;</span> <span class='ident'>c_int</span>;
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>git_remote_disconnect</span>(<span class='ident'>remote</span>: <span class='op'>*</span><span class='kw-2'>mut</span> <span class='ident'>git_remote</span>);
@@ -5151,8 +5205,8 @@
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>git_packbuilder_foreach</span>(<span class='ident'>pb</span>: <span class='op'>*</span><span class='kw-2'>mut</span> <span class='ident'>git_packbuilder</span>,
                                    <span class='ident'>cb</span>: <span class='ident'>git_packbuilder_foreach_cb</span>,
                                    <span class='ident'>payload</span>: <span class='op'>*</span><span class='kw-2'>mut</span> <span class='ident'>c_void</span>) <span class='op'>-&gt;</span> <span class='ident'>c_int</span>;
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>git_packbuilder_object_count</span>(<span class='ident'>pb</span>: <span class='op'>*</span><span class='kw-2'>mut</span> <span class='ident'>git_packbuilder</span>) <span class='op'>-&gt;</span> <span class='ident'>u32</span>;
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>git_packbuilder_written</span>(<span class='ident'>pb</span>: <span class='op'>*</span><span class='kw-2'>mut</span> <span class='ident'>git_packbuilder</span>) <span class='op'>-&gt;</span> <span class='ident'>u32</span>;
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>git_packbuilder_object_count</span>(<span class='ident'>pb</span>: <span class='op'>*</span><span class='kw-2'>mut</span> <span class='ident'>git_packbuilder</span>) <span class='op'>-&gt;</span> <span class='ident'>size_t</span>;
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>git_packbuilder_written</span>(<span class='ident'>pb</span>: <span class='op'>*</span><span class='kw-2'>mut</span> <span class='ident'>git_packbuilder</span>) <span class='op'>-&gt;</span> <span class='ident'>size_t</span>;
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>git_packbuilder_set_callbacks</span>(<span class='ident'>pb</span>: <span class='op'>*</span><span class='kw-2'>mut</span> <span class='ident'>git_packbuilder</span>,
                                          <span class='ident'>progress_cb</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>git_packbuilder_progress</span><span class='op'>&gt;</span>,
                                          <span class='ident'>progress_cb_payload</span>: <span class='op'>*</span><span class='kw-2'>mut</span> <span class='ident'>c_void</span>) <span class='op'>-&gt;</span> <span class='ident'>c_int</span>;
@@ -5220,11 +5274,9 @@
     <script>
         window.rootPath = "../../";
         window.currentCrate = "libgit2_sys";
-        window.playgroundUrl = "";
     </script>
     <script src="../../jquery.js"></script>
     <script src="../../main.js"></script>
-    
     <script defer src="../../search-index.js"></script>
 </body>
 </html>

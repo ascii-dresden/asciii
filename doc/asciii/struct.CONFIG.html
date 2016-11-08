@@ -48,7 +48,8 @@
                        [<span class='inner'>&#x2212;</span>]
                    </a>
                </span></span></h1>
-<pre class='rust struct'>pub struct CONFIG { /* fields omitted */ }</pre><h2 id='deref-methods'>Methods from <a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.Deref.html' title='core::ops::Deref'>__Deref</a>&lt;Target=<a class='struct' href='../asciii/config/struct.ConfigReader.html' title='asciii::config::ConfigReader'>ConfigReader</a>&gt;</h2><div class='impl-items'><h4 id='method.get' class='method'><span id='get.v' class='invisible'><code>fn <a href='#method.get' class='fnname'>get</a>(&amp;self, path: &amp;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;&amp;<a class='enum' href='../asciii/util/yaml/enum.Yaml.html' title='asciii::util::yaml::Yaml'>Yaml</a>&gt;</code></span></h4>
+<pre class='rust struct'>pub struct CONFIG { /* fields omitted */ }</pre><div class='docblock'><p>Static <code>ConfigReader</code> to be able to access the configuration from everywhere.</p>
+</div><h2 id='deref-methods'>Methods from <a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.Deref.html' title='core::ops::Deref'>__Deref</a>&lt;Target=<a class='struct' href='../asciii/config/struct.ConfigReader.html' title='asciii::config::ConfigReader'>ConfigReader</a>&gt;</h2><div class='impl-items'><h4 id='method.get' class='method'><span id='get.v' class='invisible'><code>fn <a href='#method.get' class='fnname'>get</a>(&amp;self, path: &amp;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;&amp;<a class='enum' href='../asciii/util/yaml/enum.Yaml.html' title='asciii::util::yaml::Yaml'>Yaml</a>&gt;</code></span></h4>
 <div class='docblock'><p>Returns whatever it finds in that position</p>
 
 <p>Supports simple path syntax: <code>top/middle/child/node</code></p>
@@ -60,14 +61,12 @@
 You should have a default config for everything that you use.</p>
 </div><h4 id='method.get_str' class='method'><span id='get_str.v' class='invisible'><code>fn <a href='#method.get_str' class='fnname'>get_str</a>(&amp;self, key: &amp;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;&amp;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>&gt;</code></span></h4>
 <div class='docblock'><p>Returns the string in the position or an empty string</p>
-
-<h1 id='panics-1' class='section-header'><a href='#panics-1'>Panics</a></h1>
-<p>This panics if nothing is found.
-You should have a default config for everything that you use.</p>
+</div><h4 id='method.get_strs' class='method'><span id='get_strs.v' class='invisible'><code>fn <a href='#method.get_strs' class='fnname'>get_strs</a>(&amp;self, key: &amp;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;&amp;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>&gt;&gt;</code></span></h4>
+<div class='docblock'><p>Returns the a vec of &amp;strs if possible</p>
 </div><h4 id='method.get_to_string' class='method'><span id='get_to_string.v' class='invisible'><code>fn <a href='#method.get_to_string' class='fnname'>get_to_string</a>(&amp;self, key: &amp;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>&gt;</code></span></h4>
 <div class='docblock'><p>Returns the string in the position or an empty string</p>
 
-<h1 id='panics-2' class='section-header'><a href='#panics-2'>Panics</a></h1>
+<h1 id='panics-1' class='section-header'><a href='#panics-1'>Panics</a></h1>
 <p>This panics if nothing is found.
 You should have a default config for everything that you use.</p>
 </div><h4 id='method.get_f64' class='method'><span id='get_f64.v' class='invisible'><code>fn <a href='#method.get_f64' class='fnname'>get_f64</a>(&amp;self, key: &amp;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a>&gt;</code></span></h4>
@@ -75,7 +74,7 @@ You should have a default config for everything that you use.</p>
 </div><h4 id='method.get_bool' class='method'><span id='get_bool.v' class='invisible'><code>fn <a href='#method.get_bool' class='fnname'>get_bool</a>(&amp;self, key: &amp;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></code></span></h4>
 <div class='docblock'><p>Returns the boolean in the position or <code>false</code></p>
 
-<h1 id='panics-3' class='section-header'><a href='#panics-3'>Panics</a></h1>
+<h1 id='panics-2' class='section-header'><a href='#panics-2'>Panics</a></h1>
 <p>This panics if nothing is found.
 You should have a default config for everything that you use.</p>
 </div></div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><span class='in-band'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.Deref.html' title='core::ops::Deref'>__Deref</a> for <a class='struct' href='../asciii/struct.CONFIG.html' title='asciii::CONFIG'>CONFIG</a></code></span><span class='out-of-band'></span></h3>
@@ -139,11 +138,9 @@ You should have a default config for everything that you use.</p>
     <script>
         window.rootPath = "../";
         window.currentCrate = "asciii";
-        window.playgroundUrl = "";
     </script>
     <script src="../jquery.js"></script>
     <script src="../main.js"></script>
-    
     <script defer src="../search-index.js"></script>
 </body>
 </html>

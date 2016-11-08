@@ -1,1 +1,1 @@
-initSidebarItems({"enum":[["StorageError","Error that may occur in Storage"]]});
+initSidebarItems({"enum":[["ErrorKind",""]],"struct":[["StorageError",""]],"trait":[["ChainErr",""]],"type":[["Result",""]]});

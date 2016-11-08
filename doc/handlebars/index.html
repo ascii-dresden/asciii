@@ -47,7 +47,7 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-0' class='srclink' href='../src/handlebars/lib.rs.html#1-285' title='goto source code'>[src]</a></span></h1>
+               </span><a id='src-0' class='srclink' href='../src/handlebars/lib.rs.html#1-284' title='goto source code'>[src]</a></span></h1>
 <div class='docblock'>
 <h1 id='handlebars' class='section-header'><a href='#handlebars'>Handlebars</a></h1>
 <p>Handlebars is a modern and extensible templating solution originally created in the JavaScript world. It&#39;s used by many popular frameworks like <a href="http://emberjs.com">Ember.js</a> and Chaplin. It&#39;s also ported to some other platforms such as <a href="https://github.com/jknack/handlebars.java">Java</a>.</p>
@@ -84,7 +84,7 @@ yourself.</p>
 }
 
 <span class='doccomment'>/// register the helper</span>
-<span class='ident'>handlebars</span>.<span class='ident'>register_helper</span>(<span class='string'>&quot;hex&quot;</span>, <span class='ident'>Box</span>::<span class='ident'>new</span>(<span class='ident'>hex_helper</span>));<a class='test-arrow' target='_blank' href=''>Run</a></pre>
+<span class='ident'>handlebars</span>.<span class='ident'>register_helper</span>(<span class='string'>&quot;hex&quot;</span>, <span class='ident'>Box</span>::<span class='ident'>new</span>(<span class='ident'>hex_helper</span>));</pre>
 
 <h4 id='template-inheritance' class='section-header'><a href='#template-inheritance'>Template inheritance</a></h4>
 <p>Every time I look into a templating system, I will investigate its
@@ -129,7 +129,7 @@ your types.</li>
   <span class='comment'>//compile returns an Option, we use unwrap() to deref it directly here</span>
   <span class='ident'>handlebars</span>.<span class='ident'>register_template_string</span>(<span class='string'>&quot;helloworld&quot;</span>, <span class='ident'>source</span>.<span class='ident'>to_string</span>())
           .<span class='ident'>ok</span>().<span class='ident'>unwrap</span>();
-}<a class='test-arrow' target='_blank' href=''>Run</a></pre>
+}</pre>
 
 <p>On registeration, the template is parsed and cached in the registry. So further
 usage will benifite from the one-time work. Also features like include, inheritance
@@ -183,7 +183,7 @@ without registeration.</p>
       <span class='ident'>age</span>: <span class='number'>27</span>
   };
   <span class='kw'>let</span> <span class='ident'>result</span> <span class='op'>=</span> <span class='ident'>handlebars</span>.<span class='ident'>render</span>(<span class='string'>&quot;hello&quot;</span>, <span class='kw-2'>&amp;</span><span class='ident'>data</span>);
-}<a class='test-arrow' target='_blank' href=''>Run</a></pre>
+}</pre>
 
 <p>Or if you don&#39;t need the template to be cached or referenced by other ones, you can
 simply render it without registering.</p>
@@ -199,7 +199,7 @@ simply render it without registering.</p>
       <span class='ident'>age</span>: <span class='number'>27</span>
   };
   <span class='kw'>let</span> <span class='ident'>result</span> <span class='op'>=</span> <span class='ident'>handlebars</span>.<span class='ident'>template_render</span>(<span class='string'>&quot;Hello, {{name}}&quot;</span>, <span class='kw-2'>&amp;</span><span class='ident'>data</span>);
-}<a class='test-arrow' target='_blank' href=''>Run</a></pre>
+}</pre>
 
 <h4 id='escaping' class='section-header'><a href='#escaping'>Escaping</a></h4>
 <p>As per the handlebars spec, output using <code>{{expression}}</code> is escaped by default (to be precise, the characters <code>&amp;&quot;&lt;&gt;</code> are replaced by their respective html / xml entities). However, since the use cases of a rust template engine are probably a bit more diverse than those of a JavaScript one, this implementation allows the user to supply a custom escape function to be used instead. For more information see the <code>EscapeFn</code> type and <code>Handlebars::register_escape_fn()</code> method.</p>
@@ -250,7 +250,7 @@ simply render it without registering.</p>
       }));
 
   <span class='comment'>//...</span>
-}<a class='test-arrow' target='_blank' href=''>Run</a></pre>
+}</pre>
 
 <h4 id='arguments-of-helpdef' class='section-header'><a href='#arguments-of-helpdef'>Arguments of HelpDef</a></h4>
 <p>You can get data from the <code>Helper</code> argument about the template information:</p>
@@ -328,15 +328,15 @@ simply render it without registering.</p>
                            <td class='docblock-short'>
                                 
                            </td>
-                       </tr></table><h2 id='enums' class='section-header'><a href="#enums">Enums</a></h2>
-<table>
+                       </tr>
                        <tr class=' module-item'>
-                           <td><a class='enum' href='enum.TemplateError.html'
+                           <td><a class='struct' href='struct.TemplateError.html'
                                   title='handlebars::TemplateError'>TemplateError</a></td>
                            <td class='docblock-short'>
-                                <p>Template parsing error</p>
+                                
                            </td>
-                       </tr>
+                       </tr></table><h2 id='enums' class='section-header'><a href="#enums">Enums</a></h2>
+<table>
                        <tr class=' module-item'>
                            <td><a class='enum' href='enum.TemplateFileError.html'
                                   title='handlebars::TemplateFileError'>TemplateFileError</a></td>
@@ -461,11 +461,9 @@ to escape potentially problematic characters in a string.</p>
     <script>
         window.rootPath = "../";
         window.currentCrate = "handlebars";
-        window.playgroundUrl = "";
     </script>
     <script src="../jquery.js"></script>
     <script src="../main.js"></script>
-    
     <script defer src="../search-index.js"></script>
 </body>
 </html>

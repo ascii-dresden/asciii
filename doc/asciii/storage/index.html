@@ -47,7 +47,7 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-1233' class='srclink' href='../../src/asciii/src/storage/mod.rs.html#1-606' title='goto source code'>[src]</a></span></h1>
+               </span><a id='src-884' class='srclink' href='../../src/asciii/src/storage/mod.rs.html#1-667' title='goto source code'>[src]</a></span></h1>
 <div class='docblock'><p>Manages file structure of templates, working directory and archives.</p>
 
 <p>This module takes care of project file management.</p>
@@ -67,8 +67,7 @@
 ...
 </code></pre>
 </div><h2 id='reexports' class='section-header'><a href="#reexports">Reexports</a></h2>
-<table><tr><td><code>pub use self::<a class='mod'
-                                       href='./error/index.html'>error</a>::<a class='enum' href='../../asciii/storage/error/enum.StorageError.html' title='asciii::storage::error::StorageError'>StorageError</a>;</code></td></tr><tr><td><code>pub use self::<a class='mod'
+<table><tr><td><code>pub use self::error::{<a class='struct' href='../../asciii/storage/error/struct.StorageError.html' title='asciii::storage::error::StorageError'>StorageError</a>, <a class='enum' href='../../asciii/storage/error/enum.ErrorKind.html' title='asciii::storage::error::ErrorKind'>ErrorKind</a>};</code></td></tr><tr><td><code>pub use self::<a class='mod'
                                        href='./storable/index.html'>storable</a>::<a class='trait' href='../../asciii/storage/storable/trait.Storable.html' title='asciii::storage::storable::Storable'>Storable</a>;</code></td></tr></table><h2 id='modules' class='section-header'><a href="#modules">Modules</a></h2>
 <table>
                        <tr class=' module-item'>
@@ -101,13 +100,6 @@
                            </td>
                        </tr>
                        <tr class=' module-item'>
-                           <td><a class='struct' href='struct.Selection.html'
-                                  title='asciii::storage::Selection'>Selection</a></td>
-                           <td class='docblock-short'>
-                               [<em class='stab deprecated'>Deprecated</em>] 
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
                            <td><a class='struct' href='struct.Storage.html'
                                   title='asciii::storage::Storage'>Storage</a></td>
                            <td class='docblock-short'>
@@ -135,7 +127,8 @@
                            <td><a class='type' href='type.StorageResult.html'
                                   title='asciii::storage::StorageResult'>StorageResult</a></td>
                            <td class='docblock-short'>
-                                <p>Result returned by Storage</p>
+                                <p>Result returned by Storage
+TODO move to <code>error</code> module</p>
                            </td>
                        </tr>
                        <tr class=' module-item'>
@@ -200,11 +193,9 @@
     <script>
         window.rootPath = "../../";
         window.currentCrate = "asciii";
-        window.playgroundUrl = "";
     </script>
     <script src="../../jquery.js"></script>
     <script src="../../main.js"></script>
-    
     <script defer src="../../search-index.js"></script>
 </body>
 </html>

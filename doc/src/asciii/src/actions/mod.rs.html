@@ -332,7 +332,6 @@
 <span id="288">288</span>
 <span id="289">289</span>
 <span id="290">290</span>
-<span id="291">291</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! General actions</span>
 
@@ -341,6 +340,7 @@
 
 
 <span class='kw'>use</span> <span class='ident'>chrono</span>::<span class='op'>*</span>;
+<span class='kw'>use</span> <span class='ident'>bill</span>::<span class='ident'>Currency</span>;
 
 <span class='kw'>use</span> <span class='ident'>std</span>::{<span class='ident'>env</span>,<span class='ident'>fs</span>};
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>time</span>;
@@ -349,7 +349,7 @@
 
 <span class='kw'>use</span> <span class='ident'>util</span>;
 <span class='kw'>use</span> <span class='kw'>super</span>::<span class='ident'>BillType</span>;
-<span class='kw'>use</span> <span class='ident'>storage</span>::{<span class='ident'>Storage</span>,<span class='ident'>StorageDir</span>,<span class='ident'>Storable</span>,<span class='ident'>Selection</span>};
+<span class='kw'>use</span> <span class='ident'>storage</span>::{<span class='ident'>Storage</span>,<span class='ident'>StorageDir</span>,<span class='ident'>Storable</span>,<span class='ident'>StorageResult</span>};
 <span class='kw'>use</span> <span class='ident'>project</span>::<span class='ident'>Project</span>;
 
 <span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>feature</span><span class='op'>=</span><span class='string'>&quot;document_export&quot;</span>)]</span>
@@ -365,6 +365,7 @@
     <span class='kw'>let</span> <span class='ident'>archive</span>   <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(::<span class='ident'>CONFIG</span>.<span class='ident'>get_str</span>(<span class='string'>&quot;dirs/archive&quot;</span>).<span class='ident'>ok_or</span>(<span class='string'>&quot;Faulty config: dirs/archive does not contain a value&quot;</span>));
     <span class='kw'>let</span> <span class='ident'>templates</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(::<span class='ident'>CONFIG</span>.<span class='ident'>get_str</span>(<span class='string'>&quot;dirs/templates&quot;</span>).<span class='ident'>ok_or</span>(<span class='string'>&quot;Faulty config: dirs/templates does not contain a value&quot;</span>));
     <span class='kw'>let</span> <span class='ident'>storage</span>   <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>Storage</span>::<span class='ident'>new</span>(<span class='ident'>util</span>::<span class='ident'>get_storage_path</span>(), <span class='ident'>working</span>, <span class='ident'>archive</span>, <span class='ident'>templates</span>));
+    <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>storage</span>.<span class='ident'>health_check</span>());
     <span class='prelude-val'>Ok</span>(<span class='ident'>storage</span>)
 }
 
@@ -375,6 +376,7 @@
     <span class='kw'>let</span> <span class='ident'>archive</span>   <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(::<span class='ident'>CONFIG</span>.<span class='ident'>get_str</span>(<span class='string'>&quot;dirs/archive&quot;</span>).<span class='ident'>ok_or</span>(<span class='string'>&quot;Faulty config: dirs/archive does not contain a value&quot;</span>));
     <span class='kw'>let</span> <span class='ident'>templates</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(::<span class='ident'>CONFIG</span>.<span class='ident'>get_str</span>(<span class='string'>&quot;dirs/templates&quot;</span>).<span class='ident'>ok_or</span>(<span class='string'>&quot;Faulty config: dirs/templates does not contain a value&quot;</span>));
     <span class='kw'>let</span> <span class='ident'>storage</span>   <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>Storage</span>::<span class='ident'>new_with_git</span>(<span class='ident'>util</span>::<span class='ident'>get_storage_path</span>(), <span class='ident'>working</span>, <span class='ident'>archive</span>, <span class='ident'>templates</span>));
+    <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>storage</span>.<span class='ident'>health_check</span>());
     <span class='prelude-val'>Ok</span>(<span class='ident'>storage</span>)
 }
 
@@ -382,30 +384,33 @@
 <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>simple_with_projects</span><span class='op'>&lt;</span><span class='ident'>F</span><span class='op'>&gt;</span>(<span class='ident'>dir</span>:<span class='ident'>StorageDir</span>, <span class='ident'>search_terms</span>:<span class='kw-2'>&amp;</span>[<span class='kw-2'>&amp;</span><span class='ident'>str</span>], <span class='ident'>f</span>:<span class='ident'>F</span>)
     <span class='kw'>where</span> <span class='ident'>F</span>:<span class='ident'>Fn</span>(<span class='kw-2'>&amp;</span><span class='ident'>Project</span>)
 {
-    <span class='ident'>with_projects</span>(<span class='ident'>dir</span>, <span class='ident'>search_terms</span>, <span class='op'>|</span><span class='ident'>p</span><span class='op'>|</span> {<span class='ident'>f</span>(<span class='ident'>p</span>);<span class='prelude-val'>Ok</span>(())}).<span class='ident'>unwrap</span>();
+    <span class='kw'>match</span> <span class='ident'>with_projects</span>(<span class='ident'>dir</span>, <span class='ident'>search_terms</span>, <span class='op'>|</span><span class='ident'>p</span><span class='op'>|</span> {<span class='ident'>f</span>(<span class='ident'>p</span>);<span class='prelude-val'>Ok</span>(())}){
+        <span class='prelude-val'>Ok</span>(_) <span class='op'>=&gt;</span> {},
+        <span class='prelude-val'>Err</span>(<span class='ident'>e</span>) <span class='op'>=&gt;</span> <span class='macro'>error</span><span class='macro'>!</span>(<span class='string'>&quot;{}&quot;</span>,<span class='ident'>e</span>)
+    }
 }
 
 <span class='doccomment'>/// Helper method that passes projects matching the `search_terms` to the passt closure `f`</span>
+<span class='doccomment'>/// TODO Really move this to `Storage`</span>
 <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>with_projects</span><span class='op'>&lt;</span><span class='ident'>F</span><span class='op'>&gt;</span>(<span class='ident'>dir</span>:<span class='ident'>StorageDir</span>, <span class='ident'>search_terms</span>:<span class='kw-2'>&amp;</span>[<span class='kw-2'>&amp;</span><span class='ident'>str</span>], <span class='ident'>f</span>:<span class='ident'>F</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span>()<span class='op'>&gt;</span>
     <span class='kw'>where</span> <span class='ident'>F</span>:<span class='ident'>Fn</span>(<span class='kw-2'>&amp;</span><span class='ident'>Project</span>)<span class='op'>-&gt;</span><span class='prelude-ty'>Result</span><span class='op'>&lt;</span>()<span class='op'>&gt;</span>
 {
     <span class='macro'>trace</span><span class='macro'>!</span>(<span class='string'>&quot;with_projects({:?})&quot;</span>, <span class='ident'>search_terms</span>);
     <span class='kw'>let</span> <span class='ident'>luigi</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>setup_luigi</span>());
     <span class='kw'>let</span> <span class='ident'>projects</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>luigi</span>.<span class='ident'>search_projects_any</span>(<span class='ident'>dir</span>, <span class='ident'>search_terms</span>));
-    <span class='kw'>if</span> <span class='op'>!</span><span class='ident'>projects</span>.<span class='ident'>is_empty</span>() {
-        <span class='kw'>for</span> <span class='ident'>project</span> <span class='kw'>in</span> <span class='kw-2'>&amp;</span><span class='ident'>projects</span>{
-            <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>f</span>(<span class='ident'>project</span>));
-        }
-        <span class='prelude-val'>Ok</span>(())
-    } <span class='kw'>else</span> {
-        <span class='prelude-val'>Err</span>(<span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;Nothing found for {:?}&quot;</span>, <span class='ident'>search_terms</span>).<span class='ident'>into</span>())
+    <span class='kw'>if</span> <span class='ident'>projects</span>.<span class='ident'>is_empty</span>() {
+        <span class='kw'>return</span> <span class='prelude-val'>Err</span>(<span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;Nothing found for {:?}&quot;</span>, <span class='ident'>search_terms</span>).<span class='ident'>into</span>())
     }
+    <span class='kw'>for</span> <span class='ident'>project</span> <span class='kw'>in</span> <span class='kw-2'>&amp;</span><span class='ident'>projects</span>{
+        <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>f</span>(<span class='ident'>project</span>));
+    }
+    <span class='prelude-val'>Ok</span>(())
 }
 
 <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>csv</span>(<span class='ident'>year</span>:<span class='ident'>i32</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>String</span><span class='op'>&gt;</span> {
     <span class='kw'>let</span> <span class='ident'>luigi</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>setup_luigi</span>());
     <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>projects</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>luigi</span>.<span class='ident'>open_projects</span>(<span class='ident'>StorageDir</span>::<span class='ident'>Year</span>(<span class='ident'>year</span>)));
-    <span class='ident'>projects</span>.<span class='ident'>sort_by</span>(<span class='op'>|</span><span class='ident'>pa</span>,<span class='ident'>pb</span><span class='op'>|</span> <span class='ident'>pa</span>.<span class='ident'>index</span>().<span class='ident'>unwrap_or</span>(<span class='string'>&quot;zzzz&quot;</span>.<span class='ident'>to_owned</span>()).<span class='ident'>cmp</span>( <span class='kw-2'>&amp;</span><span class='ident'>pb</span>.<span class='ident'>index</span>().<span class='ident'>unwrap_or</span>(<span class='string'>&quot;zzzz&quot;</span>.<span class='ident'>to_owned</span>())));
+    <span class='ident'>projects</span>.<span class='ident'>sort_by</span>(<span class='op'>|</span><span class='ident'>pa</span>,<span class='ident'>pb</span><span class='op'>|</span> <span class='ident'>pa</span>.<span class='ident'>index</span>().<span class='ident'>unwrap_or_else</span>(<span class='op'>||</span><span class='string'>&quot;zzzz&quot;</span>.<span class='ident'>to_owned</span>()).<span class='ident'>cmp</span>( <span class='kw-2'>&amp;</span><span class='ident'>pb</span>.<span class='ident'>index</span>().<span class='ident'>unwrap_or</span>(<span class='string'>&quot;zzzz&quot;</span>.<span class='ident'>to_owned</span>())));
     <span class='ident'>projects_to_csv</span>(<span class='kw-2'>&amp;</span><span class='ident'>projects</span>)
 }
 
@@ -413,18 +418,18 @@
 <span class='doccomment'>/// TODO this still contains german terms</span>
 <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>projects_to_csv</span>(<span class='ident'>projects</span>:<span class='kw-2'>&amp;</span>[<span class='ident'>Project</span>]) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>String</span><span class='op'>&gt;</span>{
     <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>string</span> <span class='op'>=</span> <span class='ident'>String</span>::<span class='ident'>new</span>();
-    <span class='kw'>let</span> <span class='ident'>splitter</span> <span class='op'>=</span> <span class='string'>&quot;\&quot;;\&quot;&quot;</span>;
-    <span class='macro'>try</span><span class='macro'>!</span>(<span class='macro'>writeln</span><span class='macro'>!</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>string</span>, <span class='string'>&quot;\&quot;{}\&quot;&quot;</span>, [ <span class='string'>&quot;Rnum&quot;</span>, <span class='string'>&quot;Bezeichnung&quot;</span>, <span class='string'>&quot;Datum&quot;</span>, <span class='string'>&quot;Rechnungs&quot;</span>, <span class='string'>&quot;Betreuer&quot;</span>, <span class='string'>&quot;Verantwortlich&quot;</span>, <span class='string'>&quot;Bezahlt am&quot;</span>, <span class='string'>&quot;Betrag&quot;</span>, <span class='string'>&quot;Canceled&quot;</span>].<span class='ident'>join</span>(<span class='ident'>splitter</span>)));
+    <span class='kw'>let</span> <span class='ident'>splitter</span> <span class='op'>=</span> <span class='string'>&quot;;&quot;</span>;
+    <span class='macro'>try</span><span class='macro'>!</span>(<span class='macro'>writeln</span><span class='macro'>!</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>string</span>, <span class='string'>&quot;{}&quot;</span>, [ <span class='string'>&quot;Rnum&quot;</span>, <span class='string'>&quot;Bezeichnung&quot;</span>, <span class='string'>&quot;Datum&quot;</span>, <span class='string'>&quot;Rechnungsdatum&quot;</span>, <span class='string'>&quot;Betreuer&quot;</span>, <span class='string'>&quot;Verantwortlich&quot;</span>, <span class='string'>&quot;Bezahlt am&quot;</span>, <span class='string'>&quot;Betrag&quot;</span>, <span class='string'>&quot;Canceled&quot;</span>].<span class='ident'>join</span>(<span class='ident'>splitter</span>)));
     <span class='kw'>for</span> <span class='ident'>project</span> <span class='kw'>in</span> <span class='ident'>projects</span>{
-        <span class='macro'>try</span><span class='macro'>!</span>(<span class='macro'>writeln</span><span class='macro'>!</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>string</span>, <span class='string'>&quot;\&quot;{}\&quot;&quot;</span>, [
-                 <span class='ident'>project</span>.<span class='ident'>get</span>(<span class='string'>&quot;InvoiceNumber&quot;</span>).<span class='ident'>unwrap_or_else</span>(<span class='ident'>String</span>::<span class='ident'>new</span>),
-                 <span class='ident'>project</span>.<span class='ident'>get</span>(<span class='string'>&quot;Name&quot;</span>).<span class='ident'>unwrap_or_else</span>(<span class='ident'>String</span>::<span class='ident'>new</span>),
-                 <span class='ident'>project</span>.<span class='ident'>get</span>(<span class='string'>&quot;event/dates/0/begin&quot;</span>).<span class='ident'>unwrap_or_else</span>(<span class='ident'>String</span>::<span class='ident'>new</span>),
-                 <span class='ident'>project</span>.<span class='ident'>get</span>(<span class='string'>&quot;invoice/date&quot;</span>).<span class='ident'>unwrap_or_else</span>(<span class='ident'>String</span>::<span class='ident'>new</span>),
-                 <span class='ident'>project</span>.<span class='ident'>get</span>(<span class='string'>&quot;Caterers&quot;</span>).<span class='ident'>unwrap_or_else</span>(<span class='ident'>String</span>::<span class='ident'>new</span>),
-                 <span class='ident'>project</span>.<span class='ident'>get</span>(<span class='string'>&quot;Responsible&quot;</span>).<span class='ident'>unwrap_or_else</span>(<span class='ident'>String</span>::<span class='ident'>new</span>),
-                 <span class='ident'>project</span>.<span class='ident'>get</span>(<span class='string'>&quot;invoice/payed_date&quot;</span>).<span class='ident'>unwrap_or_else</span>(<span class='ident'>String</span>::<span class='ident'>new</span>),
-                 <span class='ident'>project</span>.<span class='ident'>get</span>(<span class='string'>&quot;Final&quot;</span>).<span class='ident'>unwrap_or_else</span>(<span class='ident'>String</span>::<span class='ident'>new</span>),
+        <span class='macro'>try</span><span class='macro'>!</span>(<span class='macro'>writeln</span><span class='macro'>!</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>string</span>, <span class='string'>&quot;{}&quot;</span>, [
+                 <span class='ident'>project</span>.<span class='ident'>get</span>(<span class='string'>&quot;InvoiceNumber&quot;</span>).<span class='ident'>unwrap_or_else</span>(<span class='op'>||</span> <span class='ident'>String</span>::<span class='ident'>from</span>(<span class='string'>r#&quot;&quot;&quot;&quot;#</span>)),
+                 <span class='ident'>project</span>.<span class='ident'>get</span>(<span class='string'>&quot;Name&quot;</span>).<span class='ident'>unwrap_or_else</span>(<span class='op'>||</span> <span class='ident'>String</span>::<span class='ident'>from</span>(<span class='string'>r#&quot;&quot;&quot;&quot;#</span>)),
+                 <span class='ident'>project</span>.<span class='ident'>get</span>(<span class='string'>&quot;event/dates/0/begin&quot;</span>).<span class='ident'>unwrap_or_else</span>(<span class='op'>||</span> <span class='ident'>String</span>::<span class='ident'>from</span>(<span class='string'>r#&quot;&quot;&quot;&quot;#</span>)),
+                 <span class='ident'>project</span>.<span class='ident'>get</span>(<span class='string'>&quot;invoice/date&quot;</span>).<span class='ident'>unwrap_or_else</span>(<span class='op'>||</span> <span class='ident'>String</span>::<span class='ident'>from</span>(<span class='string'>r#&quot;&quot;&quot;&quot;#</span>)),
+                 <span class='ident'>project</span>.<span class='ident'>get</span>(<span class='string'>&quot;Caterers&quot;</span>).<span class='ident'>unwrap_or_else</span>(<span class='op'>||</span> <span class='ident'>String</span>::<span class='ident'>from</span>(<span class='string'>r#&quot;&quot;&quot;&quot;#</span>)),
+                 <span class='ident'>project</span>.<span class='ident'>get</span>(<span class='string'>&quot;Responsible&quot;</span>).<span class='ident'>unwrap_or_else</span>(<span class='op'>||</span> <span class='ident'>String</span>::<span class='ident'>from</span>(<span class='string'>r#&quot;&quot;&quot;&quot;#</span>)),
+                 <span class='ident'>project</span>.<span class='ident'>get</span>(<span class='string'>&quot;invoice/payed_date&quot;</span>).<span class='ident'>unwrap_or_else</span>(<span class='op'>||</span> <span class='ident'>String</span>::<span class='ident'>from</span>(<span class='string'>r#&quot;&quot;&quot;&quot;#</span>)),
+                 <span class='ident'>project</span>.<span class='ident'>sum_sold</span>().<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>c</span><span class='op'>|</span><span class='ident'>c</span>.<span class='ident'>value</span>().<span class='ident'>to_string</span>()).<span class='ident'>unwrap_or_else</span>(<span class='op'>|</span>_<span class='op'>|</span> <span class='ident'>String</span>::<span class='ident'>from</span>(<span class='string'>r#&quot;&quot;&quot;&quot;#</span>)),
                  <span class='ident'>project</span>.<span class='ident'>canceled_string</span>().<span class='ident'>to_owned</span>()
         ].<span class='ident'>join</span>(<span class='ident'>splitter</span>)));
     }
@@ -433,12 +438,7 @@
 
 <span class='doccomment'>/// Creates the latex files within each projects directory, either for Invoice or Offer.</span>
 <span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>feature</span><span class='op'>=</span><span class='string'>&quot;document_export&quot;</span>)]</span>
-<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>projects_to_tex</span>(<span class='ident'>dir</span>:<span class='ident'>StorageDir</span>, <span class='ident'>search_term</span>:<span class='kw-2'>&amp;</span><span class='ident'>str</span>, <span class='ident'>template_name</span>:<span class='kw-2'>&amp;</span><span class='ident'>str</span>, <span class='ident'>bill_type</span>:<span class='kw-2'>&amp;</span><span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>BillType</span><span class='op'>&gt;</span>, <span class='ident'>dry_run</span>:<span class='ident'>bool</span>, <span class='ident'>force</span>:<span class='ident'>bool</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span>()<span class='op'>&gt;</span> {
-    <span class='kw'>let</span> <span class='ident'>luigi</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>setup_luigi</span>());
-    <span class='comment'>//let search_term = &quot;ese&quot;;</span>
-    <span class='comment'>//let template_name = &quot;document&quot;;</span>
-    <span class='comment'>//let dir = StorageDir::Working ;</span>
-
+<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>project_to_doc</span>(<span class='ident'>project</span>: <span class='kw-2'>&amp;</span><span class='ident'>Project</span>, <span class='ident'>template_name</span>:<span class='kw-2'>&amp;</span><span class='ident'>str</span>, <span class='ident'>bill_type</span>:<span class='kw-2'>&amp;</span><span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>BillType</span><span class='op'>&gt;</span>, <span class='ident'>dry_run</span>:<span class='ident'>bool</span>, <span class='ident'>force</span>:<span class='ident'>bool</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span>()<span class='op'>&gt;</span> {
     <span class='kw'>let</span> <span class='ident'>template_ext</span> <span class='op'>=</span> ::<span class='ident'>CONFIG</span>.<span class='ident'>get_str</span>(<span class='string'>&quot;extensions/output_template&quot;</span>).<span class='ident'>expect</span>(<span class='string'>&quot;Faulty default config&quot;</span>);
     <span class='kw'>let</span> <span class='ident'>output_ext</span>   <span class='op'>=</span> ::<span class='ident'>CONFIG</span>.<span class='ident'>get_str</span>(<span class='string'>&quot;extensions/output_file&quot;</span>).<span class='ident'>expect</span>(<span class='string'>&quot;Faulty default config&quot;</span>);
     <span class='kw'>let</span> <span class='ident'>convert_ext</span>  <span class='op'>=</span> ::<span class='ident'>CONFIG</span>.<span class='ident'>get_str</span>(<span class='string'>&quot;convert/output_extension&quot;</span>).<span class='ident'>expect</span>(<span class='string'>&quot;Faulty default config&quot;</span>);
@@ -449,84 +449,92 @@
 
     <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>template_path</span> <span class='op'>=</span> <span class='ident'>PathBuf</span>::<span class='ident'>new</span>();
 
-    <span class='ident'>template_path</span>.<span class='ident'>push</span>(<span class='ident'>luigi</span>.<span class='ident'>templates_dir</span>());
+    <span class='ident'>template_path</span>.<span class='ident'>push</span>(<span class='ident'>util</span>::<span class='ident'>get_storage_path</span>());
+    <span class='ident'>template_path</span>.<span class='ident'>push</span>(::<span class='ident'>CONFIG</span>.<span class='ident'>get_str</span>(<span class='string'>&quot;dirs/templates&quot;</span>).<span class='ident'>expect</span>(<span class='string'>&quot;Faulty config: dirs/templates does not contain a value&quot;</span>));
     <span class='ident'>template_path</span>.<span class='ident'>push</span>(<span class='ident'>template_name</span>);
     <span class='ident'>template_path</span>.<span class='ident'>set_extension</span>(<span class='ident'>template_ext</span>);
 
     <span class='macro'>debug</span><span class='macro'>!</span>(<span class='string'>&quot;template file={:?} exists={}&quot;</span>, <span class='ident'>template_path</span>, <span class='ident'>template_path</span>.<span class='ident'>exists</span>());
+    <span class='kw'>if</span> <span class='op'>!</span><span class='ident'>template_path</span>.<span class='ident'>exists</span>() {
+        <span class='kw'>return</span> <span class='prelude-val'>Err</span>(<span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;Template not found at {}&quot;</span>, <span class='ident'>template_path</span>.<span class='ident'>display</span>()).<span class='ident'>into</span>())
+    }
 
-    <span class='ident'>with_projects</span>(<span class='ident'>dir</span>, <span class='kw-2'>&amp;</span>[<span class='ident'>search_term</span>], <span class='op'>|</span><span class='ident'>p</span><span class='op'>|</span> {
+    <span class='kw'>let</span> <span class='ident'>convert_tool</span> <span class='op'>=</span> ::<span class='ident'>CONFIG</span>.<span class='ident'>get_str</span>(<span class='string'>&quot;convert/tool&quot;</span>);
+    <span class='kw'>let</span> <span class='ident'>output_folder</span> <span class='op'>=</span> ::<span class='ident'>CONFIG</span>.<span class='ident'>get_str</span>(<span class='string'>&quot;output_path&quot;</span>).<span class='ident'>and_then</span>(<span class='ident'>util</span>::<span class='ident'>get_valid_path</span>).<span class='ident'>expect</span>(<span class='string'>&quot;Faulty config \&quot;output_path\&quot;&quot;</span>);
 
-        <span class='kw'>let</span> <span class='ident'>convert_tool</span> <span class='op'>=</span> ::<span class='ident'>CONFIG</span>.<span class='ident'>get_str</span>(<span class='string'>&quot;convert/tool&quot;</span>);
-        <span class='kw'>let</span> <span class='ident'>output_folder</span> <span class='op'>=</span> ::<span class='ident'>CONFIG</span>.<span class='ident'>get_str</span>(<span class='string'>&quot;output_path&quot;</span>).<span class='ident'>and_then</span>(<span class='ident'>util</span>::<span class='ident'>get_valid_path</span>).<span class='ident'>expect</span>(<span class='string'>&quot;Faulty config \&quot;output_path\&quot;&quot;</span>);
+    <span class='kw'>let</span> <span class='ident'>ready_for_offer</span> <span class='op'>=</span> <span class='ident'>project</span>.<span class='ident'>is_ready_for_offer</span>();
+    <span class='kw'>let</span> <span class='ident'>ready_for_invoice</span> <span class='op'>=</span> <span class='ident'>project</span>.<span class='ident'>is_ready_for_invoice</span>();
+    <span class='kw'>let</span> <span class='ident'>project_file</span> <span class='op'>=</span> <span class='ident'>project</span>.<span class='ident'>file</span>();
 
-        <span class='kw'>let</span> <span class='ident'>ready_for_offer</span> <span class='op'>=</span> <span class='ident'>p</span>.<span class='ident'>is_ready_for_offer</span>();
-        <span class='kw'>let</span> <span class='ident'>ready_for_invoice</span> <span class='op'>=</span> <span class='ident'>p</span>.<span class='ident'>is_ready_for_invoice</span>();
-        <span class='kw'>let</span> <span class='ident'>project_file</span> <span class='op'>=</span> <span class='ident'>p</span>.<span class='ident'>file</span>();
+    <span class='comment'>// tiny little helper</span>
+    <span class='kw'>let</span> <span class='ident'>to_local_file</span> <span class='op'>=</span> <span class='op'>|</span><span class='ident'>file</span>:<span class='kw-2'>&amp;</span><span class='ident'>Path</span>, <span class='ident'>ext</span><span class='op'>|</span> {
+        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>_tmpfile</span> <span class='op'>=</span> <span class='ident'>file</span>.<span class='ident'>to_owned</span>();
+        <span class='ident'>_tmpfile</span>.<span class='ident'>set_extension</span>(<span class='ident'>ext</span>);
+        <span class='ident'>Path</span>::<span class='ident'>new</span>(<span class='ident'>_tmpfile</span>.<span class='ident'>file_name</span>().<span class='ident'>unwrap</span>().<span class='ident'>into</span>()).<span class='ident'>to_owned</span>()
+    };
 
-        <span class='comment'>// tiny little helper</span>
-        <span class='kw'>let</span> <span class='ident'>to_local_file</span> <span class='op'>=</span> <span class='op'>|</span><span class='ident'>file</span>:<span class='kw-2'>&amp;</span><span class='ident'>Path</span>, <span class='ident'>ext</span><span class='op'>|</span> {
-            <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>_tmpfile</span> <span class='op'>=</span> <span class='ident'>file</span>.<span class='ident'>to_owned</span>();
-            <span class='ident'>_tmpfile</span>.<span class='ident'>set_extension</span>(<span class='ident'>ext</span>);
-            <span class='ident'>Path</span>::<span class='ident'>new</span>(<span class='ident'>_tmpfile</span>.<span class='ident'>file_name</span>().<span class='ident'>unwrap</span>().<span class='ident'>into</span>()).<span class='ident'>to_owned</span>()
-        };
+    <span class='kw'>use</span> <span class='ident'>BillType</span>::<span class='op'>*</span>;
+    <span class='kw'>let</span> (<span class='ident'>dyn_bill_type</span>, <span class='ident'>outfile_tex</span>):
+        (<span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>BillType</span><span class='op'>&gt;</span>, <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>PathBuf</span><span class='op'>&gt;</span>) <span class='op'>=</span>
+         <span class='kw'>match</span> (<span class='ident'>bill_type</span>, <span class='ident'>ready_for_offer</span>, <span class='ident'>ready_for_invoice</span>)
+    {
+        (<span class='kw-2'>&amp;</span><span class='prelude-val'>Some</span>(<span class='ident'>Offer</span>),   <span class='prelude-val'>Ok</span>(_), _     )  <span class='op'>|</span>
+        (<span class='kw-2'>&amp;</span><span class='prelude-val'>None</span>,          <span class='prelude-val'>Ok</span>(_), <span class='prelude-val'>Err</span>(_))  <span class='op'>=&gt;</span> (<span class='prelude-val'>Some</span>(<span class='ident'>Offer</span>), <span class='prelude-val'>Some</span>(<span class='ident'>project</span>.<span class='ident'>dir</span>().<span class='ident'>join</span>(<span class='ident'>project</span>.<span class='ident'>offer_file_name</span>(<span class='ident'>output_ext</span>).<span class='ident'>expect</span>(<span class='string'>&quot;this should have been cought by ready_for_offer()&quot;</span>)))),
+        (<span class='kw-2'>&amp;</span><span class='prelude-val'>Some</span>(<span class='ident'>Invoice</span>), _,      <span class='prelude-val'>Ok</span>(_))  <span class='op'>|</span>
+        (<span class='kw-2'>&amp;</span><span class='prelude-val'>None</span>,          _,      <span class='prelude-val'>Ok</span>(_))  <span class='op'>=&gt;</span> (<span class='prelude-val'>Some</span>(<span class='ident'>Invoice</span>), <span class='prelude-val'>Some</span>(<span class='ident'>project</span>.<span class='ident'>dir</span>().<span class='ident'>join</span>(<span class='ident'>project</span>.<span class='ident'>invoice_file_name</span>(<span class='ident'>output_ext</span>).<span class='ident'>expect</span>(<span class='string'>&quot;this should have been cought by ready_for_invoice()&quot;</span>)))),
+        (<span class='kw-2'>&amp;</span><span class='prelude-val'>Some</span>(<span class='ident'>Offer</span>),   <span class='prelude-val'>Err</span>(<span class='ident'>e</span>), _    )  <span class='op'>=&gt;</span> {<span class='macro'>error</span><span class='macro'>!</span>(<span class='string'>&quot;cannot create an offer, check out:{:#?}&quot;</span>,<span class='ident'>e</span>);(<span class='prelude-val'>None</span>,<span class='prelude-val'>None</span>)},
+        (<span class='kw-2'>&amp;</span><span class='prelude-val'>Some</span>(<span class='ident'>Invoice</span>), _,      <span class='prelude-val'>Err</span>(<span class='ident'>e</span>)) <span class='op'>=&gt;</span> {<span class='macro'>error</span><span class='macro'>!</span>(<span class='string'>&quot;cannot create an invoice, check out:{:#?}&quot;</span>,<span class='ident'>e</span>);(<span class='prelude-val'>None</span>,<span class='prelude-val'>None</span>)},
+        (_,              <span class='prelude-val'>Err</span>(<span class='ident'>e</span>), <span class='prelude-val'>Err</span>(_)) <span class='op'>=&gt;</span> {<span class='macro'>error</span><span class='macro'>!</span>(<span class='string'>&quot;Neither an Offer nor an Invoice can be created from this project\n please check out {:#?}&quot;</span>, <span class='ident'>e</span>);(<span class='prelude-val'>None</span>,<span class='prelude-val'>None</span>)}
+    };
 
-        <span class='kw'>use</span> <span class='ident'>BillType</span>::<span class='op'>*</span>;
-        <span class='kw'>let</span> (<span class='ident'>dyn_bill_type</span>, <span class='ident'>outfile_tex</span>):
-            (<span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>BillType</span><span class='op'>&gt;</span>, <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>PathBuf</span><span class='op'>&gt;</span>) <span class='op'>=</span>
-             <span class='kw'>match</span> (<span class='ident'>bill_type</span>, <span class='ident'>ready_for_offer</span>, <span class='ident'>ready_for_invoice</span>)
-        {
-            (<span class='kw-2'>&amp;</span><span class='prelude-val'>Some</span>(<span class='ident'>Offer</span>),   <span class='prelude-val'>Ok</span>(_), _     )  <span class='op'>|</span>
-            (<span class='kw-2'>&amp;</span><span class='prelude-val'>None</span>,          <span class='prelude-val'>Ok</span>(_), <span class='prelude-val'>Err</span>(_))  <span class='op'>=&gt;</span> (<span class='prelude-val'>Some</span>(<span class='ident'>Offer</span>), <span class='prelude-val'>Some</span>(<span class='ident'>p</span>.<span class='ident'>dir</span>().<span class='ident'>join</span>(<span class='ident'>p</span>.<span class='ident'>offer_file_name</span>(<span class='ident'>output_ext</span>).<span class='ident'>expect</span>(<span class='string'>&quot;this should have been cought by ready_for_offer()&quot;</span>)))),
-            (<span class='kw-2'>&amp;</span><span class='prelude-val'>Some</span>(<span class='ident'>Invoice</span>), _,      <span class='prelude-val'>Ok</span>(_))  <span class='op'>|</span>
-            (<span class='kw-2'>&amp;</span><span class='prelude-val'>None</span>,          _,      <span class='prelude-val'>Ok</span>(_))  <span class='op'>=&gt;</span> (<span class='prelude-val'>Some</span>(<span class='ident'>Invoice</span>), <span class='prelude-val'>Some</span>(<span class='ident'>p</span>.<span class='ident'>dir</span>().<span class='ident'>join</span>(<span class='ident'>p</span>.<span class='ident'>invoice_file_name</span>(<span class='ident'>output_ext</span>).<span class='ident'>expect</span>(<span class='string'>&quot;this should have been cought by ready_for_invoice()&quot;</span>)))),
-            (<span class='kw-2'>&amp;</span><span class='prelude-val'>Some</span>(<span class='ident'>Offer</span>),   <span class='prelude-val'>Err</span>(<span class='ident'>e</span>), _    )  <span class='op'>=&gt;</span> {<span class='macro'>error</span><span class='macro'>!</span>(<span class='string'>&quot;cannot create an offer, check out:{:#?}&quot;</span>,<span class='ident'>e</span>);(<span class='prelude-val'>None</span>,<span class='prelude-val'>None</span>)},
-            (<span class='kw-2'>&amp;</span><span class='prelude-val'>Some</span>(<span class='ident'>Invoice</span>), _,      <span class='prelude-val'>Err</span>(<span class='ident'>e</span>)) <span class='op'>=&gt;</span> {<span class='macro'>error</span><span class='macro'>!</span>(<span class='string'>&quot;cannot create an invoice, check out:{:#?}&quot;</span>,<span class='ident'>e</span>);(<span class='prelude-val'>None</span>,<span class='prelude-val'>None</span>)},
-            (_,              <span class='prelude-val'>Err</span>(<span class='ident'>e</span>), <span class='prelude-val'>Err</span>(_)) <span class='op'>=&gt;</span> {<span class='macro'>error</span><span class='macro'>!</span>(<span class='string'>&quot;Neither an Offer nor an Invoice can be created from this project\n please check out {:#?}&quot;</span>, <span class='ident'>e</span>);(<span class='prelude-val'>None</span>,<span class='prelude-val'>None</span>)}
-        };
+    <span class='comment'>//debug!(&quot;{:?} -&gt; {:?}&quot;,(bill_type, project.is_ready_for_offer(), project.is_ready_for_invoice()), (dyn_bill_type, outfile_tex));</span>
 
-        <span class='comment'>//debug!(&quot;{:?} -&gt; {:?}&quot;,(bill_type, p.is_ready_for_offer(), p.is_ready_for_invoice()), (dyn_bill_type, outfile_tex));</span>
+    <span class='kw'>if</span> <span class='kw'>let</span> (<span class='prelude-val'>Some</span>(<span class='ident'>outfile</span>), <span class='prelude-val'>Some</span>(<span class='ident'>dyn_bill</span>)) <span class='op'>=</span> (<span class='ident'>outfile_tex</span>, <span class='ident'>dyn_bill_type</span>) {
+        <span class='kw'>let</span> <span class='ident'>filled</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>fill_template</span>(<span class='ident'>project</span>, <span class='kw-2'>&amp;</span><span class='ident'>dyn_bill</span>, <span class='kw-2'>&amp;</span><span class='ident'>template_path</span>));
 
-        <span class='kw'>if</span> <span class='kw'>let</span> (<span class='prelude-val'>Some</span>(<span class='ident'>outfile</span>), <span class='prelude-val'>Some</span>(<span class='ident'>dyn_bill</span>)) <span class='op'>=</span> (<span class='ident'>outfile_tex</span>, <span class='ident'>dyn_bill_type</span>) {
-            <span class='kw'>let</span> <span class='ident'>filled</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>fill_template</span>(<span class='ident'>p</span>, <span class='kw-2'>&amp;</span><span class='ident'>dyn_bill</span>, <span class='kw-2'>&amp;</span><span class='ident'>template_path</span>));
+        <span class='kw'>let</span> <span class='ident'>pdffile</span> <span class='op'>=</span> <span class='ident'>to_local_file</span>(<span class='kw-2'>&amp;</span><span class='ident'>outfile</span>, <span class='ident'>convert_ext</span>);
+        <span class='kw'>let</span> <span class='ident'>target</span> <span class='op'>=</span> <span class='ident'>output_folder</span>.<span class='ident'>join</span>(<span class='kw-2'>&amp;</span><span class='ident'>pdffile</span>);
 
-            <span class='kw'>let</span> <span class='ident'>pdffile</span> <span class='op'>=</span> <span class='ident'>to_local_file</span>(<span class='kw-2'>&amp;</span><span class='ident'>outfile</span>, <span class='ident'>convert_ext</span>);
-            <span class='kw'>let</span> <span class='ident'>target</span> <span class='op'>=</span> <span class='ident'>output_folder</span>.<span class='ident'>join</span>(<span class='kw-2'>&amp;</span><span class='ident'>pdffile</span>);
+        <span class='comment'>// ok, so apparently we can create a tex file, so lets do it</span>
+        <span class='kw'>if</span> <span class='op'>!</span><span class='ident'>force</span> <span class='op'>&amp;&amp;</span> <span class='ident'>target</span>.<span class='ident'>exists</span>() <span class='op'>&amp;&amp;</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>file_age</span>(<span class='kw-2'>&amp;</span><span class='ident'>target</span>)) <span class='op'>&lt;</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>file_age</span>(<span class='kw-2'>&amp;</span><span class='ident'>project_file</span>)){
+            <span class='comment'>// no wait, nothing has changed, so lets save ourselves the work</span>
+            <span class='macro'>info</span><span class='macro'>!</span>(<span class='string'>&quot;nothing to be done, {} is younger than {}\n       use -f if you don&#39;t agree&quot;</span>, <span class='ident'>target</span>.<span class='ident'>display</span>(), <span class='ident'>project_file</span>.<span class='ident'>display</span>());
+        } <span class='kw'>else</span> {
+            <span class='comment'>// \o/ we created a tex file</span>
 
-            <span class='comment'>// ok, so apparently we can create a tex file, so lets do it</span>
-            <span class='kw'>if</span> <span class='op'>!</span><span class='ident'>force</span> <span class='op'>&amp;&amp;</span> <span class='ident'>target</span>.<span class='ident'>exists</span>() <span class='op'>&amp;&amp;</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>file_age</span>(<span class='kw-2'>&amp;</span><span class='ident'>target</span>)) <span class='op'>&lt;</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>file_age</span>(<span class='kw-2'>&amp;</span><span class='ident'>project_file</span>)){
-                <span class='comment'>// no wait, nothing has changed, so lets save ourselves the work</span>
-                <span class='macro'>info</span><span class='macro'>!</span>(<span class='string'>&quot;nothing to be done, {} is younger than {}\n       use -f if you don&#39;t agree&quot;</span>, <span class='ident'>target</span>.<span class='ident'>display</span>(), <span class='ident'>project_file</span>.<span class='ident'>display</span>());
+            <span class='kw'>if</span> <span class='ident'>dry_run</span>{
+                <span class='macro'>warn</span><span class='macro'>!</span>(<span class='string'>&quot;Dry run! This does not produce any output:\n * {}\n * {}&quot;</span>, <span class='ident'>outfile</span>.<span class='ident'>display</span>(), <span class='ident'>pdffile</span>.<span class='ident'>display</span>());
             } <span class='kw'>else</span> {
-                <span class='comment'>// \o/ we created a tex file</span>
-
-                <span class='kw'>if</span> <span class='ident'>dry_run</span>{
-                    <span class='macro'>warn</span><span class='macro'>!</span>(<span class='string'>&quot;Dry run! This does not produce any output:\n * {}\n * {}&quot;</span>, <span class='ident'>outfile</span>.<span class='ident'>display</span>(), <span class='ident'>pdffile</span>.<span class='ident'>display</span>());
-                } <span class='kw'>else</span> {
-                    <span class='kw'>let</span> <span class='ident'>outfileb</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>p</span>.<span class='ident'>write_to_file</span>(<span class='kw-2'>&amp;</span><span class='ident'>filled</span>,<span class='kw-2'>&amp;</span><span class='ident'>dyn_bill</span>,<span class='ident'>output_ext</span>));
-                    <span class='macro'>debug</span><span class='macro'>!</span>(<span class='string'>&quot;{} vs\n        {}&quot;</span>, <span class='ident'>outfile</span>.<span class='ident'>display</span>(), <span class='ident'>outfileb</span>.<span class='ident'>display</span>());
-                    <span class='ident'>util</span>::<span class='ident'>pass_to_command</span>(<span class='kw-2'>&amp;</span><span class='ident'>convert_tool</span>, <span class='kw-2'>&amp;</span>[<span class='kw-2'>&amp;</span><span class='ident'>outfileb</span>]);
+                <span class='kw'>let</span> <span class='ident'>outfileb</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>project</span>.<span class='ident'>write_to_file</span>(<span class='kw-2'>&amp;</span><span class='ident'>filled</span>,<span class='kw-2'>&amp;</span><span class='ident'>dyn_bill</span>,<span class='ident'>output_ext</span>));
+                <span class='macro'>debug</span><span class='macro'>!</span>(<span class='string'>&quot;{} vs\n        {}&quot;</span>, <span class='ident'>outfile</span>.<span class='ident'>display</span>(), <span class='ident'>outfileb</span>.<span class='ident'>display</span>());
+                <span class='ident'>util</span>::<span class='ident'>pass_to_command</span>(<span class='kw-2'>&amp;</span><span class='ident'>convert_tool</span>, <span class='kw-2'>&amp;</span>[<span class='kw-2'>&amp;</span><span class='ident'>outfileb</span>]);
+            }
+            <span class='comment'>// clean up expected trash files</span>
+            <span class='kw'>for</span> <span class='ident'>trash_ext</span> <span class='kw'>in</span> <span class='ident'>trash_exts</span>.<span class='ident'>iter</span>().<span class='ident'>filter_map</span>(<span class='op'>|</span><span class='ident'>x</span><span class='op'>|</span><span class='op'>*</span><span class='ident'>x</span>){
+                <span class='kw'>let</span> <span class='ident'>trash_file</span> <span class='op'>=</span> <span class='ident'>to_local_file</span>(<span class='kw-2'>&amp;</span><span class='ident'>outfile</span>, <span class='ident'>trash_ext</span>);
+                <span class='kw'>if</span>  <span class='ident'>trash_file</span>.<span class='ident'>exists</span>() {
+                    <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>fs</span>::<span class='ident'>remove_file</span>(<span class='kw-2'>&amp;</span><span class='ident'>trash_file</span>));
+                    <span class='macro'>debug</span><span class='macro'>!</span>(<span class='string'>&quot;just deleted: {}&quot;</span>, <span class='ident'>trash_file</span>.<span class='ident'>display</span>())
                 }
-                <span class='comment'>// clean up expected trash files</span>
-                <span class='kw'>for</span> <span class='ident'>trash_ext</span> <span class='kw'>in</span> <span class='ident'>trash_exts</span>.<span class='ident'>iter</span>().<span class='ident'>filter_map</span>(<span class='op'>|</span><span class='ident'>x</span><span class='op'>|</span><span class='op'>*</span><span class='ident'>x</span>){
-                    <span class='kw'>let</span> <span class='ident'>trash_file</span> <span class='op'>=</span> <span class='ident'>to_local_file</span>(<span class='kw-2'>&amp;</span><span class='ident'>outfile</span>, <span class='ident'>trash_ext</span>);
-                    <span class='kw'>if</span>  <span class='ident'>trash_file</span>.<span class='ident'>exists</span>() {
-                        <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>fs</span>::<span class='ident'>remove_file</span>(<span class='kw-2'>&amp;</span><span class='ident'>trash_file</span>));
-                        <span class='macro'>debug</span><span class='macro'>!</span>(<span class='string'>&quot;just deleted: {}&quot;</span>, <span class='ident'>trash_file</span>.<span class='ident'>display</span>())
-                    }
-                    <span class='kw'>else</span> {
-                        <span class='macro'>debug</span><span class='macro'>!</span>(<span class='string'>&quot;I expected there to be a {}, but there wasn&#39;t any ?&quot;</span>, <span class='ident'>trash_file</span>.<span class='ident'>display</span>())
-                    }
-                }
-                <span class='kw'>if</span> <span class='ident'>pdffile</span>.<span class='ident'>exists</span>(){
-                    <span class='macro'>debug</span><span class='macro'>!</span>(<span class='string'>&quot;now there is be a {:?} -&gt; {:?}&quot;</span>, <span class='ident'>pdffile</span>, <span class='ident'>target</span>);
-                    <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>fs</span>::<span class='ident'>rename</span>(<span class='kw-2'>&amp;</span><span class='ident'>pdffile</span>, <span class='kw-2'>&amp;</span><span class='ident'>target</span>));
+                <span class='kw'>else</span> {
+                    <span class='macro'>debug</span><span class='macro'>!</span>(<span class='string'>&quot;I expected there to be a {}, but there wasn&#39;t any ?&quot;</span>, <span class='ident'>trash_file</span>.<span class='ident'>display</span>())
                 }
             }
+            <span class='kw'>if</span> <span class='ident'>pdffile</span>.<span class='ident'>exists</span>(){
+                <span class='macro'>debug</span><span class='macro'>!</span>(<span class='string'>&quot;now there is be a {:?} -&gt; {:?}&quot;</span>, <span class='ident'>pdffile</span>, <span class='ident'>target</span>);
+                <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>fs</span>::<span class='ident'>rename</span>(<span class='kw-2'>&amp;</span><span class='ident'>pdffile</span>, <span class='kw-2'>&amp;</span><span class='ident'>target</span>));
+            }
         }
+    }
 
-        <span class='prelude-val'>Ok</span>(())
-    })
+    <span class='prelude-val'>Ok</span>(())
+
+}
+
+<span class='doccomment'>/// Creates the latex files within each projects directory, either for Invoice or Offer.</span>
+<span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>feature</span><span class='op'>=</span><span class='string'>&quot;document_export&quot;</span>)]</span>
+<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>projects_to_doc</span>(<span class='ident'>dir</span>:<span class='ident'>StorageDir</span>, <span class='ident'>search_term</span>:<span class='kw-2'>&amp;</span><span class='ident'>str</span>, <span class='ident'>template_name</span>:<span class='kw-2'>&amp;</span><span class='ident'>str</span>, <span class='ident'>bill_type</span>:<span class='kw-2'>&amp;</span><span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>BillType</span><span class='op'>&gt;</span>, <span class='ident'>dry_run</span>:<span class='ident'>bool</span>, <span class='ident'>force</span>:<span class='ident'>bool</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span>()<span class='op'>&gt;</span> {
+    <span class='ident'>with_projects</span>(<span class='ident'>dir</span>, <span class='kw-2'>&amp;</span>[<span class='ident'>search_term</span>], <span class='op'>|</span><span class='ident'>p</span><span class='op'>|</span> <span class='ident'>project_to_doc</span>(<span class='ident'>p</span>, <span class='ident'>template_name</span>, <span class='ident'>bill_type</span>, <span class='ident'>dry_run</span>, <span class='ident'>force</span>) )
 }
 
 <span class='kw'>fn</span> <span class='ident'>file_age</span>(<span class='ident'>path</span>:<span class='kw-2'>&amp;</span><span class='ident'>Path</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>time</span>::<span class='ident'>Duration</span><span class='op'>&gt;</span> {
@@ -534,6 +542,28 @@
     <span class='kw'>let</span> <span class='ident'>accessed</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>metadata</span>.<span class='ident'>accessed</span>());
     <span class='prelude-val'>Ok</span>(<span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>accessed</span>.<span class='ident'>elapsed</span>()))
 }
+
+<span class='doccomment'>/// Command DUES</span>
+<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>open_wages</span>() <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>Currency</span><span class='op'>&gt;</span>{
+    <span class='kw'>let</span> <span class='ident'>luigi</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>setup_luigi</span>());
+    <span class='kw'>let</span> <span class='ident'>projects</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>luigi</span>.<span class='ident'>open_projects</span>(<span class='ident'>StorageDir</span>::<span class='ident'>Working</span>));
+    <span class='prelude-val'>Ok</span>(<span class='ident'>projects</span>.<span class='ident'>iter</span>()
+        .<span class='ident'>filter</span>(<span class='op'>|</span><span class='ident'>p</span><span class='op'>|</span> <span class='op'>!</span><span class='ident'>p</span>.<span class='ident'>canceled</span>() <span class='op'>&amp;&amp;</span> <span class='ident'>p</span>.<span class='ident'>age</span>().<span class='ident'>unwrap_or</span>(<span class='number'>0</span>) <span class='op'>&gt;</span> <span class='number'>0</span>)
+        .<span class='ident'>filter_map</span>(<span class='op'>|</span><span class='ident'>p</span><span class='op'>|</span> <span class='ident'>p</span>.<span class='ident'>wages</span>())
+        .<span class='ident'>fold</span>(<span class='ident'>Currency</span>::<span class='ident'>default</span>(), <span class='op'>|</span><span class='ident'>acc</span>, <span class='ident'>x</span><span class='op'>|</span> <span class='ident'>acc</span> <span class='op'>+</span> <span class='ident'>x</span>))
+}
+
+
+<span class='doccomment'>/// Command DUES</span>
+<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>open_payments</span>() <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>Currency</span><span class='op'>&gt;</span>{
+    <span class='kw'>let</span> <span class='ident'>luigi</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>setup_luigi</span>());
+    <span class='kw'>let</span> <span class='ident'>projects</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>luigi</span>.<span class='ident'>open_projects</span>(<span class='ident'>StorageDir</span>::<span class='ident'>Working</span>));
+    <span class='prelude-val'>Ok</span>(<span class='ident'>projects</span>.<span class='ident'>iter</span>()
+       .<span class='ident'>filter</span>(<span class='op'>|</span><span class='ident'>p</span><span class='op'>|</span> <span class='op'>!</span><span class='ident'>p</span>.<span class='ident'>canceled</span>() <span class='op'>&amp;&amp;</span> <span class='op'>!</span><span class='ident'>p</span>.<span class='ident'>payed_by_client</span>() <span class='op'>&amp;&amp;</span> <span class='ident'>p</span>.<span class='ident'>age</span>().<span class='ident'>unwrap_or</span>(<span class='number'>0</span>) <span class='op'>&gt;</span> <span class='number'>0</span>)
+       .<span class='ident'>filter_map</span>(<span class='op'>|</span><span class='ident'>p</span><span class='op'>|</span> <span class='ident'>p</span>.<span class='ident'>sum_sold</span>().<span class='ident'>ok</span>())
+       .<span class='ident'>fold</span>(<span class='ident'>Currency</span>::<span class='ident'>default</span>(), <span class='op'>|</span><span class='ident'>acc</span>, <span class='ident'>x</span><span class='op'>|</span> <span class='ident'>acc</span> <span class='op'>+</span> <span class='ident'>x</span>))
+}
+
 
 <span class='doccomment'>/// Testing only, tries to run complete spec on all projects.</span>
 <span class='doccomment'>/// TODO make this not panic :D</span>
@@ -571,59 +601,27 @@
     <span class='prelude-val'>Ok</span>(())
 }
 
-<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>delete_project_confirmation</span>(<span class='ident'>selection</span>:<span class='ident'>Selection</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span>()<span class='op'>&gt;</span> {
-    <span class='kw'>let</span> <span class='ident'>luigi</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>setup_luigi</span>());
-    <span class='macro'>debug</span><span class='macro'>!</span>(<span class='string'>&quot;{:?}&quot;</span>,<span class='ident'>selection</span>);
-    <span class='ident'>with_projects</span>(<span class='ident'>selection</span>.<span class='ident'>dir</span>, <span class='kw-2'>&amp;</span>[<span class='ident'>selection</span>.<span class='ident'>search</span>], <span class='op'>|</span><span class='ident'>p</span><span class='op'>|</span> {
-        <span class='macro'>println</span><span class='macro'>!</span>(<span class='string'>&quot;you want me to delete [y/N]{:?}&quot;</span>, <span class='ident'>p</span>.<span class='ident'>dir</span>());
-        <span class='kw'>if</span> <span class='ident'>util</span>::<span class='ident'>really</span>() {
-            <span class='macro'>println</span><span class='macro'>!</span>(<span class='string'>&quot;commencing&quot;</span>);
-            <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>luigi</span>.<span class='ident'>delete_project</span>(<span class='ident'>p</span>));
-            <span class='prelude-val'>Ok</span>(())
-        }<span class='kw'>else</span> {
-            <span class='macro'>try</span><span class='macro'>!</span>(<span class='prelude-val'>Err</span>(<span class='string'>&quot;nope&quot;</span>))
-        }
-    })
+<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>delete_project_confirmation</span>(<span class='ident'>dir</span>: <span class='ident'>StorageDir</span>, <span class='ident'>search_terms</span>:<span class='kw-2'>&amp;</span>[<span class='kw-2'>&amp;</span><span class='ident'>str</span>]) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span>()<span class='op'>&gt;</span> {
+    <span class='kw'>let</span> <span class='ident'>luigi</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>setup_luigi_with_git</span>());
+    <span class='kw'>for</span> <span class='ident'>project</span> <span class='kw'>in</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>luigi</span>.<span class='ident'>search_projects_any</span>(<span class='ident'>dir</span>, <span class='ident'>search_terms</span>)) {
+        <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>luigi</span>.<span class='ident'>delete_project_if</span>(<span class='kw-2'>&amp;</span><span class='ident'>project</span>,
+                <span class='op'>||</span> <span class='ident'>util</span>::<span class='ident'>really</span>(<span class='kw-2'>&amp;</span><span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;you want me to delete {:?} [y/N]&quot;</span>, <span class='ident'>project</span>.<span class='ident'>dir</span>())) <span class='op'>&amp;&amp;</span> <span class='ident'>util</span>::<span class='ident'>really</span>(<span class='string'>&quot;really? [y/N]&quot;</span>)
+                ))
+    }
+    <span class='prelude-val'>Ok</span>(())
 }
 
-<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>archive_project</span>(<span class='ident'>search_term</span>:<span class='kw-2'>&amp;</span><span class='ident'>str</span>, <span class='ident'>manual_year</span>:<span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>i32</span><span class='op'>&gt;</span>, <span class='ident'>force</span>:<span class='ident'>bool</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>PathBuf</span><span class='op'>&gt;&gt;</span>{
-    <span class='macro'>trace</span><span class='macro'>!</span>(<span class='string'>&quot;archive_project({},{:?},{:?})&quot;</span>,<span class='ident'>search_term</span>, <span class='ident'>manual_year</span>,<span class='ident'>force</span>);
+<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>archive_projects</span>(<span class='ident'>search_terms</span>:<span class='kw-2'>&amp;</span>[<span class='kw-2'>&amp;</span><span class='ident'>str</span>], <span class='ident'>manual_year</span>:<span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>i32</span><span class='op'>&gt;</span>, <span class='ident'>force</span>:<span class='ident'>bool</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>PathBuf</span><span class='op'>&gt;&gt;</span>{
+    <span class='macro'>trace</span><span class='macro'>!</span>(<span class='string'>&quot;archive_projects matching ({:?},{:?},{:?})&quot;</span>, <span class='ident'>search_terms</span>, <span class='ident'>manual_year</span>,<span class='ident'>force</span>);
     <span class='kw'>let</span> <span class='ident'>luigi</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>setup_luigi_with_git</span>());
-    <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>moved_files</span> <span class='op'>=</span> <span class='ident'>Vec</span>::<span class='ident'>new</span>();
-    <span class='kw'>let</span> <span class='ident'>projects</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>luigi</span>.<span class='ident'>search_projects_any</span>(<span class='ident'>StorageDir</span>::<span class='ident'>Working</span>, <span class='kw-2'>&amp;</span>[<span class='ident'>search_term</span>]));
-    <span class='kw'>if</span> <span class='ident'>projects</span>.<span class='ident'>is_empty</span>(){
-        <span class='kw'>return</span> <span class='prelude-val'>Err</span>(<span class='string'>&quot;Nothing found&quot;</span>.<span class='ident'>to_string</span>().<span class='ident'>into</span>());
-    }
-    <span class='kw'>for</span> <span class='ident'>project</span> <span class='kw'>in</span> <span class='ident'>projects</span> {
-        <span class='kw'>if</span> <span class='ident'>force</span> {<span class='macro'>warn</span><span class='macro'>!</span>(<span class='string'>&quot;you are using --force&quot;</span>)};
-        <span class='kw'>if</span> <span class='ident'>project</span>.<span class='ident'>is_ready_for_archive</span>().<span class='ident'>is_ok</span>() <span class='op'>||</span> <span class='ident'>force</span> {
-            <span class='macro'>info</span><span class='macro'>!</span>(<span class='string'>&quot;project {:?} is ready to be archived&quot;</span>, <span class='ident'>project</span>.<span class='ident'>name</span>());
-            <span class='kw'>let</span> <span class='ident'>year</span> <span class='op'>=</span> <span class='ident'>manual_year</span>.<span class='ident'>or</span>(<span class='ident'>project</span>.<span class='ident'>year</span>()).<span class='ident'>unwrap</span>();
-            <span class='macro'>info</span><span class='macro'>!</span>(<span class='string'>&quot;archiving {} ({})&quot;</span>,  <span class='ident'>project</span>.<span class='ident'>ident</span>(), <span class='ident'>project</span>.<span class='ident'>year</span>().<span class='ident'>unwrap</span>());
-            <span class='kw'>let</span> <span class='ident'>archive_target</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>luigi</span>.<span class='ident'>archive_project</span>(<span class='kw-2'>&amp;</span><span class='ident'>project</span>, <span class='ident'>year</span>));
-            <span class='ident'>moved_files</span>.<span class='ident'>push</span>(<span class='ident'>project</span>.<span class='ident'>dir</span>());
-            <span class='ident'>moved_files</span>.<span class='ident'>push</span>(<span class='ident'>archive_target</span>);
-        }
-        <span class='kw'>else</span> {
-            <span class='macro'>error</span><span class='macro'>!</span>(<span class='string'>&quot;project {:?} is not ready to be archived&quot;</span>, <span class='ident'>project</span>.<span class='ident'>name</span>());
-        }
-    };
-    <span class='prelude-val'>Ok</span>(<span class='ident'>moved_files</span>)
+    <span class='prelude-val'>Ok</span>(<span class='macro'>try</span><span class='macro'>!</span>( <span class='ident'>luigi</span>.<span class='ident'>archive_projects_if</span>(<span class='ident'>search_terms</span>, <span class='ident'>manual_year</span>, <span class='op'>||</span> <span class='ident'>force</span>) ))
 }
 
 <span class='doccomment'>/// Command UNARCHIVE &lt;YEAR&gt; &lt;NAME&gt;</span>
 <span class='doccomment'>/// TODO: return a list of files that have to be updated in git</span>
 <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>unarchive_projects</span>(<span class='ident'>year</span>:<span class='ident'>i32</span>, <span class='ident'>search_terms</span>:<span class='kw-2'>&amp;</span>[<span class='kw-2'>&amp;</span><span class='ident'>str</span>]) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>PathBuf</span><span class='op'>&gt;&gt;</span> {
     <span class='kw'>let</span> <span class='ident'>luigi</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>setup_luigi_with_git</span>());
-    <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>moved_files</span> <span class='op'>=</span> <span class='ident'>Vec</span>::<span class='ident'>new</span>();
-    <span class='kw'>let</span> <span class='ident'>projects</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>luigi</span>.<span class='ident'>search_projects_any</span>(<span class='ident'>StorageDir</span>::<span class='ident'>Archive</span>(<span class='ident'>year</span>), <span class='ident'>search_terms</span>));
-    <span class='kw'>for</span> <span class='ident'>project</span> <span class='kw'>in</span> <span class='ident'>projects</span> {
-        <span class='macro'>println</span><span class='macro'>!</span>(<span class='string'>&quot;unarchiving {:?}&quot;</span>, <span class='ident'>project</span>.<span class='ident'>name</span>());
-        <span class='kw'>let</span> <span class='ident'>unarchive_target</span> <span class='op'>=</span> <span class='ident'>luigi</span>.<span class='ident'>unarchive_project</span>(<span class='kw-2'>&amp;</span><span class='ident'>project</span>).<span class='ident'>unwrap</span>();
-        <span class='ident'>moved_files</span>.<span class='ident'>push</span>(<span class='ident'>project</span>.<span class='ident'>dir</span>());
-        <span class='ident'>moved_files</span>.<span class='ident'>push</span>(<span class='ident'>unarchive_target</span>);
-    };
-    <span class='prelude-val'>Ok</span>(<span class='ident'>moved_files</span>)
+    <span class='prelude-val'>Ok</span>(<span class='macro'>try</span><span class='macro'>!</span>( <span class='ident'>luigi</span>.<span class='ident'>unarchive_projects</span>(<span class='ident'>year</span>, <span class='ident'>search_terms</span>) ))
 }
 </pre>
 </section>
@@ -682,11 +680,9 @@
     <script>
         window.rootPath = "../../../../";
         window.currentCrate = "asciii";
-        window.playgroundUrl = "";
     </script>
     <script src="../../../../jquery.js"></script>
     <script src="../../../../main.js"></script>
-    
     <script defer src="../../../../search-index.js"></script>
 </body>
 </html>

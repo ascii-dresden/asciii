@@ -60,7 +60,7 @@
     <span class='kw'>pub</span> <span class='kw'>enum</span> <span class='ident'>SomeError</span> {
         <span class='ident'>Variant1</span> {}
     }
-}<a class='test-arrow' target='_blank' href=''>Run</a></pre>
+}</pre>
 
 <p>Both <code>pub</code> and non-public types may be declared, and all meta attributes
 (such as <code>#[derive(Debug)]</code>) are forwarded as is. The <code>Debug</code> must be
@@ -79,7 +79,7 @@ are allowed.</p>
         <span class='doccomment'>/// Utf8 Error</span>
         <span class='ident'>Utf8</span>(<span class='ident'>err</span>: <span class='ident'>std</span>::<span class='ident'>str</span>::<span class='ident'>Utf8Error</span>) {}
     }
-}<a class='test-arrow' target='_blank' href=''>Run</a></pre>
+}</pre>
 
 <p>Note unlike in normal Enum decarations you declare names of fields (which
 are omitted from type). How they can be used is outlined below.</p>
@@ -107,7 +107,7 @@ implementations. By default:</p>
             <span class='ident'>description</span>(<span class='string'>&quot;utf8 error&quot;</span>)
         }
     }
-}<a class='test-arrow' target='_blank' href=''>Run</a></pre>
+}</pre>
 
 <p>Normal rules for borrowing apply. So most of the time description either
 returns constant string or forwards description from enclosed type.</p>
@@ -127,7 +127,7 @@ example:</p>
             <span class='ident'>description</span>(<span class='string'>&quot;utf8 error&quot;</span>)
         }
     }
-}<a class='test-arrow' target='_blank' href=''>Run</a></pre>
+}</pre>
 
 <p>Note you don&#39;t need to wrap value in <code>Some</code>, its implicit. In case you want
 <code>None</code> returned just omit the <code>cause</code>. You can&#39;t return <code>None</code>
@@ -147,7 +147,7 @@ for example:</p>
             <span class='ident'>display</span>(<span class='string'>&quot;Utf8 error, valid up to {}&quot;</span>, <span class='ident'>err</span>.<span class='ident'>valid_up_to</span>())
         }
     }
-}<a class='test-arrow' target='_blank' href=''>Run</a></pre>
+}</pre>
 
 <p>If you need a reference to the error when <code>Display</code>ing, you can instead use
 <code>display(x) -&gt; (pattern, ..args)</code>, where <code>x</code> sets the name of the reference.</p>
@@ -165,7 +165,7 @@ for example:</p>
             <span class='ident'>display</span>(<span class='ident'>self_</span>) <span class='op'>-&gt;</span> (<span class='string'>&quot;{}, valid up to {}&quot;</span>, <span class='ident'>self_</span>.<span class='ident'>description</span>(), <span class='ident'>err</span>.<span class='ident'>valid_up_to</span>())
         }
     }
-}<a class='test-arrow' target='_blank' href=''>Run</a></pre>
+}</pre>
 
 <p>To convert to the type from any other, use one of the three forms of
 <code>from</code> clause.</p>
@@ -180,7 +180,7 @@ for example:</p>
             <span class='ident'>from</span>()
         }
     }
-}<a class='test-arrow' target='_blank' href=''>Run</a></pre>
+}</pre>
 
 <p>This implements <code>From&lt;io::Error&gt;</code>.</p>
 
@@ -195,7 +195,7 @@ the <code>from(type)</code> form:</p>
             <span class='ident'>from</span>(<span class='ident'>std</span>::<span class='ident'>fmt</span>::<span class='ident'>Error</span>)
         }
     }
-}<a class='test-arrow' target='_blank' href=''>Run</a></pre>
+}</pre>
 
 <p>And the most powerful form is <code>from(var: type) -&gt; (arguments...)</code>. It
 might be used to convert to type with multiple arguments or for arbitrary
@@ -215,7 +215,7 @@ value conversions:</p>
             <span class='ident'>from</span>(<span class='ident'>err</span>: <span class='ident'>std</span>::<span class='ident'>string</span>::<span class='ident'>FromUtf8Error</span>) <span class='op'>-&gt;</span> (<span class='ident'>err</span>.<span class='ident'>utf8_error</span>())
         }
     }
-}<a class='test-arrow' target='_blank' href=''>Run</a></pre>
+}</pre>
 
 <p>Since quick-error 1.1 we also have a <code>context</code> declaration, which is
 similar to (the longest form of) <code>from</code>, but allows adding some context to
@@ -244,7 +244,7 @@ the error. We need a longer example to demonstrate this:</p>
 
     <span class='prelude-val'>Ok</span>(())
 }
-<a class='test-arrow' target='_blank' href=''>Run</a></pre>
+</pre>
 
 <p>Each <code>context(a: A, b: B)</code> clause implements
 <code>From&lt;Context&lt;A, B&gt;&gt; for Error</code>. Which means multiple <code>context</code> clauses
@@ -343,11 +343,9 @@ Docstrings are also okay.  Empty braces can be omitted as of quick_error
     <script>
         window.rootPath = "../";
         window.currentCrate = "quick_error";
-        window.playgroundUrl = "";
     </script>
     <script src="../jquery.js"></script>
     <script src="../main.js"></script>
-    
     <script defer src="../search-index.js"></script>
 </body>
 </html>

@@ -47,16 +47,16 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-4984' class='srclink' href='../src/git2/remote_callbacks.rs.html#17-23' title='goto source code'>[src]</a></span></h1>
+               </span><a id='src-3354' class='srclink' href='../src/git2/remote_callbacks.rs.html#17-23' title='goto source code'>[src]</a></span></h1>
 <pre class='rust struct'>pub struct RemoteCallbacks&lt;'a&gt; { /* fields omitted */ }</pre><div class='docblock'><p>A structure to contain the callbacks which are invoked when a repository is
 being updated or downloaded.</p>
 
 <p>These callbacks are used to manage facilities such as authentication,
 transfer progress, etc.</p>
-</div><h2 id='methods'>Methods</h2><h3 class='impl'><span class='in-band'><code>impl&lt;'a&gt; <a class='struct' href='../git2/struct.RemoteCallbacks.html' title='git2::RemoteCallbacks'>RemoteCallbacks</a>&lt;'a&gt;</code></span><span class='out-of-band'><div class='ghost'></div><a id='src-5010' class='srclink' href='../src/git2/remote_callbacks.rs.html#71-126' title='goto source code'>[src]</a></span></h3>
+</div><h2 id='methods'>Methods</h2><h3 class='impl'><span class='in-band'><code>impl&lt;'a&gt; <a class='struct' href='../git2/struct.RemoteCallbacks.html' title='git2::RemoteCallbacks'>RemoteCallbacks</a>&lt;'a&gt;</code></span><span class='out-of-band'><div class='ghost'></div><a id='src-3380' class='srclink' href='../src/git2/remote_callbacks.rs.html#71-126' title='goto source code'>[src]</a></span></h3>
 <div class='impl-items'><h4 id='method.new' class='method'><span id='new.v' class='invisible'><code>fn <a href='#method.new' class='fnname'>new</a>() -&gt; <a class='struct' href='../git2/struct.RemoteCallbacks.html' title='git2::RemoteCallbacks'>RemoteCallbacks</a>&lt;'a&gt;</code></span></h4>
 <div class='docblock'><p>Creates a new set of empty callbacks</p>
-</div><h4 id='method.credentials' class='method'><span id='credentials.v' class='invisible'><code>fn <a href='#method.credentials' class='fnname'>credentials</a>&lt;F&gt;(&amp;mut self, cb: F) -&gt; &amp;mut <a class='struct' href='../git2/struct.RemoteCallbacks.html' title='git2::RemoteCallbacks'>RemoteCallbacks</a>&lt;'a&gt; <span class='where'>where F: <a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.FnMut.html' title='core::ops::FnMut'>FnMut</a>(&amp;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>, <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;&amp;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>&gt;, <a class='struct' href='../git2/struct.CredentialType.html' title='git2::CredentialType'>CredentialType</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='struct' href='../git2/struct.Cred.html' title='git2::Cred'>Cred</a>,&nbsp;<a class='struct' href='../git2/struct.Error.html' title='git2::Error'>Error</a>&gt; + 'a</span></code></span></h4>
+</div><h4 id='method.credentials' class='method'><span id='credentials.v' class='invisible'><code>fn <a href='#method.credentials' class='fnname'>credentials</a>&lt;F&gt;(&amp;mut self, cb: F) -&gt; &amp;mut <a class='struct' href='../git2/struct.RemoteCallbacks.html' title='git2::RemoteCallbacks'>RemoteCallbacks</a>&lt;'a&gt; <span class='where'>where F: <a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.FnMut.html' title='core::ops::FnMut'>FnMut</a>(&amp;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>, <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;&amp;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>&gt;, <a class='struct' href='../git2/struct.CredentialType.html' title='git2::CredentialType'>CredentialType</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='struct' href='../git2/struct.Cred.html' title='git2::Cred'>Cred</a>, <a class='struct' href='../git2/struct.Error.html' title='git2::Error'>Error</a>&gt; + 'a</span></code></span></h4>
 <div class='docblock'><p>The callback through which to fetch credentials if required.</p>
 </div><h4 id='method.transfer_progress' class='method'><span id='transfer_progress.v' class='invisible'><code>fn <a href='#method.transfer_progress' class='fnname'>transfer_progress</a>&lt;F&gt;(&amp;mut self, cb: F) -&gt; &amp;mut <a class='struct' href='../git2/struct.RemoteCallbacks.html' title='git2::RemoteCallbacks'>RemoteCallbacks</a>&lt;'a&gt; <span class='where'>where F: <a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.FnMut.html' title='core::ops::FnMut'>FnMut</a>(<a class='struct' href='../git2/struct.Progress.html' title='git2::Progress'>Progress</a>) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a> + 'a</span></code></span></h4>
 <div class='docblock'><p>The callback through which progress is monitored.</p>
@@ -128,11 +128,9 @@ connection to proceed.</p>
     <script>
         window.rootPath = "../";
         window.currentCrate = "git2";
-        window.playgroundUrl = "";
     </script>
     <script src="../jquery.js"></script>
     <script src="../main.js"></script>
-    
     <script defer src="../search-index.js"></script>
 </body>
 </html>
