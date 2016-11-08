@@ -1,10 +1,10 @@
 [package]
 name = "asciii"
-version = "3.0.0-RC3"
+version = "3.0.0"
 authors = ["Hendrik Sollich <hendrik@hoodie.de>"]
 license = "MIT/Apache-2.0"
 
-#build = "build.rs"
+build = "build.rs"
 
 
 [dependencies]
@@ -29,7 +29,7 @@ slug = "0.1"
 tempdir = "0.3"
 
 term = "0.4"
-prettytable-rs = { version = "0.6"}
+prettytable-rs = { version = "0.6", default-features= false}
 
 # feature: lints
 #herbie-lint = {version = "*", optional = true}
