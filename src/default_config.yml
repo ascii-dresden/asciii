@@ -11,7 +11,7 @@ list:
   sort:      index
   gitstatus: false
 
-  extra_details: #[OurBad, caterers] # see asciii list --computed for all options
+  extra_details: #[OurBad, Caterers] # see asciii list --computed for all options
 
 dirs:
   storage: projects

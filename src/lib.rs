@@ -3,7 +3,7 @@
 //! **For pure user documentation please refer to the [user manual](manual/index.html).**
 //! This contains user and developer documentation together.
 //!
-//! Please check out [cli](cli/index.html) too.
+//! Please check out [cli/subcommands](cli/subcommands/index.html) too.
 
 //#![warn(missing_docs,
 //        missing_copy_implementations,
