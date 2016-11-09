@@ -92,11 +92,12 @@ pub fn parse_dmy_date(date_str:&str) -> Option<Date<UTC>>{
     let date = date_str.split('.')
         .map(|f|f.parse().unwrap_or(0))
         .collect::<Vec<i32>>();
-    if date[0] > 0 {
+    if date.len() >=2 && date[0] > 0 && date[2] > 1900 {
         // XXX this neglects the old "01-05.12.2015" format
-        return UTC.ymd_opt(date[2], date[1] as u32, date[0] as u32).single()
+        UTC.ymd_opt(date[2], date[1] as u32, date[0] as u32).single()
+    } else {
+        None
     }
-    None
 }
 
 /// Interprets `"24-25.12.2016"` as date.
