@@ -49,8 +49,9 @@ fn payed_to_cell(project:&Project) -> Cell{
     let sym = ::CONFIG.get_str("currency").expect("Faulty config: currency does not contain a value");
     match (project.payed_by_client(), project.payed_caterers()) {
         (false,false) => Cell::new("✗").with_style(Attr::ForegroundColor(color::RED)),
-        (_,   false) => Cell::new(sym).with_style(Attr::ForegroundColor(color::YELLOW)),
-        (_,   true) => Cell::new(sym).with_style(Attr::ForegroundColor(color::GREEN)),
+        (_,    false) |
+        (false, _   ) => Cell::new(sym).with_style(Attr::ForegroundColor(color::YELLOW)),
+        (true, true ) => Cell::new(sym).with_style(Attr::ForegroundColor(color::GREEN)),
     }
 }
 
