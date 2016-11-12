@@ -151,6 +151,7 @@ pub fn build_cli() -> App<'static, 'static> {
                         )
                     .arg(Arg::with_name("all")
                          .help("List all projects, ever")
+                         .short("A")
                          .long("all"))
 
                     .arg(Arg::with_name("templates")
