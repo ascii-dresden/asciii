@@ -6,6 +6,7 @@
 //! Each module contains a `validate()` function which ought to be kept up to date.
 
 use bill::Currency;
+use chrono::{Date, UTC};
 
 use util::yaml;
 use util::yaml::Yaml;
@@ -24,12 +25,16 @@ fn field_exists<'a>(yaml: &Yaml, paths: &[&'a str]) -> Vec<&'a str> {
         .collect::<Vec<&'a str>>()
 }
 
-// stage 0
+//include!("spec_trait.rs");
+
 /// Stage 0: the project itself
 pub mod project {
+    use std::str::FromStr;
+    use chrono::{Date, UTC};
+    use semver::Version;
+
     use util::yaml;
     use util::yaml::Yaml;
-    use chrono::{Date, UTC};
     use super::hours;
 
     ///Returns the content of `/event/name` or...
@@ -56,9 +61,10 @@ pub mod project {
     }
 
     ///Returns the content of `/format`
-    pub fn format(yaml: &Yaml) -> Option<&str> {
+    pub fn format(yaml: &Yaml) -> Option<Version> {
         yaml::get_str(yaml, "meta/format")
             .or_else(||yaml::get_str(yaml, "format"))
+            .and_then(|s| Version::from_str(s).ok())
     }
 
     ///Returns the content of `/canceled`
@@ -84,6 +90,27 @@ pub mod project {
 pub mod client {
     use util::yaml;
     use util::yaml::Yaml;
+    use super::ProvidesData;
+
+    pub struct Client<'a> {
+        inner: &'a Yaml,
+    }
+
+    pub trait HasClient: ProvidesData {
+        ///Returns the content of `/client/email`
+        fn client<'a>(&'a self) -> Client<'a> {
+            Client {
+                inner: self.data()
+            }
+        }
+
+        ///Returns the content of `client.email`
+        /// TODO `HasClient::email()` does not yet validate the email address!
+        fn email(&self) -> Option<&str> {
+            self.get_str("client.email")
+        }
+
+    }
 
     ///Returns the content of `/client/email`
     pub fn email(yaml: &Yaml) -> Option<&str> {
@@ -433,12 +460,20 @@ pub mod invoice {
 
 /// Stage 3: requirements to archive
 pub mod archive {
+    use semver::Version;
     use util::yaml::Yaml;
 
     pub fn validate(yaml: &Yaml) -> super::SpecResult {
         let mut errors = Vec::new();
         if super::date::payed(yaml).is_none() { errors.push("payed_date"); }
         if super::date::wages(yaml).is_none(){ errors.push("wages_date");}
+
+        if let Some(format) = super::project::format(yaml) {
+            if format < Version::parse("2.0.0").unwrap() {
+                return Ok(());
+            }
+        }
+
         if !errors.is_empty() {
             return Err(errors);
         }
