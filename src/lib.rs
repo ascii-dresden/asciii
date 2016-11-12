@@ -36,6 +36,8 @@ extern crate term;
 extern crate bill;
 extern crate ordered_float;
 extern crate open;
+extern crate semver;
+extern crate term_size;
 #[macro_use] extern crate error_chain;
 #[macro_use] extern crate log;
 #[macro_use] extern crate prettytable;

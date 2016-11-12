@@ -24,9 +24,12 @@ ordered-float = "0.3"
 error-chain = "0.5"
 
 bill = {git="https://github.com/hoodie/bill-rs"}
+icalendar = {git="https://github.com/hoodie/icalendar-rs"}
 
 slug = "0.1"
 tempdir = "0.3"
+semver = "0.5"
+term_size = "0.2"
 
 term = "0.4"
 prettytable-rs = { version = "0.6", default-features= false}

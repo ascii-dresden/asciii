@@ -112,6 +112,7 @@ pub fn project_to_doc(project: &Project, template_name:&str, bill_type:&Option<B
                                .into_iter()
                                .map(|v|v.as_str()).collect::<Vec<_>>();
 
+
     let mut template_path = PathBuf::new();
 
     template_path.push(util::get_storage_path());
