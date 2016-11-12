@@ -1,10 +1,10 @@
-use chrono::Datelike;
+use chrono::*;
 
-use util::currency_to_string;
+use util;
 use storage::Storable;
 
-use super::spec::*;
 use super::Project;
+use super::spec;
 
 /// Fields that are accessible but are not directly found in the file format.
 /// This is used to get fields that are computed through an ordinary `get("responsible")`
@@ -40,7 +40,10 @@ custom_derive! {
         /// Sorting index
         SortIndex,
         Date,
-        Invalid
+        Invalid,
+
+        Format,
+        Dir
     }
 }
 
@@ -52,26 +55,32 @@ impl<'a> From<&'a str> for ComputedField {
 
 impl ComputedField {
     pub fn get(&self, project: &Project) -> Option<String> {
+        let storage = util::get_storage_path();
+
         match *self {
-            ComputedField::Responsible => project::manager(project.yaml()).map(|s| s.to_owned()),
-            ComputedField::OfferNumber => offer::number(project.yaml()),
-            ComputedField::InvoiceNumber => invoice::number_str(project.yaml()),
-            ComputedField::InvoiceNumberLong => invoice::number_long_str(project.yaml()),
-            ComputedField::Name => project::name(project.yaml()).map(|s| s.to_owned()),
-            ComputedField::Final => project.sum_sold().map(|c| currency_to_string(&c)).ok(),
-            ComputedField::Age => project.age().map(|a| format!("{} days", a)),
+            ComputedField::Responsible       => spec::project::manager(project.yaml()).map(|s| s.to_owned()),
+            ComputedField::OfferNumber       => spec::offer::number(project.yaml()),
+            ComputedField::InvoiceNumber     => spec::invoice::number_str(project.yaml()),
+            ComputedField::InvoiceNumberLong => spec::invoice::number_long_str(project.yaml()),
+            ComputedField::Name              => Some(project.name()),
+            ComputedField::Final             => project.sum_sold().map(|c| util::currency_to_string(&c)).ok(),
+            ComputedField::Age               => project.age().map(|a| format!("{} days", a)),
 
-            ComputedField::OurBad => project.our_bad()    .map(|a| format!("{} weeks", a.num_weeks().abs())),
-            ComputedField::TheirBad => project.their_bad().map(|a| format!("{} weeks", a.num_weeks().abs())),
+            ComputedField::OurBad            => project.our_bad()  .map(|a| format!("{} weeks", a.num_weeks().abs())),
+            ComputedField::TheirBad          => project.their_bad().map(|a| format!("{} weeks", a.num_weeks().abs())),
 
-            ComputedField::Year => project.date().map(|d| d.year().to_string()),
-            ComputedField::Date => project.date().map(|d| d.format("%Y.%m.%d").to_string()),
-            ComputedField::SortIndex => project.index(),
+            ComputedField::Year              => project.date().map(|d| d.year().to_string()),
+            ComputedField::Date              => project.date().map(|d| d.format("%Y.%m.%d").to_string()),
+            ComputedField::SortIndex         => project.index(),
 
-            ComputedField::Caterers       => hours::caterers_string(project.yaml()),
-            ComputedField::ClientFullName => client::full_name(project.yaml()),
-            ComputedField::Wages          => project.wages().map(|c| currency_to_string(&c)),
-            ComputedField::Invalid        => None,
+            ComputedField::Caterers          => spec::hours::caterers_string(project.yaml()),
+            ComputedField::ClientFullName    => spec::client::full_name(project.yaml()),
+            ComputedField::Wages             => project.wages().map(|c| util::currency_to_string(&c)),
+            ComputedField::Invalid           => None,
+            ComputedField::Format            => project.format().map(|f|f.to_string()),
+            ComputedField::Dir               => project.dir().parent()
+                .and_then(|d| d.strip_prefix(&storage).ok())
+                .map(|d| d.display().to_string())
 
             // _ => None
         }

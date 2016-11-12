@@ -15,6 +15,7 @@ use yaml_rust::Yaml;
 use tempdir::TempDir;
 use slug;
 use bill::{Bill,Currency};
+use semver::Version;
 
 use super::BillType;
 use util;
@@ -78,15 +79,21 @@ pub struct Project {
     yaml: Yaml
 }
 
+
 impl Project {
     /// Access to inner data
     pub fn yaml(&self) -> &Yaml{ &self.yaml }
 
     /// wrapper around yaml::get() with replacement
-    pub fn get(&self, path:&str) -> Option<String>{
+    pub fn get(&self, path:&str) -> Option<String> {
         ComputedField::from(path).get(self).or_else(||
             yaml::get_to_string(self.yaml(),path)
         )
+    }
+
+    /// wrapper around yaml::get() with replacement
+    pub fn format(&self)  -> Option<Version> {
+        spec::project::format(self.yaml())
     }
 
     /// Wraps `spec::project::manager()`
@@ -316,7 +323,6 @@ impl Project {
     }
 
     pub fn replace_field(&self, field:&str, value:&str) -> Result<()> {
-
         // fills the template
         let filled = Templater::new(&self.file_content)
             .fill_in_field(field,value)
@@ -400,7 +406,7 @@ impl Storable for Project{
         // project now lives in the temp_file
         Ok(Project{
             file_path: temp_file,
-            _temp_dir: Some(temp_dir), // needs to be kept alive to avoid deletion TODO: try something manually
+            _temp_dir: Some(temp_dir),
             git_status: None,
             file_content: filled,
             yaml: yaml
