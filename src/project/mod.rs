@@ -646,7 +646,7 @@ impl<'a> From<&'a Project> for DebugProject{
 #[cfg(test)]
 mod test {
     use std::path::Path;
-    use ::project::spec;
+    use ::project::spec::*;
     use ::project::Project;
     use ::storage::Storable;
 
@@ -655,25 +655,37 @@ mod test {
         println!("{:?}", ::std::env::current_dir());
         let new_project = Project::open_file(Path::new("./tests/current.yml")).unwrap();
         let old_project = Project::open_file(Path::new("./tests/old.yml")).unwrap();
-        let new_yaml = new_project.yaml();
-        let old_yaml = old_project.yaml();
         let config = &::CONFIG;
 
-        assert_eq!(spec::project::name(&old_yaml), spec::project::name(&new_yaml));
+        assert_eq!(old_project.name(),
+                   new_project.name());
 
-        //assert_eq!(spec::project::storage(&old_yaml), //fails
-        //           spec::project::storage(&new_yaml));
+        assert_eq!(old_project.offer().number(),
+                   new_project.offer().number());
 
-        assert_eq!(spec::offer::number(&old_yaml), spec::offer::number(&new_yaml));
+        //assert_eq!(old_project.offer().date(), // old format had no offer date
+        //           new_project.offer().date());
 
-        //assert_eq!(spec::date::offer(&old_yaml), //fails
-        //           spec::date::offer(&new_yaml));
+        assert_eq!(old_project.invoice().number_str(),
+                   new_project.invoice().number_str());
 
-        assert_eq!(spec::invoice::number_str(&old_yaml), spec::invoice::number_str(&new_yaml));
-        assert_eq!(spec::date::invoice(&old_yaml), spec::date::invoice(&new_yaml));
-        assert_eq!(spec::date::payed(&old_yaml), spec::date::payed(&new_yaml));
-        assert_eq!(spec::client::title(&old_yaml), spec::client::title(&new_yaml));
-        assert_eq!(spec::client::last_name(&old_yaml), spec::client::last_name(&new_yaml));
-        assert_eq!(spec::client::addressing(&old_yaml), spec::client::addressing(&new_yaml));
+        assert_eq!(old_project.invoice().date(),
+                   new_project.invoice().date());
+
+        assert_eq!(old_project.payed_date(),
+                   new_project.payed_date());
+
+        assert_eq!(old_project.client().title(),
+                   new_project.client().title());
+
+        assert_eq!(old_project.client().last_name(),
+                   new_project.client().last_name());
+
+        assert_eq!(old_project.client().addressing(),
+                   new_project.client().addressing());
+
+        assert_eq!(old_project.client().address(),
+                   new_project.client().address());
+
     }
 }

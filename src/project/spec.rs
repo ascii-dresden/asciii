@@ -14,7 +14,6 @@ use semver::Version;
 
 use super::error::{SpecResult, ErrorList};
 
-use std::fmt;
 use std::str::FromStr;
 
 pub fn print_specresult(result: SpecResult) {
