@@ -2,7 +2,6 @@
 
 #![allow(unused_imports)]
 #![allow(dead_code)]
-#![deny(deprecated)]
 
 
 use chrono::*;
@@ -246,7 +245,6 @@ pub fn spec() -> Result<()> {
     for project in projects{
         info!("{}", project.dir().display());
 
-        let yaml = project.yaml();
         project.client().validate().map_err(|errors| println!("{}", errors)).unwrap();
 
         project.client().full_name();
@@ -255,7 +253,7 @@ pub fn spec() -> Result<()> {
         project.client().email();
 
 
-        hours::caterers_string(&yaml);
+        project.caterers_string();
         project.invoice().number_long_str();
         project.invoice().number_str();
         project.offer().number();

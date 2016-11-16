@@ -2,7 +2,6 @@ use util;
 use storage::Storable;
 
 use super::Project;
-use super::spec;
 use super::spec::*;
 
 /// Fields that are accessible but are not directly found in the file format.
@@ -72,7 +71,7 @@ impl ComputedField {
             ComputedField::Date              => project.modified_date().map(|d| d.format("%Y.%m.%d").to_string()),
             ComputedField::SortIndex         => project.index(),
 
-            ComputedField::Caterers          => spec::hours::caterers_string(project.yaml()),
+            ComputedField::Caterers          => project.caterers_string(),
             ComputedField::ClientFullName    => project.client().full_name(),
             ComputedField::Wages             => project.wages().map(|c| util::currency_to_string(&c)),
             ComputedField::Invalid           => None,

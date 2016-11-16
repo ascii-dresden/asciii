@@ -9,13 +9,13 @@ use bill::Currency;
 use yaml_rust::Yaml;
 use yaml_rust::yaml::Hash as YamlHash;
 
-use chrono::{Date, UTC, TimeZone, Datelike, NaiveTime};
+use chrono::{Date, UTC, TimeZone, Datelike};
 use semver::Version;
+
+use super::error::{SpecResult, ErrorList};
 
 use std::fmt;
 use std::str::FromStr;
-
-pub type SpecResult = ::std::result::Result<(), ErrorList>;
 
 pub fn print_specresult(result: SpecResult) {
     match result {
@@ -30,53 +30,6 @@ pub fn to_currency(f: f64) -> Currency {
     Currency(::CONFIG.get_char("currency"), (f * 1000.0) as i64) / 10
 }
 
-pub struct ErrorList {
-    pub errors: Vec<String>
-}
-
-impl ErrorList {
-    pub fn new() -> Self{
-        ErrorList {
-            errors: Vec::new()
-        }
-    }
-
-    pub fn push(&mut self, error:&str) {
-        self.errors.push(error.into());
-    }
-
-    pub fn is_empty(&self) -> bool{
-        self.errors.is_empty()
-    }
-}
-
-use std::ops::Deref;
-impl Deref for ErrorList {
-    type Target = [String];
-    fn deref(&self) -> &[String] {
-        &self.errors
-    }
-}
-
-impl<'a> From<&'a [&'a str]> for ErrorList {
-    fn from(errs: &'a [&str]) -> ErrorList {
-        let mut list = ErrorList::new();
-        for e in errs {
-            list.push(e);
-        }
-        list
-    }
-}
-
-
-impl fmt::Display for ErrorList {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        for error in &self.errors {
-            try!(writeln!(f, " * {}", error))
-        }
-        Ok(())
-    }
-}
 
 /// Interprets `"24-25.12.2016"` as date.
 ///
@@ -259,7 +212,6 @@ pub trait IsProject: ProvidesData {
             .or_else(|| self.get_str("event"))
     }
 
-    //#[deprecated(note="Ambiguous: what date? use another name")]
     fn event_date(&self) -> Option<Date<UTC>>{
         self.get_dmy( "event.dates.0.begin")
         .or_else(||self.get_dmy("created"))
@@ -445,6 +397,13 @@ pub trait Invoicable: ProvidesData {
 }
 
 
+use super::product::error::Error;
+use super::product::error::Result;
+use super::product::error::ErrorKind;
+use super::product::Product;
+use bill::{BillItem, Bill};
+
+
 /// Stage 3: when an `IsProject` is redeem and can be archived
 pub trait Redeemable: IsProject {
     /// When was the project payed
@@ -513,6 +472,71 @@ pub trait Redeemable: IsProject {
         })
     }
 
+    fn bills(&self) -> Result<(Bill<Product>, Bill<Product>)> {
+        let mut offer: Bill<Product> = Bill::new();
+        let mut invoice: Bill<Product> = Bill::new();
+
+        let service = || Product {
+            name: "Service",
+            unit: Some("h"),
+            tax: ::ordered_float::OrderedFloat(0f64), // TODO this ought to be in the config
+            price: self.salary().unwrap_or(Currency(None,0))
+        };
+
+        if let Some(total) = self.total() {
+            if total.is_normal() {
+                offer.add_item(total, service());
+                invoice.add_item(total, service());
+            }
+        }
+
+        let raw_products = try!(
+            self.get_hash("products")
+                .ok_or(Error::from(ErrorKind::UnknownFormat))
+            );
+
+        for (desc,values) in raw_products {
+            let (offer_item, invoice_item) = try!(self.item_from_desc_and_value(desc, values));
+            if offer_item.amount.is_normal()   { offer.add(offer_item); }
+            if invoice_item.amount.is_normal() { invoice.add(invoice_item); }
+        }
+
+        Ok((offer,invoice))
+    }
+
+    /// implementation detail
+    /// TODO please move into concrete implementation
+    fn item_from_desc_and_value<'y>(&self, desc: &'y Yaml, values: &'y Yaml) -> Result<(BillItem<Product<'y>>,BillItem<Product<'y>>)> {
+        let get_f64 = |yaml, path|
+            self.get_direct(yaml,path)
+                .and_then(|y| y.as_f64()
+                               .or( y.as_i64()
+                                     .map(|y|y as f64)
+                                  )
+                         );
+
+        let product = try!(Product::from_desc_and_value(desc, values));
+
+        let offered = try!(get_f64(values, "amount")
+                           .ok_or(Error::from(ErrorKind::MissingAmount(product.name.to_owned()))));
+        let sold = get_f64(values, "sold");
+        let sold = if let Some(returned) = get_f64(values, "returned") {
+            // if "returned", there must be no "sold"
+            if sold.is_some() {
+                return Err(ErrorKind::AmbiguousAmounts(product.name.to_owned()).into());
+            }
+            if returned > offered {
+                return Err(ErrorKind::TooMuchReturned(product.name.to_owned()).into());
+            }
+            offered - returned
+        } else if let Some(sold) = sold {
+            sold
+        } else {
+            offered
+        };
+
+        Ok(( BillItem{ amount: offered, product: product }, BillItem{ amount: sold, product: product }))
+    }
 }
 
 impl Validatable for Redeemable {
@@ -655,129 +679,3 @@ pub mod events {
     }
 }
 
-
-/// Everything related to service hours of a project
-pub mod hours {
-    use bill::Currency;
-    use util::yaml;
-    use util::yaml::Yaml;
-    use super::to_currency;
-
-    /// Salary
-    pub fn salary(yaml: &Yaml) -> Option<Currency> {
-        yaml::get_f64(yaml, "hours/salary").map(to_currency)
-    }
-
-    /// Full number of service hours
-    /// XXX test this against old format
-    pub fn total(yaml: &Yaml) -> Option<f64> {
-        caterers(yaml).map(|vec| {
-            vec.iter()
-                .map(|&(_, h)| h)
-                .fold(0f64, |acc, h| acc + h)
-        })
-        //.or_else(|| )
-    }
-
-    //pub fn total_salary(yaml: &Yaml) -> SpecResult<(f64,Currency)> {
-    //    let salary = salary(yaml);
-    //    let total = total(yaml);
-    //    match (salary, total) {
-    //        (Some(0), Some(t)) if t > 0  => Err(),
-    //        (None, Some(_)) => Err(),
-    //        (Some(s), Some(t)) => Ok((t,s))
-    //    }
-    //}
-
-    /// Nicely formated list of caterers with their respective service hours
-    pub fn caterers_string(yaml: &Yaml) -> Option<String> {
-        caterers(yaml).map(|v| {
-            v.iter()
-                .map(|t| format!("{}: ({})", t.0, t.1))
-                .collect::<Vec<String>>()
-                .join(", ")
-        })
-    }
-
-    /// List of caterers and ther respective service hours
-    pub fn caterers(yaml: &Yaml) -> Option<Vec<(String, f64)>> {
-        yaml::get_hash(yaml, "hours/caterers").map(|h| {
-            h.iter()
-                .map(|(c, h)| {
-                    (// argh, those could be int or float, grrr
-                     c.as_str().unwrap_or("").to_owned(),
-                     h.as_f64()
-                        .or_else(|| // sorry for this
-                             h.as_i64().map(|f|f as f64 ))
-                        .unwrap_or(0f64))
-                })
-                .collect::<Vec<(String, f64)>>()
-        })
-    }
-}
-
-/// Generates `Bill`s for offer and invoice.
-pub mod billing {
-    use bill::{BillItem, Bill,Currency};
-
-    use util::yaml;
-    use util::yaml::Yaml;
-    use ::project::product::error::Error;
-    use ::project::product::error::Result;
-    use ::project::product::error::ErrorKind;
-    use ::project::product::Product;
-
-    fn item_from_desc_and_value<'y>(desc: &'y Yaml, values: &'y Yaml) -> Result<(BillItem<Product<'y>>,BillItem<Product<'y>>)> {
-        let product = try!(Product::from_desc_and_value(desc, values));
-
-        let offered = try!(yaml::get_f64(values, "amount")
-                           .ok_or(Error::from(ErrorKind::MissingAmount(product.name.to_owned()))));
-        let sold = yaml::get_f64(values, "sold");
-        let sold = if let Some(returned) = yaml::get_f64(values, "returned") {
-            // if "returned", there must be no "sold"
-            if sold.is_some() {
-                return Err(ErrorKind::AmbiguousAmounts(product.name.to_owned()).into());
-            }
-            if returned > offered {
-                return Err(ErrorKind::TooMuchReturned(product.name.to_owned()).into());
-            }
-            offered - returned
-        } else if let Some(sold) = sold {
-            sold
-        } else {
-            offered
-        };
-
-        Ok(( BillItem{ amount: offered, product: product }, BillItem{ amount: sold, product: product }))
-    }
-
-    /// Produces two `Bill`s, one for the offer and one for the invoice
-    pub fn bills(yaml: &Yaml) -> Result<(Bill<Product>, Bill<Product>)> {
-        let mut offer: Bill<Product> = Bill::new();
-        let mut invoice: Bill<Product> = Bill::new();
-
-        let service = || Product {
-            name: "Service",
-            unit: Some("h"),
-            tax: ::ordered_float::OrderedFloat(0f64), // TODO this ought to be in the config
-            price: super::hours::salary(&yaml).unwrap_or(Currency(None,0))
-        };
-
-        if let Some(total) = super::hours::total(&yaml) {
-            if total.is_normal() {
-                offer.add_item(total, service());
-                invoice.add_item(total, service());
-            }
-        }
-
-        let raw_products = try!(yaml::get_hash(yaml, "products").ok_or(Error::from(ErrorKind::UnknownFormat)));
-
-        for (desc,values) in raw_products {
-            let (offer_item, invoice_item) = try!(item_from_desc_and_value(desc, values));
-            if offer_item.amount.is_normal()   { offer.add(offer_item); }
-            if invoice_item.amount.is_normal() { invoice.add(invoice_item); }
-        }
-
-        Ok((offer,invoice))
-    }
-}

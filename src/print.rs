@@ -13,9 +13,9 @@ use term_size;
 use super::BillType;
 
 use project::Project;
-use project::spec::IsProject;
-use project::spec::SpecResult;
+use project::spec::{IsProject, Redeemable};
 use project::spec::events::HasEvents;
+use project::error::SpecResult;
 use storage::Storable;
 use util::currency_to_string;
 

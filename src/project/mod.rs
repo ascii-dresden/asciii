@@ -14,7 +14,7 @@ use chrono::*;
 use yaml_rust::Yaml;
 use tempdir::TempDir;
 use slug;
-use bill::{Bill,Currency};
+use bill::Currency;
 //use semver::Version;
 
 use super::BillType;
@@ -36,9 +36,6 @@ macro_rules! try_some {
 
 pub mod product;
 pub mod spec;
-use self::spec::{IsProject, IsClient, Offerable, Invoicable, Redeemable, Validatable};
-use self::spec::events::HasEvents;
-use self::spec::ErrorList;
 
 pub mod error;
 mod computed_field;
@@ -48,12 +45,12 @@ mod tojson;
 
 //#[cfg(test)] mod tests;
 
-use self::spec::SpecResult;
 use self::spec::ProvidesData;
+use self::spec::{IsProject, IsClient};
+use self::spec::{Offerable, Invoicable, Redeemable, Validatable};
+use self::spec::events::HasEvents;
+use self::error::{ErrorKind, ErrorList, SpecResult, Result};
 
-
-use self::product::Product;
-use self::error::{ErrorKind,Result};
 pub use self::computed_field::ComputedField;
 
 
@@ -130,7 +127,7 @@ impl Project {
     }
 
     pub fn caterers(&self) -> String {
-        spec::hours::caterers_string(self.yaml()).unwrap_or_else(String::new)
+        self.caterers_string().unwrap_or_else(String::new)
     }
 
     /// Filename of the offer output file.
@@ -256,11 +253,6 @@ impl Project {
         self.modified_date().map(|date| (Local::today() - date).num_days() )
     }
 
-    /// Returs a tuple containing both `(Order,` and ` Invoice)`
-    pub fn bills(&self) -> Result<(Bill<Product>, Bill<Product>)> {
-        Ok(try!(spec::billing::bills(&self.yaml)))
-    }
-
     pub fn to_csv(&self, bill_type:&BillType) -> Result<String>{
         use std::fmt::Write;
         let (offer, invoice) = try!(self.bills());
@@ -285,7 +277,7 @@ impl Project {
     }
 
     pub fn wages(&self) -> Option<Currency> {
-        if let (Some(total), Some(salary)) = (spec::hours::total(&self.yaml), spec::hours::salary(&self.yaml)){
+        if let (Some(total), Some(salary)) = (self.total(), self.salary()){
             Some(total * salary)
         } else{None}
     }
@@ -352,7 +344,6 @@ impl Project {
         let payed   = self.payed_date().unwrap_or_else(UTC::today);
         Some(invoice - payed)
     }
-
 }
 
 impl ProvidesData for Project {

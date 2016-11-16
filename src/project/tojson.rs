@@ -46,7 +46,6 @@ impl ToJson for Project{
         let s = |s:&str| String::from(s);
 
         let opt_str = |opt:Option<&str>| opt.map(|e|e.to_owned()).to_json() ;
-        let y = &self.yaml;
         let dmy = |date:Option<Date<UTC>>| date.map(|d|d.format("%d.%m.%Y").to_string()).to_json();
 
         let item_to_json = |item:&BillItem<Product>, tax:OrderedFloat<f64>| btreemap!{
@@ -118,8 +117,8 @@ impl ToJson for Project{
             }.to_json(),
 
             s("hours") => btreemap!{
-                s("time")   => opt_to_json(hours::total(y)),
-                s("salary") => opt_to_json(hours::salary(y).map(|ref c|currency_to_string(c)))
+                s("time")   => opt_to_json(self.total()),
+                s("salary") => opt_to_json(self.salary().map(|ref c| currency_to_string(c)))
             }.to_json(),
 
         };
