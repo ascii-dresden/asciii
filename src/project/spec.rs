@@ -277,6 +277,7 @@ pub trait IsClient: ProvidesData {
     ///Returns the content of `/client/address`
     fn address(&self) -> Option<&str> {
         self.get_str("client/address")
+        .or_else(|| self.get_str("address"))
     }
 
     ///Returns the content of `/client/title`

@@ -686,6 +686,5 @@ mod test {
 
         assert_eq!(old_project.client().address(),
                    new_project.client().address());
-
     }
 }
