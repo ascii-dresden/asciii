@@ -17,6 +17,8 @@ use asciii::actions;
 use asciii::storage::*;
 use asciii::templater::Templater;
 use asciii::project::Project;
+use asciii::project::spec;
+use asciii::project::spec::IsProject;
 use asciii::project::ComputedField;
 use asciii::actions::{setup_luigi, setup_luigi_with_git};
 
@@ -260,9 +262,9 @@ fn list_projects(dir: StorageDir, list_config: &ListConfig) {
 
     // sorting
     match list_config.sort_by {
-        "manager" => projects.sort_by(|pa,pb| pa.manager().cmp( &pb.manager())),
-        "date"    => projects.sort_by(|pa,pb| pa.date().cmp( &pb.date())),
-        "name"    => projects.sort_by(|pa,pb| pa.name().cmp( &pb.name())),
+        "manager" => projects.sort_by(|pa,pb| pa.responsible().cmp( &pb.responsible())),
+        "date"    => projects.sort_by(|pa,pb| pa.modified_date().cmp( &pb.modified_date())),
+        "name"    => projects.sort_by(|pa,pb| pa.short_desc().cmp( &pb.short_desc())),
         "index"   => projects.sort_by(|pa,pb| pa.index().unwrap_or("zzzz".to_owned()).cmp( &pb.index().unwrap_or("zzzz".to_owned()))), // TODO rename to ident
         _         => projects.sort_by(|pa,pb| pa.index().unwrap_or("zzzz".to_owned()).cmp( &pb.index().unwrap_or("zzzz".to_owned()))),
     }
@@ -399,13 +401,13 @@ pub fn set(m: &ArgMatches) {
 
     execute(|| {
         actions::with_projects(dir, &search_terms, |project| {
-            println!("{}: {}", project.name(), project.empty_fields().join(", "));
+            println!("{}: {}", project.short_desc(), project.empty_fields().join(", "));
             if !project.empty_fields().contains(&field) {
-                return Err(format!("{:?} was not found in {}", field, project.name()).into());
+                return Err(format!("{:?} was not found in {}", field, project.short_desc()).into());
             }
             if util::really(&format!("do you want to set the field {} in {:?} [y|N]",
                                      field,
-                                     project.name())) {
+                                     project.short_desc())) {
                 project.replace_field(&field, &value).map_err(|e| e.into())
             } else {
                 Err("Don't want to".into())
@@ -461,16 +463,15 @@ fn dump_yaml(dir: StorageDir, search_terms: &[&str]) {
 
 fn show_errors(dir: StorageDir, search_terms: &[&str]) {
     actions::simple_with_projects(dir, &search_terms, |p| {
-        println!("{}: {}",
-                 p.name(),
-                 p.is_ready_for_archive().err().unwrap_or_else(Vec::new).join(", "))
+        println!("{}: ", p.short_desc());
+        spec::print_specresult(p.is_ready_for_archive());
     });
 }
 
 fn show_empty_fields(dir: StorageDir, search_terms: &[&str]) {
     actions::simple_with_projects(dir,
                                   &search_terms,
-                                  |p| println!("{}: {}", p.name(), p.empty_fields().join(", ")));
+                                  |p| println!("{}: {}", p.short_desc(), p.empty_fields().join(", ")));
 }
 
 

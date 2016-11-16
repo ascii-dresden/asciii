@@ -15,7 +15,7 @@ use yaml_rust::Yaml;
 use tempdir::TempDir;
 use slug;
 use bill::{Bill,Currency};
-use semver::Version;
+//use semver::Version;
 
 use super::BillType;
 use util;
@@ -36,6 +36,10 @@ macro_rules! try_some {
 
 pub mod product;
 pub mod spec;
+use self::spec::{IsProject, IsClient, Offerable, Invoicable, Redeemable, Validatable};
+use self::spec::events::HasEvents;
+use self::spec::ErrorList;
+
 pub mod error;
 mod computed_field;
 
@@ -45,7 +49,9 @@ mod tojson;
 //#[cfg(test)] mod tests;
 
 use self::spec::SpecResult;
-use self::spec::date::Event;
+use self::spec::ProvidesData;
+
+
 use self::product::Product;
 use self::error::{ErrorKind,Result};
 pub use self::computed_field::ComputedField;
@@ -79,7 +85,6 @@ pub struct Project {
     yaml: Yaml
 }
 
-
 impl Project {
     /// Access to inner data
     pub fn yaml(&self) -> &Yaml{ &self.yaml }
@@ -91,41 +96,37 @@ impl Project {
         )
     }
 
-    /// wrapper around yaml::get() with replacement
-    pub fn format(&self)  -> Option<Version> {
-        spec::project::format(self.yaml())
-    }
-
-    /// Wraps `spec::project::manager()`
-    pub fn manager(&self) -> String{
-        spec::project::manager(self.yaml()).unwrap_or("").into()
-    }
-
-    /// Wraps `spec::project::canceled()`
-    pub fn canceled(&self) -> bool{
-        spec::project::canceled(self.yaml())
-    }
-
     /// either `"canceled"` or `""`
     pub fn canceled_string(&self) -> &'static str{
         if self.canceled(){"canceled"}
         else {""}
     }
 
-    pub fn events(&self) -> Option<Vec<Event>> {
-        spec::date::events(&self.yaml())
+    /// Returns the struct `Client`, which abstracts away client specific stuff.
+    pub fn client<'a>(&'a self) -> Client<'a> {
+        Client { inner: self }
+    }
+
+    /// Returns the struct `Offer`, which abstracts away offer specific stuff.
+    pub fn offer<'a>(&'a self) -> Offer<'a> {
+        Offer { inner: self }
+    }
+
+    /// Returns the struct `Invoice`, which abstracts away invoice specific stuff.
+    pub fn invoice<'a>(&'a self) -> Invoice<'a> {
+        Invoice { inner: self }
     }
 
     pub fn invoice_num(&self) -> Option<String>{
-        spec::invoice::number_str(self.yaml())
+        self.invoice().number_str()
     }
 
     pub fn payed_by_client(&self) -> bool{
-        spec::date::payed(self.yaml()).is_some()
+        self.payed_date().is_some()
     }
 
     pub fn payed_caterers(&self) -> bool{
-        spec::date::wages(self.yaml()).is_some()
+        self.wages_date().is_some()
     }
 
     pub fn caterers(&self) -> String {
@@ -134,17 +135,17 @@ impl Project {
 
     /// Filename of the offer output file.
     pub fn offer_file_name(&self, extension:&str) -> Option<String>{
-        let num = try_some!(spec::offer::number(self.yaml()));
-        let name = slug::slugify(try_some!(spec::project::name(self.yaml())));
+        let num = try_some!(self.offer().number());
+        let name = slug::slugify(try_some!(IsProject::name(self)));
         Some(format!("{} {}.{}",num,name,extension))
     }
 
     /// Filename of the invoice output file. **Carefull!** uses today's date.
     pub fn invoice_file_name(&self, extension:&str) -> Option<String>{
-        let num = try_some!(spec::invoice::number_str(self.yaml()));
-        let name = slug::slugify(try_some!(spec::project::name(self.yaml())));
+        let num = try_some!(self.invoice().number_str());
+        let name = slug::slugify(try_some!(self.name()));
         //let date = Local::today().format("%Y-%m-%d").to_string();
-        let date = try_some!(spec::invoice::date(self.yaml())).format("%Y-%m-%d").to_string();
+        let date = try_some!(self.invoice().date()).format("%Y-%m-%d").to_string();
         Some(format!("{} {} {}.{}",num,name,date,extension))
     }
 
@@ -216,22 +217,17 @@ impl Project {
     }
 
 
-    /// Minimum correctness.
-    ///
-    /// Ready to send an **offer** to the client.
-    #[deprecated(note="please use is_ready_for_offer()")]
-    pub fn valid_stage1(&self) -> SpecResult{
-        self.is_ready_for_offer()
-    }
-
     /// Ready to produce offer.
     ///
     /// Ready to send an **offer** to the client.
     pub fn is_ready_for_offer(&self) -> SpecResult{
-        let client_validation = spec::client::validate(&self.yaml);
-        let offer_validation = spec::offer::validate(&self.yaml);
-        let project_validation = spec::project::validate(&self.yaml);
-        //TODO join error lists
+        let client             = self.client();
+        let client_validation  = client.validate();
+
+        let offer              = self.offer();
+        let offer_validation   = offer.validate();
+
+        let project_validation = self.validate();
         offer_validation.and(client_validation).and(project_validation)
     }
 
@@ -239,7 +235,9 @@ impl Project {
     ///
     /// Ready to send an **invoice** to the client.
     pub fn is_ready_for_invoice(&self) -> SpecResult{
-        self.is_ready_for_offer().and(spec::invoice::validate(&self.yaml))
+        let invoice_validation = self.invoice().validate();
+
+        self.is_ready_for_offer().and(invoice_validation)
     }
 
     /// Completely done and in the past.
@@ -249,20 +247,13 @@ impl Project {
         if self.canceled(){
             Ok(())
         } else {
-            spec::archive::validate(&self.yaml)
+            Redeemable::validate(self)
         }
     }
 
+    /// TODO move to `IsProjectExt`
     pub fn age(&self) -> Option<i64> {
-        self.date().map(|date| (Local::today() - date).num_days() )
-    }
-
-    pub fn our_bad(&self) -> Option<Duration> {
-        spec::date::our_bad(self.yaml())
-    }
-
-    pub fn their_bad(&self) -> Option<Duration> {
-        spec::date::their_bad(self.yaml())
+        self.modified_date().map(|date| (Local::today() - date).num_days() )
     }
 
     /// Returs a tuple containing both `(Order,` and ` Invoice)`
@@ -345,11 +336,150 @@ impl Project {
         }
     }
 
+    pub fn our_bad(&self) -> Option<Duration> {
+        let event   = try_some!(self.event_date());
+        let invoice = self.invoice().date().unwrap_or_else(UTC::today);
+        let diff = invoice - event;
+        if diff > Duration::zero() {
+            Some(diff)
+        } else {
+            None
+        }
+    }
+
+    pub fn their_bad(&self) -> Option<Duration> {
+        let invoice = self.invoice().date().unwrap_or_else(UTC::today);
+        let payed   = self.payed_date().unwrap_or_else(UTC::today);
+        Some(invoice - payed)
+    }
+
 }
 
-//impl From<yaml::YamlError> for StorageError {
-//    fn from(yerror: yaml::YamlError) -> StorageError{ StorageError::ParseError(yerror) }
-//}
+impl ProvidesData for Project {
+    fn data(&self) -> &Yaml{
+        self.yaml()
+    }
+}
+
+impl IsProject for Project { }
+impl Redeemable for Project { }
+
+impl Validatable for Project {
+    fn validate(&self) -> SpecResult {
+        let mut errors = ErrorList::new();
+        if self.name().is_none(){errors.push("name")}
+        if self.event_date().is_none(){errors.push("date")}
+        if self.responsible().is_none(){errors.push("manager")}
+        if self.format().is_none(){errors.push("format")}
+        //if hours::salary().is_none(){errors.push("salary")}
+
+        if errors.is_empty(){ Ok(()) }
+        else { Err(errors) }
+    }
+}
+
+impl HasEvents for Project {
+}
+
+/// This is returned by [Product::client()](struct.Project.html#method.client).
+pub struct Client<'a> {
+    inner: &'a Project
+}
+
+impl<'a> ProvidesData for Client<'a> {
+    fn data(&self) -> &Yaml{
+        self.inner.data()
+    }
+}
+
+impl<'a> Validatable for Client<'a> {
+    fn validate(&self) -> SpecResult {
+        let mut errors = self.field_exists( &[
+                                             //"client/email", // TODO make this a requirement
+                                             "client/address",
+                                             "client/title",
+                                             "client/last_name",
+                                             "client/first_name"
+                                             ]);
+
+
+        if self.addressing().is_none() {
+            errors.push("client_addressing");
+        }
+        if !errors.is_empty() {
+            return Err(errors);
+        }
+
+        Ok(())
+    }
+}
+
+/// This is returned by [Product::offer()](struct.Project.html#method.offer).
+pub struct Offer<'a> {
+    inner: &'a Project
+}
+
+impl<'a> ProvidesData for Offer<'a> {
+    fn data(&self) -> &Yaml{
+        self.inner.data()
+    }
+}
+
+impl<'a> Offerable for Offer<'a> { }
+
+impl<'a> Validatable for Offer<'a> {
+    fn validate(&self) -> SpecResult {
+        //if IsProject::canceled(self) {
+        //    return Err(vec!["canceled"]);
+        //}
+
+        let mut errors = self.field_exists(&["offer.date", "offer.appendix", "manager"]);
+        if Offerable::date(self).is_none() {
+            errors.push("offer_date_format");
+        }
+
+        if !errors.is_empty() {
+            return Err(errors);
+        }
+
+        Ok(())
+
+    }
+}
+
+
+/// This is returned by [Product::invoice()](struct.Project.html#method.invoice).
+pub struct Invoice<'a> {
+    inner: &'a Project
+}
+
+impl<'a> ProvidesData for Invoice<'a> {
+    fn data(&self) -> &Yaml{
+        self.inner.data()
+    }
+}
+
+impl<'a> Invoicable for Invoice<'a> { }
+
+impl<'a> Validatable for Invoice<'a> {
+    fn validate(&self) -> SpecResult {
+        let mut errors = self.field_exists(&["invoice.number"]);
+
+        // if super::offer::validate(yaml).is_err() {errors.push("offer")}
+        if self.date().is_none() {
+            errors.push("invoice_date");
+        }
+
+        if !errors.is_empty() {
+            return Err(errors);
+        }
+
+        Ok(())
+    }
+}
+
+// TODO move to spec_traint.rs
+impl<'a> IsClient for Client<'a> { }
 
 impl Storable for Project{
     fn file_extension() -> &'static str {PROJECT_FILE_EXTENSION}
@@ -418,8 +548,8 @@ impl Storable for Project{
     }
 
     fn index(&self) -> Option<String>{
-        if let Some(date) = self.date(){
-            spec::invoice::number_str(self.yaml())
+        if let Some(date) = self.modified_date() {
+            self.invoice().number_str()
                 .map(|num| format!("{1}{0}", date.format("%Y%m%d").to_string(),num))
                 .or_else(||Some(date.format("zzz%Y%m%d").to_string()))
         } else {
@@ -427,8 +557,8 @@ impl Storable for Project{
         }
     }
 
-    fn name(&self) -> String {
-        spec::project::name(self.yaml())
+    fn short_desc(&self) -> String {
+        self.name()
             .map(|n|n.to_owned())
             .unwrap_or_else(|| format!("unnamed: {:?}",
                                        self.dir()
@@ -438,7 +568,17 @@ impl Storable for Project{
                            )
     }
 
-    fn date(&self) -> Option<Date<UTC>>{ spec::project::date(self.yaml()) }
+    fn modified_date(&self) -> Option<Date<UTC>> {
+        self.get_dmy( "event.dates.0.begin")
+            .or_else(||self.get_dmy("created"))
+            .or_else(||self.get_dmy("date"))
+            // probably the dd-dd.mm.yyyy format
+            .or_else(||self.get_str("date")
+                     .and_then(|s|
+                               util::yaml::parse_dmy_date_range(s))
+                    )
+
+    }
 
     fn file(&self) -> PathBuf{ self.file_path.to_owned() } // TODO reconsider returning PathBuf at all
     fn set_file(&mut self, new_file:&Path){ self.file_path = new_file.to_owned(); }
@@ -493,7 +633,7 @@ impl Storable for Project{
         let search = term.to_lowercase();
         self.invoice_num().map_or(false, |num|num.to_lowercase().contains(&search))
         ||
-        self.name().to_lowercase().contains(&search)
+        Storable::short_desc(self).to_lowercase().contains(&search)
     }
 
     fn is_ready_for_archive(&self) -> bool {
@@ -513,7 +653,7 @@ impl<'a> From<&'a Project> for DebugProject{
 
 
 #[cfg(test)]
-mod test{
+mod test {
     use std::path::Path;
     use ::project::spec;
     use ::project::Project;

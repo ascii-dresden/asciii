@@ -38,6 +38,7 @@ extern crate ordered_float;
 extern crate open;
 extern crate semver;
 extern crate term_size;
+extern crate icalendar;
 #[macro_use] extern crate error_chain;
 #[macro_use] extern crate log;
 #[macro_use] extern crate prettytable;

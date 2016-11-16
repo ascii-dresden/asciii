@@ -6,152 +6,358 @@
 //! Each module contains a `validate()` function which ought to be kept up to date.
 
 use bill::Currency;
-use chrono::{Date, UTC};
+use yaml_rust::Yaml;
+use yaml_rust::yaml::Hash as YamlHash;
 
-use util::yaml;
-use util::yaml::Yaml;
+use chrono::{Date, UTC, TimeZone, Datelike, NaiveTime};
+use semver::Version;
 
-pub type SpecResult<'a> = ::std::result::Result<(), Vec<&'a str>>;
+use std::fmt;
+use std::str::FromStr;
+
+pub type SpecResult = ::std::result::Result<(), ErrorList>;
+
+pub fn print_specresult(result: SpecResult) {
+    match result {
+        Ok(_) => println!("✓"),
+        Err(ref errs) => println!("{}", errs)
+    }
+}
+
 
 // TODO there may be cases where an f64 can't be converted into Currency
 pub fn to_currency(f: f64) -> Currency {
     Currency(::CONFIG.get_char("currency"), (f * 1000.0) as i64) / 10
 }
 
-fn field_exists<'a>(yaml: &Yaml, paths: &[&'a str]) -> Vec<&'a str> {
-    paths.into_iter()
-        .map(|i|*i)
-        .filter(|path| yaml::get(yaml, path).is_none())
-        .collect::<Vec<&'a str>>()
+pub struct ErrorList {
+    pub errors: Vec<String>
 }
 
-//include!("spec_trait.rs");
+impl ErrorList {
+    pub fn new() -> Self{
+        ErrorList {
+            errors: Vec::new()
+        }
+    }
 
-/// Stage 0: the project itself
-pub mod project {
-    use std::str::FromStr;
-    use chrono::{Date, UTC};
-    use semver::Version;
+    pub fn push(&mut self, error:&str) {
+        self.errors.push(error.into());
+    }
 
-    use util::yaml;
-    use util::yaml::Yaml;
-    use super::hours;
+    pub fn is_empty(&self) -> bool{
+        self.errors.is_empty()
+    }
+}
 
-    ///Returns the content of `/event/name` or...
+use std::ops::Deref;
+impl Deref for ErrorList {
+    type Target = [String];
+    fn deref(&self) -> &[String] {
+        &self.errors
+    }
+}
+
+impl<'a> From<&'a [&'a str]> for ErrorList {
+    fn from(errs: &'a [&str]) -> ErrorList {
+        let mut list = ErrorList::new();
+        for e in errs {
+            list.push(e);
+        }
+        list
+    }
+}
+
+
+impl fmt::Display for ErrorList {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        for error in &self.errors {
+            try!(writeln!(f, " * {}", error))
+        }
+        Ok(())
+    }
+}
+
+/// Interprets `"24-25.12.2016"` as date.
+///
+/// Takes care of the old, deprecated, stupid, `dd-dd.mm.yyyy` format, what was I thinking?
+/// This is not used in the current format.
+fn parse_dmy_date_range(date_str:&str) -> Option<Date<UTC>>{
+    let date = date_str.split('.')
+        .map(|s|s.split('-').nth(0).unwrap_or("0"))
+        .map(|f|f.parse().unwrap_or(0))
+        .collect::<Vec<i32>>();
+    if date[0] > 0 {
+        return Some(UTC.ymd(date[2], date[1] as u32, date[0] as u32))
+    }
+    None
+}
+
+
+/// Enables access to structured data via a simple path
+///
+/// A path can be something like `users/clients/23/name`
+/// but also  `users.clients.23.name`
+pub trait ProvidesData {
+    /// You only need to implement this.
+    //fn data(&self) -> impl PathAccessible {
+    fn data<'a>(&'a self) -> &'a Yaml;
+
+    /// Wrapper around `get_path()`.
     ///
-    ///...that of the older formats `/event`
-    pub fn name(yaml: &Yaml) -> Option<&str> {
-        yaml::get_str(yaml, "event/name")
+    /// Splits path string
+    /// and replaces `Yaml::Null` and `Yaml::BadValue`.
+    fn get<'a>(&'a self, path:&str) -> Option<&'a Yaml> {
+        self.get_direct(self.data(), path)
+    }
+
+    /// Wrapper around `get_path()`.
+    ///
+    /// Splits path string
+    /// and replaces `Yaml::Null` and `Yaml::BadValue`.
+    fn get_direct<'a>(&'a self, data:&'a Yaml, path:&str) -> Option<&'a Yaml> {
+        // TODO this can be without copying
+        let path = path.split(|p| p == '/' || p == '.')
+                      .filter(|k|!k.is_empty())
+                      .collect::<Vec<&str>>();
+        match self.get_path(data, &path) {
+            Some(&Yaml::BadValue) |
+            Some(&Yaml::Null) => None,
+            content => content
+        }
+    }
+
+    /// Returns content at `path` in the yaml document.
+    /// TODO make this generic over the type of data to support more than just `Yaml`.
+    fn get_path<'a>(&'a self, data:&'a Yaml, path:&[&str]) -> Option<&'a Yaml>{
+        if let Some((&path, remainder)) = path.split_first() {
+            match *data {
+                // go further into the rabit hole
+                Yaml::Hash(ref hash) => {
+                    if remainder.is_empty(){
+                        hash.get(&Yaml::String(path.to_owned()))
+                    } else {
+                        hash.get(&Yaml::String(path.to_owned()))
+                            .and_then(|c| self.get_path(c, remainder))
+                    }
+                },
+                // interpret component as index
+                Yaml::Array(ref vec) => {
+                    if let Ok(index) = path.parse::<usize>() {
+                        if remainder.is_empty(){
+                            vec.get(index)
+                        } else {
+                            vec.get(index).and_then(|c| self.get_path(c, remainder))
+                        }
+                    } else { None }
+                },
+                // return none, because the path is longer than the data structure
+                _ => None
+            }
+        } else {
+            None
+        }
+    }
+
+    /// Gets a `&str` value.
+    ///
+    /// Same mentality as `yaml_rust`, only returns `Some`, if it's a `Yaml::String`.
+    fn get_str<'a>(&'a self, path:&str) -> Option<&'a str> {
+        self.get(path).and_then(|y|y.as_str())
+    }
+
+    /// Gets an `Int` value.
+    ///
+    /// Same mentality as `yaml_rust`, only returns `Some`, if it's a `Yaml::Int`.
+    fn get_int<'a>(&'a self, path:&str) -> Option<i64> {
+        self.get(path).and_then(|y|y.as_i64())
+    }
+
+    /// Gets a Date in `dd.mm.YYYY` format.
+    fn get_dmy(&self, path:&str) -> Option<Date<UTC>> {
+        self.get(path).and_then(|y|y.as_str()).and_then(|d|self.parse_dmy_date(d))
+    }
+
+    /// Interprets `"25.12.2016"` as date.
+    fn parse_dmy_date(&self, date_str:&str) -> Option<Date<UTC>>{
+        let date = date_str.split('.')
+            .map(|f|f.parse().unwrap_or(0))
+            .collect::<Vec<i32>>();
+        if date.len() >=2 && date[0] > 0 && date[2] > 1900 {
+            // XXX this neglects the old "01-05.12.2015" format
+            UTC.ymd_opt(date[2], date[1] as u32, date[0] as u32).single()
+        } else {
+            None
+        }
+    }
+
+    /// Gets a `Bool` value.
+    ///
+    /// **Careful** this is a bit sweeter then ordinary `YAML1.2`,
+    /// this will interpret `"yes"` and `"no"` as booleans, similar to `YAML1.1`.
+    /// Actually it will interpret any string but `"yes"` als `false`.
+    fn get_bool(&self, path:&str) -> Option<bool> {
+        self.get(path)
+            .and_then(|y| y
+                      .as_bool()
+                      // allowing it to be a str: "yes" or "no"
+                      .or( y.as_str()
+                           .map( |yes_or_no|
+                                 match yes_or_no.to_lowercase().as_ref() {
+                                     "yes" => true,
+                                     //"no" => false,
+                                     _ => false
+                                 })
+                         ))
+    }
+
+    fn field_exists<'a>(&'a self, paths: &[&'a str]) -> ErrorList {
+        let mut errors = ErrorList::new();
+        for err in paths.into_iter()
+            .map(|i|*i)
+                .filter(|path| self.get(path).is_none()) {
+                    errors.push(err);
+                }
+        errors
+
+    }
+
+    /// Gets `Some(Yaml::Hash)` or `None`.
+    //pub fn get_hash<'a>(yaml:&'a Yaml, key:&str) -> Option<&'a BTreeMap<Yaml,Yaml>> {
+    fn get_hash<'a>(&'a self, path:&str) -> Option<&'a YamlHash> {
+        self.get(path).and_then(|y|y.as_hash())
+    }
+
+    /// Gets a `Float` value.
+    ///
+    /// Also takes a `Yaml::I64` and reinterprets it.
+    fn get_f64(&self, path:&str) -> Option<f64> {
+        self.get(path).and_then(|y| y.as_f64().or( y.as_i64().map(|y|y as f64)))
+    }
+}
+
+/// Every other trait in this module ought to be `Validatable`
+pub trait Validatable {
+    fn validate(&self) -> SpecResult;
+    fn is_valid(&self) -> bool {
+        self.validate().is_ok()
+    }
+
+    fn errors<'a>(&'a self) -> Option<ErrorList>{
+        self.validate().err()
+    }
+}
+
+/// Stage 0: the Project itself
+///
+/// Provide the basics every Project should have.
+pub trait IsProject: ProvidesData {
+    // TODO reevaluate if these fields really belong here
+    fn name(&self) -> Option<&str> {
+        self.get_str("event.name")
             // old spec
-            .or_else(|| yaml::get_str(yaml, "event"))
+            .or_else(|| self.get_str("event"))
     }
 
-    /// Wrapper for `super::date::date()`
-    pub fn date(yaml: &Yaml) -> Option<Date<UTC>> {
-        super::date::date(yaml)
+    //#[deprecated(note="Ambiguous: what date? use another name")]
+    fn event_date(&self) -> Option<Date<UTC>>{
+        self.get_dmy( "event.dates.0.begin")
+        .or_else(||self.get_dmy("created"))
+        .or_else(||self.get_dmy("date"))
+        // probably the dd-dd.mm.yyyy format
+        .or_else(||self.get_str("date")
+                 .and_then(|s| parse_dmy_date_range(s))
+                 )
+
     }
 
-    ///Returns the content of `/manager` or...
-    ///
-    ///...that of the older formats `/signature`
-    pub fn manager(yaml: &Yaml) -> Option<&str> {
-        yaml::get_str(yaml, "manager")
-        // old spec
-        .or_else(|| yaml::get_str(yaml, "signature").and_then(|c|c.lines().last()))
-    }
-
-    ///Returns the content of `/format`
-    pub fn format(yaml: &Yaml) -> Option<Version> {
-        yaml::get_str(yaml, "meta/format")
-            .or_else(||yaml::get_str(yaml, "format"))
+    //#[deprecated(note="Ambiguous: what format? use \"Version\"")]
+    fn format(&self) -> Option<Version> {
+        self.get_str("meta.format")
+            .or_else(||self.get_str("format"))
             .and_then(|s| Version::from_str(s).ok())
     }
 
-    ///Returns the content of `/canceled`
-    pub fn canceled(yaml: &Yaml) -> bool {
-        yaml::get_bool(yaml, "canceled").unwrap_or(false)
+    fn canceled(&self) -> bool{
+        self.get_bool("canceled").unwrap_or(false)
     }
 
-    /// Validates if all of the functions in this module return `Some(_)`
-    pub fn validate(yaml: &Yaml) -> super::SpecResult {
-        let mut errors = Vec::new();
-        if name(yaml).is_none(){errors.push("name")}
-        if date(yaml).is_none(){errors.push("date")}
-        if manager(yaml).is_none(){errors.push("manager")}
-        if format(yaml).is_none(){errors.push("format")}
-        if hours::salary(yaml).is_none(){errors.push("salary")}
+    fn responsible(&self) -> Option<&str> {
+        self.get_str("manager")
+        // old spec
+        .or_else(|| self.get_str("signature").and_then(|c|c.lines().last()))
+    }
+}
 
-        if errors.is_empty(){ Ok(()) }
-        else { Err(errors) }
+
+/// Stage 1: requirements for an offer
+pub trait Offerable: ProvidesData {
+    fn appendix(&self) -> Option<i64> {
+        self.get_int("offer.appendix")
+    }
+
+    /// When was the offer created
+    fn date(&self) -> Option<Date<UTC>> {
+        self.get_dmy("offer.date")
+    }
+
+
+    fn number(&self) -> Option<String> {
+        let num = self.appendix().unwrap_or(1);
+        Offerable::date(self)
+            //.map(|d| d.format("%Y%m%d").to_string())
+            .map(|d| d.format("A%Y%m%d").to_string())
+            .map(|s| format!("{}-{}", s, num))
+
+        // old spec
+        .or_else(|| self.get_str("manumber").map(|s|s.to_string()))
     }
 }
 
 /// Everything about the client
-pub mod client {
-    use util::yaml;
-    use util::yaml::Yaml;
-    use super::ProvidesData;
-
-    pub struct Client<'a> {
-        inner: &'a Yaml,
-    }
-
-    pub trait HasClient: ProvidesData {
-        ///Returns the content of `/client/email`
-        fn client<'a>(&'a self) -> Client<'a> {
-            Client {
-                inner: self.data()
-            }
-        }
-
-        ///Returns the content of `client.email`
-        /// TODO `HasClient::email()` does not yet validate the email address!
-        fn email(&self) -> Option<&str> {
-            self.get_str("client.email")
-        }
-
-    }
-
+///
+/// This is a [client](../struct.Project.html#method.client)
+pub trait IsClient: ProvidesData {
     ///Returns the content of `/client/email`
-    pub fn email(yaml: &Yaml) -> Option<&str> {
-        yaml::get_str(yaml, "client/email")
+    fn email(&self) -> Option<&str> {
+        self.get_str("client/email")
     }
 
     ///Returns the content of `/client/address`
-    pub fn address(yaml: &Yaml) -> Option<&str> {
-        yaml::get_str(yaml, "client/address")
+    fn address(&self) -> Option<&str> {
+        self.get_str("client/address")
     }
 
     ///Returns the content of `/client/title`
-    pub fn title(yaml: &Yaml) -> Option<&str> {
-        yaml::get_str(yaml, "client/title")
+    fn title(&self) -> Option<&str> {
+        self.get_str("client/title")
         // old spec
-        .or_else(|| yaml::get_str(yaml, "client").and_then(|c|c.lines().nth(0)))
+        .or_else(|| self.get_str("client").and_then(|c|c.lines().nth(0)))
     }
 
     ///Returns the first word of `client/title`
-    pub fn salute(yaml: &Yaml) -> Option<&str> {
-        title(yaml).and_then(|s|s.split_whitespace().nth(0))
+    fn salute(&self) -> Option<&str> {
+        self.title().and_then(|s|s.split_whitespace().nth(0))
     }
 
     ///Returns the content of `/client/first_name`
-    pub fn first_name(yaml: &Yaml) -> Option<&str> {
-        yaml::get_str(yaml, "client/first_name")
+    fn first_name(&self) -> Option<&str> {
+        self.get_str("client.first_name")
         // old spec
         // .or_else(|| yaml::get_str(&yaml, "client").and_then(|c|c.lines().nth(0)))
     }
 
     ///Returns the content of `/client/last_name`
-    pub fn last_name(yaml: &Yaml) -> Option<&str> {
-        yaml::get_str(yaml, "client/last_name")
+    fn last_name(&self) -> Option<&str> {
+        self.get_str("client.last_name")
         // old spec
-        .or_else(|| yaml::get_str(yaml, "client").and_then(|c|c.lines().nth(1)))
+        .or_else(|| self.get_str("client").and_then(|c|c.lines().nth(1)))
     }
 
     /// Combines `first_name` and `last_name`.
-    pub fn full_name(yaml: &Yaml) -> Option<String> {
-        let first = first_name(yaml);
-        let last = last_name(yaml);
+    fn full_name(&self) -> Option<String> {
+        let first = self.first_name();
+        let last = self.last_name();
         first.and(last)
              .and(Some(format!("{} {}",
                                first.unwrap_or(""),
@@ -159,11 +365,11 @@ pub mod client {
     }
 
     /// Produces a standard salutation field.
-    pub fn addressing(yaml: &Yaml) -> Option<String> {
-        if let Some(salute) = salute(yaml).and_then(|salute| salute.split_whitespace().nth(0))
+    fn addressing(&self) -> Option<String> {
+        if let Some(salute) = self.salute().and_then(|salute| salute.split_whitespace().nth(0))
         // only the first word
         {
-            let last_name = last_name(yaml);
+            let last_name = self.last_name();
 
 
             let lang = ::CONFIG.get_str("defaults/lang")
@@ -183,21 +389,144 @@ pub mod client {
         }
     }
 
-    /// Validates the output of each of this modules functions.
-    pub fn validate(yaml: &Yaml) -> super::SpecResult {
-        let mut errors = super::field_exists(yaml,
-                                             &[
-                                             //"client/email", // TODO make this a requirement
-                                             "client/address",
-                                             "client/title",
-                                             "client/last_name",
-                                             "client/first_name"
-                                             ]);
+    ///// Validates the output of each of this modules functions.
+    //fn validate(&self) -> super::SpecResult {
+    //    let mut errors = super::field_exists(yaml,
+    //                                         &[
+    //                                         //"client/email", // TODO make this a requirement
+    //                                         "client/address",
+    //                                         "client/title",
+    //                                         "client/last_name",
+    //                                         "client/first_name"
+    //                                         ]);
 
 
-        if addressing(yaml).is_none() {
-            errors.push("client_addressing");
+    //    if addressing(yaml).is_none() {
+    //        errors.push("client_addressing");
+    //    }
+    //    if !errors.is_empty() {
+    //        return Err(errors);
+    //    }
+
+    //    Ok(())
+    //}
+}
+
+/// Stage 2: requirements for an invoice
+pub trait Invoicable: ProvidesData {
+    /// plain access to `invoice/number`
+    fn number(&self) -> Option<i64> {
+        self.get_int("invoice.number")
+        // old spec
+        .or_else(|| self.get_int("rnumber"))
+    }
+
+    /// When was the invoice created
+    fn date(&self) -> Option<Date<UTC>> {
+        self.get_dmy("invoice.date")
+        // old spec
+        .or_else(|| self.get_dmy("invoice_date"))
+    }
+
+    fn number_str(&self) -> Option<String> {
+        self.number().map(|n| format!("R{:03}", n))
+    }
+
+    fn number_long_str(&self) -> Option<String> {
+        let year = try_some!(self.date()).year();
+        // TODO Length or format should be a setting
+        self.number().map(|n| format!("R{}-{:03}", year, n))
+    }
+
+    /// An official identifier
+    fn official(&self) -> Option<String> {
+        self.get_str("invoice.official").map(ToOwned::to_owned)
+    }
+}
+
+
+/// Stage 3: when an `IsProject` is redeem and can be archived
+pub trait Redeemable: IsProject {
+    /// When was the project payed
+    fn payed_date(&self) -> Option<Date<UTC>> {
+        self.get_dmy("invoice.payed_date")
+        // old spec
+        .or_else(|| self.get_dmy("payed_date"))
+    }
+
+    /// When were the wages payed
+    fn wages_date(&self) -> Option<Date<UTC>> {
+        self.get_dmy("hours.wages_date")
+        // old spec
+        .or_else(|| self.get_dmy("wages_date"))
+    }
+
+    /// Salary
+    fn salary(&self) -> Option<Currency> {
+        self.get_f64("hours.salary").map(to_currency)
+    }
+
+    /// Full number of service hours
+    /// XXX test this against old format
+    fn total(&self) -> Option<f64> {
+        self.caterers().map(|vec| {
+            vec.iter()
+                .map(|&(_, h)| h)
+                .fold(0f64, |acc, h| acc + h)
+        })
+        //.or_else(|| )
+    }
+
+    //fn total_salary(&self) -> SpecResult<(f64,Currency)> {
+    //    let salary = self.salary();
+    //    let total = self.total();
+    //    match (salary, total) {
+    //        (Some(0), Some(t)) if t > 0  => Err(),
+    //        (None, Some(_)) => Err(),
+    //        (Some(s), Some(t)) => Ok((t,s))
+    //    }
+    //}
+
+    /// Nicely formated list of caterers with their respective service hours
+    fn caterers_string(&self) -> Option<String> {
+        self.caterers().map(|v| {
+            v.iter()
+                .map(|t| format!("{}: ({})", t.0, t.1))
+                .collect::<Vec<String>>()
+                .join(", ")
+        })
+    }
+
+    /// List of caterers and ther respective service hours
+    fn caterers(&self) -> Option<Vec<(String, f64)>> {
+        self.get_hash("hours.caterers").map(|h| {
+            h.iter()
+                .map(|(c, h)| {
+                    (// argh, those could be int or float, grrr
+                     c.as_str().unwrap_or("").to_owned(),
+                     h.as_f64()
+                        .or_else(|| // sorry for this
+                             h.as_i64().map(|f|f as f64 ))
+                        .unwrap_or(0f64))
+                })
+                .collect::<Vec<(String, f64)>>()
+        })
+    }
+
+}
+
+impl Validatable for Redeemable {
+    fn validate(&self) -> SpecResult {
+        let mut errors = ErrorList::new();
+        if self.payed_date().is_none() { errors.push("payed_date"); }
+        if self.wages_date().is_none(){ errors.push("wages_date");}
+
+        if let Some(format) = self.format() {
+            if format < Version::parse("2.0.0").unwrap() {
+                return Ok(());
+            }
         }
+
         if !errors.is_empty() {
             return Err(errors);
         }
@@ -206,87 +535,22 @@ pub mod client {
     }
 }
 
-/// All kinds of dates
-pub mod date {
-    use chrono::*;
-    use util;
-    use util::yaml;
-    use util::yaml::Yaml;
-
-    /// When is the first event
-    ///
-    /// Fallbacks: "created" -> "date"
-    pub fn date(yaml: &Yaml) -> Option<Date<UTC>> {
-        event(yaml)
-        .or_else(||yaml::get_dmy(yaml, "created"))
-        .or_else(||yaml::get_dmy(yaml, "date"))
-        // probably the dd-dd.mm.yyyy format
-        .or_else(||yaml::get_str(yaml, "date").and_then(|s|util::yaml::parse_dmy_date_range(s)))
-    }
-
-    /// When was the project payed
-    pub fn payed(yaml: &Yaml) -> Option<Date<UTC>> {
-        yaml::get_dmy(yaml, "invoice/payed_date")
-        // old spec
-        .or_else(|| yaml::get_dmy(yaml, "payed_date"))
-    }
-
-    /// When were the wages payed
-    pub fn wages(yaml: &Yaml) -> Option<Date<UTC>> {
-        yaml::get_dmy(yaml, "hours/wages_date")
-        // old spec
-        .or_else(|| yaml::get_dmy(yaml, "wages_date"))
-    }
-
-    /// When was the offer created
-    pub fn offer(yaml: &Yaml) -> Option<Date<UTC>> {
-        yaml::get_dmy(yaml, "offer/date")
-    }
-
-    /// When was the invoice created
-    pub fn invoice(yaml: &Yaml) -> Option<Date<UTC>> {
-        yaml::get_dmy(yaml, "invoice/date")
-        // old spec
-        .or_else(|| yaml::get_dmy(yaml, "invoice_date"))
-    }
-
-    /// Date of first event
-    pub fn event(yaml: &Yaml) -> Option<Date<UTC>> {
-        yaml::get_dmy(yaml, "event/dates/0/begin")
-    }
-
-    pub fn our_bad(yaml: &Yaml) -> Option<Duration> {
-        let event   = try_some!(event(yaml));
-        let invoice = invoice(yaml).unwrap_or_else(UTC::today);
-        let diff = invoice - event;
-        if diff > Duration::zero() {
-            Some(diff)
-        } else {
-            None
-        }
-    }
-
-    pub fn their_bad(yaml: &Yaml) -> Option<Duration> {
-        let invoice = try_some!(invoice(yaml));
-        let payed   = payed(yaml).unwrap_or_else(UTC::today);
-        Some(invoice - payed)
-    }
-
-    // TODO packed to deep? Clippy says YES, remove this allow!
-    pub type DateRange = (Option<Date<UTC>>, Option<Date<UTC>>);
-    pub type DateRanges = Vec<DateRange>;
+pub mod events {
+    use super::IsProject;
+    use yaml_rust::Yaml;
+    use chrono::{Date, UTC, NaiveTime};
 
     #[derive(Debug)]
-    pub struct EventTime{
-        start: NaiveTime,
-        end:   NaiveTime
+    pub struct EventTime {
+        pub start: NaiveTime,
+        pub end:   NaiveTime
     }
 
     #[derive(Debug)]
     pub struct Event{
-        begin: Date<UTC>,
-        end: Date<UTC>,
-        times: Vec<EventTime>
+        pub begin: Date<UTC>,
+        pub end: Date<UTC>,
+        pub times: Vec<EventTime>
     }
 
     use std::fmt;
@@ -338,149 +602,59 @@ pub mod date {
         assert_eq!(Some(NaiveTime::from_hms(9,0,0)),  naive_time_from_str("9"));
         assert_eq!(Some(NaiveTime::from_hms(23,0,0)), naive_time_from_str("23:0"));
     }
+    pub trait HasEvents: IsProject {
 
-    fn times(yaml: &Yaml) -> Option<Vec<EventTime>> {
-        let times = try_some!(yaml::get(yaml, "times").and_then(|l|l.as_vec()));
-        times.into_iter()
-            .map(|h| {
-                let begin = yaml::get_str(h, "begin").or(Some("00.00")).and_then(naive_time_from_str);
-                let end   = yaml::get_str(h, "end").and_then(naive_time_from_str).or(begin);
-                if let (Some(begin),Some(end)) = (begin,end) {
-                    Some( EventTime{
-                        start: begin,
-                        end: end
+        /// Produces a list of `DateRange`s for the event.
+        fn events(&self) -> Option<Vec<Event>> {
+            let dates = try_some!(self.get("event.dates/").and_then(|a| a.as_vec()));
+            dates.into_iter()
+                .map(|h| {
+                    let begin = try_some!(
+                        self.get_direct(h, "begin")
+                        .and_then(|y|y.as_str())
+                        .and_then(|d|self.parse_dmy_date(d))
+                        );
+                    let end = 
+                        self.get_direct(h, "end")
+                        .and_then(|y|y.as_str())
+                        .and_then(|d|self.parse_dmy_date(d));
+
+                    Some( Event{
+                        begin: begin,
+                        end: end.unwrap_or(begin),
+                        times: self.times(h).unwrap_or_else(Vec::new)
                     })
-                } else { None }
-            })
-        .collect()
-    }
-
-    /// Produces a list of `DateRange`s for the event.
-    pub fn events(yaml: &Yaml) -> Option<Vec<Event>> {
-        let dates = try_some!(yaml::get(yaml, "event/dates/").and_then(|a| a.as_vec()));
-        dates.into_iter()
-            .map(|h| {
-                let begin = try_some!(yaml::get_dmy(h, "begin"));
-                let end = yaml::get_dmy(h, "end");
-                //let times = yaml::get(h, "times").as_vec;
-                //trace!("{:#?}", times);
-                Some( Event{
-                    begin: begin,
-                    end: end.unwrap_or(begin),
-                    times: times(h).unwrap_or_else(Vec::new)
                 })
-            })
-        .collect()
+            .collect()
+        }
+
+        fn times(&self,yaml: &Yaml) -> Option<Vec<EventTime>> {
+            let times = try_some!(self.get_direct(yaml, "times").and_then(|l|l.as_vec()));
+            times.into_iter()
+                .map(|h| {
+
+                    let begin = self.get_direct(h, "begin")
+                        .and_then(|y|y.as_str())
+                        .or(Some("00.00"))
+                        .and_then(naive_time_from_str);
+
+                    let end   = self.get_direct(h, "end")
+                        .and_then(|y|y.as_str())
+                        .and_then(naive_time_from_str)
+                        .or(begin);
+
+                    if let (Some(begin),Some(end)) = (begin,end) {
+                        Some( EventTime{
+                            start: begin,
+                            end: end
+                        })
+                    } else { None }
+                })
+            .collect()
+        }
     }
 }
 
-/// Stage 1: requirements for an offer
-pub mod offer {
-    use util::yaml;
-    use util::yaml::Yaml;
-
-    pub fn number(yaml: &Yaml) -> Option<String> {
-        let num = appendix(yaml).unwrap_or(1);
-        super::date::offer(yaml)
-            .map(|d| d.format("A%Y%m%d").to_string())
-            .map(|s| format!("{}-{}", s, num))
-
-        // old spec
-        .or_else(|| yaml::get_string(yaml, "manumber"))
-    }
-
-    pub fn appendix(yaml: &Yaml) -> Option<i64> {
-        yaml::get_int(yaml, "offer/appendix")
-    }
-
-    pub fn validate(yaml: &Yaml) -> super::SpecResult {
-        if super::project::canceled(yaml) {
-            return Err(vec!["canceled"]);
-        }
-
-        let mut errors = super::field_exists(yaml, &["offer/date", "offer/appendix", "manager"]);
-        if super::date::offer(yaml).is_none() {
-            errors.push("offer_date_format");
-        }
-
-        if !errors.is_empty() {
-            return Err(errors);
-        }
-
-        Ok(())
-    }
-}
-
-/// Stage 2: requirements for an invoice
-pub mod invoice {
-    use util::yaml;
-    use util::yaml::Yaml;
-    use chrono::*;
-
-    /// plain access to `invoice/number`
-    pub fn number(yaml: &Yaml) -> Option<i64> {
-        yaml::get_int(yaml, "invoice/number")
-        // old spec
-        .or_else(|| yaml::get_int(yaml, "rnumber"))
-    }
-
-    pub fn date(yaml: &Yaml) -> Option<Date<UTC>> {
-        super::date::invoice(yaml)
-    }
-
-    pub fn number_str(yaml: &Yaml) -> Option<String> {
-        number(yaml).map(|n| format!("R{:03}", n))
-    }
-
-    pub fn number_long_str(yaml: &Yaml) -> Option<String> {
-        let year = try_some!(super::date::invoice(yaml)).year();
-        // TODO Length or format should be a setting
-        number(yaml).map(|n| format!("R{}-{:03}", year, n))
-    }
-
-    pub fn official(yaml: &Yaml) -> Option<String> {
-        yaml::get_string(yaml, "invoice/official")
-    }
-
-    pub fn validate(yaml: &Yaml) -> super::SpecResult {
-        let mut errors = super::field_exists(yaml, &["invoice/number"]);
-
-        // if super::offer::validate(yaml).is_err() {errors.push("offer")}
-        if super::date::invoice(yaml).is_none() {
-            errors.push("invoice_date");
-        }
-
-        if !errors.is_empty() {
-            return Err(errors);
-        }
-
-        Ok(())
-    }
-}
-
-/// Stage 3: requirements to archive
-pub mod archive {
-    use semver::Version;
-    use util::yaml::Yaml;
-
-    pub fn validate(yaml: &Yaml) -> super::SpecResult {
-        let mut errors = Vec::new();
-        if super::date::payed(yaml).is_none() { errors.push("payed_date"); }
-        if super::date::wages(yaml).is_none(){ errors.push("wages_date");}
-
-        if let Some(format) = super::project::format(yaml) {
-            if format < Version::parse("2.0.0").unwrap() {
-                return Ok(());
-            }
-        }
-
-        if !errors.is_empty() {
-            return Err(errors);
-        }
-
-        Ok(())
-    }
-}
 
 /// Everything related to service hours of a project
 pub mod hours {
@@ -578,7 +752,7 @@ pub mod billing {
     }
 
     /// Produces two `Bill`s, one for the offer and one for the invoice
-    pub fn bills(yaml: &Yaml) -> Result<(Bill<Product>, Bill<Product>)>{
+    pub fn bills(yaml: &Yaml) -> Result<(Bill<Product>, Bill<Product>)> {
         let mut offer: Bill<Product> = Bill::new();
         let mut invoice: Bill<Product> = Bill::new();
 

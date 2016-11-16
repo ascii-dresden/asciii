@@ -2,6 +2,7 @@
 
 #![allow(unused_imports)]
 #![allow(dead_code)]
+#![deny(deprecated)]
 
 
 use chrono::*;
@@ -16,6 +17,9 @@ use util;
 use super::BillType;
 use storage::{Storage,StorageDir,Storable,StorageResult};
 use project::Project;
+use project::spec::{IsProject, IsClient};
+use project::spec::Invoicable;
+use project::spec::ProvidesData;
 
 #[cfg(feature="document_export")]
 use fill_docs::fill_template;
@@ -148,9 +152,9 @@ pub fn project_to_doc(project: &Project, template_name:&str, bill_type:&Option<B
         (&None,          Ok(_), Err(_))  => (Some(Offer), Some(project.dir().join(project.offer_file_name(output_ext).expect("this should have been cought by ready_for_offer()")))),
         (&Some(Invoice), _,      Ok(_))  |
         (&None,          _,      Ok(_))  => (Some(Invoice), Some(project.dir().join(project.invoice_file_name(output_ext).expect("this should have been cought by ready_for_invoice()")))),
-        (&Some(Offer),   Err(e), _    )  => {error!("cannot create an offer, check out:{:#?}",e);(None,None)},
-        (&Some(Invoice), _,      Err(e)) => {error!("cannot create an invoice, check out:{:#?}",e);(None,None)},
-        (_,              Err(e), Err(_)) => {error!("Neither an Offer nor an Invoice can be created from this project\n please check out {:#?}", e);(None,None)}
+        (&Some(Offer),   Err(e), _    )  => {error!("cannot create an offer, check out:{}",e);(None,None)},
+        (&Some(Invoice), _,      Err(e)) => {error!("cannot create an invoice, check out:{}",e);(None,None)},
+        (_,              Err(e), Err(_)) => {error!("Neither an Offer nor an Invoice can be created from this project\n please check out {}", e);(None,None)}
     };
 
     //debug!("{:?} -> {:?}",(bill_type, project.is_ready_for_offer(), project.is_ready_for_invoice()), (dyn_bill_type, outfile_tex));
@@ -243,25 +247,23 @@ pub fn spec() -> Result<()> {
         info!("{}", project.dir().display());
 
         let yaml = project.yaml();
-        client::validate(&yaml).map_err(|errors|for error in errors{
-            println!("  error: {}", error);
-        }).unwrap();
+        project.client().validate().map_err(|errors| println!("{}", errors)).unwrap();
 
-        client::full_name(&yaml);
-        client::first_name(&yaml);
-        client::title(&yaml);
-        client::email(&yaml);
+        project.client().full_name();
+        project.client().first_name();
+        project.client().title();
+        project.client().email();
 
 
         hours::caterers_string(&yaml);
-        invoice::number_long_str(&yaml);
-        invoice::number_str(&yaml);
-        offer::number(&yaml);
+        project.invoice().number_long_str();
+        project.invoice().number_str();
+        project.offer().number();
         project.age().map(|a|format!("{} days", a)).unwrap();
-        project.date().map(|d|d.year().to_string()).unwrap();
+        project.modified_date().map(|d|d.year().to_string()).unwrap();
         project.sum_sold().map(|c|util::currency_to_string(&c)).unwrap();
-        project::manager(&yaml).map(|s|s.to_owned()).unwrap();
-        project::name(&yaml).map(|s|s.to_owned()).unwrap();
+        project.responsible().map(|s|s.to_owned()).unwrap();
+        project.name().map(|s|s.to_owned()).unwrap();
     }
 
     Ok(())

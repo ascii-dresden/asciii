@@ -176,25 +176,20 @@
 //! 
 //! The event files can be filled
 //! 
-//! ```yaml
-//! event:
-//! ```
-//! 
-//! 
-//! ```yaml
-//! offer:
-//! ```
-//! ```yaml
-//! invoice:
-//! ```
-//! ```yaml
-//! products:
-//! ```
-//! ```yaml
-//! hours:
-//! ```
+//! * `event:`
+//! * `offer:`
+//! * `invoice:`
+//! * `products:`
+//! * `hours:`
 //! 
 //! ### Products
+//! 
+//! There are two alternative formats for describing separate products.
+//! The first ist the direct version, describing each product in situ.
+//! The second one makes use of the `cataloge` and only references entries.
+//! If you need to add a product for a separate occation,
+//! just use the direct format.
+//! If you want to make changes to the cataloge, please consider changing the [template](#templates).
 //! 
 //! ```yaml
 //!   "Sekt  (0,75l)":
@@ -208,7 +203,8 @@
 //! 
 //! ```yaml
 //! cataloge:
-//!   product: &kaffee       { name: Kaffee          , price: 2.5  , unit: 1l  }
+//!   product: &kaffee       { name: Kaffee, price: 2.5, unit: 1l  }
+//! 
 //! products:
 //!   *kaffee:
 //!     amount: 60

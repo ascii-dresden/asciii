@@ -176,25 +176,20 @@ client:
 
 The event files can be filled
 
-```yaml
-event:
-```
-
-
-```yaml
-offer:
-```
-```yaml
-invoice:
-```
-```yaml
-products:
-```
-```yaml
-hours:
-```
+* `event:`
+* `offer:`
+* `invoice:`
+* `products:`
+* `hours:`
 
 ### Products
+
+There are two alternative formats for describing separate products.
+The first is the direct version, describing each product in situ.
+The second one makes use of the `cataloge` and only references entries.
+If you need to add a product for a separate occasion,
+just use the direct format.
+If you want to make changes to the catalogue, please consider changing the [template](#templates).
 
 ```yaml
   "Sekt  (0,75l)":
@@ -208,7 +203,8 @@ hours:
 
 ```yaml
 cataloge:
-  product: &kaffee       { name: Kaffee          , price: 2.5  , unit: 1l  }
+  product: &kaffee       { name: Kaffee, price: 2.5, unit: 1l  }
+
 products:
   *kaffee:
     amount: 60
@@ -256,15 +252,22 @@ caterings
         └── Foobar3.yml
 ```
 
+## Templates
+
+Templates can be found in `$storagedir/templates`.
+The default file extension for templates is `.tyml`.
+You should **always** have at least a `default.tyml`, but you can add your won
+
+### Template Replacement
+Templates and project files can contain `##FILL-TAGS##` some of which are filled when creating a `new` project from a template,
+some of which remain in the project file. These can be replaced with the `asciii set` command.
+
 ## Aliases
 
-// * `list`: `-l`, `l`, `ls`, `dir`
-// * `display`: `-d`, `show`
-// * `archive`: `close`
-// * `invoice`: `-l`
-// * `offer`: `-o`
-// * `settings`: `config`
-// * `log`: `history`
+* `list`: `-l`, `l`, `ls`, `dir`, `la`
+* `show`: `display`
+* `log`: `history`
+
 
 ## Pro tips
 

@@ -27,9 +27,9 @@ pub trait Storable:Send+Sync{
     /// For file names
     fn ident(&self) -> String{ self.dir().file_stem().and_then(|s|s.to_str()).unwrap().to_owned() }
 
-    fn name(&self) -> String;
-    fn date(&self) -> Option<Date<UTC>>;
-    fn year(&self) -> Option<i32>{ self.date().map(|d|d.year()) }
+    fn short_desc(&self) -> String;
+    fn modified_date(&self) -> Option<Date<UTC>>;
+    fn year(&self) -> Option<i32>{ self.modified_date().map(|d|d.year()) }
 
     /// Deletes the project if the passed in closure returns `true`
     fn delete_project_dir_if<F>(&self, confirmed:F) -> io::Result<()>

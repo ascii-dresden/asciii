@@ -361,7 +361,7 @@ impl<L:Storable> Storage<L> {
     ///</pre>
     // TODO write extra tests
     pub fn archive_project(&self, project:&L, year:Year) -> StorageResult<PathBuf> {
-        debug!("trying archiving {:?} into {:?}", project.name(), year);
+        debug!("trying archiving {:?} into {:?}", project.short_desc(), year);
         let name_in_archive = match project.prefix(){
             Some(prefix) => format!("{}_{}", prefix, project.ident()),
             None =>  project.ident()
@@ -372,7 +372,7 @@ impl<L:Storable> Storage<L> {
         let target = archive.join(&name_in_archive);
 
         try!(fs::rename(&project_folder, &target));
-        info!("succesfully archived {:?} to {:?}", project.name() ,target);
+        info!("succesfully archived {:?} to {:?}", project.short_desc() ,target);
 
         Ok(target)
     }
@@ -393,7 +393,7 @@ impl<L:Storable> Storage<L> {
         for project in projects {
             if force {warn!("you are using --force")};
             if project.is_ready_for_archive() || force {
-                info!("project {:?} is ready to be archived", project.name());
+                info!("project {:?} is ready to be archived", project.short_desc());
                 let year = manual_year.or(project.year()).unwrap();
                 info!("archiving {} ({})",  project.ident(), project.year().unwrap());
                 let archive_target = try!(self.archive_project(&project, year));
@@ -401,7 +401,7 @@ impl<L:Storable> Storage<L> {
                 moved_files.push(archive_target);
             }
             else {
-                warn!("project {:?} is not ready to be archived", project.name());
+                warn!("project {:?} is not ready to be archived", project.short_desc());
             }
         };
         Ok(moved_files)
@@ -429,7 +429,7 @@ impl<L:Storable> Storage<L> {
         let mut moved_files = Vec::new();
         let projects = try!(self.search_projects_any(StorageDir::Archive(year), search_terms));
         for project in projects {
-            println!("unarchiving {:?}", project.name());
+            println!("unarchiving {:?}", project.short_desc());
             let unarchive_target = self.unarchive_project(&project).unwrap();
             moved_files.push(project.dir());
             moved_files.push(unarchive_target);

@@ -1,10 +1,9 @@
-use chrono::*;
-
 use util;
 use storage::Storable;
 
 use super::Project;
 use super::spec;
+use super::spec::*;
 
 /// Fields that are accessible but are not directly found in the file format.
 /// This is used to get fields that are computed through an ordinary `get("responsible")`
@@ -58,23 +57,23 @@ impl ComputedField {
         let storage = util::get_storage_path();
 
         match *self {
-            ComputedField::Responsible       => spec::project::manager(project.yaml()).map(|s| s.to_owned()),
-            ComputedField::OfferNumber       => spec::offer::number(project.yaml()),
-            ComputedField::InvoiceNumber     => spec::invoice::number_str(project.yaml()),
-            ComputedField::InvoiceNumberLong => spec::invoice::number_long_str(project.yaml()),
-            ComputedField::Name              => Some(project.name()),
+            ComputedField::Responsible       => project.responsible().map(|s| s.to_owned()),
+            ComputedField::OfferNumber       => project.offer().number(),
+            ComputedField::InvoiceNumber     => project.invoice().number_str(),
+            ComputedField::InvoiceNumberLong => project.invoice().number_long_str(),
+            ComputedField::Name              => Some(project.name().map(ToString::to_string).unwrap()), // TODO remove name() from `Storable`, storables only need a slug()
             ComputedField::Final             => project.sum_sold().map(|c| util::currency_to_string(&c)).ok(),
             ComputedField::Age               => project.age().map(|a| format!("{} days", a)),
 
             ComputedField::OurBad            => project.our_bad()  .map(|a| format!("{} weeks", a.num_weeks().abs())),
             ComputedField::TheirBad          => project.their_bad().map(|a| format!("{} weeks", a.num_weeks().abs())),
 
-            ComputedField::Year              => project.date().map(|d| d.year().to_string()),
-            ComputedField::Date              => project.date().map(|d| d.format("%Y.%m.%d").to_string()),
+            ComputedField::Year              => project.year().map(|i|i.to_string()),
+            ComputedField::Date              => project.modified_date().map(|d| d.format("%Y.%m.%d").to_string()),
             ComputedField::SortIndex         => project.index(),
 
             ComputedField::Caterers          => spec::hours::caterers_string(project.yaml()),
-            ComputedField::ClientFullName    => spec::client::full_name(project.yaml()),
+            ComputedField::ClientFullName    => project.client().full_name(),
             ComputedField::Wages             => project.wages().map(|c| util::currency_to_string(&c)),
             ComputedField::Invalid           => None,
             ComputedField::Format            => project.format().map(|f|f.to_string()),

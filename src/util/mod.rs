@@ -3,6 +3,7 @@
 use std::io;
 use std::env::{home_dir,current_dir};
 use std::ffi::OsStr;
+use std::fs;
 use std::path::{Path,PathBuf};
 use std::process;
 use std::process::{Command, ExitStatus};
@@ -60,7 +61,7 @@ pub fn replace_home_tilde(p:&Path) -> PathBuf{
 ///
 /// This is by far the most important function of all utility functions.
 //TODO use https://crates.io/crates/open (supports linux, windows, mac)
-pub fn pass_to_command<T:AsRef<OsStr>>(editor:&Option<&str>, paths:&[T]){
+pub fn pass_to_command<T:AsRef<OsStr>>(editor:&Option<&str>, paths:&[T]) {
 
     let paths = paths.iter()
                       .map(|o|PathBuf::from(&o))
@@ -95,6 +96,17 @@ pub fn pass_to_command<T:AsRef<OsStr>>(editor:&Option<&str>, paths:&[T]){
             open::that(path).unwrap();
         }
     }
+}
+
+/// Deletes the file if the passed in closure returns `true`
+pub fn delete_file_if<F,P:AsRef<OsStr>>(path:P, confirmed:F) -> io::Result<()>
+    where F: Fn()->bool
+{
+    let path = PathBuf::from(&path);
+    if confirmed(){
+        debug!("$ rm {}", path.display());
+        fs::remove_file(&path)
+    } else {Ok(())}
 }
 
 /// Interprets storage path from config.

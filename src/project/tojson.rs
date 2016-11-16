@@ -8,9 +8,7 @@ use std::error::Error;
 
 use super::Project;
 use super::product::Product;
-use super::spec;
 use util::currency_to_string;
-use storage::Storable;
 
 fn opt_to_json<T: ::std::fmt::Display>(opt:Option<T>) -> Json{
     match opt{
@@ -79,44 +77,44 @@ impl ToJson for Project{
             //String::from("adressing") => ,
 
             s("bills") =>  btreemap!{
-                s("offer") => bill_to_json(&offer),
+                s("offer")   => bill_to_json(&offer),
                 s("invoice") => bill_to_json(&invoice),
             }.to_json(),
 
             s("client") => btreemap!{
-                s("email")      => opt_str(client::email(y)),
-                s("last_name")  => opt_str(client::last_name(y)),
-                s("first_name") => opt_str(client::first_name(y)),
-                s("full_name")  => client::full_name(y).to_json(),
-                s("title")      => opt_str(client::title(y)),
-                s("address")    => opt_str(client::address(y)),
-                s("addressing") => client::addressing(y).to_json(),
+                s("email")      => opt_str(self.client().email()),
+                s("last_name")  => opt_str(self.client().last_name()),
+                s("first_name") => opt_str(self.client().first_name()),
+                s("full_name")  =>         self.client().full_name().to_json(),
+                s("title")      => opt_str(self.client().title()),
+                s("address")    => opt_str(self.client().address()),
+                s("addressing") =>         self.client().addressing().to_json(),
             }.to_json(),
 
 
             s("event") => btreemap!{
-                s("name")    => self.name().to_json(),
-                s("date")    => dmy(project::date(y)),
-                s("manager") => self.manager().to_json(),
+                s("name")    => IsProject::name(self).unwrap_or("unnamed").to_json(),
+                s("date")    => dmy(self.event_date()),
+                s("manager") => self.responsible().unwrap_or("").to_string().to_json(),
             }.to_json(),
 
 
             s("offer") => btreemap!{
-                s("number") => offer::number(y).to_json(),
-                s("date")   => dmy(spec::date::offer(y)),
-                s("sums")   => taxes_by_tax_to_json(&offer),
-                s("net_total")  => currency_to_string(&offer.net_total()).to_json(),
+                s("number")       => self.offer().number().to_json(),
+                s("date")         => dmy(self.offer().date()),
+                s("sums")         => taxes_by_tax_to_json(&offer),
+                s("net_total")    => currency_to_string(&offer.net_total()).to_json(),
                 s("gross_total")  => currency_to_string(&offer.gross_total()).to_json(),
             }.to_json(),
 
             s("invoice") => btreemap!{
-                s("date")   => dmy(spec::date::invoice(y)),
-                s("number")      => invoice::number_str(y).to_json(),
-                s("number_long") => invoice::number_long_str(y).to_json(),
-                s("official") => invoice::official(y).to_json(),
-                s("sums")   => taxes_by_tax_to_json(&invoice),
-                s("net_total")  => currency_to_string(&invoice.net_total()).to_json(),
-                s("gross_total")  => currency_to_string(&invoice.gross_total()).to_json(),
+                s("date")        => dmy(self.invoice().date()),
+                s("number")      => self.invoice().number_str().to_json(),
+                s("number_long") => self.invoice().number_long_str().to_json(),
+                s("official")    => self.invoice().official().to_json(),
+                s("sums")        => taxes_by_tax_to_json(&invoice),
+                s("net_total")   => currency_to_string(&invoice.net_total()).to_json(),
+                s("gross_total") => currency_to_string(&invoice.gross_total()).to_json(),
             }.to_json(),
 
             s("hours") => btreemap!{

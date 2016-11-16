@@ -205,6 +205,7 @@ pub fn get<'a>(yaml:&'a Yaml, key:&str) -> Option<&'a Yaml>{
 }
 
 /// Returns content at `path` in the yaml document.
+#[deprecated(note="This is old style spec, please use the `ProvidesData` trait")]
 fn get_path<'a>(yaml:&'a Yaml, path:&[&str]) -> Option<&'a Yaml>{
     if let Some((&key, remainder)) = path.split_first(){
 

@@ -6,11 +6,16 @@ use chrono::*;
 use prettytable::Table;
 use prettytable::row::Row;
 use prettytable::cell::Cell;
-use prettytable::format::{LineSeparator,LinePosition,FormatBuilder};
+use prettytable::format::{LineSeparator, LinePosition, FormatBuilder};
 use term::{Attr, color};
+use term_size;
+
 use super::BillType;
 
 use project::Project;
+use project::spec::IsProject;
+use project::spec::SpecResult;
+use project::spec::events::HasEvents;
 use storage::Storable;
 use util::currency_to_string;
 
@@ -45,8 +50,11 @@ impl<'a> Default for ListConfig<'a>{
     }
 }
 
-fn payed_to_cell(project:&Project) -> Cell{
-    let sym = ::CONFIG.get_str("currency").expect("Faulty config: currency does not contain a value");
+// TODO move `payed_to_cell` into computed_field.rs
+fn payed_to_cell(project:&Project) -> Cell {
+    let sym = ::CONFIG.get_str("currency")
+        .expect("Faulty config: currency does not contain a value");
+
     match (project.payed_by_client(), project.payed_caterers()) {
         (false,false) => Cell::new("✗").with_style(Attr::ForegroundColor(color::RED)),
         (_,    false) |
@@ -55,7 +63,7 @@ fn payed_to_cell(project:&Project) -> Cell{
     }
 }
 
-fn result_to_cell(res:&Result<(), Vec<&str>>, bold:bool) -> Cell{
+fn result_to_cell(res: &SpecResult, bold:bool) -> Cell{
     match (res, bold){
         (&Ok(_),           false) => Cell::new("✓").with_style(Attr::ForegroundColor(color::GREEN)), // ✗
         (&Ok(_),           true)  => Cell::new("✓").with_style(Attr::ForegroundColor(color::GREEN))
@@ -72,7 +80,7 @@ fn project_to_style(project:&Project) -> &str{
         return "d"
     }
 
-    if let Some(date) = project.date(){
+    if let Some(date) = project.modified_date(){
         let age = (Local::today() - date).num_days();
         if project.canceled(){
             return ""
@@ -98,7 +106,7 @@ pub fn path_rows(projects:&[Project], list_config:&ListConfig) -> Vec<Row>{
             let row_style = if list_config.use_colors {project_to_style(project)}else{""};
             Row::new(vec![
                      cell!(project.invoice_num().unwrap_or("".into())),
-                     cell!(project.name()).style_spec(row_style),
+                     cell!(project.short_desc()).style_spec(row_style),
                      cell!(project.file().display()),
 
                      //cell!(project.date().map(|d|d.format("%d.%m.%Y").to_string()).unwrap_or("no_date".into())),
@@ -117,16 +125,16 @@ pub fn simple_rows(projects:&[Project], list_config:&ListConfig) -> Vec<Row>{
             Row::new(vec![
                      cell!(
                          if project.canceled() {
-                             format!("X {name}", name=project.name())
+                             format!("X {name}", name=project.short_desc())
                          } else{
-                             project.name()
+                             project.short_desc()
                          })
                      .style_spec(row_style),
 
                      //cell!(project.manager()),
                      cell!(project.invoice_num().unwrap_or("".into())),
 
-                     cell!(project.date().map(|d|d.format("%d.%m.%Y").to_string()).unwrap_or("no_date".into())),
+                     cell!(project.modified_date().map(|d|d.format("%d.%m.%Y").to_string()).unwrap_or("no_date".into())),
                      //cell!(project.file().display()),
             ])
         })
@@ -166,12 +174,12 @@ pub fn verbose_rows(projects:&[Project], list_config:&ListConfig) -> Vec<Row>{
 
                 cell!(
                     if project.canceled() {
-                        format!("CANCELED: {name}", name=project.name())
-                    } else{ project.name() }
+                        format!("CANCELED: {name}", name=project.short_desc())
+                    } else{ project.short_desc() }
                     ).style_spec(row_style),
 
                 // Hendrik Sollich
-                cell!(project.manager())
+                cell!(project.responsible().unwrap_or(""))
                     .style_spec(row_style),
 
                 // sort index
@@ -182,7 +190,7 @@ pub fn verbose_rows(projects:&[Project], list_config:&ListConfig) -> Vec<Row>{
                     .style_spec(row_style),
 
                 // Date
-                cell!(project.date().unwrap_or(UTC::today()).format("%d.%m.%Y").to_string())
+                cell!(project.modified_date().unwrap_or(UTC::today()).format("%d.%m.%Y").to_string())
                     .style_spec(row_style),
 
                 // status "✓  ✓  ✗"
@@ -270,6 +278,10 @@ pub fn print_projects(rows:Vec<Row>){
     let mut table = Table::init(rows);
     table.set_format(FormatBuilder::new().column_separator(' ').padding(0,0).build());
     table.printstd();
+    debug!("this table has {} lines", table.len());
+    if let Some(term_dims) = term_size::dimensions() {
+        debug!("terminal dimension {:?}", term_dims);
+    }
     trace!("done printing table.");
 }
 
@@ -305,7 +317,7 @@ fn table_with_borders(table:&mut Table){
 
 pub fn show_details(project:&Project, bill_type:&BillType) {
     trace!("print::show_details()");
-    println!("{}: {}", bill_type.to_string(), project.name());
+    println!("{}: {}", bill_type.to_string(), project.short_desc());
 
     let (offer, invoice) = match project.bills() {
         Ok(tuple) => tuple,
