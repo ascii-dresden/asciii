@@ -30,6 +30,18 @@ error_chain!{
 
 pub type SpecResult = ::std::result::Result<(), ErrorList>;
 
+pub fn combine_specresults(specs: Vec<SpecResult>) -> SpecResult {
+    specs.into_iter()
+         .fold(Ok(()), |acc, x|
+                      match (acc, x) {
+                          (Ok(_),          Ok(_))           => Ok(()),
+                          (Err(left_list), Ok(_))           => Err(left_list),
+                          (Ok(_),          Err(right_list)) => Err(right_list),
+                          (Err(left_list), Err(right_list)) => Err(left_list.combine_with(&right_list))
+                      }
+                     )
+}
+
 pub struct ErrorList {
     pub errors: Vec<String>
 }
@@ -43,6 +55,14 @@ impl ErrorList {
 
     pub fn push(&mut self, error:&str) {
         self.errors.push(error.into());
+    }
+
+    pub fn combine_with(&self, other:&Self) -> Self{
+        let mut new = ErrorList::new();
+        for err in self.errors.iter().chain(other.errors.iter()) {
+            new.push(err)
+        }
+        new
     }
 
     pub fn is_empty(&self) -> bool{

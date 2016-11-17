@@ -223,34 +223,34 @@ impl Project {
     ///
     /// Ready to send an **offer** to the client.
     pub fn is_ready_for_offer(&self) -> SpecResult{
-        let client             = self.client();
-        let client_validation  = client.validate();
-
-        let offer              = self.offer();
-        let offer_validation   = offer.validate();
-
-        let project_validation = self.validate();
-        offer_validation.and(client_validation).and(project_validation)
+        self::error::combine_specresults(
+            vec![ self.offer().validate(),
+                  self.client().validate(),
+                  self.validate() ]
+            )
     }
 
     /// Valid to produce invoice
     ///
     /// Ready to send an **invoice** to the client.
     pub fn is_ready_for_invoice(&self) -> SpecResult{
-        let invoice_validation = self.invoice().validate();
-
-        self.is_ready_for_offer().and(invoice_validation)
+        self::error::combine_specresults(
+            vec![ self.is_ready_for_offer(),
+                  self.invoice().validate()]
+            )
     }
 
     /// Completely done and in the past.
     ///
-    /// Ready to be **archived**.
+    /// Ready to be **h:
     pub fn is_ready_for_archive(&self) -> SpecResult {
         if self.canceled(){
             Ok(())
         } else {
-            Redeemable::validate(self)
-                //.and( self.hours().validate()) // TODO
+            self::error::combine_specresults(
+                vec![ Redeemable::validate(self),
+                      self.hours().validate() ]
+                )
         }
     }
 
@@ -707,8 +707,19 @@ impl<'a> ProvidesData for Hours<'a> {
     }
 }
 
-impl<'a> HasEmployees for Hours<'a> {
+impl<'a> HasEmployees for Hours<'a> { }
 
+impl<'a> Validatable for Hours<'a> {
+    fn validate(&self) -> SpecResult {
+        let mut errors = ErrorList::new();
+        if self.wages_date().is_none() { errors.push("wages_date"); }
+
+        if !errors.is_empty() {
+            return Err(errors);
+        }
+
+        Ok(())
+    }
 }
 
 

@@ -192,6 +192,7 @@ pub trait ProvidesData {
 /// Every other trait in this module ought to be `Validatable`
 pub trait Validatable {
     fn validate(&self) -> SpecResult;
+
     fn is_valid(&self) -> bool {
         self.validate().is_ok()
     }
