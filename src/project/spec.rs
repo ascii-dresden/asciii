@@ -548,6 +548,8 @@ pub mod events {
     use super::IsProject;
     use yaml_rust::Yaml;
     use chrono::{Date, UTC, NaiveTime};
+    use icalendar::Event as CalEvent;
+    use icalendar::{Component, Calendar};
 
     #[derive(Debug)]
     pub struct EventTime {
@@ -558,7 +560,7 @@ pub mod events {
     #[derive(Debug)]
     pub struct Event{
         pub begin: Date<UTC>,
-        pub end: Date<UTC>,
+        pub end: Option<Date<UTC>>,
         pub times: Vec<EventTime>
     }
 
@@ -566,8 +568,8 @@ pub mod events {
     impl fmt::Display for Event {
         fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
             try!(
-                if self.begin == self.end { writeln!(f, "start: {}", self.begin) }
-                else { writeln!(f, "start: {}\nend:  {}", self.begin, self.end) }
+                if let Some(end) = self.end { writeln!(f, "start: {}\nend:  {}", self.begin, end) }
+                else { writeln!(f, "start: {}", self.begin) }
                 );
             for time in &self.times {
                 try!(
@@ -578,7 +580,6 @@ pub mod events {
             Ok(())
         }
     }
-
 
     fn naive_time_from_str(string:&str) -> Option<NaiveTime> {
         let t:Vec<u32> = string
@@ -611,7 +612,49 @@ pub mod events {
         assert_eq!(Some(NaiveTime::from_hms(9,0,0)),  naive_time_from_str("9"));
         assert_eq!(Some(NaiveTime::from_hms(23,0,0)), naive_time_from_str("23:0"));
     }
+
     pub trait HasEvents: IsProject {
+
+        fn to_ical(&self) -> Calendar {
+            let mut calendar = Calendar::new();
+            for event in self.events().unwrap() {
+                if event.times.is_empty() {
+
+                    let mut cal_event = CalEvent::new();
+
+                    if let Some(end) = event.end {
+                        cal_event.start_date(event.begin);
+                        cal_event.end_date(end);
+                    } else {
+                        cal_event.all_day(event.begin);
+                    }
+
+                    cal_event.summary(&self.name().unwrap_or("unnamed"));
+                    calendar.add(cal_event);
+
+                } else {
+                    for time in &event.times {
+
+                        let mut cal_event = CalEvent::new();
+
+                        if let Some(end)   = event.begin.and_time(time.end) {
+                            cal_event.ends(end);
+                        }
+
+                        if let Some(start) = event.begin.and_time(time.start) {
+                            cal_event.starts(start);
+                        }
+
+                        //cal_event.start_date(event.begin);
+
+                        cal_event.summary(&self.name().unwrap_or("unnamed"));
+                        calendar.add(cal_event);
+                    }
+                }
+            }
+
+            calendar
+        }
 
         /// Produces a list of `DateRange`s for the event.
         fn events(&self) -> Option<Vec<Event>> {
@@ -630,10 +673,11 @@ pub mod events {
 
                     Some( Event{
                         begin: begin,
-                        end: end.unwrap_or(begin),
+                        end: end,
                         times: self.times(h).unwrap_or_else(Vec::new)
                     })
                 })
+
             .collect()
         }
 
@@ -650,7 +694,7 @@ pub mod events {
                     let end   = self.get_direct(h, "end")
                         .and_then(|y|y.as_str())
                         .and_then(naive_time_from_str)
-                        .or(begin);
+                        .or(begin); // TODO assume a duration of one hour instead
 
                     if let (Some(begin),Some(end)) = (begin,end) {
                         Some( EventTime{

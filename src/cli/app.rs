@@ -397,6 +397,11 @@ pub fn build_cli() -> App<'static, 'static> {
                          .long("json")
                          .short("j"))
 
+                    .arg(Arg::with_name("ical")
+                         .help("Show project as iCal")
+                         .long("ical")
+                         .short("C"))
+
                     .arg(Arg::with_name("dump")
                          .help("Dump project yaml")
                          .long("dump"))

@@ -19,6 +19,7 @@ use asciii::templater::Templater;
 use asciii::project::Project;
 use asciii::project::spec;
 use asciii::project::spec::IsProject;
+use asciii::project::spec::events::HasEvents;
 use asciii::project::ComputedField;
 use asciii::actions::{setup_luigi, setup_luigi_with_git};
 
@@ -427,6 +428,7 @@ fn infer_bill_type(m: &ArgMatches) -> Option<BillType> {
     }
 }
 
+///
 /// Command SHOW
 pub fn show(m: &ArgMatches) {
     let (search_terms, dir) = matches_to_search(m);
@@ -452,10 +454,12 @@ pub fn show(m: &ArgMatches) {
     } else if m.is_present("errors"){ show_errors(dir, search_terms.as_slice())
     } else if m.is_present("dump"){ dump_yaml(dir, search_terms.as_slice())
     } else if m.is_present("json"){ show_json(dir, search_terms.as_slice())
+    } else if m.is_present("ical"){ show_ical(dir, search_terms.as_slice())
     } else if m.is_present("csv"){  show_csv( dir, search_terms.as_slice());
     } else if m.is_present("template"){ show_template(search_terms[0]);
     } else { actions::simple_with_projects(dir, search_terms.as_slice(), |p|print::show_details(p,&bill_type)) }
 }
+
 
 fn dump_yaml(dir: StorageDir, search_terms: &[&str]) {
     actions::simple_with_projects(dir, &search_terms, |p| println!("{}", p.dump_yaml()));
@@ -478,6 +482,10 @@ fn show_empty_fields(dir: StorageDir, search_terms: &[&str]) {
 #[cfg(feature="document_export")]
 fn show_json(dir: StorageDir, search_terms: &[&str]) {
     actions::simple_with_projects(dir, &search_terms, |p| println!("{}", p.to_json()));
+}
+
+fn show_ical(dir: StorageDir, search_terms: &[&str]) {
+    actions::simple_with_projects(dir, &search_terms, |p| p.to_ical().print().unwrap());
 }
 
 fn show_detail(dir: StorageDir, search_terms: &[&str], detail: &str) {

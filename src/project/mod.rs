@@ -67,7 +67,7 @@ static PROJECT_FILE_EXTENSION:&'static str = "yml";
 ///
 /// A project is storable, contains products, and you can create an offer or invoice from it.
 #[derive(Debug)]
-pub struct Debug {
+struct Debug {
     file_path: PathBuf,
     //temp_dir: Option<PathBuf>, // TODO
     git_status: Option<GitStatus>,
@@ -293,7 +293,7 @@ impl Project {
         Ok(invoice.net_total())
     }
 
-    pub fn debug(&self) -> Debug {
+    fn debug(&self) -> Debug {
         self.into()
     }
 
@@ -581,6 +581,12 @@ impl<'a> From<&'a Project> for Debug {
 }
 
 impl HasEvents for Project { }
+
+impl fmt::Debug for Project {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{:?}", self.debug())
+    }
+}
 
 
 
