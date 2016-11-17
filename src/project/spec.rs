@@ -16,6 +16,7 @@ use super::error::{SpecResult, ErrorList};
 
 use std::str::FromStr;
 
+
 pub fn print_specresult(result: SpecResult) {
     match result {
         Ok(_) => println!("✓"),
@@ -397,22 +398,11 @@ pub trait Invoicable: ProvidesData {
 }
 
 
-use super::product::error::Error;
-use super::product::error::Result;
-use super::product::error::ErrorKind;
+use super::product::error::{Result, Error, ErrorKind};
 use super::product::Product;
 use bill::{BillItem, Bill};
 
-
-/// Stage 3: when an `IsProject` is redeem and can be archived
-pub trait Redeemable: IsProject {
-    /// When was the project payed
-    fn payed_date(&self) -> Option<Date<UTC>> {
-        self.get_dmy("invoice.payed_date")
-        // old spec
-        .or_else(|| self.get_dmy("payed_date"))
-    }
-
+pub trait HasEmployees: ProvidesData {
     /// When were the wages payed
     fn wages_date(&self) -> Option<Date<UTC>> {
         self.get_dmy("hours.wages_date")
@@ -426,9 +416,9 @@ pub trait Redeemable: IsProject {
     }
 
     /// Full number of service hours
-    /// XXX test this against old format
+    /// TODO test this against old format
     fn total(&self) -> Option<f64> {
-        self.caterers().map(|vec| {
+        self.employees().map(|vec| {
             vec.iter()
                 .map(|&(_, h)| h)
                 .fold(0f64, |acc, h| acc + h)
@@ -446,9 +436,9 @@ pub trait Redeemable: IsProject {
     //    }
     //}
 
-    /// Nicely formated list of caterers with their respective service hours
-    fn caterers_string(&self) -> Option<String> {
-        self.caterers().map(|v| {
+    /// Nicely formated list of employees with their respective service hours
+    fn employees_string(&self) -> Option<String> {
+        self.employees().map(|v| {
             v.iter()
                 .map(|t| format!("{}: ({})", t.0, t.1))
                 .collect::<Vec<String>>()
@@ -456,53 +446,34 @@ pub trait Redeemable: IsProject {
         })
     }
 
-    /// List of caterers and ther respective service hours
-    fn caterers(&self) -> Option<Vec<(String, f64)>> {
-        self.get_hash("hours.caterers").map(|h| {
-            h.iter()
-                .map(|(c, h)| {
-                    (// argh, those could be int or float, grrr
-                     c.as_str().unwrap_or("").to_owned(),
-                     h.as_f64()
-                        .or_else(|| // sorry for this
-                             h.as_i64().map(|f|f as f64 ))
-                        .unwrap_or(0f64))
-                })
+    /// List of employees and ther respective service hours
+    fn employees(&self) -> Option<Vec<(String, f64)>> {
+        self.get_hash("hours.caterers") .or(self.get_hash("hours.employees"))
+            .map(|h| {
+                h.iter()
+                    .map(|(c, h)| {
+                        (// argh, those could be int or float, grrr
+                            c.as_str().unwrap_or("").to_owned(),
+                            h.as_f64()
+                            .or_else(|| // sorry for this
+                                     h.as_i64().map(|f|f as f64 ))
+                            .unwrap_or(0f64))
+                    })
                 .collect::<Vec<(String, f64)>>()
-        })
+            })
+    }
+}
+
+/// Stage 3: when an `IsProject` is redeem and can be archived
+pub trait Redeemable: IsProject {
+    /// When was the project payed
+    fn payed_date(&self) -> Option<Date<UTC>> {
+        self.get_dmy("invoice.payed_date")
+        // old spec
+        .or_else(|| self.get_dmy("payed_date"))
     }
 
-    fn bills(&self) -> Result<(Bill<Product>, Bill<Product>)> {
-        let mut offer: Bill<Product> = Bill::new();
-        let mut invoice: Bill<Product> = Bill::new();
-
-        let service = || Product {
-            name: "Service",
-            unit: Some("h"),
-            tax: ::ordered_float::OrderedFloat(0f64), // TODO this ought to be in the config
-            price: self.salary().unwrap_or(Currency(None,0))
-        };
-
-        if let Some(total) = self.total() {
-            if total.is_normal() {
-                offer.add_item(total, service());
-                invoice.add_item(total, service());
-            }
-        }
-
-        let raw_products = try!(
-            self.get_hash("products")
-                .ok_or(Error::from(ErrorKind::UnknownFormat))
-            );
-
-        for (desc,values) in raw_products {
-            let (offer_item, invoice_item) = try!(self.item_from_desc_and_value(desc, values));
-            if offer_item.amount.is_normal()   { offer.add(offer_item); }
-            if invoice_item.amount.is_normal() { invoice.add(invoice_item); }
-        }
-
-        Ok((offer,invoice))
-    }
+    fn bills(&self) -> Result<(Bill<Product>, Bill<Product>)> ;
 
     /// implementation detail
     /// TODO please move into concrete implementation
@@ -539,11 +510,24 @@ pub trait Redeemable: IsProject {
     }
 }
 
+impl Validatable for HasEmployees {
+    fn validate(&self) -> SpecResult {
+        let mut errors = ErrorList::new();
+        if self.wages_date().is_none(){ errors.push("wages_date");}
+
+        if !errors.is_empty() {
+            Err(errors)
+        } else {
+            Ok(())
+        }
+    }
+
+}
+
 impl Validatable for Redeemable {
     fn validate(&self) -> SpecResult {
         let mut errors = ErrorList::new();
         if self.payed_date().is_none() { errors.push("payed_date"); }
-        if self.wages_date().is_none(){ errors.push("wages_date");}
 
         if let Some(format) = self.format() {
             if format < Version::parse("2.0.0").unwrap() {

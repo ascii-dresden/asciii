@@ -67,7 +67,7 @@ pub struct Storage<L:Storable> {
 
     project_type: PhantomData<L>,
 
-    pub repository: Option<Repository>
+    repository: Option<Repository>
 }
 
 /// Used to identify what directory you are talking about.
@@ -177,6 +177,11 @@ impl<L:Storable> Storage<L> {
     /// Getter for Storage::templates.
     pub fn templates_dir(&self) -> &Path{
         self.templates.as_ref()
+    }
+
+    /// Getter for Storage::templates.
+    pub fn repository(&self) -> Option<&Repository> {
+        self.repository.as_ref()
     }
 
     /// Creates the basic dir structure inside the storage directory.

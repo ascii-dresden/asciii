@@ -117,8 +117,8 @@ impl ToJson for Project{
             }.to_json(),
 
             s("hours") => btreemap!{
-                s("time")   => opt_to_json(self.total()),
-                s("salary") => opt_to_json(self.salary().map(|ref c| currency_to_string(c)))
+                s("time")   => opt_to_json(self.hours().total()),
+                s("salary") => opt_to_json(self.hours().salary().map(|ref c| currency_to_string(c)))
             }.to_json(),
 
         };

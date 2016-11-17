@@ -31,7 +31,7 @@ custom_derive! {
         OurBad,
         TheirBad,
         Year,
-        Caterers,
+        Employees,
         ClientFullName,
         Wages,
 
@@ -71,7 +71,7 @@ impl ComputedField {
             ComputedField::Date              => project.modified_date().map(|d| d.format("%Y.%m.%d").to_string()),
             ComputedField::SortIndex         => project.index(),
 
-            ComputedField::Caterers          => project.caterers_string(),
+            ComputedField::Employees         => project.hours().employees_string(),
             ComputedField::ClientFullName    => project.client().full_name(),
             ComputedField::Wages             => project.wages().map(|c| util::currency_to_string(&c)),
             ComputedField::Invalid           => None,

@@ -5,7 +5,7 @@
 use std::fs::File;
 use std::io::prelude::*;
 use std::ffi::OsStr;
-use std::fmt::Debug;
+use std::fmt;
 use std::path::{Path, PathBuf};
 use std::error::Error as ErrorTrait;
 use std::collections::HashMap;
@@ -14,7 +14,8 @@ use chrono::*;
 use yaml_rust::Yaml;
 use tempdir::TempDir;
 use slug;
-use bill::Currency;
+
+use bill::{Bill, Currency};
 //use semver::Version;
 
 use super::BillType;
@@ -47,9 +48,12 @@ mod tojson;
 
 use self::spec::ProvidesData;
 use self::spec::{IsProject, IsClient};
-use self::spec::{Offerable, Invoicable, Redeemable, Validatable};
+use self::spec::{Offerable, Invoicable, Redeemable, Validatable, HasEmployees};
 use self::spec::events::HasEvents;
 use self::error::{ErrorKind, ErrorList, SpecResult, Result};
+use self::product::Product;
+use self::product::error as product_error;
+
 
 pub use self::computed_field::ComputedField;
 
@@ -63,7 +67,7 @@ static PROJECT_FILE_EXTENSION:&'static str = "yml";
 ///
 /// A project is storable, contains products, and you can create an offer or invoice from it.
 #[derive(Debug)]
-pub struct DebugProject {
+pub struct Debug {
     file_path: PathBuf,
     //temp_dir: Option<PathBuf>, // TODO
     git_status: Option<GitStatus>,
@@ -114,8 +118,9 @@ impl Project {
         Invoice { inner: self }
     }
 
-    pub fn invoice_num(&self) -> Option<String>{
-        self.invoice().number_str()
+    /// Returns the struct `Invoice`, which abstracts away invoice specific stuff.
+    pub fn hours<'a>(&'a self) -> Hours<'a> {
+        Hours { inner: self }
     }
 
     pub fn payed_by_client(&self) -> bool{
@@ -123,11 +128,11 @@ impl Project {
     }
 
     pub fn payed_caterers(&self) -> bool{
-        self.wages_date().is_some()
+        self.hours().wages_date().is_some()
     }
 
     pub fn caterers(&self) -> String {
-        self.caterers_string().unwrap_or_else(String::new)
+        self.hours().employees_string().unwrap_or_else(String::new)
     }
 
     /// Filename of the offer output file.
@@ -186,7 +191,7 @@ impl Project {
         self.invoice_file().map(|f|f.exists()).unwrap_or(false)
     }
 
-    fn write_to_path<P:AsRef<OsStr> + Debug>(content:&str, target:&P) -> Result<PathBuf> {
+    fn write_to_path<P:AsRef<OsStr> + fmt::Debug>(content:&str, target:&P) -> Result<PathBuf> {
         trace!("writing content ({}bytes) to {:?}", content.len(), target);
         let mut file = try!(File::create(Path::new(target)));
         try!(file.write_all(content.as_bytes()));
@@ -245,6 +250,7 @@ impl Project {
             Ok(())
         } else {
             Redeemable::validate(self)
+                //.and( self.hours().validate()) // TODO
         }
     }
 
@@ -277,7 +283,7 @@ impl Project {
     }
 
     pub fn wages(&self) -> Option<Currency> {
-        if let (Some(total), Some(salary)) = (self.total(), self.salary()){
+        if let (Some(total), Some(salary)) = (self.hours().total(), self.hours().salary()){
             Some(total * salary)
         } else{None}
     }
@@ -287,7 +293,7 @@ impl Project {
         Ok(invoice.net_total())
     }
 
-    pub fn debug(&self) -> DebugProject{
+    pub fn debug(&self) -> Debug {
         self.into()
     }
 
@@ -353,7 +359,40 @@ impl ProvidesData for Project {
 }
 
 impl IsProject for Project { }
-impl Redeemable for Project { }
+
+impl Redeemable for Project {
+    fn bills(&self) -> product::Result<(Bill<Product>, Bill<Product>)> {
+        let mut offer: Bill<Product> = Bill::new();
+        let mut invoice: Bill<Product> = Bill::new();
+
+        let service = || Product {
+            name: "Service",
+            unit: Some("h"),
+            tax: ::ordered_float::OrderedFloat(0f64), // TODO this ought to be in the config
+            price: self.hours().salary().unwrap_or(Currency(None,0))
+        };
+
+        if let Some(total) = self.hours().total() {
+            if total.is_normal() {
+                offer.add_item(total, service());
+                invoice.add_item(total, service());
+            }
+        }
+
+        let raw_products = try!(
+            self.get_hash("products")
+                .ok_or(product_error::Error::from(product_error::ErrorKind::UnknownFormat))
+            );
+
+        for (desc,values) in raw_products {
+            let (offer_item, invoice_item) = try!(self.item_from_desc_and_value(desc, values));
+            if offer_item.amount.is_normal()   { offer.add(offer_item); }
+            if invoice_item.amount.is_normal() { invoice.add(invoice_item); }
+        }
+
+        Ok((offer,invoice))
+    }
+}
 
 impl Validatable for Project {
     fn validate(&self) -> SpecResult {
@@ -369,110 +408,7 @@ impl Validatable for Project {
     }
 }
 
-impl HasEvents for Project {
-}
-
-/// This is returned by [Product::client()](struct.Project.html#method.client).
-pub struct Client<'a> {
-    inner: &'a Project
-}
-
-impl<'a> ProvidesData for Client<'a> {
-    fn data(&self) -> &Yaml{
-        self.inner.data()
-    }
-}
-
-impl<'a> Validatable for Client<'a> {
-    fn validate(&self) -> SpecResult {
-        let mut errors = self.field_exists( &[
-                                             //"client/email", // TODO make this a requirement
-                                             "client/address",
-                                             "client/title",
-                                             "client/last_name",
-                                             "client/first_name"
-                                             ]);
-
-
-        if self.addressing().is_none() {
-            errors.push("client_addressing");
-        }
-        if !errors.is_empty() {
-            return Err(errors);
-        }
-
-        Ok(())
-    }
-}
-
-/// This is returned by [Product::offer()](struct.Project.html#method.offer).
-pub struct Offer<'a> {
-    inner: &'a Project
-}
-
-impl<'a> ProvidesData for Offer<'a> {
-    fn data(&self) -> &Yaml{
-        self.inner.data()
-    }
-}
-
-impl<'a> Offerable for Offer<'a> { }
-
-impl<'a> Validatable for Offer<'a> {
-    fn validate(&self) -> SpecResult {
-        //if IsProject::canceled(self) {
-        //    return Err(vec!["canceled"]);
-        //}
-
-        let mut errors = self.field_exists(&["offer.date", "offer.appendix", "manager"]);
-        if Offerable::date(self).is_none() {
-            errors.push("offer_date_format");
-        }
-
-        if !errors.is_empty() {
-            return Err(errors);
-        }
-
-        Ok(())
-
-    }
-}
-
-
-/// This is returned by [Product::invoice()](struct.Project.html#method.invoice).
-pub struct Invoice<'a> {
-    inner: &'a Project
-}
-
-impl<'a> ProvidesData for Invoice<'a> {
-    fn data(&self) -> &Yaml{
-        self.inner.data()
-    }
-}
-
-impl<'a> Invoicable for Invoice<'a> { }
-
-impl<'a> Validatable for Invoice<'a> {
-    fn validate(&self) -> SpecResult {
-        let mut errors = self.field_exists(&["invoice.number"]);
-
-        // if super::offer::validate(yaml).is_err() {errors.push("offer")}
-        if self.date().is_none() {
-            errors.push("invoice_date");
-        }
-
-        if !errors.is_empty() {
-            return Err(errors);
-        }
-
-        Ok(())
-    }
-}
-
-// TODO move to spec_traint.rs
-impl<'a> IsClient for Client<'a> { }
-
-impl Storable for Project{
+impl Storable for Project {
     fn file_extension() -> &'static str {PROJECT_FILE_EXTENSION}
     fn from_template(project_name:&str,template:&Path, fill: &HashMap<&str,String>) -> StorageResult<Project> {
         let template_name = template.file_stem().unwrap().to_str().unwrap();
@@ -535,7 +471,7 @@ impl Storable for Project{
     }
 
     fn prefix(&self) -> Option<String>{
-        self.invoice_num()
+        self.invoice().number_str()
     }
 
     fn index(&self) -> Option<String>{
@@ -622,9 +558,11 @@ impl Storable for Project{
     /// TODO compare agains InvoiceNumber, ClientFullName, Email, event/name, invoice/official Etc
     fn matches_search(&self, term: &str) -> bool{
         let search = term.to_lowercase();
-        self.invoice_num().map_or(false, |num|num.to_lowercase().contains(&search))
-        ||
-        Storable::short_desc(self).to_lowercase().contains(&search)
+        self.invoice()
+            .number_str()
+            .map_or(false, |num|num.to_lowercase().contains(&search))
+            ||
+            Storable::short_desc(self).to_lowercase().contains(&search)
     }
 
     fn is_ready_for_archive(&self) -> bool {
@@ -632,14 +570,145 @@ impl Storable for Project{
     }
 }
 
-impl<'a> From<&'a Project> for DebugProject{
-    fn from(project: &'a Project) -> DebugProject{
-        DebugProject{
+impl<'a> From<&'a Project> for Debug {
+    fn from(project: &'a Project) -> Debug {
+        Debug {
             file_path:  project.file_path.clone(),
             git_status: project.git_status.clone(),
             yaml:       project.yaml.clone()
         }
     }
+}
+
+impl HasEvents for Project { }
+
+
+
+
+
+/// This is returned by [Product::client()](struct.Project.html#method.client).
+pub struct Client<'a> {
+    inner: &'a Project
+}
+
+impl<'a> ProvidesData for Client<'a> {
+    fn data(&self) -> &Yaml{
+        self.inner.data()
+    }
+}
+
+impl<'a> IsClient for Client<'a> { }
+
+impl<'a> Validatable for Client<'a> {
+    fn validate(&self) -> SpecResult {
+        let mut errors = self.field_exists( &[
+                                             //"client/email", // TODO make this a requirement
+                                             "client/address",
+                                             "client/title",
+                                             "client/last_name",
+                                             "client/first_name"
+                                             ]);
+
+
+        if self.addressing().is_none() {
+            errors.push("client_addressing");
+        }
+        if !errors.is_empty() {
+            return Err(errors);
+        }
+
+        Ok(())
+    }
+}
+
+
+
+
+
+/// This is returned by [Product::offer()](struct.Project.html#method.offer).
+pub struct Offer<'a> {
+    inner: &'a Project
+}
+
+impl<'a> ProvidesData for Offer<'a> {
+    fn data(&self) -> &Yaml{
+        self.inner.data()
+    }
+}
+
+impl<'a> Offerable for Offer<'a> { }
+
+impl<'a> Validatable for Offer<'a> {
+    fn validate(&self) -> SpecResult {
+        //if IsProject::canceled(self) {
+        //    return Err(vec!["canceled"]);
+        //}
+
+        let mut errors = self.field_exists(&["offer.date", "offer.appendix", "manager"]);
+        if Offerable::date(self).is_none() {
+            errors.push("offer_date_format");
+        }
+
+        if !errors.is_empty() {
+            return Err(errors);
+        }
+
+        Ok(())
+
+    }
+}
+
+
+
+
+
+/// This is returned by [Product::invoice()](struct.Project.html#method.invoice).
+pub struct Invoice<'a> {
+    inner: &'a Project
+}
+
+impl<'a> ProvidesData for Invoice<'a> {
+    fn data(&self) -> &Yaml{
+        self.inner.data()
+    }
+}
+
+impl<'a> Invoicable for Invoice<'a> { }
+
+impl<'a> Validatable for Invoice<'a> {
+    fn validate(&self) -> SpecResult {
+        let mut errors = self.field_exists(&["invoice.number"]);
+
+        // if super::offer::validate(yaml).is_err() {errors.push("offer")}
+        if self.date().is_none() {
+            errors.push("invoice_date");
+        }
+
+        if !errors.is_empty() {
+            return Err(errors);
+        }
+
+        Ok(())
+    }
+}
+
+
+
+
+
+/// This is returned by [Product::hours()](struct.Project.html#method.hours).
+pub struct Hours<'a> {
+    inner: &'a Project
+}
+
+impl<'a> ProvidesData for Hours<'a> {
+    fn data(&self) -> &Yaml{
+        self.inner.data()
+    }
+}
+
+impl<'a> HasEmployees for Hours<'a> {
+
 }
 
 

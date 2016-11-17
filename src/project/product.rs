@@ -7,16 +7,19 @@ use util::yaml;
 use util::yaml::Yaml;
 
 use super::spec::to_currency;
+
 pub mod error{
     #![allow(trivial_casts)]
     error_chain!{
-        types { }
+        types {
+            Error, ErrorKind, ChainErr, Result;
+        }
         links { }
         foreign_links { }
         errors {
             InvalidPrice (product:String){
                 description("A product has either no or an invalid price.")
-                display("Invalid price in {}", product)
+                    display("Invalid price in {}", product)
             }
 
             UnknownFormat {}

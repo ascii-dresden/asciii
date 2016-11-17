@@ -13,13 +13,11 @@ use term_size;
 use super::BillType;
 
 use project::Project;
-use project::spec::{IsProject, Redeemable};
+use project::spec::{IsProject, Redeemable, Invoicable};
 use project::spec::events::HasEvents;
 use project::error::SpecResult;
 use storage::Storable;
 use util::currency_to_string;
-
-//TODO construct table rows way more dynamically
 
 /// Configuration for this list output.
 #[derive(Debug)]
@@ -105,7 +103,7 @@ pub fn path_rows(projects:&[Project], list_config:&ListConfig) -> Vec<Row>{
         .map(|project| {
             let row_style = if list_config.use_colors {project_to_style(project)}else{""};
             Row::new(vec![
-                     cell!(project.invoice_num().unwrap_or("".into())),
+                     cell!(project.invoice().number_str().unwrap_or("".into())),
                      cell!(project.short_desc()).style_spec(row_style),
                      cell!(project.file().display()),
 
@@ -132,7 +130,7 @@ pub fn simple_rows(projects:&[Project], list_config:&ListConfig) -> Vec<Row>{
                      .style_spec(row_style),
 
                      //cell!(project.manager()),
-                     cell!(project.invoice_num().unwrap_or("".into())),
+                     cell!(project.invoice().number_str().unwrap_or("".into())),
 
                      cell!(project.modified_date().map(|d|d.format("%d.%m.%Y").to_string()).unwrap_or("no_date".into())),
                      //cell!(project.file().display()),
@@ -186,7 +184,7 @@ pub fn verbose_rows(projects:&[Project], list_config:&ListConfig) -> Vec<Row>{
                 //cell!(project.index().unwrap_or(String::from(""))),
 
                 // R042
-                cell!(project.invoice_num().unwrap_or("".into()))
+                cell!(project.invoice().number_str().unwrap_or("".into()))
                     .style_spec(row_style),
 
                 // Date
