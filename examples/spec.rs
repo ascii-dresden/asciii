@@ -5,75 +5,37 @@ use std::result::Result;
 use std::fs::File;
 use std::io::prelude::*;
 
-use asciii::project::spec;
+use asciii::project::spec::*;
 use asciii::project::Project;
 use asciii::storage::Storable;
 
-use yaml::*;
-
-fn _main() {
+fn main() {
     for project in [Project::open_file(Path::new("./examples/current.yml")).unwrap(),
                     Project::open_file(Path::new("./examples/old.yml")).unwrap()]
         .iter() {
         let yaml = project.yaml();
         println!("Index:     {:?}", project.index());
         println!("Canceled   {:?}", project.canceled());
-        println!("Date:      {:?}", project.date());
-        println!("Name:      {:?}", spec::project::name(&yaml));
-        println!("Manager:   {:?}", spec::project::manager(&yaml));
-        println!("Offer:     {:?}", spec::offer::number(&yaml));
-        println!("           {:?}", spec::date::offer(&yaml));
-        println!("Invoice:   {:?}", spec::invoice::number_str(&yaml));
-        println!("           {:?}", spec::date::invoice(&yaml));
-        println!("Payed      {:?}", spec::date::payed(&yaml));
-        println!("Title:     {:?}", spec::client::title(&yaml));
-        println!("FirstName: {:?}", spec::client::first_name(&yaml));
-        println!("LastName:  {:?}", spec::client::last_name(&yaml));
-        println!("Client:    {:?}", spec::client::addressing(&yaml));
+        println!("Date:      {:?}", project.event_date());
+        println!("Name:      {:?}", project.name());
+        println!("Manager:   {:?}", project.responsible());
+        println!("Offer:     {:?}", project.offer().number());
+        println!("           {:?}", project.offer().date());
+        println!("Invoice:   {:?}", project.invoice().number_str());
+        println!("           {:?}", project.invoice().date());
+        println!("Payed      {:?}", project.payed_date());
+        println!("Title:     {:?}", project.client().title());
+        println!("FirstName: {:?}", project.client().first_name());
+        println!("LastName:  {:?}", project.client().last_name());
+        println!("Client:    {:?}", project.client().addressing());
         println!("--------------");
-        // let (_offer, invoice) = spec::billing::bills(&yaml).unwrap();
+        // let (_offer, invoice) = spec::billing::bills().unwrap();
         // println!("Products:  {:#?}", invoice.as_items().iter().map(|item|format!("{:?}",item)).collect::<Vec<_>>());
         println!("--------------");
-        println!("hours:     {:?}h * {}", spec::hours::total(&yaml), spec::hours::salary(&yaml) .map(|c| c.postfix().to_string()).unwrap_or_else(|| String::from("0€")));
-        println!("caterers:  {:?}", spec::hours::caterers(&yaml));
+        println!("hours:     {:?}h * {}", project.hours().total(), project.hours().salary() .map(|c| c.postfix().to_string()).unwrap_or_else(|| String::from("0€")));
+        println!("caterers:  {:?}", project.caterers());
         println!("\n\n\n");
     }
 
     // println!("Products: {:#?}", spec::products::all(new_project.yaml()));
-}
-
-/// Ruby like API to yaml-rust.
-pub fn yaml_parse( file_content:&str ) -> Result<Yaml, ScanError> {
-    Ok(
-        try!(YamlLoader::load_from_str(&file_content))
-        .get(0)
-        .map(|i|i.to_owned())
-        .unwrap_or_else(||Yaml::from_str("[]"))
-      )
-}
-
-struct TestProject {
-    yaml: Yaml
-}
-
-impl TestProject {
-    /// Opens a yaml and parses it.
-    fn open_file(file_path:&Path)  -> Result<TestProject,ScanError>{
-        let file_content = try!(File::open(&file_path)
-                                .and_then(|mut file| {
-                                    let mut content = String::new();
-                                    file.read_to_string(&mut content).map(|_| content)
-                                }));
-        Ok(TestProject{
-            yaml: try!(yaml_parse(&file_content)),
-        })
-    }
-
-}
-
-fn main() {
-    for project in [TestProject::open_file(Path::new("./examples/current.yml")).unwrap(),
-                    TestProject::open_file(Path::new("./examples/old.yml")).unwrap()]
-        .iter() {
-    }
 }
