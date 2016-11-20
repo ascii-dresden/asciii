@@ -45,11 +45,10 @@ use storage::error::StorageError;
 error_chain!{
 
     types {
-        Error, ErrorKind, ChainErr, Result;
+        Error, ErrorKind, Result;
     }
 
-    links {
-    }
+    links { }
 
     foreign_links {
         io::Error, Io;

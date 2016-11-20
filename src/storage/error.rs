@@ -13,11 +13,7 @@ use super::repo::GitError;
 
 error_chain!{
     types {
-        StorageError, ErrorKind, ChainErr, Result;
-    }
-
-    links {
-// product::Error, product::ErrorKind, Product;
+        StorageError, ErrorKind, Result;
     }
 
     foreign_links {

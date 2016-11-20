@@ -12,6 +12,7 @@
 //        unused_import_braces,
 //        )]
 
+#![recursion_limit = "1024"]
 #![deny( trivial_casts, trivial_numeric_casts,)]
 
 #![warn( unused_import_braces, unused_qualifications)]

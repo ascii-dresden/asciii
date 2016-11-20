@@ -8,11 +8,11 @@ use super::product;
 
 error_chain!{
     types {
-        Error, ErrorKind, ChainErr, Result;
+        Error, ErrorKind, Result;
     }
 
     links {
-        product::Error, product::ErrorKind, Product;
+        product::Error, Product;
     }
 
     foreign_links {

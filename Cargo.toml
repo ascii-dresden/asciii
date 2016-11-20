@@ -4,7 +4,7 @@ version = "3.1.0"
 authors = ["Hendrik Sollich <hendrik@hoodie.de>"]
 license = "MIT/Apache-2.0"
 
-build = "build.rs"
+#build = "build.rs"
 
 
 [dependencies]
@@ -21,10 +21,11 @@ enum_derive = "0.1"
 custom_derive = "0.1"
 open = "1.1"
 ordered-float = "0.3"
-error-chain = "0.5"
+error-chain = "0.6"
 
 bill = {git="https://github.com/hoodie/bill-rs"}
-icalendar = {git="https://github.com/hoodie/icalendar-rs"}
+#icalendar = {git="https://github.com/hoodie/icalendar-rs"}
+icalendar = {path="../icalendar-rs"}
 
 slug = "0.1"
 tempdir = "0.3"

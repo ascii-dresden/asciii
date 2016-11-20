@@ -9,6 +9,7 @@ extern crate alloc_system;
 extern crate chrono;
 extern crate term; // TODO consolidate term, ansi_term and terminal_size
 extern crate open;
+extern crate icalendar;
 
 #[cfg(feature="document_export")] extern crate rustc_serialize;
 
@@ -58,6 +59,7 @@ fn setup_app(){
      ("edit",      Some(sub_m)) => subcommands::edit(sub_m),
      ("set",       Some(sub_m)) => subcommands::set(sub_m),
      ("show",      Some(sub_m)) => subcommands::show(sub_m),
+     ("calendar",  Some(sub_m)) => subcommands::calendar(sub_m),
      ("archive",   Some(sub_m)) => subcommands::archive(sub_m),
      ("unarchive", Some(sub_m)) => subcommands::unarchive(sub_m),
      ("config",    Some(sub_m)) => subcommands::config(sub_m),
@@ -84,10 +86,10 @@ fn setup_app(){
      //("unadd",     Some(sub_m)) => subcommands::git_unadd(sub_m),
      ("commit",    _          ) => subcommands::git_commit(),
      ("push",      _          ) => subcommands::git_push(),
-     ("stash",      _          ) => subcommands::git_stash(),
-     ("pop",      _          ) => subcommands::git_stash_pop(),
+     ("stash",     _          ) => subcommands::git_stash(),
+     ("pop",       _          ) => subcommands::git_stash_pop(),
      ("log",       _          ) => subcommands::git_log(),
-     _                       => ()
+     _                          => ()
     }
 }
 

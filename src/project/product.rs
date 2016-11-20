@@ -12,10 +12,13 @@ pub mod error{
     #![allow(trivial_casts)]
     error_chain!{
         types {
-            Error, ErrorKind, ChainErr, Result;
+            Error, ErrorKind, Result;
         }
+
         links { }
+
         foreign_links { }
+
         errors {
             InvalidPrice (product:String){
                 description("A product has either no or an invalid price.")

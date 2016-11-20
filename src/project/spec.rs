@@ -221,7 +221,6 @@ pub trait IsProject: ProvidesData {
         .or_else(||self.get_str("date")
                  .and_then(|s| parse_dmy_date_range(s))
                  )
-
     }
 
     //#[deprecated(note="Ambiguous: what format? use \"Version\"")]
@@ -615,40 +614,48 @@ pub mod events {
 
     pub trait HasEvents: IsProject {
 
+        /// Produces an iCal calendar from this project.
         fn to_ical(&self) -> Calendar {
             let mut calendar = Calendar::new();
-            for event in self.events().unwrap() {
-                if event.times.is_empty() {
-
-                    let mut cal_event = CalEvent::new();
-
-                    if let Some(end) = event.end {
-                        cal_event.start_date(event.begin);
-                        cal_event.end_date(end);
-                    } else {
-                        cal_event.all_day(event.begin);
-                    }
-
-                    cal_event.summary(&self.name().unwrap_or("unnamed"));
-                    calendar.add(cal_event);
-
-                } else {
-                    for time in &event.times {
+            if let Some(events) = self.events() {
+                for event in events {
+                    if event.times.is_empty() {
 
                         let mut cal_event = CalEvent::new();
+                        cal_event.description(&format!("made with {}", *::VERSION ));
 
-                        if let Some(end)   = event.begin.and_time(time.end) {
-                            cal_event.ends(end);
+                        if let Some(location) = self.location() { cal_event.location(location); }
+
+                        if let Some(end) = event.end {
+                            cal_event.start_date(event.begin);
+                            cal_event.end_date(end);
+                        } else {
+                            cal_event.all_day(event.begin);
                         }
-
-                        if let Some(start) = event.begin.and_time(time.start) {
-                            cal_event.starts(start);
-                        }
-
-                        //cal_event.start_date(event.begin);
 
                         cal_event.summary(&self.name().unwrap_or("unnamed"));
-                        calendar.add(cal_event);
+                        calendar.push(cal_event);
+
+                    } else {
+                        for time in &event.times {
+
+                            let mut cal_event = CalEvent::new();
+                            cal_event.description(&format!("made with {}", *::VERSION ));
+                            if let Some(location) = self.location() { cal_event.location(location); }
+
+                            if let Some(end)   = event.begin.and_time(time.end) {
+                                cal_event.ends(end);
+                            }
+
+                            if let Some(start) = event.begin.and_time(time.start) {
+                                cal_event.starts(start);
+                            }
+
+                            //cal_event.start_date(event.begin);
+
+                            cal_event.summary(&self.name().unwrap_or("unnamed"));
+                            calendar.push(cal_event);
+                        }
                     }
                 }
             }
@@ -661,12 +668,13 @@ pub mod events {
             let dates = try_some!(self.get("event.dates/").and_then(|a| a.as_vec()));
             dates.into_iter()
                 .map(|h| {
+
                     let begin = try_some!(
                         self.get_direct(h, "begin")
                         .and_then(|y|y.as_str())
-                        .and_then(|d|self.parse_dmy_date(d))
-                        );
-                    let end = 
+                        .and_then(|d|self.parse_dmy_date(d)));
+
+                    let end =
                         self.get_direct(h, "end")
                         .and_then(|y|y.as_str())
                         .and_then(|d|self.parse_dmy_date(d));
@@ -704,6 +712,10 @@ pub mod events {
                     } else { None }
                 })
             .collect()
+        }
+
+        fn location(&self) -> Option<&str> {
+            self.get_str("event.location")
         }
     }
 }

@@ -7,6 +7,7 @@ use std::collections::HashMap;
 use open;
 use clap::ArgMatches;
 use chrono::*;
+use icalendar::Calendar;
 
 use asciii;
 use asciii::CONFIG;
@@ -97,16 +98,7 @@ fn decide_mode(simple:bool, verbose:bool, paths:bool,nothing:bool, csv:bool) -> 
     }
 }
 
-fn matches_to_search<'a>(matches: &'a ArgMatches) -> (Vec<&'a str>, StorageDir) {
-    let search_terms = matches
-        .values_of("search_term")
-        .map(|v| v.collect::<Vec<&str>>())
-        .unwrap_or_else(Vec::new);
-
-    debug!("matches_to_search: --archive={:?}", matches.value_of("archive"));
-
-
-    let dir =
+fn matches_to_dir<'a>(matches: &'a ArgMatches) -> StorageDir {
         if matches.is_present("archive"){
             let archive_year = matches.value_of("archive")
                 .and_then(|y|y.parse::<i32>().ok())
@@ -127,7 +119,19 @@ fn matches_to_search<'a>(matches: &'a ArgMatches) -> (Vec<&'a str>, StorageDir) 
             StorageDir::All }
 
         // or list normal
-        else { StorageDir::Working };
+        else { StorageDir::Working }
+}
+
+fn matches_to_search<'a>(matches: &'a ArgMatches) -> (Vec<&'a str>, StorageDir) {
+    let search_terms = matches
+        .values_of("search_term")
+        .map(|v| v.collect::<Vec<&str>>())
+        .unwrap_or_else(Vec::new);
+
+    debug!("matches_to_search: --archive={:?}", matches.value_of("archive"));
+
+
+    let dir = matches_to_dir(matches);
 
     (search_terms, dir)
 }
@@ -230,7 +234,7 @@ pub fn list(matches: &ArgMatches) {
             else { StorageDir::Working };
 
         if matches.is_present("broken"){
-            list_broken_projects(dir);
+            list_broken_projects(dir); // XXX Broken
         } else {
             list_projects(dir, &list_config);
         }
@@ -460,6 +464,19 @@ pub fn show(m: &ArgMatches) {
     } else { actions::simple_with_projects(dir, search_terms.as_slice(), |p|print::show_details(p,&bill_type)) }
 }
 
+/// Command CALENDAR
+//#[deprecated(note="Move to actions")]
+pub fn calendar(matches: &ArgMatches) {
+    let dir = matches_to_dir(matches);
+    let luigi = execute(setup_luigi);
+    let projects = execute(|| luigi.open_projects(dir));
+    let mut cal = Calendar::new();
+    for project in projects {
+        cal.append(&mut project.to_ical())
+    }
+    cal.print().unwrap();
+}
+
 
 fn dump_yaml(dir: StorageDir, search_terms: &[&str]) {
     actions::simple_with_projects(dir, &search_terms, |p| println!("{}", p.dump_yaml()));
@@ -599,6 +616,7 @@ pub fn config(matches: &ArgMatches) {
     if let Some(path) = matches.value_of("show") {
         config_show(path);
     }
+
     if matches.is_present("location") {
         println!("config location: {:?}", config::ConfigReader::path_home())
     }
