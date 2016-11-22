@@ -6,6 +6,7 @@
 
 use chrono::*;
 use bill::Currency;
+use icalendar::Calendar;
 
 use std::{env,fs};
 use std::time;
@@ -16,9 +17,11 @@ use util;
 use super::BillType;
 use storage::{Storage,StorageDir,Storable,StorageResult};
 use project::Project;
-use project::spec::{IsProject, IsClient};
+use project::spec::IsProject;
+use project::spec::IsClient;
 use project::spec::Invoicable;
 use project::spec::ProvidesData;
+use project::spec::events::HasEvents;
 
 #[cfg(feature="document_export")]
 use fill_docs::fill_template;
@@ -289,3 +292,16 @@ pub fn unarchive_projects(year:i32, search_terms:&[&str]) -> Result<Vec<PathBuf>
     let luigi = try!(setup_luigi_with_git());
     Ok(try!( luigi.unarchive_projects(year, search_terms) ))
 }
+
+/// Command CALENDAR
+pub fn calendar(dir: StorageDir) -> Result<String> {
+    let luigi = try!(setup_luigi());
+    let projects = try!(luigi.open_projects(dir));
+    let mut cal = Calendar::new();
+    for project in projects {
+        cal.append(&mut project.to_ical())
+    }
+    Ok(cal.to_string())
+}
+
+

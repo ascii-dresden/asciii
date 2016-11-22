@@ -7,7 +7,6 @@ use std::collections::HashMap;
 use open;
 use clap::ArgMatches;
 use chrono::*;
-use icalendar::Calendar;
 
 use asciii;
 use asciii::CONFIG;
@@ -465,16 +464,8 @@ pub fn show(m: &ArgMatches) {
 }
 
 /// Command CALENDAR
-//#[deprecated(note="Move to actions")]
 pub fn calendar(matches: &ArgMatches) {
-    let dir = matches_to_dir(matches);
-    let luigi = execute(setup_luigi);
-    let projects = execute(|| luigi.open_projects(dir));
-    let mut cal = Calendar::new();
-    for project in projects {
-        cal.append(&mut project.to_ical())
-    }
-    cal.print().unwrap();
+    execute(||actions::calendar(matches_to_dir(matches)));
 }
 
 
