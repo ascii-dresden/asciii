@@ -440,7 +440,8 @@ pub trait HasEmployees: ProvidesData {
     fn employees_string(&self) -> Option<String> {
         self.employees().map(|v| {
             v.iter()
-                .map(|t| format!("{}: ({})", t.0, t.1))
+                .filter(|&&(_, ref time)| *time as u32 > 0)
+                .map(|&(ref name, ref time)| format!("{}: ({})", name, time))
                 .collect::<Vec<String>>()
                 .join(", ")
         })
