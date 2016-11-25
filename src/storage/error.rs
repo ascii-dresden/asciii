@@ -3,13 +3,17 @@
 #![allow(trivial_casts)]
 use std::io;
 use std::fmt;
-use git2;
 use util::yaml;
+#[cfg(feature="git_statuses")] use git2;
+
+#[cfg(not(feature="git_statuses"))]
+mod git2 {
+    pub use super::super::repo::GitError as Error;
+}
+
 
 use templater;
 
-#[cfg(not(feature="git_statuses"))]
-use super::repo::GitError;
 
 error_chain!{
     types {
