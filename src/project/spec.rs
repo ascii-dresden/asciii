@@ -239,6 +239,8 @@ pub trait IsProject: ProvidesData {
         // old spec
         .or_else(|| self.get_str("signature").and_then(|c|c.lines().last()))
     }
+
+    fn long_desc(&self) -> String;
 }
 
 
@@ -623,7 +625,7 @@ pub mod events {
                     if event.times.is_empty() {
 
                         let mut cal_event = CalEvent::new();
-                        cal_event.description(&format!("made with {}", *::VERSION ));
+                        cal_event.description(&self.long_desc());
 
                         if let Some(location) = self.location() { cal_event.location(location); }
 
@@ -641,7 +643,7 @@ pub mod events {
                         for time in &event.times {
 
                             let mut cal_event = CalEvent::new();
-                            cal_event.description(&format!("made with {}", *::VERSION ));
+                            cal_event.description(&self.long_desc());
                             if let Some(location) = self.location() { cal_event.location(location); }
 
                             if let Some(end)   = event.begin.and_time(time.end) {

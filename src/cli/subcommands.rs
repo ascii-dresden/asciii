@@ -431,7 +431,6 @@ fn infer_bill_type(m: &ArgMatches) -> Option<BillType> {
     }
 }
 
-///
 /// Command SHOW
 pub fn show(m: &ArgMatches) {
     let (search_terms, dir) = matches_to_search(m);
@@ -460,12 +459,16 @@ pub fn show(m: &ArgMatches) {
     } else if m.is_present("ical"){ show_ical(dir, search_terms.as_slice())
     } else if m.is_present("csv"){  show_csv( dir, search_terms.as_slice());
     } else if m.is_present("template"){ show_template(search_terms[0]);
-    } else { actions::simple_with_projects(dir, search_terms.as_slice(), |p|print::show_details(p,&bill_type)) }
+    } else { actions::simple_with_projects(dir,
+                                           search_terms.as_slice(),
+                                           |p|print::show_details(p,&bill_type))
+    }
 }
 
 /// Command CALENDAR
 pub fn calendar(matches: &ArgMatches) {
-    execute(||actions::calendar(matches_to_dir(matches)));
+    let calendar = execute(||actions::calendar(matches_to_dir(matches)));
+    println!("{}", calendar);
 }
 
 

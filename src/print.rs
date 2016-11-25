@@ -330,6 +330,7 @@ pub fn show_details(project:&Project, bill_type:&BillType) {
         BillType::Invoice => invoice
     };
 
+    // TODO move to Project::product_table(&self) {
     let mut table = Table::new();
     trace!("                   - created table");
     //table.set_format(*format::consts::FORMAT_BORDERS_ONLY);
@@ -366,6 +367,7 @@ pub fn show_details(project:&Project, bill_type:&BillType) {
         }
     }
     table.add_row( row!["", "Total", "", "", bill.net_total().postfix()]);
+    // }
 
     table.printstd();
 

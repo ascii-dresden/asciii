@@ -358,7 +358,22 @@ impl ProvidesData for Project {
     }
 }
 
-impl IsProject for Project { }
+impl IsProject for Project {
+    fn long_desc(&self) -> String {
+        use std::fmt::Write;
+        let mut out_string = String::new();
+
+        if let Some(responsible) = self.responsible() {
+            writeln!(out_string, "Responsible: {}", responsible).unwrap();
+        }
+
+        if let Some(employees) = self.hours().employees_string() {
+            writeln!(out_string, "\n{}", employees).unwrap();
+        }
+
+        out_string
+    }
+}
 
 impl Redeemable for Project {
     fn bills(&self) -> product::Result<(Bill<Product>, Bill<Product>)> {

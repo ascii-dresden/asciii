@@ -110,30 +110,35 @@ pub fn projects_to_csv(projects:&[Project]) -> Result<String>{
 /// Creates the latex files within each projects directory, either for Invoice or Offer.
 #[cfg(feature="document_export")]
 pub fn project_to_doc(project: &Project, template_name:&str, bill_type:&Option<BillType>, dry_run:bool, force:bool) -> Result<()> {
-    let template_ext = ::CONFIG.get_str("extensions/output_template").expect("Faulty default config");
-    let output_ext   = ::CONFIG.get_str("extensions/output_file").expect("Faulty default config");
-    let convert_ext  = ::CONFIG.get_str("convert/output_extension").expect("Faulty default config");
-    let trash_exts   = ::CONFIG.get("convert/trash_extensions") .expect("Faulty default config")
-                               .as_vec().expect("Faulty default config")
-                               .into_iter()
-                               .map(|v|v.as_str()).collect::<Vec<_>>();
+
+    // init_export_config()
+    let template_ext  = ::CONFIG.get_str("extensions/output_template").expect("Faulty default config");
+    let output_ext    = ::CONFIG.get_str("extensions/output_file").expect("Faulty default config");
+    let convert_ext   = ::CONFIG.get_str("convert/output_extension").expect("Faulty default config");
+    let convert_tool  = ::CONFIG.get_str("convert/tool");
+    let output_folder = ::CONFIG.get_str("output_path").and_then(util::get_valid_path).expect("Faulty config \"output_path\"");
+    let trash_exts    = ::CONFIG.get("convert/trash_extensions") .expect("Faulty default config")
+                                .as_vec().expect("Faulty default config")
+                                .into_iter()
+                                .map(|v|v.as_str()).collect::<Vec<_>>();
 
 
+    // construct_template_path(&template_name) {
     let mut template_path = PathBuf::new();
-
     template_path.push(util::get_storage_path());
     template_path.push(::CONFIG.get_str("dirs/templates").expect("Faulty config: dirs/templates does not contain a value"));
     template_path.push(template_name);
     template_path.set_extension(template_ext);
+    // }
 
+    // check stays here
     debug!("template file={:?} exists={}", template_path, template_path.exists());
     if !template_path.exists() {
         return Err(format!("Template not found at {}", template_path.display()).into())
     }
 
-    let convert_tool = ::CONFIG.get_str("convert/tool");
-    let output_folder = ::CONFIG.get_str("output_path").and_then(util::get_valid_path).expect("Faulty config \"output_path\"");
 
+    // project_readyness(&project) {
     let ready_for_offer = project.is_ready_for_offer();
     let ready_for_invoice = project.is_ready_for_invoice();
     let project_file = project.file();
@@ -159,6 +164,8 @@ pub fn project_to_doc(project: &Project, template_name:&str, bill_type:&Option<B
         (_,              Err(e), Err(_)) => {error!("Neither an Offer nor an Invoice can be created from this project\n please check out {}", e);(None,None)}
     };
 
+    // }
+
     //debug!("{:?} -> {:?}",(bill_type, project.is_ready_for_offer(), project.is_ready_for_invoice()), (dyn_bill_type, outfile_tex));
 
     if let (Some(outfile), Some(dyn_bill)) = (outfile_tex, dyn_bill_type) {
@@ -168,9 +175,14 @@ pub fn project_to_doc(project: &Project, template_name:&str, bill_type:&Option<B
         let target = output_folder.join(&pdffile);
 
         // ok, so apparently we can create a tex file, so lets do it
-        if !force && target.exists() && try!(file_age(&target)) < try!(file_age(&project_file)){
+        if !force && target.exists() && try!(file_age(&target)) < try!(file_age(&project_file)) {
             // no wait, nothing has changed, so lets save ourselves the work
-            info!("nothing to be done, {} is younger than {}\n       use -f if you don't agree", target.display(), project_file.display());
+            info!("nothing to be done, {} is younger than {}
+                         use --force if you don't agree
+                         use --pdf to only rebuild the pdf",
+                  target.display(),
+                  project_file.display());
+            unimplemented!();
         } else {
             // \o/ we created a tex file
 
@@ -200,7 +212,6 @@ pub fn project_to_doc(project: &Project, template_name:&str, bill_type:&Option<B
     }
 
     Ok(())
-
 }
 
 /// Creates the latex files within each projects directory, either for Invoice or Offer.
