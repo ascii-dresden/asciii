@@ -1,9 +1,6 @@
 use asciii;
 use clap::{App, AppSettings, Arg, ArgMatches, SubCommand};
-
-pub fn setup() -> ArgMatches<'static> {
-    build_cli().get_matches()
-}
+use super::subcommands;
 
 pub fn build_cli() -> App<'static, 'static> {
     App::new("asciii")
@@ -649,6 +646,11 @@ pub fn build_cli() -> App<'static, 'static> {
                          .long("rebase")
                         )
                    )
+
+        .subcommand(SubCommand::with_name("shell")
+                    .about("(experimental) starts interactive shell")
+                   )
+
         .subcommand(SubCommand::with_name("diff")
                     .about("git diff")
                     .arg(Arg::with_name("search_term")
@@ -730,6 +732,50 @@ pub fn build_cli() -> App<'static, 'static> {
                     .aliases(&["lg", "hist", "history"])
                     .about("Show commit logs")
                    )
+}
+
+/// Starting point for handling commandline matches
+pub fn match_matches(matches: &ArgMatches) {
+    match matches.subcommand() {
+     ("list",      Some(sub_m)) => subcommands::list(sub_m),
+     ("csv",       Some(sub_m)) => subcommands::csv(sub_m),
+     ("new",       Some(sub_m)) => subcommands::new(sub_m),
+     ("edit",      Some(sub_m)) => subcommands::edit(sub_m),
+     ("set",       Some(sub_m)) => subcommands::set(sub_m),
+     ("show",      Some(sub_m)) => subcommands::show(sub_m),
+     ("calendar",  Some(sub_m)) => subcommands::calendar(sub_m),
+     ("archive",   Some(sub_m)) => subcommands::archive(sub_m),
+     ("unarchive", Some(sub_m)) => subcommands::unarchive(sub_m),
+     ("config",    Some(sub_m)) => subcommands::config(sub_m),
+     ("whoami",    _          ) => subcommands::config_show("user/name"),
+
+     ("path",      Some(sub_m)) => subcommands::show_path(sub_m),
+     ("open",      Some(sub_m)) => subcommands::open_path(sub_m),
+
+     ("make",      Some(sub_m)) => subcommands::make(sub_m),
+     ("delete",    Some(sub_m)) => subcommands::delete(sub_m),
+     ("spec",      Some(sub_m)) => subcommands::spec(sub_m),
+
+     ("doc",       _          ) => subcommands::doc(),
+     ("version",   _          ) => subcommands::version(),
+
+     ("dues",      Some(sub_m)) => subcommands::dues(sub_m),
+     ("shell",     Some(sub_m)) => subcommands::shell(sub_m, build_cli()),
+
+     ("remote",    _          ) => subcommands::git_remote(),
+     ("pull",      Some(sub_m)) => subcommands::git_pull(sub_m),
+     ("diff",      Some(sub_m)) => subcommands::git_diff(sub_m),
+     ("cleanup",   Some(sub_m)) => subcommands::git_cleanup(sub_m),
+     ("status",    _          ) => subcommands::git_status(),
+     ("add",       Some(sub_m)) => subcommands::git_add(sub_m),
+     //("unadd",     Some(sub_m)) => subcommands::git_unadd(sub_m),
+     ("commit",    _          ) => subcommands::git_commit(),
+     ("push",      _          ) => subcommands::git_push(),
+     ("stash",     _          ) => subcommands::git_stash(),
+     ("pop",       _          ) => subcommands::git_stash_pop(),
+     ("log",       _          ) => subcommands::git_log(),
+     _                          => ()
+    }
 }
 
 pub mod validators {

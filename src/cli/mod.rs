@@ -17,7 +17,8 @@ use std::error::Error;
 pub mod app;
 pub mod subcommands;
 
-pub use self::app::setup;
+pub use self::app::build_cli;
+pub use self::app::match_matches;
 
 /// prints a message and exist with code 1
 pub fn fail<T:Display>(message:T) -> !{
