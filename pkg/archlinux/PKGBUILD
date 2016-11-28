@@ -5,7 +5,7 @@ pkgver=3.0.0
 pkgrel=1
 #makedepends=('rust' 'cargo' 'cmake')
 arch=('i686' 'x86_64')
-source=("git+https://github.com/ascii-dresden/asciii-rs.git#branch=version/3.0")
+source=("git+https://github.com/ascii-dresden/asciii.git#branch=version/3.0")
 md5sums=('SKIP')
 replaces=('asciii-git')
 license=('MIT/Apache-2.0')
@@ -13,18 +13,18 @@ license=('MIT/Apache-2.0')
 
 
 pkgver() {
-    cd "$srcdir/asciii-rs/"
+    cd "$srcdir/asciii/"
     #git describe --long | sed 's/\([^-]*-g\)/r\1/;s/-/./g'
     echo $(git tag | tail -1).$(git rev-list --count HEAD)
 }
 
 build() {
-    cd "$srcdir/asciii-rs/"
+    cd "$srcdir/asciii/"
     cargo build --release
 }
 
 package() {
-    cd "$srcdir/asciii-rs/"
-    target="$srcdir/asciii-rs/target/release/$_pkgname"
+    cd "$srcdir/asciii/"
+    target="$srcdir/asciii/target/release/$_pkgname"
     install -Dm755 $target "$pkgdir/usr/bin/$_pkgname"
 }

@@ -3,7 +3,7 @@
 //! This user documentation has been ripped off straight from the [original
 //! README](https://github.com/ascii-dresden/ascii-invoicer/), so please forgive if you find any
 //! mistakes or unimplemented material,
-//! please **[file an issue immediately](https://github.com/hoodie/asciii-rs/issues/new)**.
+//! please **[file an issue immediately](https://github.com/ascii-dresden/asciii/issues/new)**.
 //! 
 //! 1. [Introduction](#introduction)
 //! 1. [Installation](#installation)

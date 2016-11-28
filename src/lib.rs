@@ -68,7 +68,7 @@ pub mod templater;
 pub use yaml_rust::Yaml;
 
 // TODO keep this up to date after move
-pub static DOCUMENTATION_URL: &'static str  = "http://ascii-dresden.github.io/asciii-rs/";
+pub static DOCUMENTATION_URL: &'static str  = "http://ascii-dresden.github.io/asciii/";
 
 lazy_static!{
     /// Static `ConfigReader` to be able to access the configuration from everywhere.
