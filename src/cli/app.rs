@@ -505,6 +505,7 @@ pub fn build_cli() -> App<'static, 'static> {
 
         .subcommand(SubCommand::with_name("make")
                     .about("Creates documents from projects")
+                    .aliases(&["mk"])
 
                     .arg(Arg::with_name("force")
                          .help("Do it against better judgement")
@@ -546,6 +547,7 @@ pub fn build_cli() -> App<'static, 'static> {
 
         .subcommand(SubCommand::with_name("delete")
                     .about("Deletes a project")
+                    .aliases(&["rm"])
 
                     .arg(Arg::with_name("dry-run")
                          .help("Do not create final output file")
@@ -635,12 +637,13 @@ pub fn build_cli() -> App<'static, 'static> {
 
         //# GIT STUFF
         .subcommand(SubCommand::with_name("status")
-                    .aliases(&["st"])
                     .about("Show the working tree status")
+                    .aliases(&["st"])
                    )
 
         .subcommand(SubCommand::with_name("pull")
                     .about("Pull and merge new commits from remote")
+                    .aliases(&["update"])
                     .arg(Arg::with_name("rebase")
                          .help("git pull with --rebase")
                          .long("rebase")
