@@ -760,7 +760,7 @@ pub fn match_matches(matches: &ArgMatches) {
      ("version",   _          ) => subcommands::version(),
 
      ("dues",      Some(sub_m)) => subcommands::dues(sub_m),
-     ("shell",     Some(sub_m)) => subcommands::shell(sub_m, build_cli()),
+     ("shell",     Some(sub_m)) => subcommands::shell(sub_m),
 
      ("remote",    _          ) => subcommands::git_remote(),
      ("pull",      Some(sub_m)) => subcommands::git_pull(sub_m),

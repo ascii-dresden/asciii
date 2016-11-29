@@ -1,12 +1,11 @@
 use std::path::{Path, PathBuf};
 use std::ffi::OsStr;
 use std::{env, fs};
-use std::io;
 use std::io::Write;
 use std::collections::HashMap;
 
 use open;
-use clap::{App, ArgMatches};
+use clap::ArgMatches;
 use chrono::*;
 
 use asciii;
@@ -33,7 +32,7 @@ use asciii::print::{ListConfig, ListMode};
 // path_rows, dynamic_rows,
 // print_projects,print_csv};
 
-use super::{execute, fail};
+use super::{execute, fail, shell};
 
 // TODO refactor this into actions module and actual, short subcommands
 
@@ -749,23 +748,8 @@ pub fn path<F: Fn(&Path)>(m: &ArgMatches, action: F) {
     }
 }
 
-pub fn shell(_matches: &ArgMatches, mut app: App<'static, 'static>) {
-    loop {
-        print!(">>> ");
-        io::stdout().flush().unwrap();
-        let mut s = String::new();
-        io::stdin()
-            .read_line(&mut s)
-            .ok()
-            .expect("failed to read line");
-        let mut argv: Vec<_> = s.trim().split(" ").collect();
-        // you have to insert the binary name since clap expects it
-        argv.insert(0, "prog");
-        match app.get_matches_from_safe_borrow(argv) {
-            Ok(matches) => super::match_matches(&matches),
-            Err(e) => println!("{}", e.message)
-        }
-    }
+pub fn shell(_matches: &ArgMatches) {
+    shell::launch_shell();
 }
 
 

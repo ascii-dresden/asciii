@@ -16,6 +16,7 @@ use std::error::Error;
 /// Contains concrete implementation of each subcommand
 pub mod app;
 pub mod subcommands;
+pub mod shell;
 
 pub use self::app::build_cli;
 pub use self::app::match_matches;

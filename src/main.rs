@@ -10,6 +10,7 @@ extern crate chrono;
 extern crate term; // TODO consolidate term, ansi_term and terminal_size
 extern crate open;
 extern crate icalendar;
+extern crate rustyline;
 
 #[cfg(feature="document_export")] extern crate rustc_serialize;
 
