@@ -21,11 +21,11 @@ custom_derive = "0.1"
 open = "1.1"
 ordered-float = "0.3"
 error-chain = "0.6"
-rustyline = {git="https://github.com/kkawakam/rustyline/", revision="1ae47dc" }
+rustyline = {git="https://github.com/kkawakam/rustyline/", rev="1ae47dc", optional = true }
 
 bill = {git="https://github.com/hoodie/bill-rs"}
-#icalendar = {git="https://github.com/hoodie/icalendar-rs"}
-icalendar = {path="../icalendar-rs"}
+icalendar = {git="https://github.com/hoodie/icalendar-rs"}
+#icalendar = {path="../icalendar-rs"}
 
 slug = "0.1"
 tempdir = "0.3"
@@ -51,6 +51,7 @@ git2 = {version = "*", default-features= false, optional = true}
 default = ["document_export", "git_statuses"]
 document_export = ["rustc-serialize", "handlebars"]
 git_statuses = ["git2"]
+shell = ["rustyline"]
 nightly = []
 
 [profile.release]

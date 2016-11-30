@@ -32,7 +32,9 @@ use asciii::print::{ListConfig, ListMode};
 // path_rows, dynamic_rows,
 // print_projects,print_csv};
 
-use super::{execute, fail, shell};
+use super::{execute, fail};
+
+#[cfg(feature="shell")] use super::shell;
 
 // TODO refactor this into actions module and actual, short subcommands
 
@@ -564,7 +566,6 @@ pub fn delete(m: &ArgMatches) {
 #[cfg(not(feature="document_export"))]
 pub fn make(_: &ArgMatches) {
     error!("Make functionality not built-in with this release!");
-    unimplemented!();
 }
 
 
@@ -750,8 +751,14 @@ pub fn path<F: Fn(&Path)>(m: &ArgMatches, action: F) {
     }
 }
 
+#[cfg(feature="shell")]
 pub fn shell(_matches: &ArgMatches) {
     shell::launch_shell();
+}
+
+#[cfg(not(feature="shell"))]
+pub fn shell(_matches: &ArgMatches) {
+    error!("Shell functionality not built-in with this release!");
 }
 
 

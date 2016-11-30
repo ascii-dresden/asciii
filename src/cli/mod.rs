@@ -16,6 +16,8 @@ use std::error::Error;
 /// Contains concrete implementation of each subcommand
 pub mod app;
 pub mod subcommands;
+
+#[cfg(feature="shell")]
 pub mod shell;
 
 pub use self::app::build_cli;
