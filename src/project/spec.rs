@@ -17,10 +17,10 @@ use super::error::{SpecResult, ErrorList};
 use std::str::FromStr;
 
 
-pub fn print_specresult(result: SpecResult) {
+pub fn print_specresult(label: &str, result: SpecResult) {
     match result {
-        Ok(_) => println!("✓"),
-        Err(ref errs) => println!("{}", errs)
+        Ok(_) => println!("{}: ✓", label),
+        Err(ref errs) => println!("{}: ✗\n{}", label, errs)
     }
 }
 

@@ -479,7 +479,9 @@ fn dump_yaml(dir: StorageDir, search_terms: &[&str]) {
 fn show_errors(dir: StorageDir, search_terms: &[&str]) {
     actions::simple_with_projects(dir, &search_terms, |p| {
         println!("{}: ", p.short_desc());
-        spec::print_specresult(p.is_ready_for_archive());
+        spec::print_specresult("offer", p.is_ready_for_offer());
+        spec::print_specresult("invoice", p.is_ready_for_invoice());
+        spec::print_specresult("archive", p.is_ready_for_archive());
     });
 }
 
