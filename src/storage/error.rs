@@ -17,15 +17,15 @@ use templater;
 
 error_chain!{
     types {
-        StorageError, ErrorKind, Result;
+        StorageError, ErrorKind, ResultExt, Result;
     }
 
     foreign_links {
-        io::Error, Io;
-        fmt::Error, Fmt;
-        yaml::YamlError, Yaml;
-        git2::Error, Git;
-        templater::TemplateError, Template;
+        Io(io::Error);
+        Fmt(fmt::Error);
+        Yaml(yaml::YamlError);
+        Git(git2::Error);
+        Template(templater::TemplateError);
     }
 
     errors {

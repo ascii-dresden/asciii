@@ -12,7 +12,7 @@ pub mod error{
     #![allow(trivial_casts)]
     error_chain!{
         types {
-            Error, ErrorKind, Result;
+            Error, ErrorKind, ResultExt, Result;
         }
 
         links { }

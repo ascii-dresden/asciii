@@ -45,18 +45,18 @@ use storage::error::StorageError;
 error_chain!{
 
     types {
-        Error, ErrorKind, Result;
+        Error, ErrorKind, ResultExt, Result;
     }
 
     links { }
 
     foreign_links {
-        io::Error, Io;
-        fmt::Error, Fmt;
-        time::SystemTimeError, Time;
-        RenderError, Handlebar;
-        project::error::Error, Project;
-        StorageError, Storage;
+        Io(io::Error);
+        Fmt(fmt::Error);
+        Time(time::SystemTimeError);
+        Handlebar(RenderError);
+        Project(project::error::Error);
+        Storage(StorageError);
     }
 
     errors {

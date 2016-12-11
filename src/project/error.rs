@@ -8,17 +8,17 @@ use super::product;
 
 error_chain!{
     types {
-        Error, ErrorKind, Result;
+        Error, ErrorKind, ResultExt, Result;
     }
 
     links {
-        product::Error, Product;
+        Product(product::Error, product::ErrorKind);
     }
 
     foreign_links {
-        io::Error, Io;
-        fmt::Error, Fmt;
-        yaml::YamlError, Yaml;
+        Io(io::Error) ;
+        Fmt(fmt::Error) ;
+        Yaml(yaml::YamlError) ;
     }
 
     errors {
