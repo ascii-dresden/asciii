@@ -443,7 +443,13 @@ pub trait HasEmployees: ProvidesData {
         self.employees().map(|v| {
             v.iter()
                 .filter(|&&(_, ref time)| *time as u32 > 0)
-                .map(|&(ref name, ref time)| format!("{}: ({})", name, time)) // TODO Fix #57 here
+                .map(|&(ref name, ref time)| {
+                    if let Some(salary) = self.salary() {
+                        format!("{}: ({}h {})", name, time, (salary * *time).postfix())
+                    } else {
+                        String::from("---")
+                    }
+                })
                 .collect::<Vec<String>>()
                 .join(", ")
         })
