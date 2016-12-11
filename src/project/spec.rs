@@ -481,6 +481,12 @@ pub trait HasEmployees: ProvidesData {
                 >()
             })
     }
+
+    fn employees_payed(&self) -> bool {
+        self.employees().is_none()
+        ||
+        self.wages_date().is_some()
+    }
 }
 
 /// Stage 3: when an `IsProject` is redeem and can be archived
@@ -527,20 +533,6 @@ pub trait Redeemable: IsProject {
 
         Ok(( BillItem{ amount: offered, product: product }, BillItem{ amount: sold, product: product }))
     }
-}
-
-impl Validatable for HasEmployees {
-    fn validate(&self) -> SpecResult {
-        let mut errors = ErrorList::new();
-        if self.wages_date().is_none(){ errors.push("wages_date");}
-
-        if !errors.is_empty() {
-            Err(errors)
-        } else {
-            Ok(())
-        }
-    }
-
 }
 
 impl Validatable for Redeemable {

@@ -13,7 +13,7 @@ use term_size;
 use super::BillType;
 
 use project::Project;
-use project::spec::{IsProject, Redeemable, Invoicable};
+use project::spec::{IsProject, Redeemable, Invoicable, HasEmployees};
 use project::spec::events::HasEvents;
 use project::error::SpecResult;
 use storage::Storable;
@@ -53,7 +53,7 @@ fn payed_to_cell(project:&Project) -> Cell {
     let sym = ::CONFIG.get_str("currency")
         .expect("Faulty config: currency does not contain a value");
 
-    match (project.payed_by_client(), project.payed_employees()) {
+    match (project.payed_by_client(), project.hours().employees_payed()) {
         (false,false) => Cell::new("✗").with_style(Attr::ForegroundColor(color::RED)),
         (_,    false) |
         (false, _   ) => Cell::new(sym).with_style(Attr::ForegroundColor(color::YELLOW)),

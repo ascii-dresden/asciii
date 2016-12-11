@@ -127,12 +127,7 @@ impl Project {
         self.payed_date().is_some()
     }
 
-    pub fn payed_employees(&self) -> bool{
-        self.hours().employees().is_none()
-        ||
-        self.hours().wages_date().is_some()
-    }
-
+    //#[deprecated]
     pub fn employees_string(&self) -> String {
         self.hours().employees_string().unwrap_or_else(String::new)
     }
@@ -740,7 +735,7 @@ impl<'a> HasEmployees for Hours<'a> { }
 impl<'a> Validatable for Hours<'a> {
     fn validate(&self) -> SpecResult {
         let mut errors = ErrorList::new();
-        if self.wages_date().is_none() { errors.push("wages_date"); }
+        if !self.employees_payed() { errors.push("employees_payed"); }
 
         if !errors.is_empty() {
             return Err(errors);
