@@ -127,12 +127,19 @@ impl Project {
         self.payed_date().is_some()
     }
 
-    pub fn payed_caterers(&self) -> bool{
+    pub fn payed_employees(&self) -> bool{
+        self.hours().employees().is_none()
+        ||
         self.hours().wages_date().is_some()
     }
 
-    pub fn caterers(&self) -> String {
+    pub fn employees_string(&self) -> String {
         self.hours().employees_string().unwrap_or_else(String::new)
+    }
+
+    #[deprecated]
+    pub fn caterers(&self) -> String {
+        self.employees_string()
     }
 
     /// Filename of the offer output file.
@@ -756,7 +763,7 @@ mod test {
         println!("{:?}", ::std::env::current_dir());
         let new_project = Project::open_file(Path::new("./tests/current.yml")).unwrap();
         let old_project = Project::open_file(Path::new("./tests/old.yml")).unwrap();
-        let config = &::CONFIG;
+        //let config = &::CONFIG;
 
         assert_eq!(old_project.name(),
                    new_project.name());

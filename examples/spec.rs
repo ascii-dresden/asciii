@@ -1,9 +1,6 @@
 extern crate asciii;
 extern crate yaml_rust as yaml;
 use std::path::Path;
-use std::result::Result;
-use std::fs::File;
-use std::io::prelude::*;
 
 use asciii::project::spec::*;
 use asciii::project::Project;
@@ -33,7 +30,7 @@ fn main() {
         // println!("Products:  {:#?}", invoice.as_items().iter().map(|item|format!("{:?}",item)).collect::<Vec<_>>());
         println!("--------------");
         println!("hours:     {:?}h * {}", project.hours().total(), project.hours().salary() .map(|c| c.postfix().to_string()).unwrap_or_else(|| String::from("0€")));
-        println!("caterers:  {:?}", project.caterers());
+        println!("caterers:  {:?}", project.employees_string());
         println!("\n\n\n");
     }
 

@@ -443,7 +443,7 @@ pub trait HasEmployees: ProvidesData {
         self.employees().map(|v| {
             v.iter()
                 .filter(|&&(_, ref time)| *time as u32 > 0)
-                .map(|&(ref name, ref time)| format!("{}: ({})", name, time))
+                .map(|&(ref name, ref time)| format!("{}: ({})", name, time)) // TODO Fix #57 here
                 .collect::<Vec<String>>()
                 .join(", ")
         })
@@ -451,8 +451,9 @@ pub trait HasEmployees: ProvidesData {
 
     /// List of employees and ther respective service hours
     fn employees(&self) -> Option<Vec<(String, f64)>> {
-        self.get_hash("hours.caterers") .or(self.get_hash("hours.employees"))
-            .map(|h| {
+        self.get_hash("hours.caterers")
+            .or(self.get_hash("hours.employees"))
+            .and_then(|h| {
                 h.iter()
                     .map(|(c, h)| {
                         (// argh, those could be int or float, grrr
@@ -462,7 +463,16 @@ pub trait HasEmployees: ProvidesData {
                                      h.as_i64().map(|f|f as f64 ))
                             .unwrap_or(0f64))
                     })
-                .collect::<Vec<(String, f64)>>()
+                .map(|(employee,time)| if time > 0f64 {
+                    Some((employee, time))
+                } else {
+                    None
+                } )
+                .collect::<
+                Option<
+                Vec<(String, f64)>
+                >
+                >()
             })
     }
 }
