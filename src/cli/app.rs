@@ -86,6 +86,7 @@ pub fn build_cli() -> App<'static, 'static> {
                          .takes_value(true)
                          .value_name("year")
                         )
+
                     .arg(Arg::with_name("year")
                          .help("List projects from that year, archived or not")
                          .short("y")
@@ -203,14 +204,21 @@ pub fn build_cli() -> App<'static, 'static> {
                     .about("Move a Project into the archive")
                     .arg(Arg::with_name("search terms")
                          .help("Search terms to match the project")
-                         .required(true)
+                         //.required(true)
                          .multiple(true)
+                         .conflicts_with("all")
                         )
 
                     .arg(Arg::with_name("force")
-                         .help("Archives the Project, even though it is not completely valid")
+                         .help("Archives the project, even though it is not completely valid")
                          .long("force")
                          .short("f")
+                        )
+
+                    .arg(Arg::with_name("all")
+                         .help("Archives all projects that can be archived")
+                         .long("all")
+                         .short("a")
                         )
 
                     .arg(Arg::with_name("year")
@@ -336,7 +344,6 @@ pub fn build_cli() -> App<'static, 'static> {
                          .help("Pick an archived project")
                          .short("a")
                          .long("archive")
-                         .min_values(0)
                          .takes_value(true)
                         )
 

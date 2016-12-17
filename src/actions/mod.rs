@@ -297,6 +297,19 @@ pub fn archive_projects(search_terms:&[&str], manual_year:Option<i32>, force:boo
     Ok(try!( luigi.archive_projects_if(search_terms, manual_year, || force) ))
 }
 
+pub fn archive_all_projects() -> Result<Vec<PathBuf>> {
+    let luigi = try!(setup_luigi_with_git());
+    let mut moved_files = Vec::new();
+    for project in luigi.open_projects(StorageDir::Working)?
+                        .iter()
+                        .filter(|p| p.is_ready_for_archive().is_ok()) {
+        println!(" we could get rid of: {}", project.name().unwrap_or(""));
+        moved_files.push(project.dir());
+        moved_files.append(&mut luigi.archive_project(&project, project.year().unwrap())?);
+    }
+    Ok(moved_files)
+}
+
 /// Command UNARCHIVE <YEAR> <NAME>
 /// TODO: return a list of files that have to be updated in git
 pub fn unarchive_projects(year:i32, search_terms:&[&str]) -> Result<Vec<PathBuf>> {

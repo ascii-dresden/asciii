@@ -189,59 +189,59 @@ impl Repository {
             .unwrap_or_else(|e| { panic!("failed to execute process: {}", e) })
     }
 
-    pub fn add(&self, paths:&[PathBuf]) -> ExitStatus{
+    pub fn add(&self, paths:&[PathBuf]) -> ExitStatus {
         info!("adding to git\n {:?}", paths);
         self.execute_git("add", &[], paths)
     }
 
-    pub fn commit(&self) -> ExitStatus{
+    pub fn commit(&self) -> ExitStatus {
         // TODO override git editor with asciii editor
         self.execute_git("commit", &[], &[])
     }
 
-    pub fn status(&self) -> ExitStatus{
+    pub fn status(&self) -> ExitStatus {
         self.execute_git("status", &[], &[])
     }
 
-    pub fn checkout(&self, paths:&[PathBuf]) -> ExitStatus{
+    pub fn checkout(&self, paths:&[PathBuf]) -> ExitStatus {
         self.execute_git("checkout", &[], paths)
     }
 
-    pub fn clean(&self, paths:&[PathBuf]) -> ExitStatus{
+    pub fn clean(&self, paths:&[PathBuf]) -> ExitStatus {
         self.execute_git("clean", &["-d", "--force"], paths)
     }
 
     /// TODO not yet functional
-    pub fn stash(&self) -> ExitStatus{
+    pub fn stash(&self) -> ExitStatus {
         self.execute_git("stash", &[], &[])
     }
 
-    pub fn stash_pop(&self) -> ExitStatus{
+    pub fn stash_pop(&self) -> ExitStatus {
         self.execute_git("stash", &["pop"], &[])
     }
 
-    pub fn push(&self) -> ExitStatus{
+    pub fn push(&self) -> ExitStatus {
         self.execute_git("push", &["origin", "master"], &[])
     }
 
-    pub fn diff(&self,paths:&[PathBuf]) -> ExitStatus{
+    pub fn diff(&self,paths:&[PathBuf]) -> ExitStatus {
         let paths:Vec<&str> = paths.iter().filter_map(|p|p.to_str()).collect();
         self.execute_git("diff", &paths, &[])
     }
 
-    pub fn pull(&self) -> ExitStatus{
+    pub fn pull(&self) -> ExitStatus {
         self.execute_git("pull", &["origin", "master"], &[])
     }
 
-    pub fn pull_rebase(&self) -> ExitStatus{
+    pub fn pull_rebase(&self) -> ExitStatus {
         self.execute_git("pull", &["origin", "master", "--rebase"], &[])
     }
 
-    pub fn remote(&self) -> ExitStatus{
+    pub fn remote(&self) -> ExitStatus {
         self.execute_git("remote", &[], &[])
     }
 
-    pub fn log(&self) -> ExitStatus{
+    pub fn log(&self) -> ExitStatus {
         self.execute_git("log", &[], &[])
     }
 }

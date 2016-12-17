@@ -2,10 +2,6 @@
 #![cfg_attr(feature = "lints", feature(plugin))]
 #![cfg_attr(feature = "lints", plugin(clippy))]
 
-#![cfg_attr(feature = "nightly", feature(alloc_system))]
-
-#[cfg(feature = "nightly")]
-extern crate alloc_system;
 extern crate chrono;
 extern crate term; // TODO consolidate term, ansi_term and terminal_size
 extern crate open;

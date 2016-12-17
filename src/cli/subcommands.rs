@@ -582,22 +582,20 @@ fn show_template(name: &str) {
     println!("{:#?}", templater.list_keywords());
 }
 
-fn add_to_git(paths: &[PathBuf]) {
-    let luigi = execute(setup_luigi_with_git);
-    if !paths.is_empty() {
-        if let Some(repo) = luigi.repository() {
-            util::exit(repo.add(&paths));
-        }
-    }
-}
-
 /// TODO make this be have like `edit`, taking multiple names
 pub fn archive(matches: &ArgMatches) {
-    let search_terms = matches.values_of("search terms").unwrap().collect::<Vec<_>>();
-    let year = matches.value_of("year").and_then(|s| s.parse::<i32>().ok());
-    trace!("archive({:?},{:?})", search_terms, year);
-    let moved_files = execute(|| actions::archive_projects(&search_terms, year, matches.is_present("force")));
-    add_to_git(&moved_files);
+    if let Some(search_terms) = matches.values_of("search terms"){
+        let search_terms = search_terms.collect::<Vec<_>>();
+        let year = matches.value_of("year").and_then(|s| s.parse::<i32>().ok());
+        let moved_files = execute(|| actions::archive_projects(&search_terms, year, matches.is_present("force")));
+        debug!("archive({:?},{:?}) :\n{:?}", search_terms, year, moved_files);
+    } else if matches.is_present("all"){
+        debug!("archiving all I can find");
+        let moved_files = execute(|| actions::archive_all_projects());
+        debug!("git adding {:?} ", moved_files);
+    } else {
+        debug!("what do you wanna do?");
+    }
 }
 
 pub fn unarchive(matches: &ArgMatches) {
@@ -606,7 +604,7 @@ pub fn unarchive(matches: &ArgMatches) {
         .unwrap_or_else(|e| panic!("can't parse year {:?}, {:?}", year, e));
     let search_terms = matches.values_of("name").unwrap().collect::<Vec<_>>();
     let moved_files = execute(|| actions::unarchive_projects(year, &search_terms));
-    add_to_git(&moved_files);
+    debug!("unarchive({:?},{:?}) :\n{:?}", search_terms, year, moved_files);
 }
 
 pub fn config(matches: &ArgMatches) {

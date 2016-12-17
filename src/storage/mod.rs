@@ -94,6 +94,7 @@ pub fn list_path_content(path:&Path) -> StorageResult<Vec<PathBuf>> {
     if !path.exists() {
         error!("Path does not exist: {}", path.display());
     }
+
     Ok(try!(fs::read_dir(path))
         .filter_map(|entry| entry.ok())
         .map(|entry| entry.path())
@@ -365,8 +366,12 @@ impl<L:Storable> Storage<L> {
     ///    ...
     ///</pre>
     // TODO write extra tests
-    pub fn archive_project(&self, project:&L, year:Year) -> StorageResult<PathBuf> {
+    // TODO make year optional and default to project.year()
+    pub fn archive_project(&self, project:&L, year:Year) -> StorageResult<Vec<PathBuf>> {
         debug!("trying archiving {:?} into {:?}", project.short_desc(), year);
+
+        let mut moved_files = Vec::new();
+
         let name_in_archive = match project.prefix(){
             Some(prefix) => format!("{}_{}", prefix, project.ident()),
             None =>  project.ident()
@@ -379,7 +384,14 @@ impl<L:Storable> Storage<L> {
         try!(fs::rename(&project_folder, &target));
         info!("succesfully archived {:?} to {:?}", project.short_desc() ,target);
 
-        Ok(target)
+        moved_files.push(project.dir());
+        moved_files.push(target);
+
+        if let Some(repo) = self.repository() {
+            repo.add(&moved_files);
+        }
+
+        Ok(moved_files)
     }
 
 
@@ -389,11 +401,12 @@ impl<L:Storable> Storage<L> {
     pub fn archive_projects_if<F>(&self, search_terms:&[&str], manual_year:Option<i32>, confirm:F) -> StorageResult<Vec<PathBuf>>
         where F: Fn()->bool
     {
-        let mut moved_files = Vec::new();
         let projects = try!(self.search_projects_any(StorageDir::Working, search_terms));
         let force = confirm();
 
         if projects.is_empty() { return Err(ErrorKind:: ProjectDoesNotExist.into()) }
+
+        let mut moved_files = Vec::new();
 
         for project in projects {
             if force {warn!("you are using --force")};
@@ -401,14 +414,19 @@ impl<L:Storable> Storage<L> {
                 info!("project {:?} is ready to be archived", project.short_desc());
                 let year = manual_year.or(project.year()).unwrap();
                 info!("archiving {} ({})",  project.ident(), project.year().unwrap());
-                let archive_target = try!(self.archive_project(&project, year));
+                let mut archive_target = try!(self.archive_project(&project, year));
                 moved_files.push(project.dir());
-                moved_files.push(archive_target);
+                moved_files.append(&mut archive_target);
             }
             else {
                 warn!("project {:?} is not ready to be archived", project.short_desc());
             }
         };
+
+        if let Some(repo) = self.repository() {
+            repo.add(&moved_files);
+        }
+
         Ok(moved_files)
     }
 
@@ -431,14 +449,20 @@ impl<L:Storable> Storage<L> {
     ///
     /// Returns list of old and new paths.
     pub fn unarchive_projects(&self, year:i32, search_terms:&[&str]) -> StorageResult<Vec<(PathBuf)>> {
-        let mut moved_files = Vec::new();
         let projects = try!(self.search_projects_any(StorageDir::Archive(year), search_terms));
+
+        let mut moved_files = Vec::new();
         for project in projects {
             println!("unarchiving {:?}", project.short_desc());
             let unarchive_target = self.unarchive_project(&project).unwrap();
             moved_files.push(project.dir());
             moved_files.push(unarchive_target);
         };
+
+        if let Some(repo) = self.repository() {
+            repo.add(&moved_files);
+        }
+
         Ok(moved_files)
     }
 
