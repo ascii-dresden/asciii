@@ -40,7 +40,7 @@ impl Completer for ClapCompleter {
         let break_chars = BTreeSet::new();
         let (start, path) = completion::extract_word(line, pos, ESCAPE_CHAR, &break_chars);
         let path = completion::unescape(path, ESCAPE_CHAR);
-        let matches = try!(self.naiv_complete(&path, ESCAPE_CHAR, &break_chars));
+        let matches = self.naiv_complete(&path, ESCAPE_CHAR, &break_chars)?;
         Ok((start, matches))
     }
 }
@@ -62,16 +62,23 @@ pub fn launch_shell() {
     rl.set_completer(Some(clap_compl));
     //if rl.load_history("history.txt").is_err() { debug!("No previous shell history."); }
 
+    let exit_cmds = ["exit", "stop", "kill", "halt"];
+
     loop {
         let readline = rl.readline("asciii > ");
         match readline {
             Ok(line) => {
                 rl.add_history_entry(line.as_ref());
-                debug!("Line: {}", line);
+
+                if exit_cmds.contains(&line.trim()){
+                    println!("Byebye");
+                    break;
+                }
 
                 let mut argv: Vec<_> = line.trim().split(" ").collect();
                 // you have to insert the binary name since clap expects it
                 argv.insert(0, "prog");
+                debug!("shell: {} -> {:?}", line, argv);
                 match app.get_matches_from_safe_borrow(argv) {
                     Ok(matches) => super::match_matches(&matches),
                     Err(e) => println!("{}", e.message)
