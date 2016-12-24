@@ -55,7 +55,6 @@ impl Error for YamlError{
     }
 }
 
-// All you need to make try!() fun again
 impl From<io::Error> for YamlError { fn from(ioerror: io::Error)   -> YamlError{ YamlError::Io(ioerror) } }
 impl From<ScanError> for YamlError { fn from(scanerror: ScanError) -> YamlError{ YamlError::Scan(scanerror) } }
 impl fmt::Display for YamlError {
@@ -69,18 +68,18 @@ impl fmt::Display for YamlError {
 
 /// Wrapper that opens and parses a `.yml` file.
 pub fn open( path:&Path ) -> Result<Yaml, YamlError> {
-    let file_content = try!(File::open(&path)
+    let file_content = File::open(&path)
                              .and_then(|mut file| {
                                  let mut content = String::new();
                                  file.read_to_string(&mut content).map(|_| content)
-                             }));
+                             })?;
     parse( &file_content )
 }
 
 /// Ruby like API to yaml-rust.
 pub fn parse( file_content:&str ) -> Result<Yaml, YamlError> {
     Ok(
-        try!(YamlLoader::load_from_str(&file_content))
+        YamlLoader::load_from_str(&file_content)?
         .get(0)
         .map(|i|i.to_owned())
         .unwrap_or_else(||Yaml::from_str("[]"))

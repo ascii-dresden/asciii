@@ -511,10 +511,10 @@ pub trait Redeemable: IsProject {
                                   )
                          );
 
-        let product = try!(Product::from_desc_and_value(desc, values));
+        let product = Product::from_desc_and_value(desc, values)?;
 
-        let offered = try!(get_f64(values, "amount")
-                           .ok_or(Error::from(ErrorKind::MissingAmount(product.name.to_owned()))));
+        let offered = get_f64(values, "amount")
+                           .ok_or(Error::from(ErrorKind::MissingAmount(product.name.to_owned())))?;
         let sold = get_f64(values, "sold");
         let sold = if let Some(returned) = get_f64(values, "returned") {
             // if "returned", there must be no "sold"
@@ -577,15 +577,11 @@ pub mod events {
     use std::fmt;
     impl fmt::Display for Event {
         fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-            try!(
-                if let Some(end) = self.end { writeln!(f, "start: {}\nend:  {}", self.begin, end) }
-                else { writeln!(f, "start: {}", self.begin) }
-                );
+            if let Some(end) = self.end { writeln!(f, "start: {}\nend:  {}", self.begin, end) }
+            else { writeln!(f, "start: {}", self.begin) }?;
             for time in &self.times {
-                try!(
-                    if time.start == time.end { writeln!(f, " * {}", time.start) }
-                    else { writeln!(f, " * {} - {}", time.start, time.end) }
-                    )
+                if time.start == time.end { writeln!(f, " * {}", time.start) }
+                else { writeln!(f, " * {} - {}", time.start, time.end) } ?
             }
             Ok(())
         }

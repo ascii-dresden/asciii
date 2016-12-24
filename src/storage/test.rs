@@ -24,7 +24,7 @@ impl Storable for TestProject{
         let temp_file = temp_dir.path().join(project_name);
 
         // just copy over template
-        try!(fs::copy(template, &temp_file));
+        fs::copy(template, &temp_file)?;
 
         // project now lives in the temp_file
         Ok(TestProject{

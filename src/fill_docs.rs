@@ -54,7 +54,7 @@ fn inc_helper(_: &Context, h: &Helper, _: &Handlebars, rc: &mut RenderContext) -
     // just for example, add error check for unwrap
     let param = h.param(0).unwrap().value();
     let rendered = format!("{}", param.as_u64().unwrap() + 1);
-    try!(rc.writer.write(rendered.into_bytes().as_ref()));
+    rc.writer.write(rendered.into_bytes().as_ref())?;
     Ok(())
 }
 
@@ -62,7 +62,7 @@ fn count_helper(_: &Context, h: &Helper, _: &Handlebars, rc: &mut RenderContext)
     let count = h.param(0).unwrap().value().as_array().map_or(0, |a|a.len());
     //println!("count_helper{:?}", param);
     let rendered = format!("{}", count);
-    try!(rc.writer.write(rendered.into_bytes().as_ref()));
+    rc.writer.write(rendered.into_bytes().as_ref())?;
     Ok(())
 }
 

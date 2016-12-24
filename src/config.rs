@@ -45,7 +45,7 @@ impl ConfigReader{
 
         let config = Ok(ConfigReader{
             path: home_path.to_owned(),
-            defaults: try!(yaml::parse(&DEFAULT_CONFIG)),
+            defaults: yaml::parse(&DEFAULT_CONFIG)?,
             custom: yaml::open(&home_path).unwrap_or(Yaml::Null),
             local:  yaml::open(&local_path).unwrap_or(Yaml::Null)
         });

@@ -195,9 +195,9 @@ impl Project {
 
     fn write_to_path<P:AsRef<OsStr> + fmt::Debug>(content:&str, target:&P) -> Result<PathBuf> {
         trace!("writing content ({}bytes) to {:?}", content.len(), target);
-        let mut file = try!(File::create(Path::new(target)));
-        try!(file.write_all(content.as_bytes()));
-        try!(file.sync_all());
+        let mut file = File::create(Path::new(target))?;
+        file.write_all(content.as_bytes())?;
+        file.sync_all()?;
         Ok(Path::new(target).to_owned())
     }
 
@@ -263,22 +263,22 @@ impl Project {
 
     pub fn to_csv(&self, bill_type:&BillType) -> Result<String>{
         use std::fmt::Write;
-        let (offer, invoice) = try!(self.bills());
+        let (offer, invoice) = self.bills()?;
         let bill = match *bill_type{ BillType::Offer => offer, BillType::Invoice => invoice };
         let mut csv_string = String::new();
         let splitter = ";";
 
-        try!(writeln!(&mut csv_string, "{}", [ "#", "Bezeichnung", "Menge", "EP", "Steuer", "Preis"].join(splitter)));
+        writeln!(&mut csv_string, "{}", [ "#", "Bezeichnung", "Menge", "EP", "Steuer", "Preis"].join(splitter))?;
 
 
         for items in bill.items_by_tax.values(){
             for (index,item) in items.iter().enumerate(){
-                                        try!(write!(&mut csv_string, "{};",  &index.to_string()));
-                                        try!(write!(&mut csv_string, "{};",  item.product.name));
-                                        try!(write!(&mut csv_string, "{};",  item.amount.to_string()));
-                                        try!(write!(&mut csv_string, "{:.2};",  item.product.price.as_float()));
-                                        try!(write!(&mut csv_string, "{:.2};",  item.product.tax));
-                                        try!(write!(&mut csv_string, "{:.2}\n", (item.product.price * item.amount).as_float()));
+                                        write!(&mut csv_string, "{};",  &index.to_string())?;
+                                        write!(&mut csv_string, "{};",  item.product.name)?;
+                                        write!(&mut csv_string, "{};",  item.amount.to_string())?;
+                                        write!(&mut csv_string, "{:.2};",  item.product.price.as_float())?;
+                                        write!(&mut csv_string, "{:.2};",  item.product.tax)?;
+                                        write!(&mut csv_string, "{:.2}\n", (item.product.price * item.amount).as_float())?;
             }
         }
         Ok(csv_string)
@@ -291,7 +291,7 @@ impl Project {
     }
 
     pub fn sum_sold(&self) -> Result<Currency> {
-        let (_,invoice) = try!(self.bills());
+        let (_,invoice) = self.bills()?;
         Ok(invoice.net_total())
     }
 
@@ -322,9 +322,9 @@ impl Project {
 
         match yaml::parse(&filled){
             Ok(_) => {
-                let mut file = try!(File::create(self.file()));
-                try!(file.write_all(filled.as_bytes()));
-                try!(file.sync_all());
+                let mut file = File::create(self.file())?;
+                file.write_all(filled.as_bytes())?;
+                file.sync_all()?;
                 Ok(())
             },
             Err(e) => {
@@ -396,13 +396,12 @@ impl Redeemable for Project {
             }
         }
 
-        let raw_products = try!(
+        let raw_products = 
             self.get_hash("products")
-                .ok_or(product_error::Error::from(product_error::ErrorKind::UnknownFormat))
-            );
+                .ok_or(product_error::Error::from(product_error::ErrorKind::UnknownFormat))?;
 
         for (desc,values) in raw_products {
-            let (offer_item, invoice_item) = try!(self.item_from_desc_and_value(desc, values));
+            let (offer_item, invoice_item) = self.item_from_desc_and_value(desc, values)?;
             if offer_item.amount.is_normal()   { offer.add(offer_item); }
             if invoice_item.amount.is_normal() { invoice.add(invoice_item); }
         }
@@ -450,7 +449,7 @@ impl Storable for Project {
         };
 
         // fills the template
-        let filled = try!(Templater::from_file(template))
+        let filled = Templater::from_file(template)?
             .fill_in_data(&fill).fix()
             .fill_in_data(&default_fill)
             .finalize()
@@ -463,9 +462,9 @@ impl Storable for Project {
         let temp_file = temp_dir.path().join(slug::slugify(project_name) + "." + Self::file_extension());
 
         // write into a file
-        let mut file = try!( File::create(&temp_file) );
-        try!(file.write_all(filled.as_bytes()));
-        try!(file.sync_all());
+        let mut file = File::create(&temp_file)?;
+        file.write_all(filled.as_bytes())?;
+        file.sync_all()?;
 
         let yaml = match yaml::parse(&filled){
             Ok(y) => y,
@@ -543,24 +542,24 @@ impl Storable for Project {
 
     /// Opens a yaml and parses it.
     fn open(folder_path:&Path) -> StorageResult<Project>{
-        let file_path = try!(try!(list_path_content(folder_path)).iter()
+        let file_path = list_path_content(folder_path)?.iter()
             .filter(|f|f.extension().unwrap_or(&OsStr::new("")) == PROJECT_FILE_EXTENSION)
             .nth(0).map(|b|b.to_owned())
-            .ok_or(StorageErrorKind::ProjectDoesNotExist));
+            .ok_or(StorageErrorKind::ProjectDoesNotExist)?;
         Self::open_file(&file_path)
     }
 
     fn open_file(file_path:&Path) -> StorageResult<Project>{
-        let file_content = try!(File::open(&file_path)
+        let file_content = File::open(&file_path)
                                 .and_then(|mut file| {
                                     let mut content = String::new();
                                     file.read_to_string(&mut content).map(|_| content)
-                                }));
+                                })?;
         Ok(Project{
             file_path: file_path.to_owned(),
             _temp_dir: None,
             git_status: None,
-            yaml: try!(yaml::parse(&file_content)),
+            yaml: yaml::parse(&file_content)?,
             file_content: file_content,
         })
     }

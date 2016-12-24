@@ -21,7 +21,7 @@ pub enum GitStatus{
     Ignored, Conflict, Current, Unknown
 }
 
-impl GitStatus{
+impl GitStatus {
     pub fn to_format(&self) -> Attr{
         //Bold,
         //Dim,
@@ -52,7 +52,7 @@ impl GitStatus{
     }
 }
 
-impl fmt::Display for GitStatus{
+impl fmt::Display for GitStatus {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
 // X ✘ ✓
         match *self{
@@ -114,8 +114,8 @@ impl Repository {
 
     #[cfg(feature="git_statuses")]
     pub fn new(path:&Path) -> Result<Self, git2::Error>{
-        let repo = try!(git2::Repository::open(path));
-        let statuses = try!(Self::cache_statuses(&repo));
+        let repo = git2::Repository::open(path)?;
+        let statuses = Self::cache_statuses(&repo)?;
         Ok(
             Repository{
                 repo: repo,
@@ -134,9 +134,9 @@ impl Repository {
     fn cache_statuses(repo:&git2::Repository) -> Result<HashMap<PathBuf, GitStatus>, git2::Error>{
         let repo_path = repo.path().parent().unwrap().to_owned();
 
-        let git_statuses = try!(repo.statuses( Some( git2::StatusOptions::new()
+        let git_statuses = repo.statuses( Some( git2::StatusOptions::new()
                                                      .include_ignored(false)
-                                                     .include_untracked(true) )));
+                                                     .include_untracked(true) ))?;
 
         let mut statuses:HashMap<PathBuf,GitStatus> = HashMap::new();
 

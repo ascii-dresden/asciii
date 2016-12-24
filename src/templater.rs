@@ -111,11 +111,11 @@ impl Templater{
     }
 
     pub fn from_file(path:&Path) -> Result<Templater, io::Error> {
-        let template = try!(File::open(&path)
+        let template = File::open(&path)
             .and_then(|mut file| {
                 let mut content = String::new();
                 file.read_to_string(&mut content).map(|_| content)
-            }));
+            })?;
 
         Ok(Templater::new(&template))
     }

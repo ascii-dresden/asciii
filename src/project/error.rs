@@ -92,7 +92,7 @@ impl<'a> From<&'a [&'a str]> for ErrorList {
 impl fmt::Display for ErrorList {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         for error in &self.errors {
-            try!(writeln!(f, " * {}", error))
+            writeln!(f, " * {}", error)?
         }
         Ok(())
     }

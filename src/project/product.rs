@@ -62,10 +62,10 @@ impl<'a> Product<'a>{
         Ok(Product {
             name: name,
             unit: yaml::get_str(values, "unit"),
-            price: try!(yaml::get_f64(values, "price")
+            price: yaml::get_f64(values, "price")
                 .map(to_currency)
                 .ok_or_else(||Error::from(ErrorKind::InvalidPrice(name.to_string())))
-                ),
+                ?,
             tax: yaml::get_f64(values, "tax").unwrap_or(default_tax).into(),
         })
     }
@@ -81,9 +81,9 @@ impl<'a> Product<'a>{
         Ok(Product {
             name: name,
             unit: yaml::get_str(desc, "unit"),
-            price: try!(yaml::get_f64(desc, "price")
+            price: yaml::get_f64(desc, "price")
                 .ok_or_else(||Error::from(ErrorKind::InvalidPrice(name.to_string())))
-                .map(to_currency)),
+                .map(to_currency)?,
             tax: yaml::get_f64(desc, "tax").unwrap_or(default_tax).into(),
         })
     }

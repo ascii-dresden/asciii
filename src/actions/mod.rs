@@ -32,22 +32,22 @@ use self::error::*;
 /// Sets up an instance of `Storage`.
 pub fn setup_luigi() -> Result<Storage<Project>> {
     trace!("setup_luigi()");
-    let working   = try!(::CONFIG.get_str("dirs/working").ok_or("Faulty config: dirs/working does not contain a value"));
-    let archive   = try!(::CONFIG.get_str("dirs/archive").ok_or("Faulty config: dirs/archive does not contain a value"));
-    let templates = try!(::CONFIG.get_str("dirs/templates").ok_or("Faulty config: dirs/templates does not contain a value"));
-    let storage   = try!(Storage::new(util::get_storage_path(), working, archive, templates));
-    try!(storage.health_check());
+    let working   = ::CONFIG.get_str("dirs/working").ok_or("Faulty config: dirs/working does not contain a value")?;
+    let archive   = ::CONFIG.get_str("dirs/archive").ok_or("Faulty config: dirs/archive does not contain a value")?;
+    let templates = ::CONFIG.get_str("dirs/templates").ok_or("Faulty config: dirs/templates does not contain a value")?;
+    let storage   = Storage::new(util::get_storage_path(), working, archive, templates)?;
+    storage.health_check()?;
     Ok(storage)
 }
 
 /// Sets up an instance of `Storage`, with git turned on.
 pub fn setup_luigi_with_git() -> Result<Storage<Project>> {
     trace!("setup_luigi()");
-    let working   = try!(::CONFIG.get_str("dirs/working").ok_or("Faulty config: dirs/working does not contain a value"));
-    let archive   = try!(::CONFIG.get_str("dirs/archive").ok_or("Faulty config: dirs/archive does not contain a value"));
-    let templates = try!(::CONFIG.get_str("dirs/templates").ok_or("Faulty config: dirs/templates does not contain a value"));
-    let storage   = try!(Storage::new_with_git(util::get_storage_path(), working, archive, templates));
-    try!(storage.health_check());
+    let working   = ::CONFIG.get_str("dirs/working").ok_or("Faulty config: dirs/working does not contain a value")?;
+    let archive   = ::CONFIG.get_str("dirs/archive").ok_or("Faulty config: dirs/archive does not contain a value")?;
+    let templates = ::CONFIG.get_str("dirs/templates").ok_or("Faulty config: dirs/templates does not contain a value")?;
+    let storage   = Storage::new_with_git(util::get_storage_path(), working, archive, templates)?;
+    storage.health_check()?;
     Ok(storage)
 }
 
@@ -67,20 +67,20 @@ pub fn with_projects<F>(dir:StorageDir, search_terms:&[&str], f:F) -> Result<()>
     where F:Fn(&Project)->Result<()>
 {
     trace!("with_projects({:?})", search_terms);
-    let luigi = try!(setup_luigi());
-    let projects = try!(luigi.search_projects_any(dir, search_terms));
+    let luigi = setup_luigi()?;
+    let projects = luigi.search_projects_any(dir, search_terms)?;
     if projects.is_empty() {
         return Err(format!("Nothing found for {:?}", search_terms).into())
     }
     for project in &projects{
-        try!(f(project));
+        f(project)?;
     }
     Ok(())
 }
 
 pub fn csv(year:i32) -> Result<String> {
-    let luigi = try!(setup_luigi());
-    let mut projects = try!(luigi.open_projects(StorageDir::Year(year)));
+    let luigi = setup_luigi()?;
+    let mut projects = luigi.open_projects(StorageDir::Year(year))?;
     projects.sort_by(|pa,pb| pa.index().unwrap_or_else(||"zzzz".to_owned()).cmp( &pb.index().unwrap_or("zzzz".to_owned())));
     projects_to_csv(&projects)
 }
@@ -90,9 +90,9 @@ pub fn csv(year:i32) -> Result<String> {
 pub fn projects_to_csv(projects:&[Project]) -> Result<String>{
     let mut string = String::new();
     let splitter = ";";
-    try!(writeln!(&mut string, "{}", [ "Rnum", "Bezeichnung", "Datum", "Rechnungsdatum", "Betreuer", "Verantwortlich", "Bezahlt am", "Betrag", "Canceled"].join(splitter)));
+    writeln!(&mut string, "{}", [ "Rnum", "Bezeichnung", "Datum", "Rechnungsdatum", "Betreuer", "Verantwortlich", "Bezahlt am", "Betrag", "Canceled"].join(splitter))?;
     for project in projects{
-        try!(writeln!(&mut string, "{}", [
+        writeln!(&mut string, "{}", [
                  project.get("InvoiceNumber")                     .unwrap_or_else(|| String::from(r#""""#)),
                  project.get("Name")                              .unwrap_or_else(|| String::from(r#""""#)),
                  project.get("event/dates/0/begin")               .unwrap_or_else(|| String::from(r#""""#)),
@@ -102,7 +102,7 @@ pub fn projects_to_csv(projects:&[Project]) -> Result<String>{
                  project.get("invoice/payed_date")                .unwrap_or_else(|| String::from(r#""""#)),
                  project.sum_sold().map(|c|c.value().to_string()).unwrap_or_else(|_| String::from(r#""""#)),
                  project.canceled_string().to_owned()
-        ].join(splitter)));
+        ].join(splitter))?;
     }
     Ok(string)
 }
@@ -169,13 +169,13 @@ pub fn project_to_doc(project: &Project, template_name:&str, bill_type:&Option<B
     //debug!("{:?} -> {:?}",(bill_type, project.is_ready_for_offer(), project.is_ready_for_invoice()), (dyn_bill_type, outfile_tex));
 
     if let (Some(outfile), Some(dyn_bill)) = (outfile_tex, dyn_bill_type) {
-        let filled = try!(fill_template(project, &dyn_bill, &template_path));
+        let filled = fill_template(project, &dyn_bill, &template_path)?;
 
         let pdffile = to_local_file(&outfile, convert_ext);
         let target = output_folder.join(&pdffile);
 
         // ok, so apparently we can create a tex file, so lets do it
-        if !force && target.exists() && try!(file_age(&target)) < try!(file_age(&project_file)) {
+        if !force && target.exists() && file_age(&target)? < file_age(&project_file)? {
             // no wait, nothing has changed, so lets save ourselves the work
             info!("nothing to be done, {} is younger than {}
                          use --force if you don't agree
@@ -189,7 +189,7 @@ pub fn project_to_doc(project: &Project, template_name:&str, bill_type:&Option<B
             if dry_run{
                 warn!("Dry run! This does not produce any output:\n * {}\n * {}", outfile.display(), pdffile.display());
             } else {
-                let outfileb = try!(project.write_to_file(&filled,&dyn_bill,output_ext));
+                let outfileb = project.write_to_file(&filled,&dyn_bill,output_ext)?;
                 debug!("{} vs\n        {}", outfile.display(), outfileb.display());
                 util::pass_to_command(&convert_tool, &[&outfileb]);
             }
@@ -197,7 +197,7 @@ pub fn project_to_doc(project: &Project, template_name:&str, bill_type:&Option<B
             for trash_ext in trash_exts.iter().filter_map(|x|*x){
                 let trash_file = to_local_file(&outfile, trash_ext);
                 if  trash_file.exists() {
-                    try!(fs::remove_file(&trash_file));
+                    fs::remove_file(&trash_file)?;
                     debug!("just deleted: {}", trash_file.display())
                 }
                 else {
@@ -206,7 +206,7 @@ pub fn project_to_doc(project: &Project, template_name:&str, bill_type:&Option<B
             }
             if pdffile.exists(){
                 debug!("now there is be a {:?} -> {:?}", pdffile, target);
-                try!(fs::rename(&pdffile, &target));
+                fs::rename(&pdffile, &target)?;
             }
         }
     }
@@ -221,15 +221,15 @@ pub fn projects_to_doc(dir:StorageDir, search_term:&str, template_name:&str, bil
 }
 
 fn file_age(path:&Path) -> Result<time::Duration> {
-    let metadata = try!(fs::metadata(path));
-    let accessed = try!(metadata.accessed());
-    Ok(try!(accessed.elapsed()))
+    let metadata = fs::metadata(path)?;
+    let accessed = metadata.accessed()?;
+    Ok(accessed.elapsed()?)
 }
 
 /// Command DUES
 pub fn open_wages() -> Result<Currency>{
-    let luigi = try!(setup_luigi());
-    let projects = try!(luigi.open_projects(StorageDir::Working));
+    let luigi = setup_luigi()?;
+    let projects = luigi.open_projects(StorageDir::Working)?;
     Ok(projects.iter()
         .filter(|p| !p.canceled() && p.age().unwrap_or(0) > 0)
         .filter_map(|p| p.wages())
@@ -239,8 +239,8 @@ pub fn open_wages() -> Result<Currency>{
 
 /// Command DUES
 pub fn open_payments() -> Result<Currency>{
-    let luigi = try!(setup_luigi());
-    let projects = try!(luigi.open_projects(StorageDir::Working));
+    let luigi = setup_luigi()?;
+    let projects = luigi.open_projects(StorageDir::Working)?;
     Ok(projects.iter()
        .filter(|p| !p.canceled() && !p.payed_by_client() && p.age().unwrap_or(0) > 0)
        .filter_map(|p| p.sum_sold().ok())
@@ -253,9 +253,9 @@ pub fn open_payments() -> Result<Currency>{
 /// TODO move this to `spec::all_the_things`
 pub fn spec() -> Result<()> {
     use project::spec::*;
-    let luigi = try!(setup_luigi());
+    let luigi = setup_luigi()?;
     //let projects = super::execute(||luigi.open_projects(StorageDir::All));
-    let projects = try!(luigi.open_projects(StorageDir::Working));
+    let projects = luigi.open_projects(StorageDir::Working)?;
     for project in projects{
         info!("{}", project.dir().display());
 
@@ -282,23 +282,23 @@ pub fn spec() -> Result<()> {
 }
 
 pub fn delete_project_confirmation(dir: StorageDir, search_terms:&[&str]) -> Result<()> {
-    let luigi = try!(setup_luigi_with_git());
-    for project in try!(luigi.search_projects_any(dir, search_terms)) {
-        try!(luigi.delete_project_if(&project,
+    let luigi = setup_luigi_with_git()?;
+    for project in luigi.search_projects_any(dir, search_terms)? {
+        luigi.delete_project_if(&project,
                 || util::really(&format!("you want me to delete {:?} [y/N]", project.dir())) && util::really("really? [y/N]")
-                ))
+                )?
     }
     Ok(())
 }
 
 pub fn archive_projects(search_terms:&[&str], manual_year:Option<i32>, force:bool) -> Result<Vec<PathBuf>>{
     trace!("archive_projects matching ({:?},{:?},{:?})", search_terms, manual_year,force);
-    let luigi = try!(setup_luigi_with_git());
-    Ok(try!( luigi.archive_projects_if(search_terms, manual_year, || force) ))
+    let luigi = setup_luigi_with_git()?;
+    Ok( luigi.archive_projects_if(search_terms, manual_year, || force) ?)
 }
 
 pub fn archive_all_projects() -> Result<Vec<PathBuf>> {
-    let luigi = try!(setup_luigi_with_git());
+    let luigi = setup_luigi_with_git()?;
     let mut moved_files = Vec::new();
     for project in luigi.open_projects(StorageDir::Working)?
                         .iter()
@@ -313,14 +313,14 @@ pub fn archive_all_projects() -> Result<Vec<PathBuf>> {
 /// Command UNARCHIVE <YEAR> <NAME>
 /// TODO: return a list of files that have to be updated in git
 pub fn unarchive_projects(year:i32, search_terms:&[&str]) -> Result<Vec<PathBuf>> {
-    let luigi = try!(setup_luigi_with_git());
-    Ok(try!( luigi.unarchive_projects(year, search_terms) ))
+    let luigi = setup_luigi_with_git()?;
+    Ok( luigi.unarchive_projects(year, search_terms) ?)
 }
 
 /// Command CALENDAR
 pub fn calendar(dir: StorageDir) -> Result<String> {
-    let luigi = try!(setup_luigi());
-    let projects = try!(luigi.open_projects(dir));
+    let luigi = setup_luigi()?;
+    let projects = luigi.open_projects(dir)?;
     let mut cal = Calendar::new();
     for project in projects {
         cal.append(&mut project.to_ical())
