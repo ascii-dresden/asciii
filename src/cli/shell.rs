@@ -1,5 +1,4 @@
 use rustyline::completion;
-use rustyline::completion::FilenameCompleter;
 use rustyline::completion::Completer;
 use rustyline::error::ReadlineError;
 use rustyline::config::Config as LineConfig;
@@ -9,7 +8,6 @@ use rustyline::Result as LineResult;
 use std::collections::BTreeSet;
 use clap::App;
 use super::app::build_cli;
-use super::app::match_matches;
 
 static ESCAPE_CHAR: Option<char> = Some('\\');
 
@@ -27,7 +25,7 @@ impl ClapCompleter {
         }
     }
 
-    pub fn naiv_complete(&self, start: &str, _esc_char: Option<char>, break_chars: &BTreeSet<char>) -> LineResult<Vec<String>> {
+    pub fn naiv_complete(&self, start: &str, _esc_char: Option<char>, _break_chars: &BTreeSet<char>) -> LineResult<Vec<String>> {
         Ok(self.commands.iter()
                         .filter(|s|s.starts_with(start))
                         .cloned()

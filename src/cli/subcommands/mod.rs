@@ -15,22 +15,22 @@ use asciii::util;
 use asciii::BillType;
 use asciii::actions;
 use asciii::storage::*;
-use asciii::templater::Templater;
 use asciii::project::Project;
-use asciii::project::spec;
-use asciii::project::spec::IsProject;
-use asciii::project::spec::events::HasEvents;
-use asciii::project::ComputedField;
-use asciii::actions::{setup_luigi, setup_luigi_with_git};
+use asciii::actions::setup_luigi;
 
-#[cfg(feature="document_export")]
-use rustc_serialize::json::ToJson;
 
-use asciii::print;
-use asciii::print::{ListConfig, ListMode};
 // simple_rows, verbose_rows,
 // path_rows, dynamic_rows,
 // print_projects,print_csv};
+
+pub mod git;
+pub use self::git::*;
+
+pub mod list;
+pub use self::list::*;
+
+pub mod show;
+pub use self::show::*;
 
 use super::{execute, fail};
 
@@ -82,20 +82,6 @@ pub fn new(matches: &ArgMatches) {
     let project_file = project.file();
     if edit {
         util::pass_to_command(&editor, &[project_file]);
-    }
-}
-
-//#[deprecated(note="move to impl ListMode and then to asciii::actions")]
-fn decide_mode(simple:bool, verbose:bool, paths:bool,nothing:bool, csv:bool) -> ListMode {
-    if csv{     ListMode::Csv }
-    else if nothing{ ListMode::Nothing }
-    else if paths{   ListMode::Paths }
-    else {
-        match (simple, verbose, CONFIG.get_bool("list/verbose")){
-            (false, true,  _   ) => {debug!("-v overwrites config"); ListMode::Verbose },
-            (false,    _, true ) => {debug!("-v from config");ListMode::Verbose},
-                          _      => {debug!("simple mode");ListMode::Simple},
-        }
     }
 }
 
@@ -170,165 +156,6 @@ pub fn matches_to_paths(matches: &ArgMatches, luigi: &Storage<Project>) -> Vec<P
     }
 }
 
-/// Command LIST
-pub fn list(matches: &ArgMatches) {
-    if matches.is_present("templates") {
-        list_templates();
-    } else if matches.is_present("years") {
-        list_years();
-    } else if matches.is_present("computed_fields") {
-        list_computed_fields();
-    } else {
-        let list_mode = decide_mode(matches.is_present("simple"),
-                                    matches.is_present("verbose"),
-                                    matches.is_present("paths"),
-                                    matches.is_present("nothing"),
-                                    matches.is_present("csv"));
-
-        let extra_details = matches.values_of("details").map(|v| v.collect::<Vec<&str>>());
-        let config_details = CONFIG.get_strs("list/extra_details");
-
-        let mut list_config = ListConfig {
-            sort_by: matches.value_of("sort")
-                            .unwrap_or_else(|| {
-                                CONFIG.get_str("list/sort")
-                                    .expect("Faulty config: field list/sort does not contain a string value")
-                            }),
-            mode: list_mode,
-            details: extra_details.or(config_details),
-            filter_by: matches.values_of("filter").map(|v| v.collect::<Vec<&str>>()),
-            show_errors: matches.is_present("errors"),
-
-            ..Default::default()
-        };
-
-        if matches.is_present("colors") {
-            list_config.use_colors = true;
-        }
-        if matches.is_present("no-colors") {
-            list_config.use_colors = false;
-        }
-
-        // list archive of year `archive`
-        let dir =
-            if matches.is_present("archive"){
-                let archive_year = matches.value_of("archive")
-                    .and_then(|y|y.parse::<i32>().ok())
-                    .unwrap_or(UTC::today().year());
-                StorageDir::Archive(archive_year)
-            }
-
-            else if matches.is_present("year"){
-                let year = matches.value_of("year")
-                    .and_then(|y|y.parse::<i32>().ok())
-                    .unwrap_or(UTC::today().year());
-                StorageDir::Year(year)
-            }
-
-            // or list all, but sort by date
-            else if matches.is_present("all"){
-                // sort by date on --all of not overriden
-                if !matches.is_present("sort"){ list_config.sort_by = "date" }
-                StorageDir::All }
-
-            // or list normal
-            else { StorageDir::Working };
-
-        if matches.is_present("broken"){
-            list_broken_projects(dir); // XXX Broken
-        } else {
-            list_projects(dir, &list_config);
-        }
-    }
-}
-
-/// Command LIST [--archive, --all]
-///
-/// This interprets the `ListConfig` struct and passes it on to either
-///
-/// * `print::rows()`
-/// * `print::simple_rows()`
-/// * `print::verbose_rows()`
-///
-/// which it prints with `print::print_projects()`
-fn list_projects(dir: StorageDir, list_config: &ListConfig) {
-    let luigi = if CONFIG.get_bool("list/gitstatus") {
-        execute(setup_luigi_with_git)
-    } else {
-        execute(setup_luigi)
-    };
-    debug!("listing projects: {}", luigi.working_dir().display());
-
-    let mut projects = execute(|| luigi.open_projects(dir));
-
-    // filtering, can you read this
-    if let Some(ref filters) = list_config.filter_by {
-        projects.filter_by_all(filters);
-    }
-
-    // sorting
-    match list_config.sort_by {
-        "manager" => projects.sort_by(|pa,pb| pa.responsible().cmp( &pb.responsible())),
-        "date"    => projects.sort_by(|pa,pb| pa.modified_date().cmp( &pb.modified_date())),
-        "name"    => projects.sort_by(|pa,pb| pa.short_desc().cmp( &pb.short_desc())),
-        "index"   => projects.sort_by(|pa,pb| pa.index().unwrap_or("zzzz".to_owned()).cmp( &pb.index().unwrap_or("zzzz".to_owned()))), // TODO rename to ident
-        _         => projects.sort_by(|pa,pb| pa.index().unwrap_or("zzzz".to_owned()).cmp( &pb.index().unwrap_or("zzzz".to_owned()))),
-    }
-
-    // fit screen
-    let wide_enough = true;
-
-    if !wide_enough && list_config.mode != ListMode::Csv {
-        // TODO room for improvement
-        print::print_projects(print::simple_rows(&projects, list_config));
-    } else {
-        debug!("list_mode: {:?}", list_config.mode );
-        match list_config.mode{
-            ListMode::Csv     => print::print_csv(&projects),
-            ListMode::Paths   => print::print_projects(print::path_rows(&projects, list_config)),
-            ListMode::Simple  => print::print_projects(print::simple_rows(&projects, list_config)),
-            ListMode::Verbose => print::print_projects(print::verbose_rows(&projects,list_config)),
-            ListMode::Nothing => print::print_projects(print::dynamic_rows(&projects,list_config)),
-        }
-    }
-}
-
-/// Command LIST --broken
-fn list_broken_projects(dir: StorageDir) {
-    let luigi = execute(setup_luigi);
-    let invalid_files = execute(|| luigi.list_project_files(dir));
-    let tups = invalid_files.iter()
-                            .filter_map(|dir| Project::open(dir).err().map(|e| (e, dir)))
-                            .collect::<Vec<(StorageError, &PathBuf)>>();
-
-    for (err, path) in tups {
-        println!("{}: {:?}", path.display(), err);
-    }
-}
-
-/// Command LIST --templates
-fn list_templates() {
-    let luigi = execute(setup_luigi);
-
-    for name in execute(|| luigi.list_template_names()) {
-        println!("{}", name);
-    }
-}
-
-/// Command LIST --years
-fn list_years() {
-    let luigi = execute(setup_luigi);
-    let years = execute(|| luigi.list_years());
-    println!("{:?}", years);
-}
-
-/// Command LIST --virt
-fn list_computed_fields() {
-    println!("{:?}",
-             ComputedField::iter_variant_names()
-                 .filter(|v| *v != "Invalid")
-                 .collect::<Vec<&str>>());
-}
 
 
 /// Command CSV
@@ -384,7 +211,7 @@ fn edit_projects(dir: StorageDir, search_terms: &[&str], editor: &Option<&str>) 
 }
 
 /// Command EDIT --template
-fn with_templates<F>(name: &str, action: F)
+pub fn with_templates<F>(name: &str, action: F)
     where F: FnOnce(&[PathBuf])
 {
     let luigi = execute(setup_luigi);
@@ -433,40 +260,6 @@ fn infer_bill_type(m: &ArgMatches) -> Option<BillType> {
     }
 }
 
-/// Command SHOW
-pub fn show(m: &ArgMatches) {
-    let (search_terms, dir) = matches_to_search(m);
-
-    let bill_type = match (m.is_present("offer"), m.is_present("invoice")) {
-        (true, true)    => unreachable!("this should have been prevented by clap-rs"),
-        (true, false)   => BillType::Offer,
-        // (false,true) => BillType::Invoice,
-        _               => BillType::Invoice, //TODO be inteligent here ( use date )
-    };
-
-
-    if m.is_present("files") {
-        actions::simple_with_projects(dir, &search_terms, |p| {
-            println!("{}: ", p.dir().display());
-            for entry in fs::read_dir(p.dir()).unwrap() {
-                println!("  {}", entry.unwrap().path().display())
-            }
-        });
-    } else if let Some(detail) = m.value_of("detail") {
-        show_detail(dir, &search_terms, detail);
-    } else if m.is_present("empty fields"){ show_empty_fields(dir, search_terms.as_slice())
-    } else if m.is_present("errors"){ show_errors(dir, search_terms.as_slice())
-    } else if m.is_present("dump"){ dump_yaml(dir, search_terms.as_slice())
-    } else if m.is_present("json"){ show_json(dir, search_terms.as_slice())
-    } else if m.is_present("ical"){ show_ical(dir, search_terms.as_slice())
-    } else if m.is_present("csv"){  show_csv( dir, search_terms.as_slice());
-    } else if m.is_present("template"){ show_template(search_terms[0]);
-    } else { actions::simple_with_projects(dir,
-                                           search_terms.as_slice(),
-                                           |p|print::show_details(p,&bill_type))
-    }
-}
-
 /// Command CALENDAR
 pub fn calendar(matches: &ArgMatches) {
     let calendar = execute(||actions::calendar(matches_to_dir(matches)));
@@ -474,52 +267,6 @@ pub fn calendar(matches: &ArgMatches) {
 }
 
 
-fn dump_yaml(dir: StorageDir, search_terms: &[&str]) {
-    actions::simple_with_projects(dir, &search_terms, |p| println!("{}", p.dump_yaml()));
-}
-
-fn show_errors(dir: StorageDir, search_terms: &[&str]) {
-    actions::simple_with_projects(dir, &search_terms, |p| {
-        println!("{}: ", p.short_desc());
-        spec::print_specresult("offer", p.is_ready_for_offer());
-        spec::print_specresult("invoice", p.is_ready_for_invoice());
-        spec::print_specresult("archive", p.is_ready_for_archive());
-    });
-}
-
-fn show_empty_fields(dir: StorageDir, search_terms: &[&str]) {
-    actions::simple_with_projects(dir,
-                                  &search_terms,
-                                  |p| println!("{}: {}", p.short_desc(), p.empty_fields().join(", ")));
-}
-
-
-#[cfg(feature="document_export")]
-fn show_json(dir: StorageDir, search_terms: &[&str]) {
-    actions::simple_with_projects(dir, &search_terms, |p| println!("{}", p.to_json()));
-}
-
-fn show_ical(dir: StorageDir, search_terms: &[&str]) {
-    actions::simple_with_projects(dir, &search_terms, |p| p.to_ical().print().unwrap());
-}
-
-fn show_detail(dir: StorageDir, search_terms: &[&str], detail: &str) {
-    actions::simple_with_projects(dir, &search_terms, |p| {
-        println!("{}",
-                 p.get(detail).unwrap_or_else(|| String::from("Nothing found")))
-    });
-}
-
-fn show_csv(dir: StorageDir, search_terms: &[&str]) {
-    actions::simple_with_projects(dir,
-                                  &search_terms,
-                                  |p| println!("{}", execute(|| p.to_csv(&BillType::Invoice))));
-}
-
-#[cfg(not(feature="document_export"))]
-fn show_json(_: StorageDir, _: &[&str]) {
-    error!("feature temporarily disabled")
-}
 
 /// Command SPEC
 /// TODO make this not panic :D
@@ -573,14 +320,6 @@ pub fn make(_: &ArgMatches) {
 
 
 
-
-/// Command SHOW --template
-fn show_template(name: &str) {
-    let luigi = execute(setup_luigi);
-    let template = execute(|| luigi.get_template_file(name));
-    let templater = execute(|| Templater::from_file(&template));
-    println!("{:#?}", templater.list_keywords());
-}
 
 /// TODO make this be have like `edit`, taking multiple names
 pub fn archive(matches: &ArgMatches) {
@@ -697,10 +436,6 @@ pub fn dues(matches: &ArgMatches) {
     }
 }
 
-pub fn show_path(matches: &ArgMatches) {
-    path(matches, |path| println!("{}", path.display()))
-}
-
 // pub fn open_path(matches:&ArgMatches){path(matches, |path| {open::that(path).unwrap();})}
 pub fn open_path(m: &ArgMatches) {
     if m.is_present("search_term") {
@@ -716,6 +451,7 @@ pub fn open_path(m: &ArgMatches) {
 }
 
 pub fn path<F: Fn(&Path)>(m: &ArgMatches, action: F) {
+
     let path = CONFIG.get_str("path")
         .expect("Faulty config: field output_path does not contain a string value");
     let storage_path = CONFIG.get_str("dirs/storage")
@@ -759,151 +495,3 @@ pub fn shell(_matches: &ArgMatches) {
     error!("Shell functionality not built-in with this release!");
 }
 
-
-/// Command LOG
-pub fn git_log() {
-    let luigi = execute(setup_luigi_with_git);
-    let repo = luigi.repository().unwrap();
-    if !repo.log().success() {
-        error!("git log did not exit successfully")
-    }
-}
-
-/// Command STATUS
-pub fn git_status() {
-    let luigi = execute(setup_luigi_with_git);
-    let repo = luigi.repository().unwrap();
-    if !repo.status().success() {
-        error!("git status did not exit successfully")
-    }
-}
-
-/// Command COMMIT
-pub fn git_commit() {
-    let luigi = execute(setup_luigi_with_git);
-    let repo = luigi.repository().unwrap();
-    if !repo.commit().success() {
-        error!("git commit did not exit successfully")
-    }
-}
-
-/// Command REMOTE
-/// exact replica of `git remote -v`
-#[cfg(not(feature="git_statuses"))]
-pub fn git_remote() {
-    let luigi = execute(setup_luigi_with_git);
-    luigi.repository().unwrap().remote();
-}
-
-/// Command REMOTE
-/// exact replica of `git remote -v`
-#[cfg(feature="git_statuses")]
-pub fn git_remote() {
-    let luigi = execute(setup_luigi_with_git);
-
-    if let Some(r) = luigi.repository() {
-        let ref repo = r.repo;
-
-        for remote_name in repo.remotes().unwrap().iter() {
-
-            if let Some(name) = remote_name {
-
-                if let Ok(remote) = repo.find_remote(name) {
-                    println!("{}  {} (fetch)\n{}  {} (push)",
-                    remote.name().unwrap_or("no name"),
-                    remote.url().unwrap_or("no url"),
-                    remote.name().unwrap_or("no name"),
-                    remote.pushurl().or(remote.url()).unwrap_or(""),
-                    );
-                } else {
-                    println!("no remote")
-                }
-
-            } else {
-                println!("no remote name")
-            }
-        }
-
-    }
-
-}
-
-/// Command ADD
-pub fn git_add(matches: &ArgMatches) {
-    let luigi = execute(setup_luigi_with_git);
-    let paths = matches_to_paths(matches, &luigi);
-    let repo = luigi.repository().unwrap();
-    if !repo.add(&paths).success() {
-        error!("git add did not exit successfully")
-    }
-}
-
-
-/// Command DIFF
-pub fn git_diff(matches: &ArgMatches) {
-    let luigi = execute(setup_luigi_with_git);
-    let paths = matches_to_paths(matches, &luigi);
-    let repo = luigi.repository().unwrap();
-    if !repo.diff(&paths).success() {
-        error!("git diff did not exit successfully")
-    }
-}
-
-/// Command PULL
-pub fn git_pull(matches: &ArgMatches) {
-    let luigi = execute(setup_luigi_with_git);
-    let repo = luigi.repository().unwrap();
-
-    let success = if matches.is_present("rebase") {
-        repo.pull_rebase().success()
-    } else {
-        repo.pull().success()
-    };
-    if !success {
-        error!("git pull did not exit successfully")
-    }
-}
-
-/// Command PUSH
-pub fn git_push() {
-    let luigi = execute(setup_luigi_with_git);
-    let repo = luigi.repository().unwrap();
-    if !repo.push().success() {
-        error!("git push did not exit successfully")
-    }
-}
-
-/// Command STASH
-pub fn git_stash() {
-    let luigi = execute(setup_luigi_with_git);
-    let repo = luigi.repository().unwrap();
-    if !repo.stash().success() {
-        error!("git stash did not exit successfully")
-    }
-}
-
-/// Command CLEANUP
-pub fn git_cleanup(matches: &ArgMatches) {
-    let luigi = execute(setup_luigi_with_git);
-    let paths = matches_to_paths(matches, &luigi);
-    let repo = luigi.repository().unwrap();
-    // TODO implement `.and()` for exitstatus
-
-    if util::really(&format!(
-            "Do you really want to reset any changes you made to:\n {:?}\n[y|N]", paths)) {
-        let checkout_status = repo.checkout(&paths);
-        if checkout_status.success() {
-            util::exit(repo.clean(&paths))
-        } else {
-            debug!("clean checkout was no success");
-            util::exit(checkout_status)
-        }
-    }
-}
-
-/// Command DIFF
-pub fn git_stash_pop() {
-    let luigi = execute(setup_luigi_with_git);
-    let repo = luigi.repository().unwrap();
-    util::exit(repo.stash_pop())
-}
