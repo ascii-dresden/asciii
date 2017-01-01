@@ -35,11 +35,11 @@ prettytable-rs = { version = "0.6", default-features= false}
 #herbie-lint = {version = "*", optional = true}
 
 # feature: document_export
-handlebars = {version = "*", optional = true}
-rustc-serialize = {version = "*", optional = true}
+handlebars = {version = "0.22", optional = true}
+rustc-serialize = {version = "0.3", optional = true}
 
 # feature: git_statuses
-git2 = {version = "*", default-features= false, optional = true}
+git2 = {version = "0.6", default-features= false, optional = true}
 
 # planned optional features: termprint, term resize, xdg-open, web server :D
 
