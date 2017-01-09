@@ -88,15 +88,15 @@ pub fn new(matches: &ArgMatches) {
 fn matches_to_dir<'a>(matches: &'a ArgMatches) -> StorageDir {
         if matches.is_present("archive"){
             let archive_year = matches.value_of("archive")
-                .and_then(|y|y.parse::<i32>().ok())
-                .unwrap_or(UTC::today().year());
+                                      .and_then(|y|y.parse::<i32>().ok())
+                                      .unwrap_or(UTC::today().year());
             StorageDir::Archive(archive_year)
         }
 
         else if matches.is_present("year"){
             let year = matches.value_of("year")
-                .and_then(|y|y.parse::<i32>().ok())
-                .unwrap_or(UTC::today().year());
+                              .and_then(|y|y.parse::<i32>().ok())
+                              .unwrap_or(UTC::today().year());
             StorageDir::Year(year)
         }
 
@@ -126,10 +126,9 @@ fn matches_to_search<'a>(matches: &'a ArgMatches) -> (Vec<&'a str>, StorageDir) 
 /// Produces a list of paths.
 /// This is more general than `with_projects`, as this includes templates too.
 pub fn matches_to_paths(matches: &ArgMatches, luigi: &Storage<Project>) -> Vec<PathBuf> {
-    let search_terms = matches
-        .values_of("search_term")
-        .map(|v| v.collect::<Vec<&str>>())
-        .unwrap_or_else(Vec::new);
+    let search_terms = matches.values_of("search_term")
+                              .map(|v| v.collect::<Vec<&str>>())
+                              .unwrap_or_else(Vec::new);
 
     if matches.is_present("template") {
         super::execute(|| luigi.list_template_files())
@@ -262,7 +261,7 @@ fn infer_bill_type(m: &ArgMatches) -> Option<BillType> {
 
 /// Command CALENDAR
 pub fn calendar(matches: &ArgMatches) {
-    let calendar = execute(||actions::calendar(matches_to_dir(matches)));
+    let calendar = execute(||actions::calendar(matches_to_dir(matches), matches.is_present("tasks")));
     println!("{}", calendar);
 }
 

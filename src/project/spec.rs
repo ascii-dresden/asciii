@@ -491,11 +491,17 @@ pub trait HasEmployees: ProvidesData {
 
 /// Stage 3: when an `IsProject` is redeem and can be archived
 pub trait Redeemable: IsProject {
+
     /// When was the project payed
     fn payed_date(&self) -> Option<Date<UTC>> {
         self.get_dmy("invoice.payed_date")
         // old spec
         .or_else(|| self.get_dmy("payed_date"))
+    }
+
+    /// If was the project payed
+    fn is_payed(&self) -> bool {
+        self.payed_date().is_some()
     }
 
     fn bills(&self) -> Result<(Bill<Product>, Bill<Product>)> ;

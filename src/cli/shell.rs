@@ -73,7 +73,14 @@ pub fn launch_shell() {
                     break;
                 }
 
+                // this operators are not allowed
+                if line.contains(">") || line.contains(">") || line.contains("|") {
+                    error!("What do you think this is? A shell?");
+                    break
+                }
+
                 let mut argv: Vec<_> = line.trim().split(" ").collect();
+
                 // you have to insert the binary name since clap expects it
                 argv.insert(0, "prog");
                 debug!("shell: {} -> {:?}", line, argv);
@@ -84,11 +91,11 @@ pub fn launch_shell() {
 
             },
             Err(ReadlineError::Interrupted) => {
-                println!("CTRL-C");
+                //println!("CTRL-C");
                 break
             },
             Err(ReadlineError::Eof) => {
-                println!("CTRL-D");
+                //println!("CTRL-D");
                 break
             },
             Err(err) => {

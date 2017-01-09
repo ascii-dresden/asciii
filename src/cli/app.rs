@@ -481,14 +481,22 @@ pub fn build_cli() -> App<'static, 'static> {
                 )
 
         .subcommand(SubCommand::with_name("calendar")
+                    .aliases(&["cal","ical","ics","kalender"])
                     .arg(Arg::with_name("archive")
-                         .help("list archived projects of a specific year, defaults to the current year")
+                         .help("List archived projects of a specific year, defaults to the current year")
                          .short("a")
                          .long("archive")
                          .min_values(0)
                          .takes_value(true)
                          .value_name("year")
                         )
+
+                    .arg(Arg::with_name("tasks")
+                         .help("Include open tasks")
+                         .short("t")
+                         .long("tasks")
+                        )
+
                     .arg(Arg::with_name("year")
                          .help("List projects from that year, archived or not")
                          .short("y")
@@ -655,6 +663,7 @@ pub fn build_cli() -> App<'static, 'static> {
                    )
 
         .subcommand(SubCommand::with_name("shell")
+                    .aliases(&["sh"])
                     .about("(experimental) starts interactive shell")
                    )
 
