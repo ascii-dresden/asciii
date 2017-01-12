@@ -663,7 +663,7 @@ pub fn build_cli() -> App<'static, 'static> {
                    )
 
         .subcommand(SubCommand::with_name("shell")
-                    .aliases(&["sh"])
+                    .aliases(&["sh", "repl"])
                     .about("(experimental) starts interactive shell")
                    )
 

@@ -574,12 +574,13 @@ impl Storable for Project {
     }
 
     fn index(&self) -> Option<String>{
-        if let Some(date) = self.modified_date() {
-            self.invoice().number_str()
-                .map(|num| format!("{1}{0}", date.format("%Y%m%d").to_string(),num))
-                .or_else(||Some(date.format("zzz%Y%m%d").to_string()))
-        } else {
-            None
+        let prefix = self.invoice().number_long_str().unwrap_or_else(||String::from("zzzz"));
+        match (self.invoice().date(), self.modified_date()) {
+            (Some(date), _) |
+            (None, Some(date)) => {
+                Some(format!("{0}{1}", prefix, date.format("%Y%m%d").to_string()))
+            },
+            (None, None) => None,
         }
     }
 
