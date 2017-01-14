@@ -14,6 +14,15 @@ The ascii-invoicer is a command-line tool that manages projects and stores them 
 ### Archlinux
 You can install the package `asciii-git` from the AUR.
 
+### macOS
+
+You can install asciii via homebrew.
+
+```sh
+$ brew tap ascii-dresden/formulae
+$ brew install asciii
+```
+
 ### Using cargo
 Just plain old `cargo install --git https://github.com/ascii-dresden/asciii` will do.
 
