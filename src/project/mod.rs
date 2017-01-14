@@ -412,12 +412,13 @@ impl Storable for Project{
     }
 
     fn index(&self) -> Option<String>{
-        if let Some(date) = self.date(){
-            spec::invoice::number_str(self.yaml())
-                .map(|num| format!("{1}{0}", date.format("%Y%m%d").to_string(),num))
-                .or_else(||Some(date.format("zzz%Y%m%d").to_string()))
-        } else {
-            None
+        let prefix = spec::invoice::number_long_str(self.yaml()).unwrap_or_else(||String::from("zzzz"));
+        match (spec::date::invoice(&self.yaml), self.date()) {
+            (Some(date), _) |
+            (None, Some(date)) => {
+                Some(format!("{0}{1}", prefix, date.format("%Y%m%d").to_string()))
+            },
+            (None, None) => None,
         }
     }
 
