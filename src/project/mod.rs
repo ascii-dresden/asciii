@@ -259,7 +259,7 @@ impl Project {
 
     /// TODO move to `IsProjectExt`
     pub fn age(&self) -> Option<i64> {
-        self.modified_date().map(|date| (Local::today() - date).num_days() )
+        self.modified_date().map(|date| (UTC::today() - date).num_days() )
     }
 
     pub fn to_csv(&self, bill_type:&BillType) -> Result<String>{
@@ -362,78 +362,85 @@ impl Project {
         //return if self.canceled();
         let mut cal = Calendar::new();
 
+        let event   = self.event_date();
+        let invoice = self.invoice().date();
+        let payed   = self.payed_date();
+        let wages   = self.hours().wages_date();
+        let today   = UTC::today();
 
-        if let Some(event_date) = self.event_date() {
-            let days_since_event = (Local::today() - event_date).num_days();
-            // the event is over, please make an invoice
+        let days_since = |date:Date<UTC>| (today - date).num_days();
 
-            if let Some(invoice_date) = self.invoice().date() {
-                let days_since_invoice = (Local::today() - invoice_date).num_days();
-                // the invoice is done, please remind your client to pay
+        if let Some(event) = event {
+            match (invoice, payed, wages) {
 
-                if let Some(payed_date) = self.payed_date() {
-                    let days_since_payed = (Local::today() - payed_date).num_days();
+                // we need to issue an invoice invoice
+                (None, None, _) if today >= event => { cal.push(self.task_issue_invoice(event)); },
+                (None, None, _) if today < event => { /* no need to worry yet */ },
 
-                    if let Some(wages_date) = self.hours().wages_date() {
-                        let days_since_wages = (Local::today() - wages_date).num_days();
-                        if days_since_wages > 7 {
-                            cal.push(Todo::new()
-                                     .summary( &format!("Archiviere {}", self.name().unwrap()))
-                                     .description( &format!("{:?} ist seit {} Tagen abgeschlossen. Weg damit!", self.name().unwrap(), days_since_wages))
-                                     .done());
-                        }
+                // they haven't payed us yet
+                (Some(invoice), None, _) if days_since(invoice) >= 14 => { cal.push(self.task_follow_up(invoice)); },
+                (Some(invoice), None, _) if days_since(invoice) < 14 => { /* they have 14 days before we complain */ },
 
-                    } else { // we need to pay the employees
-                        let due_at = payed_date + Duration::days(7);
-                        cal.push(Todo::new().summary("Hungry employees!")
-                                            .description( &format!("Pay {}\nYou have had the money for {} days!", self.employees_string(), days_since_payed))
-                                            .due(due_at.and_hms(11, 10, 0))
-                                            .done());
-                    }
+                // we need to pay the employees
+                (Some(_),Some(payed),None) => { cal.push(self.task_pay_employees(payed)); },
 
-                } else { // they haven't payed us yet
-                    if days_since_invoice > 21 {
-                        let mut follow_up = Todo::new();
-                        follow_up.summary( &format!("Nachfragen: \"{event}\"!", event = self.name().unwrap()));
-                        follow_up.description( &format!(
-"{inum }{event:?} wurde am {invoice_date} (vor {days} Tagen) in Rechnung gestellt, aber noch nicht als bezahlt markiert.
-Bitte erkundige kontrolliere den Zahlungseingang und erkundige dich ggf bei {client} ({mail}).",
-                                                    event = self.name().unwrap(),
-                                                    days = days_since_invoice,
-                                                    inum = self.invoice().number_str().unwrap_or_else(String::new),
-                                                    invoice_date = invoice_date.format("%d.%m.%Y").to_string(),
-                                                    client = self.client().full_name().unwrap_or_else(String::new),
-                                                    mail = self.client().email().unwrap_or(""),
-                                                    ));
-                        follow_up.priority(3);
-                        if days_since_invoice > 35 {
-                            follow_up.summary( &format!("5 Wochen Verzug: \"{event}\"!", event = self.name().unwrap()));
-                            follow_up.priority(6); }
-                        if days_since_invoice > 42 {
-                            follow_up.summary( &format!("6 Wochen Verzug: \"{event}\"", event = self.name().unwrap()));
-                            follow_up.priority(8); }
-                        if days_since_invoice > 49 {
-                            follow_up.summary( &format!("7 Wochen Verzug: \"{event}\"", event = self.name().unwrap()));
-                            follow_up.priority(10);
-                        }
-                        cal.push(follow_up);
-                    }
-                }
-
-            } else { // we need to write an invoice invoice
-                if !self.is_payed() && days_since_event > 0 {
-                    let due_at = event_date + Duration::days(14);
-                    cal.push(Todo::new().summary("Rechnung erstellen")
-                                        .due(due_at.and_hms(11, 10, 0))
-                                        .priority(6)
-                                        .done());
-                }
+                // everything's all set to close this
+                (Some(_),Some(_),Some(wages)) if days_since(wages) > 7 => { cal.push(self.task_close_project(wages)); },
+                _ => {warn!("weird task edgecase in {:?}:\n{:?}", self.file(), (event, invoice, payed, wages) )}
             }
-
         }
         cal
     }
 
+    fn task_issue_invoice(&self, event_date: Date<UTC>) -> Todo {
+        Todo::new().summary("Rechnung erstellen")
+                   .due((event_date + Duration::days(14)).and_hms(11, 10, 0))
+                   .priority(6)
+                   .done()
+    }
+
+    fn task_pay_employees(&self, payed_date: Date<UTC>) -> Todo {
+        let days_since_payed = (UTC::today() - payed_date).num_days();
+        Todo::new().summary(&format!("{}: Hungry employees!", self.invoice().number_str().unwrap_or_else(String::new)))
+            .description( &format!("Pay {}\nYou have had the money for {} days!",
+                                   self.employees_string(),
+                                   days_since_payed))
+            .due((payed_date + Duration::days(14)).and_hms(11, 10, 0))
+            .done()
+    }
+
+    fn task_follow_up(&self, invoice_date: Date<UTC>) -> Todo {
+        let days_since_invoice = (UTC::today() - invoice_date).num_days();
+        let mut follow_up = Todo::new();
+        follow_up.summary( &format!("Nachfragen: \"{event}\"!", event = self.name().unwrap()));
+        follow_up.description(&format!("{inum }{event:?} wurde am {invoice_date} (vor {days} Tagen) in Rechnung gestellt, aber noch nicht als bezahlt markiert.\nBitte kontrolliere den Zahlungseingang und erkundige dich ggf. bei {client} ({mail}).",
+                                       event = self.name().unwrap(),
+                                       days = days_since_invoice,
+                                       inum = self.invoice().number_str().unwrap_or_else(String::new),
+                                       invoice_date = invoice_date.format("%d.%m.%Y").to_string(),
+                                       client = self.client().full_name().unwrap_or_else(String::new),
+                                       mail = self.client().email().unwrap_or(""),
+                                       ));
+        follow_up.priority(3);
+        if days_since_invoice > 14 {
+            follow_up.summary( &format!("{rnum}: Zahlungsverzug {weeks} Wochen: \"{event}\"",
+                                        rnum = self.invoice().number_str().unwrap_or_else(String::new),
+                                        weeks = days_since_invoice / 7,
+                                        event = self.name().unwrap()),
+                             );
+            follow_up.priority(10);
+        }
+        follow_up
+    }
+
+    fn task_close_project(&self, wages_date: Date<UTC>) -> Todo {
+            let days_since_wages = (UTC::today() - wages_date).num_days();
+            Todo::new().summary( &format!("Archiviere {}", self.name().unwrap()))
+                       .description( &format!("{:?} ist seit {} Tagen abgeschlossen. Weg damit!",
+                                              self.name().unwrap(),
+                                              days_since_wages))
+                       .done()
+    }
 
 }
 
@@ -512,8 +519,8 @@ impl Storable for Project {
     fn from_template(project_name:&str,template:&Path, fill: &HashMap<&str,String>) -> StorageResult<Project> {
         let template_name = template.file_stem().unwrap().to_str().unwrap();
 
-        let event_date = (Local::today() + Duration::days(14)).format("%d.%m.%Y").to_string();
-        let created_date = Local::today().format("%d.%m.%Y").to_string();
+        let event_date = (UTC::today() + Duration::days(14)).format("%d.%m.%Y").to_string();
+        let created_date = UTC::today().format("%d.%m.%Y").to_string();
 
         // fill template with these values
         let default_fill = hashmap!{
