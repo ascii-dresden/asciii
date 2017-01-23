@@ -9,7 +9,7 @@ fn main() {
 
     let dir = StorageDir::All;
 
-    match actions::calendar(dir) {
+    match actions::calendar(dir, true) {
         Ok(cal) => println!("{}", cal),
         Err(er) => println!("{}", er.description())
     }
