@@ -4,7 +4,9 @@ set -ex
 
 # TODO This is the "test phase", tweak it as you see fit
 main() {
-    ./build.sh
+    
+    ci/most_recent_commit.sh
+
     # cross build --target $TARGET
     cross build --target $TARGET --release
 
