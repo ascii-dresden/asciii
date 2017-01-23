@@ -8,8 +8,6 @@ main() {
 
     case $TRAVIS_OS_NAME in
         linux)
-            sudo apt-get update -qq
-            sudo apt-get install --only-upgrade -y cmake
             stage=$(mktemp -d)
             ;;
         osx)
@@ -20,10 +18,10 @@ main() {
     test -f Cargo.lock || cargo generate-lockfile
 
     # TODO Update this to build the artifacts that matter to you
-    cross rustc --bin hello --target $TARGET --release -- -C lto
+    cross rustc --bin asciii --target $TARGET --release -- -C lto
 
     # TODO Update this to package the right artifacts
-    cp target/$TARGET/release/hello $stage/
+    cp target/$TARGET/release/asciii $stage/
 
     cd $stage
     tar czf $src/$CRATE_NAME-$TRAVIS_TAG-$TARGET.tar.gz *
