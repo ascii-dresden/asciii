@@ -39,6 +39,10 @@ matrix:
     - env: TARGET=x86_64-unknown-freebsd DISABLE_TESTS=1
     - env: TARGET=x86_64-unknown-netbsd DISABLE_TESTS=1
 
+    # Windows
+    - env: TARGET=i686-pc-windows-gnu DISABLE_TESTS=1
+    - env: TARGET=x86_64-pc-windows-gnu DISABLE_TESTS=1
+
     # Other architectures
     - env: TARGET=aarch64-unknown-linux-gnu
     - env: TARGET=armv7-unknown-linux-gnueabihf
