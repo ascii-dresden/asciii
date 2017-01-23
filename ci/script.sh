@@ -6,6 +6,7 @@ export RUST_BACKTRACE=1
 
 # TODO This is the "test phase", tweak it as you see fit
 main() {
+    ./build.sh
     cross build --target $TARGET
     cross build --target $TARGET --release
 
