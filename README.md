@@ -45,3 +45,7 @@ To enable logging you have to set `ASCIII_LOG=debug`.
 Besides `debug`, you can also use `trace`, `warn` or `error`.
 You can enable logging per-module logging like this: `ASCIII_LOG=storage=debug`.
 Modules are all top-level files and folders in `src/`.
+
+## CI/CD
+
+### Travis-CI [![Build Status](https://travis-ci.org/ascii-dresden/asciii.svg?branch=master)](https://travis-ci.org/ascii-dresden/asciii)
