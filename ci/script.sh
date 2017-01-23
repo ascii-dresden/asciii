@@ -2,6 +2,8 @@
 
 set -ex
 
+export RUST_BACKTRACE=1
+
 # TODO This is the "test phase", tweak it as you see fit
 main() {
     cross build --target $TARGET
