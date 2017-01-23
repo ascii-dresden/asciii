@@ -4,6 +4,7 @@ target
 *.yml
 *.sh
 !ci/*
+!build.sh
 tests/caterings
 .directory
 *.dot
