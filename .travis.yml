@@ -156,6 +156,8 @@ matrix:
 
 before_install:
   - export PATH="$PATH:$HOME/.cargo/bin"
+  - apt-get update -qq
+  - apt-get install -y --only-upgrade cmake
 
 install:
   - bash ci/install.sh
