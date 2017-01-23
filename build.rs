@@ -22,7 +22,7 @@ fn execute_git(command:&str, args:&[&str]) -> Output{
         .arg(command)
         .args(args)
         .output()
-        .unwrap_or_else(|_| { panic!("git_failed") })
+        .unwrap_or_else(|e| { panic!("git_failed {}", e) })
 }
 
 use std::fs::File;
