@@ -74,11 +74,19 @@ lazy_static!{
     /// Static `ConfigReader` to be able to access the configuration from everywhere.
     pub static ref CONFIG: config::ConfigReader = config::ConfigReader::new().unwrap();
 
-    /// Human readable, no semantic versioning.
-    pub static ref VERSION: String = format!("{} - {}", env!("CARGO_PKG_VERSION"), include_str!("../.most_recent_commit"));
-
     /// Hint for app to point at `asciii::DOCUMENTATION_URL`
     pub static ref DOCHINT: String = format!("Documentation at: {}", DOCUMENTATION_URL);
+}
+#[cfg(not(feature="version_string"))]
+lazy_static!{
+    /// Human readable, no semantic versioning.
+    pub static ref VERSION: &'static str = env!("CARGO_PKG_VERSION");
+}
+
+#[cfg(feature="version_string")]
+lazy_static!{
+    /// Human readable, no semantic versioning.
+    pub static ref VERSION: String = format!("{} - {}", env!("CARGO_PKG_VERSION"), include_str!("../.most_recent_commit"));
 }
 
 #[derive(Debug)]
