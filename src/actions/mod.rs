@@ -321,13 +321,13 @@ pub fn unarchive_projects(year:i32, search_terms:&[&str]) -> Result<Vec<PathBuf>
 pub fn calendar(dir: StorageDir, show_tasks:bool) -> Result<String> {
     let luigi = setup_luigi()?;
     let mut cal = Calendar::new();
-    for project in luigi.open_projects(StorageDir::Working)?  {
-        cal.append(&mut project.to_tasks())
-    }
     if show_tasks {
-        for project in luigi.open_projects(dir)?{
-            cal.append(&mut project.to_ical())
+        for project in luigi.open_projects(StorageDir::Working)?  {
+            cal.append(&mut project.to_tasks())
         }
+    }
+    for project in luigi.open_projects(dir)?{
+        cal.append(&mut project.to_ical())
     }
     Ok(cal.to_string())
 }
