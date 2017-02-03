@@ -42,8 +42,8 @@ pub mod spec;
 pub mod error;
 mod computed_field;
 
-#[cfg(feature="document_export")]
-mod tojson;
+#[cfg(feature="json")]
+pub mod tojson;
 
 //#[cfg(test)] mod tests;
 
@@ -374,18 +374,18 @@ impl Project {
             match (invoice, payed, wages) {
 
                 // we need to issue an invoice invoice
-                (None, None, _) if today >= event => { cal.push(self.task_issue_invoice(event)); },
-                (None, None, _) if today < event => { /* no need to worry yet */ },
+                (None,          None,          _) if today >= event => { cal.push(self.task_issue_invoice(event)); },
+                (None,          None,          _) if today < event => { /* no need to worry yet */ },
 
                 // they haven't payed us yet
-                (Some(invoice), None, _) if days_since(invoice) >= 14 => { cal.push(self.task_follow_up(invoice)); },
-                (Some(invoice), None, _) if days_since(invoice) < 14 => { /* they have 14 days before we complain */ },
+                (Some(invoice), None,          _) if days_since(invoice) >= 14 => { cal.push(self.task_follow_up(invoice)); },
+                (Some(invoice), None,          _) if days_since(invoice) < 14 => { /* they have 14 days before we complain */ },
 
                 // we need to pay the employees
-                (Some(_),Some(payed),None) => { cal.push(self.task_pay_employees(payed)); },
+                (Some(_),       Some(payed),   None) => { cal.push(self.task_pay_employees(payed)); },
 
                 // everything's all set to close this
-                (Some(_),Some(_),Some(wages)) if days_since(wages) > 7 => { cal.push(self.task_close_project(wages)); },
+                (Some(_),       Some(_),       Some(wages)) if days_since(wages) > 7 => { cal.push(self.task_close_project(wages)); },
                 _ => {warn!("weird task edgecase in {:?}:\n{:?}", self.file(), (event, invoice, payed, wages) )}
             }
         }
@@ -489,6 +489,8 @@ impl Redeemable for Project {
         let raw_products =
             self.get_hash("products")
                 .ok_or(product_error::Error::from(product_error::ErrorKind::UnknownFormat))?;
+
+        // let document_tax =  // TODO activate this once the tax no longer 19%
 
         for (desc,values) in raw_products {
             let (offer_item, invoice_item) = self.item_from_desc_and_value(desc, values)?;
