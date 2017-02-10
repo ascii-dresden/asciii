@@ -105,22 +105,22 @@ impl Project {
     }
 
     /// Returns the struct `Client`, which abstracts away client specific stuff.
-    pub fn client<'a>(&'a self) -> Client<'a> {
+    pub fn client(&self) -> Client {
         Client { inner: self }
     }
 
     /// Returns the struct `Offer`, which abstracts away offer specific stuff.
-    pub fn offer<'a>(&'a self) -> Offer<'a> {
+    pub fn offer(&self) -> Offer {
         Offer { inner: self }
     }
 
     /// Returns the struct `Invoice`, which abstracts away invoice specific stuff.
-    pub fn invoice<'a>(&'a self) -> Invoice<'a> {
+    pub fn invoice(&self) -> Invoice {
         Invoice { inner: self }
     }
 
     /// Returns the struct `Invoice`, which abstracts away invoice specific stuff.
-    pub fn hours<'a>(&'a self) -> Hours<'a> {
+    pub fn hours(&self) -> Hours {
         Hours { inner: self }
     }
 
@@ -488,7 +488,7 @@ impl Redeemable for Project {
 
         let raw_products =
             self.get_hash("products")
-                .ok_or(product_error::Error::from(product_error::ErrorKind::UnknownFormat))?;
+                .ok_or_else(||product_error::Error::from(product_error::ErrorKind::UnknownFormat))?;
 
         // let document_tax =  // TODO activate this once the tax no longer 19%
 
@@ -700,7 +700,7 @@ impl fmt::Debug for Project {
 
 
 
-/// This is returned by [Product::client()](struct.Project.html#method.client).
+/// This is returned by `[Product::client()](struct.Project.html#method.client)`.
 pub struct Client<'a> {
     inner: &'a Project
 }
@@ -739,7 +739,7 @@ impl<'a> Validatable for Client<'a> {
 
 
 
-/// This is returned by [Product::offer()](struct.Project.html#method.offer).
+/// This is returned by [`Product::offer()`](struct.Project.html#method.offer).
 pub struct Offer<'a> {
     inner: &'a Project
 }
@@ -776,7 +776,7 @@ impl<'a> Validatable for Offer<'a> {
 
 
 
-/// This is returned by [Product::invoice()](struct.Project.html#method.invoice).
+/// This is returned by [`Product::invoice()`](struct.Project.html#method.invoice).
 pub struct Invoice<'a> {
     inner: &'a Project
 }
@@ -810,7 +810,7 @@ impl<'a> Validatable for Invoice<'a> {
 
 
 
-/// This is returned by [Product::hours()](struct.Project.html#method.hours).
+/// This is returned by [`Product::hours()`](struct.Project.html#method.hours).
 pub struct Hours<'a> {
     inner: &'a Project
 }

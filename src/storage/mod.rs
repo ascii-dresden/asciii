@@ -262,7 +262,7 @@ impl<L:Storable> Storage<L> {
         self.list_template_files()?.iter()
             .filter(|f|f.file_stem().unwrap_or_else(||OsStr::new("")) == name)
             .cloned()
-            .nth(0).ok_or(ErrorKind::TemplateNotFound.into())
+            .nth(0).ok_or_else(||ErrorKind::TemplateNotFound.into())
     }
 
     /// Produces a list of paths to all archives in the `archive_dir`.
@@ -412,7 +412,7 @@ impl<L:Storable> Storage<L> {
             if force {warn!("you are using --force")};
             if project.is_ready_for_archive() || force {
                 info!("project {:?} is ready to be archived", project.short_desc());
-                let year = manual_year.or(project.year()).unwrap();
+                let year = manual_year.or_else(|| project.year()).unwrap();
                 info!("archiving {} ({})",  project.ident(), project.year().unwrap());
                 let mut archive_target = self.archive_project(&project, year)?;
                 moved_files.push(project.dir());
@@ -555,7 +555,7 @@ impl<L:Storable> Storage<L> {
         list_path_content(directory)?.iter()
             .filter(|f|f.extension().unwrap_or_else(||OsStr::new("")) == L::file_extension())
             .nth(0).map(ToOwned::to_owned)
-            .ok_or(ErrorKind::ProjectDoesNotExist.into())
+            .ok_or_else(|| ErrorKind::ProjectDoesNotExist.into())
     }
 
     fn get_project_name(&self, directory:&Path) -> StorageResult<String> {
@@ -569,7 +569,7 @@ impl<L:Storable> Storage<L> {
     fn get_project_dir_from_archive(&self, name:&str, year:Year) -> StorageResult<PathBuf> {
         for project_file in &self.list_project_files(StorageDir::Archive(year))?{
             if project_file.ends_with(slugify(name) + "."+ L::file_extension()) {
-                return project_file.parent().map(|p|p.to_owned()).ok_or(ErrorKind::ProjectDoesNotExist.into());
+                return project_file.parent().map(|p|p.to_owned()).ok_or_else (|| ErrorKind::ProjectDoesNotExist.into());
             }
         }
         Err(ErrorKind::ProjectDoesNotExist.into())

@@ -12,9 +12,9 @@ extern crate icalendar;
 #[cfg(feature="document_export")] extern crate rustc_serialize;
 
 extern crate env_logger;
+extern crate prettytable;
 #[macro_use] extern crate log;
 #[macro_use] extern crate clap;
-#[macro_use] extern crate prettytable;
 
 extern crate asciii;
 

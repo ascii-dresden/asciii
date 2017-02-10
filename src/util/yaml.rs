@@ -131,7 +131,7 @@ pub fn get_bool(yaml:&Yaml, key:&str) -> Option<bool> {
         .and_then(|y| y
                   .as_bool()
                   // allowing it to be a str: "yes" or "no"
-                  .or( y.as_str()
+                  .or_else(|| y.as_str()
                        .map( |yes_or_no|
                              match yes_or_no.to_lowercase().as_ref() // XXX ??? why as_ref?
                              {
@@ -146,7 +146,7 @@ pub fn get_bool(yaml:&Yaml, key:&str) -> Option<bool> {
 ///
 /// Also takes a `Yaml::I64` and reinterprets it.
 pub fn get_f64(yaml:&Yaml, key:&str) -> Option<f64> {
-    get(yaml,key).and_then(|y| y.as_f64().or( y.as_i64().map(|y|y as f64)))
+    get(yaml,key).and_then(|y| y.as_f64().or_else(|| y.as_i64().map(|y|y as f64)))
 }
 
 /// Gets an `Int` value.

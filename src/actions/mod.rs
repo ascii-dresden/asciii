@@ -81,7 +81,7 @@ pub fn with_projects<F>(dir:StorageDir, search_terms:&[&str], f:F) -> Result<()>
 pub fn csv(year:i32) -> Result<String> {
     let luigi = setup_luigi()?;
     let mut projects = luigi.open_projects(StorageDir::Year(year))?;
-    projects.sort_by(|pa,pb| pa.index().unwrap_or_else(||"zzzz".to_owned()).cmp( &pb.index().unwrap_or("zzzz".to_owned())));
+    projects.sort_by(|pa,pb| pa.index().unwrap_or_else(||"zzzz".to_owned()).cmp( &pb.index().unwrap_or_else(||"zzzz".to_owned())));
     projects_to_csv(&projects)
 }
 

@@ -54,7 +54,7 @@ fn parse_dmy_date_range(date_str:&str) -> Option<Date<UTC>>{
 pub trait ProvidesData {
     /// You only need to implement this.
     //fn data(&self) -> impl PathAccessible {
-    fn data<'a>(&'a self) -> &'a Yaml;
+    fn data(&self) -> &Yaml;
 
     /// Wrapper around `get_path()`.
     ///
@@ -154,7 +154,7 @@ pub trait ProvidesData {
             .and_then(|y| y
                       .as_bool()
                       // allowing it to be a str: "yes" or "no"
-                      .or( y.as_str()
+                      .or_else(|| y.as_str()
                            .map( |yes_or_no|
                                  match yes_or_no.to_lowercase().as_ref() {
                                      "yes" => true,
@@ -185,7 +185,7 @@ pub trait ProvidesData {
     ///
     /// Also takes a `Yaml::I64` and reinterprets it.
     fn get_f64(&self, path:&str) -> Option<f64> {
-        self.get(path).and_then(|y| y.as_f64().or( y.as_i64().map(|y|y as f64)))
+        self.get(path).and_then(|y| y.as_f64().or_else(|| y.as_i64().map(|y|y as f64)))
     }
 }
 
@@ -197,7 +197,7 @@ pub trait Validatable {
         self.validate().is_ok()
     }
 
-    fn errors<'a>(&'a self) -> Option<ErrorList>{
+    fn errors(&self) -> Option<ErrorList>{
         self.validate().err()
     }
 }
@@ -458,7 +458,7 @@ pub trait HasEmployees: ProvidesData {
     /// List of employees and ther respective service hours
     fn employees(&self) -> Option<Vec<(String, f64)>> {
         self.get_hash("hours.caterers")
-            .or(self.get_hash("hours.employees"))
+            .or_else(||self.get_hash("hours.employees"))
             .and_then(|h| {
                 h.iter()
                     .map(|(c, h)| {
@@ -512,7 +512,7 @@ pub trait Redeemable: IsProject {
         let get_f64 = |yaml, path|
             self.get_direct(yaml,path)
                 .and_then(|y| y.as_f64()
-                               .or( y.as_i64()
+                               .or_else(|| y.as_i64()
                                      .map(|y|y as f64)
                                   )
                          );
@@ -520,7 +520,7 @@ pub trait Redeemable: IsProject {
         let product = Product::from_desc_and_value(desc, values)?;
 
         let offered = get_f64(values, "amount")
-                           .ok_or(Error::from(ErrorKind::MissingAmount(product.name.to_owned())))?;
+                           .ok_or_else(|| Error::from(ErrorKind::MissingAmount(product.name.to_owned())))?;
         let sold = get_f64(values, "sold");
         let sold = if let Some(returned) = get_f64(values, "returned") {
             // if "returned", there must be no "sold"
