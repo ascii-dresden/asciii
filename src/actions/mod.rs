@@ -90,7 +90,21 @@ pub fn csv(year:i32) -> Result<String> {
 pub fn projects_to_csv(projects:&[Project]) -> Result<String>{
     let mut string = String::new();
     let splitter = ";";
-    writeln!(&mut string, "{}", [ "Rnum", "Bezeichnung", "Datum", "Rechnungsdatum", "Betreuer", "Verantwortlich", "Bezahlt am", "Betrag", "Canceled"].join(splitter))?;
+
+    writeln!(&mut string, "{}",
+             [
+             lformat!("INum"), // Rnum
+             lformat!("Designation"), //Bezeichnung
+             lformat!("Date"), // Datum
+             lformat!("InvoiceDate"), // Rechnungsdatum
+             lformat!("Caterer"), // Betreuer
+             lformat!("Responsible"), //Verantwortlich
+             lformat!("Payed on"), // Bezahlt am
+             lformat!("Amount"), // Betrag
+             lformat!("Canceled") //Canceled
+             ]
+             .join(splitter))?;
+
     for project in projects{
         writeln!(&mut string, "{}", [
                  project.get("InvoiceNumber")                     .unwrap_or_else(|| String::from(r#""""#)),

@@ -7,7 +7,7 @@ use rustyline::Result as LineResult;
 
 use std::collections::BTreeSet;
 use clap::App;
-use super::app::build_cli;
+use super::app::with_cli;
 
 static ESCAPE_CHAR: Option<char> = Some('\\');
 
@@ -16,7 +16,7 @@ struct ClapCompleter{
 }
 
 impl ClapCompleter {
-    pub fn from_app(app:&App<'static,'static>) -> Self {
+    pub fn from_app(app:&App) -> Self {
         ClapCompleter {
             commands:
                 app.p.subcommands.iter()
@@ -45,7 +45,8 @@ impl Completer for ClapCompleter {
 
 pub fn launch_shell() {
 
-    let mut app = build_cli();
+    with_cli( |mut app| {
+
 
     let config = LineConfig::builder()
         .history_ignore_space(true)
@@ -105,4 +106,5 @@ pub fn launch_shell() {
         }
     }
     //rl.save_history("history.txt").unwrap();
+    });
 }

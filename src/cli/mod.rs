@@ -20,7 +20,7 @@ pub mod subcommands;
 #[cfg(feature="shell")]
 pub mod shell;
 
-pub use self::app::build_cli;
+pub use self::app::with_cli;
 pub use self::app::match_matches;
 
 /// prints a message and exist with code 1
