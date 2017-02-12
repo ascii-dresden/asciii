@@ -2,8 +2,30 @@ use asciii;
 use clap::{App, AppSettings, Arg, ArgMatches, SubCommand};
 use super::subcommands;
 
-pub fn build_cli() -> App<'static, 'static> {
-    App::new("asciii")
+use std::collections::HashMap;
+
+pub struct AppBox<'a,'b>  where 'a:'b{
+    pub app: App<'a,'b>,
+    about: HashMap<&'static str, String>,
+    help: HashMap<&'static str, String>
+}
+
+//use std::ops::Deref;
+//impl<'a, 'b> Deref for AppBox<'a,'b> where 'a:'b{
+//    type Target = App<'a,'b>;
+//    fn deref(&self) -> &App<'a,'b> {
+//        &self.app
+//    }
+//}
+
+pub fn build_cli<'a,'b>() -> AppBox<'a,'b> {
+    let about = hashmap!{
+        "app_doc_about" => lformat!("Opens the online documentation, please read it")
+    };
+    let help  = hashmap!{
+    };
+
+    let app = App::new("asciii")
         .author(crate_authors!())
         .version(asciii::VERSION.as_ref())
         .about("The ascii invoicer III")
@@ -11,7 +33,7 @@ pub fn build_cli() -> App<'static, 'static> {
         .after_help(asciii::DOCUMENTATION_URL)
 
         .subcommand(SubCommand::with_name("doc")
-            .about("Opens the online documentation, please read it")
+            .about(about["app_doc_about"].as_ref())
         )
 
         .subcommand(SubCommand::with_name("version")
@@ -103,7 +125,7 @@ pub fn build_cli() -> App<'static, 'static> {
                          .multiple(true)
                         )
                     .arg(Arg::with_name("filter")
-                         .help("List of fields to print for each project listed")
+                         .help("Filter selection by field content")
                          .short("f")
                          .long("filter")
                          .takes_value(true)
@@ -126,7 +148,7 @@ pub fn build_cli() -> App<'static, 'static> {
                          .conflicts_with("color")
                         )
                     .arg(Arg::with_name("simple")
-                         .help("Use simple list")
+                         .help("Show non-verbose list")
                          .long("simple")
                         )
                     .arg(Arg::with_name("csv")
@@ -143,7 +165,7 @@ pub fn build_cli() -> App<'static, 'static> {
                          .conflicts_with("csv")
                         )
                     .arg(Arg::with_name("sort")
-                         .help("sort by")
+                         .help("Sort by :")
                          .long("sort")
                          .short("s")
                          .possible_values(&["date",  "index",  "name",  "manager"])
@@ -245,7 +267,7 @@ pub fn build_cli() -> App<'static, 'static> {
         .subcommand(SubCommand::with_name("path")
                     .about("Show storage path")
                     .arg(Arg::with_name("templates")
-                         .help("Open path to templates instead")
+                         .help("Shows templates path instead")
                          .long("templates")
                          .short("t")
                          .conflicts_with("output")
@@ -254,7 +276,7 @@ pub fn build_cli() -> App<'static, 'static> {
                          .conflicts_with("search_term")
                         )
                     .arg(Arg::with_name("output")
-                         .help("Open path to created documents instead")
+                         .help("Shows path to created documents instead")
                          .long("output")
                          .short("o")
                          .conflicts_with("templates")
@@ -275,32 +297,6 @@ pub fn build_cli() -> App<'static, 'static> {
 
         .subcommand(SubCommand::with_name("open")
                     .about("Open storage path")
-//                    .arg(Arg::with_name("search_term")
-//                         .help("Search term, possibly event name")
-//                         .multiple(true)
-//                        )
-//
-//                    .arg(Arg::with_name("archive")
-//                         .help("Pick an archived project")
-//                         .short("a")
-//                         .long("archive")
-//                    .min_values(0)
-//                         .takes_value(true)
-//                        )
-//
-//                    .arg(Arg::with_name("invoice")
-//                         .help("Open values resulting invoice file. Makes it if necessary")
-//                         .long("invoice")
-//                         .short("i")
-//                        )
-//
-//                    .arg(Arg::with_name("offer")
-//                         .help("Open values resulting offer file. Makes it if necessary")
-//                         .long("offer")
-//                         .short("o")
-//                        )
-//
-//
                     .arg(Arg::with_name("templates")
                          .help("Open path to templates instead")
                          .long("templates")
@@ -363,7 +359,7 @@ pub fn build_cli() -> App<'static, 'static> {
 
         .subcommand(SubCommand::with_name("set")
                     .aliases(&["ed"])
-                    .about("Set a value in a project")
+                    .about("Set a value in a project file")
                     .arg(Arg::with_name("search_term")
                          .help("Search term, possibly event name")
                          .required(true)
@@ -408,9 +404,9 @@ pub fn build_cli() -> App<'static, 'static> {
                          .long("ical")
                          .short("C"))
 
-                    .arg(Arg::with_name("dump")
-                         .help("Dump project yaml")
-                         .long("dump"))
+                    .arg(Arg::with_name("yaml")
+                         .help("Show project as yaml")
+                         .long("yaml"))
 
                     .arg(Arg::with_name("detail")
                          .help("Shows a particular detail")
@@ -428,7 +424,7 @@ pub fn build_cli() -> App<'static, 'static> {
                         )
 
                     .arg(Arg::with_name("empty fields")
-                         .help("shows fields that can still be filled")
+                         .help("Shows fields that can be filled automatically")
                          .long("empty_fields")
                          .short("f")
                         )
@@ -440,7 +436,7 @@ pub fn build_cli() -> App<'static, 'static> {
                         )
 
                     .arg(Arg::with_name("template")
-                         .help("Show show fields in templates that are filled")
+                         .help("Show fields in templates that are filled")
                          .long("template")
                          .short("t")
                         )
@@ -462,10 +458,10 @@ pub fn build_cli() -> App<'static, 'static> {
                          .short("o")
                         )
 
-                    .arg(Arg::with_name("hours") //# what used to be --caterers
-                         .help("Display hours")
-                         .long("hours")
-                        )
+                    //.arg(Arg::with_name("hours") //# what used to be --caterers
+                    //     .help("Display hours")
+                    //     .long("hours")
+                    //    )
 
                     .arg(Arg::with_name("csv")
                          .help("Show as csv")
@@ -473,11 +469,11 @@ pub fn build_cli() -> App<'static, 'static> {
                          .short("c")
                         )
 
-                    .arg(Arg::with_name("markdown")
-                         .help("Show as markdown")
-                         .long("markdown")
-                         .short("m")
-                        )
+                    //.arg(Arg::with_name("markdown")
+                    //     .help("Show as markdown")
+                    //     .long("markdown")
+                    //     .short("m")
+                    //    )
                 )
 
         .subcommand(SubCommand::with_name("calendar")
@@ -511,9 +507,9 @@ pub fn build_cli() -> App<'static, 'static> {
                          .long("all"))
                    )
 
-        .subcommand(SubCommand::with_name("spec")
-                    .about("runs full spec on all projects")
-                   )
+        //.subcommand(SubCommand::with_name("spec")
+        //            .about("runs full spec on all projects")
+        //           )
 
         .subcommand(SubCommand::with_name("make")
                     .about("Creates documents from projects")
@@ -748,6 +744,12 @@ pub fn build_cli() -> App<'static, 'static> {
                     .aliases(&["lg", "hist", "history"])
                     .about("Show commit logs")
                    )
+        ;
+    AppBox{
+        app: app,
+        about: about,
+        help: help
+    }
 }
 
 /// Starting point for handling commandline matches
@@ -800,7 +802,7 @@ pub mod validators {
     pub fn is_dmy(val: String) -> Result<(), String> {
         match parse_dmy_date(&val) {
             Some(_) => Ok(()),
-            None => Err(String::from("Date Format must be DD.MM.YYYY")),
+            None => Err(lformat!("Date Format must be DD.MM.YYYY")),
         }
     }
 }

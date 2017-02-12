@@ -7,14 +7,20 @@ extern crate term; // TODO consolidate term, ansi_term and terminal_size
 extern crate open;
 extern crate icalendar;
 
-#[cfg(feature="shell")] extern crate rustyline;
+#[cfg(feature="shell")]
+extern crate rustyline;
 
-#[cfg(feature="document_export")] extern crate rustc_serialize;
+#[cfg(feature="document_export")]
+extern crate rustc_serialize;
 
 extern crate env_logger;
 extern crate prettytable;
 #[macro_use] extern crate log;
 #[macro_use] extern crate clap;
+#[macro_use] extern crate maplit;
+
+extern crate crowbook_intl_runtime;
+#[macro_use] pub mod localize_macros;
 
 extern crate asciii;
 
@@ -22,9 +28,9 @@ use std::env;
 
 use log::{LogRecord, LogLevelFilter};
 use env_logger::LogBuilder;
+use crowbook_intl_runtime::set_lang;
 
 pub mod cli;
-use cli::match_matches;
 pub mod manual;
 
 fn setup_log(){
@@ -45,12 +51,19 @@ fn setup_log(){
     builder.init().unwrap();
 }
 
+fn setup_locale() {
+    if let Ok(env_lang) = env::var("LANG") {
+        if env_lang.starts_with("de") {
+            set_lang("de");
+        }
+    }
+}
+
 fn main(){
     setup_log();
+    setup_locale();
 
-    trace!("setting up app");
-    cli::with_app( |app| {
-        let matches = app.get_matches();
-        match_matches(&matches);
-    });
+    let matches = cli::build_cli().app.get_matches();
+    cli::match_matches(&matches);
+
 }

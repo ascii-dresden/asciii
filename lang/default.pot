@@ -1,0 +1,98 @@
+# SOME DESCRIPTIVE TITLE
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# LICENSE
+# AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+
+#: /home/hendrik/code/rust/asciii/src/actions/mod.rs:96
+msgid "INum"
+msgstr ""
+
+#: /home/hendrik/code/rust/asciii/src/actions/mod.rs:97
+msgid "Designation"
+msgstr ""
+
+#: /home/hendrik/code/rust/asciii/src/actions/mod.rs:98
+msgid "Date"
+msgstr ""
+
+#: /home/hendrik/code/rust/asciii/src/actions/mod.rs:99
+msgid "InvoiceDate"
+msgstr ""
+
+#: /home/hendrik/code/rust/asciii/src/actions/mod.rs:100
+msgid "Caterer"
+msgstr ""
+
+#: /home/hendrik/code/rust/asciii/src/actions/mod.rs:101
+msgid "Responsible"
+msgstr ""
+
+#: /home/hendrik/code/rust/asciii/src/actions/mod.rs:102
+msgid "Payed on"
+msgstr ""
+
+#: /home/hendrik/code/rust/asciii/src/actions/mod.rs:103
+msgid "Amount"
+msgstr ""
+
+#: /home/hendrik/code/rust/asciii/src/actions/mod.rs:104
+msgid "Canceled"
+msgstr ""
+
+#: /home/hendrik/code/rust/asciii/src/cli/app.rs:23
+msgid "Opens the online documentation, please read it"
+msgstr ""
+
+#: /home/hendrik/code/rust/asciii/src/cli/app.rs:805
+msgid "Date Format must be DD.MM.YYYY"
+msgstr ""
+
+#: /home/hendrik/code/rust/asciii/src/project/computed_field.rs:65
+msgid "{} days"
+msgstr ""
+
+#: /home/hendrik/code/rust/asciii/src/project/computed_field.rs:67 /home/hendrik/code/rust/asciii/src/project/computed_field.rs:68
+msgid "{} weeks"
+msgstr ""
+
+#: /home/hendrik/code/rust/asciii/src/project/mod.rs:397
+msgid "Create an Invoice"
+msgstr ""
+
+#: /home/hendrik/code/rust/asciii/src/project/mod.rs:405
+msgid "{}: Hungry employees!"
+msgstr ""
+
+#: /home/hendrik/code/rust/asciii/src/project/mod.rs:406
+msgid "Pay {}\nYou have had the money for {} days!"
+msgstr ""
+
+#: /home/hendrik/code/rust/asciii/src/project/mod.rs:416
+msgid "Inquire about: \"{event}\"!"
+msgstr ""
+
+#: /home/hendrik/code/rust/asciii/src/project/mod.rs:417
+msgid "{inum }{event:?} on {invoice_date} ({days} days ago) was already invoice but is still not marked as payed.\nBitte kontrolliere den Zahlungseingang und erkundige dich ggf. bei {client} ({mail})."
+msgstr ""
+
+#: /home/hendrik/code/rust/asciii/src/project/mod.rs:427
+msgid "{rnum}: Zahlungsverzug {weeks} Wochen: \"{event}\""
+msgstr ""
+
+#: /home/hendrik/code/rust/asciii/src/project/mod.rs:439
+msgid "Archiviere {}"
+msgstr ""
+
+#: /home/hendrik/code/rust/asciii/src/project/mod.rs:440
+msgid "{:?} ist seit {} Tagen abgeschlossen. Weg damit!"
+msgstr ""
+
+#: /home/hendrik/code/rust/asciii/src/project/mod.rs:460
+msgid "Responsible: {}"
+msgstr ""
+

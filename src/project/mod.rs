@@ -394,7 +394,7 @@ impl Project {
     }
 
     fn task_issue_invoice(&self, event_date: Date<UTC>) -> Todo {
-        Todo::new().summary("Rechnung erstellen")
+        Todo::new().summary(&lformat!("Create an Invoice"))
                    .due((event_date + Duration::days(14)).and_hms(11, 10, 0))
                    .priority(6)
                    .done()
@@ -402,8 +402,8 @@ impl Project {
 
     fn task_pay_employees(&self, payed_date: Date<UTC>) -> Todo {
         let days_since_payed = (UTC::today().signed_duration_since(payed_date)).num_days();
-        Todo::new().summary(&format!("{}: Hungry employees!", self.invoice().number_str().unwrap_or_else(String::new)))
-            .description( &format!("Pay {}\nYou have had the money for {} days!",
+        Todo::new().summary(&lformat!("{}: Hungry employees!", self.invoice().number_str().unwrap_or_else(String::new)))
+            .description( &lformat!("Pay {}\nYou have had the money for {} days!",
                                    self.employees_string(),
                                    days_since_payed))
             .due((payed_date + Duration::days(14)).and_hms(11, 10, 0))
@@ -413,8 +413,8 @@ impl Project {
     fn task_follow_up(&self, invoice_date: Date<UTC>) -> Todo {
         let days_since_invoice = (UTC::today().signed_duration_since(invoice_date)).num_days();
         let mut follow_up = Todo::new();
-        follow_up.summary( &format!("Nachfragen: \"{event}\"!", event = self.name().unwrap()));
-        follow_up.description(&format!("{inum }{event:?} wurde am {invoice_date} (vor {days} Tagen) in Rechnung gestellt, aber noch nicht als bezahlt markiert.\nBitte kontrolliere den Zahlungseingang und erkundige dich ggf. bei {client} ({mail}).",
+        follow_up.summary( &lformat!("Inquire about: \"{event}\"!", event = self.name().unwrap()));
+        follow_up.description(&lformat!("{inum }{event:?} on {invoice_date} ({days} days ago) was already invoice but is still not marked as payed.\nBitte kontrolliere den Zahlungseingang und erkundige dich ggf. bei {client} ({mail}).",
                                        event = self.name().unwrap(),
                                        days = days_since_invoice,
                                        inum = self.invoice().number_str().unwrap_or_else(String::new),
@@ -424,7 +424,7 @@ impl Project {
                                        ));
         follow_up.priority(3);
         if days_since_invoice > 14 {
-            follow_up.summary( &format!("{rnum}: Zahlungsverzug {weeks} Wochen: \"{event}\"",
+            follow_up.summary( &lformat!("{rnum}: Zahlungsverzug {weeks} Wochen: \"{event}\"",
                                         rnum = self.invoice().number_str().unwrap_or_else(String::new),
                                         weeks = days_since_invoice / 7,
                                         event = self.name().unwrap()),
@@ -436,8 +436,8 @@ impl Project {
 
     fn task_close_project(&self, wages_date: Date<UTC>) -> Todo {
             let days_since_wages = (UTC::today().signed_duration_since(wages_date)).num_days();
-            Todo::new().summary( &format!("Archiviere {}", self.name().unwrap()))
-                       .description( &format!("{:?} ist seit {} Tagen abgeschlossen. Weg damit!",
+            Todo::new().summary( &lformat!("Archiviere {}", self.name().unwrap()))
+                       .description( &lformat!("{:?} ist seit {} Tagen abgeschlossen. Weg damit!",
                                               self.name().unwrap(),
                                               days_since_wages))
                        .done()
@@ -457,7 +457,7 @@ impl IsProject for Project {
         let mut out_string = String::new();
 
         if let Some(responsible) = self.responsible() {
-            writeln!(out_string, "Responsible: {}", responsible).unwrap();
+            out_string += &lformat!("Responsible: {}", responsible);
         }
 
         if let Some(employees) = self.hours().employees_string() {
@@ -532,9 +532,9 @@ impl Storable for Project {
             "DATE-EVENT"    => event_date,
             "DATE-CREATED"  => created_date,
             "TAX"           => ::CONFIG.get_to_string("defaults/tax")
-                .expect("Faulty config: field defaults/tax does not contain a value"),
+                                       .expect("Faulty config: field defaults/tax does not contain a value"),
             "SALARY"        => ::CONFIG.get_to_string("defaults/salary")
-                .expect("Faulty config: field defaults/salary does not contain a value"),
+                                       .expect("Faulty config: field defaults/salary does not contain a value"),
             "MANAGER"       => ::CONFIG.get_str("user/name").unwrap_or("").to_string(),
             "TIME-START"    => String::new(),
             "TIME-END"      => String::new(),
@@ -611,8 +611,7 @@ impl Storable for Project {
             .or_else(||self.get_dmy("date"))
             // probably the dd-dd.mm.yyyy format
             .or_else(||self.get_str("date")
-                     .and_then(|s|
-                               util::yaml::parse_dmy_date_range(s))
+                           .and_then(|s| util::yaml::parse_dmy_date_range(s))
                     )
     }
 
