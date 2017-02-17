@@ -19,3 +19,7 @@ tests/caterings
 *.aux
 *.ymlx
 *.json
+pkg
+.direnv
+.envrc
+templates/latex
