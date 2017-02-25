@@ -2,25 +2,28 @@ use asciii;
 use clap::{App, AppSettings, Arg, ArgMatches, SubCommand};
 use super::subcommands;
 
-pub fn build_cli<'a,'b>() -> AppBox<'a,'b> {
+pub fn with_cli<F> (app_handler:F)
+    where F: Fn(App)
+{
 
-    let app = App::new("asciii")
+    app_handler(
+    App::new("asciii")
         .author(crate_authors!())
         .version(asciii::VERSION.as_ref())
-        .about("The ascii invoicer III")
+        .about(lformat!("The ascii invoicer III").as_ref())
         .settings(&[AppSettings::SubcommandRequiredElseHelp,AppSettings::ColoredHelp])
         .after_help(asciii::DOCUMENTATION_URL)
 
         .subcommand(SubCommand::with_name("doc")
-            .about("Opens the online documentation, please read it")
+            .about(lformat!("Opens the online documentation, please read it").as_ref())
         )
 
         .subcommand(SubCommand::with_name("version")
-            .about("Prints version of this tool")
+            .about(lformat!("Prints version of this tool").as_ref())
         )
 
         .subcommand(SubCommand::with_name("new")
-                    .about("Create a new project")
+                    .about(lformat!("Create a new project").as_ref())
 
                     .arg(Arg::with_name("name")
                          .help("Project name")
@@ -77,7 +80,7 @@ pub fn build_cli<'a,'b>() -> AppBox<'a,'b> {
 
         .subcommand(SubCommand::with_name("list")
                     .aliases(&["ls", "dir", "la", "l", "lsit"])
-                    .about("List Projects")
+                    .about(lformat!("List Projects").as_ref())
 
                     .arg(Arg::with_name("archive")
                          .help("list archived projects of a specific year, defaults to the current year")
@@ -191,7 +194,7 @@ pub fn build_cli<'a,'b>() -> AppBox<'a,'b> {
                     )
 
         .subcommand(SubCommand::with_name("csv")
-                    .about("Produces a CSV report for a given year")
+                    .about(lformat!("Produces a CSV report for a given year").as_ref())
                     .arg(Arg::with_name("year")
                          .help("List projects from that year, archived or not")
                          //.short("y")
@@ -202,7 +205,7 @@ pub fn build_cli<'a,'b>() -> AppBox<'a,'b> {
                     )
 
         .subcommand(SubCommand::with_name("archive")
-                    .about("Move a Project into the archive")
+                    .about(lformat!("Move a Project into the archive").as_ref())
                     .arg(Arg::with_name("search terms")
                          .help("Search terms to match the project")
                          //.required(true)
@@ -231,7 +234,7 @@ pub fn build_cli<'a,'b>() -> AppBox<'a,'b> {
                    )
 
         .subcommand(SubCommand::with_name("unarchive")
-                    .about("Move a Project out of the archive")
+                    .about(lformat!("Move a Project out of the archive").as_ref())
                     .arg(Arg::with_name("year")
                          .help("Specify the Archiv")
                          .required(true)
@@ -244,7 +247,7 @@ pub fn build_cli<'a,'b>() -> AppBox<'a,'b> {
                    )
 
         .subcommand(SubCommand::with_name("path")
-                    .about("Show storage path")
+                    .about(lformat!("Show storage path").as_ref())
                     .arg(Arg::with_name("templates")
                          .help("Shows templates path instead")
                          .long("templates")
@@ -275,7 +278,7 @@ pub fn build_cli<'a,'b>() -> AppBox<'a,'b> {
                     )
 
         .subcommand(SubCommand::with_name("open")
-                    .about("Open storage path")
+                    .about(lformat!("Open storage path").as_ref())
                     .arg(Arg::with_name("templates")
                          .help("Open path to templates instead")
                          .long("templates")
@@ -308,7 +311,7 @@ pub fn build_cli<'a,'b>() -> AppBox<'a,'b> {
 
         .subcommand(SubCommand::with_name("edit")
                     .aliases(&["ed"])
-                    .about("Edit a specific project")
+                    .about(lformat!("Edit a specific project").as_ref())
                     .arg(Arg::with_name("search_term")
                          .help("Search term, possibly event name")
                          .required(true)
@@ -338,7 +341,7 @@ pub fn build_cli<'a,'b>() -> AppBox<'a,'b> {
 
         .subcommand(SubCommand::with_name("set")
                     .aliases(&["ed"])
-                    .about("Set a value in a project file")
+                    .about(lformat!("Set a value in a project file").as_ref())
                     .arg(Arg::with_name("search_term")
                          .help("Search term, possibly event name")
                          .required(true)
@@ -366,7 +369,7 @@ pub fn build_cli<'a,'b>() -> AppBox<'a,'b> {
 
         .subcommand(SubCommand::with_name("show")
                     .aliases(&["display"])
-                    .about("Display a specific project")
+                    .about(lformat!("Display a specific project").as_ref())
                     .arg(Arg::with_name("search_term")
                          .help("Search term, possibly event name")
                          .required(true)
@@ -487,11 +490,11 @@ pub fn build_cli<'a,'b>() -> AppBox<'a,'b> {
                    )
 
         //.subcommand(SubCommand::with_name("spec")
-        //            .about("runs full spec on all projects")
+        //            .about(lformat!("runs full spec on all projects").as_ref())
         //           )
 
         .subcommand(SubCommand::with_name("make")
-                    .about("Creates documents from projects")
+                    .about(lformat!("Creates documents from projects").as_ref())
                     .aliases(&["mk"])
 
                     .arg(Arg::with_name("force")
@@ -533,7 +536,7 @@ pub fn build_cli<'a,'b>() -> AppBox<'a,'b> {
                    )
 
         .subcommand(SubCommand::with_name("delete")
-                    .about("Deletes a project")
+                    .about(lformat!("Deletes a project").as_ref())
                     .aliases(&["rm"])
 
                     .arg(Arg::with_name("dry-run")
@@ -564,7 +567,7 @@ pub fn build_cli<'a,'b>() -> AppBox<'a,'b> {
 
         .subcommand(SubCommand::with_name("config")
                     .aliases(&["settings"])
-                    .about("Show and edit your config")
+                    .about(lformat!("Show and edit your config").as_ref())
                     .arg(Arg::with_name("edit")
                          .help("Edit your config")
                          .short("e")
@@ -601,11 +604,11 @@ pub fn build_cli<'a,'b>() -> AppBox<'a,'b> {
 
 
         .subcommand(SubCommand::with_name("whoami")
-                    .about("Show your name from config")
+                    .about(lformat!("Show your name from config").as_ref())
                    )
 
         .subcommand(SubCommand::with_name("dues")
-                    .about("Experimental: open does")
+                    .about(lformat!("Experimental: open does").as_ref())
 
                     .arg(Arg::with_name("invoices")
                          .help("Show unpayed wages")
@@ -624,12 +627,12 @@ pub fn build_cli<'a,'b>() -> AppBox<'a,'b> {
 
         //# GIT STUFF
         .subcommand(SubCommand::with_name("status")
-                    .about("Show the working tree status")
+                    .about(lformat!("Show the working tree status").as_ref())
                     .aliases(&["st"])
                    )
 
         .subcommand(SubCommand::with_name("pull")
-                    .about("Pull and merge new commits from remote")
+                    .about(lformat!("Pull and merge new commits from remote").as_ref())
                     .aliases(&["update"])
                     .arg(Arg::with_name("rebase")
                          .help("git pull with --rebase")
@@ -639,11 +642,11 @@ pub fn build_cli<'a,'b>() -> AppBox<'a,'b> {
 
         .subcommand(SubCommand::with_name("shell")
                     .aliases(&["sh", "repl"])
-                    .about("(experimental) starts interactive shell")
+                    .about(lformat!("(experimental) starts interactive shell").as_ref())
                    )
 
         .subcommand(SubCommand::with_name("diff")
-                    .about("git diff")
+                    .about(lformat!("git diff").as_ref())
                     .arg(Arg::with_name("search_term")
                          .help("Search term, possibly event name")
                          .multiple(true)
@@ -663,7 +666,7 @@ pub fn build_cli<'a,'b>() -> AppBox<'a,'b> {
                    )
 
         .subcommand(SubCommand::with_name("cleanup")
-                    .about("cleans changes and untracked files in project folder")
+                    .about(lformat!("cleans changes and untracked files in project folder").as_ref())
                     .arg(Arg::with_name("search_term")
                          .help("Search term, possibly event name")
                          .multiple(true)
@@ -684,7 +687,7 @@ pub fn build_cli<'a,'b>() -> AppBox<'a,'b> {
                    )
 
         .subcommand(SubCommand::with_name("add")
-                    .about("Add file contents to the index")
+                    .about(lformat!("Add file contents to the index").as_ref())
                     .arg(Arg::with_name("search_term")
                          .help("Search term, possibly event name")
                          .required(true)
@@ -706,29 +709,25 @@ pub fn build_cli<'a,'b>() -> AppBox<'a,'b> {
                    )
         .subcommand(SubCommand::with_name("commit")
                     .aliases(&["cm"])
-                    .about("Save changes locally")
+                    .about(lformat!("Save changes locally").as_ref())
                    )
         .subcommand(SubCommand::with_name("remote")
-                    .about("Show information about the remote")
+                    .about(lformat!("Show information about the remote").as_ref())
                    )
 
         .subcommand(SubCommand::with_name("push")
-                    .about("Upload locally saved changes to the remote")
+                    .about(lformat!("Upload locally saved changes to the remote").as_ref())
                    )
 
-        .subcommand(SubCommand::with_name("stash").about(""))
-        .subcommand(SubCommand::with_name("pop").about(""))
+        .subcommand(SubCommand::with_name("stash").about(lformat!("equals git stash").as_ref()))
+        .subcommand(SubCommand::with_name("pop").about(lformat!("equals git pop").as_ref()))
 
         .subcommand(SubCommand::with_name("log")
                     .aliases(&["lg", "hist", "history"])
-                    .about("Show commit logs")
+                    .about(lformat!("Show commit logs").as_ref())
                    )
-        ;
-    AppBox{
-        app: app,
-        about: about,
-        help: help
-    }
+        );
+
 }
 
 /// Starting point for handling commandline matches

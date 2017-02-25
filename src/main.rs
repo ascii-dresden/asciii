@@ -63,7 +63,5 @@ fn main(){
     setup_log();
     setup_locale();
 
-    let matches = cli::build_cli().app.get_matches();
-    cli::match_matches(&matches);
-
+    cli::with_cli(|app| cli::match_matches(&app.get_matches()));
 }
