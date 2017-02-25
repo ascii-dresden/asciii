@@ -2,7 +2,7 @@
 
 use std::error::Error;
 
-use chrono::*;
+use chrono::prelude::*;
 use prettytable::Table;
 use prettytable::row::Row;
 use prettytable::cell::Cell;
@@ -79,7 +79,7 @@ fn project_to_style(project:&Project) -> &str{
     }
 
     if let Some(date) = project.modified_date(){
-        let age = (Local::today() - date).num_days();
+        let age = (Local::today().signed_duration_since(date)).num_days();
         if project.canceled(){
             return ""
         }

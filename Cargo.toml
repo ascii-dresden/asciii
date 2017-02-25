@@ -4,15 +4,15 @@ version = "3.1.0"
 authors = ["Hendrik Sollich <hendrik@hoodie.de>"]
 license = "MIT/Apache-2.0"
 
-# build = "build.rs"
+ build = false
 
 [dependencies]
 
 log = "0.3"
-env_logger = { version = "0.3"} # default feature requires regex
+env_logger = "0.4" # default feature requires regex
 yaml-rust = {version = "0.3", features = ["preserve_order"]}
-chrono = "0.2"
-regex = "0.1"
+chrono = "0.3"
+regex = "0.2"
 lazy_static = "0.2"
 maplit = "0.1"
 clap = "2"
@@ -20,17 +20,17 @@ enum_derive = "0.1"
 custom_derive = "0.1"
 open = "1.1"
 ordered-float = "0.4"
-error-chain = "0.7"
+error-chain = "0.9"
 rustyline = {git="https://github.com/kkawakam/rustyline/", rev="1ae47dc", optional = true }
 
 bill = {git="https://github.com/hoodie/bill-rs"}
 #icalendar = {git="https://github.com/hoodie/icalendar-rs"}
-icalendar = "0.2"
+icalendar = "0.3"
 #icalendar = {path="../icalendar-rs"}
 
 slug = "0.1"
 tempdir = "0.3"
-semver = "0.5"
+semver = "0.6"
 term_size = "0.2"
 
 term = "0.4"

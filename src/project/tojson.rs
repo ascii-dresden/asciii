@@ -1,5 +1,5 @@
 use rustc_serialize::json::{ToJson, Json};
-use chrono::*;
+use chrono::prelude::*;
 use bill::{Bill, BillItem, ItemList, Tax};
 use ordered_float::OrderedFloat;
 

@@ -30,7 +30,7 @@ pub use yaml_rust::Yaml;
 use yaml_rust::YamlLoader;
 use yaml_rust::yaml::Hash as YamlHash;
 use yaml_rust::scanner::ScanError;
-use chrono::*;
+use chrono::prelude::*;
 
 /// Wrapper around `io::Error` and `yaml_rust::scanner::ScanError`.
 #[derive(Debug)]

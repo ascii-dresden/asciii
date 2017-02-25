@@ -2,7 +2,7 @@ use std::path::{Path,PathBuf};
 use std::fs;
 use std::collections::HashMap;
 
-use chrono::*;
+use chrono::prelude::*;
 use tempdir::TempDir;
 
 use util;

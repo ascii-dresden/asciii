@@ -4,7 +4,7 @@
 #![allow(dead_code)]
 
 
-use chrono::*;
+use chrono::prelude::*;
 use bill::Currency;
 use icalendar::Calendar;
 

@@ -6,7 +6,7 @@ use std::collections::HashMap;
 
 use open;
 use clap::ArgMatches;
-use chrono::*;
+use chrono::prelude::*;
 
 use asciii;
 use asciii::CONFIG;

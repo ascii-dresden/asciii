@@ -1,5 +1,5 @@
 use clap::ArgMatches;
-use chrono::*;
+use chrono::prelude::*;
 
 use asciii::CONFIG;
 use asciii::actions::{setup_luigi, setup_luigi_with_git};

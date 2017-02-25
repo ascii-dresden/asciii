@@ -49,6 +49,8 @@ fn main(){
     setup_log();
 
     trace!("setting up app");
-    let matches = cli::build_cli().get_matches();
-    match_matches(&matches);
+    cli::with_app( |app| {
+        let matches = app.get_matches();
+        match_matches(&matches);
+    });
 }

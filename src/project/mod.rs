@@ -10,7 +10,8 @@ use std::path::{Path, PathBuf};
 use std::error::Error as ErrorTrait;
 use std::collections::HashMap;
 
-use chrono::*;
+use chrono::prelude::*;
+use chrono::Duration;
 use yaml_rust::Yaml;
 use tempdir::TempDir;
 use slug;
@@ -259,7 +260,7 @@ impl Project {
 
     /// TODO move to `IsProjectExt`
     pub fn age(&self) -> Option<i64> {
-        self.modified_date().map(|date| (UTC::today() - date).num_days() )
+        self.modified_date().map(|date| (UTC::today().signed_duration_since(date)).num_days() )
     }
 
     pub fn to_csv(&self, bill_type:&BillType) -> Result<String>{
@@ -341,7 +342,7 @@ impl Project {
     pub fn our_bad(&self) -> Option<Duration> {
         let event   = try_some!(self.event_date());
         let invoice = self.invoice().date().unwrap_or_else(UTC::today);
-        let diff = invoice - event;
+        let diff = invoice.signed_duration_since(event);
         if diff > Duration::zero() {
             Some(diff)
         } else {
@@ -352,7 +353,7 @@ impl Project {
     pub fn their_bad(&self) -> Option<Duration> {
         let invoice = self.invoice().date().unwrap_or_else(UTC::today);
         let payed   = self.payed_date().unwrap_or_else(UTC::today);
-        Some(invoice - payed)
+        Some(invoice.signed_duration_since(payed))
     }
 
     /// What I need to do
@@ -368,7 +369,7 @@ impl Project {
         let wages   = self.hours().wages_date();
         let today   = UTC::today();
 
-        let days_since = |date:Date<UTC>| (today - date).num_days();
+        let days_since = |date:Date<UTC>| (today.signed_duration_since(date)).num_days();
 
         if let Some(event) = event {
             match (invoice, payed, wages) {
@@ -400,7 +401,7 @@ impl Project {
     }
 
     fn task_pay_employees(&self, payed_date: Date<UTC>) -> Todo {
-        let days_since_payed = (UTC::today() - payed_date).num_days();
+        let days_since_payed = (UTC::today().signed_duration_since(payed_date)).num_days();
         Todo::new().summary(&format!("{}: Hungry employees!", self.invoice().number_str().unwrap_or_else(String::new)))
             .description( &format!("Pay {}\nYou have had the money for {} days!",
                                    self.employees_string(),
@@ -410,7 +411,7 @@ impl Project {
     }
 
     fn task_follow_up(&self, invoice_date: Date<UTC>) -> Todo {
-        let days_since_invoice = (UTC::today() - invoice_date).num_days();
+        let days_since_invoice = (UTC::today().signed_duration_since(invoice_date)).num_days();
         let mut follow_up = Todo::new();
         follow_up.summary( &format!("Nachfragen: \"{event}\"!", event = self.name().unwrap()));
         follow_up.description(&format!("{inum }{event:?} wurde am {invoice_date} (vor {days} Tagen) in Rechnung gestellt, aber noch nicht als bezahlt markiert.\nBitte kontrolliere den Zahlungseingang und erkundige dich ggf. bei {client} ({mail}).",
@@ -434,7 +435,7 @@ impl Project {
     }
 
     fn task_close_project(&self, wages_date: Date<UTC>) -> Todo {
-            let days_since_wages = (UTC::today() - wages_date).num_days();
+            let days_since_wages = (UTC::today().signed_duration_since(wages_date)).num_days();
             Todo::new().summary( &format!("Archiviere {}", self.name().unwrap()))
                        .description( &format!("{:?} ist seit {} Tagen abgeschlossen. Weg damit!",
                                               self.name().unwrap(),
