@@ -2,28 +2,7 @@ use asciii;
 use clap::{App, AppSettings, Arg, ArgMatches, SubCommand};
 use super::subcommands;
 
-use std::collections::HashMap;
-
-pub struct AppBox<'a,'b>  where 'a:'b{
-    pub app: App<'a,'b>,
-    about: HashMap<&'static str, String>,
-    help: HashMap<&'static str, String>
-}
-
-//use std::ops::Deref;
-//impl<'a, 'b> Deref for AppBox<'a,'b> where 'a:'b{
-//    type Target = App<'a,'b>;
-//    fn deref(&self) -> &App<'a,'b> {
-//        &self.app
-//    }
-//}
-
 pub fn build_cli<'a,'b>() -> AppBox<'a,'b> {
-    let about = hashmap!{
-        "app_doc_about" => lformat!("Opens the online documentation, please read it")
-    };
-    let help  = hashmap!{
-    };
 
     let app = App::new("asciii")
         .author(crate_authors!())
@@ -33,7 +12,7 @@ pub fn build_cli<'a,'b>() -> AppBox<'a,'b> {
         .after_help(asciii::DOCUMENTATION_URL)
 
         .subcommand(SubCommand::with_name("doc")
-            .about(about["app_doc_about"].as_ref())
+            .about("Opens the online documentation, please read it")
         )
 
         .subcommand(SubCommand::with_name("version")
