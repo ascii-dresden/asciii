@@ -31,6 +31,10 @@ Just plain old `cargo install --git https://github.com/ascii-dresden/asciii` wil
 You need at least `rustc`, `cargo`, `cmake` and `git` to run this.
 
 
+## Development
+
+**Hint!** After the first build you can removed the content of `build.rs`s `fn main()` during dev for significantly improved compile times :D
+
 ## Usage
 After installation simply run `asciii` and it will present you with a list of possible subcommands. `asciii help list` will give you a comprehensive explanation of  what `asciii list` does.
 
