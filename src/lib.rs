@@ -47,6 +47,9 @@ extern crate icalendar;
 #[macro_use] extern crate custom_derive;
 #[macro_use] extern crate enum_derive;
 
+extern crate crowbook_intl_runtime;
+#[macro_use] pub mod localize_macros;
+
 #[cfg(feature="git_statuses")] extern crate git2;
 
 #[macro_use]
@@ -75,7 +78,7 @@ lazy_static!{
     pub static ref CONFIG: config::ConfigReader = config::ConfigReader::new().unwrap();
 
     /// Hint for app to point at `asciii::DOCUMENTATION_URL`
-    pub static ref DOCHINT: String = format!("Documentation at: {}", DOCUMENTATION_URL);
+    pub static ref DOCHINT: String = lformat!("Documentation at: {}", DOCUMENTATION_URL);
 }
 #[cfg(not(feature="version_string"))]
 lazy_static!{
