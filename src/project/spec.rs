@@ -525,10 +525,10 @@ pub trait Redeemable: IsProject {
         let sold = if let Some(returned) = get_f64(values, "returned") {
             // if "returned", there must be no "sold"
             if sold.is_some() {
-                return Err(ErrorKind::AmbiguousAmounts(product.name.to_owned()).into());
+                bail!(ErrorKind::AmbiguousAmounts(product.name.to_owned()));
             }
             if returned > offered {
-                return Err(ErrorKind::TooMuchReturned(product.name.to_owned()).into());
+                bail!(ErrorKind::TooMuchReturned(product.name.to_owned()));
             }
             offered - returned
         } else if let Some(sold) = sold {
@@ -553,7 +553,7 @@ impl Validatable for Redeemable {
         }
 
         if !errors.is_empty() {
-            return Err(errors);
+            bail!(errors);
         }
 
         Ok(())

@@ -130,7 +130,7 @@ impl<L:Storable> Storage<L> {
                 repository: None,
             })
         } else {
-            Err(ErrorKind::StoragePathNotAbsolute.into())
+            bail!(ErrorKind::StoragePathNotAbsolute)
         }
     }
 
@@ -156,7 +156,7 @@ impl<L:Storable> Storage<L> {
             for f in &[r,w,a,t]{
                 if !f.exists() { warn!("{} does not exist", f.display())}
             }
-            Err(ErrorKind::InvalidDirStructure.into())
+            bail!(ErrorKind::InvalidDirStructure)
         }
     }
 
@@ -198,7 +198,7 @@ impl<L:Storable> Storage<L> {
     /// with the names given in this setup.
     pub fn create_dirs(&self) -> StorageResult<()> {
         trace!("creating storage directories");
-        if !self.root_dir().is_absolute() { return Err(ErrorKind::StoragePathNotAbsolute.into()) }
+        ensure!(self.root_dir().is_absolute(), ErrorKind::StoragePathNotAbsolute);
 
         if !self.root_dir().exists()  { fs::create_dir(&self.root_dir())?;  }
         if !self.working_dir().exists()  { fs::create_dir(&self.working_dir())?;  }
@@ -239,11 +239,8 @@ impl<L:Storable> Storage<L> {
                         )
             .cloned()
             .collect();
-        if template_files.is_empty(){
-            Err(ErrorKind::TemplateNotFound.into()) // TODO: RFC perhaps "NoTemplates"?
-        } else {
-            Ok(template_files)
-        }
+        ensure!(!template_files.is_empty(), ErrorKind::TemplateNotFound);
+        Ok(template_files)
     }
 
     /// Produces a list of names of all template filess in the `templates_dir()`
@@ -297,13 +294,13 @@ impl<L:Storable> Storage<L> {
                );
         if !self.working_dir().exists(){
             error!("working directory does not exist");
-            return Err(ErrorKind::NoWorkingDir.into())
+            bail!(ErrorKind::NoWorkingDir)
         };
         let slugged_name = slugify(project_name);
         let project_dir  = self.working_dir().join(&slugged_name);
         if project_dir.exists() {
             error!("project directory already exists");
-            return Err(ErrorKind::ProjectDirExists.into());
+            bail!(ErrorKind::ProjectDirExists);
         }
 
         trace!("created project will be called {:?}", slugged_name);
@@ -404,7 +401,7 @@ impl<L:Storable> Storage<L> {
         let projects = self.search_projects_any(StorageDir::Working, search_terms)?;
         let force = confirm();
 
-        if projects.is_empty() { return Err(ErrorKind:: ProjectDoesNotExist.into()) }
+        ensure!(!projects.is_empty(), ErrorKind:: ProjectDoesNotExist);
 
         let mut moved_files = Vec::new();
 
@@ -438,7 +435,7 @@ impl<L:Storable> Storage<L> {
         if let Some(ref repo) = self.repository {
             if !repo.add(&[project.dir()]).success() {
                 debug!("adding {} to git", project.dir().display());
-                return Err(ErrorKind::GitProcessFailed.into());
+                bail!(ErrorKind::GitProcessFailed);
             }
         }
         Ok(())
@@ -489,14 +486,14 @@ impl<L:Storable> Storage<L> {
 
         let name = self.get_project_name(archived_dir)?;
         let target = self.working_dir().join(&name);
-        if target.exists() { return Err(ErrorKind::ProjectFileExists.into()); }
+        ensure!(!target.exists(), ErrorKind::ProjectFileExists);
         info!("unarchiving project from {:?} to {:?}", archived_dir, target);
 
         if child_of_archive && !archive_itself && parent_is_num{
             fs::rename(&archived_dir, &target)?;
-        }else{
+        } else {
             error!("moving out of archive failed");
-            return Err(ErrorKind::InvalidDirStructure.into());
+            bail!(ErrorKind::InvalidDirStructure);
         };
 
         Ok(target.to_owned())
@@ -538,13 +535,13 @@ impl<L:Storable> Storage<L> {
         if let Ok(path) = match directory{
             StorageDir::Working => Ok(self.working_dir().join(&slugged_name)),
             StorageDir::Archive(year) => self.get_project_dir_from_archive(name, year),
-            _ => return Err(ErrorKind::BadChoice.into())
+            _ => bail!(ErrorKind::BadChoice)
         }{
             if path.exists(){
                 return Ok(path);
             }
         }
-        Err(ErrorKind::ProjectDoesNotExist.into())
+        bail!(ErrorKind::ProjectDoesNotExist)
     }
 
     /// Locates the project file inside a folder.
@@ -563,7 +560,7 @@ impl<L:Storable> Storage<L> {
         if let Some(stem) = path.file_stem(){
             return Ok(stem.to_str().expect("this filename is no valid unicode").to_owned());
         }
-        Err(ErrorKind::BadProjectFileName.into())
+        bail!(ErrorKind::BadProjectFileName)
     }
 
     fn get_project_dir_from_archive(&self, name:&str, year:Year) -> StorageResult<PathBuf> {
@@ -572,7 +569,7 @@ impl<L:Storable> Storage<L> {
                 return project_file.parent().map(|p|p.to_owned()).ok_or_else (|| ErrorKind::ProjectDoesNotExist.into());
             }
         }
-        Err(ErrorKind::ProjectDoesNotExist.into())
+        bail!(ErrorKind::ProjectDoesNotExist)
     }
 
     /// Produces a list of project folders.
@@ -593,7 +590,7 @@ impl<L:Storable> Storage<L> {
                 all.append(&mut list_path_content(&self.working_dir())?);
                 Ok(all)
             },
-            _ => Err(ErrorKind::BadChoice.into())
+            _ => bail!(ErrorKind::BadChoice)
         }
     }
 

@@ -531,12 +531,3 @@ msgstr "{:?} ist seit {} Tagen abgeschlossen. Weg damit!"
 #, fuzzy
 msgid "Responsible: {}"
 msgstr "Verantwortlich: {}"
-
-#~ msgid "Pay {}\n"
-#~ msgstr "You have had the money for {} days!"
-
-#~ msgid "Dump project yaml"
-#~ msgstr "Zeige das Projekt als yaml"
-
-#~ msgid "Display hours"
-#~ msgstr "Zeigt Stunden"

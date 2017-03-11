@@ -213,13 +213,13 @@ impl Project {
     fn write_to_offer_file(&self,content:&str, ext:&str) -> Result<PathBuf> {
         if let Some(target) = self.offer_file_name(ext){
             Self::write_to_path(content, &self.dir().join(&target))
-        } else {Err(ErrorKind::CantDetermineTargetFile.into())}
+        } else {bail!(ErrorKind::CantDetermineTargetFile)}
     }
 
     fn write_to_invoice_file(&self,content:&str, ext:&str) -> Result<PathBuf> {
         if let Some(target) = self.invoice_file_name(ext){
             Self::write_to_path(content, &self.dir().join(&target))
-        } else {Err(ErrorKind::CantDetermineTargetFile.into())}
+        } else {bail!(ErrorKind::CantDetermineTargetFile)}
     }
 
 
@@ -333,7 +333,7 @@ impl Project {
                 error!("The resulting document is no valid yaml. SORRY!\n{}\n\n{}",
                        filled.lines().enumerate().map(|(n,l)| format!("{:>3}. {}\n",n,l)).collect::<String>(), //line numbers :D
                        e.description());
-                Err(e.into())
+                bail!(e)
             }
         }
     }
@@ -565,7 +565,7 @@ impl Storable for Project {
                 error!("The created document is no valid yaml. SORRY!\n{}\n\n{}",
                        filled.lines().enumerate().map(|(n,l)| format!("{:>3}. {}\n",n,l)).collect::<String>(), //line numbers :D
                        e.description());
-                return Err(e.into())
+                bail!(e)
             }
         };
 

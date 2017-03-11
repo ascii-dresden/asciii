@@ -18,7 +18,7 @@ use util::yaml;
 use util::yaml::{Yaml, YamlError};
 
 /// Name of the configfile
-pub const DEFAULT_LOCATION: &str = ".asciii.yml";
+pub const DEFAULT_LOCATION: &'static str = ".asciii.yml";
 
 /// Looks for a configuration yaml in your `HOME_DIR`
 #[derive(Debug)]
