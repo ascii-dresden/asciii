@@ -29,7 +29,7 @@ use storage::ErrorKind as StorageErrorKind;
 use storage::repo::GitStatus;
 use templater::{Templater, IsKeyword};
 
-#[export_macro]
+//#[export_macro]
 macro_rules! try_some {
     ($expr:expr) => (match $expr {
         Some(val) => val,
@@ -651,7 +651,10 @@ impl Storable for Project {
             file_path: file_path.to_owned(),
             _temp_dir: None,
             git_status: None,
-            yaml: yaml::parse(&file_content)?,
+            yaml: yaml::parse(&file_content).unwrap_or_else(|e|{
+                error!("syntax error in {}\n  {}", file_path.display(), e);
+                Yaml::Null
+            }),
             file_content: file_content,
         })
     }

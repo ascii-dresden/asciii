@@ -12,7 +12,7 @@ use open;
 
 pub mod yaml;
 
-#[export_macro]
+//#[export_macro]
 macro_rules! try_some {
     ($expr:expr) => (match $expr {
         Some(val) => val,
