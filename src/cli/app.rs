@@ -338,6 +338,24 @@ pub fn with_cli<F> (app_handler:F) where F: Fn(App) {
                             )
                         )
 
+            .subcommand(SubCommand::with_name("workspace")
+                        .aliases(&["ws"])
+                         .arg(Arg::with_name("archive")
+                             .help(lformat!("Open an archive instead").as_ref())
+                             .short("a")
+                             .long("archive")
+                             .takes_value(true)
+                            )
+
+                        .arg(Arg::with_name("editor")
+                             .help(lformat!("Override the configured editor").as_ref())
+                             .short("e")
+                             .long("editor")
+                             .takes_value(true)
+                            )
+                        .about(lformat!("Open the working directory in an editor").as_ref())
+                        )
+
             .subcommand(SubCommand::with_name("set")
                         .aliases(&["ed"])
                         .about(lformat!("Set a value in a project file").as_ref())
@@ -746,6 +764,7 @@ pub fn match_matches(matches: &ArgMatches) {
      ("csv",       Some(sub_m)) => subcommands::csv(sub_m),
      ("new",       Some(sub_m)) => subcommands::new(sub_m),
      ("edit",      Some(sub_m)) => subcommands::edit(sub_m),
+     ("workspace", Some(sub_m)) => subcommands::workspace(sub_m),
      ("set",       Some(sub_m)) => subcommands::set(sub_m),
      ("show",      Some(sub_m)) => subcommands::show(sub_m),
      ("calendar",  Some(sub_m)) => subcommands::calendar(sub_m),

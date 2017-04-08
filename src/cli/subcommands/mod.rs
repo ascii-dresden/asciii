@@ -176,7 +176,8 @@ pub fn edit(matches: &ArgMatches) {
     let search_terms = matches.values_of("search_term").unwrap().collect::<Vec<&str>>();
 
     let editor = matches.value_of("editor")
-        .or(CONFIG.get("user/editor").and_then(|e| e.as_str()));
+        .or(CONFIG.get("user/editor")
+                  .and_then(|e| e.as_str()));
 
     if matches.is_present("template") {
         with_templates(search_term, |template_paths:&[PathBuf]| util::pass_to_command(&editor, template_paths));
@@ -207,6 +208,16 @@ fn edit_projects(dir: StorageDir, search_terms: &[&str], editor: &Option<&str>) 
         let all_paths = all_projects.iter().map(|p| p.file()).collect::<Vec<PathBuf>>();
         util::pass_to_command(&editor, &all_paths);
     }
+}
+
+/// Command WORKSPACE 
+pub fn workspace(matches: &ArgMatches) {
+    println!("{:?}", matches);
+    let luigi = execute(setup_luigi);
+    let editor = matches.value_of("editor")
+        .or(CONFIG.get("user/editor")
+                  .and_then(|e| e.as_str()));
+    util::pass_to_command(&editor, &[luigi.working_dir()]);
 }
 
 /// Command EDIT --template
