@@ -142,7 +142,7 @@ fn list_broken_projects(dir: StorageDir) {
     let luigi = execute(setup_luigi);
     let invalid_files = execute(|| luigi.list_project_files(dir));
     let tups = invalid_files.iter()
-                            .filter_map(|dir| Project::open(dir).err().map(|e| (e, dir)))
+                            .filter_map(|dir| Project::open_folder(dir).err().map(|e| (e, dir)))
                             .collect::<Vec<(StorageError, &PathBuf)>>();
 
     for (err, path) in tups {

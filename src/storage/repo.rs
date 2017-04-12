@@ -241,8 +241,8 @@ impl Repository {
         self.execute_git("remote", &[], &[])
     }
 
-    pub fn log(&self) -> ExitStatus {
-        self.execute_git("log", &[], &[])
+    pub fn log(&self, paths:&[PathBuf]) -> ExitStatus {
+        self.execute_git("log", &[], paths)
     }
 }
 

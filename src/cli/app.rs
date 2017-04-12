@@ -742,6 +742,23 @@ pub fn with_cli<F> (app_handler:F) where F: Fn(App) {
             .subcommand(SubCommand::with_name("log")
                         .aliases(&["lg", "hist", "history"])
                         .about(lformat!("Show commit logs").as_ref())
+                        .arg(Arg::with_name("search_term")
+                             .help(lformat!("Search term, possibly event name").as_ref())
+                             .required(true)
+                             .multiple(true)
+                            )
+                        .arg(Arg::with_name("archive")
+                             .help(lformat!("list archived projects").as_ref())
+                             .short("a")
+                             .long("archive")
+                             .min_values(0)
+                             .takes_value(true)
+                            )
+                        .arg(Arg::with_name("template")
+                             .help(lformat!("A template").as_ref())
+                             .short("t")
+                             .long("template")
+                            )
                        )
             .subcommand(SubCommand::with_name("complete")
                         //.aliases(&["lg", "hist", "history"])
@@ -797,7 +814,7 @@ pub fn match_matches(matches: &ArgMatches) {
      ("push",      _          ) => subcommands::git_push(),
      ("stash",     _          ) => subcommands::git_stash(),
      ("pop",       _          ) => subcommands::git_stash_pop(),
-     ("log",       _          ) => subcommands::git_log(),
+     ("log",       Some(sub_m)) => subcommands::git_log(sub_m),
      ("complete",  Some(sub_m)) => generate_completions(sub_m),
      _                          => ()
     }

@@ -633,7 +633,7 @@ impl Storable for Project {
     }
 
     /// Opens a yaml and parses it.
-    fn open(folder_path:&Path) -> StorageResult<Project>{
+    fn open_folder(folder_path:&Path) -> StorageResult<Project>{
         let file_path = list_path_content(folder_path)?.iter()
             .filter(|f|f.extension().unwrap_or(&OsStr::new("")) == PROJECT_FILE_EXTENSION)
             .nth(0).map(|b|b.to_owned())

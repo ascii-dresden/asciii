@@ -660,7 +660,7 @@ impl<L:Storable> Storage<L> {
 
     #[cfg(feature="git_statuses")]
     fn open_project(&self, path:&PathBuf) -> Option<L>{
-        match L::open(path) {
+        match L::open_folder(path) {
             Ok(mut project) => {
                 if let Some(ref repo) = self.repository{
                     project.set_git_status(repo.get_status(path));

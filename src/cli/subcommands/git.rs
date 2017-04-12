@@ -7,10 +7,11 @@ use ::cli::execute;
 use super::matches_to_paths;
 
 /// Command LOG
-pub fn git_log() {
+pub fn git_log(matches: &ArgMatches) {
     let luigi = execute(setup_luigi_with_git);
+    let paths = matches_to_paths(matches, &luigi);
     let repo = luigi.repository().unwrap();
-    if !repo.log().success() {
+    if !repo.log(&paths).success() {
         error!("git log did not exit successfully")
     }
 }
