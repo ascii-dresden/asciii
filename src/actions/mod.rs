@@ -7,7 +7,6 @@
 use chrono::prelude::*;
 use bill::Currency;
 use icalendar::Calendar;
-use handlebars::RenderError;
 
 use std::{env,fs};
 use std::time;
