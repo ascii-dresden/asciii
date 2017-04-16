@@ -744,7 +744,6 @@ pub fn with_cli<F> (app_handler:F) where F: Fn(App) {
                         .about(lformat!("Show commit logs").as_ref())
                         .arg(Arg::with_name("search_term")
                              .help(lformat!("Search term, possibly event name").as_ref())
-                             .required(true)
                              .multiple(true)
                             )
                         .arg(Arg::with_name("archive")
