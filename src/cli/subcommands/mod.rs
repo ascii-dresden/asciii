@@ -14,6 +14,7 @@ use asciii::config;
 use asciii::util;
 use asciii::BillType;
 use asciii::actions;
+use asciii::document_export;
 use asciii::storage::*;
 use asciii::project::Project;
 use asciii::actions::setup_storage;
@@ -260,16 +261,6 @@ pub fn set(m: &ArgMatches) {
 }
 
 
-#[cfg(feature="document_export")]
-fn infer_bill_type(m: &ArgMatches) -> Option<BillType> {
-    match (m.is_present("offer"), m.is_present("invoice")) {
-        (true, true)   => unreachable!("this should have been prevented by clap-rs"),
-        (true, false)  => Some(BillType::Offer),
-        (false, true)  => Some(BillType::Invoice),
-        (false, false) => None,
-    }
-}
-
 /// Command CALENDAR
 pub fn calendar(matches: &ArgMatches) {
     let calendar = execute(||actions::calendar(matches_to_dir(matches), matches.is_present("tasks")));
@@ -285,27 +276,49 @@ pub fn spec(_: &ArgMatches) {
     execute(actions::spec)
 }
 
+#[cfg(feature="document_export")]
+fn infer_bill_type(m: &ArgMatches) -> Option<BillType> {
+    match (m.is_present("offer"), m.is_present("invoice")) {
+        (true, true)   => unreachable!("this should have been prevented by clap-rs"),
+        (true, false)  => Some(BillType::Offer),
+        (false, true)  => Some(BillType::Invoice),
+        (false, false) => None,
+    }
+}
+
 /// Command MAKE
 #[cfg(feature="document_export")]
 pub fn make(m: &ArgMatches) {
+    debug!("{:?}", m);
     let template_name = m.value_of("template").unwrap_or("document");
     let bill_type = infer_bill_type(m);
+    if  m.is_present("search_terms") {
     let (search_terms, dir) = matches_to_search(m);
+        debug!("make {t}({s}/{d:?}, invoice={i:?})", d = dir, s = search_terms[0], t = template_name, i = bill_type);
 
-    debug!("make {t}({s}/{d:?}, invoice={i:?})",
-           d = dir,
-           s = search_terms[0],
-           t = template_name,
-           i = bill_type);
+        execute(|| {
+            document_export::projects_to_doc(dir,
+                                             search_terms[0],
+                                             template_name,
+                                             bill_type,
+                                             m.value_of("output").map(Path::new),
+                                             m.is_present("dry-run"),
+                                             m.is_present("force"))
+        });
+    } else if let Some(file_path) = m.value_of("file") {
+        debug!("make {t}({d:?}, invoice={i:?})", d = file_path, t = template_name, i = bill_type);
+        execute(|| {
+            document_export::project_files_to_doc(&Path::new(file_path),
+                                                  template_name,
+                                                  bill_type,
+                                                  m.value_of("output").map(Path::new),
+                                                  m.is_present("dry-run"),
+                                                  m.is_present("force"))
+        });
 
-    execute(|| {
-        actions::projects_to_doc(dir,
-                                 search_terms[0],
-                                 template_name,
-                                 &bill_type,
-                                 m.is_present("dry-run"),
-                                 m.is_present("force"))
-    });
+    } else {
+        error!("{}", lformat!("You have to provide either a search term or path"));
+    }
 }
 
 

@@ -1,0 +1,288 @@
+//! Fills export templates to create tex documents.
+//!
+//! Haven't decided on a templating engine yet, my own will probably not do.
+
+use std::io;
+use std::fmt;
+use std::time;
+use std::{env,fs};
+use std::path::{Path,PathBuf};
+use std::error::Error as ErrorTrait;
+
+use rustc_serialize::json::{ToJson, Json};
+use handlebars::{RenderError, Handlebars, no_escape};
+use handlebars::{Context, Helper, RenderContext};
+
+use util;
+use project;
+use project::Project;
+use storage::error::StorageError;
+use storage::{Storage,StorageDir,Storable,StorageResult};
+
+pub mod error {
+    use super::*;
+
+    error_chain!{
+        types {
+            Error, ErrorKind, ResultExt, Result;
+        }
+
+        links { }
+
+        foreign_links {
+            Io(io::Error);
+            Fmt(fmt::Error);
+            Time(time::SystemTimeError);
+            Handlebar(RenderError);
+            Project(project::error::Error);
+            Storage(StorageError);
+        }
+
+        errors {
+            ActionError{
+                description("unexpected response from service")
+            }
+        }
+    }
+}
+
+use self::error::*;
+
+/// Sets up an instance of `Storage`.
+/// TODO isn't this redundant
+fn setup_luigi() -> Storage<Project> {
+    let working = ::CONFIG.get_str("dirs/working")
+        .expect("Faulty config: dirs/working does not contain a value");
+    let archive = ::CONFIG.get_str("dirs/archive")
+        .expect("Faulty config: dirs/archive does not contain a value");
+    let templates = ::CONFIG.get_str("dirs/templates")
+        .expect("Faulty config: dirs/templates does not contain a value");
+    Storage::new(util::get_storage_path(), working, archive, templates).unwrap()
+}
+
+struct PackData<'a, T: 'a + ToJson> {
+    document: &'a T,
+    storage: Storage<Project>,
+    is_invoice:bool
+}
+
+
+impl<'a, T> ToJson for PackData<'a, T>
+    where T: ToJson
+{
+    fn to_json(&self) -> Json {
+        Json::Object(btreemap!{
+            String::from("document")   => self.document.to_json(),
+            String::from("storage")    => self.storage.to_json(),
+            String::from("is_invoice") => self.is_invoice.to_json()
+        })
+    }
+}
+
+fn pack_data<E: ToJson>(document: &E, is_invoice:bool) -> PackData<E> {
+    PackData {
+        document: document,
+        storage: setup_luigi(),
+        is_invoice:is_invoice
+    }
+}
+
+/// Helper method that passes projects matching the `search_terms` to the passt closure `f`
+/// TODO REALLY MOVE THIS TO `Storage`
+fn with_projects<F>(dir:StorageDir, search_terms:&[&str], f:F) -> Result<()>
+    where F:Fn(&Project)->Result<()>
+{
+    trace!("with_projects({:?})", search_terms);
+    let luigi = setup_luigi();
+    let projects = luigi.search_projects_any(dir, search_terms)?;
+    if projects.is_empty() {
+        return Err(format!("Nothing found for {:?}", search_terms).into())
+    }
+    for project in &projects{
+        f(project)?;
+    }
+    Ok(())
+}
+
+fn inc_helper(_: &Context, h: &Helper, _: &Handlebars, rc: &mut RenderContext) -> ::std::result::Result<(), RenderError> {
+    // just for example, add error check for unwrap
+    let param = h.param(0).unwrap().value();
+    let rendered = format!("{}", param.as_u64().unwrap() + 1);
+    rc.writer.write_all(rendered.into_bytes().as_ref())?;
+    Ok(())
+}
+
+fn count_helper(_: &Context, h: &Helper, _: &Handlebars, rc: &mut RenderContext) -> ::std::result::Result<(), RenderError> {
+    let count = h.param(0).unwrap().value().as_array().map_or(0, |a|a.len());
+    //println!("count_helper{:?}", param);
+    let rendered = format!("{}", count);
+    rc.writer.write_all(rendered.into_bytes().as_ref())?;
+    Ok(())
+}
+
+use super::BillType;
+
+/// Takes a `T:ToJson` and a template path and does it's thing.
+///
+/// Returns path to created file, potenially in a `tempdir`.
+// pub fn fill_template<E:ToJson>(document:E, template_file:&Path) -> PathBuf{
+pub fn fill_template<E: ToJson, P:AsRef<Path>>(document: &E, bill_type:&BillType, template_path: P) -> Result<String> {
+    let mut handlebars = Handlebars::new();
+
+    handlebars.register_escape_fn(no_escape);
+    handlebars.register_escape_fn(|data| data.replace("\n", r#"\newline "#));
+    handlebars.register_helper("inc",   Box::new(inc_helper));
+    handlebars.register_helper("count", Box::new(count_helper));
+
+    handlebars.register_template_file("document", template_path).unwrap();
+
+    let packed = match *bill_type {
+        BillType::Offer => pack_data(document, false),
+        BillType::Invoice => pack_data(document, true)
+    };
+
+
+    Ok(handlebars.render("document", &packed)
+                 .map(|r| r.replace("<", "{")
+                           .replace(">", "}"))?)
+}
+
+fn file_age(path:&Path) -> Result<time::Duration> {
+    let metadata = fs::metadata(path)?;
+    let accessed = metadata.accessed()?;
+    Ok(accessed.elapsed()?)
+}
+
+fn output_template_path(template_name:&str) -> Result<PathBuf> {
+    // construct_template_path(&template_name) {
+    let template_ext  = ::CONFIG.get_str("extensions/output_template").expect("Faulty default config");
+    let mut template_path = PathBuf::new();
+    template_path.push(util::get_storage_path());
+    template_path.push(::CONFIG.get_str("dirs/templates").expect("Faulty config: dirs/templates does not contain a value"));
+    template_path.push(template_name);
+    template_path.set_extension(template_ext);
+    // }
+
+    // check stays here
+    debug!("template file={:?} exists={}", template_path, template_path.exists());
+    if template_path.exists() {
+        Ok(template_path)
+    } else {
+        Err(format!("Template not found at {}", template_path.display()).into())
+    }
+}
+
+/// Creates the latex files within each projects directory, either for Invoice or Offer.
+#[cfg(feature="document_export")]
+fn project_to_doc(project: &Project, template_name:&str, bill_type:Option<BillType>, output_path: Option<&Path>,dry_run:bool, force:bool) -> Result<()> {
+    // init_export_config()
+    let output_ext    = ::CONFIG.get_str("extensions/output_file").expect("Faulty default config");
+    let convert_ext   = ::CONFIG.get_str("convert/output_extension").expect("Faulty default config");
+    let convert_tool  = ::CONFIG.get_str("convert/tool");
+    let output_folder = ::CONFIG.get_str("output_path").and_then(util::get_valid_path).expect("Faulty config \"output_path\"");
+    let trash_exts    = ::CONFIG.get("convert/trash_extensions") .expect("Faulty default config")
+                                .as_vec().expect("Faulty default config")
+                                .into_iter()
+                                .map(|v|v.as_str()).collect::<Vec<_>>();
+
+    let  template_path = output_template_path(template_name)?;
+
+    // project_readyness(&project) {
+    let ready_for_offer = project.is_ready_for_offer();
+    let ready_for_invoice = project.is_ready_for_invoice();
+    let project_file = project.file();
+
+    // tiny little helper
+    let to_local_file = |file:&Path, ext| {
+        let mut _tmpfile = file.to_owned();
+        _tmpfile.set_extension(ext);
+        Path::new(_tmpfile.file_name().unwrap().into()).to_owned()
+    };
+
+    use BillType::*;
+    let (dyn_bill_type, outfile_tex):
+        (Option<BillType>, Option<PathBuf>) =
+         match (bill_type, ready_for_offer, ready_for_invoice)
+    {
+        (Some(Offer),   Ok(_),  _     )  |
+        (None,          Ok(_),  Err(_))  => (Some(Offer), Some(project.dir().join(project.offer_file_name(output_ext).expect("this should have been cought by ready_for_offer()")))),
+        (Some(Invoice), _,      Ok(_))  |
+        (None,          _,      Ok(_))  => (Some(Invoice), Some(project.dir().join(project.invoice_file_name(output_ext).expect("this should have been cought by ready_for_invoice()")))),
+        (Some(Offer),   Err(e), _    )  => {error!("cannot create an offer, check out:{}",e);(None,None)},
+        (Some(Invoice), _,      Err(e)) => {error!("cannot create an invoice, check out:{}",e);(None,None)},
+        (_,         Err(e),     Err(_)) => {error!("Neither an Offer nor an Invoice can be created from this project\n please check out {}", e);(None,None)}
+    };
+
+    // }
+
+    //debug!("{:?} -> {:?}",(bill_type, project.is_ready_for_offer(), project.is_ready_for_invoice()), (dyn_bill_type, outfile_tex));
+
+    if let (Some(outfile), Some(dyn_bill)) = (outfile_tex, dyn_bill_type) {
+        let filled = fill_template(project, &dyn_bill, &template_path)?;
+
+        let pdffile = to_local_file(&outfile, convert_ext);
+        let target = if let Some(output_path) = output_path {
+            if output_path.is_dir() { // if dir, use my name and place in there
+                output_folder.join(&pdffile)
+            } else if output_path.parent().map(Path::exists).unwrap_or(false) {// if not dir, place at this path with this name
+                output_path.to_owned()
+            } else {
+                warn!("{}", lformat!("Can't make sense of {}", output_path.display()));
+                output_folder.join(&pdffile)
+            }
+        } else {
+            output_folder.join(&pdffile)
+        };
+
+        // ok, so apparently we can create a tex file, so lets do it
+        if !force && target.exists() && file_age(&target)? < file_age(&project_file)? {
+            // no wait, nothing has changed, so lets save ourselves the work
+            info!("nothing to be done, {} is younger than {}
+                         use --force if you don't agree
+                         use --pdf to only rebuild the pdf",
+                  target.display(),
+                  project_file.display());
+            unimplemented!();
+        } else {
+            // \o/ we created a tex file
+
+            if dry_run{
+                warn!("Dry run! This does not produce any output:\n * {}\n * {}", outfile.display(), pdffile.display());
+            } else {
+                let outfileb = project.write_to_file(&filled,&dyn_bill,output_ext)?;
+                debug!("{} vs\n        {}", outfile.display(), outfileb.display());
+                util::pass_to_command(&convert_tool, &[&outfileb]);
+            }
+            // clean up expected trash files
+            for trash_ext in trash_exts.iter().filter_map(|x|*x){
+                let trash_file = to_local_file(&outfile, trash_ext);
+                if  trash_file.exists() {
+                    fs::remove_file(&trash_file)?;
+                    debug!("just deleted: {}", trash_file.display())
+                }
+                else {
+                    debug!("I expected there to be a {}, but there wasn't any ?", trash_file.display())
+                }
+            }
+            if pdffile.exists(){
+                debug!("now there is be a {:?} -> {:?}", pdffile, target);
+                fs::rename(&pdffile, &target)?;
+            }
+        }
+    }
+
+    Ok(())
+}
+
+/// Creates the latex files within each projects directory, either for Invoice or Offer.
+#[cfg(feature="document_export")]
+pub fn projects_to_doc(dir:StorageDir, search_term:&str, template_name:&str, bill_type:Option<BillType>, output: Option<&Path>, dry_run:bool, force:bool) -> Result<()> {
+    with_projects(dir, &[search_term], |p| project_to_doc(p, template_name, bill_type, output, dry_run, force) )
+}
+
+/// Creates the latex files within each projects directory, either for Invoice or Offer.
+#[cfg(feature="document_export")]
+pub fn project_files_to_doc(project_file:&Path, template_name:&str, bill_type:Option<BillType>, output: Option<&Path>, dry_run:bool, force:bool) -> Result<()> {
+    let project = Project::open_file(project_file)?;
+    project_to_doc(&project, template_name, bill_type, output, dry_run, force)
+}

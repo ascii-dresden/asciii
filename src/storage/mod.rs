@@ -228,6 +228,7 @@ impl<L:Storable> Storage<L> {
 
     /// Produces a list of files in the `template_dir()`
     pub fn list_template_files(&self) -> StorageResult<Vec<PathBuf>> {
+        // TODO this is the only reference to `CONFIG`, lets get rid of it
         let template_file_extension = ::CONFIG.get_str("extensions/project_template").expect("Internal Error: default config is wrong");
         trace!("listing template files (.{})", template_file_extension);
         let template_files :Vec<PathBuf>=

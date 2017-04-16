@@ -67,7 +67,7 @@ pub mod templater;
 
 #[cfg(feature="json")] extern crate rustc_serialize;
 #[cfg(feature="document_export")] extern crate handlebars;
-#[cfg(feature="document_export")] pub mod fill_docs;
+#[cfg(feature="document_export")] pub mod document_export;
 
 pub use yaml_rust::Yaml;
 
@@ -94,7 +94,7 @@ lazy_static!{
     pub static ref VERSION: String = format!("{} - {}", env!("CARGO_PKG_VERSION"), include_str!("../.most_recent_commit"));
 }
 
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone)]
 pub enum BillType{
     Offer,
     Invoice

@@ -215,7 +215,7 @@ pub fn with_cli<F> (app_handler:F) where F: Fn(App) {
                         .arg(Arg::with_name("force")
                              .help(lformat!("Archives the project, even though it is not completely valid").as_ref())
                              .long("force")
-                             .short("f")
+                             .short("F")
                             )
 
                         .arg(Arg::with_name("all")
@@ -514,9 +514,20 @@ pub fn with_cli<F> (app_handler:F) where F: Fn(App) {
                         .about(lformat!("Creates documents from projects").as_ref())
                         .aliases(&["mk"])
 
+                        .arg(Arg::with_name("file")
+                             .help(lformat!("Manually pass a file path").as_ref())
+                             .long("file")
+                             .takes_value(true)
+                            )
+
+                        .arg(Arg::with_name("output")
+                             .help(lformat!("Manually pass a output folder").as_ref())
+                             .long("output")
+                             .takes_value(true)
+                            )
+
                         .arg(Arg::with_name("force")
                              .help(lformat!("Do it against better judgement").as_ref())
-                             .short("f")
                              .long("force")
                             )
 
@@ -528,19 +539,17 @@ pub fn with_cli<F> (app_handler:F) where F: Fn(App) {
 
                         .arg(Arg::with_name("search_term")
                              .help(lformat!("Search term, possibly event name").as_ref())
-                             .required(true)
-                             .multiple(true))
+                             .multiple(true)
+                             )
 
                         .arg(Arg::with_name("offer")
                              .help(lformat!("Produce an offer document").as_ref())
-                             .short("o")
                              .long("offer")
                              .conflicts_with("invoice")
                              )
 
                         .arg(Arg::with_name("invoice")
                              .help(lformat!("Produce an invoice document").as_ref())
-                             .short("i")
                              .long("invoice")
                              )
 
