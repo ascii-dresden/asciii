@@ -242,7 +242,7 @@ impl Repository {
     }
 
     pub fn log(&self, paths:&[PathBuf]) -> ExitStatus {
-        self.execute_git("log", &[], paths)
+        self.execute_git("log", &[ "--graph", "--pretty=format:'%Cred%h%Creset -%C(bold yellow)%d%Creset %C() %s %C(reset) ( %C(yellow)%an%Creset %C(green)%cr )'", "--abbrev-commit", "--date=relative" ], paths)
     }
 }
 
