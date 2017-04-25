@@ -28,7 +28,7 @@ Just plain old `cargo install --git https://github.com/ascii-dresden/asciii` wil
 
 ### Requirements
 
-You need at least `rustc`, `cargo`, `cmake` and `git` to run this.
+You need at least `rustc`, `cargo`, `cmake`, `git` and `zlib1g-dev` to run this.
 
 
 ## Development
