@@ -44,6 +44,7 @@ impl<L: Storable> ProjectList<L> {
 }
 
 use std::iter::IntoIterator;
+
 impl<L: Storable> IntoIterator for ProjectList<L> {
     type Item = L;
     type IntoIter = ::std::vec::IntoIter<L>;
@@ -78,3 +79,5 @@ impl<L: Storable> DerefMut for ProjectList<L> {
         &mut self.projects
     }
 }
+
+

@@ -8,39 +8,39 @@ msgid ""
 msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 
-#: /Users/hendrik/code/rust/asciii/src/actions/mod.rs:93
+#: /Users/hendrik/code/rust/asciii/src/actions/mod.rs:60
 msgid "INum"
 msgstr ""
 
-#: /Users/hendrik/code/rust/asciii/src/actions/mod.rs:94
+#: /Users/hendrik/code/rust/asciii/src/actions/mod.rs:61
 msgid "Designation"
 msgstr ""
 
-#: /Users/hendrik/code/rust/asciii/src/actions/mod.rs:95
+#: /Users/hendrik/code/rust/asciii/src/actions/mod.rs:62
 msgid "Date"
 msgstr ""
 
-#: /Users/hendrik/code/rust/asciii/src/actions/mod.rs:96
+#: /Users/hendrik/code/rust/asciii/src/actions/mod.rs:63
 msgid "InvoiceDate"
 msgstr ""
 
-#: /Users/hendrik/code/rust/asciii/src/actions/mod.rs:97
+#: /Users/hendrik/code/rust/asciii/src/actions/mod.rs:64
 msgid "Caterer"
 msgstr ""
 
-#: /Users/hendrik/code/rust/asciii/src/actions/mod.rs:98
+#: /Users/hendrik/code/rust/asciii/src/actions/mod.rs:65
 msgid "Responsible"
 msgstr ""
 
-#: /Users/hendrik/code/rust/asciii/src/actions/mod.rs:99
+#: /Users/hendrik/code/rust/asciii/src/actions/mod.rs:66
 msgid "Payed on"
 msgstr ""
 
-#: /Users/hendrik/code/rust/asciii/src/actions/mod.rs:100
+#: /Users/hendrik/code/rust/asciii/src/actions/mod.rs:67
 msgid "Amount"
 msgstr ""
 
-#: /Users/hendrik/code/rust/asciii/src/actions/mod.rs:101
+#: /Users/hendrik/code/rust/asciii/src/actions/mod.rs:68
 msgid "Canceled"
 msgstr ""
 
@@ -472,15 +472,15 @@ msgstr ""
 msgid "Date Format must be DD.MM.YYYY"
 msgstr ""
 
-#: /Users/hendrik/code/rust/asciii/src/cli/subcommands/mod.rs:320
+#: /Users/hendrik/code/rust/asciii/src/cli/subcommands/mod.rs:319
 msgid "You have to provide either a search term or path"
 msgstr ""
 
-#: /Users/hendrik/code/rust/asciii/src/document_export/mod.rs:230
+#: /Users/hendrik/code/rust/asciii/src/document_export/mod.rs:212
 msgid "Can't make sense of {}"
 msgstr ""
 
-#: /Users/hendrik/code/rust/asciii/src/lib.rs:82
+#: /Users/hendrik/code/rust/asciii/src/lib.rs:81
 msgid "Documentation at: {}"
 msgstr ""
 

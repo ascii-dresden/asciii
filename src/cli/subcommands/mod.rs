@@ -12,13 +12,13 @@ use asciii;
 use asciii::CONFIG;
 use asciii::config;
 use asciii::util;
-use asciii::BillType;
 use asciii::actions;
-use asciii::document_export;
+use asciii::storage;
 use asciii::storage::*;
 use asciii::project::Project;
-use asciii::actions::setup_storage;
 
+#[cfg(feature="document_export")] use asciii::document_export;
+#[cfg(feature="document_export")] use asciii::BillType;
 
 // simple_rows, verbose_rows,
 // path_rows, dynamic_rows,
@@ -50,7 +50,7 @@ pub fn new(matches: &ArgMatches) {
         .unwrap();
 
     let edit = !matches.is_present("don't edit");
-    let luigi = execute(setup_storage);
+    let luigi = execute(storage::setup::<Project>);
 
     let mut fill_data: HashMap<&str, String> = HashMap::new();
 
@@ -192,7 +192,7 @@ pub fn edit(matches: &ArgMatches) {
 }
 
 fn edit_projects(dir: StorageDir, search_terms: &[&str], editor: &Option<&str>) {
-    let luigi = execute(setup_storage);
+    let luigi = execute(storage::setup::<Project>);
     let mut all_projects = Vec::new();
     for search_term in search_terms {
         let mut paths = execute(|| luigi.search_projects(dir, search_term));
@@ -211,10 +211,10 @@ fn edit_projects(dir: StorageDir, search_terms: &[&str], editor: &Option<&str>) 
     }
 }
 
-/// Command WORKSPACE 
+/// Command WORKSPACE
 pub fn workspace(matches: &ArgMatches) {
     println!("{:?}", matches);
-    let luigi = execute(setup_storage);
+    let luigi = execute(storage::setup::<Project>);
     let editor = matches.value_of("editor")
         .or(CONFIG.get("user/editor")
                   .and_then(|e| e.as_str()));
@@ -225,7 +225,7 @@ pub fn workspace(matches: &ArgMatches) {
 pub fn with_templates<F>(name: &str, action: F)
     where F: FnOnce(&[PathBuf])
 {
-    let luigi = execute(setup_storage);
+    let luigi = execute(storage::setup::<Project>);
     let template_paths = execute(||luigi.list_template_files())
         .into_iter() // drain?
         .filter(|f|f.file_stem() .unwrap_or_else(||OsStr::new("")) == name)
@@ -263,7 +263,7 @@ pub fn set(m: &ArgMatches) {
 
 /// Command CALENDAR
 pub fn calendar(matches: &ArgMatches) {
-    let calendar = execute(||actions::calendar(matches_to_dir(matches), matches.is_present("tasks")));
+    let calendar = execute(||actions::calendar_with_tasks(matches_to_dir(matches), matches.is_present("tasks")));
     println!("{}", calendar);
 }
 
@@ -296,24 +296,23 @@ pub fn make(m: &ArgMatches) {
     let (search_terms, dir) = matches_to_search(m);
         debug!("make {t}({s}/{d:?}, invoice={i:?})", d = dir, s = search_terms[0], t = template_name, i = bill_type);
 
-        execute(|| {
-            document_export::projects_to_doc(dir,
-                                             search_terms[0],
-                                             template_name,
-                                             bill_type,
-                                             m.value_of("output").map(Path::new),
-                                             m.is_present("dry-run"),
-                                             m.is_present("force"))
-        });
+        document_export::projects_to_doc(dir,
+                                         search_terms[0],
+                                         template_name,
+                                         bill_type,
+                                         m.value_of("output").map(Path::new),
+                                         m.is_present("dry-run"),
+                                         m.is_present("force"))
+
     } else if let Some(file_path) = m.value_of("file") {
         debug!("make {t}({d:?}, invoice={i:?})", d = file_path, t = template_name, i = bill_type);
         execute(|| {
-            document_export::project_files_to_doc(&Path::new(file_path),
-                                                  template_name,
-                                                  bill_type,
-                                                  m.value_of("output").map(Path::new),
-                                                  m.is_present("dry-run"),
-                                                  m.is_present("force"))
+            document_export::project_file_to_doc(&Path::new(file_path),
+                                                 template_name,
+                                                 bill_type,
+                                                 m.value_of("output").map(Path::new),
+                                                 m.is_present("dry-run"),
+                                                 m.is_present("force"))
         });
 
     } else {

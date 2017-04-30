@@ -1,5 +1,5 @@
 use util;
-use storage::Storable;
+use storage::{self,Storable};
 
 use super::Project;
 use super::spec::*;
@@ -53,7 +53,7 @@ impl<'a> From<&'a str> for ComputedField {
 
 impl ComputedField {
     pub fn get(&self, project: &Project) -> Option<String> {
-        let storage = util::get_storage_path();
+        let storage = storage::get_storage_path();
 
         match *self {
             ComputedField::Responsible       => project.responsible().map(|s| s.to_owned()),

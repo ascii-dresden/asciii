@@ -15,7 +15,7 @@ use std::path::{Path,PathBuf};
 
 use util;
 use super::BillType;
-use storage::{Storage,StorageDir,Storable,StorageResult};
+use storage::{self, Storage,StorageDir,Storable,StorageResult};
 use project::Project;
 use project::spec::IsProject;
 use project::spec::IsClient;
@@ -26,57 +26,25 @@ use project::spec::events::HasEvents;
 pub mod error;
 use self::error::*;
 
-/// Sets up an instance of `Storage`.
-pub fn setup_storage() -> Result<Storage<Project>> {
-    trace!("setup_storage()");
-    let working   = ::CONFIG.get_str("dirs/working").ok_or("Faulty config: dirs/working does not contain a value")?;
-    let archive   = ::CONFIG.get_str("dirs/archive").ok_or("Faulty config: dirs/archive does not contain a value")?;
-    let templates = ::CONFIG.get_str("dirs/templates").ok_or("Faulty config: dirs/templates does not contain a value")?;
-    let storage   = Storage::new(util::get_storage_path(), working, archive, templates)?;
-    storage.health_check()?;
-    Ok(storage)
-}
-
-/// Sets up an instance of `Storage`, with git turned on.
-pub fn setup_storage_with_git() -> Result<Storage<Project>> {
-    trace!("setup_storage()");
-    let working   = ::CONFIG.get_str("dirs/working").ok_or("Faulty config: dirs/working does not contain a value")?;
-    let archive   = ::CONFIG.get_str("dirs/archive").ok_or("Faulty config: dirs/archive does not contain a value")?;
-    let templates = ::CONFIG.get_str("dirs/templates").ok_or("Faulty config: dirs/templates does not contain a value")?;
-    let storage   = Storage::new_with_git(util::get_storage_path(), working, archive, templates)?;
-    storage.health_check()?;
-    Ok(storage)
-}
-
-
-pub fn simple_with_projects<F>(dir:StorageDir, search_terms:&[&str], f:F)
-    where F:Fn(&Project)
-{
-    match with_projects(dir, search_terms, |p| {f(p);Ok(())}){
-        Ok(_) => {},
-        Err(e) => error!("{}",e)
-    }
-}
-
 /// Helper method that passes projects matching the `search_terms` to the passt closure `f`
 /// TODO Really move this to `Storage`
 pub fn with_projects<F>(dir:StorageDir, search_terms:&[&str], f:F) -> Result<()>
     where F:Fn(&Project)->Result<()>
 {
     trace!("with_projects({:?})", search_terms);
-    let luigi = setup_storage()?;
+    let luigi = storage::setup::<Project>()?;
     let projects = luigi.search_projects_any(dir, search_terms)?;
     if projects.is_empty() {
         return Err(format!("Nothing found for {:?}", search_terms).into())
     }
-    for project in &projects{
-        f(project)?;
+    for project in projects {
+        f(&project)?;
     }
     Ok(())
 }
 
 pub fn csv(year:i32) -> Result<String> {
-    let luigi = setup_storage()?;
+    let luigi = storage::setup::<Project>()?;
     let mut projects = luigi.open_projects(StorageDir::Year(year))?;
     projects.sort_by(|pa,pb| pa.index().unwrap_or_else(||"zzzz".to_owned()).cmp( &pb.index().unwrap_or_else(||"zzzz".to_owned())));
     projects_to_csv(&projects)
@@ -120,7 +88,7 @@ pub fn projects_to_csv(projects:&[Project]) -> Result<String>{
 
 /// Command DUES
 pub fn open_wages() -> Result<Currency>{
-    let luigi = setup_storage()?;
+    let luigi = storage::setup::<Project>()?;
     let projects = luigi.open_projects(StorageDir::Working)?;
     Ok(projects.iter()
         .filter(|p| !p.canceled() && p.age().unwrap_or(0) > 0)
@@ -131,7 +99,7 @@ pub fn open_wages() -> Result<Currency>{
 
 /// Command DUES
 pub fn open_payments() -> Result<Currency>{
-    let luigi = setup_storage()?;
+    let luigi = storage::setup::<Project>()?;
     let projects = luigi.open_projects(StorageDir::Working)?;
     Ok(projects.iter()
        .filter(|p| !p.canceled() && !p.payed_by_client() && p.age().unwrap_or(0) > 0)
@@ -145,7 +113,7 @@ pub fn open_payments() -> Result<Currency>{
 /// TODO move this to `spec::all_the_things`
 pub fn spec() -> Result<()> {
     use project::spec::*;
-    let luigi = setup_storage()?;
+    let luigi = storage::setup::<Project>()?;
     //let projects = super::execute(||luigi.open_projects(StorageDir::All));
     let projects = luigi.open_projects(StorageDir::Working)?;
     for project in projects{
@@ -174,7 +142,7 @@ pub fn spec() -> Result<()> {
 }
 
 pub fn delete_project_confirmation(dir: StorageDir, search_terms:&[&str]) -> Result<()> {
-    let luigi = setup_storage_with_git()?;
+    let luigi = storage::setup_with_git::<Project>()?;
     for project in luigi.search_projects_any(dir, search_terms)? {
         luigi.delete_project_if(&project,
                 || util::really(&format!("you want me to delete {:?} [y/N]", project.dir())) && util::really("really? [y/N]")
@@ -185,12 +153,12 @@ pub fn delete_project_confirmation(dir: StorageDir, search_terms:&[&str]) -> Res
 
 pub fn archive_projects(search_terms:&[&str], manual_year:Option<i32>, force:bool) -> Result<Vec<PathBuf>>{
     trace!("archive_projects matching ({:?},{:?},{:?})", search_terms, manual_year,force);
-    let luigi = setup_storage_with_git()?;
+    let luigi = storage::setup_with_git::<Project>()?;
     Ok( luigi.archive_projects_if(search_terms, manual_year, || force) ?)
 }
 
 pub fn archive_all_projects() -> Result<Vec<PathBuf>> {
-    let luigi = setup_storage_with_git()?;
+    let luigi = storage::setup_with_git::<Project>()?;
     let mut moved_files = Vec::new();
     for project in luigi.open_projects(StorageDir::Working)?
                         .iter()
@@ -205,7 +173,7 @@ pub fn archive_all_projects() -> Result<Vec<PathBuf>> {
 /// Command UNARCHIVE <YEAR> <NAME>
 /// TODO: return a list of files that have to be updated in git
 pub fn unarchive_projects(year:i32, search_terms:&[&str]) -> Result<Vec<PathBuf>> {
-    let luigi = setup_storage_with_git()?;
+    let luigi = storage::setup_with_git::<Project>()?;
     Ok( luigi.unarchive_projects(year, search_terms) ?)
 }
 
@@ -221,8 +189,8 @@ pub fn calendar_and_tasks(dir: StorageDir) -> Result<String> {
     calendar_with_tasks(dir, false)
 }
 
-fn calendar_with_tasks(dir: StorageDir, show_tasks:bool) -> Result<String> {
-    let luigi = setup_storage()?;
+pub fn calendar_with_tasks(dir: StorageDir, show_tasks:bool) -> Result<String> {
+    let luigi = storage::setup::<Project>()?;
     let mut cal = Calendar::new();
     if show_tasks {
         for project in luigi.open_projects(StorageDir::Working)?  {

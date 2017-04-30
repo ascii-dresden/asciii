@@ -5,9 +5,8 @@
 use std::io;
 use std::fmt;
 use std::time;
-use std::{env,fs};
+use std::fs;
 use std::path::{Path,PathBuf};
-use std::error::Error as ErrorTrait;
 
 use rustc_serialize::json::{ToJson, Json};
 use handlebars::{RenderError, Handlebars, no_escape};
@@ -17,7 +16,7 @@ use util;
 use project;
 use project::Project;
 use storage::error::StorageError;
-use storage::{Storage,StorageDir,Storable,StorageResult};
+use storage::{self,Storage,StorageDir,Storable};
 
 pub mod error {
     use super::*;
@@ -57,7 +56,7 @@ fn setup_luigi() -> Storage<Project> {
         .expect("Faulty config: dirs/archive does not contain a value");
     let templates = ::CONFIG.get_str("dirs/templates")
         .expect("Faulty config: dirs/templates does not contain a value");
-    Storage::new(util::get_storage_path(), working, archive, templates).unwrap()
+    Storage::new(storage::get_storage_path(), working, archive, templates).unwrap()
 }
 
 struct PackData<'a, T: 'a + ToJson> {
@@ -85,23 +84,6 @@ fn pack_data<E: ToJson>(document: &E, is_invoice:bool) -> PackData<E> {
         storage: setup_luigi(),
         is_invoice:is_invoice
     }
-}
-
-/// Helper method that passes projects matching the `search_terms` to the passt closure `f`
-/// TODO REALLY MOVE THIS TO `Storage`
-fn with_projects<F>(dir:StorageDir, search_terms:&[&str], f:F) -> Result<()>
-    where F:Fn(&Project)->Result<()>
-{
-    trace!("with_projects({:?})", search_terms);
-    let luigi = setup_luigi();
-    let projects = luigi.search_projects_any(dir, search_terms)?;
-    if projects.is_empty() {
-        return Err(format!("Nothing found for {:?}", search_terms).into())
-    }
-    for project in &projects{
-        f(project)?;
-    }
-    Ok(())
 }
 
 fn inc_helper(_: &Context, h: &Helper, _: &Handlebars, rc: &mut RenderContext) -> ::std::result::Result<(), RenderError> {
@@ -157,7 +139,7 @@ fn output_template_path(template_name:&str) -> Result<PathBuf> {
     // construct_template_path(&template_name) {
     let template_ext  = ::CONFIG.get_str("extensions/output_template").expect("Faulty default config");
     let mut template_path = PathBuf::new();
-    template_path.push(util::get_storage_path());
+    template_path.push(storage::get_storage_path());
     template_path.push(::CONFIG.get_str("dirs/templates").expect("Faulty config: dirs/templates does not contain a value"));
     template_path.push(template_name);
     template_path.set_extension(template_ext);
@@ -276,13 +258,18 @@ fn project_to_doc(project: &Project, template_name:&str, bill_type:Option<BillTy
 
 /// Creates the latex files within each projects directory, either for Invoice or Offer.
 #[cfg(feature="document_export")]
-pub fn projects_to_doc(dir:StorageDir, search_term:&str, template_name:&str, bill_type:Option<BillType>, output: Option<&Path>, dry_run:bool, force:bool) -> Result<()> {
-    with_projects(dir, &[search_term], |p| project_to_doc(p, template_name, bill_type, output, dry_run, force) )
+pub fn projects_to_doc(dir:StorageDir, search_term:&str, template_name:&str, bill_type:Option<BillType>, output: Option<&Path>, dry_run:bool, force:bool) {
+
+    let storage = storage::setup::<Project>().unwrap();
+    storage.simple_with_projects(dir,
+                                 Some(&[search_term]),
+                                 |p| project_to_doc(&p, template_name, bill_type, output, dry_run, force).unwrap()
+                                 );
 }
 
 /// Creates the latex files within each projects directory, either for Invoice or Offer.
 #[cfg(feature="document_export")]
-pub fn project_files_to_doc(project_file:&Path, template_name:&str, bill_type:Option<BillType>, output: Option<&Path>, dry_run:bool, force:bool) -> Result<()> {
+pub fn project_file_to_doc(project_file:&Path, template_name:&str, bill_type:Option<BillType>, output: Option<&Path>, dry_run:bool, force:bool) -> Result<()> {
     let project = Project::open_file(project_file)?;
     project_to_doc(&project, template_name, bill_type, output, dry_run, force)
 }

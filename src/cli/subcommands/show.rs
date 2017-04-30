@@ -5,11 +5,10 @@ use rustc_serialize::json::ToJson;
 use clap::ArgMatches;
 
 use asciii::BillType;
-use asciii::actions;
 use asciii::print;
+use asciii::storage;
 use asciii::storage::*;
-use asciii::project::spec;
-use asciii::actions::setup_storage;
+use asciii::project::{spec,Project};
 use asciii::templater::Templater;
 use asciii::project::spec::events::HasEvents;
 
@@ -31,9 +30,10 @@ pub fn show(m: &ArgMatches) {
         _               => BillType::Invoice, //TODO be inteligent here ( use date )
     };
 
+    let storage = execute(||storage::setup::<Project>());
 
     if m.is_present("files") {
-        actions::simple_with_projects(dir, &search_terms, |p| {
+        storage.simple_with_projects(dir, Some(&search_terms), |p| {
             println!("{}: ", p.dir().display());
             for entry in fs::read_dir(p.dir()).unwrap() {
                 println!("  {}", entry.unwrap().path().display())
@@ -48,14 +48,15 @@ pub fn show(m: &ArgMatches) {
     } else if m.is_present("ical"){ show_ical(dir, search_terms.as_slice())
     } else if m.is_present("csv"){  show_csv( dir, search_terms.as_slice());
     } else if m.is_present("template"){ show_template(search_terms[0]);
-    } else { actions::simple_with_projects(dir,
-                                           search_terms.as_slice(),
-                                           |p|print::show_details(p,&bill_type))
+    } else { storage.simple_with_projects(dir,
+                                         Some(search_terms.as_slice()),
+                                         |p|print::show_details(&p, &bill_type))
     }
 }
 
 fn show_errors(dir: StorageDir, search_terms: &[&str]) {
-    actions::simple_with_projects(dir, &search_terms, |p| {
+    let storage = execute(||storage::setup::<Project>());
+    storage.simple_with_projects(dir, Some(&search_terms), |p| {
         println!("{}: ", p.short_desc());
         spec::print_specresult("offer", p.is_ready_for_offer());
         spec::print_specresult("invoice", p.is_ready_for_invoice());
@@ -64,32 +65,37 @@ fn show_errors(dir: StorageDir, search_terms: &[&str]) {
 }
 
 fn show_empty_fields(dir: StorageDir, search_terms: &[&str]) {
-    actions::simple_with_projects(dir,
-                                  &search_terms,
-                                  |p| println!("{}: {}", p.short_desc(), p.empty_fields().join(", ")));
+    let storage = execute(||storage::setup::<Project>());
+    storage.simple_with_projects(dir,
+                                Some(&search_terms),
+                                |p| println!("{}: {}", p.short_desc(), p.empty_fields().join(", ")));
 }
 
 
 #[cfg(feature="document_export")]
 fn show_json(dir: StorageDir, search_terms: &[&str]) {
-    actions::simple_with_projects(dir, &search_terms, |p| println!("{}", p.to_json()));
+    let storage = execute(||storage::setup::<Project>());
+    storage.simple_with_projects(dir, Some(&search_terms), |p| println!("{}", p.to_json()));
 }
 
 fn show_ical(dir: StorageDir, search_terms: &[&str]) {
-    actions::simple_with_projects(dir, &search_terms, |p| p.to_ical().print().unwrap());
+    let storage = execute(||storage::setup::<Project>());
+    storage.simple_with_projects(dir, Some(&search_terms), |p| p.to_ical().print().unwrap());
 }
 
 fn show_detail(dir: StorageDir, search_terms: &[&str], detail: &str) {
-    actions::simple_with_projects(dir, &search_terms, |p| {
+    let storage = execute(||storage::setup::<Project>());
+    storage.simple_with_projects(dir, Some(&search_terms), |p| {
         println!("{}",
                  p.get(detail).unwrap_or_else(|| String::from("Nothing found")))
     });
 }
 
 fn show_csv(dir: StorageDir, search_terms: &[&str]) {
-    actions::simple_with_projects(dir,
-                                  &search_terms,
-                                  |p| println!("{}", execute(|| p.to_csv(&BillType::Invoice))));
+    let storage = execute(||storage::setup::<Project>());
+    storage.simple_with_projects(dir,
+                                Some(&search_terms),
+                                |p| println!("{}", execute(|| p.to_csv(&BillType::Invoice))));
 }
 
 #[cfg(not(feature="document_export"))]
@@ -103,13 +109,14 @@ pub fn show_path(matches: &ArgMatches) {
 
 /// Command SHOW --template
 fn show_template(name: &str) {
-    let luigi = execute(setup_storage);
+    let luigi = execute(storage::setup::<Project>);
     let template = execute(|| luigi.get_template_file(name));
     let templater = execute(|| Templater::from_file(&template));
     println!("{:#?}", templater.list_keywords());
 }
 
 fn dump_yaml(dir: StorageDir, search_terms: &[&str]) {
-    actions::simple_with_projects(dir, &search_terms, |p| println!("{}", p.dump_yaml()));
+    let storage = execute(||storage::setup::<Project>());
+    storage.simple_with_projects(dir, Some(&search_terms), |p| println!("{}", p.dump_yaml()));
 }
 

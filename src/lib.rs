@@ -61,7 +61,6 @@ pub mod project;
 pub mod storage;
 pub mod print;
 pub mod actions;
-pub use actions::{setup_storage, setup_storage_with_git, calendar};
 
 pub mod templater;
 

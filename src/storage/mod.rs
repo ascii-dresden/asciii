@@ -21,6 +21,7 @@
 
 
 use std::fs;
+use std::env::{home_dir,current_dir};
 use std::path::{Path, PathBuf};
 use std::marker::PhantomData;
 
@@ -99,6 +100,55 @@ pub fn list_path_content(path:&Path) -> StorageResult<Vec<PathBuf>> {
         .filter_map(|entry| entry.ok())
         .map(|entry| entry.path())
         .collect::<Vec<PathBuf>>())
+}
+
+fn replace_home_tilde(p:&Path) -> PathBuf{
+    let path = p.to_str().unwrap();
+    PathBuf::from( path.replace("~",home_dir().unwrap().to_str().unwrap()))
+}
+
+/// Interprets storage path from config.
+///
+/// Even if it starts with `~` or is a relatetive path.
+/// This is by far the most important function of all utility functions.
+pub fn get_storage_path() -> PathBuf
+{
+    let storage_path = PathBuf::from(::CONFIG.get_str("path")
+            .expect("Faulty config: field path does not contain a string value"))
+            .join( ::CONFIG.get_str("dirs/storage")
+            .expect("Faulty config: field dirs/storage does not contain a string value"));
+
+    // TODO make replace tilde a Trait function
+    let storage_path = replace_home_tilde(&storage_path);
+
+    if !storage_path.is_absolute(){
+        current_dir().unwrap().join(storage_path)
+    } else {
+        storage_path
+    }
+}
+
+
+/// Sets up an instance of `Storage`.
+pub fn setup<L:Storable>() -> StorageResult<Storage<L>> {
+    trace!("setup_luigi()");
+    let working   = ::CONFIG.get_str("dirs/working").ok_or("Faulty config: dirs/working does not contain a value")?;
+    let archive   = ::CONFIG.get_str("dirs/archive").ok_or("Faulty config: dirs/archive does not contain a value")?;
+    let templates = ::CONFIG.get_str("dirs/templates").ok_or("Faulty config: dirs/templates does not contain a value")?;
+    let storage   = Storage::new(get_storage_path(), working, archive, templates)?;
+    storage.health_check()?;
+    Ok(storage)
+}
+
+/// Sets up an instance of `Storage`, with git turned on.
+pub fn setup_with_git<L:Storable>() -> StorageResult<Storage<L>> {
+    trace!("setup_luigi()");
+    let working   = ::CONFIG.get_str("dirs/working").ok_or("Faulty config: dirs/working does not contain a value")?;
+    let archive   = ::CONFIG.get_str("dirs/archive").ok_or("Faulty config: dirs/archive does not contain a value")?;
+    let templates = ::CONFIG.get_str("dirs/templates").ok_or("Faulty config: dirs/templates does not contain a value")?;
+    let storage   = Storage::new_with_git(get_storage_path(), working, archive, templates)?;
+    storage.health_check()?;
+    Ok(storage)
 }
 
 
@@ -323,11 +373,33 @@ impl<L:Storable> Storage<L> {
         Ok(project)
     }
 
-    //pub fn with_projects<F>(&self, dir:StorageDir, search_terms:&[&str], f:F) -> StorageResult<()>
-    //    where F:Fn(&L)->Result<()>
-    //{
-    //    Ok(())
-    //}
+    pub fn simple_with_projects<F>(&self, dir:StorageDir, search_terms:Option<&[&str]>, f:F)
+        where F:Fn(L)
+    {
+        match self.with_projects(dir, search_terms, |p| {f(p);Ok(())}){
+            Ok(_) => {},
+            Err(e) => error!("{}",e)
+        }
+    }
+
+    pub fn with_projects<F>(&self, dir:StorageDir, search_terms:Option<&[&str]>, f:F) -> StorageResult<()>
+        where F:Fn(L)->StorageResult<()>
+    {
+        trace!("Storage::with_projects({:?})", search_terms);
+        let projects = if let Some(search_terms) = search_terms {
+            self.search_projects_any(dir, search_terms)?
+        } else {
+            self.open_projects(dir)?
+        };
+
+        if projects.is_empty() {
+            return Err(format!("Nothing found for {:?}", search_terms).into())
+        }
+        for project in projects {
+            f(project)?;
+        }
+        Ok(())
+    }
 
     /// Moves a project folder from `/working` dir to `/archive/$year`.
     ///
@@ -506,26 +578,25 @@ impl<L:Storable> Storage<L> {
     ///
     /// # Warning
     /// Please be adviced that this uses [`Storage::open_projects()`](struct.Storage.html#method.open_projects) and therefore opens all projects.
-    pub fn search_projects(&self, directory:StorageDir, search_term:&str) -> StorageResult<Vec<L>> {
+    pub fn search_projects(&self, directory:StorageDir, search_term:&str) -> StorageResult<ProjectList<L>> {
         trace!("searching for projects by {:?} in {:?}", search_term, directory);
-        let project_paths = self.open_projects(directory)?;
-        let projects = project_paths
-            .into_iter()
-            .filter(|project| project.matches_search(&search_term.to_lowercase()))
-            .collect();
-        Ok(projects)
+        let projects = self.open_projects(directory)?
+                           .into_iter()
+                           .filter(|project| project.matches_search(&search_term.to_lowercase()))
+                           .collect();
+        Ok(ProjectList{projects})
     }
 
     /// Matches StorageDir's content against multiple terms and returns matching projects.
     /// TODO add search_multiple_projects_deep
-    pub fn search_projects_any(&self, dir:StorageDir, search_terms:&[&str]) -> StorageResult<Vec<L>> {
-        let mut all_projects = Vec::new();
+    pub fn search_projects_any(&self, dir:StorageDir, search_terms:&[&str]) -> StorageResult<ProjectList<L>> {
+        let mut projects = Vec::new();
         for search_term in search_terms{
-            let mut projects = self.search_projects(dir, &search_term)?;
-            all_projects.append(&mut projects);
+            let mut found_projects = self.search_projects(dir, &search_term)?;
+            projects.append(&mut found_projects);
         }
 
-        Ok(all_projects)
+        Ok(ProjectList{projects})
     }
 
     /// Tries to find a concrete Project.

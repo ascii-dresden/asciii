@@ -1,6 +1,7 @@
 use clap::ArgMatches;
 
-use asciii::actions::setup_storage_with_git;
+use asciii::storage;
+use asciii::project::Project;
 use asciii::util;
 
 use ::cli::execute;
@@ -8,9 +9,9 @@ use super::matches_to_paths;
 
 /// Command LOG
 pub fn git_log(matches: &ArgMatches) {
-    let luigi = execute(setup_storage_with_git);
-    let paths = matches_to_paths(matches, &luigi);
-    let repo = luigi.repository().unwrap();
+    let storage = execute(storage::setup_with_git::<Project>);
+    let paths = matches_to_paths(matches, &storage);
+    let repo = storage.repository().unwrap();
     if !repo.log(&paths).success() {
         error!("git log did not exit successfully")
     }
@@ -18,8 +19,8 @@ pub fn git_log(matches: &ArgMatches) {
 
 /// Command STATUS
 pub fn git_status() {
-    let luigi = execute(setup_storage_with_git);
-    let repo = luigi.repository().unwrap();
+    let storage = execute(storage::setup_with_git::<Project>);
+    let repo = storage.repository().unwrap();
     if !repo.status().success() {
         error!("git status did not exit successfully")
     }
@@ -27,8 +28,8 @@ pub fn git_status() {
 
 /// Command COMMIT
 pub fn git_commit() {
-    let luigi = execute(setup_storage_with_git);
-    let repo = luigi.repository().unwrap();
+    let storage = execute(storage::setup_with_git::<Project>);
+    let repo = storage.repository().unwrap();
     if !repo.commit().success() {
         error!("git commit did not exit successfully")
     }
@@ -38,17 +39,17 @@ pub fn git_commit() {
 /// exact replica of `git remote -v`
 #[cfg(not(feature="git_statuses"))]
 pub fn git_remote() {
-    let luigi = execute(setup_storage_with_git);
-    luigi.repository().unwrap().remote();
+    let storage = execute(storage::setup_with_git::<Project>);
+    storage.repository().unwrap().remote();
 }
 
 /// Command REMOTE
 /// exact replica of `git remote -v`
 #[cfg(feature="git_statuses")]
 pub fn git_remote() {
-    let luigi = execute(setup_storage_with_git);
+    let storage = execute(storage::setup_with_git::<Project>);
 
-    if let Some(r) = luigi.repository() {
+    if let Some(r) = storage.repository() {
         let ref repo = r.repo;
 
         for remote_name in repo.remotes().unwrap().iter() {
@@ -77,9 +78,9 @@ pub fn git_remote() {
 
 /// Command ADD
 pub fn git_add(matches: &ArgMatches) {
-    let luigi = execute(setup_storage_with_git);
-    let paths = matches_to_paths(matches, &luigi);
-    let repo = luigi.repository().unwrap();
+    let storage = execute(storage::setup_with_git::<Project>);
+    let paths = matches_to_paths(matches, &storage);
+    let repo = storage.repository().unwrap();
     if !repo.add(&paths).success() {
         error!("git add did not exit successfully")
     }
@@ -88,9 +89,9 @@ pub fn git_add(matches: &ArgMatches) {
 
 /// Command DIFF
 pub fn git_diff(matches: &ArgMatches) {
-    let luigi = execute(setup_storage_with_git);
-    let paths = matches_to_paths(matches, &luigi);
-    let repo = luigi.repository().unwrap();
+    let storage = execute(storage::setup_with_git::<Project>);
+    let paths = matches_to_paths(matches, &storage);
+    let repo = storage.repository().unwrap();
     if !repo.diff(&paths).success() {
         error!("git diff did not exit successfully")
     }
@@ -98,8 +99,8 @@ pub fn git_diff(matches: &ArgMatches) {
 
 /// Command PULL
 pub fn git_pull(matches: &ArgMatches) {
-    let luigi = execute(setup_storage_with_git);
-    let repo = luigi.repository().unwrap();
+    let storage = execute(storage::setup_with_git::<Project>);
+    let repo = storage.repository().unwrap();
 
     let success = if matches.is_present("rebase") {
         repo.pull_rebase().success()
@@ -113,8 +114,8 @@ pub fn git_pull(matches: &ArgMatches) {
 
 /// Command PUSH
 pub fn git_push() {
-    let luigi = execute(setup_storage_with_git);
-    let repo = luigi.repository().unwrap();
+    let storage = execute(storage::setup_with_git::<Project>);
+    let repo = storage.repository().unwrap();
     if !repo.push().success() {
         error!("git push did not exit successfully")
     }
@@ -122,8 +123,8 @@ pub fn git_push() {
 
 /// Command STASH
 pub fn git_stash() {
-    let luigi = execute(setup_storage_with_git);
-    let repo = luigi.repository().unwrap();
+    let storage = execute(storage::setup_with_git::<Project>);
+    let repo = storage.repository().unwrap();
     if !repo.stash().success() {
         error!("git stash did not exit successfully")
     }
@@ -131,9 +132,9 @@ pub fn git_stash() {
 
 /// Command CLEANUP
 pub fn git_cleanup(matches: &ArgMatches) {
-    let luigi = execute(setup_storage_with_git);
-    let paths = matches_to_paths(matches, &luigi);
-    let repo = luigi.repository().unwrap();
+    let storage = execute(storage::setup_with_git::<Project>);
+    let paths = matches_to_paths(matches, &storage);
+    let repo = storage.repository().unwrap();
     // TODO implement `.and()` for exitstatus
 
     if util::really(&format!(
@@ -147,8 +148,8 @@ pub fn git_cleanup(matches: &ArgMatches) {
 
 /// Command STASH POP
 pub fn git_stash_pop() {
-    let luigi = execute(setup_storage_with_git);
-    let repo = luigi.repository().unwrap();
+    let storage = execute(storage::setup_with_git::<Project>);
+    let repo = storage.repository().unwrap();
     if !repo.stash_pop().success() {
         error!("git stash pop did not exit successfully")
     }

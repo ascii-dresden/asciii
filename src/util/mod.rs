@@ -109,27 +109,6 @@ pub fn delete_file_if<F,P:AsRef<OsStr>>(path:P, confirmed:F) -> io::Result<()>
     } else {Ok(())}
 }
 
-/// Interprets storage path from config.
-///
-/// Even if it starts with `~` or is a relatetive path.
-/// This is by far the most important function of all utility functions.
-pub fn get_storage_path() -> PathBuf
-{
-    let storage_path = PathBuf::from(::CONFIG.get_str("path")
-            .expect("Faulty config: field path does not contain a string value"))
-        .join( ::CONFIG.get_str("dirs/storage")
-            .expect("Faulty config: field dirs/storage does not contain a string value"));
-
-    // TODO make replace tilde a Trait function
-    let storage_path = replace_home_tilde(&storage_path);
-
-    if !storage_path.is_absolute(){
-        current_dir().unwrap().join(storage_path)
-    } else {
-        storage_path
-    }
-}
-
 /// takes a path that could be relative or contains a `~` and turn it into a path that exists
 pub fn get_valid_path<T:AsRef<OsStr>>(p:T) -> Option<PathBuf>{
     let path = replace_home_tilde(Path::new(&p));
