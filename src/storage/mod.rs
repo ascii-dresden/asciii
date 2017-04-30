@@ -648,7 +648,7 @@ impl<L:Storable> Storage<L> {
 
     #[cfg(not(feature="git_statuses"))]
     fn open_project(&self, path:&PathBuf) -> Option<L>{
-        match L::open(path) {
+        match L::open_folder(path) {
             Ok(project) => Some(project) ,
             Err(err) => {
                 warn!("Erroneous Project: {}\n {:#?}", path.display(), err);
