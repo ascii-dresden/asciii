@@ -1,7 +1,6 @@
 use rustc_serialize::json::{ToJson, Json};
 use chrono::prelude::*;
 use bill::{Bill, BillItem, ItemList, Tax};
-use ordered_float::OrderedFloat;
 
 use std::process;
 use std::error::Error;
@@ -48,13 +47,13 @@ impl ToJson for Project{
         let opt_str = |opt:Option<&str>| opt.map(|e|e.to_owned()).to_json() ;
         let dmy = |date:Option<Date<UTC>>| date.map(|d|d.format("%d.%m.%Y").to_string()).to_json();
 
-        let item_to_json = |item:&BillItem<Product>, tax:OrderedFloat<f64>| btreemap!{
+        let item_to_json = |item:&BillItem<Product>, tax:Tax| btreemap!{
             s("name") => item.product.name.to_json(),
             s("price") => currency_to_string(&item.product.price).to_json(),
             s("unit") => item.product.unit.unwrap_or_else(||"").to_json(),
             s("amount") => item.amount.to_json(),
             s("cost") => currency_to_string(&item.gross()).to_json(),
-            s("tax") => tax.into_inner().to_json()
+            s("tax") => tax.value().to_json()
         }.to_json();
 
         let bill_to_json = |bill:&Bill<Product>| bill.as_items_with_tax()
@@ -134,7 +133,7 @@ impl<'a> ToJson for Product<'a> {
             s("unit")     => self.unit.map(|s|s.to_owned()).to_json(),
             s("tax")      => self.tax.to_string().to_json(),
             s("price")    => currency_to_string(&self.price).to_json(),
-            s("currency") => self.price.0.map(|s|s.to_string()).to_json(),
+            s("currency") => self.price.symbol.map(|s|s.to_string()).to_json(),
         })
     }
 }

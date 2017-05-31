@@ -292,7 +292,7 @@ pub fn make(m: &ArgMatches) {
     debug!("{:?}", m);
     let template_name = m.value_of("template").unwrap_or("document");
     let bill_type = infer_bill_type(m);
-    if  m.is_present("search_terms") {
+    if  m.is_present("search_term") {
     let (search_terms, dir) = matches_to_search(m);
         debug!("make {t}({s}/{d:?}, invoice={i:?})", d = dir, s = search_terms[0], t = template_name, i = bill_type);
 

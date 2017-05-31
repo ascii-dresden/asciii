@@ -27,7 +27,7 @@ pub fn print_specresult(label: &str, result: SpecResult) {
 
 // TODO there may be cases where an f64 can't be converted into Currency
 pub fn to_currency(f: f64) -> Currency {
-    Currency(::CONFIG.get_char("currency"), (f * 1000.0) as i64) / 10
+    Currency{ symbol: ::CONFIG.get_char("currency"), value: (f * 1000.0) as i64} / 10
 }
 
 

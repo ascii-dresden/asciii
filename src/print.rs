@@ -360,7 +360,7 @@ pub fn show_details(project:&Project, bill_type:&BillType) {
             table.add_row( row!["",
                                 "",
                                 "",
-                                cell!(r->format!("+{}%",*tax*100f64)),
+                                cell!(r->format!("+{}%",**tax*100f64)),
                                 cell!(r->format!("{}", itemlist.tax_sum().postfix()))
                                 //cell!(r->itemlist.net_sum().postfix())
             ]);

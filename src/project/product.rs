@@ -1,6 +1,8 @@
 //! Takes care of instantiating the Product.
 //! All of the calculating is done by `extern crate bill`.
 
+use serde::ser::Serialize;
+
 use bill::{Currency, BillProduct, Tax};
 
 use util::yaml;
@@ -46,7 +48,7 @@ pub use self::error::*;
 ///
 /// Products are mapped to `Bill`s by `BillItems`,
 /// these are implemented by `bill`.
-#[derive(Copy,Clone,Debug)]
+#[derive(Copy,Clone,Debug, Serialize)]
 pub struct Product<'a> {
     pub name: &'a str,
     pub unit: Option<&'a str>,

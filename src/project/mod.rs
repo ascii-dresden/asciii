@@ -14,9 +14,10 @@ use chrono::prelude::*;
 use chrono::Duration;
 use yaml_rust::Yaml;
 use tempdir::TempDir;
+use serde::ser::Serialize;
 use slug;
 
-use bill::{Bill, Currency};
+use bill::{Bill, Currency, Tax};
 use icalendar::*;
 //use semver::Version;
 
@@ -87,6 +88,63 @@ pub struct Project {
     git_status: Option<GitStatus>,
     file_content: String,
     yaml: Yaml
+}
+
+pub mod export {
+    use super::spec::*;
+    use super::Project;
+    use super::product::Product;
+    use bill::{Bill, Currency, Tax};
+
+    pub trait Exportable<T> {
+        fn export(self) -> T;
+    }
+
+    fn opt_str(opt:Option<&str>) -> Option<String> {
+        opt.map(|e|e.to_owned())
+    }
+
+    #[derive(Serialize, Deserialize, Debug, PartialEq)]
+    pub struct Client {
+        title: Option<String>,
+        first_name: Option<String>,
+        last_name: Option<String>,
+        full_name: Option<String>,
+        address: Option<String>,
+        email: Option<String>,
+        addressing : Option<String>,
+    }
+
+    impl Exportable<Client> for Project {
+        fn export(self) -> Client {
+            Client {
+                full_name:   self.client().full_name(),
+                addressing:  self.client().addressing(),
+                email:       opt_str(self.client().email()),
+                last_name:   opt_str(self.client().last_name()),
+                first_name:  opt_str(self.client().first_name()),
+                title:       opt_str(self.client().title()),
+                address:     opt_str(self.client().address()),
+            }
+        }
+    }
+
+    //#[derive(Serialize, Debug)]
+    //pub struct Bills<'a> {
+    //    offer: Bill<Product<'a>>,
+    //    invoice: Bill<Product<'a>>,
+    //}
+
+    //impl<'a> Exportable<Bills<'a>> for Project {
+    //    fn export(self) -> Bills<'a> {
+    //        let (offer, invoice) = self.bills().unwrap();
+    //        Bills {
+    //            offer, invoice
+    //        }
+    //    }
+    //}
+
+
 }
 
 impl Project {
@@ -477,8 +535,8 @@ impl Redeemable for Project {
         let service = || Product {
             name: "Service",
             unit: Some("h"),
-            tax: ::ordered_float::OrderedFloat(0f64), // TODO this ought to be in the config
-            price: self.hours().salary().unwrap_or(Currency(None,0))
+            tax: Tax::new(0.0), // TODO this ought to be in the config
+            price: self.hours().salary().unwrap_or(Currency::new())
         };
 
         if let Some(total) = self.hours().total() {
