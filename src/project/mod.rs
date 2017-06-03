@@ -80,6 +80,7 @@ struct Debug {
 ///
 /// A project is storable, contains products, and you can create an offer or invoice from it.
 /// The main implementation is done in [`spec`](spec/index.html).
+//#[derive(Clone)]
 pub struct Project {
     file_path: PathBuf,
     _temp_dir: Option<TempDir>,
@@ -695,7 +696,8 @@ impl HasEvents for Project { }
 
 impl fmt::Debug for Project {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{:?}", self.debug())
+        //write!(f, "{:?}", self.debug())
+        write!(f, "{:?}{:?}", self.name(), self.file())
     }
 }
 

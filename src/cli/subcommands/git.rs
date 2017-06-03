@@ -1,6 +1,6 @@
 use clap::ArgMatches;
 
-use asciii::actions::setup_luigi_with_git;
+use asciii::actions::setup_storage_with_git;
 use asciii::util;
 
 use ::cli::execute;
@@ -8,7 +8,7 @@ use super::matches_to_paths;
 
 /// Command LOG
 pub fn git_log(matches: &ArgMatches) {
-    let luigi = execute(setup_luigi_with_git);
+    let luigi = execute(setup_storage_with_git);
     let paths = matches_to_paths(matches, &luigi);
     let repo = luigi.repository().unwrap();
     if !repo.log(&paths).success() {
@@ -18,7 +18,7 @@ pub fn git_log(matches: &ArgMatches) {
 
 /// Command STATUS
 pub fn git_status() {
-    let luigi = execute(setup_luigi_with_git);
+    let luigi = execute(setup_storage_with_git);
     let repo = luigi.repository().unwrap();
     if !repo.status().success() {
         error!("git status did not exit successfully")
@@ -27,7 +27,7 @@ pub fn git_status() {
 
 /// Command COMMIT
 pub fn git_commit() {
-    let luigi = execute(setup_luigi_with_git);
+    let luigi = execute(setup_storage_with_git);
     let repo = luigi.repository().unwrap();
     if !repo.commit().success() {
         error!("git commit did not exit successfully")
@@ -38,7 +38,7 @@ pub fn git_commit() {
 /// exact replica of `git remote -v`
 #[cfg(not(feature="git_statuses"))]
 pub fn git_remote() {
-    let luigi = execute(setup_luigi_with_git);
+    let luigi = execute(setup_storage_with_git);
     luigi.repository().unwrap().remote();
 }
 
@@ -46,7 +46,7 @@ pub fn git_remote() {
 /// exact replica of `git remote -v`
 #[cfg(feature="git_statuses")]
 pub fn git_remote() {
-    let luigi = execute(setup_luigi_with_git);
+    let luigi = execute(setup_storage_with_git);
 
     if let Some(r) = luigi.repository() {
         let ref repo = r.repo;
@@ -77,7 +77,7 @@ pub fn git_remote() {
 
 /// Command ADD
 pub fn git_add(matches: &ArgMatches) {
-    let luigi = execute(setup_luigi_with_git);
+    let luigi = execute(setup_storage_with_git);
     let paths = matches_to_paths(matches, &luigi);
     let repo = luigi.repository().unwrap();
     if !repo.add(&paths).success() {
@@ -88,7 +88,7 @@ pub fn git_add(matches: &ArgMatches) {
 
 /// Command DIFF
 pub fn git_diff(matches: &ArgMatches) {
-    let luigi = execute(setup_luigi_with_git);
+    let luigi = execute(setup_storage_with_git);
     let paths = matches_to_paths(matches, &luigi);
     let repo = luigi.repository().unwrap();
     if !repo.diff(&paths).success() {
@@ -98,7 +98,7 @@ pub fn git_diff(matches: &ArgMatches) {
 
 /// Command PULL
 pub fn git_pull(matches: &ArgMatches) {
-    let luigi = execute(setup_luigi_with_git);
+    let luigi = execute(setup_storage_with_git);
     let repo = luigi.repository().unwrap();
 
     let success = if matches.is_present("rebase") {
@@ -113,7 +113,7 @@ pub fn git_pull(matches: &ArgMatches) {
 
 /// Command PUSH
 pub fn git_push() {
-    let luigi = execute(setup_luigi_with_git);
+    let luigi = execute(setup_storage_with_git);
     let repo = luigi.repository().unwrap();
     if !repo.push().success() {
         error!("git push did not exit successfully")
@@ -122,7 +122,7 @@ pub fn git_push() {
 
 /// Command STASH
 pub fn git_stash() {
-    let luigi = execute(setup_luigi_with_git);
+    let luigi = execute(setup_storage_with_git);
     let repo = luigi.repository().unwrap();
     if !repo.stash().success() {
         error!("git stash did not exit successfully")
@@ -131,7 +131,7 @@ pub fn git_stash() {
 
 /// Command CLEANUP
 pub fn git_cleanup(matches: &ArgMatches) {
-    let luigi = execute(setup_luigi_with_git);
+    let luigi = execute(setup_storage_with_git);
     let paths = matches_to_paths(matches, &luigi);
     let repo = luigi.repository().unwrap();
     // TODO implement `.and()` for exitstatus
@@ -147,7 +147,7 @@ pub fn git_cleanup(matches: &ArgMatches) {
 
 /// Command STASH POP
 pub fn git_stash_pop() {
-    let luigi = execute(setup_luigi_with_git);
+    let luigi = execute(setup_storage_with_git);
     let repo = luigi.repository().unwrap();
     if !repo.stash_pop().success() {
         error!("git stash pop did not exit successfully")

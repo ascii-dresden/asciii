@@ -35,7 +35,7 @@ pub type StorageResult<T> = Result<T, StorageError>;
 #[cfg(test)] mod realworld;
 
 mod project_list;
-pub use self::project_list::ProjectList;
+pub use self::project_list::{ProjectList, ProjectsByYear, Projects};
 pub mod repo;
 pub mod error;
 pub use self::error::{StorageError,ErrorKind};
@@ -112,7 +112,6 @@ use std::collections::HashMap;
 
 use slug;
 fn slugify(string:&str) -> String{ slug::slugify(string) }
-
 
 impl<L:Storable> Storage<L> {
 
@@ -646,6 +645,25 @@ impl<L:Storable> Storage<L> {
         }
     }
 
+    pub fn open_working_dir_projects(&self) -> StorageResult<ProjectList<L>> {
+        Ok(self.open_projects(StorageDir::Working)?)
+    }
+
+    pub fn open_all_archived_projects(&self) -> StorageResult<ProjectsByYear<L>> {
+        let mut map = HashMap::new();
+        for year in self.list_years()? {
+            map.insert(year, self.open_projects(StorageDir::Archive(year))?);
+        }
+        Ok(map)
+    }
+
+    pub fn open_all_projects(&self) -> StorageResult<Projects<L>> {
+        Ok( Projects {
+            working: self.open_projects(StorageDir::Working)?,
+            archive: self.open_all_archived_projects()?
+        })
+    }
+
     #[cfg(not(feature="git_statuses"))]
     fn open_project(&self, path:&PathBuf) -> Option<L>{
         match L::open_folder(path) {
@@ -691,4 +709,3 @@ impl<P:Storable> fmt::Debug for Storage<P>{
                )
     }
 }
-

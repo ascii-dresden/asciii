@@ -39,7 +39,7 @@ impl Storable for TestProject{
     fn index(&self) -> Option<String>{ Some("ZZ99".into()) }
     fn prefix(&self) -> Option<String>{ self.index() }
 
-    fn open(path:&Path) -> StorageResult<Self>{
+    fn open_folder(path:&Path) -> StorageResult<Self>{
         Self::open_file(path)
     }
 

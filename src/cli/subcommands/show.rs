@@ -9,7 +9,7 @@ use asciii::actions;
 use asciii::print;
 use asciii::storage::*;
 use asciii::project::spec;
-use asciii::actions::setup_luigi;
+use asciii::actions::setup_storage;
 use asciii::templater::Templater;
 use asciii::project::spec::events::HasEvents;
 
@@ -103,7 +103,7 @@ pub fn show_path(matches: &ArgMatches) {
 
 /// Command SHOW --template
 fn show_template(name: &str) {
-    let luigi = execute(setup_luigi);
+    let luigi = execute(setup_storage);
     let template = execute(|| luigi.get_template_file(name));
     let templater = execute(|| Templater::from_file(&template));
     println!("{:#?}", templater.list_keywords());

@@ -16,7 +16,7 @@ use asciii::BillType;
 use asciii::actions;
 use asciii::storage::*;
 use asciii::project::Project;
-use asciii::actions::setup_luigi;
+use asciii::actions::setup_storage;
 
 
 // simple_rows, verbose_rows,
@@ -49,7 +49,7 @@ pub fn new(matches: &ArgMatches) {
         .unwrap();
 
     let edit = !matches.is_present("don't edit");
-    let luigi = execute(setup_luigi);
+    let luigi = execute(setup_storage);
 
     let mut fill_data: HashMap<&str, String> = HashMap::new();
 
@@ -191,7 +191,7 @@ pub fn edit(matches: &ArgMatches) {
 }
 
 fn edit_projects(dir: StorageDir, search_terms: &[&str], editor: &Option<&str>) {
-    let luigi = execute(setup_luigi);
+    let luigi = execute(setup_storage);
     let mut all_projects = Vec::new();
     for search_term in search_terms {
         let mut paths = execute(|| luigi.search_projects(dir, search_term));
@@ -213,7 +213,7 @@ fn edit_projects(dir: StorageDir, search_terms: &[&str], editor: &Option<&str>) 
 /// Command WORKSPACE 
 pub fn workspace(matches: &ArgMatches) {
     println!("{:?}", matches);
-    let luigi = execute(setup_luigi);
+    let luigi = execute(setup_storage);
     let editor = matches.value_of("editor")
         .or(CONFIG.get("user/editor")
                   .and_then(|e| e.as_str()));
@@ -224,7 +224,7 @@ pub fn workspace(matches: &ArgMatches) {
 pub fn with_templates<F>(name: &str, action: F)
     where F: FnOnce(&[PathBuf])
 {
-    let luigi = execute(setup_luigi);
+    let luigi = execute(setup_storage);
     let template_paths = execute(||luigi.list_template_files())
         .into_iter() // drain?
         .filter(|f|f.file_stem() .unwrap_or_else(||OsStr::new("")) == name)

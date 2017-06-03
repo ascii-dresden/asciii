@@ -12,7 +12,7 @@ use storage::Storage;
 
 /// Sets up an instance of `Storage`.
 /// TODO isn't this redundant
-fn setup_luigi() -> Storage<Project> {
+fn setup_storage() -> Storage<Project> {
     let working = ::CONFIG.get_str("dirs/working")
         .expect("Faulty config: dirs/working does not contain a value");
     let archive = ::CONFIG.get_str("dirs/archive")
@@ -44,7 +44,7 @@ impl<'a, T> ToJson for PackData<'a, T>
 fn pack_data<E: ToJson>(document: &E, is_invoice:bool) -> PackData<E> {
     PackData {
         document: document,
-        storage: setup_luigi(),
+        storage: setup_storage(),
         is_invoice:is_invoice
     }
 }

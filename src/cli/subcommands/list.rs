@@ -2,7 +2,7 @@ use clap::ArgMatches;
 use chrono::prelude::*;
 
 use asciii::CONFIG;
-use asciii::actions::{setup_luigi, setup_luigi_with_git};
+use asciii::actions::{setup_storage, setup_storage_with_git};
 use asciii::storage::*;
 use asciii::print;
 use asciii::print::{ListConfig, ListMode};
@@ -97,9 +97,9 @@ pub fn list(matches: &ArgMatches) {
 /// which it prints with `print::print_projects()`
 fn list_projects(dir: StorageDir, list_config: &ListConfig) {
     let luigi = if CONFIG.get_bool("list/gitstatus") {
-        execute(setup_luigi_with_git)
+        execute(setup_storage_with_git)
     } else {
-        execute(setup_luigi)
+        execute(setup_storage)
     };
     debug!("listing projects: {}", luigi.working_dir().display());
 
@@ -139,7 +139,7 @@ fn list_projects(dir: StorageDir, list_config: &ListConfig) {
 
 /// Command LIST --broken
 fn list_broken_projects(dir: StorageDir) {
-    let luigi = execute(setup_luigi);
+    let luigi = execute(setup_storage);
     let invalid_files = execute(|| luigi.list_project_files(dir));
     let tups = invalid_files.iter()
                             .filter_map(|dir| Project::open_folder(dir).err().map(|e| (e, dir)))
@@ -152,7 +152,7 @@ fn list_broken_projects(dir: StorageDir) {
 
 /// Command LIST --templates
 fn list_templates() {
-    let luigi = execute(setup_luigi);
+    let luigi = execute(setup_storage);
 
     for name in execute(|| luigi.list_template_names()) {
         println!("{}", name);
@@ -161,7 +161,7 @@ fn list_templates() {
 
 /// Command LIST --years
 pub fn list_years() {
-    let luigi = execute(setup_luigi);
+    let luigi = execute(setup_storage);
     let years = execute(|| luigi.list_years());
     println!("{:?}", years);
 }

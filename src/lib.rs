@@ -61,6 +61,7 @@ pub mod project;
 pub mod storage;
 pub mod print;
 pub mod actions;
+pub use actions::{setup_storage, setup_storage_with_git, calendar};
 
 pub mod templater;
 
@@ -80,6 +81,7 @@ lazy_static!{
     /// Hint for app to point at `asciii::DOCUMENTATION_URL`
     pub static ref DOCHINT: String = lformat!("Documentation at: {}", DOCUMENTATION_URL);
 }
+
 #[cfg(not(feature="version_string"))]
 lazy_static!{
     /// Human readable, no semantic versioning.
