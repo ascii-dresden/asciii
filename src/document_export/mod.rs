@@ -156,7 +156,7 @@ fn output_template_path(template_name:&str) -> Result<PathBuf> {
 
 /// Creates the latex files within each projects directory, either for Invoice or Offer.
 #[cfg(feature="document_export")]
-fn project_to_doc(project: &Project, template_name:&str, bill_type:Option<BillType>, output_path: Option<&Path>,dry_run:bool, force:bool) -> Result<()> {
+fn project_to_doc(project: &Project, template_name:&str, bill_type:Option<BillType>, output_path: Option<&Path>, dry_run:bool, force:bool) -> Result<()> {
     // init_export_config()
     let output_ext    = ::CONFIG.get_str("extensions/output_file").expect("Faulty default config");
     let convert_ext   = ::CONFIG.get_str("convert/output_extension").expect("Faulty default config");
@@ -197,7 +197,7 @@ fn project_to_doc(project: &Project, template_name:&str, bill_type:Option<BillTy
 
     // }
 
-    //debug!("{:?} -> {:?}",(bill_type, project.is_ready_for_offer(), project.is_ready_for_invoice()), (dyn_bill_type, outfile_tex));
+    debug!("{:?} -> {:?}",(bill_type, project.is_ready_for_offer(), project.is_ready_for_invoice()), (dyn_bill_type, outfile_tex));
 
     if let (Some(outfile), Some(dyn_bill)) = (outfile_tex, dyn_bill_type) {
         let filled = fill_template(project, &dyn_bill, &template_path)?;
@@ -205,8 +205,10 @@ fn project_to_doc(project: &Project, template_name:&str, bill_type:Option<BillTy
         let pdffile = to_local_file(&outfile, convert_ext);
         let target = if let Some(output_path) = output_path {
             if output_path.is_dir() { // if dir, use my name and place in there
-                output_folder.join(&pdffile)
+                trace!("output_path is dir");
+                output_path.join(&pdffile)
             } else if output_path.parent().map(Path::exists).unwrap_or(false) {// if not dir, place at this path with this name
+                trace!("output_path is file");
                 output_path.to_owned()
             } else {
                 warn!("{}", lformat!("Can't make sense of {}", output_path.display()));
@@ -215,16 +217,16 @@ fn project_to_doc(project: &Project, template_name:&str, bill_type:Option<BillTy
         } else {
             output_folder.join(&pdffile)
         };
+        debug!("output target will be {:?}", target);
 
         // ok, so apparently we can create a tex file, so lets do it
         if !force && target.exists() && file_age(&target)? < file_age(&project_file)? {
             // no wait, nothing has changed, so lets save ourselves the work
             info!("nothing to be done, {} is younger than {}
-                         use --force if you don't agree
-                         use --pdf to only rebuild the pdf",
+                         use --force if you don't agree",
+                         //use --pdf to only rebuild the pdf",
                   target.display(),
                   project_file.display());
-            unimplemented!();
         } else {
             // \o/ we created a tex file
 
@@ -259,7 +261,6 @@ fn project_to_doc(project: &Project, template_name:&str, bill_type:Option<BillTy
 /// Creates the latex files within each projects directory, either for Invoice or Offer.
 #[cfg(feature="document_export")]
 pub fn projects_to_doc(dir:StorageDir, search_term:&str, template_name:&str, bill_type:Option<BillType>, output: Option<&Path>, dry_run:bool, force:bool) {
-
     let storage = storage::setup::<Project>().unwrap();
     storage.simple_with_projects(dir,
                                  Some(&[search_term]),
@@ -270,6 +271,8 @@ pub fn projects_to_doc(dir:StorageDir, search_term:&str, template_name:&str, bil
 /// Creates the latex files within each projects directory, either for Invoice or Offer.
 #[cfg(feature="document_export")]
 pub fn project_file_to_doc(project_file:&Path, template_name:&str, bill_type:Option<BillType>, output: Option<&Path>, dry_run:bool, force:bool) -> Result<()> {
+    trace!("project_file_to_doc");
     let project = Project::open_file(project_file)?;
     project_to_doc(&project, template_name, bill_type, output, dry_run, force)
 }
+
