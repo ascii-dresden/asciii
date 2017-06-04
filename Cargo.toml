@@ -29,7 +29,7 @@ icalendar = "0.3"
 
 slug = "0.1"
 tempdir = "0.3"
-semver = "0.6"
+semver = "0.7"
 term_size = "0.3"
 
 term = "0.4"

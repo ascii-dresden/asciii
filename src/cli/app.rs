@@ -768,9 +768,10 @@ pub fn with_cli<F> (app_handler:F) where F: Fn(App) {
                              .long("template")
                             )
                        )
+
             .subcommand(SubCommand::with_name("complete")
                         //.aliases(&["lg", "hist", "history"])
-                        .about(lformat!("Generates completion for ...").as_ref())
+                        .about(lformat!("Generates completion for bash, zsh, etc").as_ref())
                         .arg(Arg::with_name("shell")
                              .help(lformat!("what shell to generate completion for (bash, zsh, fish,PowerShell)").as_ref())
                              .min_values(0)

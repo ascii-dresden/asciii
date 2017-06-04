@@ -197,8 +197,6 @@ fn project_to_doc(project: &Project, template_name:&str, bill_type:Option<BillTy
 
     // }
 
-    debug!("{:?} -> {:?}",(bill_type, project.is_ready_for_offer(), project.is_ready_for_invoice()), (dyn_bill_type, outfile_tex));
-
     if let (Some(outfile), Some(dyn_bill)) = (outfile_tex, dyn_bill_type) {
         let filled = fill_template(project, &dyn_bill, &template_path)?;
 

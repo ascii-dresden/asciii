@@ -25,15 +25,18 @@ macro_rules! try_some {
 
 pub fn setup_log() {
     let format = |record: &LogRecord| {
-        format!("{level}:  {args}",
+        let location = record.location();
+        format!("{level}::{location}:  {args}",
+        location = location.module_path(),
         level = record.level(),
         args  = record.args())
     };
 
     let mut builder = LogBuilder::new();
-//    builder.format(format)
-//        .filter(None, LogLevelFilter::Info);
-//
+    builder
+        .format(format)
+        .filter(None, LogLevelFilter::Info);
+
     let log_var ="ASCIII_LOG";
     if env::var(log_var).is_ok() {
        builder.parse(&env::var(log_var).unwrap());
