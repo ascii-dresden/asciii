@@ -46,7 +46,8 @@ pub use self::error::*;
 ///
 /// Products are mapped to `Bill`s by `BillItems`,
 /// these are implemented by `bill`.
-#[derive(Copy,Clone,Debug, Serialize)]
+#[derive(Copy,Clone,Debug)]
+#[cfg_attr(feature = "serialization", derive(Serialize))]
 pub struct Product<'a> {
     pub name: &'a str,
     pub unit: Option<&'a str>,

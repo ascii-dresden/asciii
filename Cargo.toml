@@ -7,7 +7,6 @@ license = "MIT/Apache-2.0"
 build = false
 
 [dependencies]
-
 log = "0.3"
 env_logger = "0.4" # default feature requires regex
 yaml-rust = {version = "0.3", features = ["preserve_order"]}
@@ -42,9 +41,9 @@ prettytable-rs = { version = "0.6", default-features= false}
 handlebars = {version = "0.22", optional = true}
 rustc-serialize = {version = "0.3", optional = true}
 
-serde = "*"
-serde_json = "*"
-serde_derive = "*"
+serde        = {version = "1.0", optional = true}
+serde_json   = {version = "1.0", optional = true}
+serde_derive = {version = "1.0", optional = true}
 
 # feature: git_statuses
 git2 = {version = "0.6", default-features= false, optional = true}
@@ -55,6 +54,7 @@ git2 = {version = "0.6", default-features= false, optional = true}
 default = ["document_export", "git_statuses", "shell"]
 document_export = ["json", "handlebars"]
 json = ["rustc-serialize"]
+serialization = ["serde", "serde_json", "serde_derive"]
 git_statuses = ["git2"]
 shell = ["rustyline"]
 version_string = []

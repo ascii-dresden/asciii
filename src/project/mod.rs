@@ -101,7 +101,8 @@ pub mod export {
         opt.map(|e|e.to_owned())
     }
 
-    #[derive(Serialize, Deserialize, Debug, PartialEq)]
+    #[derive(Debug, PartialEq)]
+    #[cfg_attr(feature = "serialization", derive(Serialize,Deserialize))]
     pub struct Client {
         title: Option<String>,
         first_name: Option<String>,
