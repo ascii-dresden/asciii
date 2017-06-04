@@ -14,7 +14,6 @@ use chrono::prelude::*;
 use chrono::Duration;
 use yaml_rust::Yaml;
 use tempdir::TempDir;
-use serde::ser::Serialize;
 use slug;
 
 use bill::{Bill, Currency, Tax};
@@ -70,7 +69,7 @@ static PROJECT_FILE_EXTENSION:&'static str = "yml";
 ///
 /// A project is storable, contains products, and you can create an offer or invoice from it.
 #[derive(Debug)]
-struct Debug {
+pub struct Debug {
     file_path: PathBuf,
     //temp_dir: Option<PathBuf>, // TODO
     git_status: Option<GitStatus>,
@@ -93,8 +92,6 @@ pub struct Project {
 pub mod export {
     use super::spec::*;
     use super::Project;
-    use super::product::Product;
-    use bill::{Bill, Currency, Tax};
 
     pub trait Exportable<T> {
         fn export(self) -> T;
@@ -150,6 +147,25 @@ pub mod export {
 impl Project {
     /// Access to inner data
     pub fn yaml(&self) -> &Yaml{ &self.yaml }
+
+    pub fn open<S: AsRef<OsStr> + ?Sized>(pathish: &S) -> Result<Project> {
+        let file_path = Path::new(&pathish);
+        let file_content = File::open(&file_path)
+                                .and_then(|mut file| {
+                                    let mut content = String::new();
+                                    file.read_to_string(&mut content).map(|_| content)
+                                })?;
+        Ok(Project{
+            file_path: file_path.to_owned(),
+            _temp_dir: None,
+            git_status: None,
+            yaml: yaml::parse(&file_content).unwrap_or_else(|e|{
+                error!("syntax error in {}\n  {}", file_path.display(), e);
+                Yaml::Null
+            }),
+            file_content: file_content,
+        })
+    }
 
     /// wrapper around yaml::get() with replacement
     pub fn get(&self, path:&str) -> Option<String> {
@@ -356,7 +372,7 @@ impl Project {
         Ok(invoice.net_total())
     }
 
-    fn debug(&self) -> Debug {
+    pub fn debug(&self) -> Debug {
         self.into()
     }
 
@@ -624,7 +640,7 @@ impl Storable for Project {
                 error!("The created document is no valid yaml. SORRY!\n{}\n\n{}",
                        filled.lines().enumerate().map(|(n,l)| format!("{:>3}. {}\n",n,l)).collect::<String>(), //line numbers :D
                        e.description());
-                bail!(e)
+                bail!(error::Error::from_kind(ErrorKind::Yaml(e)))
             }
         };
 
@@ -701,21 +717,7 @@ impl Storable for Project {
     }
 
     fn open_file(file_path:&Path) -> StorageResult<Project>{
-        let file_content = File::open(&file_path)
-                                .and_then(|mut file| {
-                                    let mut content = String::new();
-                                    file.read_to_string(&mut content).map(|_| content)
-                                })?;
-        Ok(Project{
-            file_path: file_path.to_owned(),
-            _temp_dir: None,
-            git_status: None,
-            yaml: yaml::parse(&file_content).unwrap_or_else(|e|{
-                error!("syntax error in {}\n  {}", file_path.display(), e);
-                Yaml::Null
-            }),
-            file_content: file_content,
-        })
+        Ok(Project::open(file_path)?)
     }
 
     /// Checks against a certain key-val pair.

@@ -16,9 +16,9 @@ error_chain!{
     }
 
     foreign_links {
-        Io(io::Error) ;
-        Fmt(fmt::Error) ;
-        Yaml(yaml::YamlError) ;
+        Io(io::Error);
+        Fmt(fmt::Error);
+        Yaml(yaml::YamlError);
     }
 
     errors {

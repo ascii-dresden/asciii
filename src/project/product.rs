@@ -1,8 +1,6 @@
 //! Takes care of instantiating the Product.
 //! All of the calculating is done by `extern crate bill`.
 
-use serde::ser::Serialize;
-
 use bill::{Currency, BillProduct, Tax};
 
 use util::yaml;
@@ -72,6 +70,8 @@ impl<'a> Product<'a>{
         })
     }
 
+    //pub fn from_new_format(desc: &Yaml, defaultTax: ) -> Result<Product> {
+    #[deprecated]
     pub fn from_new_format(desc: &Yaml) -> Result<Product> {
         //TODO read default tax from document
         let default_tax = ::CONFIG.get_f64("defaults/tax")
