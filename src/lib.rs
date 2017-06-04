@@ -54,6 +54,8 @@ extern crate crowbook_intl_runtime;
 
 #[cfg(feature="git_statuses")] extern crate git2;
 
+extern crate env_logger; // TODO featuregate logging in libasciii
+
 #[macro_use]
 pub mod util;
 pub mod config;

@@ -1,12 +1,15 @@
 //! Utility functions that are needed all over the places.
 #![allow(dead_code)]
 use std::io;
-use std::env::{home_dir,current_dir};
+use std::env::{self, home_dir, current_dir};
 use std::ffi::OsStr;
 use std::fs;
 use std::path::{Path,PathBuf};
 use std::process;
 use std::process::{Command, ExitStatus};
+
+use log::{LogRecord, LogLevelFilter};
+use env_logger::LogBuilder;
 
 use open;
 
@@ -18,6 +21,25 @@ macro_rules! try_some {
         Some(val) => val,
         None => return None,
     });
+}
+
+pub fn setup_log() {
+    let format = |record: &LogRecord| {
+        format!("{level}:  {args}",
+        level = record.level(),
+        args  = record.args())
+    };
+
+    let mut builder = LogBuilder::new();
+//    builder.format(format)
+//        .filter(None, LogLevelFilter::Info);
+//
+    let log_var ="ASCIII_LOG";
+    if env::var(log_var).is_ok() {
+       builder.parse(&env::var(log_var).unwrap());
+    }
+
+    builder.init().unwrap();
 }
 
 /// Freezes the program until for inspection
