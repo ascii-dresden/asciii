@@ -10,16 +10,10 @@ pub fn with_cli<F> (app_handler:F) where F: Fn(App) {
             .author(crate_authors!())
             .version(asciii::VERSION.as_ref())
             .about(lformat!("The ascii invoicer III").as_ref())
-            .settings(&[AppSettings::SubcommandRequiredElseHelp,AppSettings::ColoredHelp])
+            .settings(&[AppSettings::SubcommandRequiredElseHelp,AppSettings::ColoredHelp,AppSettings::DeriveDisplayOrder])
             .after_help(asciii::DOCUMENTATION_URL)
 
-            .subcommand(SubCommand::with_name("doc")
-                .about(lformat!("Opens the online documentation, please read it").as_ref())
-            )
-
-            .subcommand(SubCommand::with_name("version")
-                .about(lformat!("Prints version of this tool").as_ref())
-            )
+            
 
             .subcommand(SubCommand::with_name("new")
                         .about(lformat!("Create a new project").as_ref())
@@ -785,6 +779,14 @@ pub fn with_cli<F> (app_handler:F) where F: Fn(App) {
                             )
 
                        )
+
+            .subcommand(SubCommand::with_name("doc")
+                .about(lformat!("Opens the online documentation, please read it").as_ref())
+            )
+
+            .subcommand(SubCommand::with_name("version")
+                .about(lformat!("Prints version of this tool").as_ref())
+            )
         );
 }
 
