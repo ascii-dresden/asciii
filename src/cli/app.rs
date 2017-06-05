@@ -537,6 +537,11 @@ pub fn with_cli<F> (app_handler:F) where F: Fn(App) {
                              .long("dry")
                             )
 
+                        .arg(Arg::with_name("open")
+                             .help(lformat!("Open the pdf file afterwards.").as_ref())
+                             .long("open")
+                            )
+
                         .arg(Arg::with_name("search_term")
                              .help(lformat!("Search term, possibly event name").as_ref())
                              .multiple(true)

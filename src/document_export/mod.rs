@@ -38,26 +38,13 @@ pub mod error {
         }
 
         errors {
-            ActionError{
-                description("unexpected response from service")
-            }
+            NoPdfCreated{ description("No Pdf Created") }
+            NothingToDo{ description("Nothing to do") }
         }
     }
 }
 
 use self::error::*;
-
-/// Sets up an instance of `Storage`.
-/// TODO isn't this redundant
-fn setup_luigi() -> Storage<Project> {
-    let working = ::CONFIG.get_str("dirs/working")
-        .expect("Faulty config: dirs/working does not contain a value");
-    let archive = ::CONFIG.get_str("dirs/archive")
-        .expect("Faulty config: dirs/archive does not contain a value");
-    let templates = ::CONFIG.get_str("dirs/templates")
-        .expect("Faulty config: dirs/templates does not contain a value");
-    Storage::new(storage::get_storage_path(), working, archive, templates).unwrap()
-}
 
 struct PackData<'a, T: 'a + ToJson> {
     document: &'a T,
@@ -81,7 +68,7 @@ impl<'a, T> ToJson for PackData<'a, T>
 fn pack_data<E: ToJson>(document: &E, is_invoice:bool) -> PackData<E> {
     PackData {
         document: document,
-        storage: setup_luigi(),
+        storage: storage::setup().unwrap(),
         is_invoice:is_invoice
     }
 }
@@ -156,7 +143,7 @@ fn output_template_path(template_name:&str) -> Result<PathBuf> {
 
 /// Creates the latex files within each projects directory, either for Invoice or Offer.
 #[cfg(feature="document_export")]
-fn project_to_doc(project: &Project, template_name:&str, bill_type:Option<BillType>, output_path: Option<&Path>, dry_run:bool, force:bool) -> Result<()> {
+fn project_to_doc(project: &Project, template_name:&str, bill_type:Option<BillType>, output_path: Option<&Path>, dry_run:bool, force:bool) -> Result<PathBuf> {
     // init_export_config()
     let output_ext    = ::CONFIG.get_str("extensions/output_file").expect("Faulty default config");
     let convert_ext   = ::CONFIG.get_str("convert/output_extension").expect("Faulty default config");
@@ -225,6 +212,7 @@ fn project_to_doc(project: &Project, template_name:&str, bill_type:Option<BillTy
                          //use --pdf to only rebuild the pdf",
                   target.display(),
                   project_file.display());
+            bail!(error::ErrorKind::NothingToDo);
         } else {
             // \o/ we created a tex file
 
@@ -241,19 +229,21 @@ fn project_to_doc(project: &Project, template_name:&str, bill_type:Option<BillTy
                 if  trash_file.exists() {
                     fs::remove_file(&trash_file)?;
                     debug!("just deleted: {}", trash_file.display())
-                }
-                else {
+                } else {
                     debug!("I expected there to be a {}, but there wasn't any ?", trash_file.display())
                 }
             }
             if pdffile.exists(){
                 debug!("now there is be a {:?} -> {:?}", pdffile, target);
                 fs::rename(&pdffile, &target)?;
+                Ok(target)
+            } else {
+                bail!(error::ErrorKind::NoPdfCreated);
             }
         }
+    } else {
+        bail!(error::ErrorKind::NoPdfCreated);
     }
-
-    Ok(())
 }
 
 /// Creates the latex files within each projects directory, either for Invoice or Offer.
@@ -262,13 +252,13 @@ pub fn projects_to_doc(dir:StorageDir, search_term:&str, template_name:&str, bil
     let storage = storage::setup::<Project>().unwrap();
     storage.simple_with_projects(dir,
                                  Some(&[search_term]),
-                                 |p| project_to_doc(&p, template_name, bill_type, output, dry_run, force).unwrap()
+                                 |p| project_to_doc(&p, template_name, bill_type, output, dry_run, force).map(|_| ()).unwrap()
                                  );
 }
 
 /// Creates the latex files within each projects directory, either for Invoice or Offer.
 #[cfg(feature="document_export")]
-pub fn project_file_to_doc(project_file:&Path, template_name:&str, bill_type:Option<BillType>, output: Option<&Path>, dry_run:bool, force:bool) -> Result<()> {
+pub fn project_file_to_doc(project_file:&Path, template_name:&str, bill_type:Option<BillType>, output: Option<&Path>, dry_run:bool, force:bool) -> Result<PathBuf> {
     trace!("project_file_to_doc");
     let project = Project::open_file(project_file)?;
     project_to_doc(&project, template_name, bill_type, output, dry_run, force)
