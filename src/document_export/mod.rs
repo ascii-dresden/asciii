@@ -8,6 +8,7 @@ use std::time;
 use std::fs;
 use std::path::{Path,PathBuf};
 
+use open;
 use rustc_serialize::json::{ToJson, Json};
 use handlebars::{RenderError, Handlebars, no_escape};
 use handlebars::{Context, Helper, RenderContext};
@@ -212,16 +213,16 @@ fn project_to_doc(project: &Project, template_name:&str, bill_type:Option<BillTy
                          //use --pdf to only rebuild the pdf",
                   target.display(),
                   project_file.display());
-            bail!(error::ErrorKind::NothingToDo);
+            Ok(target)
         } else {
             // \o/ we created a tex file
 
             if dry_run{
                 warn!("Dry run! This does not produce any output:\n * {}\n * {}", outfile.display(), pdffile.display());
             } else {
-                let outfileb = project.write_to_file(&filled,&dyn_bill,output_ext)?;
-                debug!("{} vs\n        {}", outfile.display(), outfileb.display());
-                util::pass_to_command(&convert_tool, &[&outfileb]);
+                let outfile_path = project.write_to_file(&filled,&dyn_bill,output_ext)?;
+                debug!("{} vs\n        {}", outfile.display(), outfile_path.display());
+                util::pass_to_command(&convert_tool, &[&outfile_path]);
             }
             // clean up expected trash files
             for trash_ext in trash_exts.iter().filter_map(|x|*x){
@@ -248,19 +249,22 @@ fn project_to_doc(project: &Project, template_name:&str, bill_type:Option<BillTy
 
 /// Creates the latex files within each projects directory, either for Invoice or Offer.
 #[cfg(feature="document_export")]
-pub fn projects_to_doc(dir:StorageDir, search_term:&str, template_name:&str, bill_type:Option<BillType>, output: Option<&Path>, dry_run:bool, force:bool) {
+pub fn projects_to_doc(dir:StorageDir, search_term:&str, template_name:&str, bill_type:Option<BillType>, output: Option<&Path>, dry_run:bool, force:bool, do_open:bool) {
     let storage = storage::setup::<Project>().unwrap();
     storage.simple_with_projects(dir,
                                  Some(&[search_term]),
-                                 |p| project_to_doc(&p, template_name, bill_type, output, dry_run, force).map(|_| ()).unwrap()
+                                 |p| project_to_doc(&p, template_name, bill_type, output, dry_run, force)
+                                                    .map(|path| { if do_open {open::that(&path).unwrap();} } )
+                                                    .unwrap()
                                  );
 }
 
 /// Creates the latex files within each projects directory, either for Invoice or Offer.
 #[cfg(feature="document_export")]
-pub fn project_file_to_doc(project_file:&Path, template_name:&str, bill_type:Option<BillType>, output: Option<&Path>, dry_run:bool, force:bool) -> Result<PathBuf> {
+pub fn project_file_to_doc(project_file:&Path, template_name:&str, bill_type:Option<BillType>, output: Option<&Path>, dry_run:bool, force:bool, do_open:bool) -> Result<PathBuf> {
     trace!("project_file_to_doc");
     let project = Project::open_file(project_file)?;
     project_to_doc(&project, template_name, bill_type, output, dry_run, force)
+    .map(|path| { if do_open {open::that(&path).unwrap();} path } )
 }
 

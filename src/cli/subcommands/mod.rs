@@ -302,7 +302,8 @@ pub fn make(m: &ArgMatches) {
                                          bill_type,
                                          m.value_of("output").map(Path::new),
                                          m.is_present("dry-run"),
-                                         m.is_present("force"))
+                                         m.is_present("force"),
+                                         m.is_present("open"))
 
     } else if let Some(file_path) = m.value_of("file") {
         debug!("make {t}({d:?}, invoice={i:?})", d = file_path, t = template_name, i = bill_type);
@@ -312,7 +313,8 @@ pub fn make(m: &ArgMatches) {
                                                  bill_type,
                                                  m.value_of("output").map(Path::new),
                                                  m.is_present("dry-run"),
-                                                 m.is_present("force"))
+                                                 m.is_present("force"),
+                                                 m.is_present("open"))
         });
 
     } else {
