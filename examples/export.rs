@@ -20,7 +20,7 @@ fn main() {
     let dir = StorageDir::All;
 
     let storage = storage::setup().unwrap();
-    storage.simple_with_projects(dir, None, with_project);
+    storage.with_projects(dir, None, with_project);
 
 }
 

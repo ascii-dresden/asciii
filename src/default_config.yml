@@ -32,6 +32,7 @@ convert:
   tool: pdflatex
   output_extension: pdf
   trash_extensions: [aux,log]
+  default_template: document
 
 #log_file: ~/.ascii_log # unimplemented
 #calendar_file: invoicer.ics #unimplemented

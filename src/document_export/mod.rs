@@ -17,7 +17,7 @@ use util;
 use project;
 use project::Project;
 use storage::error::StorageError;
-use storage::{self,Storage,StorageDir,Storable};
+use storage::{self,Storage,StorageDir,Storable, StorageSelection};
 
 pub mod error {
     use super::*;
@@ -144,7 +144,18 @@ fn output_template_path(template_name:&str) -> Result<PathBuf> {
 
 /// Creates the latex files within each projects directory, either for Invoice or Offer.
 #[cfg(feature="document_export")]
-fn project_to_doc(project: &Project, template_name:&str, bill_type:Option<BillType>, output_path: Option<&Path>, dry_run:bool, force:bool) -> Result<PathBuf> {
+fn project_to_doc(project: &Project, config: &ExportConfig) -> Result<PathBuf> {
+
+    let &ExportConfig {
+        select: _,
+        template_name: template_name,
+        bill_type: bill_type,
+        output: output_path,
+        dry_run: dry_run,
+        force: force,
+        open: _
+    } = config;
+
     // init_export_config()
     let output_ext    = ::CONFIG.get_str("extensions/output_file").expect("Faulty default config");
     let convert_ext   = ::CONFIG.get_str("convert/output_extension").expect("Faulty default config");
@@ -247,24 +258,38 @@ fn project_to_doc(project: &Project, template_name:&str, bill_type:Option<BillTy
     }
 }
 
-/// Creates the latex files within each projects directory, either for Invoice or Offer.
-#[cfg(feature="document_export")]
-pub fn projects_to_doc(dir:StorageDir, search_term:&str, template_name:&str, bill_type:Option<BillType>, output: Option<&Path>, dry_run:bool, force:bool, do_open:bool) {
-    let storage = storage::setup::<Project>().unwrap();
-    storage.simple_with_projects(dir,
-                                 Some(&[search_term]),
-                                 |p| project_to_doc(&p, template_name, bill_type, output, dry_run, force)
-                                                    .map(|path| { if do_open {open::that(&path).unwrap();} } )
-                                                    .unwrap()
-                                 );
+pub struct ExportConfig<'a> {
+    pub select: StorageSelection,
+    pub template_name: &'a str,
+    pub bill_type: Option<BillType>,
+    pub output: Option<&'a Path>,
+    pub dry_run: bool,
+    pub force: bool,
+    pub open: bool,
+}
+
+impl<'a> Default for ExportConfig<'a> {
+    fn default() -> Self {
+        Self {
+            select: StorageSelection::default(),
+            template_name: "document",
+            bill_type: None,
+            output: None,
+            dry_run: false,
+            force: false,
+            open: true
+        }
+    }
 }
 
 /// Creates the latex files within each projects directory, either for Invoice or Offer.
 #[cfg(feature="document_export")]
-pub fn project_file_to_doc(project_file:&Path, template_name:&str, bill_type:Option<BillType>, output: Option<&Path>, dry_run:bool, force:bool, do_open:bool) -> Result<PathBuf> {
-    trace!("project_file_to_doc");
-    let project = Project::open_file(project_file)?;
-    project_to_doc(&project, template_name, bill_type, output, dry_run, force)
-    .map(|path| { if do_open {open::that(&path).unwrap();} path } )
+pub fn projects_to_doc(config: &ExportConfig) {
+    let storage = storage::setup::<Project>().unwrap();
+    storage.with_selection(&config.select, |p| {
+        project_to_doc(&p, &config)
+            .map(|path| { if config.open {open::that(&path).unwrap();} } )
+            .unwrap();
+    });
 }
 

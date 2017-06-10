@@ -86,6 +86,11 @@ pub fn new(matches: &ArgMatches) {
     }
 }
 
+fn matches_to_selection<'a>(matches: &'a ArgMatches) -> StorageSelection {
+    let (search_terms, dir) = matches_to_search(matches);
+    StorageSelection::DirAndSearch(dir, search_terms.into_iter().map(ToOwned::to_owned).collect())
+}
+
 fn matches_to_dir<'a>(matches: &'a ArgMatches) -> StorageDir {
         if matches.is_present("archive"){
             let archive_year = matches.value_of("archive")
@@ -276,6 +281,9 @@ pub fn spec(_: &ArgMatches) {
     execute(actions::spec)
 }
 
+
+use self::document_export::ExportConfig;
+
 #[cfg(feature="document_export")]
 fn infer_bill_type(m: &ArgMatches) -> Option<BillType> {
     match (m.is_present("offer"), m.is_present("invoice")) {
@@ -286,39 +294,50 @@ fn infer_bill_type(m: &ArgMatches) -> Option<BillType> {
     }
 }
 
+#[cfg(feature="document_export")]
+fn matches_to_export_config<'a>(m: &'a ArgMatches) -> Option<ExportConfig<'a>> {
+
+    let template_name = m.value_of("template")
+                         .or_else(||CONFIG.get("convert/default_template").and_then(|e| e.as_str()))
+                         .unwrap();
+    let bill_type = infer_bill_type(m);
+
+    let mut config = ExportConfig{
+            select:        StorageSelection::Unintiailzed,
+            template_name: template_name,
+            bill_type:     bill_type,
+            output:        m.value_of("output").map(Path::new),
+            dry_run:       m.is_present("dry-run"),
+            force:         m.is_present("force"),
+            open:          m.is_present("open")
+        };
+
+    if  m.is_present("search_term") {
+        let (search_terms, dir) = matches_to_search(m);
+        let search_terms = search_terms.into_iter().map(ToOwned::to_owned).collect::<Vec<_>>();
+        debug!("make {t}({s}/{d:?}, invoice={i:?})", d = dir, s = search_terms[0], t = template_name, i = bill_type);
+        config.select = StorageSelection::DirAndSearch(dir, search_terms);
+        Some(config)
+
+    } else if let Some(file_path) = m.value_of("file") {
+        debug!("make {t}({d:?}, invoice={i:?})", d = file_path, t = template_name, i = bill_type);
+        config.select = StorageSelection::Paths(vec![PathBuf::from(file_path)]);
+        Some(config)
+
+    } else {
+        error!("{}", lformat!("You have to provide either a search term or path"));
+        None
+    }
+
+}
+
+
 /// Command MAKE
 #[cfg(feature="document_export")]
 pub fn make(m: &ArgMatches) {
     debug!("{:?}", m);
-    let template_name = m.value_of("template").unwrap_or("document");
-    let bill_type = infer_bill_type(m);
-    if  m.is_present("search_term") {
-    let (search_terms, dir) = matches_to_search(m);
-        debug!("make {t}({s}/{d:?}, invoice={i:?})", d = dir, s = search_terms[0], t = template_name, i = bill_type);
-
-        document_export::projects_to_doc(dir,
-                                         search_terms[0],
-                                         template_name,
-                                         bill_type,
-                                         m.value_of("output").map(Path::new),
-                                         m.is_present("dry-run"),
-                                         m.is_present("force"),
-                                         m.is_present("open"))
-
-    } else if let Some(file_path) = m.value_of("file") {
-        debug!("make {t}({d:?}, invoice={i:?})", d = file_path, t = template_name, i = bill_type);
-        execute(|| {
-            document_export::project_file_to_doc(&Path::new(file_path),
-                                                 template_name,
-                                                 bill_type,
-                                                 m.value_of("output").map(Path::new),
-                                                 m.is_present("dry-run"),
-                                                 m.is_present("force"),
-                                                 m.is_present("open"))
-        });
-
-    } else {
-        error!("{}", lformat!("You have to provide either a search term or path"));
+    if let Some(ref config) = matches_to_export_config(m) {
+        document_export::projects_to_doc(config) // TODO if-let this
     }
 }
 
