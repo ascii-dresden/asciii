@@ -73,7 +73,6 @@ pub struct Storage<L:Storable> {
 
 /// Used to identify what directory you are talking about.
 #[derive(Debug,Clone,Copy)]
-#[allow(dead_code)]
 pub enum StorageDir {
     /// Describes exclusively the working directory.
     Working,
@@ -88,6 +87,20 @@ pub enum StorageDir {
     Templates,
     /// `Archive` and `Working` directory, not `Templates`.
     All
+}
+
+/// A description from which we can open Storables
+#[derive(Debug)]
+pub enum StorageSelection {
+    DirAndSearch(StorageDir, Vec<String>),
+    Paths(Vec<PathBuf>),
+    Unintiailzed
+}
+
+impl Default for StorageSelection {
+    fn default() -> Self {
+        StorageSelection::DirAndSearch(StorageDir::Working, Vec::new())
+    }
 }
 
 /// Basically `ls`, returns a list of paths.
@@ -373,17 +386,32 @@ impl<L:Storable> Storage<L> {
         Ok(project)
     }
 
-    pub fn simple_with_projects<F>(&self, dir:StorageDir, search_terms:Option<&[&str]>, f:F)
+    /// Does something with matching projects.
+    pub fn with_selection<F>(&self, select: &StorageSelection, f:F) -> StorageResult<()>
         where F:Fn(L)
     {
-        match self.with_projects(dir, search_terms, |p| {f(p);Ok(())}){
-            Ok(_) => {},
-            Err(e) => error!("{}",e)
+
+        use self::StorageSelection::*;
+        match *select {
+            DirAndSearch(dir, ref search_terms) => {
+                let terms = search_terms.iter().map(AsRef::as_ref).collect::<Vec<_>>(); // sorry about this
+                self.with_projects(dir, Some(terms.as_slice()), f)?
+            },
+            Paths(ref paths) => {
+                for path in paths {
+                    if let Some(project) = self.open_project(path) {
+                        f(project);
+                    } else { error!("cannot open {}", path.display())}
+                }
+            }
+            Unintiailzed => unreachable!()
         }
+        Ok(())
     }
 
+    /// Does something with matching projects.
     pub fn with_projects<F>(&self, dir:StorageDir, search_terms:Option<&[&str]>, f:F) -> StorageResult<()>
-        where F:Fn(L)->StorageResult<()>
+        where F:Fn(L)
     {
         trace!("Storage::with_projects({:?})", search_terms);
         let projects = if let Some(search_terms) = search_terms {
@@ -396,7 +424,7 @@ impl<L:Storable> Storage<L> {
             return Err(format!("Nothing found for {:?}", search_terms).into())
         }
         for project in projects {
-            f(project)?;
+            f(project);
         }
         Ok(())
     }

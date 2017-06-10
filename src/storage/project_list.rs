@@ -9,6 +9,7 @@ use super::Year;
 pub type ProjectsByYear<P: Storable + Sized> = HashMap<Year, ProjectList<P>>;
 
 #[derive(Debug)]
+/// Container keeping all opened projects.
 pub struct Projects<P: Storable + Sized> {
     /// working directory
     pub working: ProjectList<P>,
