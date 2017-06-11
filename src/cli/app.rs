@@ -13,7 +13,7 @@ pub fn with_cli<F> (app_handler:F) where F: Fn(App) {
             .settings(&[AppSettings::SubcommandRequiredElseHelp,AppSettings::ColoredHelp,AppSettings::DeriveDisplayOrder])
             .after_help(asciii::DOCUMENTATION_URL)
 
-            
+
 
             .subcommand(SubCommand::with_name("new")
                         .about(lformat!("Create a new project").as_ref())

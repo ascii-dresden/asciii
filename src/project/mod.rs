@@ -45,6 +45,9 @@ mod computed_field;
 
 #[cfg(feature="json")]
 pub mod tojson;
+#[cfg(feature="serialization")]
+pub mod export;
+
 
 //#[cfg(test)] mod tests;
 
@@ -87,62 +90,6 @@ pub struct Project {
     git_status: Option<GitStatus>,
     file_content: String,
     yaml: Yaml
-}
-
-pub mod export {
-    use super::spec::*;
-    use super::Project;
-
-    pub trait Exportable<T> {
-        fn export(self) -> T;
-    }
-
-    fn opt_str(opt:Option<&str>) -> Option<String> {
-        opt.map(|e|e.to_owned())
-    }
-
-    #[derive(Debug, PartialEq)]
-    #[cfg_attr(feature = "serialization", derive(Serialize,Deserialize))]
-    pub struct Client {
-        title: Option<String>,
-        first_name: Option<String>,
-        last_name: Option<String>,
-        full_name: Option<String>,
-        address: Option<String>,
-        email: Option<String>,
-        addressing : Option<String>,
-    }
-
-    impl Exportable<Client> for Project {
-        fn export(self) -> Client {
-            Client {
-                full_name:   self.client().full_name(),
-                addressing:  self.client().addressing(),
-                email:       opt_str(self.client().email()),
-                last_name:   opt_str(self.client().last_name()),
-                first_name:  opt_str(self.client().first_name()),
-                title:       opt_str(self.client().title()),
-                address:     opt_str(self.client().address()),
-            }
-        }
-    }
-
-    //#[derive(Serialize, Debug)]
-    //pub struct Bills<'a> {
-    //    offer: Bill<Product<'a>>,
-    //    invoice: Bill<Product<'a>>,
-    //}
-
-    //impl<'a> Exportable<Bills<'a>> for Project {
-    //    fn export(self) -> Bills<'a> {
-    //        let (offer, invoice) = self.bills().unwrap();
-    //        Bills {
-    //            offer, invoice
-    //        }
-    //    }
-    //}
-
-
 }
 
 impl Project {

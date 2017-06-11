@@ -27,7 +27,6 @@ pub mod error;
 use self::error::*;
 
 /// Helper method that passes projects matching the `search_terms` to the passt closure `f`
-/// TODO Really move this to `Storage`
 pub fn with_projects<F>(dir:StorageDir, search_terms:&[&str], f:F) -> Result<()>
     where F:Fn(&Project)->Result<()>
 {
