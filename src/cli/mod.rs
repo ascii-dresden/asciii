@@ -16,6 +16,7 @@ use std::error::Error;
 /// Contains concrete implementation of each subcommand
 pub mod app;
 pub mod subcommands;
+mod error;
 
 #[cfg(feature="shell")]
 pub mod shell;
@@ -27,18 +28,4 @@ pub use self::app::match_matches;
 pub fn fail<T:Display>(message:T) -> !{
     println!("{}", message);
     exit(1);
-}
-
-/// Execute a command returning a `StorageError`
-pub fn execute<F, S, E:Error>(command:F) -> S where F: FnOnce() -> Result<S, E> {
-    match command(){
-        Ok(s) => s,
-        Err(lerr) => {
-            error!("{}", lerr);
-            if let Some(cause) = lerr.cause() {
-                println!("caused by {}", cause);
-            }
-            exit(1)
-        }
-    }
 }

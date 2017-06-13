@@ -3,6 +3,7 @@ use std::ffi::OsStr;
 use std::{env, fs};
 use std::io::Write;
 use std::collections::HashMap;
+use std::process::ExitStatus;
 
 use open;
 use clap::ArgMatches;
@@ -28,7 +29,8 @@ pub use self::list::*;
 pub mod show;
 pub use self::show::*;
 
-use super::{execute, fail};
+use ::cli::error::*;
+use super::fail;
 
 #[cfg(feature="shell")] use super::shell;
 
@@ -36,7 +38,7 @@ use super::{execute, fail};
 
 /// Create NEW Project
 // #[deprecated(note="move to asciii::actions")]
-pub fn new(matches: &ArgMatches) {
+pub fn new(matches: &ArgMatches) -> Result<()> {
     let project_name = matches.value_of("name").expect("You did not pass a \"Name\"!");
     let editor = CONFIG.get("user/editor").and_then(|e| e.as_str());
 
@@ -45,7 +47,7 @@ pub fn new(matches: &ArgMatches) {
         .unwrap();
 
     let edit = !matches.is_present("don't edit");
-    let luigi = execute(setup::<Project>);
+    let luigi = setup::<Project>()?;
 
     let mut fill_data: HashMap<&str, String> = HashMap::new();
 
@@ -74,11 +76,12 @@ pub fn new(matches: &ArgMatches) {
         fill_data.insert("MANAGER", manager.to_owned());
     }
 
-    let project = execute(|| luigi.create_project(project_name, template_name, &fill_data));
+    let project = luigi.create_project(project_name, template_name, &fill_data)?;
     let project_file = project.file();
     if edit {
         util::pass_to_command(&editor, &[project_file]);
     }
+    Ok(())
 }
 
 fn matches_to_selection<'a>(matches: &'a ArgMatches) -> StorageSelection {
@@ -126,13 +129,13 @@ fn matches_to_search<'a>(matches: &'a ArgMatches) -> (Vec<&'a str>, StorageDir) 
 
 /// Produces a list of paths.
 /// This is more general than `with_projects`, as this includes templates too.
-pub fn matches_to_paths(matches: &ArgMatches, luigi: &Storage<Project>) -> Vec<PathBuf> {
+pub fn matches_to_paths(matches: &ArgMatches, luigi: &Storage<Project>) -> Result<Vec<PathBuf>> {
     let search_terms = matches.values_of("search_term")
                               .map(|v| v.collect::<Vec<&str>>())
                               .unwrap_or_else(Vec::new);
 
     if matches.is_present("template") {
-        super::execute(|| luigi.list_template_files())
+        Ok(luigi.list_template_files()?
             .into_iter()
             .filter(|f| {
                 let stem = f.file_stem()
@@ -140,7 +143,7 @@ pub fn matches_to_paths(matches: &ArgMatches, luigi: &Storage<Project>) -> Vec<P
                     .unwrap_or("");
                 search_terms.contains(&stem)
             })
-            .collect::<Vec<_>>()
+            .collect::<Vec<_>>())
     } else {
         let dir = if let Some(archive) = matches.value_of("archive") {
             StorageDir::Archive(archive.parse::<i32>().unwrap())
@@ -148,31 +151,31 @@ pub fn matches_to_paths(matches: &ArgMatches, luigi: &Storage<Project>) -> Vec<P
             StorageDir::Working
         };
 
-        super::execute(|| luigi.search_projects_any(dir, &search_terms))
+        Ok(luigi.search_projects_any(dir, &search_terms)?
             .iter()
             .map(|project| project.dir())
-            .collect::<Vec<_>>()
-
+            .collect::<Vec<_>>())
     }
 }
 
 
 
 /// Command CSV
-pub fn csv(matches: &ArgMatches) {
+pub fn csv(matches: &ArgMatches) -> Result<()> {
     use chrono::{Local, Datelike};
     let year = matches.value_of("year")
                       .and_then(|y| y.parse::<i32>().ok())
                       .unwrap_or(Local::now().year());
 
     debug!("asciii csv --year {}", year);
-    let csv = execute(|| actions::csv(year));
+    let csv = actions::csv(year)?;
     println!("{}", csv);
+    Ok(())
 }
 
 
 /// Command EDIT
-pub fn edit(matches: &ArgMatches) {
+pub fn edit(matches: &ArgMatches) -> Result<()> {
     let search_term = matches.value_of("search_term").unwrap();
     let search_terms = matches.values_of("search_term").unwrap().collect::<Vec<&str>>();
 
@@ -189,13 +192,15 @@ pub fn edit(matches: &ArgMatches) {
     } else {
         edit_projects(StorageDir::Working, &search_terms, &editor);
     }
+    Ok(())
 }
 
-fn edit_projects(dir: StorageDir, search_terms: &[&str], editor: &Option<&str>) {
-    let luigi = execute(setup::<Project>);
+
+fn edit_projects(dir: StorageDir, search_terms: &[&str], editor: &Option<&str>) -> Result<()> {
+    let luigi = setup::<Project>()?;
     let mut all_projects = Vec::new();
     for search_term in search_terms {
-        let mut paths = execute(|| luigi.search_projects(dir, search_term));
+        let mut paths = luigi.search_projects(dir, search_term)?;
         if paths.is_empty() {
             // println!{"Nothing found for {:?}", search_term}
         } else {
@@ -204,37 +209,41 @@ fn edit_projects(dir: StorageDir, search_terms: &[&str], editor: &Option<&str>) 
     }
 
     if all_projects.is_empty() {
-        fail(format!("Nothing found for {:?}", search_terms));
+        bail!("Nothing found for {:?}", search_terms);
     } else {
         let all_paths = all_projects.iter().map(|p| p.file()).collect::<Vec<PathBuf>>();
         util::pass_to_command(&editor, &all_paths);
+        Ok(())
     }
 }
 
 /// Command WORKSPACE
-pub fn workspace(matches: &ArgMatches) {
+pub fn workspace(matches: &ArgMatches) -> Result<()> {
     println!("{:?}", matches);
-    let luigi = execute(setup::<Project>);
+    let luigi = setup::<Project>()?;
+
     let editor = matches.value_of("editor")
         .or(CONFIG.get("user/editor")
                   .and_then(|e| e.as_str()));
     util::pass_to_command(&editor, &[luigi.working_dir()]);
+    Ok(())
 }
 
 /// Command EDIT --template
-pub fn with_templates<F>(name: &str, action: F)
+pub fn with_templates<F>(name: &str, action: F) -> Result<()>
     where F: FnOnce(&[PathBuf])
 {
-    let luigi = execute(setup::<Project>);
-    let template_paths = execute(||luigi.list_template_files())
+    let luigi = setup::<Project>()?;
+    let template_paths = luigi.list_template_files()?
         .into_iter() // drain?
         .filter(|f|f.file_stem() .unwrap_or_else(||OsStr::new("")) == name)
         .collect::<Vec<PathBuf>>();
     action(template_paths.as_slice());
+    Ok(())
 }
 
 /// Command SET
-pub fn set(m: &ArgMatches) {
+pub fn set(m: &ArgMatches) -> Result<()> {
     let field = m.value_of("field name")
                             .unwrap()
                             .chars()
@@ -243,28 +252,27 @@ pub fn set(m: &ArgMatches) {
     let value = m.value_of("field value").unwrap();
     let (search_terms, dir) = matches_to_search(m);
 
-    execute(|| {
-        actions::with_projects(dir, &search_terms, |project| {
-            println!("{}: {}", project.short_desc(), project.empty_fields().join(", "));
-            if !project.empty_fields().contains(&field) {
-                return Err(format!("{:?} was not found in {}", field, project.short_desc()).into());
-            }
-            if util::really(&format!("do you want to set the field {} in {:?} [y|N]",
-                                     field,
-                                     project.short_desc())) {
-                project.replace_field(&field, &value).map_err(|e| e.into())
-            } else {
-                Err("Don't want to".into())
-            }
-        })
-    })
+    Ok(actions::with_projects(dir, &search_terms, |project| {
+        println!("{}: {}", project.short_desc(), project.empty_fields().join(", "));
+        if !project.empty_fields().contains(&field) {
+            return Err(format!("{:?} was not found in {}", field, project.short_desc()).into());
+        }
+        if util::really(&format!("do you want to set the field {} in {:?} [y|N]",
+                                 field,
+                                 project.short_desc())) {
+            project.replace_field(&field, &value).map_err(|e| e.into())
+        } else {
+            Err("Don't want to".into())
+        }
+    })?)
 }
 
 
 /// Command CALENDAR
-pub fn calendar(matches: &ArgMatches) {
-    let calendar = execute(||actions::calendar_with_tasks(matches_to_dir(matches), matches.is_present("tasks")));
+pub fn calendar(matches: &ArgMatches) -> Result<()> {
+    let calendar = actions::calendar_with_tasks(matches_to_dir(matches), matches.is_present("tasks"))?;
     println!("{}", calendar);
+    Ok(())
 }
 
 
@@ -272,8 +280,8 @@ pub fn calendar(matches: &ArgMatches) {
 /// Command SPEC
 /// TODO make this not panic :D
 /// TODO move this to `spec::all_the_things`
-pub fn spec(_: &ArgMatches) {
-    execute(actions::spec)
+pub fn spec(_: &ArgMatches) -> Result<()> {
+    Ok(actions::spec()?)
 }
 
 
@@ -329,28 +337,30 @@ fn matches_to_export_config<'a>(m: &'a ArgMatches) -> Option<ExportConfig<'a>> {
 
 /// Command MAKE
 #[cfg(feature="document_export")]
-pub fn make(m: &ArgMatches) {
+pub fn make(m: &ArgMatches) -> Result<()> {
     debug!("{:?}", m);
     if let Some(ref config) = matches_to_export_config(m) {
-        document_export::projects_to_doc(config) // TODO if-let this
+        document_export::projects_to_doc(config) // TODO if-let this TODO should return Result
     }
+    Ok(())
 }
 
 
 
 /// Command DELETE
-pub fn delete(m: &ArgMatches) {
+pub fn delete(m: &ArgMatches) -> Result<()> {
     let (search_terms, dir) = matches_to_search(m);
     if m.is_present("template") {
         unimplemented!();
     } else {
-        execute(|| actions::delete_project_confirmation(dir, &search_terms));
+        Ok(actions::delete_project_confirmation(dir, &search_terms)?)
     }
 }
 
 #[cfg(not(feature="document_export"))]
-pub fn make(_: &ArgMatches) {
+pub fn make(_: &ArgMatches) -> Result<()> {
     error!("Make functionality not built-in with this release!");
+    Ok(())
 }
 
 
@@ -360,31 +370,33 @@ pub fn make(_: &ArgMatches) {
 
 
 /// TODO make this be have like `edit`, taking multiple names
-pub fn archive(matches: &ArgMatches) {
+pub fn archive(matches: &ArgMatches) -> Result<()> {
     if let Some(search_terms) = matches.values_of("search terms"){
         let search_terms = search_terms.collect::<Vec<_>>();
         let year = matches.value_of("year").and_then(|s| s.parse::<i32>().ok());
-        let moved_files = execute(|| actions::archive_projects(&search_terms, year, matches.is_present("force")));
+        let moved_files = actions::archive_projects(&search_terms, year, matches.is_present("force"))?;
         debug!("archive({:?},{:?}) :\n{:?}", search_terms, year, moved_files);
     } else if matches.is_present("all"){
         debug!("archiving all I can find");
-        let moved_files = execute(|| actions::archive_all_projects());
+        let moved_files = actions::archive_all_projects()?;
         debug!("git adding {:?} ", moved_files);
     } else {
         debug!("what do you wanna do?");
     }
+    Ok(())
 }
 
-pub fn unarchive(matches: &ArgMatches) {
+pub fn unarchive(matches: &ArgMatches) -> Result<()> {
     let year = matches.value_of("year").unwrap();
     let year = year.parse::<i32>()
         .unwrap_or_else(|e| panic!("can't parse year {:?}, {:?}", year, e));
     let search_terms = matches.values_of("name").unwrap().collect::<Vec<_>>();
-    let moved_files = execute(|| actions::unarchive_projects(year, &search_terms));
+    let moved_files = actions::unarchive_projects(year, &search_terms)?;
     debug!("unarchive({:?},{:?}) :\n{:?}", search_terms, year, moved_files);
+    Ok(())
 }
 
-pub fn config(matches: &ArgMatches) {
+pub fn config(matches: &ArgMatches) -> Result<()> {
     if let Some(path) = matches.value_of("show") {
         config_show(path);
     }
@@ -425,15 +437,17 @@ pub fn config(matches: &ArgMatches) {
     else if matches.is_present("default") {
         config_show_default();
     }
+    Ok(())
 }
 
 
 
 /// Command CONFIG --show
-pub fn config_show(path: &str) {
+pub fn config_show(path: &str) -> Result<()> {
     println!("{}: {:#?}", path,
              CONFIG.get_to_string(&path)
                    .unwrap_or_else(|| format!("{} not set", path)));
+    Ok(())
 }
 
 /// Command CONFIG --edit
@@ -447,23 +461,27 @@ fn config_edit(editor: &Option<&str>) {
 }
 
 /// Command CONFIG --default
-fn config_show_default() {
+fn config_show_default() -> Result<()> {
     println!("{}", config::DEFAULT_CONFIG);
+    Ok(())
 }
 
 
 /// Command DOC
-pub fn doc() {
-    open::that(asciii::DOCUMENTATION_URL).unwrap();
+pub fn doc() -> Result<()> {
+    open::that(asciii::DOCUMENTATION_URL).unwrap(); //TODO
+    //.and_then(|es| if !es.success() {Err("open-error".into())} else {Ok(())} )  ?
+    Ok(())
 }
 
 /// Command VERSION
-pub fn version() {
+pub fn version() -> Result<()> {
     println!("{}", *asciii::VERSION);
+    Ok(())
 }
 
 /// Command DUES
-pub fn dues(matches: &ArgMatches) {
+pub fn dues(matches: &ArgMatches) -> Result<()> {
     let dues = if matches.is_present("wages") {
         actions::open_wages()
     } else {
@@ -472,23 +490,26 @@ pub fn dues(matches: &ArgMatches) {
     if let Ok(dues) = dues {
         println!("{}", dues.postfix());
     }
+    Ok(())
 }
 
 // pub fn open_path(matches:&ArgMatches){path(matches, |path| {open::that(path).unwrap();})}
-pub fn open_path(m: &ArgMatches) {
+pub fn open_path(m: &ArgMatches) -> Result<()> {
     if m.is_present("search_term") {
         // let bill_type = infer_bill_type(m);
         // let template_name = "document";
         // let (search_terms, dir) = matches_to_search(m);
         unimplemented!()
     } else {
-        path(m, |path| {
-            open::that(path).unwrap();
-        })
+        path(m, |path| { Ok(open::that(path).map(|_| ())?) })?;
     }
+    Ok(())
 }
 
-pub fn path<F: Fn(&Path)>(m: &ArgMatches, action: F) {
+// TODO return result!
+pub fn path<F>(m: &ArgMatches, action: F) -> Result<()>
+    where F: Fn(&Path) -> Result<()>
+{
 
     let path = CONFIG.get_str("path")
         .expect("Faulty config: field output_path does not contain a string value");
@@ -499,37 +520,40 @@ pub fn path<F: Fn(&Path)>(m: &ArgMatches, action: F) {
     let output_path = CONFIG.get_str("output_path")
         .expect("Faulty config: field output_path does not contain a string value");
 
-    let exe = env::current_exe().unwrap();
+    let exe = env::current_exe()?;
 
-    if m.is_present("templates") {
+    Ok(if m.is_present("templates") {
         action(&PathBuf::from(path)
             .join(storage_path)
             .join(templates_path)
-            );
+            )?
     }
 
     else if m.is_present("output") {
-        action(&util::replace_home_tilde(Path::new(output_path)));
+        action(&util::replace_home_tilde(Path::new(output_path)))?
     }
 
     else if m.is_present("bin") {
-        action(exe.parent().unwrap());
+        action(
+            exe.parent().unwrap()
+               //.ok_or(Err("no parent".into()))? TODO
+               )?
     }
 
     else {
         // default case
         let path = util::replace_home_tilde(Path::new(path)).join(storage_path);
-        action(&path);
-    }
+        action(&path)?
+    })
 }
 
 #[cfg(feature="shell")]
-pub fn shell(_matches: &ArgMatches) {
-    shell::launch_shell();
+pub fn shell(_matches: &ArgMatches) -> Result<()> {
+    shell::launch_shell()
 }
 
 #[cfg(not(feature="shell"))]
-pub fn shell(_matches: &ArgMatches) {
-    error!("Shell functionality not built-in with this release!");
+pub fn shell(_matches: &ArgMatches) -> Result<()> {
+    bail!("Shell functionality not built-in with this release!");
 }
 

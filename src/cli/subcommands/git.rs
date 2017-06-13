@@ -3,50 +3,57 @@ use clap::ArgMatches;
 use asciii::{storage, util};
 use asciii::project::Project;
 
-use ::cli::execute;
+use ::cli::error::*;
 use super::matches_to_paths;
 
 /// Command LOG
-pub fn git_log(matches: &ArgMatches) {
-    let storage = execute(storage::setup_with_git::<Project>);
-    let paths = matches_to_paths(matches, &storage);
+pub fn git_log(matches: &ArgMatches) -> Result<()> {
+    let storage = storage::setup_with_git::<Project>()?;
+    let paths = matches_to_paths(matches, &storage)?;
     let repo = storage.repository().unwrap();
     if !repo.log(&paths).success() {
-        error!("git log did not exit successfully")
+        Err("git log did not exit successfully".into())
+    } else {
+        Ok(())
     }
 }
 
 /// Command STATUS
-pub fn git_status() {
-    let storage = execute(storage::setup_with_git::<Project>);
+pub fn git_status() -> Result<()> {
+    let storage = storage::setup_with_git::<Project>()?;
     let repo = storage.repository().unwrap();
     if !repo.status().success() {
-        error!("git status did not exit successfully")
+        Err("git status did not exit successfully".into())
+    } else {
+        Ok(())
     }
 }
 
 /// Command COMMIT
-pub fn git_commit() {
-    let storage = execute(storage::setup_with_git::<Project>);
+pub fn git_commit() -> Result<()> {
+    let storage = storage::setup_with_git::<Project>()?;
     let repo = storage.repository().unwrap();
     if !repo.commit().success() {
-        error!("git commit did not exit successfully")
+        Err("git commit did not exit successfully".into())
+    } else {
+        Ok(())
     }
 }
 
 /// Command REMOTE
 /// exact replica of `git remote -v`
 #[cfg(not(feature="git_statuses"))]
-pub fn git_remote() {
-    let storage = execute(storage::setup_with_git::<Project>);
+pub fn git_remote() -> Result<()> {
+    let storage = storage::setup_with_git::<Project>()?;
     storage.repository().unwrap().remote();
+    Ok(())
 }
 
 /// Command REMOTE
 /// exact replica of `git remote -v`
 #[cfg(feature="git_statuses")]
-pub fn git_remote() {
-    let storage = execute(storage::setup_with_git::<Project>);
+pub fn git_remote() -> Result<()> {
+    let storage = storage::setup_with_git::<Project>()?;
 
     if let Some(r) = storage.repository() {
         let ref repo = r.repo;
@@ -73,32 +80,36 @@ pub fn git_remote() {
 
     }
 
+    Ok(())
 }
 
 /// Command ADD
-pub fn git_add(matches: &ArgMatches) {
-    let storage = execute(storage::setup_with_git::<Project>);
-    let paths = matches_to_paths(matches, &storage);
+pub fn git_add(matches: &ArgMatches) -> Result<()> {
+    let storage = storage::setup_with_git::<Project>()?;
+    let paths = matches_to_paths(matches, &storage)?;
     let repo = storage.repository().unwrap();
-    if !repo.add(&paths).success() {
-        error!("git add did not exit successfully")
+    if repo.add(&paths).success() {
+        Ok(())
+    } else {
+        Err("git add did not exit successfully".into())
     }
 }
 
 
 /// Command DIFF
-pub fn git_diff(matches: &ArgMatches) {
-    let storage = execute(storage::setup_with_git::<Project>);
-    let paths = matches_to_paths(matches, &storage);
+pub fn git_diff(matches: &ArgMatches) -> Result<()> {
+    let storage = storage::setup_with_git::<Project>()?;
+    let paths = matches_to_paths(matches, &storage)?;
     let repo = storage.repository().unwrap();
     if !repo.diff(&paths).success() {
-        error!("git diff did not exit successfully")
+        return Err("git diff did not exit successfully".into())
     }
+    Ok(())
 }
 
 /// Command PULL
-pub fn git_pull(matches: &ArgMatches) {
-    let storage = execute(storage::setup_with_git::<Project>);
+pub fn git_pull(matches: &ArgMatches) -> Result<()> {
+    let storage = storage::setup_with_git::<Project>()?;
     let repo = storage.repository().unwrap();
 
     let success = if matches.is_present("rebase") {
@@ -107,32 +118,35 @@ pub fn git_pull(matches: &ArgMatches) {
         repo.pull().success()
     };
     if !success {
-        error!("git pull did not exit successfully")
+        return Err("git pull did not exit successfully".into())
     }
+    Ok(())
 }
 
 /// Command PUSH
-pub fn git_push() {
-    let storage = execute(storage::setup_with_git::<Project>);
+pub fn git_push() -> Result<()> {
+    let storage = storage::setup_with_git::<Project>()?;
     let repo = storage.repository().unwrap();
     if !repo.push().success() {
-        error!("git push did not exit successfully")
+        return Err("git push did not exit successfully".into())
     }
+    Ok(())
 }
 
 /// Command STASH
-pub fn git_stash() {
-    let storage = execute(storage::setup_with_git::<Project>);
+pub fn git_stash() -> Result<()> {
+    let storage = storage::setup_with_git::<Project>()?;
     let repo = storage.repository().unwrap();
     if !repo.stash().success() {
-        error!("git stash did not exit successfully")
+        return Err("git stash did not exit successfully".into())
     }
+    Ok(())
 }
 
 /// Command CLEANUP
-pub fn git_cleanup(matches: &ArgMatches) {
-    let storage = execute(storage::setup_with_git::<Project>);
-    let paths = matches_to_paths(matches, &storage);
+pub fn git_cleanup(matches: &ArgMatches) -> Result<()> {
+    let storage = storage::setup_with_git::<Project>()?;
+    let paths = matches_to_paths(matches, &storage)?;
     let repo = storage.repository().unwrap();
     // TODO implement `.and()` for exitstatus
 
@@ -140,16 +154,19 @@ pub fn git_cleanup(matches: &ArgMatches) {
             "Do you really want to reset any changes you made to:\n {:?}\n[y|N]", paths)) {
 
         if !(repo.checkout(&paths).success() && repo.clean(&paths).success()) {
-            error!("clean was not successfull");
+            return Err("clean was not successfull".into());
         }
     }
+    Ok(())
 }
 
 /// Command STASH POP
-pub fn git_stash_pop() {
-    let storage = execute(storage::setup_with_git::<Project>);
+pub fn git_stash_pop() -> Result<()> {
+    let storage = storage::setup_with_git::<Project>()?;
     let repo = storage.repository().unwrap();
     if !repo.stash_pop().success() {
-        error!("git stash pop did not exit successfully")
+        Err("git stash pop did not exit successfully".into())
+    } else {
+        Ok(())
     }
 }

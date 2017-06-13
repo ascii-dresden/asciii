@@ -3,6 +3,8 @@ use clap::{App, AppSettings, Arg, ArgMatches, SubCommand, Shell};
 use super::subcommands;
 use std::str::FromStr;
 
+use ::cli::error::*;
+
 pub fn with_cli<F> (app_handler:F) where F: Fn(App) {
     app_handler(
         App::new("asciii")
@@ -791,7 +793,7 @@ pub fn with_cli<F> (app_handler:F) where F: Fn(App) {
 
 /// Starting point for handling commandline matches
 pub fn match_matches(matches: &ArgMatches) {
-    match matches.subcommand() {
+    let res = match matches.subcommand() {
      ("list",      Some(sub_m)) => subcommands::list(sub_m),
      ("csv",       Some(sub_m)) => subcommands::csv(sub_m),
      ("new",       Some(sub_m)) => subcommands::new(sub_m),
@@ -831,17 +833,20 @@ pub fn match_matches(matches: &ArgMatches) {
      ("pop",       _          ) => subcommands::git_stash_pop(),
      ("log",       Some(sub_m)) => subcommands::git_log(sub_m),
      ("complete",  Some(sub_m)) => generate_completions(sub_m),
-     _                          => ()
+     _                          => Ok(())
+    };
+    if let Err(e) = res {
+        println!("{}", e)
     }
 }
 
-pub fn generate_completions(matches: &ArgMatches) {
+pub fn generate_completions(matches: &ArgMatches) -> Result<()>{
     if let Some(shell) = matches.value_of("shell").and_then(|s|Shell::from_str(s).ok()) {
         with_cli(|mut app| app.gen_completions("asciii", shell, ".") );
     } else {
         error!("{}", lformat!("please specify either bash, zsh, fish or powershell"));
-        return;
     }
+    Ok(())
 }
 
 pub mod validators {

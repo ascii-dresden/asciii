@@ -7,6 +7,7 @@ use rustyline::Result as LineResult;
 use std::collections::BTreeSet;
 use clap::App;
 use super::app::with_cli;
+use ::cli::error::*;
 
 static ESCAPE_CHAR: Option<char> = Some('\\');
 
@@ -42,7 +43,7 @@ impl completion::Completer for ClapCompleter {
     }
 }
 
-pub fn launch_shell() {
+pub fn launch_shell() -> Result<()>{
 
     with_cli( |mut app| {
 
@@ -106,4 +107,5 @@ pub fn launch_shell() {
     }
     //rl.save_history("history.txt").unwrap();
     });
+    Ok(())
 }

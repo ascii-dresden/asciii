@@ -17,6 +17,7 @@ extern crate prettytable;
 extern crate maplit;
 #[macro_use] extern crate log;
 #[macro_use] extern crate clap;
+#[macro_use] extern crate error_chain;
 
 extern crate crowbook_intl_runtime;
 #[macro_use] pub mod localize_macros;
@@ -42,5 +43,5 @@ fn main(){
     asciii::util::setup_log();
     setup_locale();
 
-    cli::with_cli(|app| cli::match_matches(&app.get_matches()));
+    cli::with_cli(|app| cli::match_matches(&app.get_matches()) );
 }
