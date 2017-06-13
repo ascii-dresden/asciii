@@ -148,11 +148,11 @@ fn project_to_doc(project: &Project, config: &ExportConfig) -> Result<PathBuf> {
 
     let &ExportConfig {
         select: _,
-        template_name: template_name,
-        bill_type: bill_type,
+        template_name,
+        bill_type,
         output: output_path,
-        dry_run: dry_run,
-        force: force,
+        dry_run,
+        force,
         open: _
     } = config;
 
@@ -227,11 +227,11 @@ fn project_to_doc(project: &Project, config: &ExportConfig) -> Result<PathBuf> {
             Ok(target)
         } else {
             // \o/ we created a tex file
-
+            let mut outfile_path:PathBuf = PathBuf::new();
             if dry_run{
                 warn!("Dry run! This does not produce any output:\n * {}\n * {}", outfile.display(), pdffile.display());
             } else {
-                let outfile_path = project.write_to_file(&filled,&dyn_bill,output_ext)?;
+                outfile_path = project.write_to_file(&filled,&dyn_bill,output_ext)?;
                 debug!("{} vs\n        {}", outfile.display(), outfile_path.display());
                 util::pass_to_command(&convert_tool, &[&outfile_path]);
             }
@@ -245,9 +245,15 @@ fn project_to_doc(project: &Project, config: &ExportConfig) -> Result<PathBuf> {
                     debug!("I expected there to be a {}, but there wasn't any ?", trash_file.display())
                 }
             }
-            if pdffile.exists(){
-                debug!("now there is be a {:?} -> {:?}", pdffile, target);
-                fs::rename(&pdffile, &target)?;
+
+            outfile_path.set_extension("pdf");
+            if pdffile.exists() || outfile_path.exists(){
+                let file = match pdffile.exists() {
+                    true => pdffile,
+                    false => outfile_path,
+                };
+                debug!("now there is be a {:?} -> {:?}", file, target);
+                fs::rename(&file, &target)?;
                 Ok(target)
             } else {
                 bail!(error::ErrorKind::NoPdfCreated);
@@ -289,7 +295,7 @@ pub fn projects_to_doc(config: &ExportConfig) {
     storage.with_selection(&config.select, |p| {
         project_to_doc(&p, &config)
             .map(|path| { if config.open {open::that(&path).unwrap();} } )
-            .unwrap();
-    });
+            .unwrap()
+    }).unwrap();
 }
 
