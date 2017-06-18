@@ -3,7 +3,6 @@
 use std::io;
 use std::fmt;
 use std::time;
-use std::error::Error as ErrorTrait;
 
 use asciii::actions;
 use asciii::project;

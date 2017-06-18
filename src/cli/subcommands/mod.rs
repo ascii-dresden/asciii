@@ -3,7 +3,6 @@ use std::ffi::OsStr;
 use std::{env, fs};
 use std::io::Write;
 use std::collections::HashMap;
-use std::process::ExitStatus;
 
 use open;
 use clap::ArgMatches;
@@ -30,7 +29,6 @@ pub mod show;
 pub use self::show::*;
 
 use ::cli::error::*;
-use super::fail;
 
 #[cfg(feature="shell")] use super::shell;
 
@@ -184,13 +182,15 @@ pub fn edit(matches: &ArgMatches) -> Result<()> {
                   .and_then(|e| e.as_str()));
 
     if matches.is_present("template") {
-        with_templates(search_term, |template_paths:&[PathBuf]| util::pass_to_command(&editor, template_paths));
+        with_templates(search_term,
+                       |template_paths:&[PathBuf]| util::pass_to_command(&editor, template_paths)
+                       )?;
 
     } else if let Some(archive) = matches.value_of("archive") {
         let archive = archive.parse::<i32>().unwrap();
-        edit_projects(StorageDir::Archive(archive), &search_terms, &editor);
+        edit_projects(StorageDir::Archive(archive), &search_terms, &editor)?;
     } else {
-        edit_projects(StorageDir::Working, &search_terms, &editor);
+        edit_projects(StorageDir::Working, &search_terms, &editor)?;
     }
     Ok(())
 }
@@ -398,7 +398,7 @@ pub fn unarchive(matches: &ArgMatches) -> Result<()> {
 
 pub fn config(matches: &ArgMatches) -> Result<()> {
     if let Some(path) = matches.value_of("show") {
-        config_show(path);
+        config_show(path)?;
     }
 
     if matches.is_present("location") {
@@ -435,7 +435,7 @@ pub fn config(matches: &ArgMatches) -> Result<()> {
     }
 
     else if matches.is_present("default") {
-        config_show_default();
+        config_show_default()?;
     }
     Ok(())
 }
