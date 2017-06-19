@@ -1,12 +1,10 @@
 //! Utility functions that are needed all over the places.
 #![allow(dead_code)]
-use std::io;
+use std::{io, fs};
 use std::env::{self, home_dir, current_dir};
 use std::ffi::OsStr;
-use std::fs;
-use std::path::{Path,PathBuf};
-use std::process;
-use std::process::{Command, ExitStatus};
+use std::path::{Path, PathBuf};
+use std::process::{self, Command, ExitStatus};
 
 use log::{LogRecord, LogLevelFilter};
 use env_logger::LogBuilder;

@@ -21,7 +21,7 @@
 
 
 use std::fs;
-use std::env::{home_dir,current_dir};
+use std::env::{home_dir, current_dir};
 use std::path::{Path, PathBuf};
 use std::marker::PhantomData;
 
@@ -39,7 +39,7 @@ mod project_list;
 pub use self::project_list::{ProjectList, ProjectsByYear, Projects};
 pub mod repo;
 pub mod error;
-pub use self::error::{StorageError,ErrorKind};
+pub use self::error::{StorageError, ErrorKind};
 pub mod storable;
 pub use self::storable::Storable;
 

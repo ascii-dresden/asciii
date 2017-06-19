@@ -3,8 +3,7 @@
 use std::ops::{Deref, DerefMut};
 use std::collections::HashMap;
 
-use super::Storable;
-use super::Year;
+use super::{Storable, Year};
 
 pub type ProjectsByYear<P: Storable + Sized> = HashMap<Year, ProjectList<P>>;
 

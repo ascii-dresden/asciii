@@ -12,10 +12,9 @@
 //#![warn(missing_debug_implementations)]
 
 
-use std::path::{Path,PathBuf};
-use std::env::{home_dir,current_dir};
-use util::yaml;
-use util::yaml::{Yaml, YamlError};
+use std::path::{Path, PathBuf};
+use std::env::{home_dir, current_dir};
+use util::yaml::{self, Yaml, YamlError};
 
 /// Name of the configfile
 pub const DEFAULT_LOCATION: &'static str = ".asciii.yml";

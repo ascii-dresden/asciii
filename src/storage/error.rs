@@ -2,8 +2,7 @@
 //!
 
 #![allow(trivial_casts)]
-use std::io;
-use std::fmt;
+use std::{io, fmt};
 use ::project;
 #[cfg(feature="git_statuses")] use git2;
 

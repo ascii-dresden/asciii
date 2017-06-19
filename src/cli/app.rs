@@ -1,6 +1,5 @@
 use asciii;
-use clap::{App, AppSettings, Arg, ArgMatches, SubCommand};
-use clap::{Shell};
+use clap::{App, AppSettings, Arg, ArgMatches, SubCommand, Shell};
 use super::subcommands;
 use std::str::FromStr;
 

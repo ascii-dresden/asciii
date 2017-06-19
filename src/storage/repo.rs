@@ -3,14 +3,14 @@ use std::fmt;
 use std::path::{Path, PathBuf};
 #[cfg(feature="git_statuses")]
 use std::collections::HashMap;
-use std::process::{Command,ExitStatus};
+use std::process::{Command, ExitStatus};
 
 #[cfg(not(feature="git_statuses"))]
 use std::error::Error;
 
 #[cfg(feature="git_statuses")]
 use git2;
-use term::{color,Attr};
+use term::{color, Attr};
 use term::color::Color;
 
 /// More Rustacious way of representing a git status

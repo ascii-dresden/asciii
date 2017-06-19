@@ -1,5 +1,5 @@
 use util;
-use storage::{self,Storable};
+use storage::{self, Storable};
 
 use super::Project;
 use super::spec::*;

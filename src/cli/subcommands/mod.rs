@@ -8,12 +8,7 @@ use open;
 use clap::ArgMatches;
 use chrono::prelude::*;
 
-use asciii;
-use asciii::CONFIG;
-use asciii::config;
-use asciii::util;
-use asciii::actions;
-use asciii::storage;
+use asciii::{self, CONFIG, config, util, actions};
 use asciii::storage::*;
 use asciii::project::Project;
 
@@ -50,7 +45,7 @@ pub fn new(matches: &ArgMatches) {
         .unwrap();
 
     let edit = !matches.is_present("don't edit");
-    let luigi = execute(storage::setup::<Project>);
+    let luigi = execute(setup::<Project>);
 
     let mut fill_data: HashMap<&str, String> = HashMap::new();
 
@@ -197,7 +192,7 @@ pub fn edit(matches: &ArgMatches) {
 }
 
 fn edit_projects(dir: StorageDir, search_terms: &[&str], editor: &Option<&str>) {
-    let luigi = execute(storage::setup::<Project>);
+    let luigi = execute(setup::<Project>);
     let mut all_projects = Vec::new();
     for search_term in search_terms {
         let mut paths = execute(|| luigi.search_projects(dir, search_term));
@@ -219,7 +214,7 @@ fn edit_projects(dir: StorageDir, search_terms: &[&str], editor: &Option<&str>) 
 /// Command WORKSPACE
 pub fn workspace(matches: &ArgMatches) {
     println!("{:?}", matches);
-    let luigi = execute(storage::setup::<Project>);
+    let luigi = execute(setup::<Project>);
     let editor = matches.value_of("editor")
         .or(CONFIG.get("user/editor")
                   .and_then(|e| e.as_str()));
@@ -230,7 +225,7 @@ pub fn workspace(matches: &ArgMatches) {
 pub fn with_templates<F>(name: &str, action: F)
     where F: FnOnce(&[PathBuf])
 {
-    let luigi = execute(storage::setup::<Project>);
+    let luigi = execute(setup::<Project>);
     let template_paths = execute(||luigi.list_template_files())
         .into_iter() // drain?
         .filter(|f|f.file_stem() .unwrap_or_else(||OsStr::new("")) == name)

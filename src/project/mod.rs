@@ -21,10 +21,8 @@ use icalendar::*;
 //use semver::Version;
 
 use super::BillType;
-use util;
-use util::yaml;
-use storage::list_path_content;
-use storage::{Storable,StorageResult};
+use util::{yaml, get_valid_path};
+use storage::{Storable, StorageResult, list_path_content};
 use storage::ErrorKind as StorageErrorKind;
 use storage::repo::GitStatus;
 use templater::{Templater, IsKeyword};
@@ -193,7 +191,7 @@ impl Project {
     }
 
     pub fn offer_file(&self) -> Option<PathBuf> {
-        let output_folder = ::CONFIG.get_str("output_path").and_then(util::get_valid_path);
+        let output_folder = ::CONFIG.get_str("output_path").and_then(get_valid_path);
         let convert_ext  = ::CONFIG.get_str("convert/output_extension").expect("Faulty default config");
         match (output_folder, self.offer_file_name(convert_ext)) {
             (Some(folder), Some(name)) => folder.join(&name).into(),
@@ -202,7 +200,7 @@ impl Project {
     }
 
     pub fn invoice_file(&self) -> Option<PathBuf>{
-        let output_folder = ::CONFIG.get_str("output_path").and_then(util::get_valid_path);
+        let output_folder = ::CONFIG.get_str("output_path").and_then(get_valid_path);
         let convert_ext  = ::CONFIG.get_str("convert/output_extension").expect("Faulty default config");
         match (output_folder, self.invoice_file_name(convert_ext)) {
             (Some(folder), Some(name)) => folder.join(&name).into(),
@@ -634,7 +632,7 @@ impl Storable for Project {
             .or_else(||self.get_dmy("date"))
             // probably the dd-dd.mm.yyyy format
             .or_else(||self.get_str("date")
-                           .and_then(|s| util::yaml::parse_dmy_date_range(s))
+                           .and_then(|s| yaml::parse_dmy_date_range(s))
                     )
     }
 

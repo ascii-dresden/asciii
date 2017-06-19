@@ -1,5 +1,4 @@
 use rustyline::completion;
-use rustyline::completion::Completer;
 use rustyline::error::ReadlineError;
 use rustyline::config::Config as LineConfig;
 use rustyline::{CompletionType, Editor};
@@ -33,7 +32,7 @@ impl ClapCompleter {
     }
 }
 
-impl Completer for ClapCompleter {
+impl completion::Completer for ClapCompleter {
     fn complete(&self, line: &str, pos: usize) -> LineResult<(usize, Vec<String>)> {
         let break_chars = BTreeSet::new();
         let (start, path) = completion::extract_word(line, pos, ESCAPE_CHAR, &break_chars);

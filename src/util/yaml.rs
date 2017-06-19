@@ -20,8 +20,7 @@
 #![allow(dead_code)]
 
 use std::fmt;
-use std::io;
-use std::io::Read;
+use std::io::{self, Read};
 use std::fs::File;
 use std::path::Path;
 use std::error::Error;

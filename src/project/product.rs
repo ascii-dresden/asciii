@@ -4,7 +4,6 @@
 use bill::{Currency, BillProduct, Tax};
 
 use util::yaml;
-use util::yaml::Yaml;
 
 use super::spec::to_currency;
 
@@ -57,7 +56,7 @@ pub struct Product<'a> {
 
 
 impl<'a> Product<'a>{
-    pub fn from_old_format<'y>(name: &'y str, values: &'y Yaml) -> Result<Product<'y>> {
+    pub fn from_old_format<'y>(name: &'y str, values: &'y yaml::Yaml) -> Result<Product<'y>> {
         let default_tax = ::CONFIG.get_f64("defaults/tax")
             .expect("Faulty config: field defaults/tax does not contain a value");
         Ok(Product {
@@ -73,7 +72,7 @@ impl<'a> Product<'a>{
 
     //pub fn from_new_format(desc: &Yaml, defaultTax: ) -> Result<Product> {
     #[deprecated]
-    pub fn from_new_format(desc: &Yaml) -> Result<Product> {
+    pub fn from_new_format(desc: &yaml::Yaml) -> Result<Product> {
         //TODO read default tax from document
         let default_tax = ::CONFIG.get_f64("defaults/tax")
             .expect("Faulty config: field defaults/tax does not contain a value");
@@ -90,7 +89,7 @@ impl<'a> Product<'a>{
         })
     }
 
-    pub fn from_desc_and_value<'y>(desc: &'y Yaml, values: &'y Yaml) -> Result<Product<'y>> {
+    pub fn from_desc_and_value<'y>(desc: &'y yaml::Yaml, values: &'y yaml::Yaml) -> Result<Product<'y>> {
         match *desc {
             yaml::Yaml::String(ref name) => Self::from_old_format(name, values),
             yaml::Yaml::Hash(_) => Self::from_new_format(desc),

@@ -1,7 +1,6 @@
 #![allow(trivial_casts)]
 
-use std::io;
-use std::fmt;
+use std::{io, fmt};
 use util::yaml;
 
 use super::product;

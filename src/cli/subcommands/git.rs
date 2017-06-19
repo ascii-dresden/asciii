@@ -1,8 +1,7 @@
 use clap::ArgMatches;
 
-use asciii::storage;
+use asciii::{storage, util};
 use asciii::project::Project;
-use asciii::util;
 
 use ::cli::execute;
 use super::matches_to_paths;

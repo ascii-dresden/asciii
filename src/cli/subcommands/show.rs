@@ -4,11 +4,9 @@ use rustc_serialize::json::ToJson;
 
 use clap::ArgMatches;
 
-use asciii::BillType;
-use asciii::print;
-use asciii::storage;
+use asciii::{BillType, print};
 use asciii::storage::*;
-use asciii::project::{spec,Project};
+use asciii::project::{spec, Project};
 use asciii::templater::Templater;
 use asciii::project::spec::events::HasEvents;
 
@@ -31,7 +29,7 @@ pub fn show(m: &ArgMatches) {
         _               => BillType::Invoice, //TODO be inteligent here ( use date )
     };
 
-    let storage = execute(||storage::setup::<Project>());
+    let storage = execute(||setup::<Project>());
 
     if m.is_present("files") {
         storage.with_selection(&selection, |p| {
@@ -53,7 +51,7 @@ pub fn show(m: &ArgMatches) {
 }
 
 fn show_errors(selection: &StorageSelection) {
-    let storage = execute(||storage::setup::<Project>());
+    let storage = execute(||setup::<Project>());
     storage.with_selection(selection, |p| {
         println!("{}: ", p.short_desc());
         spec::print_specresult("offer", p.is_ready_for_offer());
@@ -63,24 +61,24 @@ fn show_errors(selection: &StorageSelection) {
 }
 
 fn show_empty_fields(selection: &StorageSelection) {
-    let storage = execute(||storage::setup::<Project>());
+    let storage = execute(||setup::<Project>());
     storage.with_selection(selection, |p| println!("{}: {}", p.short_desc(), p.empty_fields().join(", "))).unwrap();
 }
 
 
 #[cfg(feature="document_export")]
 fn show_json(selection: &StorageSelection) {
-    let storage = execute(||storage::setup::<Project>());
+    let storage = execute(||setup::<Project>());
     storage.with_selection(selection, |p| println!("{}", p.to_json())).unwrap();
 }
 
 fn show_ical(selection: &StorageSelection) {
-    let storage = execute(||storage::setup::<Project>());
+    let storage = execute(||setup::<Project>());
     storage.with_selection(selection, |p| p.to_ical().print().unwrap()).unwrap();
 }
 
 fn show_detail(selection: &StorageSelection, detail: &str) {
-    let storage = execute(||storage::setup::<Project>());
+    let storage = execute(||setup::<Project>());
     storage.with_selection(selection, |p| {
         println!("{}",
                  p.get(detail).unwrap_or_else(|| String::from("Nothing found")))
@@ -88,7 +86,7 @@ fn show_detail(selection: &StorageSelection, detail: &str) {
 }
 
 fn show_csv(selection: &StorageSelection) {
-    let storage = execute(||storage::setup::<Project>());
+    let storage = execute(||setup::<Project>());
     storage.with_selection(selection, |p| println!("{}", execute(|| p.to_csv(&BillType::Invoice)))).unwrap();
 }
 
@@ -103,14 +101,14 @@ pub fn show_path(matches: &ArgMatches) {
 
 /// Command SHOW --template
 fn show_template(name: &str) {
-    let luigi = execute(storage::setup::<Project>);
+    let luigi = execute(setup::<Project>);
     let template = execute(|| luigi.get_template_file(name));
     let templater = execute(|| Templater::from_file(&template));
     println!("{:#?}", templater.list_keywords());
 }
 
 fn dump_yaml(selection: &StorageSelection) {
-    let storage = execute(||storage::setup::<Project>());
+    let storage = execute(||setup::<Project>());
     storage.with_selection(selection, |p| println!("{}", p.dump_yaml())).unwrap();
 }
 

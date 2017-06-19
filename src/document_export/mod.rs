@@ -2,22 +2,17 @@
 //!
 //! Haven't decided on a templating engine yet, my own will probably not do.
 
-use std::io;
-use std::fmt;
-use std::time;
-use std::fs;
-use std::path::{Path,PathBuf};
+use std::{io,fmt,time,fs};
+use std::path::{Path, PathBuf};
 
 use open;
 use rustc_serialize::json::{ToJson, Json};
-use handlebars::{RenderError, Handlebars, no_escape};
-use handlebars::{Context, Helper, RenderContext};
+use handlebars::{RenderError, Handlebars, no_escape, Context, Helper, RenderContext};
 
 use util;
-use project;
-use project::Project;
+use project::{self, Project};
 use storage::error::StorageError;
-use storage::{self,Storage,StorageDir,Storable, StorageSelection};
+use storage::{self, Storage, Storable, StorageSelection};
 
 pub mod error {
     use super::*;

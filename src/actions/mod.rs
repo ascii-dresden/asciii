@@ -8,20 +8,16 @@ use chrono::prelude::*;
 use bill::Currency;
 use icalendar::Calendar;
 
-use std::{env,fs};
-use std::time;
+use std::{env, fs, time};
 use std::fmt::Write;
-use std::path::{Path,PathBuf};
+use std::path::{Path, PathBuf};
 
 use util;
 use super::BillType;
-use storage::{self, Storage,StorageDir,Storable,StorageResult};
+use storage::{self, Storage, StorageDir, Storable, StorageResult};
 use project::Project;
-use project::spec::IsProject;
-use project::spec::IsClient;
-use project::spec::Invoicable;
-use project::spec::ProvidesData;
 use project::spec::events::HasEvents;
+use project::spec::{IsProject, IsClient, Invoicable, ProvidesData};
 
 pub mod error;
 use self::error::*;
