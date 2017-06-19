@@ -10,18 +10,6 @@ use util;
 use project::Project;
 use storage::Storage;
 
-/// Sets up an instance of `Storage`.
-/// TODO isn't this redundant
-fn setup_storage() -> Storage<Project> {
-    let working = ::CONFIG.get_str("dirs/working")
-        .expect("Faulty config: dirs/working does not contain a value");
-    let archive = ::CONFIG.get_str("dirs/archive")
-        .expect("Faulty config: dirs/archive does not contain a value");
-    let templates = ::CONFIG.get_str("dirs/templates")
-        .expect("Faulty config: dirs/templates does not contain a value");
-    Storage::new(util::get_storage_path(), working, archive, templates).unwrap()
-}
-
 struct PackData<'a, T: 'a + ToJson> {
     document: &'a T,
     storage: Storage<Project>,
