@@ -94,14 +94,14 @@ pub fn list(matches: &ArgMatches) -> Result<()> {
 ///
 /// which it prints with `print::print_projects()`
 fn list_projects(dir: StorageDir, list_config: &ListConfig) -> Result<()> {
-    let luigi = if CONFIG.get_bool("list/gitstatus") {
+    let storage = if CONFIG.get_bool("list/gitstatus") {
 setup_with_git::<Project>()?
     } else {
         setup::<Project>()?
     };
-    debug!("listing projects: {}", luigi.working_dir().display());
+    debug!("listing projects: {}", storage.working_dir().display());
 
-    let mut projects = luigi.open_projects(dir)?;
+    let mut projects = storage.open_projects(dir)?;
 
     // filtering, can you read this
     if let Some(ref filters) = list_config.filter_by {
@@ -138,8 +138,8 @@ setup_with_git::<Project>()?
 
 /// Command LIST --broken
 fn list_broken_projects(dir: StorageDir) -> Result<()> {
-    let luigi = setup::<Project>()?;
-    let invalid_files = luigi.list_project_files(dir)?;
+    let storage = setup::<Project>()?;
+    let invalid_files = storage.list_project_files(dir)?;
     let tups = invalid_files.iter()
                             .filter_map(|dir| Project::open_folder(dir).err().map(|e| (e, dir)))
                             .collect::<Vec<(StorageError, &PathBuf)>>();
@@ -152,9 +152,9 @@ fn list_broken_projects(dir: StorageDir) -> Result<()> {
 
 /// Command LIST --templates
 fn list_templates() -> Result<()> {
-    let luigi = setup::<Project>()?;
+    let storage = setup::<Project>()?;
 
-    for name in luigi.list_template_names()? {
+    for name in storage.list_template_names()? {
         println!("{}", name);
     }
     Ok(())
@@ -162,8 +162,8 @@ fn list_templates() -> Result<()> {
 
 /// Command LIST --years
 pub fn list_years() -> Result<()> {
-    let luigi = setup::<Project>()?;
-    let years = luigi.list_years()?;
+    let storage = setup::<Project>()?;
+    let years = storage.list_years()?;
     println!("{:?}", years);
     Ok(())
 }

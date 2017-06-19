@@ -107,8 +107,8 @@ pub fn show_path(matches: &ArgMatches) -> Result<()> {
 
 /// Command SHOW --template
 fn show_template(name: &str) -> Result<()> {
-    let luigi = setup::<Project>()?;
-    let template = luigi.get_template_file(name)?;
+    let storage = setup::<Project>()?;
+    let template = storage.get_template_file(name)?;
     let templater = Templater::from_file(&template)?;
     println!("{:#?}", templater.list_keywords());
     Ok(())

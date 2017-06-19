@@ -27,8 +27,8 @@ pub fn with_projects<F>(dir:StorageDir, search_terms:&[&str], f:F) -> Result<()>
     where F:Fn(&Project)->Result<()>
 {
     trace!("with_projects({:?})", search_terms);
-    let luigi = storage::setup::<Project>()?;
-    let projects = luigi.search_projects_any(dir, search_terms)?;
+    let storage = storage::setup::<Project>()?;
+    let projects = storage.search_projects_any(dir, search_terms)?;
     if projects.is_empty() {
         return Err(format!("Nothing found for {:?}", search_terms).into())
     }
@@ -39,8 +39,8 @@ pub fn with_projects<F>(dir:StorageDir, search_terms:&[&str], f:F) -> Result<()>
 }
 
 pub fn csv(year:i32) -> Result<String> {
-    let luigi = storage::setup::<Project>()?;
-    let mut projects = luigi.open_projects(StorageDir::Year(year))?;
+    let storage = storage::setup::<Project>()?;
+    let mut projects = storage.open_projects(StorageDir::Year(year))?;
     projects.sort_by(|pa,pb| pa.index().unwrap_or_else(||"zzzz".to_owned()).cmp( &pb.index().unwrap_or_else(||"zzzz".to_owned())));
     projects_to_csv(&projects)
 }
@@ -83,8 +83,8 @@ pub fn projects_to_csv(projects:&[Project]) -> Result<String>{
 
 /// Command DUES
 pub fn open_wages() -> Result<Currency>{
-    let luigi = storage::setup::<Project>()?;
-    let projects = luigi.open_projects(StorageDir::Working)?;
+    let storage = storage::setup::<Project>()?;
+    let projects = storage.open_projects(StorageDir::Working)?;
     Ok(projects.iter()
         .filter(|p| !p.canceled() && p.age().unwrap_or(0) > 0)
         .filter_map(|p| p.wages())
@@ -94,8 +94,8 @@ pub fn open_wages() -> Result<Currency>{
 
 /// Command DUES
 pub fn open_payments() -> Result<Currency>{
-    let luigi = storage::setup::<Project>()?;
-    let projects = luigi.open_projects(StorageDir::Working)?;
+    let storage = storage::setup::<Project>()?;
+    let projects = storage.open_projects(StorageDir::Working)?;
     Ok(projects.iter()
        .filter(|p| !p.canceled() && !p.payed_by_client() && p.age().unwrap_or(0) > 0)
        .filter_map(|p| p.sum_sold().ok())
@@ -108,9 +108,9 @@ pub fn open_payments() -> Result<Currency>{
 /// TODO move this to `spec::all_the_things`
 pub fn spec() -> Result<()> {
     use project::spec::*;
-    let luigi = storage::setup::<Project>()?;
-    //let projects = super::execute(||luigi.open_projects(StorageDir::All));
-    let projects = luigi.open_projects(StorageDir::Working)?;
+    let storage = storage::setup::<Project>()?;
+    //let projects = super::execute(||storage.open_projects(StorageDir::All));
+    let projects = storage.open_projects(StorageDir::Working)?;
     for project in projects{
         info!("{}", project.dir().display());
 
@@ -137,9 +137,9 @@ pub fn spec() -> Result<()> {
 }
 
 pub fn delete_project_confirmation(dir: StorageDir, search_terms:&[&str]) -> Result<()> {
-    let luigi = storage::setup_with_git::<Project>()?;
-    for project in luigi.search_projects_any(dir, search_terms)? {
-        luigi.delete_project_if(&project,
+    let storage = storage::setup_with_git::<Project>()?;
+    for project in storage.search_projects_any(dir, search_terms)? {
+        storage.delete_project_if(&project,
                 || util::really(&format!("you want me to delete {:?} [y/N]", project.dir())) && util::really("really? [y/N]")
                 )?
     }
@@ -148,19 +148,19 @@ pub fn delete_project_confirmation(dir: StorageDir, search_terms:&[&str]) -> Res
 
 pub fn archive_projects(search_terms:&[&str], manual_year:Option<i32>, force:bool) -> Result<Vec<PathBuf>>{
     trace!("archive_projects matching ({:?},{:?},{:?})", search_terms, manual_year,force);
-    let luigi = storage::setup_with_git::<Project>()?;
-    Ok( luigi.archive_projects_if(search_terms, manual_year, || force) ?)
+    let storage = storage::setup_with_git::<Project>()?;
+    Ok( storage.archive_projects_if(search_terms, manual_year, || force) ?)
 }
 
 pub fn archive_all_projects() -> Result<Vec<PathBuf>> {
-    let luigi = storage::setup_with_git::<Project>()?;
+    let storage = storage::setup_with_git::<Project>()?;
     let mut moved_files = Vec::new();
-    for project in luigi.open_projects(StorageDir::Working)?
+    for project in storage.open_projects(StorageDir::Working)?
                         .iter()
                         .filter(|p| p.is_ready_for_archive().is_ok()) {
         println!(" we could get rid of: {}", project.name().unwrap_or(""));
         moved_files.push(project.dir());
-        moved_files.append(&mut luigi.archive_project(&project, project.year().unwrap())?);
+        moved_files.append(&mut storage.archive_project(&project, project.year().unwrap())?);
     }
     Ok(moved_files)
 }
@@ -168,8 +168,8 @@ pub fn archive_all_projects() -> Result<Vec<PathBuf>> {
 /// Command UNARCHIVE <YEAR> <NAME>
 /// TODO: return a list of files that have to be updated in git
 pub fn unarchive_projects(year:i32, search_terms:&[&str]) -> Result<Vec<PathBuf>> {
-    let luigi = storage::setup_with_git::<Project>()?;
-    Ok( luigi.unarchive_projects(year, search_terms) ?)
+    let storage = storage::setup_with_git::<Project>()?;
+    Ok( storage.unarchive_projects(year, search_terms) ?)
 }
 
 /// Produces a calendar from the selected `StorageDir`
@@ -185,14 +185,14 @@ pub fn calendar_and_tasks(dir: StorageDir) -> Result<String> {
 }
 
 pub fn calendar_with_tasks(dir: StorageDir, show_tasks:bool) -> Result<String> {
-    let luigi = storage::setup::<Project>()?;
+    let storage = storage::setup::<Project>()?;
     let mut cal = Calendar::new();
     if show_tasks {
-        for project in luigi.open_projects(StorageDir::Working)?  {
+        for project in storage.open_projects(StorageDir::Working)?  {
             cal.append(&mut project.to_tasks())
         }
     }
-    for project in luigi.open_projects(dir)?{
+    for project in storage.open_projects(dir)?{
         cal.append(&mut project.to_ical())
     }
     Ok(cal.to_string())

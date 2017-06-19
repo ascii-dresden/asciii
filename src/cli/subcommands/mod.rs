@@ -45,7 +45,7 @@ pub fn new(matches: &ArgMatches) -> Result<()> {
         .unwrap();
 
     let edit = !matches.is_present("don't edit");
-    let luigi = setup::<Project>()?;
+    let storage = setup::<Project>()?;
 
     let mut fill_data: HashMap<&str, String> = HashMap::new();
 
@@ -74,7 +74,7 @@ pub fn new(matches: &ArgMatches) -> Result<()> {
         fill_data.insert("MANAGER", manager.to_owned());
     }
 
-    let project = luigi.create_project(project_name, template_name, &fill_data)?;
+    let project = storage.create_project(project_name, template_name, &fill_data)?;
     let project_file = project.file();
     if edit {
         util::pass_to_command(&editor, &[project_file]);
@@ -127,13 +127,13 @@ fn matches_to_search<'a>(matches: &'a ArgMatches) -> (Vec<&'a str>, StorageDir) 
 
 /// Produces a list of paths.
 /// This is more general than `with_projects`, as this includes templates too.
-pub fn matches_to_paths(matches: &ArgMatches, luigi: &Storage<Project>) -> Result<Vec<PathBuf>> {
+pub fn matches_to_paths(matches: &ArgMatches, storage: &Storage<Project>) -> Result<Vec<PathBuf>> {
     let search_terms = matches.values_of("search_term")
                               .map(|v| v.collect::<Vec<&str>>())
                               .unwrap_or_else(Vec::new);
 
     if matches.is_present("template") {
-        Ok(luigi.list_template_files()?
+        Ok(storage.list_template_files()?
             .into_iter()
             .filter(|f| {
                 let stem = f.file_stem()
@@ -149,7 +149,7 @@ pub fn matches_to_paths(matches: &ArgMatches, luigi: &Storage<Project>) -> Resul
             StorageDir::Working
         };
 
-        Ok(luigi.search_projects_any(dir, &search_terms)?
+        Ok(storage.search_projects_any(dir, &search_terms)?
             .iter()
             .map(|project| project.dir())
             .collect::<Vec<_>>())
@@ -197,10 +197,10 @@ pub fn edit(matches: &ArgMatches) -> Result<()> {
 
 
 fn edit_projects(dir: StorageDir, search_terms: &[&str], editor: &Option<&str>) -> Result<()> {
-    let luigi = setup::<Project>()?;
+    let storage = setup::<Project>()?;
     let mut all_projects = Vec::new();
     for search_term in search_terms {
-        let mut paths = luigi.search_projects(dir, search_term)?;
+        let mut paths = storage.search_projects(dir, search_term)?;
         if paths.is_empty() {
             // println!{"Nothing found for {:?}", search_term}
         } else {
@@ -220,12 +220,12 @@ fn edit_projects(dir: StorageDir, search_terms: &[&str], editor: &Option<&str>) 
 /// Command WORKSPACE
 pub fn workspace(matches: &ArgMatches) -> Result<()> {
     println!("{:?}", matches);
-    let luigi = setup::<Project>()?;
+    let storage = setup::<Project>()?;
 
     let editor = matches.value_of("editor")
         .or(CONFIG.get("user/editor")
                   .and_then(|e| e.as_str()));
-    util::pass_to_command(&editor, &[luigi.working_dir()]);
+    util::pass_to_command(&editor, &[storage.working_dir()]);
     Ok(())
 }
 
@@ -233,8 +233,8 @@ pub fn workspace(matches: &ArgMatches) -> Result<()> {
 pub fn with_templates<F>(name: &str, action: F) -> Result<()>
     where F: FnOnce(&[PathBuf])
 {
-    let luigi = setup::<Project>()?;
-    let template_paths = luigi.list_template_files()?
+    let storage = setup::<Project>()?;
+    let template_paths = storage.list_template_files()?
         .into_iter() // drain?
         .filter(|f|f.file_stem() .unwrap_or_else(||OsStr::new("")) == name)
         .collect::<Vec<PathBuf>>();
