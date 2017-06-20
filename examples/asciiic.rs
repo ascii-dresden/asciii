@@ -4,18 +4,25 @@ extern crate asciii;
 use std::env;
 use std::path::Path;
 
+use asciii::storage::Storable;
 use asciii::project::Project;
 
 fn main() {
     asciii::util::setup_log();
 
-    let project_file = env::args().nth(1);
+    if let Some(project_file) = env::args().nth(1) {
 
-    let project = Project::open_file(&project_file);
+        let project = Project::open_file(Path::new(&project_file));
+        let output= Path::new("./foo.pdf");
 
-    debug!("project_file {:?}", project_file);
+        debug!("{:?} -> {:?}", project_file, output.display());
 
-    let output= Path::new("./foo.pdf");
+        unimplemented!();
+
+
+    } else {
+        error!("please pass in a projectfile");
+    }
 
 }
 

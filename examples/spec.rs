@@ -1,5 +1,4 @@
 extern crate asciii;
-extern crate yaml_rust as yaml;
 use std::path::Path;
 
 use asciii::project::spec::*;
@@ -10,7 +9,6 @@ fn main() {
     for project in [Project::open_file(Path::new("./examples/current.yml")).unwrap(),
                     Project::open_file(Path::new("./examples/old.yml")).unwrap()]
         .iter() {
-        let yaml = project.yaml();
         println!("Index:     {:?}", project.index());
         println!("Canceled   {:?}", project.canceled());
         println!("Date:      {:?}", project.event_date());
@@ -34,5 +32,4 @@ fn main() {
         println!("\n\n\n");
     }
 
-    // println!("Products: {:#?}", spec::products::all(new_project.yaml()));
 }
