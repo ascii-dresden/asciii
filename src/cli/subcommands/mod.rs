@@ -74,8 +74,7 @@ pub fn new(matches: &ArgMatches) -> Result<()> {
         fill_data.insert("MANAGER", manager.to_owned());
     }
 
-    let project = storage.create_project(project_name, template_name, &fill_data)?;
-    let project_file = project.file();
+    let project_file = storage.create_project(project_name, template_name, &fill_data)?.file();
     if edit {
         util::pass_to_command(&editor, &[project_file]);
     }
@@ -233,8 +232,7 @@ pub fn workspace(matches: &ArgMatches) -> Result<()> {
 pub fn with_templates<F>(name: &str, action: F) -> Result<()>
     where F: FnOnce(&[PathBuf])
 {
-    let storage = setup::<Project>()?;
-    let template_paths = storage.list_template_files()?
+    let template_paths = setup::<Project>()?.list_template_files()?
         .into_iter() // drain?
         .filter(|f|f.file_stem() .unwrap_or_else(||OsStr::new("")) == name)
         .collect::<Vec<PathBuf>>();

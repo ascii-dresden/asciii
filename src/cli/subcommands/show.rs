@@ -45,8 +45,7 @@ pub fn show(m: &ArgMatches) -> Result<()>{
 }
 
 fn show_files(selection: &StorageSelection) -> Result<()> {
-    let storage = setup::<Project>()?;
-    Ok(storage.with_selection(&selection, |p| {
+    Ok(setup::<Project>()?.with_selection(&selection, |p| {
         println!("{}: ", p.dir().display());
         for entry in fs::read_dir(p.dir()).unwrap() {
             println!("  {}", entry.unwrap().path().display())
@@ -55,8 +54,7 @@ fn show_files(selection: &StorageSelection) -> Result<()> {
 }
 
 fn show_errors(selection: &StorageSelection) -> Result<()> {
-    let storage = setup::<Project>()?;
-    Ok(storage.with_selection(selection, |p| {
+    Ok(setup::<Project>()?.with_selection(selection, |p| {
         println!("{}: ", p.short_desc());
         spec::print_specresult("offer", p.is_ready_for_offer());
         spec::print_specresult("invoice", p.is_ready_for_invoice());
@@ -65,32 +63,27 @@ fn show_errors(selection: &StorageSelection) -> Result<()> {
 }
 
 fn show_empty_fields(selection: &StorageSelection) -> Result<()> {
-    let storage = setup::<Project>()?;
-    Ok(storage.with_selection(selection, |p| println!("{}: {}", p.short_desc(), p.empty_fields().join(", ")))?)
+    Ok(setup::<Project>()?.with_selection(selection, |p| println!("{}: {}", p.short_desc(), p.empty_fields().join(", ")))?)
 }
 
 
 #[cfg(feature="document_export")]
 fn show_json(selection: &StorageSelection) -> Result<()> {
-    let storage = setup::<Project>()?;
-    Ok(storage.with_selection(selection, |p| println!("{}", p.to_json()))?)
+    Ok(setup::<Project>()?.with_selection(selection, |p| println!("{}", p.to_json()))?)
 }
 
 fn show_ical(selection: &StorageSelection) -> Result<()> {
-    let storage = setup::<Project>()?;
-    Ok(storage.with_selection(selection, |p| p.to_ical().print().unwrap())?)
+    Ok(setup::<Project>()?.with_selection(selection, |p| p.to_ical().print().unwrap())?)
 }
 
 fn show_detail(selection: &StorageSelection, detail: &str) -> Result<()> {
-    let storage = setup::<Project>()?;
-    Ok(storage.with_selection(selection, |p| {
+    Ok(setup::<Project>()?.with_selection(selection, |p| {
         println!("{}", p.get(detail).unwrap_or_else(|| format!("No {:?} found", selection)))
     })?)
 }
 
 fn show_csv(selection: &StorageSelection) -> Result<()> {
-    let storage = setup::<Project>()?;
-    Ok(storage.with_selection(selection, |p| println!("{}",  p.to_csv(&BillType::Invoice).unwrap()) )?)
+    Ok(setup::<Project>()?.with_selection(selection, |p| println!("{}",  p.to_csv(&BillType::Invoice).unwrap()) )?)
 }
 
 #[cfg(not(feature="document_export"))]
@@ -107,15 +100,12 @@ pub fn show_path(matches: &ArgMatches) -> Result<()> {
 
 /// Command SHOW --template
 fn show_template(name: &str) -> Result<()> {
-    let storage = setup::<Project>()?;
-    let template = storage.get_template_file(name)?;
-    let templater = Templater::from_file(&template)?;
+    let templater = Templater::from_file(&setup::<Project>()?.get_template_file(name)?)?;
     println!("{:#?}", templater.list_keywords());
     Ok(())
 }
 
 fn dump_yaml(selection: &StorageSelection) -> Result<()> {
-    let storage = setup::<Project>()?;
-    Ok(storage.with_selection(selection, |p| println!("{}", p.dump_yaml()))?)
+    Ok(setup::<Project>()?.with_selection(selection, |p| println!("{}", p.dump_yaml()))?)
 }
 

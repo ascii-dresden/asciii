@@ -27,8 +27,7 @@ pub fn with_projects<F>(dir:StorageDir, search_terms:&[&str], f:F) -> Result<()>
     where F:Fn(&Project)->Result<()>
 {
     trace!("with_projects({:?})", search_terms);
-    let storage = storage::setup::<Project>()?;
-    let projects = storage.search_projects_any(dir, search_terms)?;
+    let projects = storage::setup::<Project>()?.search_projects_any(dir, search_terms)?;
     if projects.is_empty() {
         return Err(format!("Nothing found for {:?}", search_terms).into())
     }
@@ -39,8 +38,7 @@ pub fn with_projects<F>(dir:StorageDir, search_terms:&[&str], f:F) -> Result<()>
 }
 
 pub fn csv(year:i32) -> Result<String> {
-    let storage = storage::setup::<Project>()?;
-    let mut projects = storage.open_projects(StorageDir::Year(year))?;
+    let mut projects = storage::setup::<Project>()?.open_projects(StorageDir::Year(year))?;
     projects.sort_by(|pa,pb| pa.index().unwrap_or_else(||"zzzz".to_owned()).cmp( &pb.index().unwrap_or_else(||"zzzz".to_owned())));
     projects_to_csv(&projects)
 }
@@ -83,8 +81,7 @@ pub fn projects_to_csv(projects:&[Project]) -> Result<String>{
 
 /// Command DUES
 pub fn open_wages() -> Result<Currency>{
-    let storage = storage::setup::<Project>()?;
-    let projects = storage.open_projects(StorageDir::Working)?;
+    let projects = storage::setup::<Project>()?.open_projects(StorageDir::Working)?;
     Ok(projects.iter()
         .filter(|p| !p.canceled() && p.age().unwrap_or(0) > 0)
         .filter_map(|p| p.wages())
@@ -94,8 +91,7 @@ pub fn open_wages() -> Result<Currency>{
 
 /// Command DUES
 pub fn open_payments() -> Result<Currency>{
-    let storage = storage::setup::<Project>()?;
-    let projects = storage.open_projects(StorageDir::Working)?;
+    let projects = storage::setup::<Project>()?.open_projects(StorageDir::Working)?;
     Ok(projects.iter()
        .filter(|p| !p.canceled() && !p.payed_by_client() && p.age().unwrap_or(0) > 0)
        .filter_map(|p| p.sum_sold().ok())
@@ -108,10 +104,9 @@ pub fn open_payments() -> Result<Currency>{
 /// TODO move this to `spec::all_the_things`
 pub fn spec() -> Result<()> {
     use project::spec::*;
-    let storage = storage::setup::<Project>()?;
+    let projects = storage::setup::<Project>()?.open_projects(StorageDir::Working)?;
     //let projects = super::execute(||storage.open_projects(StorageDir::All));
-    let projects = storage.open_projects(StorageDir::Working)?;
-    for project in projects{
+    for project in projects {
         info!("{}", project.dir().display());
 
         project.client().validate().map_err(|errors| println!("{}", errors)).unwrap();
@@ -148,8 +143,7 @@ pub fn delete_project_confirmation(dir: StorageDir, search_terms:&[&str]) -> Res
 
 pub fn archive_projects(search_terms:&[&str], manual_year:Option<i32>, force:bool) -> Result<Vec<PathBuf>>{
     trace!("archive_projects matching ({:?},{:?},{:?})", search_terms, manual_year,force);
-    let storage = storage::setup_with_git::<Project>()?;
-    Ok( storage.archive_projects_if(search_terms, manual_year, || force) ?)
+    Ok( storage::setup_with_git::<Project>()?.archive_projects_if(search_terms, manual_year, || force) ?)
 }
 
 pub fn archive_all_projects() -> Result<Vec<PathBuf>> {
@@ -168,8 +162,7 @@ pub fn archive_all_projects() -> Result<Vec<PathBuf>> {
 /// Command UNARCHIVE <YEAR> <NAME>
 /// TODO: return a list of files that have to be updated in git
 pub fn unarchive_projects(year:i32, search_terms:&[&str]) -> Result<Vec<PathBuf>> {
-    let storage = storage::setup_with_git::<Project>()?;
-    Ok( storage.unarchive_projects(year, search_terms) ?)
+    Ok( storage::setup_with_git::<Project>()?.unarchive_projects(year, search_terms) ?)
 }
 
 /// Produces a calendar from the selected `StorageDir`
