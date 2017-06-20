@@ -7,18 +7,18 @@ use asciii::print::{self, ListConfig, ListMode};
 use asciii::project::spec::IsProject;
 use asciii::project::{Project, ComputedField};
 
-use ::cli::execute;
+use ::cli::error::*;
 
 use std::path::PathBuf;
 
 /// Command LIST
-pub fn list(matches: &ArgMatches) {
+pub fn list(matches: &ArgMatches) -> Result<()> {
     if matches.is_present("templates") {
-        list_templates();
+        Ok(list_templates()?)
     } else if matches.is_present("years") {
-        list_years();
+        Ok(list_years()?)
     } else if matches.is_present("computed_fields") {
-        list_computed_fields();
+        Ok(list_computed_fields()?)
     } else {
         let list_mode = decide_mode(matches.is_present("simple"),
                                     matches.is_present("verbose"),
@@ -75,11 +75,12 @@ pub fn list(matches: &ArgMatches) {
             // or list normal
             else { StorageDir::Working };
 
+        Ok(
         if matches.is_present("broken"){
-            list_broken_projects(dir); // XXX Broken
+            list_broken_projects(dir)? // XXX Broken
         } else {
-            list_projects(dir, &list_config);
-        }
+            list_projects(dir, &list_config)?
+        })
     }
 }
 
@@ -92,15 +93,15 @@ pub fn list(matches: &ArgMatches) {
 /// * `print::verbose_rows()`
 ///
 /// which it prints with `print::print_projects()`
-fn list_projects(dir: StorageDir, list_config: &ListConfig) {
-    let luigi = if CONFIG.get_bool("list/gitstatus") {
-        execute(setup_with_git::<Project>)
+fn list_projects(dir: StorageDir, list_config: &ListConfig) -> Result<()> {
+    let storage = if CONFIG.get_bool("list/gitstatus") {
+setup_with_git::<Project>()?
     } else {
-        execute(setup::<Project>)
+        setup::<Project>()?
     };
-    debug!("listing projects: {}", luigi.working_dir().display());
+    debug!("listing projects: {}", storage.working_dir().display());
 
-    let mut projects = execute(|| luigi.open_projects(dir));
+    let mut projects = storage.open_projects(dir)?;
 
     // filtering, can you read this
     if let Some(ref filters) = list_config.filter_by {
@@ -132,12 +133,13 @@ fn list_projects(dir: StorageDir, list_config: &ListConfig) {
             ListMode::Nothing => print::print_projects(print::dynamic_rows(&projects,list_config)),
         }
     }
+    Ok(())
 }
 
 /// Command LIST --broken
-fn list_broken_projects(dir: StorageDir) {
-    let luigi = execute(setup::<Project>);
-    let invalid_files = execute(|| luigi.list_project_files(dir));
+fn list_broken_projects(dir: StorageDir) -> Result<()> {
+    let storage = setup::<Project>()?;
+    let invalid_files = storage.list_project_files(dir)?;
     let tups = invalid_files.iter()
                             .filter_map(|dir| Project::open_folder(dir).err().map(|e| (e, dir)))
                             .collect::<Vec<(StorageError, &PathBuf)>>();
@@ -145,30 +147,34 @@ fn list_broken_projects(dir: StorageDir) {
     for (err, path) in tups {
         println!("{}: {:?}", path.display(), err);
     }
+    Ok(())
 }
 
 /// Command LIST --templates
-fn list_templates() {
-    let luigi = execute(setup::<Project>);
+fn list_templates() -> Result<()> {
+    let storage = setup::<Project>()?;
 
-    for name in execute(|| luigi.list_template_names()) {
+    for name in storage.list_template_names()? {
         println!("{}", name);
     }
+    Ok(())
 }
 
 /// Command LIST --years
-pub fn list_years() {
-    let luigi = execute(setup::<Project>);
-    let years = execute(|| luigi.list_years());
+pub fn list_years() -> Result<()> {
+    let storage = setup::<Project>()?;
+    let years = storage.list_years()?;
     println!("{:?}", years);
+    Ok(())
 }
 
 /// Command LIST --virt
-pub fn list_computed_fields() {
+pub fn list_computed_fields() -> Result<()> {
     println!("{:?}",
              ComputedField::iter_variant_names()
                  .filter(|v| *v != "Invalid")
                  .collect::<Vec<&str>>());
+    Ok(())
 }
 
 //#[deprecated(note="move to impl ListMode and then to asciii::actions")]

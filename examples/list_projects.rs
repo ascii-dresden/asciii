@@ -1,14 +1,11 @@
 extern crate asciii;
 
-use std::error::Error;
-use asciii::storage::{Storable,StorageDir};
+use asciii::project::Project;
 
 fn main() {
 
-    let dir = StorageDir::All;
-
-    let luigi = asciii::setup_storage().unwrap();
-    for project in luigi.open_working_dir_projects().unwrap() {
+    let storage = asciii::storage::setup::<Project>().unwrap();
+    for project in storage.open_working_dir_projects().unwrap() {
         println!("{:#?}", project);
     }
 }

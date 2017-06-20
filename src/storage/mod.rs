@@ -144,7 +144,7 @@ pub fn get_storage_path() -> PathBuf
 
 /// Sets up an instance of `Storage`.
 pub fn setup<L:Storable>() -> StorageResult<Storage<L>> {
-    trace!("setup_luigi()");
+    trace!("storage::setup()");
     let working   = ::CONFIG.get_str("dirs/working").ok_or("Faulty config: dirs/working does not contain a value")?;
     let archive   = ::CONFIG.get_str("dirs/archive").ok_or("Faulty config: dirs/archive does not contain a value")?;
     let templates = ::CONFIG.get_str("dirs/templates").ok_or("Faulty config: dirs/templates does not contain a value")?;
@@ -155,7 +155,7 @@ pub fn setup<L:Storable>() -> StorageResult<Storage<L>> {
 
 /// Sets up an instance of `Storage`, with git turned on.
 pub fn setup_with_git<L:Storable>() -> StorageResult<Storage<L>> {
-    trace!("setup_luigi()");
+    trace!("storage::setup_with_git()");
     let working   = ::CONFIG.get_str("dirs/working").ok_or("Faulty config: dirs/working does not contain a value")?;
     let archive   = ::CONFIG.get_str("dirs/archive").ok_or("Faulty config: dirs/archive does not contain a value")?;
     let templates = ::CONFIG.get_str("dirs/templates").ok_or("Faulty config: dirs/templates does not contain a value")?;
