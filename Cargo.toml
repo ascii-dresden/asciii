@@ -42,7 +42,7 @@ prettytable-rs = { version = "0.6", default-features= false}
 #herbie-lint = {version = "*", optional = true}
 
 # feature: document_export
-handlebars = {version = "0.22", optional = true}
+handlebars = {version = "0.27", optional = true}
 rustc-serialize = {version = "0.3", optional = true}
 
 serde        = {version = "1.0", optional = true}
@@ -55,7 +55,7 @@ git2 = {version = "0.6", default-features= false, optional = true}
 # planned optional features: termprint, term resize, xdg-open, web server :D
 
 [features]
-default = ["document_export", "git_statuses", "shell"]
+default = ["document_export", "git_statuses", "shell", "serialization"]
 document_export = ["json", "handlebars"]
 json = ["rustc-serialize"]
 serialization = ["serde", "serde_json", "serde_derive"]

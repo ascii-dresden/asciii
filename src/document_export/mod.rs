@@ -5,8 +5,9 @@
 use std::{io,fmt,time,fs};
 use std::path::{Path, PathBuf};
 
+use serde::ser::Serialize;
+
 use open;
-use rustc_serialize::json::{ToJson, Json};
 use handlebars::{RenderError, Handlebars, no_escape, Context, Helper, RenderContext};
 
 use util;
@@ -14,54 +15,19 @@ use project::{self, Project};
 use storage::error::StorageError;
 use storage::{self, Storage, Storable, StorageSelection};
 
-pub mod error {
-    use super::*;
-
-    error_chain!{
-        types {
-            Error, ErrorKind, ResultExt, Result;
-        }
-
-        links { }
-
-        foreign_links {
-            Io(io::Error);
-            Fmt(fmt::Error);
-            Time(time::SystemTimeError);
-            Handlebar(RenderError);
-            Project(project::error::Error);
-            Storage(StorageError);
-        }
-
-        errors {
-            NoPdfCreated{ description("No Pdf Created") }
-            NothingToDo{ description("Nothing to do") }
-        }
-    }
-}
+pub mod error;
 
 use self::error::*;
 
-struct PackData<'a, T: 'a + ToJson> {
+#[cfg_attr(feature = "serialization", derive(Serialize))]
+struct PackData<'a, T: 'a + Serialize> {
     document: &'a T,
     storage: Storage<Project>,
     is_invoice:bool
 }
 
 
-impl<'a, T> ToJson for PackData<'a, T>
-    where T: ToJson
-{
-    fn to_json(&self) -> Json {
-        Json::Object(btreemap!{
-            String::from("document")   => self.document.to_json(),
-            String::from("storage")    => self.storage.to_json(),
-            String::from("is_invoice") => self.is_invoice.to_json()
-        })
-    }
-}
-
-fn pack_data<E: ToJson>(document: &E, is_invoice:bool) -> PackData<E> {
+fn pack_data<E: Serialize>(document: &E, is_invoice:bool) -> PackData<E> {
     PackData {
         document: document,
         storage: storage::setup().unwrap(),
@@ -69,7 +35,7 @@ fn pack_data<E: ToJson>(document: &E, is_invoice:bool) -> PackData<E> {
     }
 }
 
-fn inc_helper(_: &Context, h: &Helper, _: &Handlebars, rc: &mut RenderContext) -> ::std::result::Result<(), RenderError> {
+fn inc_helper(h: &Helper, _: &Handlebars, rc: &mut RenderContext) -> ::std::result::Result<(), RenderError> {
     // just for example, add error check for unwrap
     let param = h.param(0).unwrap().value();
     let rendered = format!("{}", param.as_u64().unwrap() + 1);
@@ -77,7 +43,7 @@ fn inc_helper(_: &Context, h: &Helper, _: &Handlebars, rc: &mut RenderContext) -
     Ok(())
 }
 
-fn count_helper(_: &Context, h: &Helper, _: &Handlebars, rc: &mut RenderContext) -> ::std::result::Result<(), RenderError> {
+fn count_helper(h: &Helper, _: &Handlebars, rc: &mut RenderContext) -> ::std::result::Result<(), RenderError> {
     let count = h.param(0).unwrap().value().as_array().map_or(0, |a|a.len());
     //println!("count_helper{:?}", param);
     let rendered = format!("{}", count);
@@ -87,11 +53,11 @@ fn count_helper(_: &Context, h: &Helper, _: &Handlebars, rc: &mut RenderContext)
 
 use super::BillType;
 
-/// Takes a `T:ToJson` and a template path and does it's thing.
+/// Takes a `T:Serialize` and a template path and does it's thing.
 ///
 /// Returns path to created file, potenially in a `tempdir`.
-// pub fn fill_template<E:ToJson>(document:E, template_file:&Path) -> PathBuf{
-pub fn fill_template<E: ToJson, P:AsRef<Path>>(document: &E, bill_type:&BillType, template_path: P) -> Result<String> {
+// pub fn fill_template<E:Serialize>(document:E, template_file:&Path) -> PathBuf{
+pub fn fill_template<E: Serialize, P:AsRef<Path>>(document: &E, bill_type:&BillType, template_path: P) -> Result<String> {
     let mut handlebars = Handlebars::new();
 
     handlebars.register_escape_fn(no_escape);
