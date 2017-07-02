@@ -68,7 +68,6 @@ pub mod actions;
 
 pub mod templater;
 
-#[cfg(feature="json")] extern crate rustc_serialize;
 #[cfg(feature="document_export")] extern crate handlebars;
 #[cfg(feature="document_export")] pub mod document_export;
 
