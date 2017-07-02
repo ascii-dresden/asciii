@@ -11,7 +11,7 @@ fn main() {
 
     let project_file = env::args().nth(1);
 
-    let project = Project::open(&project_file);
+    let project = Project::open_file(&project_file);
 
     debug!("project_file {:?}", project_file);
 
