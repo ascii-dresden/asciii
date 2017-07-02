@@ -226,20 +226,20 @@ impl Project {
         Ok(Path::new(target).to_owned())
     }
 
-    pub fn write_to_file(&self,content:&str, bill_type:&BillType,ext:&str) -> Result<PathBuf> {
+    pub fn write_to_file(&self, content:&str, bill_type:&BillType,ext:&str) -> Result<PathBuf> {
         match *bill_type{
             BillType::Offer   => self.write_to_offer_file(content, ext),
             BillType::Invoice => self.write_to_invoice_file(content, ext)
         }
     }
 
-    fn write_to_offer_file(&self,content:&str, ext:&str) -> Result<PathBuf> {
+    fn write_to_offer_file(&self, content:&str, ext:&str) -> Result<PathBuf> {
         if let Some(target) = self.offer_file_name(ext){
             Self::write_to_path(content, &self.dir().join(&target))
         } else {bail!(ErrorKind::CantDetermineTargetFile)}
     }
 
-    fn write_to_invoice_file(&self,content:&str, ext:&str) -> Result<PathBuf> {
+    fn write_to_invoice_file(&self, content:&str, ext:&str) -> Result<PathBuf> {
         if let Some(target) = self.invoice_file_name(ext){
             Self::write_to_path(content, &self.dir().join(&target))
         } else {bail!(ErrorKind::CantDetermineTargetFile)}

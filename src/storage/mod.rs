@@ -119,10 +119,10 @@ impl Default for StorageSelection {
 #[cfg_attr(feature = "serialization", derive(Serialize))]
 #[derive(Debug)]
 pub struct Paths {
-    pub storage:  PathBuf,
-    pub working:  PathBuf,
-    pub archive:  PathBuf,
-    pub template: PathBuf
+    pub storage:   PathBuf,
+    pub working:   PathBuf,
+    pub archive:   PathBuf,
+    pub templates: PathBuf
 }
 
 /// Basically `ls`, returns a list of paths.
@@ -273,7 +273,7 @@ impl<L:Storable> Storage<L> {
            storage: self.root_dir().into(),
            working: self.working_dir().into(),
            archive: self.archive_dir().into(),
-           template: self.templates_dir().into(),
+           templates: self.templates_dir().into(),
         }
     }
 

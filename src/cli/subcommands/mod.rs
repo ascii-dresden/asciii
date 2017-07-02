@@ -303,13 +303,14 @@ fn matches_to_export_config<'a>(m: &'a ArgMatches) -> Option<ExportConfig<'a>> {
                          .unwrap();
     let bill_type = infer_bill_type(m);
 
-    let mut config = ExportConfig{
+    let mut config = ExportConfig {
             select:        StorageSelection::Unintiailzed,
             template_name: template_name,
             bill_type:     bill_type,
             output:        m.value_of("output").map(Path::new),
             dry_run:       m.is_present("dry-run"),
             force:         m.is_present("force"),
+            print_only:    m.is_present("print-only"),
             open:          m.is_present("open")
         };
 
