@@ -299,7 +299,7 @@ fn infer_bill_type(m: &ArgMatches) -> Option<BillType> {
 fn matches_to_export_config<'a>(m: &'a ArgMatches) -> Option<ExportConfig<'a>> {
 
     let template_name = m.value_of("template")
-                         .or_else(||CONFIG.get("convert/default_template").and_then(|e| e.as_str()))
+                         .or_else(||CONFIG.get("document_export/default_template").and_then(|e| e.as_str()))
                          .unwrap();
     let bill_type = infer_bill_type(m);
 
@@ -338,9 +338,10 @@ fn matches_to_export_config<'a>(m: &'a ArgMatches) -> Option<ExportConfig<'a>> {
 pub fn make(m: &ArgMatches) -> Result<()> {
     debug!("{:?}", m);
     if let Some(ref config) = matches_to_export_config(m) {
-        document_export::projects_to_doc(config) // TODO if-let this TODO should return Result
+        Ok(document_export::projects_to_doc(config)?) // TODO if-let this TODO should return Result
+    } else {
+        Ok(())
     }
-    Ok(())
 }
 
 
@@ -443,8 +444,7 @@ pub fn config(matches: &ArgMatches) -> Result<()> {
 /// Command CONFIG --show
 pub fn config_show(path: &str) -> Result<()> {
     println!("{}: {:#?}", path,
-             CONFIG.get_to_string(&path)
-                   .unwrap_or_else(|| format!("{} not set", path)));
+             CONFIG.get_to_string(&path));
     Ok(())
 }
 
@@ -509,14 +509,10 @@ pub fn path<F>(m: &ArgMatches, action: F) -> Result<()>
     where F: Fn(&Path) -> Result<()>
 {
 
-    let path = CONFIG.get_str("path")
-        .expect("Faulty config: field output_path does not contain a string value");
-    let storage_path = CONFIG.get_str("dirs/storage")
-        .expect("Faulty config: field output_path does not contain a string value");
-    let templates_path = CONFIG.get_str("dirs/templates")
-        .expect("Faulty config: field output_path does not contain a string value");
-    let output_path = CONFIG.get_str("output_path")
-        .expect("Faulty config: field output_path does not contain a string value");
+    let path = CONFIG.get_str("path");
+    let storage_path = CONFIG.get_str("dirs/storage");
+    let templates_path = CONFIG.get_str("dirs/templates");
+    let output_path = CONFIG.get_str("output_path");
 
     let exe = env::current_exe()?;
 

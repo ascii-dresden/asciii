@@ -28,11 +28,11 @@ extensions:
   output_file: tex
   output_template: tex.hbs
 
-convert:
-  tool: pdflatex
+document_export:
+  convert_tool: pdflatex
   output_extension: pdf
   trash_extensions: [aux,log]
-  default_template: document
+  default_template: export
 
 #log_file: ~/.ascii_log # unimplemented
 #calendar_file: invoicer.ics #unimplemented

@@ -36,7 +36,6 @@ fn compare(project: &Project) {
 }
 
 fn main() {
-
     let storage = storage::setup().unwrap();
     let projects = storage.open_projects(StorageDir::Archive(2016)).unwrap();
     let project = &projects[2];

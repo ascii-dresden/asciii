@@ -40,7 +40,7 @@ impl<'a> Default for ListConfig<'a>{
             mode:         if ::CONFIG.get_bool("list/verbose"){ ListMode::Verbose } else{ ListMode::Simple },
             git_status:   ::CONFIG.get_bool("list/gitstatus"),
             show_errors:  false,
-            sort_by:      ::CONFIG.get_str("list/sort").expect("Faulty config: list/sort does not contain a value"),
+            sort_by:      ::CONFIG.get_str("list/sort"),
             filter_by:    None,
             use_colors:   ::CONFIG.get_bool("list/colors"),
             details:      None,
@@ -50,8 +50,7 @@ impl<'a> Default for ListConfig<'a>{
 
 // TODO move `payed_to_cell` into computed_field.rs
 fn payed_to_cell(project:&Project) -> Cell {
-    let sym = ::CONFIG.get_str("currency")
-        .expect("Faulty config: currency does not contain a value");
+    let sym = ::CONFIG.get_str("currency");
 
     match (project.payed_by_client(), project.hours().employees_payed()) {
         (false,false) => Cell::new("✗").with_style(Attr::ForegroundColor(color::RED)),

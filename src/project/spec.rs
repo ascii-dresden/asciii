@@ -327,16 +327,13 @@ pub trait IsClient: ProvidesData {
             let last_name = self.last_name();
 
 
-            let lang = ::CONFIG.get_str("defaults/lang")
-                .expect("Faulty config: defaults/lang does not contain a value");
+            let lang = ::CONFIG.get_str("defaults/lang");
 
             let gend_path = "gender_matches/".to_owned() + &salute.to_lowercase();
-            let gend = ::CONFIG.get_str(&gend_path)
-                .expect(&format!("Faulty config: {} does not contain a value", gend_path));
+            let gend = ::CONFIG.get_str(&gend_path);
 
             let addr_path = "lang_addressing/".to_owned() + &lang.to_lowercase() + "/" + gend;
-            let addr = ::CONFIG.get_str(&addr_path)
-                .expect(&format!("Faulty config: {} does not contain a value", addr_path));
+            let addr = ::CONFIG.get_str(&addr_path);
 
             last_name.and(Some(format!("{} {} {}", addr, salute, last_name.unwrap_or(""))))
         } else {

@@ -1,12 +1,12 @@
 \documentclass[11pt,utf8]<{{storage.dirs.template}}/latex/ascii-brief>
 \Logo <{{storage.dirs.template}}/latex/ascii-logo.png>
 
-{{#partial items}}
-{{#each this}} {{inc @index}} & {{ name }} {{#if unit}}    ({{ unit }}) {{/if}}   & {{ amount}}  & {{ price }} & {{ cost }} \\
+{{#> items}}
+{{#each this}} {{@index}} & {{ name }} {{#if unit}}    ({{ unit }}) {{/if}}   & {{ amount}}  & {{ price }} & {{ cost }} \\
 {{/each~}}
-{{/partial}}
+{{/items}}
 
-{{#partial foo}}
+{{#> foo}}
 {{#each sums}}{{#if has_tax}}
 \multicolumn{4}{r}{Netto MwSt.}   & {{gross_sum}}  \\ % {{gross_total}}
 \multicolumn{4}{r}{+MwSt. {{tax_value}}\%}   & {{tax_sum}}  \\
@@ -17,7 +17,7 @@
 \multicolumn{4}{r}{\textbf{Gesamtpreis}}  & {{net_total}} \\
 \end{tabular}
 \end{center}
-{{/partial}}
+{{/foo}}
 
 {{#with document}}
 \lochermarke
@@ -86,15 +86,15 @@ hiermit möchten wir Ihnen für die gastronomische Betreuung Ihrer Veranstaltung
   \textbf{Nr.} & \textbf{Bezeichnung}&    \textbf{Menge}    &    \textbf{EP}    &    \textbf{Preis}    \\
   \midrule {{#with bills}}
   {{#if ../../is_invoice}}
-{{#with invoice}} {{#block items}}{{/block}} {{/with}}
+{{#with invoice}} {{#> items}}{{/items}} {{/with}}
   {{else}}
-{{#with offer}} {{#block items}}{{/block}} {{/with}}
+{{#with offer}} {{#> items}}{{/items}} {{/with}}
   {{/if}}
 {{/with}}
 
 \bottomrule[1pt]
-{{#if ../is_invoice}} {{#with invoice}}{{#block foo}}{{/block}}{{/with}}
-{{else}} {{#with offer}}{{#block foo}}{{/block}}{{/with}} {{/if}}
+{{#if ../is_invoice}} {{#with invoice}}{{#> foo}}{{/foo}}{{/with}}
+{{else}} {{#with offer}}{{#> foo}}{{/foo}}{{/with}} {{/if}}
 
 {{#if ../is_invoice}}
 Wir bitten um eine Begleichung des Betrags innerhalb von 14 Tagen nach Erhalt der Rechnung.

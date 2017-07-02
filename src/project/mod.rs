@@ -13,13 +13,15 @@ use std::collections::HashMap;
 use chrono::prelude::*;
 use chrono::Duration;
 use yaml_rust::Yaml;
-use tempdir::TempDir;
+use serde_json;
 use slug;
+use tempdir::TempDir;
 
 use bill::{Bill, Currency, Tax};
 use icalendar::*;
 //use semver::Version;
 
+use self::export::*;
 use super::BillType;
 use util::{yaml, get_valid_path};
 use storage::{Storable, StorageResult, list_path_content};
@@ -191,8 +193,8 @@ impl Project {
     }
 
     pub fn offer_file(&self) -> Option<PathBuf> {
-        let output_folder = ::CONFIG.get_str("output_path").and_then(get_valid_path);
-        let convert_ext  = ::CONFIG.get_str("convert/output_extension").expect("Faulty default config");
+        let output_folder = get_valid_path(::CONFIG.get_str("output_path"));
+        let convert_ext  = ::CONFIG.get_str("document_export/output_extension");
         match (output_folder, self.offer_file_name(convert_ext)) {
             (Some(folder), Some(name)) => folder.join(&name).into(),
             _ => None
@@ -200,8 +202,8 @@ impl Project {
     }
 
     pub fn invoice_file(&self) -> Option<PathBuf>{
-        let output_folder = ::CONFIG.get_str("output_path").and_then(get_valid_path);
-        let convert_ext  = ::CONFIG.get_str("convert/output_extension").expect("Faulty default config");
+        let output_folder = get_valid_path(::CONFIG.get_str("output_path"));
+        let convert_ext  = ::CONFIG.get_str("document_export/output_extension");
         match (output_folder, self.invoice_file_name(convert_ext)) {
             (Some(folder), Some(name)) => folder.join(&name).into(),
             _ => None
@@ -282,6 +284,11 @@ impl Project {
     /// TODO move to `IsProjectExt`
     pub fn age(&self) -> Option<i64> {
         self.modified_date().map(|date| (UTC::today().signed_duration_since(date)).num_days() )
+    }
+
+    pub fn to_json(&self) -> Result<String>{
+        let complete: Complete = self.export();
+        Ok(serde_json::to_string(&complete)?)
     }
 
     pub fn to_csv(&self, bill_type:&BillType) -> Result<String>{
@@ -552,11 +559,9 @@ impl Storable for Project {
             "PROJECT-NAME"  => project_name.to_owned(),
             "DATE-EVENT"    => event_date,
             "DATE-CREATED"  => created_date,
-            "TAX"           => ::CONFIG.get_to_string("defaults/tax")
-                                       .expect("Faulty config: field defaults/tax does not contain a value"),
-            "SALARY"        => ::CONFIG.get_to_string("defaults/salary")
-                                       .expect("Faulty config: field defaults/salary does not contain a value"),
-            "MANAGER"       => ::CONFIG.get_str("user/name").unwrap_or("").to_string(),
+            "TAX"           => ::CONFIG.get_to_string("defaults/tax"),
+            "SALARY"        => ::CONFIG.get_to_string("defaults/salary"),
+            "MANAGER"       => ::CONFIG.get_str_or("user/name").unwrap_or("").to_string(),
             "TIME-START"    => String::new(),
             "TIME-END"      => String::new(),
             "VERSION"       => ::VERSION.to_string(),

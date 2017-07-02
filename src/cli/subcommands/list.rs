@@ -33,7 +33,6 @@ pub fn list(matches: &ArgMatches) -> Result<()> {
             sort_by: matches.value_of("sort")
                             .unwrap_or_else(|| {
                                 CONFIG.get_str("list/sort")
-                                    .expect("Faulty config: field list/sort does not contain a string value")
                             }),
             mode: list_mode,
             details: extra_details.or(config_details),
