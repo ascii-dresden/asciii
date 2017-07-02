@@ -187,7 +187,7 @@ pub fn verbose_rows(projects:&[Project], list_config:&ListConfig) -> Vec<Row>{
                     .style_spec(row_style),
 
                 // Date
-                cell!(project.modified_date().unwrap_or(UTC::today()).format("%d.%m.%Y").to_string())
+                cell!(project.modified_date().unwrap_or(Utc::today()).format("%d.%m.%Y").to_string())
                     .style_spec(row_style),
 
                 // status "✓  ✓  ✗"

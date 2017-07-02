@@ -1,7 +1,6 @@
 use rustyline::completion;
 use rustyline::error::ReadlineError;
-use rustyline::config::Config as LineConfig;
-use rustyline::{CompletionType, Editor};
+use rustyline::Editor;
 use rustyline::Result as LineResult;
 
 use std::collections::BTreeSet;
@@ -36,8 +35,8 @@ impl ClapCompleter {
 impl completion::Completer for ClapCompleter {
     fn complete(&self, line: &str, pos: usize) -> LineResult<(usize, Vec<String>)> {
         let break_chars = BTreeSet::new();
-        let (start, path) = completion::extract_word(line, pos, ESCAPE_CHAR, &break_chars);
-        let path = completion::unescape(path, ESCAPE_CHAR);
+        let (start, path) = completion::extract_word(line, pos, &break_chars);
+        //let path = completion::unescape(path, ESCAPE_CHAR);
         let matches = self.naiv_complete(&path, ESCAPE_CHAR, &break_chars)?;
         Ok((start, matches))
     }
@@ -48,14 +47,9 @@ pub fn launch_shell() -> Result<()>{
     with_cli( |mut app| {
 
 
-    let config = LineConfig::builder()
-        .history_ignore_space(true)
-        .completion_type(CompletionType::List)
-        .build();
-
     //let file_compl = FilenameCompleter::new();
     let clap_compl = ClapCompleter::from_app(&app);
-    let mut rl = Editor::new(config);
+    let mut rl = Editor::new();
 
     //rl.set_completer(Some(file_compl));
     rl.set_completer(Some(clap_compl));

@@ -9,7 +9,7 @@ use bill::Currency;
 use yaml_rust::Yaml;
 use yaml_rust::yaml::Hash as YamlHash;
 
-use chrono::{Date, UTC, TimeZone, Datelike};
+use chrono::{Date, Utc, TimeZone, Datelike};
 use semver::Version;
 
 use super::error::{SpecResult, ErrorList};
@@ -35,13 +35,13 @@ pub fn to_currency(f: f64) -> Currency {
 ///
 /// Takes care of the old, deprecated, stupid, `dd-dd.mm.yyyy` format, what was I thinking?
 /// This is not used in the current format.
-fn parse_dmy_date_range(date_str:&str) -> Option<Date<UTC>>{
+fn parse_dmy_date_range(date_str:&str) -> Option<Date<Utc>>{
     let date = date_str.split('.')
         .map(|s|s.split('-').nth(0).unwrap_or("0"))
         .map(|f|f.parse().unwrap_or(0))
         .collect::<Vec<i32>>();
     if date[0] > 0 {
-        return Some(UTC.ymd(date[2], date[1] as u32, date[0] as u32))
+        return Some(Utc.ymd(date[2], date[1] as u32, date[0] as u32))
     }
     None
 }
@@ -127,18 +127,18 @@ pub trait ProvidesData {
     }
 
     /// Gets a Date in `dd.mm.YYYY` format.
-    fn get_dmy(&self, path:&str) -> Option<Date<UTC>> {
+    fn get_dmy(&self, path:&str) -> Option<Date<Utc>> {
         self.get(path).and_then(|y|y.as_str()).and_then(|d|self.parse_dmy_date(d))
     }
 
     /// Interprets `"25.12.2016"` as date.
-    fn parse_dmy_date(&self, date_str:&str) -> Option<Date<UTC>>{
+    fn parse_dmy_date(&self, date_str:&str) -> Option<Date<Utc>>{
         let date = date_str.split('.')
             .map(|f|f.parse().unwrap_or(0))
             .collect::<Vec<i32>>();
         if date.len() >=2 && date[0] > 0 && date[2] > 1900 {
             // XXX this neglects the old "01-05.12.2015" format
-            UTC.ymd_opt(date[2], date[1] as u32, date[0] as u32).single()
+            Utc.ymd_opt(date[2], date[1] as u32, date[0] as u32).single()
         } else {
             None
         }
@@ -213,7 +213,7 @@ pub trait IsProject: ProvidesData {
             .or_else(|| self.get_str("event"))
     }
 
-    fn event_date(&self) -> Option<Date<UTC>>{
+    fn event_date(&self) -> Option<Date<Utc>>{
         self.get_dmy( "event.dates.0.begin")
         .or_else(||self.get_dmy("created"))
         .or_else(||self.get_dmy("date"))
@@ -251,7 +251,7 @@ pub trait Offerable: ProvidesData {
     }
 
     /// When was the offer created
-    fn date(&self) -> Option<Date<UTC>> {
+    fn date(&self) -> Option<Date<Utc>> {
         self.get_dmy("offer.date")
     }
 
@@ -374,7 +374,7 @@ pub trait Invoicable: ProvidesData {
     }
 
     /// When was the invoice created
-    fn date(&self) -> Option<Date<UTC>> {
+    fn date(&self) -> Option<Date<Utc>> {
         self.get_dmy("invoice.date")
         // old spec
         .or_else(|| self.get_dmy("invoice_date"))
@@ -403,7 +403,7 @@ use bill::{BillItem, Bill};
 
 pub trait HasEmployees: ProvidesData {
     /// When were the wages payed
-    fn wages_date(&self) -> Option<Date<UTC>> {
+    fn wages_date(&self) -> Option<Date<Utc>> {
         self.get_dmy("hours.wages_date")
         // old spec
         .or_else(|| self.get_dmy("wages_date"))
@@ -490,7 +490,7 @@ pub trait HasEmployees: ProvidesData {
 pub trait Redeemable: IsProject {
 
     /// When was the project payed
-    fn payed_date(&self) -> Option<Date<UTC>> {
+    fn payed_date(&self) -> Option<Date<Utc>> {
         self.get_dmy("invoice.payed_date")
         // old spec
         .or_else(|| self.get_dmy("payed_date"))
@@ -560,7 +560,7 @@ impl Validatable for Redeemable {
 pub mod events {
     use super::IsProject;
     use yaml_rust::Yaml;
-    use chrono::{Date, UTC, NaiveTime};
+    use chrono::{Date, Utc, NaiveTime};
     use icalendar::Event as CalEvent;
     use icalendar::{Component, Calendar};
 
@@ -572,8 +572,8 @@ pub mod events {
 
     #[derive(Debug)]
     pub struct Event{
-        pub begin: Date<UTC>,
-        pub end: Option<Date<UTC>>,
+        pub begin: Date<Utc>,
+        pub end: Option<Date<Utc>>,
         pub times: Vec<EventTime>
     }
 

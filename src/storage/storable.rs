@@ -5,7 +5,7 @@ use std::{fs,io};
 use std::path::{Path, PathBuf};
 use std::collections::HashMap;
 
-use chrono::{Date, UTC, Datelike};
+use chrono::{Date, Utc, Datelike};
 
 use super::StorageResult;
 use super::repo::GitStatus;
@@ -28,7 +28,7 @@ pub trait Storable:Send+Sync{
     fn ident(&self) -> String{ self.dir().file_stem().and_then(|s|s.to_str()).unwrap().to_owned() }
 
     fn short_desc(&self) -> String;
-    fn modified_date(&self) -> Option<Date<UTC>>;
+    fn modified_date(&self) -> Option<Date<Utc>>;
     fn year(&self) -> Option<i32>{ self.modified_date().map(|d|d.year()) }
 
     /// Deletes the project if the passed in closure returns `true`

@@ -283,7 +283,7 @@ impl Project {
 
     /// TODO move to `IsProjectExt`
     pub fn age(&self) -> Option<i64> {
-        self.modified_date().map(|date| (UTC::today().signed_duration_since(date)).num_days() )
+        self.modified_date().map(|date| (Utc::today().signed_duration_since(date)).num_days() )
     }
 
     pub fn to_json(&self) -> Result<String>{
@@ -369,7 +369,7 @@ impl Project {
     /// Time Since Event
     pub fn our_bad(&self) -> Option<Duration> {
         let event   = try_some!(self.event_date());
-        let invoice = self.invoice().date().unwrap_or_else(UTC::today);
+        let invoice = self.invoice().date().unwrap_or_else(Utc::today);
         let diff = invoice.signed_duration_since(event);
         if diff > Duration::zero() {
             Some(diff)
@@ -379,8 +379,8 @@ impl Project {
     }
 
     pub fn their_bad(&self) -> Option<Duration> {
-        let invoice = self.invoice().date().unwrap_or_else(UTC::today);
-        let payed   = self.payed_date().unwrap_or_else(UTC::today);
+        let invoice = self.invoice().date().unwrap_or_else(Utc::today);
+        let payed   = self.payed_date().unwrap_or_else(Utc::today);
         Some(invoice.signed_duration_since(payed))
     }
 
@@ -395,9 +395,9 @@ impl Project {
         let invoice = self.invoice().date();
         let payed   = self.payed_date();
         let wages   = self.hours().wages_date();
-        let today   = UTC::today();
+        let today   = Utc::today();
 
-        let days_since = |date:Date<UTC>| (today.signed_duration_since(date)).num_days();
+        let days_since = |date:Date<Utc>| (today.signed_duration_since(date)).num_days();
 
         if let Some(event) = event {
             match (invoice, payed, wages) {
@@ -421,15 +421,15 @@ impl Project {
         cal
     }
 
-    fn task_issue_invoice(&self, event_date: Date<UTC>) -> Todo {
+    fn task_issue_invoice(&self, event_date: Date<Utc>) -> Todo {
         Todo::new().summary(&lformat!("Create an Invoice"))
                    .due((event_date + Duration::days(14)).and_hms(11, 10, 0))
                    .priority(6)
                    .done()
     }
 
-    fn task_pay_employees(&self, payed_date: Date<UTC>) -> Todo {
-        let days_since_payed = (UTC::today().signed_duration_since(payed_date)).num_days();
+    fn task_pay_employees(&self, payed_date: Date<Utc>) -> Todo {
+        let days_since_payed = (Utc::today().signed_duration_since(payed_date)).num_days();
         Todo::new().summary(&lformat!("{}: Hungry employees!", self.invoice().number_str().unwrap_or_else(String::new)))
             .description( &lformat!("Pay {}\nYou have had the money for {} days!",
                                    self.employees_string(),
@@ -438,8 +438,8 @@ impl Project {
             .done()
     }
 
-    fn task_follow_up(&self, invoice_date: Date<UTC>) -> Todo {
-        let days_since_invoice = (UTC::today().signed_duration_since(invoice_date)).num_days();
+    fn task_follow_up(&self, invoice_date: Date<Utc>) -> Todo {
+        let days_since_invoice = (Utc::today().signed_duration_since(invoice_date)).num_days();
         let mut follow_up = Todo::new();
         follow_up.summary( &lformat!("Inquire about: \"{event}\"!", event = self.name().unwrap()));
         follow_up.description(&lformat!("{inum }{event:?} on {invoice_date} ({days} days ago) was already invoiced but is still not marked as payed.\nPlease check for incoming payments! You can ask {client} ({mail}).",
@@ -462,8 +462,8 @@ impl Project {
         follow_up
     }
 
-    fn task_close_project(&self, wages_date: Date<UTC>) -> Todo {
-            let days_since_wages = (UTC::today().signed_duration_since(wages_date)).num_days();
+    fn task_close_project(&self, wages_date: Date<Utc>) -> Todo {
+            let days_since_wages = (Utc::today().signed_duration_since(wages_date)).num_days();
             Todo::new().summary( &lformat!("Archive {}", self.name().unwrap()))
                        .description( &lformat!("{:?} has been finished for {} days, get rid of it!",
                                               self.name().unwrap(),
@@ -550,8 +550,8 @@ impl Storable for Project {
     fn from_template(project_name:&str,template:&Path, fill: &HashMap<&str,String>) -> StorageResult<Project> {
         let template_name = template.file_stem().unwrap().to_str().unwrap();
 
-        let event_date = (UTC::today() + Duration::days(14)).format("%d.%m.%Y").to_string();
-        let created_date = UTC::today().format("%d.%m.%Y").to_string();
+        let event_date = (Utc::today() + Duration::days(14)).format("%d.%m.%Y").to_string();
+        let created_date = Utc::today().format("%d.%m.%Y").to_string();
 
         // fill template with these values
         let default_fill = hashmap!{
@@ -631,7 +631,7 @@ impl Storable for Project {
                            )
     }
 
-    fn modified_date(&self) -> Option<Date<UTC>> {
+    fn modified_date(&self) -> Option<Date<Utc>> {
         self.get_dmy( "event.dates.0.begin")
             .or_else(||self.get_dmy("created"))
             .or_else(||self.get_dmy("date"))

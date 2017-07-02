@@ -86,13 +86,13 @@ pub fn parse( file_content:&str ) -> Result<Yaml, YamlError> {
 }
 
 /// Interprets `"25.12.2016"` as date.
-pub fn parse_dmy_date(date_str:&str) -> Option<Date<UTC>>{
+pub fn parse_dmy_date(date_str:&str) -> Option<Date<Utc>>{
     let date = date_str.split('.')
         .map(|f|f.parse().unwrap_or(0))
         .collect::<Vec<i32>>();
     if date.len() >=2 && date[0] > 0 && date[2] > 1900 {
         // XXX this neglects the old "01-05.12.2015" format
-        UTC.ymd_opt(date[2], date[1] as u32, date[0] as u32).single()
+        Utc.ymd_opt(date[2], date[1] as u32, date[0] as u32).single()
     } else {
         None
     }
@@ -102,13 +102,13 @@ pub fn parse_dmy_date(date_str:&str) -> Option<Date<UTC>>{
 ///
 /// Takes care of the old, deprecated, stupid, `dd-dd.mm.yyyy` format, what was I thinking?
 /// This is not used in the current format.
-pub fn parse_dmy_date_range(date_str:&str) -> Option<Date<UTC>>{
+pub fn parse_dmy_date_range(date_str:&str) -> Option<Date<Utc>>{
     let date = date_str.split('.')
         .map(|s|s.split('-').nth(0).unwrap_or("0"))
         .map(|f|f.parse().unwrap_or(0))
         .collect::<Vec<i32>>();
     if date[0] > 0 {
-        return Some(UTC.ymd(date[2], date[1] as u32, date[0] as u32))
+        return Some(Utc.ymd(date[2], date[1] as u32, date[0] as u32))
     }
     None
 }
@@ -186,7 +186,7 @@ pub fn get_to_string(yaml:&Yaml, key:&str) -> Option<String> {
 }
 
 /// Gets a Date in `dd.mm.YYYY` format.
-pub fn get_dmy(yaml:&Yaml, key:&str) -> Option<Date<UTC>> {
+pub fn get_dmy(yaml:&Yaml, key:&str) -> Option<Date<Utc>> {
     get(yaml,key).and_then(|y|y.as_str()).and_then(|d|parse_dmy_date(d))
 }
 
