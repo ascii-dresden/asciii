@@ -4,13 +4,13 @@ version = "3.1.0"
 authors = ["Hendrik Sollich <hendrik@hoodie.de>"]
 license = "MIT/Apache-2.0"
 
-build = false
+build = true
 
 [dependencies]
 log = "0.3"
 env_logger = "0.4" # default feature requires regex
-yaml-rust = {version = "0.3", features = ["preserve_order"]}
-chrono = "0.3"
+yaml-rust = {git = "https://github.com/chyh1990/yaml-rust/"}
+chrono = "0.4"
 regex = "0.2"
 lazy_static = "0.2"
 maplit = "0.1"
@@ -20,15 +20,10 @@ custom_derive = "0.1"
 open = "1.1"
 error-chain = "0.10"
 crowbook-intl-runtime = "0.1"
-rustyline = {git="https://github.com/kkawakam/rustyline/", rev="1ae47dc", optional = true }
+rustyline = {version = "1.0.0", optional = true }
 
-#Testing tectonic
-#tectonic = "0.1.5"
-
-#bill = "0.1.1"
 bill = {version= "0.2", features=["serialization"]}
 icalendar = "0.3"
-pretty_assertions = "0.2.0"
 
 slug = "0.1"
 tempdir = "0.3"
@@ -38,12 +33,8 @@ term_size = "0.3"
 term = "0.4"
 prettytable-rs = { version = "0.6", default-features= false}
 
-# feature: lints
-#herbie-lint = {version = "*", optional = true}
-
 # feature: document_export
-handlebars = {version = "0.22", optional = true}
-rustc-serialize = {version = "0.3", optional = true}
+handlebars = {version = "0.27", optional = true}
 
 serde        = {version = "1.0", optional = true}
 serde_json   = {version = "1.0", optional = true}
@@ -56,8 +47,7 @@ git2 = {version = "0.6", default-features= false, optional = true}
 
 [features]
 default = ["document_export", "git_statuses", "shell"]
-document_export = ["json", "handlebars"]
-json = ["rustc-serialize"]
+document_export = ["handlebars", "serialization"]
 serialization = ["serde", "serde_json", "serde_derive"]
 git_statuses = ["git2"]
 shell = ["rustyline"]

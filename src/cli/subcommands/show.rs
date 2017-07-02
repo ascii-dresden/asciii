@@ -1,7 +1,4 @@
 
-#[cfg(feature="document_export")]
-use rustc_serialize::json::ToJson;
-
 use clap::ArgMatches;
 
 use asciii::{BillType, print};
@@ -30,60 +27,78 @@ pub fn show(m: &ArgMatches) -> Result<()>{
         _               => BillType::Invoice, //TODO be inteligent here ( use date )
     };
 
-    if m.is_present("files") { show_files(&selection)
-    } else if let Some(detail) = m.value_of("detail") { show_detail(&selection, detail)
-    } else if m.is_present("empty fields"){ show_empty_fields(&selection)
-    } else if m.is_present("errors"){ show_errors(&selection)
-    } else if m.is_present("dump"){ dump_yaml(&selection)
-    } else if m.is_present("json"){ show_json(&selection)
-    } else if m.is_present("ical"){ show_ical(&selection)
-    } else if m.is_present("csv"){  show_csv(&selection)
+    if m.is_present("files") { show_files(selection)
+    } else if let Some(detail) = m.value_of("detail") { show_detail(selection, detail)
+    } else if m.is_present("empty fields"){ show_empty_fields(selection)
+    } else if m.is_present("errors"){ show_errors(selection)
+    } else if m.is_present("dump"){ dump_yaml(selection)
+    } else if m.is_present("json"){ show_json(selection)
+    } else if m.is_present("ical"){ show_ical(selection)
+    } else if m.is_present("csv"){  show_csv(selection)
     } else if m.is_present("template"){ show_template(search_terms[0])
-    } else { Ok(setup::<Project>()?
-                .with_selection(&selection, |p| print::show_details(&p, &bill_type))?)
+    } else {
+        for p in setup::<Project>()?.open_projects(selection)? {
+            print::show_details(&p, &bill_type)
+        }
+        Ok(())
     }
 }
 
-fn show_files(selection: &StorageSelection) -> Result<()> {
-    Ok(setup::<Project>()?.with_selection(&selection, |p| {
-        println!("{}: ", p.dir().display());
-        for entry in fs::read_dir(p.dir()).unwrap() {
+fn show_files(selection: StorageSelection) -> Result<()> {
+    for project in setup::<Project>()?.open_projects(selection)? {
+        println!("{}: ", project.dir().display());
+        for entry in fs::read_dir(project.dir()).unwrap() {
             println!("  {}", entry.unwrap().path().display())
         }
-    })?)
+    }
+    Ok(())
 }
 
-fn show_errors(selection: &StorageSelection) -> Result<()> {
-    Ok(setup::<Project>()?.with_selection(selection, |p| {
+fn show_errors(selection: StorageSelection) -> Result<()> {
+    for p in setup::<Project>()?.open_projects(selection)? {
         println!("{}: ", p.short_desc());
         spec::print_specresult("offer", p.is_ready_for_offer());
         spec::print_specresult("invoice", p.is_ready_for_invoice());
         spec::print_specresult("archive", p.is_ready_for_archive());
-    })?)
+    }
+    Ok(())
 }
 
-fn show_empty_fields(selection: &StorageSelection) -> Result<()> {
-    Ok(setup::<Project>()?.with_selection(selection, |p| println!("{}: {}", p.short_desc(), p.empty_fields().join(", ")))?)
+fn show_empty_fields(selection: StorageSelection) -> Result<()> {
+    for p in setup::<Project>()?.open_projects(selection)? {
+        println!("{}: {}", p.short_desc(), p.empty_fields().join(", "))
+    }
+    Ok(())
 }
 
 
 #[cfg(feature="document_export")]
-fn show_json(selection: &StorageSelection) -> Result<()> {
-    Ok(setup::<Project>()?.with_selection(selection, |p| println!("{}", p.to_json()))?)
+fn show_json(selection: StorageSelection) -> Result<()> {
+    for p in setup::<Project>()?.open_projects(selection)? {
+        println!("{}", p.to_json()?)
+    }
+    Ok(())
 }
 
-fn show_ical(selection: &StorageSelection) -> Result<()> {
-    Ok(setup::<Project>()?.with_selection(selection, |p| p.to_ical().print().unwrap())?)
+fn show_ical(selection: StorageSelection) -> Result<()> {
+    for p in setup::<Project>()?.open_projects(selection)? {
+        p.to_ical().print()?
+    }
+    Ok(())
 }
 
-fn show_detail(selection: &StorageSelection, detail: &str) -> Result<()> {
-    Ok(setup::<Project>()?.with_selection(selection, |p| {
+fn show_detail(selection: StorageSelection, detail: &str) -> Result<()> {
+    for p in setup::<Project>()?.open_projects(&selection)? {
         println!("{}", p.get(detail).unwrap_or_else(|| format!("No {:?} found", selection)))
-    })?)
+    }
+    Ok(())
 }
 
-fn show_csv(selection: &StorageSelection) -> Result<()> {
-    Ok(setup::<Project>()?.with_selection(selection, |p| println!("{}",  p.to_csv(&BillType::Invoice).unwrap()) )?)
+fn show_csv(selection: StorageSelection) -> Result<()> {
+    for p in setup::<Project>()?.open_projects(selection)? {
+        println!("{}",  p.to_csv(&BillType::Invoice)?)
+    }
+    Ok(())
 }
 
 #[cfg(not(feature="document_export"))]
@@ -105,7 +120,10 @@ fn show_template(name: &str) -> Result<()> {
     Ok(())
 }
 
-fn dump_yaml(selection: &StorageSelection) -> Result<()> {
-    Ok(setup::<Project>()?.with_selection(selection, |p| println!("{}", p.dump_yaml()))?)
+fn dump_yaml(selection: StorageSelection) -> Result<()> {
+    for p in setup::<Project>()?.open_projects(selection)? {
+        println!("{}", p.dump_yaml())
+    }
+    Ok(())
 }
 

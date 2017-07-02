@@ -157,3 +157,10 @@ pub fn currency_to_string(currency:&Currency) -> String {
 }
 
 
+// tiny little helper
+pub fn to_local_file(file:&Path, ext:&str) -> PathBuf {
+    let mut _tmpfile = file.to_owned();
+    _tmpfile.set_extension(ext);
+    Path::new(_tmpfile.file_name().unwrap().into()).to_owned()
+}
+

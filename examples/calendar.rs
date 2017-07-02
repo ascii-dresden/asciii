@@ -1,7 +1,7 @@
 extern crate asciii;
 
 use std::error::Error;
-use asciii::calendar;
+use asciii::actions::calendar;
 use asciii::storage::StorageDir;
 
 

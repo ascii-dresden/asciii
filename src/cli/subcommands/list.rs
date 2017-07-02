@@ -33,7 +33,6 @@ pub fn list(matches: &ArgMatches) -> Result<()> {
             sort_by: matches.value_of("sort")
                             .unwrap_or_else(|| {
                                 CONFIG.get_str("list/sort")
-                                    .expect("Faulty config: field list/sort does not contain a string value")
                             }),
             mode: list_mode,
             details: extra_details.or(config_details),
@@ -55,14 +54,14 @@ pub fn list(matches: &ArgMatches) -> Result<()> {
             if matches.is_present("archive"){
                 let archive_year = matches.value_of("archive")
                     .and_then(|y|y.parse::<i32>().ok())
-                    .unwrap_or(UTC::today().year());
+                    .unwrap_or(Utc::today().year());
                 StorageDir::Archive(archive_year)
             }
 
             else if matches.is_present("year"){
                 let year = matches.value_of("year")
                     .and_then(|y|y.parse::<i32>().ok())
-                    .unwrap_or(UTC::today().year());
+                    .unwrap_or(Utc::today().year());
                 StorageDir::Year(year)
             }
 

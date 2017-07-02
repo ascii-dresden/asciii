@@ -46,7 +46,7 @@ pub struct Event {
 }
 
 use chrono::prelude::*;
-fn dmy(date: Option<Date<UTC>>) -> Option<String> {
+fn dmy(date: Option<Date<Utc>>) -> Option<String> {
     date.map(|d| d.format("%d.%m.%Y").to_string())
 }
 

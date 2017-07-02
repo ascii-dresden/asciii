@@ -10,9 +10,6 @@ extern crate icalendar;
 #[cfg(feature="shell")]
 extern crate rustyline;
 
-#[cfg(feature="document_export")]
-extern crate rustc_serialize;
-
 extern crate prettytable;
 extern crate maplit;
 #[macro_use] extern crate log;

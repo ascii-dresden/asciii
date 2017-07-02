@@ -33,7 +33,7 @@ impl Storable for TestProject{
         })
     }
     fn short_desc(&self) -> String{ self.file().file_stem().unwrap().to_str().unwrap().to_owned() }
-    fn modified_date(&self) -> Option<Date<UTC>>{ Some(UTC::today()) }
+    fn modified_date(&self) -> Option<Date<Utc>>{ Some(Utc::today()) }
     fn file(&self) -> PathBuf{ self.file_path.to_owned() }
     fn set_file(&mut self, new_file:&Path){ self.file_path = new_file.to_owned(); }
     fn index(&self) -> Option<String>{ Some("ZZ99".into()) }
@@ -209,7 +209,7 @@ fn archive_project(){
     assert_existens(&storage_path);
     copy_template(storage_path.join("templates"));
 
-    let year = UTC::today().year();
+    let year = Utc::today().year();
 
     let templates = storage.list_template_names().unwrap();
     for test_project_name in TEST_PROJECTS.iter() {

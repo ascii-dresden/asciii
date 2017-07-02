@@ -43,8 +43,6 @@ pub use self::error::{StorageError, ErrorKind};
 pub mod storable;
 pub use self::storable::Storable;
 
-#[cfg(feature="document_export")]
-mod tojson;
 
 // TODO rely more on IoError, it has most of what you need
 /// Manages project file storage.
@@ -90,17 +88,41 @@ pub enum StorageDir {
 }
 
 /// A description from which we can open Storables
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum StorageSelection {
     DirAndSearch(StorageDir, Vec<String>),
+    Dir(StorageDir),
     Paths(Vec<PathBuf>),
     Unintiailzed
 }
+
+impl<'a> Into<StorageSelection> for &'a StorageSelection {
+    fn into(self) -> StorageSelection {
+        self.clone()
+    }
+}
+
+
+impl Into<StorageSelection> for StorageDir {
+    fn into(self) -> StorageSelection {
+        StorageSelection::Dir(self)
+    }
+}
+
 
 impl Default for StorageSelection {
     fn default() -> Self {
         StorageSelection::DirAndSearch(StorageDir::Working, Vec::new())
     }
+}
+
+#[cfg_attr(feature = "serialization", derive(Serialize))]
+#[derive(Debug)]
+pub struct Paths {
+    pub storage:   PathBuf,
+    pub working:   PathBuf,
+    pub archive:   PathBuf,
+    pub templates: PathBuf
 }
 
 /// Basically `ls`, returns a list of paths.
@@ -126,10 +148,8 @@ fn replace_home_tilde(p:&Path) -> PathBuf{
 /// This is by far the most important function of all utility functions.
 pub fn get_storage_path() -> PathBuf
 {
-    let storage_path = PathBuf::from(::CONFIG.get_str("path")
-            .expect("Faulty config: field path does not contain a string value"))
-            .join( ::CONFIG.get_str("dirs/storage")
-            .expect("Faulty config: field dirs/storage does not contain a string value"));
+    let storage_path = PathBuf::from(::CONFIG.get_str("path"))
+            .join(::CONFIG.get_str("dirs/storage"));
 
     // TODO make replace tilde a Trait function
     let storage_path = replace_home_tilde(&storage_path);
@@ -145,9 +165,9 @@ pub fn get_storage_path() -> PathBuf
 /// Sets up an instance of `Storage`.
 pub fn setup<L:Storable>() -> StorageResult<Storage<L>> {
     trace!("storage::setup()");
-    let working   = ::CONFIG.get_str("dirs/working").ok_or("Faulty config: dirs/working does not contain a value")?;
-    let archive   = ::CONFIG.get_str("dirs/archive").ok_or("Faulty config: dirs/archive does not contain a value")?;
-    let templates = ::CONFIG.get_str("dirs/templates").ok_or("Faulty config: dirs/templates does not contain a value")?;
+    let working   = ::CONFIG.get_str_or("dirs/working").ok_or("Faulty config: dirs/working does not contain a value")?;
+    let archive   = ::CONFIG.get_str_or("dirs/archive").ok_or("Faulty config: dirs/archive does not contain a value")?;
+    let templates = ::CONFIG.get_str_or("dirs/templates").ok_or("Faulty config: dirs/templates does not contain a value")?;
     let storage   = Storage::new(get_storage_path(), working, archive, templates)?;
     storage.health_check()?;
     Ok(storage)
@@ -156,9 +176,9 @@ pub fn setup<L:Storable>() -> StorageResult<Storage<L>> {
 /// Sets up an instance of `Storage`, with git turned on.
 pub fn setup_with_git<L:Storable>() -> StorageResult<Storage<L>> {
     trace!("storage::setup_with_git()");
-    let working   = ::CONFIG.get_str("dirs/working").ok_or("Faulty config: dirs/working does not contain a value")?;
-    let archive   = ::CONFIG.get_str("dirs/archive").ok_or("Faulty config: dirs/archive does not contain a value")?;
-    let templates = ::CONFIG.get_str("dirs/templates").ok_or("Faulty config: dirs/templates does not contain a value")?;
+    let working   = ::CONFIG.get_str_or("dirs/working").ok_or("Faulty config: dirs/working does not contain a value")?;
+    let archive   = ::CONFIG.get_str_or("dirs/archive").ok_or("Faulty config: dirs/archive does not contain a value")?;
+    let templates = ::CONFIG.get_str_or("dirs/templates").ok_or("Faulty config: dirs/templates does not contain a value")?;
     let storage   = Storage::new_with_git(get_storage_path(), working, archive, templates)?;
     storage.health_check()?;
     Ok(storage)
@@ -247,6 +267,16 @@ impl<L:Storable> Storage<L> {
         self.repository.as_ref()
     }
 
+    /// Returns a struct containing all configured paths of this `Storage`.
+    pub fn paths(&self) -> Paths {
+        Paths {
+           storage: self.root_dir().into(),
+           working: self.working_dir().into(),
+           archive: self.archive_dir().into(),
+           templates: self.templates_dir().into(),
+        }
+    }
+
     /// Creates the basic dir structure inside the storage directory.
     ///
     ///<pre>
@@ -292,7 +322,7 @@ impl<L:Storable> Storage<L> {
     /// Produces a list of files in the `template_dir()`
     pub fn list_template_files(&self) -> StorageResult<Vec<PathBuf>> {
         // TODO this is the only reference to `CONFIG`, lets get rid of it
-        let template_file_extension = ::CONFIG.get_str("extensions/project_template").expect("Internal Error: default config is wrong");
+        let template_file_extension = ::CONFIG.get_str("extensions/project_template");
         trace!("listing template files (.{})", template_file_extension);
         let template_files :Vec<PathBuf>=
         list_path_content(&self.templates_dir())?
@@ -387,29 +417,8 @@ impl<L:Storable> Storage<L> {
     }
 
     /// Does something with matching projects.
-    pub fn with_selection<F>(&self, select: &StorageSelection, f:F) -> StorageResult<()>
-        where F:Fn(L)
-    {
-
-        use self::StorageSelection::*;
-        match *select {
-            DirAndSearch(dir, ref search_terms) => {
-                let terms = search_terms.iter().map(AsRef::as_ref).collect::<Vec<_>>(); // sorry about this
-                self.with_projects(dir, Some(terms.as_slice()), f)?
-            },
-            Paths(ref paths) => {
-                for path in paths {
-                    if let Some(project) = self.open_project(path) {
-                        f(project);
-                    } else { error!("cannot open {}", path.display())}
-                }
-            }
-            Unintiailzed => unreachable!()
-        }
-        Ok(())
-    }
-
-    /// Does something with matching projects.
+    ///
+    /// #[deprecated(note="evil error eating monster")]
     pub fn with_projects<F>(&self, dir:StorageDir, search_terms:Option<&[&str]>, f:F) -> StorageResult<()>
         where F:Fn(L)
     {
@@ -723,8 +732,34 @@ impl<L:Storable> Storage<L> {
     }
 
     /// Behaves like `list_project_files()` but also opens projects directly.
-    pub fn open_projects(&self, directory:StorageDir) -> StorageResult<ProjectList<L>>{
-        trace!("OPENING ALL PROJECTS in {:?}-directory", directory);
+    pub fn open_projects<I>(&self, selection:I) -> StorageResult<ProjectList<L>>
+        where I: Into<StorageSelection>
+    {
+        use self::StorageSelection::*;
+        let projects = match selection.into() {
+            DirAndSearch(dir, ref search_terms) => {
+                let terms = search_terms.iter().map(AsRef::as_ref).collect::<Vec<_>>(); // sorry about this
+                let projects = self.search_projects_any(dir, &terms)?;
+                if projects.is_empty() {
+                    return Err(format!("Nothing found for {:?}", search_terms).into())
+                }
+                projects
+            },
+            Dir(dir) => self.open_projects_dir(dir)?,
+            Paths(ref paths) =>
+                ProjectList {
+                    projects:paths.iter()
+                        .filter_map(|path| self.open_project(path))
+                        .collect::<Vec<L>>()
+                },
+            Unintiailzed => unreachable!()
+        };
+        Ok(projects)
+    }
+
+    /// Behaves like `list_project_files()` but also opens projects directly.
+    pub fn open_projects_dir(&self, directory:StorageDir) -> StorageResult<ProjectList<L>>{
+        debug!("OPENING ALL PROJECTS in {:?}-directory", directory);
         match directory {
             StorageDir::Year(year) => {
                 // recursive :D
@@ -746,10 +781,12 @@ impl<L:Storable> Storage<L> {
     }
 
     pub fn open_working_dir_projects(&self) -> StorageResult<ProjectList<L>> {
+        debug!("OPENING ALL WORKING DIR PROJECTS");
         Ok(self.open_projects(StorageDir::Working)?)
     }
 
     pub fn open_all_archived_projects(&self) -> StorageResult<ProjectsByYear<L>> {
+        debug!("OPENING ALL ARCHIVED PROJECTS");
         let mut map = HashMap::new();
         for year in self.list_years()? {
             map.insert(year, self.open_projects(StorageDir::Archive(year))?);
@@ -758,6 +795,7 @@ impl<L:Storable> Storage<L> {
     }
 
     pub fn open_all_projects(&self) -> StorageResult<Projects<L>> {
+        debug!("OPENING ALL PROJECTS");
         Ok( Projects {
             working: self.open_projects(StorageDir::Working)?,
             archive: self.open_all_archived_projects()?

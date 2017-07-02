@@ -532,6 +532,11 @@ pub fn with_cli<F> (app_handler:F) where F: Fn(App) {
                              .long("dry")
                             )
 
+                        .arg(Arg::with_name("print-only")
+                             .help(lformat!("Only prints to stdout").as_ref())
+                             .long("print")
+                            )
+
                         .arg(Arg::with_name("open")
                              .help(lformat!("Open the pdf file afterwards.").as_ref())
                              .long("open")

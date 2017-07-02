@@ -1,23 +1,25 @@
-\documentclass[11pt,utf8]<{{storage.dirs.template}}/latex/ascii-brief>
-\Logo <{{storage.dirs.template}}/latex/ascii-logo.png>
+\documentclass[11pt,utf8]<{{storage.templates}}/latex/ascii-brief>
+\Logo <{{storage.templates}}/latex/ascii-logo.png>
 
-{{#partial items}}
-{{#each this}} {{inc @index}} & {{ name }} {{#if unit}}    ({{ unit }}) {{/if}}   & {{ amount}}  & {{ price }} & {{ cost }} \\
+{{~#*inline "items"}}
+{{#each this}}{{inc @index}} & {{ name }} {{#if unit}} ({{ unit }}) {{/if}} & {{ amount}} & {{ price }} & {{ cost }} \\
 {{/each~}}
-{{/partial}}
+{{/inline}}
 
-{{#partial foo}}
-{{#each sums}}{{#if has_tax}}
-\multicolumn{4}{r}{Netto MwSt.}   & {{gross_sum}}  \\ % {{gross_total}}
+{{~#*inline "foo"}}
+{{~#each sums}}{{#if has_tax}}
+\multicolumn{4}{r}{Netto MwSt.}   & {{gross_sum}}  \\
 \multicolumn{4}{r}{+MwSt. {{tax_value}}\%}   & {{tax_sum}}  \\
-{{else}}
-\multicolumn{4}{r}{MwSt. 0\%}  & {{gross_sum}}  \\ % {{gross_total}}
-{{/if}}{{/each}}
+{{~else}}
+\multicolumn{4}{r}{MwSt. 0\%}  & {{gross_sum}}  \\
+{{/if~}}
+{{/each~}}
+
 
 \multicolumn{4}{r}{\textbf{Gesamtpreis}}  & {{net_total}} \\
 \end{tabular}
 \end{center}
-{{/partial}}
+{{/inline}}
 
 {{#with document}}
 \lochermarke
@@ -84,17 +86,25 @@ hiermit möchten wir Ihnen für die gastronomische Betreuung Ihrer Veranstaltung
 \begin{center}
 \begin{tabular}{rp{7cm}rrr}
   \textbf{Nr.} & \textbf{Bezeichnung}&    \textbf{Menge}    &    \textbf{EP}    &    \textbf{Preis}    \\
-  \midrule {{#with bills}}
-  {{#if ../../is_invoice}}
-{{#with invoice}} {{#block items}}{{/block}} {{/with}}
+  \midrule
+{{~#with bills}}
+  {{~#if ../../is_invoice}}
+    {{~#with invoice}}
+      {{~#> items}}{{/items}}
+    {{/with~}}
   {{else}}
-{{#with offer}} {{#block items}}{{/block}} {{/with}}
-  {{/if}}
+    {{~#with offer}}
+      {{~#> items}}{{/items}}
+    {{/with~}}
+  {{/if~}}
 {{/with}}
 
 \bottomrule[1pt]
-{{#if ../is_invoice}} {{#with invoice}}{{#block foo}}{{/block}}{{/with}}
-{{else}} {{#with offer}}{{#block foo}}{{/block}}{{/with}} {{/if}}
+{{~#if ../is_invoice}}
+  {{~#with invoice}}{{~> foo}}{{/with}}
+{{else}}
+ {{~#with offer}}{{~> foo}}{{/with}}
+{{/if}}
 
 {{#if ../is_invoice}}
 Wir bitten um eine Begleichung des Betrags innerhalb von 14 Tagen nach Erhalt der Rechnung.

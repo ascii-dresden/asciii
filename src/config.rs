@@ -77,15 +77,22 @@ impl ConfigReader{
     /// This panics if nothing is found.
     /// You should have a default config for everything that you use.
     pub fn get_char(&self, key:&str) -> Option<char> {
-        self.get_str(key).and_then(|s|s.chars().nth(0))
+        self.get_str(key).chars().nth(0)
     }
 
     /// Returns the string in the position or an empty string
-    pub fn get_str(&self, key:&str) -> Option<&str> {
+    pub fn get_str_or(&self, key:&str) -> Option<&str> {
         yaml::get_str(&self.local, key)
             .or_else(||yaml::get_str(&self.custom, key))
             .or_else(||yaml::get_str(&self.defaults, key))
-            //.expect(&format!("Config file {} in field {} does not contain a string value", DEFAULT_LOCATION, key))
+    }
+
+    /// Returns the string in the position or an empty string
+    pub fn get_str(&self, key:&str) -> &str {
+        yaml::get_str(&self.local, key)
+            .or_else(||yaml::get_str(&self.custom, key))
+            .or_else(||yaml::get_str(&self.defaults, key))
+            .expect(&format!("Config file {} in field {} does not contain a string value", DEFAULT_LOCATION, key))
     }
 
     /// Returns the a vec of &strs if possible
@@ -103,11 +110,11 @@ impl ConfigReader{
     /// # Panics
     /// This panics if nothing is found.
     /// You should have a default config for everything that you use.
-    pub fn get_to_string(&self, key:&str) -> Option<String>{
+    pub fn get_to_string(&self, key:&str) -> String{
         yaml::get_to_string(&self.local, key)
             .or_else(||yaml::get_to_string(&self.custom, key))
             .or_else(||yaml::get_to_string(&self.defaults, key))
-            //.expect(&format!("Config file {} in field {} does not contain a value", DEFAULT_LOCATION, key))
+            .expect(&format!("Config file {} in field {} does not contain a value", DEFAULT_LOCATION, key))
     }
 
     /// Tries to get the config field as float
@@ -140,7 +147,7 @@ fn simple_reading(){
     let config = ConfigReader::new().unwrap();
 
     assert_eq!(config.get("user/name").unwrap().as_str().unwrap(),
-               config.get_str("user/name").unwrap());
+               config.get_str("user/name"));
 
     assert_eq!(config.get("list/colors").unwrap().as_bool().unwrap(),
                config.get_bool("list/colors"));
