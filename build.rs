@@ -47,6 +47,9 @@ fn generate_localization() {
 }
 
 fn main(){
-    gen_commit_file();
+    
+    if env::var("TRAVIS").is_err(){
+        gen_commit_file();
+    }
     generate_localization();
 }
