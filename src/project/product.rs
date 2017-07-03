@@ -55,44 +55,43 @@ pub struct Product<'a> {
 }
 
 
-impl<'a> Product<'a>{
-    pub fn from_old_format<'y>(name: &'y str, values: &'y yaml::Yaml) -> Result<Product<'y>> {
-        let default_tax = ::CONFIG.get_f64("defaults/tax")
+impl<'a> Product<'a> {
+
+    fn from_old_format<'y>( name: &'y str, values: &'y yaml::Yaml, local_tax: Option<Tax>) -> Result<Product<'y>> {
+        let default_tax = ::CONFIG.get_f64("defaults/tax").map(Tax::new)
             .expect("Faulty config: field defaults/tax does not contain a value");
-        Ok(Product {
-            name: name,
-            unit: yaml::get_str(values, "unit"),
-            price: yaml::get_f64(values, "price")
-                .map(to_currency)
-                .ok_or_else(||Error::from(ErrorKind::InvalidPrice(name.to_string())))
-                ?,
-            tax: yaml::get_f64(values, "tax").unwrap_or(default_tax).into(),
-        })
+
+        let product_tax = yaml::get_f64(values, "tax").map(Tax::new);
+        let tax = product_tax.or(local_tax).unwrap_or(default_tax);
+
+        let unit = yaml::get_str(values, "unit");
+        let price = yaml::get_f64(values, "price")
+            .map(to_currency)
+            .ok_or_else(||Error::from(ErrorKind::InvalidPrice(name.to_string())))?;
+
+        Ok(Product { name, unit, price, tax })
     }
 
-    //pub fn from_new_format(desc: &Yaml, defaultTax: ) -> Result<Product> {
-    #[deprecated]
-    pub fn from_new_format(desc: &yaml::Yaml) -> Result<Product> {
-        //TODO read default tax from document
-        let default_tax = ::CONFIG.get_f64("defaults/tax")
+    fn from_new_format(desc: &yaml::Yaml, local_tax: Option<Tax>) -> Result<Product> {
+
+        let default_tax = ::CONFIG.get_f64("defaults/tax").map(Tax::new)
             .expect("Faulty config: field defaults/tax does not contain a value");
 
+        let product_tax = yaml::get_f64(desc, "tax").map(Tax::new);
+        let tax = product_tax.or(local_tax).unwrap_or(default_tax);
         let name = yaml::get_str(desc, "name").unwrap_or("unnamed");
-
-        Ok(Product {
-            name: name,
-            unit: yaml::get_str(desc, "unit"),
-            price: yaml::get_f64(desc, "price")
+        let price = yaml::get_f64(desc, "price")
                 .ok_or_else(||Error::from(ErrorKind::InvalidPrice(name.to_string())))
-                .map(to_currency)?,
-            tax: yaml::get_f64(desc, "tax").unwrap_or(default_tax).into(),
-        })
+                .map(to_currency)?;
+        let unit = yaml::get_str(desc, "unit");
+
+        Ok(Product { name, unit, price, tax })
     }
 
-    pub fn from_desc_and_value<'y>(desc: &'y yaml::Yaml, values: &'y yaml::Yaml) -> Result<Product<'y>> {
+    pub fn from_desc_and_value<'y>(desc: &'y yaml::Yaml, values: &'y yaml::Yaml, local_tax: Option<Tax>) -> Result<Product<'y>> {
         match *desc {
-            yaml::Yaml::String(ref name) => Self::from_old_format(name, values),
-            yaml::Yaml::Hash(_) => Self::from_new_format(desc),
+            yaml::Yaml::String(ref name) => Self::from_old_format(name, values, local_tax),
+            yaml::Yaml::Hash(_) => Self::from_new_format(desc, local_tax),
             _ => Err(ErrorKind::UnknownFormat.into()),
         }
     }
