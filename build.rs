@@ -47,7 +47,6 @@ fn generate_localization() {
 }
 
 fn main(){
-    panic!("{:#?}", env::vars());    
     if cfg!(not(feature="ci")){
         gen_commit_file();
     }
