@@ -47,8 +47,8 @@ fn generate_localization() {
 }
 
 fn main(){
-    
-    if env::var("TRAVIS").is_err(){
+    panic!("{:#?}", env::vars());    
+    if cfg!(not(feature="ci")){
         gen_commit_file();
     }
     generate_localization();
