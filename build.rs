@@ -22,7 +22,7 @@ fn execute_git(command:&str, args:&[&str]) -> Output{
 }
 
 fn gen_commit_file(){
-    let git_log    = String::from_utf8(execute_git("log", &["--oneline", r##"--format=%h"##]).stdout).unwrap();
+    let git_log = String::from_utf8(execute_git("log", &["--oneline", r##"--format=%h"##]).stdout).unwrap();
     let count = git_log.lines().count().to_string();
     let last_commit= git_log.lines().nth(0).unwrap().to_string();
     let description = format!("build {} ({})", count.trim(), last_commit.trim());
