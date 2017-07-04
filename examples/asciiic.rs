@@ -7,6 +7,7 @@ use std::path::Path;
 use asciii::storage::Storable;
 use asciii::project::Project;
 
+#[allow(unused_variables)]
 fn main() {
     asciii::util::setup_log();
 

@@ -1,6 +1,6 @@
 extern crate asciii;
+extern crate pretty_assertions;
 #[macro_use] extern crate log;
-#[macro_use] extern crate pretty_assertions;
 
 use std::fs;
 use std::ffi::OsStr;
@@ -8,8 +8,8 @@ use std::path::{Path, PathBuf};
 
 use asciii::storage::Storable;
 use asciii::project::Project;
-//use asciii::project::spec::*;
-use asciii::project::export::*;
+// use asciii::project::spec::*;
+// use asciii::project::export::*;
 
 /// Basically `ls`, returns a list of paths.
 fn list_path_content(path:&Path) -> Vec<PathBuf> {

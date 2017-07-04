@@ -13,7 +13,7 @@ main() {
         return
     fi
 
-    # cross test --target $TARGET --features ci --no-default-features
+    cross test --target $TARGET --features ci --no-default-features
     # cross test --target $TARGET --release
     # cross run --target $TARGET
     # cross run --target $TARGET --release
