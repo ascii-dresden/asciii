@@ -7,16 +7,14 @@ main() {
 
     ci/most_recent_commit.sh
 
-    # cross build --target $TARGET
-    cross build --target $TARGET --release --features ci --no-default-features
+    cross build --target $TARGET --no-default-features --features ci
 
     if [ ! -z $DISABLE_TESTS ]; then
         return
     fi
 
-    cross test --target $TARGET --features ci --no-default-features
+    # cross test --target $TARGET --features ci --no-default-features
     # cross test --target $TARGET --release
-
     # cross run --target $TARGET
     # cross run --target $TARGET --release
 }
