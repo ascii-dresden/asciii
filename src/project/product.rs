@@ -77,6 +77,7 @@ impl<'a> Product<'a> {
         let default_tax = ::CONFIG.get_f64("defaults/tax").map(Tax::new)
             .expect("Faulty config: field defaults/tax does not contain a value");
 
+        //let product_tax = yaml::get_f64(desc, "tax").or()
         let product_tax = yaml::get_f64(desc, "tax").map(Tax::new);
         let tax = product_tax.or(local_tax).unwrap_or(default_tax);
         let name = yaml::get_str(desc, "name").unwrap_or("unnamed");

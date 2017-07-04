@@ -4,7 +4,7 @@ version = "3.1.0"
 authors = ["Hendrik Sollich <hendrik@hoodie.de>"]
 license = "MIT/Apache-2.0"
 
-build = true
+build = false
 
 [dependencies]
 log = "0.3"
@@ -43,7 +43,8 @@ serde_derive = {version = "1.0", optional = true}
 # feature: git_statuses
 git2 = {version = "0.6", default-features= false, optional = true}
 
-# planned optional features: termprint, term resize, xdg-open, web server :D
+[dev-dependencies]
+pretty_assertions = "*"
 
 [features]
 default = ["document_export", "git_statuses", "shell"]
@@ -52,6 +53,7 @@ serialization = ["serde", "serde_json", "serde_derive"]
 git_statuses = ["git2"]
 shell = ["rustyline"]
 version_string = []
+localize = []
 nightly = []
 
 [profile.release]
