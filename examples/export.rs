@@ -3,12 +3,14 @@ extern crate asciii;
 extern crate serde;
 extern crate serde_json;
 
-
+use asciii::project::Project;
+use asciii::storage::{self,StorageDir};
+use asciii::project::export::*;
 
 fn json_serde(project: &Project) -> String {
-    let client: Complete = project.export();
+    let exported: Complete = project.export();
     println!("Serde");
-    format!("{:#}", serde_json::to_value(&client).unwrap())
+    format!("{:#}", serde_json::to_value(&exported).unwrap())
 }
 
 fn main() {
