@@ -5,7 +5,7 @@
 //! Most of the functions in these modules take the `yaml` data directly as reference.
 //! Each module contains a `validate()` function which ought to be kept up to date.
 
-use bill::Currency;
+use bill::{Currency, Tax};
 use yaml_rust::Yaml;
 use yaml_rust::yaml::Hash as YamlHash;
 
@@ -501,7 +501,12 @@ pub trait Redeemable: IsProject {
         self.payed_date().is_some()
     }
 
-    fn bills(&self) -> Result<(Bill<Product>, Bill<Product>)> ;
+    fn bills(&self) -> Result<(Bill<Product>, Bill<Product>)>;
+
+    /// When what is the MWsT of the project.
+    fn tax(&self) -> Option<Tax> {
+        self.get_f64("tax").map(Tax::new)
+    }
 
     /// implementation detail
     /// TODO please move into concrete implementation
@@ -514,7 +519,7 @@ pub trait Redeemable: IsProject {
                                   )
                          );
 
-        let product = Product::from_desc_and_value(desc, values)?;
+        let product = Product::from_desc_and_value(desc, values, self.tax())?;
 
         let offered = get_f64(values, "amount")
                            .ok_or_else(|| Error::from(ErrorKind::MissingAmount(product.name.to_owned())))?;
