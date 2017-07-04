@@ -50,5 +50,7 @@ fn main(){
     if cfg!(not(feature="ci")){
         gen_commit_file();
     }
-    generate_localization();
+    if cfg!(feature="localize"){
+        generate_localization();
+    }
 }
