@@ -72,14 +72,15 @@ impl<'a> Product<'a> {
         Ok(Product { name, unit, price, tax })
     }
 
-    fn from_new_format(desc: &yaml::Yaml, local_tax: Option<Tax>) -> Result<Product> {
+    fn from_new_format<'y>(desc: &'y yaml::Yaml, values: &'y yaml::Yaml, local_tax: Option<Tax>) -> Result<Product<'y>> {
 
         let default_tax = ::CONFIG.get_f64("defaults/tax").map(Tax::new)
             .expect("Faulty config: field defaults/tax does not contain a value");
 
-        //let product_tax = yaml::get_f64(desc, "tax").or()
-        let product_tax = yaml::get_f64(desc, "tax").map(Tax::new);
-        let tax = product_tax.or(local_tax).unwrap_or(default_tax);
+        let desc_tax = yaml::get_f64(desc, "tax").map(Tax::new);
+        let values_tax = yaml::get_f64(values, "tax").map(Tax::new);
+        let tax = values_tax.or(desc_tax).or(local_tax).unwrap_or(default_tax);
+
         let name = yaml::get_str(desc, "name").unwrap_or("unnamed");
         let price = yaml::get_f64(desc, "price")
                 .ok_or_else(||Error::from(ErrorKind::InvalidPrice(name.to_string())))
@@ -92,7 +93,7 @@ impl<'a> Product<'a> {
     pub fn from_desc_and_value<'y>(desc: &'y yaml::Yaml, values: &'y yaml::Yaml, local_tax: Option<Tax>) -> Result<Product<'y>> {
         match *desc {
             yaml::Yaml::String(ref name) => Self::from_old_format(name, values, local_tax),
-            yaml::Yaml::Hash(_) => Self::from_new_format(desc, local_tax),
+            yaml::Yaml::Hash(_) => Self::from_new_format(desc, values, local_tax),
             _ => Err(ErrorKind::UnknownFormat.into()),
         }
     }
