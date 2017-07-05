@@ -47,9 +47,7 @@ fn generate_localization() {
 }
 
 fn main(){
-    if cfg!(not(feature="ci")){
-        gen_commit_file();
-    }
+    gen_commit_file();
     if cfg!(feature="localize"){
         generate_localization();
     }

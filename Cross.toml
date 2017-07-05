@@ -1,0 +1,14 @@
+[target.x86_64-unknown-linux-gnu]
+image = "quay.io/ascii/x86_64-unknown-linux-gnu:latest"
+
+[target.i686-unknown-linux-gnu]
+image = "quay.io/ascii/i686-unknown-linux-gnu:latest"
+
+[target.i686-unknown-linux-musl]
+image = "quay.io/ascii/i686-unknown-linux-musl:latest"
+
+[target.i686-pc-windows-gnu]
+image = "quay.io/ascii/i686-pc-windows-gnu:latest"
+
+[target.x86_64-pc-windows-gnu]
+image = "quay.io/ascii/x86_64-pc-windows-gnu:latest"
