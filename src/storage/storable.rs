@@ -67,6 +67,11 @@ pub trait Storable:Send+Sync{
     /// Path to project file
     fn file(&self) -> FilePathBuf;
 
+    /// Filename as fallback
+    fn file_name(&self) -> String {
+        self.file().file_name().expect("filename ended in ..").to_string_lossy().into()
+    }
+
     /// Path to project folder
     fn dir(&self)  -> FolderPathBuf{ self.file().parent().unwrap().to_owned() }
 

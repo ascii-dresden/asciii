@@ -60,7 +60,7 @@ impl ComputedField {
             ComputedField::OfferNumber       => project.offer().number(),
             ComputedField::InvoiceNumber     => project.invoice().number_str(),
             ComputedField::InvoiceNumberLong => project.invoice().number_long_str(),
-            ComputedField::Name              => Some(project.name().map(ToString::to_string).unwrap()), // TODO remove name() from `Storable`, storables only need a slug()
+            ComputedField::Name              => Some(project.name().map(ToString::to_string).unwrap_or(project.file_name())), // TODO remove name() from `Storable`, storables only need a slug()
             ComputedField::Final             => project.sum_sold().map(|c| util::currency_to_string(&c)).ok(),
             ComputedField::Age               => project.age().map(|a| lformat!("{} days", a)),
 

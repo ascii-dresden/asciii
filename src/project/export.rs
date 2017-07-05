@@ -165,7 +165,7 @@ impl ExportTarget<Invoice> for Project {
 
 #[derive(Debug, PartialEq)]
 #[cfg_attr(feature = "serialization", derive(Serialize))]
-struct ExportProduct {
+pub struct ExportProduct {
     name: String,
     price: String,
     unit: String,
@@ -193,8 +193,8 @@ fn bill_products(bill: &Bill<Product>) -> Vec<ExportProduct> {
 #[derive(Debug, PartialEq)]
 #[cfg_attr(feature = "serialization", derive(Serialize))]
 pub struct Bills {
-    offer: Vec<ExportProduct>,
-    invoice: Vec<ExportProduct>,
+    pub offer: Vec<ExportProduct>,
+    pub invoice: Vec<ExportProduct>,
 }
 
 
