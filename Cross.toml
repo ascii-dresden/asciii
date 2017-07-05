@@ -1,14 +1,19 @@
 [target.x86_64-unknown-linux-gnu]
 image = "quay.io/ascii/x86_64-unknown-linux-gnu:latest"
+passthrough = ["CI"]
 
 [target.i686-unknown-linux-gnu]
 image = "quay.io/ascii/i686-unknown-linux-gnu:latest"
+passthrough = ["CI"]
 
 [target.i686-unknown-linux-musl]
 image = "quay.io/ascii/i686-unknown-linux-musl:latest"
+passthrough = ["CI"]
 
 [target.i686-pc-windows-gnu]
 image = "quay.io/ascii/i686-pc-windows-gnu:latest"
+passthrough = ["CI"]
 
 [target.x86_64-pc-windows-gnu]
 image = "quay.io/ascii/x86_64-pc-windows-gnu:latest"
+passthrough = ["CI"]
