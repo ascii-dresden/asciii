@@ -20,7 +20,7 @@ impl Storable for TestProject{
     // creates in tempfile
     fn from_template(project_name:&str,template:&Path, _fill:&HashMap<&str, String>) -> StorageResult<Self> where Self: Sized{
         // generates a temp file
-        let temp_dir  = TempDir::new_in("./target/",&project_name).unwrap();
+        let temp_dir  = TempDir::new_in("./target/debug/build/",&project_name).unwrap();
         let temp_file = temp_dir.path().join(project_name);
 
         // just copy over template
@@ -64,7 +64,7 @@ const TEST_PROJECTS:[&'static str;4] = [
 
 
 fn setup() -> (TempDir, PathBuf, Storage<TestProject>) {
-    let dir = TempDir::new_in(Path::new("./target/"),"storage_test").unwrap();
+    let dir = TempDir::new_in(Path::new("./target/debug/build/"),"storage_test").unwrap();
     let storage_path = dir.path().join("storage");
     let storage = Storage::new(&storage_path, "working", "archive", "templates").unwrap();
     (dir, storage_path, storage)
