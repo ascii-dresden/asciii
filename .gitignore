@@ -29,3 +29,4 @@ _asciii
 _asciii.ps1
 .DS_Store
 src/localize_macros_static.rs
+*.rustfmt
