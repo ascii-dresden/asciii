@@ -399,7 +399,7 @@ pub fn with_cli<F> (app_handler:F) where F: Fn(App) {
                              .short("C"))
 
                         .arg(Arg::with_name("yaml")
-                             .help(lformat!("Show project as yaml").as_ref())
+                             .help(lformat!("Show project as raw yaml").as_ref())
                              .long("yaml"))
 
                         .arg(Arg::with_name("detail")

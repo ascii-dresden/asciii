@@ -277,7 +277,7 @@ msgid "Show project as iCal"
 msgstr ""
 
 #: /Users/hendrik/code/rust/asciii/src/cli/app.rs:402
-msgid "Show project as yaml"
+msgid "Show project as raw yaml"
 msgstr ""
 
 #: /Users/hendrik/code/rust/asciii/src/cli/app.rs:406

@@ -31,7 +31,7 @@ pub fn show(m: &ArgMatches) -> Result<()>{
     } else if let Some(detail) = m.value_of("detail") { show_detail(selection, detail)
     } else if m.is_present("empty fields"){ show_empty_fields(selection)
     } else if m.is_present("errors"){ show_errors(selection)
-    } else if m.is_present("dump"){ dump_yaml(selection)
+    } else if m.is_present("yaml"){ show_yaml(selection)
     } else if m.is_present("json"){ show_json(selection)
     } else if m.is_present("ical"){ show_ical(selection)
     } else if m.is_present("csv"){  show_csv(selection)
@@ -80,6 +80,18 @@ fn show_json(selection: StorageSelection) -> Result<()> {
     Ok(())
 }
 
+#[cfg(not(feature="document_export"))]
+fn show_json(_: StorageDir, _: &[&str]) -> Result<()> {
+    error!("feature temporarily disabled")?
+}
+
+fn show_yaml(selection: StorageSelection) -> Result<()> {
+    for p in setup::<Project>()?.open_projects(selection)? {
+        println!("{}", p.dump_yaml())
+    }
+    Ok(())
+}
+
 fn show_ical(selection: StorageSelection) -> Result<()> {
     for p in setup::<Project>()?.open_projects(selection)? {
         p.to_ical().print()?
@@ -101,11 +113,6 @@ fn show_csv(selection: StorageSelection) -> Result<()> {
     Ok(())
 }
 
-#[cfg(not(feature="document_export"))]
-fn show_json(_: StorageDir, _: &[&str]) -> Result<()> {
-    error!("feature temporarily disabled")?
-}
-
 pub fn show_path(matches: &ArgMatches) -> Result<()> {
     Ok(path(matches, |path| {
         println!("{}", path.display());
@@ -117,13 +124,6 @@ pub fn show_path(matches: &ArgMatches) -> Result<()> {
 fn show_template(name: &str) -> Result<()> {
     let templater = Templater::from_file(&setup::<Project>()?.get_template_file(name)?)?;
     println!("{:#?}", templater.list_keywords());
-    Ok(())
-}
-
-fn dump_yaml(selection: StorageSelection) -> Result<()> {
-    for p in setup::<Project>()?.open_projects(selection)? {
-        println!("{}", p.dump_yaml())
-    }
     Ok(())
 }
 
