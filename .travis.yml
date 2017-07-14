@@ -43,8 +43,10 @@ script:
         -w /buildslave
         -v `pwd`:/buildslave
         -v `pwd`/target:/buildslave/target
-        -e TARGET=$TARGET
-        -e SKIP_TESTS=$SKIP_TESTS
+        -v $HOME:$HOME
+        -e HOME
+        -e TARGET
+        -e SKIP_TESTS
         -it $DOCKER
         ci/run-docker.sh;
     else

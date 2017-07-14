@@ -64,8 +64,8 @@ const TEST_PROJECTS:[&'static str;4] = [
 
 
 fn setup() -> (TempDir, PathBuf, Storage<TestProject>) {
-    let dir = TempDir::new_in(Path::new("./target/debug/build/"),"storage_test").unwrap();
-    let storage_path = dir.path().join("storage");
+    let dir = TempDir::new_in(Path::new("./target/"),"storage_test").unwrap();
+    let storage_path = dir.path().join("storage_test");
     let storage = Storage::new(&storage_path, "working", "archive", "templates").unwrap();
     (dir, storage_path, storage)
 }
