@@ -1,6 +1,7 @@
 sudo: required
 dist: trusty
 services: docker
+language: rust
 
 matrix:
   include:
@@ -34,14 +35,13 @@ install:
     sh -s -- --prefix=$HOME/rust --with-target=$TARGET
 
 script:
-  - mkdir target
   - if [ ! -z "$DOCKER" ]; then
       docker run
         --entrypoint bash
         -u `id -u`:`id -g`
         -v $HOME/rust:/travis-rust:ro
         -w /buildslave
-        -v `pwd`:/buildslave:ro
+        -v `pwd`:/buildslave
         -v `pwd`/target:/buildslave/target
         -e TARGET=$TARGET
         -e SKIP_TESTS=$SKIP_TESTS
