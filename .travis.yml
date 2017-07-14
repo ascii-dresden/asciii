@@ -43,8 +43,8 @@ script:
         -w /buildslave
         -v `pwd`:/buildslave
         -v `pwd`/target:/buildslave/target
-        -v $HOME:$HOME
-        -e HOME
+        -v /home/travis:$HOME
+        -e HOME=/home/travis
         -e TARGET
         -e SKIP_TESTS
         -it $DOCKER
