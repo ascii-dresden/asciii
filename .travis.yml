@@ -40,6 +40,7 @@ script:
         --entrypoint bash
         -u `id -u`:`id -g`
         -v $HOME/rust:/travis-rust:ro
+        -w /buildslave
         -v `pwd`:/buildslave:ro
         -v `pwd`/target:/buildslave/target
         -e TARGET=$TARGET
