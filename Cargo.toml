@@ -4,7 +4,7 @@ version = "3.1.0"
 authors = ["Hendrik Sollich <hendrik@hoodie.de>"]
 license = "MIT/Apache-2.0"
 
-build = false
+build = true
 
 [dependencies]
 log = "0.3"
@@ -47,7 +47,7 @@ git2 = {version = "0.6", default-features= false, optional = true}
 pretty_assertions = "*"
 
 [features]
-default = ["document_export", "git_statuses", "shell"]
+default = ["document_export", "git_statuses", "shell", "version_string", "localize"]
 document_export = ["handlebars", "serialization"]
 serialization = ["serde", "serde_json", "serde_derive"]
 git_statuses = ["git2"]

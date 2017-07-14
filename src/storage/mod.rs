@@ -32,7 +32,7 @@ pub type Year =  i32;
 /// TODO move to `error` module
 pub type StorageResult<T> = Result<T, StorageError>;
 
-#[cfg(test)] mod test;
+#[cfg(test)] mod tests;
 #[cfg(test)] mod realworld;
 
 mod project_list;
