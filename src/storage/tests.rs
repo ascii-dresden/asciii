@@ -205,7 +205,7 @@ fn archive_project_by_name(){
 #[test]
 fn archive_project(){
     let (_dir , storage_path, storage) = setup();
-    assert!(storage.create_dirs().is_ok());
+    assert!(storage.create_dirs().is_ok(), "could not even create storage in {:?}", storage_path);
     assert_existens(&storage_path);
     copy_template(storage_path.join("templates"));
 
