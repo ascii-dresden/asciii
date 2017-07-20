@@ -64,7 +64,7 @@ const TEST_PROJECTS:[&'static str;4] = [
 
 
 fn setup() -> (TempDir, PathBuf, Storage<TestProject>) {
-    let dir = TempDir::new_in(Path::new("./target/"),"storage_test").unwrap();
+    let dir = TempDir::new_in(Path::new("."),"storage_test").unwrap();
     let storage_path = dir.path().join("storage_test");
     let storage = Storage::new(&storage_path, "working", "archive", "templates").unwrap();
     (dir, storage_path, storage)
@@ -186,6 +186,7 @@ fn archive_project_by_name(){
     copy_template(storage_path.join("templates"));
 
     let templates = storage.list_template_names().unwrap();
+    trace!("templates: {:#?}", templates);
     for test_project in TEST_PROJECTS.iter() {
         // tested above
         let origin = storage.create_project( &test_project, &templates[0], &hashmap!{}).unwrap();
