@@ -20,7 +20,7 @@ impl Storable for TestProject{
     // creates in tempfile
     fn from_template(project_name:&str,template:&Path, _fill:&HashMap<&str, String>) -> StorageResult<Self> where Self: Sized{
         // generates a temp file
-        let temp_dir  = TempDir::new_in(".",&project_name).unwrap();
+        let temp_dir  = TempDir::new_in("./target/debug/build/",&project_name).unwrap();
         let temp_file = temp_dir.path().join(project_name);
 
         // just copy over template
@@ -65,7 +65,7 @@ const TEST_PROJECTS:[&'static str;4] = [
 
 fn setup() -> (TempDir, PathBuf, Storage<TestProject>) {
     let dir = TempDir::new_in(Path::new("."),"storage_test").unwrap();
-    let storage_path = dir.path().join("storage");
+    let storage_path = dir.path().join("storage_test");
     let storage = Storage::new(&storage_path, "working", "archive", "templates").unwrap();
     (dir, storage_path, storage)
 }
@@ -186,6 +186,7 @@ fn archive_project_by_name(){
     copy_template(storage_path.join("templates"));
 
     let templates = storage.list_template_names().unwrap();
+    trace!("templates: {:#?}", templates);
     for test_project in TEST_PROJECTS.iter() {
         // tested above
         let origin = storage.create_project( &test_project, &templates[0], &hashmap!{}).unwrap();
@@ -205,7 +206,7 @@ fn archive_project_by_name(){
 #[test]
 fn archive_project(){
     let (_dir , storage_path, storage) = setup();
-    assert!(storage.create_dirs().is_ok());
+    assert!(storage.create_dirs().is_ok(), "could not even create storage in {:?}", storage_path);
     assert_existens(&storage_path);
     copy_template(storage_path.join("templates"));
 
