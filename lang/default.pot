@@ -480,7 +480,7 @@ msgstr ""
 msgid "Date Format must be DD.MM.YYYY"
 msgstr ""
 
-#: /Users/hendrik/code/rust/asciii/src/cli/subcommands/mod.rs:330
+#: /Users/hendrik/code/rust/asciii/src/cli/subcommands/mod.rs:331
 msgid "You have to provide either a search term or path"
 msgstr ""
 
@@ -500,39 +500,39 @@ msgstr ""
 msgid "{} weeks"
 msgstr ""
 
-#: /Users/hendrik/code/rust/asciii/src/project/mod.rs:425
+#: /Users/hendrik/code/rust/asciii/src/project/mod.rs:431
 msgid "Create an Invoice"
 msgstr ""
 
-#: /Users/hendrik/code/rust/asciii/src/project/mod.rs:433
+#: /Users/hendrik/code/rust/asciii/src/project/mod.rs:439
 msgid "{}: Hungry employees!"
 msgstr ""
 
-#: /Users/hendrik/code/rust/asciii/src/project/mod.rs:434
+#: /Users/hendrik/code/rust/asciii/src/project/mod.rs:440
 msgid "Pay {}\nYou have had the money for {} days!"
 msgstr ""
 
-#: /Users/hendrik/code/rust/asciii/src/project/mod.rs:444
+#: /Users/hendrik/code/rust/asciii/src/project/mod.rs:450
 msgid "Inquire about: \"{event}\"!"
 msgstr ""
 
-#: /Users/hendrik/code/rust/asciii/src/project/mod.rs:445
+#: /Users/hendrik/code/rust/asciii/src/project/mod.rs:451
 msgid "{inum }{event:?} on {invoice_date} ({days} days ago) was already invoiced but is still not marked as payed.\nPlease check for incoming payments! You can ask {client} ({mail})."
 msgstr ""
 
-#: /Users/hendrik/code/rust/asciii/src/project/mod.rs:455
+#: /Users/hendrik/code/rust/asciii/src/project/mod.rs:461
 msgid "{rnum}: payment is {weeks} weeks late: \"{event}\""
 msgstr ""
 
-#: /Users/hendrik/code/rust/asciii/src/project/mod.rs:467
+#: /Users/hendrik/code/rust/asciii/src/project/mod.rs:473
 msgid "Archive {}"
 msgstr ""
 
-#: /Users/hendrik/code/rust/asciii/src/project/mod.rs:468
+#: /Users/hendrik/code/rust/asciii/src/project/mod.rs:474
 msgid "{:?} has been finished for {} days, get rid of it!"
 msgstr ""
 
-#: /Users/hendrik/code/rust/asciii/src/project/mod.rs:488
+#: /Users/hendrik/code/rust/asciii/src/project/mod.rs:494
 msgid "Responsible: {}"
 msgstr ""
 
