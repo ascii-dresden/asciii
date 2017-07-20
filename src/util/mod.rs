@@ -61,7 +61,7 @@ pub fn really(msg:&str) -> bool {
 
 /// Shells out to print directory structure
 pub fn ls(path:&str){
-    println!("tree {}", path);
+    println!("find {}", path); // TODO implement in here with walkdir
     let output = Command::new("find")
         .arg(&path)
         .output()
