@@ -72,17 +72,11 @@ fn show_empty_fields(selection: StorageSelection) -> Result<()> {
 }
 
 
-#[cfg(feature="document_export")]
 fn show_json(selection: StorageSelection) -> Result<()> {
     for p in setup::<Project>()?.open_projects(selection)? {
         println!("{}", p.to_json()?)
     }
     Ok(())
-}
-
-#[cfg(not(feature="document_export"))]
-fn show_json(_: StorageDir, _: &[&str]) -> Result<()> {
-    error!("feature temporarily disabled")?
 }
 
 fn show_yaml(selection: StorageSelection) -> Result<()> {

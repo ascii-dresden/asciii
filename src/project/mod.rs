@@ -13,7 +13,7 @@ use std::collections::HashMap;
 use chrono::prelude::*;
 use chrono::Duration;
 use yaml_rust::Yaml;
-use serde_json;
+#[cfg(feature="serialization")] use serde_json;
 use slug;
 use tempdir::TempDir;
 
@@ -21,7 +21,7 @@ use bill::{Bill, Currency, Tax};
 use icalendar::*;
 //use semver::Version;
 
-use self::export::*;
+#[cfg(feature="serialization")] use self::export::*;
 use super::BillType;
 use util::{yaml, get_valid_path};
 use storage::{Storable, StorageResult, list_path_content};
@@ -286,9 +286,15 @@ impl Project {
         self.modified_date().map(|date| (Utc::today().signed_duration_since(date)).num_days() )
     }
 
-    pub fn to_json(&self) -> Result<String>{
+    #[cfg(feature="serialization")]
+    pub fn to_json(&self) -> Result<String> {
         let complete: Complete = self.export();
         Ok(serde_json::to_string(&complete)?)
+    }
+
+    #[cfg(not(feature="serialization"))]
+    pub fn to_json(&self) -> Result<String> {
+        bail!(error::ErrorKind::FeatureDeactivated)
     }
 
     pub fn to_csv(&self, bill_type:&BillType) -> Result<String>{

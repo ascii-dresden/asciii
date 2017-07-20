@@ -1,7 +1,7 @@
 #![allow(trivial_casts)]
 
 use std::{io, fmt};
-use serde_json;
+#[cfg(feature="serialization")] use serde_json;
 use util::yaml;
 
 use super::product;
@@ -19,10 +19,13 @@ error_chain!{
         Io(io::Error);
         Fmt(fmt::Error);
         Yaml(yaml::YamlError);
-        Serde(serde_json::Error);
+        Serde(serde_json::Error) #[cfg(feature="serialization")];
     }
 
     errors {
+        FeatureDeactivated{
+            description("This feature is not enabled in this build")
+        }
         CantDetermineTargetFile{
             description("Cannot determine target file name")
         }

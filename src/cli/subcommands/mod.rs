@@ -283,6 +283,7 @@ pub fn spec(_: &ArgMatches) -> Result<()> {
 }
 
 
+#[cfg(feature="document_export")]
 use self::document_export::ExportConfig;
 
 #[cfg(feature="document_export")]

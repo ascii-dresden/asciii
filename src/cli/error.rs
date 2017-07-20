@@ -7,6 +7,7 @@ use std::time;
 use asciii::actions;
 use asciii::project;
 use asciii::storage;
+#[cfg(feature="document_export")]
 use asciii::document_export;
 
 error_chain!{
@@ -21,11 +22,14 @@ error_chain!{
         Fmt(fmt::Error);
         Time(time::SystemTimeError);
         Actions(actions::error::Error);
-        Export(document_export::error::Error);
+        Export(document_export::error::Error) #[cfg(feature="document_export")];
         Project(project::error::Error);
         Storage(storage::error::StorageError);
     }
 
     errors {
+        FeatureDeactivated{
+            description("This feature is not enabled in this build")
+        }
     }
 }
