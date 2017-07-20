@@ -40,6 +40,8 @@ script:
         --entrypoint bash
         -u `id -u`:`id -g`
         -v $HOME/rust:/travis-rust:ro
+        -e RUST_BACKTRACE=1
+        -e ASCIII_LOG=trace
         -w /buildslave
         -v `pwd`:/buildslave
         -v `pwd`/target:/buildslave/target

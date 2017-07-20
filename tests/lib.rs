@@ -6,7 +6,6 @@ use std::fs;
 use std::ffi::OsStr;
 use std::path::{Path, PathBuf};
 
-use asciii::storage::Storable;
 use asciii::project::Project;
 //use asciii::project::spec::*;
 use asciii::project::export::*;
@@ -28,6 +27,7 @@ fn list_path_content(path:&Path) -> Vec<PathBuf> {
 #[cfg(test)]
 mod acceptance {
     use super::*;
+    use asciii::storage::Storable;
 
     #[test]
     fn open_old_projects() {
