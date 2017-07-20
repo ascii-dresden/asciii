@@ -67,5 +67,5 @@ before_cache:
 #     - master
 
 notifications:
-  email:
+  email: hendrik@hoodie.de
     on_success: never
