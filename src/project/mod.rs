@@ -25,7 +25,7 @@ use storage::ErrorKind as StorageErrorKind;
 use storage::repo::GitStatus;
 use templater::{Templater, IsKeyword};
 
-#[export_macro]
+//#[export_macro]
 macro_rules! try_some {
     ($expr:expr) => (match $expr {
         Some(val) => val,

@@ -1,6 +1,6 @@
 [package]
 name = "asciii"
-version = "3.0.2"
+version = "3.0.3"
 authors = ["Hendrik Sollich <hendrik@hoodie.de>"]
 license = "MIT/Apache-2.0"
 
@@ -8,10 +8,9 @@ build = "build.rs"
 
 
 [dependencies]
-
 log = "0.3"
 env_logger = { version = "0.3"} # default feature requires regex
-yaml-rust = {version = "0.3", features = ["preserve_order"]}
+yaml-rust = {git = "https://github.com/chyh1990/yaml-rust/"}
 chrono = "0.2"
 regex = "0.1"
 lazy_static = "0.2"
@@ -20,10 +19,10 @@ clap = "2"
 enum_derive = "0.1"
 custom_derive = "0.1"
 open = "1.1"
-ordered-float = "0.3"
+ordered-float = "0.4"
 error-chain = "0.5"
 
-bill = {git="https://github.com/hoodie/bill-rs"}
+bill = "0.1"
 
 slug = "0.1"
 tempdir = "0.3"
