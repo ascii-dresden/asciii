@@ -21,7 +21,7 @@
 
 
 use std::fs;
-use std::env::{home_dir, current_dir};
+use std::env::{self, home_dir, current_dir};
 use std::path::{Path, PathBuf};
 use std::marker::PhantomData;
 
@@ -148,8 +148,8 @@ fn replace_home_tilde(p:&Path) -> PathBuf{
 /// This is by far the most important function of all utility functions.
 pub fn get_storage_path() -> PathBuf
 {
-    let storage_path = PathBuf::from(::CONFIG.get_str("path"))
-            .join(::CONFIG.get_str("dirs/storage"));
+    let storage_path = PathBuf::from(::CONFIG.var_get_str("path"))
+            .join(::CONFIG.var_get_str("dirs/storage"));
 
     // TODO make replace tilde a Trait function
     let storage_path = replace_home_tilde(&storage_path);
@@ -179,7 +179,12 @@ pub fn setup_with_git<L:Storable>() -> StorageResult<Storage<L>> {
     let working   = ::CONFIG.get_str_or("dirs/working").ok_or("Faulty config: dirs/working does not contain a value")?;
     let archive   = ::CONFIG.get_str_or("dirs/archive").ok_or("Faulty config: dirs/archive does not contain a value")?;
     let templates = ::CONFIG.get_str_or("dirs/templates").ok_or("Faulty config: dirs/templates does not contain a value")?;
-    let storage   = Storage::new_with_git(get_storage_path(), working, archive, templates)?;
+    let storage   = if env::var("ASCIII_NO_GIT").is_ok() {
+        Storage::new(get_storage_path(), working, archive, templates)?
+    } else {
+        Storage::new_with_git(get_storage_path(), working, archive, templates)?
+    };
+
     storage.health_check()?;
     Ok(storage)
 }

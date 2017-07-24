@@ -13,7 +13,7 @@
 
 
 use std::path::{Path, PathBuf};
-use std::env::{home_dir, current_dir};
+use std::env::{self, home_dir, current_dir};
 use util::yaml::{self, Yaml, YamlError};
 
 /// Name of the configfile
@@ -29,7 +29,7 @@ pub struct ConfigReader{
     local: Yaml
 }
 
-impl ConfigReader{
+impl ConfigReader {
 
     /// The Path of the config file.
     pub fn path_home() -> PathBuf {
@@ -62,6 +62,24 @@ impl ConfigReader{
         config
     }
 
+    fn envify_path(path: &str) -> String {
+        path.split(|c| c == '/' || c == '.')
+            .map(|word| word.to_uppercase())
+            .fold(String::from("ASCIII"), |mut acc, w| {
+                acc.push_str("_");
+                acc.push_str(&w);
+                acc
+            })
+    }
+
+
+    /// Looks up path in ENV
+    ///
+    /// Paths are translatet from `top/middle/child/node` to `ASCIII_TOP_MIDDLE_CHILD_NODE`
+    pub fn var_get(path:&str) -> Option<String> {
+        env::var(Self::envify_path(path)).ok()
+    }
+
     /// Returns whatever it finds in that position
     ///
     /// Supports simple path syntax: `top/middle/child/node`
@@ -85,6 +103,11 @@ impl ConfigReader{
         yaml::get_str(&self.local, key)
             .or_else(||yaml::get_str(&self.custom, key))
             .or_else(||yaml::get_str(&self.defaults, key))
+    }
+
+    /// Returns the string in the position or an empty string
+    pub fn var_get_str(&self, key:&str) -> String {
+        Self::var_get(key).unwrap_or(self.get_str(&key).into())
     }
 
     /// Returns the string in the position or an empty string
