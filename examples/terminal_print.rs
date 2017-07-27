@@ -1,4 +1,4 @@
-#[macro_use] extern crate prettytable;
+m[macro_use] extern crate prettytable;
 extern crate term;
 use prettytable::Table;
 use prettytable::row::Row;
