@@ -9,6 +9,7 @@ use std::fmt;
 use std::path::{Path, PathBuf};
 use std::error::Error as ErrorTrait;
 use std::collections::HashMap;
+use std::marker::PhantomData;
 
 use chrono::prelude::*;
 use chrono::Duration;
@@ -61,15 +62,16 @@ pub use self::computed_field::ComputedField;
 ///
 /// A project is storable, contains products, and you can create an offer or invoice from it.
 /// The main implementation is done in [`spec`](spec/index.html).
-pub struct Project {
+pub struct Project<'a, T> {
     file_path: PathBuf,
     _temp_dir: Option<TempDir>,
     git_status: Option<GitStatus>,
     file_content: String,
-    yaml: Yaml
+    yaml: Yaml,
+    phantom: PhantomData<&'a T>,
 }
 
-impl Project {
+impl<'a, T> Project<'a, T> {
     /// Access to inner data
     pub fn yaml(&self) -> &Yaml{ &self.yaml }
 
@@ -89,6 +91,7 @@ impl Project {
                 Yaml::Null
             }),
             file_content: file_content,
+            phantom: PhantomData
         })
     }
 
@@ -184,7 +187,7 @@ impl Project {
             Ok(())
         } else {
             self::error::combine_specresults(
-                vec![ Redeemable::validate(self),
+                vec![ self.redeemed(),
                       self.hours().validate() ]
                 )
         }
@@ -468,7 +471,7 @@ pub trait Exportable {
     }
 }
 
-impl Exportable for Project {
+impl<'a, T> Exportable for Project<'a, T> {
     fn export_dir(&self)  -> PathBuf { Storable::dir(self) }
 
     fn offer_file_name(&self, extension: &str) -> Option<String>{
@@ -487,12 +490,12 @@ impl Exportable for Project {
 
 }
 
-impl Storable for Project {
+impl<'a, T> Storable for Project<'a, T> {
     fn file_extension() -> String {
         ::CONFIG.get_to_string("extensions.project_file")
     }
 
-    fn from_template(project_name:&str,template:&Path, fill: &HashMap<&str,String>) -> StorageResult<Project> {
+    fn from_template(project_name:&str,template:&Path, fill: &HashMap<&str,String>) -> StorageResult<Project<'a, T>> {
         let template_name = template.file_stem().unwrap().to_str().unwrap();
 
         let event_date = (Utc::today() + Duration::days(14)).format("%d.%m.%Y").to_string();
@@ -640,23 +643,23 @@ impl Storable for Project {
 }
 
 /// This is returned by `[Product::client()](struct.Project.html#method.client)`.
-pub struct Client<'a> {
-    inner: &'a Project
+pub struct Client<'a, T: 'a> {
+    inner: &'a Project<'a, T>
 }
 
 /// This is returned by [`Product::offer()`](struct.Project.html#method.offer).
-pub struct Offer<'a> {
-    inner: &'a Project
+pub struct Offer<'a, T: 'a> {
+    inner: &'a Project<'a, T>
 }
 
 /// This is returned by [`Product::invoice()`](struct.Project.html#method.invoice).
-pub struct Invoice<'a> {
-    inner: &'a Project
+pub struct Invoice<'a, T: 'a> {
+    inner: &'a Project<'a, T>
 }
 
 /// This is returned by [`Product::hours()`](struct.Project.html#method.hours).
-pub struct Hours<'a> {
-    inner: &'a Project
+pub struct Hours<'a, T: 'a> {
+    inner: &'a Project<'a, T>
 }
 
 /// Output of `Project::debug()`.
@@ -670,7 +673,7 @@ pub struct Debug {
     yaml: Yaml
 }
 
-impl<'a> From<&'a Project> for Debug {
+impl<'a, T> From<&'a Project<'a, T>> for Debug {
     fn from(project: &'a Project) -> Debug {
         Debug {
             file_path:  project.file_path.clone(),
@@ -680,7 +683,7 @@ impl<'a> From<&'a Project> for Debug {
     }
 }
 
-impl fmt::Debug for Project {
+impl<'a, T> fmt::Debug for Project<'a, T> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         //write!(f, "{:?}", self.debug())
         write!(f, "{:?}{:?}", self.name(), self.file())

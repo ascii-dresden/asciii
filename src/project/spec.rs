@@ -43,6 +43,7 @@ pub trait Validatable {
 ///
 /// Provide the basics every Project should have.
 pub trait IsProject {
+    type C;
 
     /// Project Name
     fn name(&self) -> Option<&str>;
@@ -61,6 +62,8 @@ pub trait IsProject {
 
     /// Long description of the project
     fn long_desc(&self) -> String;
+
+    fn client_trait(&self) -> Self::C;
 }
 
 pub trait IsProjectExt {
@@ -160,6 +163,7 @@ pub trait HasEmployees {
 
 /// Stage 3: when an `IsProject` is redeem and can be archived
 pub trait Redeemable: IsProject {
+    type C;
 
     /// When was the project payed
     fn payed_date(&self) -> Option<Date<Utc>>;
@@ -178,6 +182,7 @@ pub trait Redeemable: IsProject {
         Ok(invoice.net_total())
     }
 
+    fn redeemed(&self) -> SpecResult;
 }
 
 #[derive(Debug)]

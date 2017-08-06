@@ -23,7 +23,7 @@ pub struct Client {
     addressing: Option<String>,
 }
 
-impl ExportTarget<Client> for Project {
+impl<'a, T> ExportTarget<Client> for Project<'a, T> {
     fn export(&self) -> Client {
         Client {
             full_name: self.client().full_name(),
@@ -50,7 +50,7 @@ fn dmy(date: Option<Date<Utc>>) -> Option<String> {
     date.map(|d| d.format("%d.%m.%Y").to_string())
 }
 
-impl ExportTarget<Event> for Project {
+impl<'a, T> ExportTarget<Event> for Project<'a, T> {
     fn export(&self) -> Event {
         Event {
             name: IsProject::name(self).map(ToOwned::to_owned),
@@ -68,7 +68,7 @@ pub struct Hours {
     salary: Option<String>,
 }
 
-impl ExportTarget<Hours> for Project {
+impl<'a, T> ExportTarget<Hours> for Project<'a, T> {
     fn export(&self) -> Hours {
         Hours {
             time: self.hours().total(),
@@ -120,7 +120,7 @@ pub struct Offer {
 }
 
 
-impl ExportTarget<Offer> for Project {
+impl<'a, T> ExportTarget<Offer> for Project<'a, T> {
     fn export(&self) -> Offer {
         let (offer, _) = self.bills().unwrap();
         Offer {
@@ -147,7 +147,7 @@ pub struct Invoice {
 }
 
 
-impl ExportTarget<Invoice> for Project {
+impl<'a, T> ExportTarget<Invoice> for Project<'a, T> {
     fn export(&self) -> Invoice {
         let (_, invoice) = self.bills().unwrap();
 
@@ -198,7 +198,7 @@ pub struct Bills {
 }
 
 
-impl ExportTarget<Bills> for Project {
+impl<'a, T> ExportTarget<Bills> for Project<'a, T> {
     fn export(&self) -> Bills {
         let (offer, invoice) = self.bills().unwrap();
 
@@ -221,7 +221,7 @@ pub struct Complete {
 }
 
 
-impl ExportTarget<Complete> for Project {
+impl<'a, T> ExportTarget<Complete> for Project<'a, T> {
     fn export(&self) -> Complete {
         Complete {
             client: self.export(),

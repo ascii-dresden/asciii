@@ -48,7 +48,7 @@ impl<'a> Default for ListConfig<'a>{
 }
 
 // TODO move `payed_to_cell` into computed_field.rs
-fn payed_to_cell(project:&Project) -> Cell {
+fn payed_to_cell<T: Redeemable>(project: &T) -> Cell {
     let sym = ::CONFIG.get_str("currency");
 
     match (project.is_payed(), project.hours().employees_payed()) {
@@ -70,7 +70,7 @@ fn result_to_cell(res: &SpecResult, bold:bool) -> Cell{
 }
 
 /// create a Style string from the properties of a project
-fn project_to_style(project:&Project) -> &str{
+fn project_to_style(project:&Project) -> &'static str {
     // can be send as invoice
     if project.is_ready_for_invoice().is_ok(){
         return "d"

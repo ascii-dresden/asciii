@@ -156,11 +156,13 @@ pub trait ProvidesData {
     }
 }
 
-impl ProvidesData for Project {
+impl<'a, T> ProvidesData for Project<'a, T>  {
     fn data(&self) -> &Yaml{ self.yaml() }
 }
 
-impl IsProject for Project {
+impl<'a, T: 'a> IsProject for Project<'a, T> {
+    type C = Client<'a>;
+
     fn name(&self) -> Option<&str> {
         self.get_str("event.name")
             // old spec
@@ -210,7 +212,7 @@ impl IsProject for Project {
     }
 }
 
-impl HasEvents for Project {
+impl<'a, T> HasEvents for Project<'a, T> {
     fn to_ical(&self) -> Calendar {
         let mut calendar = Calendar::new();
         if let Some(events) = self.events() {
@@ -314,7 +316,9 @@ impl HasEvents for Project {
     }
 }
 
-impl Redeemable for Project {
+impl<'a, T> Redeemable for Project<'a, T> {
+    type C = Client<'a>;
+
     fn payed_date(&self) -> Option<Date<Utc>> {
         self.get_dmy("invoice.payed_date")
         // old spec
@@ -362,25 +366,7 @@ impl Redeemable for Project {
         Ok((offer,invoice))
     }
 
-}
-
-impl Validatable for Project {
-    fn validate(&self) -> SpecResult {
-        let mut errors = ErrorList::new();
-        if self.name().is_none(){errors.push("name")}
-        if self.event_date().is_none(){errors.push("date")}
-        if self.responsible().is_none(){errors.push("manager")}
-        if self.format().is_none(){errors.push("format")}
-        //if hours::salary().is_none(){errors.push("salary")}
-
-        if errors.is_empty(){ Ok(()) }
-        else { Err(errors) }
-    }
-}
-
-
-impl Validatable for Redeemable {
-    fn validate(&self) -> SpecResult {
+    fn redeemed(&self) -> SpecResult {
         let mut errors = ErrorList::new();
         if self.payed_date().is_none() { errors.push("payed_date"); }
 
@@ -395,16 +381,33 @@ impl Validatable for Redeemable {
         }
 
         Ok(())
+
+    }
+
+}
+
+impl<'a, T> Validatable for Project<'a, T> {
+    fn validate(&self) -> SpecResult {
+        let mut errors = ErrorList::new();
+        if self.name().is_none(){errors.push("name")}
+        if self.event_date().is_none(){errors.push("date")}
+        if self.responsible().is_none(){errors.push("manager")}
+        if self.format().is_none(){errors.push("format")}
+        //if hours::salary().is_none(){errors.push("salary")}
+
+        if errors.is_empty(){ Ok(()) }
+        else { Err(errors) }
     }
 }
 
-impl<'a> ProvidesData for Client<'a> {
+
+impl<'a, T> ProvidesData for Client<'a, T> {
     fn data(&self) -> &Yaml{
         self.inner.data()
     }
 }
 
-impl<'a> IsClient for Client<'a> {
+impl<'a, T> IsClient for Client<'a, T> {
     fn email(&self) -> Option<&str> {
         self.get_str("client/email")
     }
@@ -467,7 +470,7 @@ impl<'a> IsClient for Client<'a> {
     }
 }
 
-impl<'a> Validatable for Client<'a> {
+impl<'a, T> Validatable for Client<'a, T> {
     fn validate(&self) -> SpecResult {
         let mut errors = self.field_exists( &[
                                              //"client/email", // TODO make this a requirement
@@ -489,13 +492,13 @@ impl<'a> Validatable for Client<'a> {
     }
 }
 
-impl<'a> ProvidesData for Offer<'a> {
+impl<'a, T> ProvidesData for Offer<'a, T> {
     fn data(&self) -> &Yaml{
         self.inner.data()
     }
 }
 
-impl<'a> Offerable for Offer<'a> {
+impl<'a, T> Offerable for Offer<'a, T> {
     fn appendix(&self) -> Option<i64> {
         self.get_int("offer.appendix")
     }
@@ -516,7 +519,7 @@ impl<'a> Offerable for Offer<'a> {
     }
 }
 
-impl<'a> Validatable for Offer<'a> {
+impl<'a, T> Validatable for Offer<'a, T> {
     fn validate(&self) -> SpecResult {
         //if IsProject::canceled(self) {
         //    return Err(vec!["canceled"]);
@@ -536,13 +539,13 @@ impl<'a> Validatable for Offer<'a> {
     }
 }
 
-impl<'a> ProvidesData for Invoice<'a> {
+impl<'a, T> ProvidesData for Invoice<'a, T> {
     fn data(&self) -> &Yaml{
         self.inner.data()
     }
 }
 
-impl<'a> Invoicable for Invoice<'a> {
+impl<'a, T> Invoicable for Invoice<'a, T> {
     fn number(&self) -> Option<i64> {
         self.get_int("invoice.number")
         // old spec
@@ -570,7 +573,7 @@ impl<'a> Invoicable for Invoice<'a> {
     }
 }
 
-impl<'a> Validatable for Invoice<'a> {
+impl<'a, T> Validatable for Invoice<'a, T> {
     fn validate(&self) -> SpecResult {
         let mut errors = self.field_exists(&["invoice.number"]);
 
@@ -587,13 +590,13 @@ impl<'a> Validatable for Invoice<'a> {
     }
 }
 
-impl<'a> ProvidesData for Hours<'a> {
+impl<'a, T> ProvidesData for Hours<'a, T> {
     fn data(&self) -> &Yaml{
         self.inner.data()
     }
 }
 
-impl<'a> HasEmployees for Hours<'a> {
+impl<'a, T> HasEmployees for Hours<'a, T> {
     fn wages_date(&self) -> Option<Date<Utc>> {
         self.get_dmy("hours.wages_date")
         // old spec
@@ -669,7 +672,7 @@ impl<'a> HasEmployees for Hours<'a> {
 }
 
 
-impl<'a> Validatable for Hours<'a> {
+impl<'a, T> Validatable for Hours<'a, T> {
     fn validate(&self) -> SpecResult {
         let mut errors = ErrorList::new();
         if !self.employees_payed() { errors.push("employees_payed"); }
