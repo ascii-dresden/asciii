@@ -7,9 +7,10 @@ use yaml_rust::Yaml;
 use yaml_rust::yaml::Hash as YamlHash;
 
 use super::*;
-use super::spec::{HasEvents, Event, EventTime, to_currency};
+use super::spec::{HasEvents, Event, EventTime};
 use super::product::error::Result as ProductResult;
 use util::yaml;
+use util::to_currency;
 
 use util;
 

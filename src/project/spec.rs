@@ -26,12 +26,6 @@ pub fn print_specresult(label: &str, result: SpecResult) {
 }
 
 
-// TODO there may be cases where an f64 can't be converted into Currency
-pub fn to_currency(f: f64) -> Currency {
-    Currency{ symbol: ::CONFIG.get_char("currency"), value: (f * 1000.0) as i64} / 10
-}
-
-
 /// Every other trait in this module ought to be `Validatable`
 pub trait Validatable {
     fn validate(&self) -> SpecResult;

@@ -61,7 +61,6 @@ pub use self::computed_field::ComputedField;
 ///
 /// A project is storable, contains products, and you can create an offer or invoice from it.
 /// The main implementation is done in [`spec`](spec/index.html).
-//#[derive(Clone)]
 pub struct Project {
     file_path: PathBuf,
     _temp_dir: Option<TempDir>,
@@ -93,9 +92,16 @@ impl Project {
         })
     }
 
+    /// import from yaml file
     #[cfg(feature="deserialization")]
     pub fn from_yaml(&self) -> Result<import::Project> {
         import::from_str(&self.file_content)
+    }
+
+    /// (feature deactivated) import from yaml file
+    #[cfg(not(feature="deserialization"))]
+    pub fn from_yaml(&self) -> Result<()> {
+        bail!(error::ErrorKind::FeatureDeactivated)
     }
 
     pub fn dump_yaml(&self) -> String {
@@ -109,12 +115,14 @@ impl Project {
     }
 
     #[cfg(feature="serialization")]
+    /// export to JSON
     pub fn to_json(&self) -> Result<String> {
         let complete: Complete = self.export();
         Ok(serde_json::to_string(&complete)?)
     }
 
     #[cfg(not(feature="serialization"))]
+    /// feature deactivateda) export to JSON
     pub fn to_json(&self) -> Result<String> {
         bail!(error::ErrorKind::FeatureDeactivated)
     }
@@ -381,6 +389,7 @@ impl Project {
     }
 }
 
+/// Functionality to create output files
 pub trait Exportable {
     /// Where to export to
     fn export_dir(&self)  -> PathBuf;

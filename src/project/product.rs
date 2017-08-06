@@ -4,8 +4,7 @@
 use bill::{Currency, BillProduct, Tax};
 
 use util::yaml;
-
-use super::spec::to_currency;
+use util::to_currency;
 
 pub mod error{
     #![allow(trivial_casts)]
