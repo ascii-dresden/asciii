@@ -157,6 +157,10 @@ pub fn currency_to_string(currency:&Currency) -> String {
     currency.postfix().to_string()
 }
 
+// TODO there may be cases where an f64 can't be converted into Currency
+pub fn to_currency(f: f64) -> Currency {
+    Currency{ symbol: ::CONFIG.get_char("currency"), value: (f * 1000.0) as i64} / 10
+}
 
 // tiny little helper
 pub fn to_local_file(file:&Path, ext:&str) -> PathBuf {
