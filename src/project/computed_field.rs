@@ -74,13 +74,14 @@ impl ComputedField {
 
             ComputedField::Employees         => project.hours().employees_string(),
             ComputedField::ClientFullName    => project.client().full_name(),
-            ComputedField::Wages             => project.wages().map(|c| util::currency_to_string(&c)),
+            ComputedField::Wages             => project.hours().wages().map(|c| util::currency_to_string(&c)),
             ComputedField::Deserializes      => Some(format!("{:?}", project.from_yaml().is_ok())),
             ComputedField::Invalid           => None,
             ComputedField::Format            => project.format().map(|f|f.to_string()),
-            ComputedField::Dir               => project.dir().parent()
-                .and_then(|d| d.strip_prefix(&storage).ok())
-                .map(|d| d.display().to_string())
+            ComputedField::Dir               => project.dir()
+                                                       .parent()
+                                                       .and_then(|d| d.strip_prefix(&storage).ok())
+                                                       .map(|d| d.display().to_string())
 
             // _ => None
         }

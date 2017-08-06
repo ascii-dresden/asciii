@@ -13,7 +13,7 @@ use std::path::PathBuf;
 use util;
 use storage::{self, StorageDir, Storable};
 use project::Project;
-use project::spec::{IsProject, HasEvents};
+use project::spec::*;
 
 pub mod error;
 use self::error::*;
@@ -58,7 +58,7 @@ pub fn projects_to_csv(projects:&[Project]) -> Result<String>{
              ]
              .join(splitter))?;
 
-    for project in projects{
+    for project in projects {
         writeln!(&mut string, "{}", [
                  project.field("InvoiceNumber")                     .unwrap_or_else(|| String::from(r#""""#)),
                  project.field("Name")                              .unwrap_or_else(|| String::from(r#""""#)),
@@ -68,7 +68,8 @@ pub fn projects_to_csv(projects:&[Project]) -> Result<String>{
                  project.field("Responsible")                       .unwrap_or_else(|| String::from(r#""""#)),
                  project.field("invoice/payed_date")                .unwrap_or_else(|| String::from(r#""""#)),
                  project.sum_sold().map(|c|c.value().to_string()).unwrap_or_else(|_| String::from(r#""""#)),
-                 project.canceled_string().to_owned()
+                 String::from(if project.canceled(){"canceled"} else {""})
+
         ].join(splitter))?;
     }
     Ok(string)
@@ -80,7 +81,7 @@ pub fn open_wages() -> Result<Currency>{
     let projects = storage::setup::<Project>()?.open_projects(StorageDir::Working)?;
     Ok(projects.iter()
         .filter(|p| !p.canceled() && p.age().unwrap_or(0) > 0)
-        .filter_map(|p| p.wages())
+        .filter_map(|p| p.hours().wages())
         .fold(Currency::default(), |acc, x| acc + x))
 }
 
@@ -89,7 +90,7 @@ pub fn open_wages() -> Result<Currency>{
 pub fn open_payments() -> Result<Currency>{
     let projects = storage::setup::<Project>()?.open_projects(StorageDir::Working)?;
     Ok(projects.iter()
-       .filter(|p| !p.canceled() && !p.payed_by_client() && p.age().unwrap_or(0) > 0)
+       .filter(|p| !p.canceled() && !p.is_payed() && p.age().unwrap_or(0) > 0)
        .filter_map(|p| p.sum_sold().ok())
        .fold(Currency::default(), |acc, x| acc + x))
 }

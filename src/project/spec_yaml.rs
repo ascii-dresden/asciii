@@ -1,10 +1,10 @@
 use std::str::FromStr;
 
+use bill::{Bill, Currency, Tax};
 use icalendar::Event as CalEvent;
 use icalendar::{Component, Calendar};
 use yaml_rust::Yaml;
 use yaml_rust::yaml::Hash as YamlHash;
-use bill::{Bill, Currency, Tax};
 
 use super::*;
 use super::spec::{HasEvents, Event, EventTime, to_currency};
@@ -160,7 +160,6 @@ impl ProvidesData for Project {
 }
 
 impl IsProject for Project {
-
     fn name(&self) -> Option<&str> {
         self.get_str("event.name")
             // old spec
@@ -208,7 +207,6 @@ impl IsProject for Project {
 
         out_string
     }
-
 }
 
 impl HasEvents for Project {
@@ -362,7 +360,23 @@ impl Redeemable for Project {
 
         Ok((offer,invoice))
     }
+
 }
+
+impl Validatable for Project {
+    fn validate(&self) -> SpecResult {
+        let mut errors = ErrorList::new();
+        if self.name().is_none(){errors.push("name")}
+        if self.event_date().is_none(){errors.push("date")}
+        if self.responsible().is_none(){errors.push("manager")}
+        if self.format().is_none(){errors.push("format")}
+        //if hours::salary().is_none(){errors.push("salary")}
+
+        if errors.is_empty(){ Ok(()) }
+        else { Err(errors) }
+    }
+}
+
 
 impl Validatable for Redeemable {
     fn validate(&self) -> SpecResult {
@@ -382,21 +396,6 @@ impl Validatable for Redeemable {
         Ok(())
     }
 }
-
-
-//impl Validatable for Project {
-//    fn validate(&self) -> SpecResult {
-//        let mut errors = ErrorList::new();
-//        if self.name().is_none(){errors.push("name")}
-//        if self.event_date().is_none(){errors.push("date")}
-//        if self.responsible().is_none(){errors.push("manager")}
-//        if self.format().is_none(){errors.push("format")}
-//        //if hours::salary().is_none(){errors.push("salary")}
-//
-//        if errors.is_empty(){ Ok(()) }
-//        else { Err(errors) }
-//    }
-//}
 
 impl<'a> ProvidesData for Client<'a> {
     fn data(&self) -> &Yaml{
@@ -659,6 +658,12 @@ impl<'a> HasEmployees for Hours<'a> {
         self.employees().is_none()
         ||
         self.wages_date().is_some()
+    }
+
+    fn wages(&self) -> Option<Currency> {
+        if let (Some(total), Some(salary)) = (self.total(), self.salary()) {
+            Some(total * salary)
+        } else{None}
     }
 }
 

@@ -5,12 +5,15 @@
 //! Most of the functions in these modules take the `yaml` data directly as reference.
 //! Each module contains a `validate()` function which ought to be kept up to date.
 
+use std::fmt;
+
 use bill::{Bill, Currency, Tax};
+use chrono::{Date, Utc, NaiveTime};
+use icalendar::Calendar;
+use semver::Version;
 use yaml_rust::Yaml;
 
-use chrono::{Date, Utc, NaiveTime};
-use semver::Version;
-
+use storage::Storable;
 use super::error::{SpecResult, ErrorList};
 use super::product::Product;
 use super::product::error::Result as ProductResult;
@@ -47,12 +50,13 @@ pub trait Validatable {
 /// Provide the basics every Project should have.
 pub trait IsProject {
 
-    // TODO reevaluate if these fields really belong here
+    /// Project Name
     fn name(&self) -> Option<&str>;
 
     /// When was the event
     fn event_date(&self) -> Option<Date<Utc>>;
 
+    /// Version of project format
     fn format(&self) -> Option<Version>;
 
     /// Did the event actually occur
@@ -61,7 +65,22 @@ pub trait IsProject {
     /// Who organized the event
     fn responsible(&self) -> Option<&str>;
 
+    /// Long description of the project
     fn long_desc(&self) -> String;
+}
+
+pub trait IsProjectExt {
+    fn age(&self) -> Option<i64>;
+}
+
+impl<T> IsProjectExt for T where T: Storable {
+    fn age(&self) -> Option<i64> {
+        self.modified_date()
+            .map(|date|
+                 (Utc::today().signed_duration_since(date))
+                              .num_days()
+                )
+    }
 }
 
 /// Stage 1: requirements for an offer
@@ -139,6 +158,9 @@ pub trait HasEmployees {
     fn employees(&self) -> Option<Vec<(String, f64)>>;
 
     fn employees_payed(&self) -> bool;
+
+    fn wages(&self) -> Option<Currency>;
+
 }
 
 
@@ -155,6 +177,13 @@ pub trait Redeemable: IsProject {
 
     /// When what is the MWsT of the project.
     fn tax(&self) -> Option<Tax>;
+
+    /// Sum of sold products
+    fn sum_sold(&self) -> ProductResult<Currency> {
+        let (_,invoice) = self.bills()?;
+        Ok(invoice.net_total())
+    }
+
 }
 
 #[derive(Debug)]
@@ -170,7 +199,6 @@ pub struct Event {
     pub times: Vec<EventTime>
 }
 
-use std::fmt;
 impl fmt::Display for Event {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         if let Some(end) = self.end { writeln!(f, "start: {}\nend:  {}", self.begin, end) }
@@ -182,8 +210,6 @@ impl fmt::Display for Event {
         Ok(())
     }
 }
-
-use icalendar::Calendar;
 
 /// Something that has events
 pub trait HasEvents {

@@ -73,7 +73,7 @@ pub trait Storable:Send+Sync{
     }
 
     /// Path to project folder
-    fn dir(&self)  -> FolderPathBuf{ self.file().parent().unwrap().to_owned() }
+    fn dir(&self)  -> FolderPathBuf { self.file().parent().unwrap().to_owned() }
 
     fn matches_filter(&self, key: &str, val: &str) -> bool;
     fn matches_search(&self, term: &str) -> bool;

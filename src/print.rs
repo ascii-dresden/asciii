@@ -12,7 +12,7 @@ use term_size;
 
 use super::BillType;
 
-use project::Project;
+use project::{Project, Exportable};
 use project::spec::{IsProject, Redeemable, Invoicable, HasEmployees, HasEvents};
 use project::error::SpecResult;
 use storage::Storable;
@@ -51,7 +51,7 @@ impl<'a> Default for ListConfig<'a>{
 fn payed_to_cell(project:&Project) -> Cell {
     let sym = ::CONFIG.get_str("currency");
 
-    match (project.payed_by_client(), project.hours().employees_payed()) {
+    match (project.is_payed(), project.hours().employees_payed()) {
         (false,false) => Cell::new("✗").with_style(Attr::ForegroundColor(color::RED)),
         (_,    false) |
         (false, _   ) => Cell::new(sym).with_style(Attr::ForegroundColor(color::YELLOW)),
@@ -376,6 +376,6 @@ pub fn show_details(project:&Project, bill_type:&BillType) {
         }
     }
 
-    println!("{}", project.employees_string());
+    println!("{}", project.hours().employees_string().unwrap_or_else(String::new));
 
 }

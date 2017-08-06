@@ -11,7 +11,7 @@ use open;
 use handlebars::{RenderError, Handlebars, no_escape, Helper, RenderContext};
 
 use util;
-use project::{self, Project};
+use project::{self, Project, Exportable};
 use project::export::ExportTarget;
 use storage::error::StorageError;
 use storage::{self, Storable, StorageSelection};
