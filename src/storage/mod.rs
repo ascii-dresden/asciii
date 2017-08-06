@@ -404,7 +404,7 @@ impl<L:Storable> Storage<L> {
         trace!("created project will be called {:?}", slugged_name);
 
         let target_file  = project_dir
-            .join(&(slugged_name + "." + L::file_extension()));
+            .join(&(slugged_name + "." + &L::file_extension()));
 
         let template_path = self.get_template_file(template_name)?;
 
@@ -663,7 +663,7 @@ impl<L:Storable> Storage<L> {
     pub fn get_project_file(&self, directory:&Path) -> StorageResult<PathBuf> {
         trace!("getting project file from {:?}", directory);
         list_path_content(directory)?.iter()
-            .filter(|f|f.extension().unwrap_or_else(||OsStr::new("")) == L::file_extension())
+            .filter(|f|f.extension().unwrap_or_else(||OsStr::new("")) == L::file_extension().as_str())
             .nth(0).map(ToOwned::to_owned)
             .ok_or_else(|| ErrorKind::ProjectDoesNotExist.into())
     }
@@ -678,7 +678,7 @@ impl<L:Storable> Storage<L> {
 
     fn get_project_dir_from_archive(&self, name:&str, year:Year) -> StorageResult<PathBuf> {
         for project_file in &self.list_project_files(StorageDir::Archive(year))?{
-            if project_file.ends_with(slugify(name) + "."+ L::file_extension()) {
+            if project_file.ends_with(slugify(name) + "."+ &L::file_extension()) {
                 return project_file.parent().map(|p|p.to_owned()).ok_or_else (|| ErrorKind::ProjectDoesNotExist.into());
             }
         }

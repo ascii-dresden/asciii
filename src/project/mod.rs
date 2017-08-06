@@ -57,8 +57,6 @@ use self::product::error as product_error;
 
 pub use self::computed_field::ComputedField;
 
-static PROJECT_FILE_EXTENSION:&'static str = "yml";
-
 /// Represents a Project.
 ///
 /// A project is storable, contains products, and you can create an offer or invoice from it.
@@ -490,7 +488,10 @@ impl Exportable for Project {
 }
 
 impl Storable for Project {
-    fn file_extension() -> &'static str {PROJECT_FILE_EXTENSION}
+    fn file_extension() -> String {
+        ::CONFIG.get_to_string("extensions.project_file")
+    }
+
     fn from_template(project_name:&str,template:&Path, fill: &HashMap<&str,String>) -> StorageResult<Project> {
         let template_name = template.file_stem().unwrap().to_str().unwrap();
 
@@ -522,7 +523,7 @@ impl Storable for Project {
 
         // generates a temp file
         let temp_dir  = TempDir::new(project_name).unwrap();
-        let temp_file = temp_dir.path().join(slug::slugify(project_name) + "." + Self::file_extension());
+        let temp_file = temp_dir.path().join(slug::slugify(project_name) + "." + &Self::file_extension());
 
         // write into a file
         let mut file = File::create(&temp_file)?;
@@ -604,8 +605,9 @@ impl Storable for Project {
 
     /// Opens a yaml and parses it.
     fn open_folder(folder_path:&Path) -> StorageResult<Project>{
+        let project_file_extension = ::CONFIG.get_to_string("extensions.project_file");
         let file_path = list_path_content(folder_path)?.iter()
-            .filter(|f|f.extension().unwrap_or(&OsStr::new("")) == PROJECT_FILE_EXTENSION)
+            .filter(|f|f.extension().unwrap_or(&OsStr::new("")) == project_file_extension.as_str())
             .nth(0).map(|b|b.to_owned())
             .ok_or(StorageErrorKind::ProjectDoesNotExist)?;
         Self::open_file(&file_path)
