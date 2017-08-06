@@ -17,7 +17,7 @@ use yaml_rust::Yaml;
 use slug;
 use tempdir::TempDir;
 
-use bill::{BillItem, Currency};
+use bill::BillItem;
 use icalendar::*;
 use semver::Version;
 
@@ -49,7 +49,7 @@ mod computed_field;
 
 use self::spec::{IsProject, IsClient};
 use self::spec::{Offerable, Invoicable, Redeemable, Validatable, HasEmployees};
-pub use self::spec_yaml::ProvidesData;
+use self::spec_yaml::ProvidesData;
 
 use self::error::{ErrorKind, ErrorList, SpecResult, Result};
 use self::product::Product;
@@ -93,17 +93,37 @@ impl Project {
         })
     }
 
+    #[cfg(feature="deserialization")]
+    pub fn from_yaml(&self) -> Result<import::Project> {
+        import::from_str(&self.file_content)
+    }
+
+    pub fn dump_yaml(&self) -> String {
+        use yaml_rust::emitter::YamlEmitter;
+        let mut buf = String::new();
+        {
+            let mut emitter = YamlEmitter::new(&mut buf);
+            emitter.dump(self.yaml()).unwrap();
+        }
+        buf
+    }
+
+    #[cfg(feature="serialization")]
+    pub fn to_json(&self) -> Result<String> {
+        let complete: Complete = self.export();
+        Ok(serde_json::to_string(&complete)?)
+    }
+
+    #[cfg(not(feature="serialization"))]
+    pub fn to_json(&self) -> Result<String> {
+        bail!(error::ErrorKind::FeatureDeactivated)
+    }
+
     /// wrapper around yaml::get() with replacement
     pub fn field(&self, path:&str) -> Option<String> {
         ComputedField::from(path).get(self).or_else(||
             yaml::get_to_string(self.yaml(),path)
         )
-    }
-
-    /// either `"canceled"` or `""`
-    pub fn canceled_string(&self) -> &'static str {
-        if self.canceled(){"canceled"}
-        else {""}
     }
 
     /// Returns the struct `Client`, which abstracts away client specific stuff.
@@ -124,97 +144,6 @@ impl Project {
     /// Returns the struct `Invoice`, which abstracts away invoice specific stuff.
     pub fn hours(&self) -> Hours {
         Hours { inner: self }
-    }
-
-    pub fn payed_by_client(&self) -> bool {
-        self.payed_date().is_some()
-    }
-
-    pub fn employees_string(&self) -> String {
-        self.hours().employees_string().unwrap_or_else(String::new)
-    }
-
-    /// Filename of the offer output file.
-    pub fn offer_file_name(&self, extension:&str) -> Option<String>{
-        let num = try_some!(self.offer().number());
-        let name = slug::slugify(try_some!(IsProject::name(self)));
-        Some(format!("{} {}.{}",num,name,extension))
-    }
-
-    /// Filename of the invoice output file. **Carefull!** uses today's date.
-    pub fn invoice_file_name(&self, extension:&str) -> Option<String>{
-        let num = try_some!(self.invoice().number_str());
-        let name = slug::slugify(try_some!(self.name()));
-        //let date = Local::today().format("%Y-%m-%d").to_string();
-        let date = try_some!(self.invoice().date()).format("%Y-%m-%d").to_string();
-        Some(format!("{} {} {}.{}",num,name,date,extension))
-    }
-
-    pub fn output_file_exists(&self, bill_type:&BillType) -> bool {
-        match *bill_type{
-            BillType::Offer   => self.offer_file_exists(),
-            BillType::Invoice => self.invoice_file_exists()
-        }
-    }
-
-    pub fn output_file(&self, bill_type:&BillType) -> Option<PathBuf> {
-        match *bill_type{
-            BillType::Offer   => self.offer_file(),
-            BillType::Invoice => self.invoice_file()
-        }
-    }
-
-    pub fn offer_file(&self) -> Option<PathBuf> {
-        let output_folder = get_valid_path(::CONFIG.get_str("output_path"));
-        let convert_ext  = ::CONFIG.get_str("document_export/output_extension");
-        match (output_folder, self.offer_file_name(convert_ext)) {
-            (Some(folder), Some(name)) => folder.join(&name).into(),
-            _ => None
-        }
-    }
-
-    pub fn invoice_file(&self) -> Option<PathBuf>{
-        let output_folder = get_valid_path(::CONFIG.get_str("output_path"));
-        let convert_ext  = ::CONFIG.get_str("document_export/output_extension");
-        match (output_folder, self.invoice_file_name(convert_ext)) {
-            (Some(folder), Some(name)) => folder.join(&name).into(),
-            _ => None
-        }
-    }
-
-    pub fn offer_file_exists(&self) -> bool {
-        self.offer_file().map(|f|f.exists()).unwrap_or(false)
-    }
-
-    pub fn invoice_file_exists(&self) -> bool {
-        self.invoice_file().map(|f|f.exists()).unwrap_or(false)
-    }
-
-    fn write_to_path<P:AsRef<OsStr> + fmt::Debug>(content:&str, target:&P) -> Result<PathBuf> {
-        trace!("writing content ({}bytes) to {:?}", content.len(), target);
-        let mut file = File::create(Path::new(target))?;
-        file.write_all(content.as_bytes())?;
-        file.sync_all()?;
-        Ok(Path::new(target).to_owned())
-    }
-
-    pub fn write_to_file(&self, content:&str, bill_type:&BillType,ext:&str) -> Result<PathBuf> {
-        match *bill_type{
-            BillType::Offer   => self.write_to_offer_file(content, ext),
-            BillType::Invoice => self.write_to_invoice_file(content, ext)
-        }
-    }
-
-    fn write_to_offer_file(&self, content:&str, ext:&str) -> Result<PathBuf> {
-        if let Some(target) = self.offer_file_name(ext){
-            Self::write_to_path(content, &self.dir().join(&target))
-        } else {bail!(ErrorKind::CantDetermineTargetFile)}
-    }
-
-    fn write_to_invoice_file(&self, content:&str, ext:&str) -> Result<PathBuf> {
-        if let Some(target) = self.invoice_file_name(ext){
-            Self::write_to_path(content, &self.dir().join(&target))
-        } else {bail!(ErrorKind::CantDetermineTargetFile)}
     }
 
 
@@ -253,22 +182,6 @@ impl Project {
         }
     }
 
-    /// TODO move to `IsProjectExt`
-    pub fn age(&self) -> Option<i64> {
-        self.modified_date().map(|date| (Utc::today().signed_duration_since(date)).num_days() )
-    }
-
-    #[cfg(feature="serialization")]
-    pub fn to_json(&self) -> Result<String> {
-        let complete: Complete = self.export();
-        Ok(serde_json::to_string(&complete)?)
-    }
-
-    #[cfg(not(feature="serialization"))]
-    pub fn to_json(&self) -> Result<String> {
-        bail!(error::ErrorKind::FeatureDeactivated)
-    }
-
     pub fn to_csv(&self, bill_type:&BillType) -> Result<String>{
         use std::fmt::Write;
         let (offer, invoice) = self.bills()?;
@@ -292,41 +205,16 @@ impl Project {
         Ok(csv_string)
     }
 
-    pub fn wages(&self) -> Option<Currency> {
-        if let (Some(total), Some(salary)) = (self.hours().total(), self.hours().salary()){
-            Some(total * salary)
-        } else{None}
-    }
-
-    pub fn sum_sold(&self) -> Result<Currency> {
-        let (_,invoice) = self.bills()?;
-        Ok(invoice.net_total())
-    }
-
     pub fn debug(&self) -> Debug {
         self.into()
     }
 
-
-    #[cfg(feature="deserialization")]
-    pub fn from_yaml(&self) -> Result<import::Project> {
-        import::from_str(&self.file_content)
-    }
-
-    pub fn dump_yaml(&self) -> String {
-        use yaml_rust::emitter::YamlEmitter;
-        let mut buf = String::new();
-        {
-            let mut emitter = YamlEmitter::new(&mut buf);
-            emitter.dump(self.yaml()).unwrap();
-        }
-        buf
-    }
-
+    /// Check Templated for replacable markers
     pub fn empty_fields(&self) -> Vec<String>{
         self.file_content.list_keywords()
     }
 
+    /// Fill certain field
     pub fn replace_field(&self, field:&str, value:&str) -> Result<()> {
         // fills the template
         let filled = Templater::new(&self.file_content)
@@ -350,7 +238,7 @@ impl Project {
         }
     }
 
-    /// Time Since Event
+    /// Time between event and creation of invoice
     pub fn our_bad(&self) -> Option<Duration> {
         let event   = try_some!(self.event_date());
         let invoice = self.invoice().date().unwrap_or_else(Utc::today);
@@ -362,6 +250,7 @@ impl Project {
         }
     }
 
+    /// Time between creation of invoice and payment
     pub fn their_bad(&self) -> Option<Duration> {
         let invoice = self.invoice().date().unwrap_or_else(Utc::today);
         let payed   = self.payed_date().unwrap_or_else(Utc::today);
@@ -416,7 +305,7 @@ impl Project {
         let days_since_payed = (Utc::today().signed_duration_since(payed_date)).num_days();
         Todo::new().summary(&lformat!("{}: Hungry employees!", self.invoice().number_str().unwrap_or_else(String::new)))
             .description( &lformat!("Pay {}\nYou have had the money for {} days!",
-                                   self.employees_string(),
+                                   self.hours().employees_string().unwrap_or_else(String::new),
                                    days_since_payed))
             .due((payed_date + Duration::days(14)).and_hms(11, 10, 0))
             .done()
@@ -492,18 +381,101 @@ impl Project {
     }
 }
 
-impl Validatable for Project {
-    fn validate(&self) -> SpecResult {
-        let mut errors = ErrorList::new();
-        if self.name().is_none(){errors.push("name")}
-        if self.event_date().is_none(){errors.push("date")}
-        if self.responsible().is_none(){errors.push("manager")}
-        if self.format().is_none(){errors.push("format")}
-        //if hours::salary().is_none(){errors.push("salary")}
+pub trait Exportable {
+    /// Where to export to
+    fn export_dir(&self)  -> PathBuf;
 
-        if errors.is_empty(){ Ok(()) }
-        else { Err(errors) }
+    /// Filename of the offer output file.
+    fn offer_file_name(&self, extension:&str) -> Option<String>;
+
+    /// Filename of the invoice output file. **Carefull!** uses today's date.
+    fn invoice_file_name(&self, extension:&str) -> Option<String>;
+
+    fn output_file_exists(&self, bill_type: &BillType) -> bool {
+        match *bill_type{
+            BillType::Offer   => self.offer_file_exists(),
+            BillType::Invoice => self.invoice_file_exists()
+        }
     }
+
+    fn output_file(&self, bill_type: &BillType) -> Option<PathBuf> {
+        match *bill_type{
+            BillType::Offer   => self.offer_file(),
+            BillType::Invoice => self.invoice_file()
+        }
+    }
+
+    fn offer_file(&self) -> Option<PathBuf> {
+        let output_folder = get_valid_path(::CONFIG.get_str("output_path"));
+        let convert_ext  = ::CONFIG.get_str("document_export/output_extension");
+        match (output_folder, self.offer_file_name(convert_ext)) {
+            (Some(folder), Some(name)) => folder.join(&name).into(),
+            _ => None
+        }
+    }
+
+    fn invoice_file(&self) -> Option<PathBuf>{
+        let output_folder = get_valid_path(::CONFIG.get_str("output_path"));
+        let convert_ext  = ::CONFIG.get_str("document_export/output_extension");
+        match (output_folder, self.invoice_file_name(convert_ext)) {
+            (Some(folder), Some(name)) => folder.join(&name).into(),
+            _ => None
+        }
+    }
+
+    fn offer_file_exists(&self) -> bool {
+        self.offer_file().map(|f|f.exists()).unwrap_or(false)
+    }
+
+    fn invoice_file_exists(&self) -> bool {
+        self.invoice_file().map(|f|f.exists()).unwrap_or(false)
+    }
+
+    fn write_to_path<P:AsRef<OsStr> + fmt::Debug>(content:&str, target:&P) -> Result<PathBuf> {
+        trace!("writing content ({}bytes) to {:?}", content.len(), target);
+        let mut file = File::create(Path::new(target))?;
+        file.write_all(content.as_bytes())?;
+        file.sync_all()?;
+        Ok(Path::new(target).to_owned())
+    }
+
+    fn write_to_file(&self, content:&str, bill_type:&BillType,ext:&str) -> Result<PathBuf> {
+        match *bill_type{
+            BillType::Offer   => self.write_to_offer_file(content, ext),
+            BillType::Invoice => self.write_to_invoice_file(content, ext)
+        }
+    }
+
+    fn write_to_offer_file(&self, content:&str, ext:&str) -> Result<PathBuf> {
+        if let Some(target) = self.offer_file_name(ext){
+            Self::write_to_path(content, &self.export_dir().join(&target))
+        } else {bail!(ErrorKind::CantDetermineTargetFile)}
+    }
+
+    fn write_to_invoice_file(&self, content:&str, ext:&str) -> Result<PathBuf> {
+        if let Some(target) = self.invoice_file_name(ext){
+            Self::write_to_path(content, &self.export_dir().join(&target))
+        } else {bail!(ErrorKind::CantDetermineTargetFile)}
+    }
+}
+
+impl Exportable for Project {
+    fn export_dir(&self)  -> PathBuf { Storable::dir(self) }
+
+    fn offer_file_name(&self, extension: &str) -> Option<String>{
+        let num = try_some!(self.offer().number());
+        let name = slug::slugify(try_some!(IsProject::name(self)));
+        Some(format!("{} {}.{}", num, name, extension))
+    }
+
+    fn invoice_file_name(&self, extension: &str) -> Option<String>{
+        let num = try_some!(self.invoice().number_str());
+        let name = slug::slugify(try_some!(self.name()));
+        //let date = Local::today().format("%Y-%m-%d").to_string();
+        let date = try_some!(self.invoice().date()).format("%Y-%m-%d").to_string();
+        Some(format!("{} {} {}.{}",num,name,date,extension))
+    }
+
 }
 
 impl Storable for Project {
