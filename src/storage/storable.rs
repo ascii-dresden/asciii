@@ -62,7 +62,7 @@ pub trait Storable:Send+Sync{
     fn get_git_status(&self) -> GitStatus{GitStatus::Unknown}
 
     /// Main Projectfile extension
-    fn file_extension() -> &'static str {"PROJECT"}
+    fn file_extension() -> String {String::from("PROJECT")}
 
     /// Path to project file
     fn file(&self) -> FilePathBuf;
