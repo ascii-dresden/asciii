@@ -1,6 +1,5 @@
 //! General actions
 
-#![allow(unused_imports)]
 #![allow(dead_code)]
 
 
@@ -8,16 +7,13 @@ use chrono::prelude::*;
 use bill::Currency;
 use icalendar::Calendar;
 
-use std::{env, fs, time};
 use std::fmt::Write;
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 
 use util;
-use super::BillType;
-use storage::{self, Storage, StorageDir, Storable, StorageResult};
+use storage::{self, StorageDir, Storable};
 use project::Project;
-use project::spec::events::HasEvents;
-use project::spec::{IsProject, IsClient, Invoicable, ProvidesData};
+use project::spec::{IsProject, HasEvents};
 
 pub mod error;
 use self::error::*;
@@ -64,13 +60,13 @@ pub fn projects_to_csv(projects:&[Project]) -> Result<String>{
 
     for project in projects{
         writeln!(&mut string, "{}", [
-                 project.get("InvoiceNumber")                     .unwrap_or_else(|| String::from(r#""""#)),
-                 project.get("Name")                              .unwrap_or_else(|| String::from(r#""""#)),
-                 project.get("event/dates/0/begin")               .unwrap_or_else(|| String::from(r#""""#)),
-                 project.get("invoice/date")                      .unwrap_or_else(|| String::from(r#""""#)),
-                 project.get("Employees")                         .unwrap_or_else(|| String::from(r#""""#)),
-                 project.get("Responsible")                       .unwrap_or_else(|| String::from(r#""""#)),
-                 project.get("invoice/payed_date")                .unwrap_or_else(|| String::from(r#""""#)),
+                 project.field("InvoiceNumber")                     .unwrap_or_else(|| String::from(r#""""#)),
+                 project.field("Name")                              .unwrap_or_else(|| String::from(r#""""#)),
+                 project.field("event/dates/0/begin")               .unwrap_or_else(|| String::from(r#""""#)),
+                 project.field("invoice/date")                      .unwrap_or_else(|| String::from(r#""""#)),
+                 project.field("Employees")                         .unwrap_or_else(|| String::from(r#""""#)),
+                 project.field("Responsible")                       .unwrap_or_else(|| String::from(r#""""#)),
+                 project.field("invoice/payed_date")                .unwrap_or_else(|| String::from(r#""""#)),
                  project.sum_sold().map(|c|c.value().to_string()).unwrap_or_else(|_| String::from(r#""""#)),
                  project.canceled_string().to_owned()
         ].join(splitter))?;

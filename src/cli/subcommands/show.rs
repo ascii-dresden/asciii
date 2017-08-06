@@ -6,7 +6,7 @@ use asciii::storage::*;
 //use asciii::storage::error::*;
 use asciii::project::{spec, Project};
 use asciii::templater::Templater;
-use asciii::project::spec::events::HasEvents;
+use asciii::project::spec::HasEvents;
 
 use super::{matches_to_search, matches_to_selection};
 
@@ -95,7 +95,7 @@ fn show_ical(selection: StorageSelection) -> Result<()> {
 
 fn show_detail(selection: StorageSelection, detail: &str) -> Result<()> {
     for p in setup::<Project>()?.open_projects(&selection)? {
-        println!("{}", p.get(detail).unwrap_or_else(|| format!("No {:?} found", selection)))
+        println!("{}", p.field(detail).unwrap_or_else(|| format!("No {:?} found", selection)))
     }
     Ok(())
 }

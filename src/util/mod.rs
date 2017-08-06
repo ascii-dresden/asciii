@@ -5,6 +5,7 @@ use std::env::{self, home_dir, current_dir};
 use std::ffi::OsStr;
 use std::path::{Path, PathBuf};
 use std::process::{self, Command, ExitStatus};
+use chrono::NaiveTime;
 
 use log::{LogRecord, LogLevelFilter};
 use env_logger::LogBuilder;
@@ -162,5 +163,37 @@ pub fn to_local_file(file:&Path, ext:&str) -> PathBuf {
     let mut _tmpfile = file.to_owned();
     _tmpfile.set_extension(ext);
     Path::new(_tmpfile.file_name().unwrap().into()).to_owned()
+}
+
+pub fn naive_time_from_str(string:&str) -> Option<NaiveTime> {
+    let t:Vec<u32> = string
+        .splitn(2, |p| p == '.' || p == ':')
+        .map(|s|s.parse().unwrap_or(0))
+        .collect();
+
+    if let (Some(h),m) = (t.get(0),t.get(1).unwrap_or(&0)){
+        if *h < 24 && *m < 60 {
+            return Some(NaiveTime::from_hms(*h,*m,0))
+        }
+    }
+
+    None
+}
+
+#[test]
+fn test_naive_time_from_str() {
+    assert_eq!(Some(NaiveTime::from_hms(9,15,0)), naive_time_from_str("9.15"));
+    assert_eq!(Some(NaiveTime::from_hms(9,0,0)),  naive_time_from_str("9."));
+    assert_eq!(Some(NaiveTime::from_hms(9,0,0)),  naive_time_from_str("9"));
+    assert_eq!(Some(NaiveTime::from_hms(23,0,0)), naive_time_from_str("23.0"));
+    assert_eq!(Some(NaiveTime::from_hms(23,59,0)), naive_time_from_str("23.59"));
+    assert_eq!(None, naive_time_from_str("24.0"));
+    assert_eq!(None, naive_time_from_str("25.0"));
+    assert_eq!(None, naive_time_from_str("0.60"));
+
+    assert_eq!(Some(NaiveTime::from_hms(9,15,0)), naive_time_from_str("9:15"));
+    assert_eq!(Some(NaiveTime::from_hms(9,0,0)),  naive_time_from_str("9:"));
+    assert_eq!(Some(NaiveTime::from_hms(9,0,0)),  naive_time_from_str("9"));
+    assert_eq!(Some(NaiveTime::from_hms(23,0,0)), naive_time_from_str("23:0"));
 }
 
