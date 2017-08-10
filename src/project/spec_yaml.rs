@@ -340,7 +340,7 @@ impl Redeemable for Project {
             price: self.hours().salary().unwrap_or(Currency::new())
         };
 
-        if let Some(total) = self.hours().total() {
+        if let Some(total) = self.hours().total_time() {
             if total.is_normal() {
                 offer.add_item(total, service());
                 invoice.add_item(total, service());
@@ -604,13 +604,37 @@ impl<'a> HasEmployees for Hours<'a> {
         self.get_f64("hours.salary").map(to_currency)
     }
 
-    fn total(&self) -> Option<f64> {
+    fn tax(&self) -> Option<Tax> {
+        self.get_f64("tax").map(Tax::new)
+    }
+
+    fn net_wages(&self) -> Option<Currency> {
+        let triple = (self.total_time(), self.salary(), self.tax());
+        match triple {
+            ( Some(total_time), Some(salary), Some(tax))
+                => Some(total_time * salary * (tax.value() + 1f64)),
+            // covering the legacy case where Services always had Tax=0%
+            ( Some(total_time), Some(salary), None)
+                => Some(total_time * salary),
+            _ => None
+        }
+    }
+
+    fn gross_wages(&self) -> Option<Currency> {
+        let tuple = (self.total_time(), self.salary());
+        if let ( Some(total_time), Some(salary)) = tuple {
+            Some(total_time * salary)
+        } else {
+            None
+        }
+    }
+
+    fn total_time(&self) -> Option<f64> {
         self.employees().map(|vec| {
             vec.iter()
                 .map(|&(_, h)| h)
                 .fold(0f64, |acc, h| acc + h)
         })
-        //.or_else(|| )
     }
 
     fn employees_string(&self) -> Option<String> {
@@ -662,7 +686,7 @@ impl<'a> HasEmployees for Hours<'a> {
     }
 
     fn wages(&self) -> Option<Currency> {
-        if let (Some(total), Some(salary)) = (self.total(), self.salary()) {
+        if let (Some(total), Some(salary)) = (self.total_time(), self.salary()) {
             Some(total * salary)
         } else{None}
     }

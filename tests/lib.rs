@@ -68,6 +68,40 @@ mod regression {
             compare_exports::<Hours>(&project1, &project2);
         }
     }
+}
 
 
+#[cfg(test)]
+mod taxed_service {
+    use super::*;
+    use asciii::project::spec::HasEmployees;
+
+    static HOURS_ZEROTAXED: &str = "hours: { salary: 8.0, caterers: { unknown: 3 }, tax: 0 }";
+    static HOURS_UNTAXED: &str   = "hours: { salary: 8.0, caterers: { unknown: 3 } }";
+
+
+    #[test]
+    fn services_are_implicitely_zero() {
+        let project_untaxed   = Project::from_file_content(&HOURS_UNTAXED).unwrap();
+        let project_zerotaxed = Project::from_file_content(&HOURS_ZEROTAXED).unwrap();
+
+        assert_eq!(
+            project_untaxed  .hours().gross_wages(),
+            project_zerotaxed.hours().gross_wages()
+            );
+    }
+
+    static HOURS_TAXED: &str   = "hours: { salary: 8.0, caterers: { unknown: 3 }, tax: 0.19 }";
+    static HOURS_INTAXED: &str = "hours: { salary: 9.52, caterers: { unknown: 3 } }";
+
+    #[test]
+    fn services_calculate_gross_wages() {
+
+        let project_taxed     = Project::from_file_content(&HOURS_TAXED).unwrap();
+        let project_intaxed   = Project::from_file_content(&HOURS_INTAXED).unwrap();
+        assert_eq!(
+            project_taxed    .hours().gross_wages(),
+            project_intaxed  .hours().gross_wages()
+            );
+    }
 }

@@ -66,13 +66,20 @@ impl ExportTarget<Event> for Project {
 pub struct Hours {
     time: Option<f64>,
     salary: Option<String>,
+    gross_total: Option<String>,
+    net_total: Option<String>,
 }
 
 impl ExportTarget<Hours> for Project {
     fn export(&self) -> Hours {
         Hours {
-            time: self.hours().total(),
-            salary: self.hours().salary().map(|s| s.postfix().to_string()),
+            time:         self.hours().total_time(),
+            salary:       self.hours().salary()
+                                      .map(|s| s.postfix().to_string()),
+            gross_total:  self.hours().gross_wages()
+                                      .map(|s| s.postfix().to_string()),
+            net_total:    self.hours().net_wages()
+                                      .map(|s| s.postfix().to_string()),
         }
     }
 }

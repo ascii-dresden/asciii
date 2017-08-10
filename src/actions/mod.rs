@@ -95,7 +95,6 @@ pub fn open_payments() -> Result<Currency>{
        .fold(Currency::default(), |acc, x| acc + x))
 }
 
-
 /// Testing only, tries to run complete spec on all projects.
 /// TODO make this not panic :D
 /// TODO move this to `spec::all_the_things`

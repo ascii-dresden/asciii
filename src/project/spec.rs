@@ -141,9 +141,33 @@ pub trait HasEmployees {
     /// Salary
     fn salary(&self) -> Option<Currency>;
 
+    /// Tax
+    fn tax(&self) -> Option<Tax>;
+
+    /// Sum of wages after tax
+    fn net_wages(&self) -> Option<Currency> ;
+
+    /// Sum of wages before tax
+    fn gross_wages(&self) -> Option<Currency> ;
+
+
     /// Full number of service hours
     /// TODO test this against old format
-    fn total(&self) -> Option<f64>;
+    fn total_time(&self) -> Option<f64>;
+
+    /// Returns a product from Service
+    fn to_product(&self) -> Option<Product> {
+        if let Some(salary) = self.salary() {
+            Some(Product {
+                name: "Service",
+                unit: Some("h"),
+                tax: self.tax().unwrap_or(Tax::new(0.0)),
+                price: salary
+            })
+        } else {
+            None
+        }
+    }
 
     /// Nicely formated list of employees with their respective service hours
     fn employees_string(&self) -> Option<String>;

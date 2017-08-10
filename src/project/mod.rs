@@ -127,6 +127,17 @@ impl Project {
         bail!(error::ErrorKind::FeatureDeactivated)
     }
 
+    /// Used mostly for testing purposes
+    pub fn from_file_content(content: &str) -> Result<Project> {
+        Ok(Project{
+            file_path: PathBuf::new(),
+            _temp_dir: None,
+            git_status: None,
+            yaml: yaml::parse(&content).unwrap(),
+            file_content: String::from(content),
+        })
+    }
+
     /// wrapper around yaml::get() with replacement
     pub fn field(&self, path:&str) -> Option<String> {
         ComputedField::from(path).get(self).or_else(||
@@ -153,7 +164,6 @@ impl Project {
     pub fn hours(&self) -> Hours {
         Hours { inner: self }
     }
-
 
     /// Ready to produce offer.
     ///
