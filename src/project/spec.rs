@@ -132,6 +132,12 @@ pub trait Invoicable {
     fn official(&self) -> Option<String>;
 }
 
+pub struct Employee {
+    pub name: String,
+    pub salary: Currency,
+    pub time: f64,
+    pub wage: Currency,
+}
 
 /// Something that has employees
 pub trait HasEmployees {
@@ -173,12 +179,12 @@ pub trait HasEmployees {
     fn employees_string(&self) -> Option<String>;
 
     /// List of employees and ther respective service hours
-    fn employees(&self) -> Option<Vec<(String, f64)>>;
+
+    fn employees(&self) -> Option<Vec<Employee>>;
 
     fn employees_payed(&self) -> bool;
 
     fn wages(&self) -> Option<Currency>;
-
 }
 
 

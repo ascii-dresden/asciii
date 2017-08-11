@@ -63,23 +63,52 @@ impl ExportTarget<Event> for Project {
 
 #[derive(Debug, PartialEq)]
 #[cfg_attr(feature = "serialization", derive(Serialize))]
-pub struct Hours {
+pub struct Service {
     time: Option<f64>,
+    tax: Option<f64>,
     salary: Option<String>,
     gross_total: Option<String>,
     net_total: Option<String>,
+    employees: Option<Vec<Employee>>,
 }
 
-impl ExportTarget<Hours> for Project {
-    fn export(&self) -> Hours {
-        Hours {
+
+#[derive(Debug, PartialEq)]
+#[cfg_attr(feature = "serialization", derive(Serialize))]
+/// TODO move this type to spec
+pub struct Employee {
+    name: String,
+    salary: String,
+    time: f64,
+    wage: String,
+}
+
+fn export_employee(e: &::project::spec::Employee) -> Employee {
+    Employee {
+        name: e.name.clone(),
+        time: e.time,
+        salary:  e.salary.postfix().to_string(),
+        wage:  e.wage.postfix().to_string(),
+    }
+}
+
+impl ExportTarget<Service> for Project {
+    fn export(&self) -> Service {
+        Service {
             time:         self.hours().total_time(),
+            tax:          self.hours().tax().map(|t|t.value()),
             salary:       self.hours().salary()
                                       .map(|s| s.postfix().to_string()),
             gross_total:  self.hours().gross_wages()
                                       .map(|s| s.postfix().to_string()),
             net_total:    self.hours().net_wages()
                                       .map(|s| s.postfix().to_string()),
+            employees:    self.hours().employees()
+                                      .map(|empls|
+                                           empls.iter()
+                                                .map(export_employee)
+                                                .collect()
+                                      )
         }
     }
 }
@@ -221,7 +250,7 @@ impl ExportTarget<Bills> for Project {
 pub struct Complete {
     client: Client,
     event: Event,
-    hours: Hours,
+    service: Service,
     offer: Offer,
     invoice: Invoice,
     bills: Bills,
@@ -233,7 +262,7 @@ impl ExportTarget<Complete> for Project {
         Complete {
             client: self.export(),
             event: self.export(),
-            hours: self.export(),
+            service: self.export(),
             offer: self.export(),
             invoice: self.export(),
             bills: self.export(),

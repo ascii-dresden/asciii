@@ -7,7 +7,7 @@ use yaml_rust::Yaml;
 use yaml_rust::yaml::Hash as YamlHash;
 
 use super::*;
-use super::spec::{HasEvents, Event, EventTime};
+use super::spec::*;
 use super::product::error::Result as ProductResult;
 use util::yaml;
 use util::to_currency;
@@ -259,7 +259,8 @@ impl HasEvents for Project {
         calendar
     }
 
-    fn events(&self) -> Option<Vec<Event>> {
+    #[allow(unused_qualifications)]
+    fn events(&self) -> Option<Vec<spec::Event>> {
         let dates = try_some!(ProvidesData::get(self, "event.dates/").and_then(|a| a.as_vec()));
         dates.into_iter()
             .map(|h| {
@@ -274,7 +275,7 @@ impl HasEvents for Project {
                     .and_then(|y|y.as_str())
                     .and_then(|d|self.parse_dmy_date(d));
 
-                Some( Event{
+                Some( spec::Event{
                     begin: begin,
                     end: end,
                     times: self.times(h).unwrap_or_else(Vec::new)
@@ -630,53 +631,42 @@ impl<'a> HasEmployees for Hours<'a> {
     }
 
     fn total_time(&self) -> Option<f64> {
-        self.employees().map(|vec| {
-            vec.iter()
-                .map(|&(_, h)| h)
-                .fold(0f64, |acc, h| acc + h)
-        })
+        self.employees()
+            .map(|e|e.iter()
+                     .fold(0f64, |acc, e| acc + e.time))
     }
 
     fn employees_string(&self) -> Option<String> {
-        self.employees().map(|v| {
-            v.iter()
-                .filter(|&&(_, ref time)| *time as u32 > 0)
-                .map(|&(ref name, ref time)| {
-                    if let Some(salary) = self.salary() {
-                        format!("{}: ({}h {})", name, time, (salary * *time).postfix())
-                    } else {
-                        String::from("---")
-                    }
-                })
-                .collect::<Vec<String>>()
-                .join(", ")
-        })
+        self.employees()
+            .map(|e|e.iter()
+            .filter(|e| e.time as u32 > 0)
+            .map(|e| format!("{}: ({}h {})", e.name, e.time, (e.salary * e.time).postfix()))
+            .collect::<Vec<String>>()
+            .join(", "))
     }
 
-    fn employees(&self) -> Option<Vec<(String, f64)>> {
+    fn employees(&self) -> Option<Vec<Employee>> {
+        let employees =
         self.get_hash("hours.caterers")
-            .or_else(||self.get_hash("hours.employees"))
-            .and_then(|h| {
-                h.iter()
-                    .map(|(c, h)| {
-                        (// argh, those could be int or float, grrr
-                            c.as_str().unwrap_or("").to_owned(),
-                            h.as_f64()
-                            .or_else(|| // sorry for this
-                                     h.as_i64().map(|f|f as f64 ))
-                            .unwrap_or(0f64))
-                    })
-                .map(|(employee,time)| if time > 0f64 {
-                    Some((employee, time))
-                } else {
-                    None
-                } )
-                .collect::<
-                Option<
-                Vec<(String, f64)>
-                >
-                >()
-            })
+            .or_else(||self.get_hash("hours.employees"));
+
+        if let Some(employees) = employees {
+            employees.iter()
+                     .map(|(c, h)| (
+                             c.as_str().unwrap_or("").into(),
+                             make_float(h)
+                             )
+                         )
+                     .filter(|&(_, h)| h > 0f64 )
+                     .map(|(name, time)| {
+                          let wage = try_some!(self.salary()) * time;
+                          let salary = try_some!(self.salary());
+                          Some( Employee { name, time, wage, salary })
+                      })
+                     .collect::< Option<Vec<Employee>> >()
+        } else {
+            None
+        }
     }
 
     fn employees_payed(&self) -> bool {
@@ -691,6 +681,13 @@ impl<'a> HasEmployees for Hours<'a> {
         } else{None}
     }
 }
+
+// helper for HasEmployees::employees()
+fn make_float(h: &Yaml) -> f64 {
+    h.as_f64().or_else(|| h.as_i64().map(|f|f as f64 ))
+        .unwrap_or(0f64)
+}
+
 
 
 impl<'a> Validatable for Hours<'a> {
