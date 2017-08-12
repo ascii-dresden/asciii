@@ -25,7 +25,7 @@ fn list_path_content(path:&Path) -> Vec<PathBuf> {
 }
 
 
-#[cfg(test)]
+#[cfg(all(feature="serialization",test))]
 mod regression {
     use super::*;
     use asciii::storage::Storable;
