@@ -196,7 +196,10 @@ pub fn get_dmy(yaml:&Yaml, key:&str) -> Option<Date<Utc>> {
 /// and replaces `Yaml::Null` and `Yaml::BadValue`.
 //#[deprecated(note="use `ProvicdesData` instead")]
 pub fn get<'a>(yaml:&'a Yaml, key:&str) -> Option<&'a Yaml>{
-    match get_path(yaml, &key.split('/').filter(|k|!k.is_empty()).collect::<Vec<&str>>()) {
+    let path = key.split(|c| c == '/' || c == '.')
+                  .filter(|k|!k.is_empty())
+                  .collect::<Vec<&str>>();
+    match get_path(yaml, &path) {
         Some(&Yaml::Null) |
         Some(&Yaml::BadValue) => None,
         content => content
