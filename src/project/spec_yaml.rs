@@ -315,6 +315,20 @@ impl HasEvents for Project {
     }
 }
 
+/// Returns a product from Service
+fn service_to_product<'a, T: HasEmployees>(s: T) -> Option<Product<'a>> {
+    if let Some(salary) = s.salary() {
+        Some(Product {
+            name: "Service",
+            unit: Some("h"),
+            tax: s.tax().unwrap_or(Tax::new(0.0)),
+            price: salary
+        })
+    } else {
+        None
+    }
+}
+
 impl Redeemable for Project {
     fn payed_date(&self) -> Option<Date<Utc>> {
         self.get_dmy("invoice.payed_date")
@@ -334,17 +348,13 @@ impl Redeemable for Project {
         let mut offer: Bill<Product> = Bill::new();
         let mut invoice: Bill<Product> = Bill::new();
 
-        let service = || Product {
-            name: "Service",
-            unit: Some("h"),
-            tax: Tax::new(0.0), // TODO this ought to be in the config
-            price: self.hours().salary().unwrap_or(Currency::new())
-        };
+        let service = service_to_product(self.hours())
+            .expect("cannot create product from employees, salary or tax missing");
 
         if let Some(total) = self.hours().total_time() {
             if total.is_normal() {
-                offer.add_item(total, service());
-                invoice.add_item(total, service());
+                offer.add_item(total, service);
+                invoice.add_item(total, service);
             }
         }
 

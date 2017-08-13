@@ -162,7 +162,7 @@ pub trait HasEmployees {
     fn total_time(&self) -> Option<f64>;
 
     /// Returns a product from Service
-    fn to_product(&self) -> Option<Product> {
+    fn to_product<'a>(&'a self) -> Option<Product<'a>> {
         if let Some(salary) = self.salary() {
             Some(Product {
                 name: "Service",
