@@ -482,13 +482,15 @@ pub fn version() -> Result<()> {
 
 /// Command DUES
 pub fn dues(matches: &ArgMatches) -> Result<()> {
-    let dues = if matches.is_present("wages") {
-        actions::open_wages()
-    } else {
-        actions::open_payments()
-    };
+    let dues = actions::dues();
     if let Ok(dues) = dues {
-        println!("{}", dues.postfix());
+        println!("Open Payments: {}", dues.acc_sum_sold.postfix());
+        println!("Open Wages:    {}", dues.acc_wages.postfix());
+        if matches.is_present("wages") {
+            for (employee, open_wages) in &dues.unpayed_employees {
+                println!("{}:    {}", employee, open_wages.postfix());
+            }
+        }
     }
     Ok(())
 }

@@ -12,9 +12,8 @@ use term_size;
 
 use super::BillType;
 
-use project::Project;
-use project::spec::{IsProject, Redeemable, Invoicable, HasEmployees};
-use project::spec::events::HasEvents;
+use project::{Project, Exportable};
+use project::spec::{IsProject, Redeemable, Invoicable, HasEmployees, HasEvents};
 use project::error::SpecResult;
 use storage::Storable;
 use util::currency_to_string;
@@ -52,7 +51,7 @@ impl<'a> Default for ListConfig<'a>{
 fn payed_to_cell(project:&Project) -> Cell {
     let sym = ::CONFIG.get_str("currency");
 
-    match (project.payed_by_client(), project.hours().employees_payed()) {
+    match (project.is_payed(), project.hours().employees_payed()) {
         (false,false) => Cell::new("✗").with_style(Attr::ForegroundColor(color::RED)),
         (_,    false) |
         (false, _   ) => Cell::new(sym).with_style(Attr::ForegroundColor(color::YELLOW)),
@@ -208,7 +207,7 @@ pub fn verbose_rows(projects:&[Project], list_config:&ListConfig) -> Vec<Row>{
             if let Some(ref details) = list_config.details{
                 cells.extend_from_slice(
                     &details.iter().map(|d|
-                                 cell!( project.get(&d).unwrap_or_else(String::new)),
+                                 cell!( project.field(&d).unwrap_or_else(String::new)),
                                  ).collect::<Vec<Cell>>()
                     );
             }
@@ -246,7 +245,7 @@ pub fn dynamic_rows(projects:&[Project], list_config:&ListConfig) -> Vec<Row>{
             if let Some(ref details) = list_config.details{
                 cells.extend_from_slice(
                     &details.iter().map(|d|
-                                        cell!( project.get(&d).unwrap_or_else(String::new)).style_spec(row_style),
+                                        cell!( project.field(&d).unwrap_or_else(String::new)).style_spec(row_style),
                                         ).collect::<Vec<Cell>>()
                     );
                 if list_config.show_errors{
@@ -377,6 +376,6 @@ pub fn show_details(project:&Project, bill_type:&BillType) {
         }
     }
 
-    println!("{}", project.employees_string());
+    println!("{}", project.hours().employees_string().unwrap_or_else(String::new));
 
 }

@@ -17,11 +17,10 @@ use yaml_rust::Yaml;
 use slug;
 use tempdir::TempDir;
 
-use bill::{Bill, Currency, Tax};
+use bill::BillItem;
 use icalendar::*;
-//use semver::Version;
+use semver::Version;
 
-#[cfg(feature="serialization")] use self::export::*;
 use super::BillType;
 use util::{yaml, get_valid_path};
 use storage::{Storable, StorageResult, list_path_content};
@@ -39,45 +38,29 @@ macro_rules! try_some {
 
 pub mod product;
 pub mod spec;
+mod spec_yaml;
 
 pub mod error;
 mod computed_field;
 
-#[cfg(feature="json")]
-pub mod tojson;
-#[cfg(feature="serialization")]
-pub mod export;
+#[cfg(feature="deserialization")] pub mod import;
+#[cfg(feature="serialization")] pub mod export;
+#[cfg(feature="serialization")] use self::export::*;
 
-
-//#[cfg(test)] mod tests;
-
-use self::spec::ProvidesData;
 use self::spec::{IsProject, IsClient};
 use self::spec::{Offerable, Invoicable, Redeemable, Validatable, HasEmployees};
-use self::spec::events::HasEvents;
+use self::spec_yaml::ProvidesData;
+
 use self::error::{ErrorKind, ErrorList, SpecResult, Result};
 use self::product::Product;
 use self::product::error as product_error;
 
-
 pub use self::computed_field::ComputedField;
-
-/// Output of `Project::debug()`.
-///
-/// A project is storable, contains products, and you can create an offer or invoice from it.
-#[derive(Debug)]
-pub struct Debug {
-    file_path: PathBuf,
-    //temp_dir: Option<PathBuf>, // TODO
-    git_status: Option<GitStatus>,
-    yaml: Yaml
-}
 
 /// Represents a Project.
 ///
 /// A project is storable, contains products, and you can create an offer or invoice from it.
 /// The main implementation is done in [`spec`](spec/index.html).
-//#[derive(Clone)]
 pub struct Project {
     file_path: PathBuf,
     _temp_dir: Option<TempDir>,
@@ -109,17 +92,57 @@ impl Project {
         })
     }
 
+    /// import from yaml file
+    #[cfg(feature="deserialization")]
+    pub fn from_yaml(&self) -> Result<import::Project> {
+        import::from_str(&self.file_content)
+    }
+
+    /// (feature deactivated) import from yaml file
+    #[cfg(not(feature="deserialization"))]
+    pub fn from_yaml(&self) -> Result<()> {
+        bail!(error::ErrorKind::FeatureDeactivated)
+    }
+
+    pub fn dump_yaml(&self) -> String {
+        use yaml_rust::emitter::YamlEmitter;
+        let mut buf = String::new();
+        {
+            let mut emitter = YamlEmitter::new(&mut buf);
+            emitter.dump(self.yaml()).unwrap();
+        }
+        buf
+    }
+
+    #[cfg(feature="serialization")]
+    /// export to JSON
+    pub fn to_json(&self) -> Result<String> {
+        let complete: Complete = self.export();
+        Ok(serde_json::to_string(&complete)?)
+    }
+
+    #[cfg(not(feature="serialization"))]
+    /// feature deactivateda) export to JSON
+    pub fn to_json(&self) -> Result<String> {
+        bail!(error::ErrorKind::FeatureDeactivated)
+    }
+
+    /// Used mostly for testing purposes
+    pub fn from_file_content(content: &str) -> Result<Project> {
+        Ok(Project{
+            file_path: PathBuf::new(),
+            _temp_dir: None,
+            git_status: None,
+            yaml: yaml::parse(&content).unwrap(),
+            file_content: String::from(content),
+        })
+    }
+
     /// wrapper around yaml::get() with replacement
-    pub fn get(&self, path:&str) -> Option<String> {
+    pub fn field(&self, path:&str) -> Option<String> {
         ComputedField::from(path).get(self).or_else(||
             yaml::get_to_string(self.yaml(),path)
         )
-    }
-
-    /// either `"canceled"` or `""`
-    pub fn canceled_string(&self) -> &'static str{
-        if self.canceled(){"canceled"}
-        else {""}
     }
 
     /// Returns the struct `Client`, which abstracts away client specific stuff.
@@ -141,104 +164,6 @@ impl Project {
     pub fn hours(&self) -> Hours {
         Hours { inner: self }
     }
-
-    pub fn payed_by_client(&self) -> bool{
-        self.payed_date().is_some()
-    }
-
-    //#[deprecated]
-    pub fn employees_string(&self) -> String {
-        self.hours().employees_string().unwrap_or_else(String::new)
-    }
-
-    #[deprecated]
-    pub fn caterers(&self) -> String {
-        self.employees_string()
-    }
-
-    /// Filename of the offer output file.
-    pub fn offer_file_name(&self, extension:&str) -> Option<String>{
-        let num = try_some!(self.offer().number());
-        let name = slug::slugify(try_some!(IsProject::name(self)));
-        Some(format!("{} {}.{}",num,name,extension))
-    }
-
-    /// Filename of the invoice output file. **Carefull!** uses today's date.
-    pub fn invoice_file_name(&self, extension:&str) -> Option<String>{
-        let num = try_some!(self.invoice().number_str());
-        let name = slug::slugify(try_some!(self.name()));
-        //let date = Local::today().format("%Y-%m-%d").to_string();
-        let date = try_some!(self.invoice().date()).format("%Y-%m-%d").to_string();
-        Some(format!("{} {} {}.{}",num,name,date,extension))
-    }
-
-    pub fn output_file_exists(&self, bill_type:&BillType) -> bool {
-        match *bill_type{
-            BillType::Offer   => self.offer_file_exists(),
-            BillType::Invoice => self.invoice_file_exists()
-        }
-    }
-
-    pub fn output_file(&self, bill_type:&BillType) -> Option<PathBuf> {
-        match *bill_type{
-            BillType::Offer   => self.offer_file(),
-            BillType::Invoice => self.invoice_file()
-        }
-    }
-
-    pub fn offer_file(&self) -> Option<PathBuf> {
-        let output_folder = get_valid_path(::CONFIG.get_str("output_path"));
-        let convert_ext  = ::CONFIG.get_str("document_export/output_extension");
-        match (output_folder, self.offer_file_name(convert_ext)) {
-            (Some(folder), Some(name)) => folder.join(&name).into(),
-            _ => None
-        }
-    }
-
-    pub fn invoice_file(&self) -> Option<PathBuf>{
-        let output_folder = get_valid_path(::CONFIG.get_str("output_path"));
-        let convert_ext  = ::CONFIG.get_str("document_export/output_extension");
-        match (output_folder, self.invoice_file_name(convert_ext)) {
-            (Some(folder), Some(name)) => folder.join(&name).into(),
-            _ => None
-        }
-    }
-
-    pub fn offer_file_exists(&self) -> bool {
-        self.offer_file().map(|f|f.exists()).unwrap_or(false)
-    }
-
-    pub fn invoice_file_exists(&self) -> bool {
-        self.invoice_file().map(|f|f.exists()).unwrap_or(false)
-    }
-
-    fn write_to_path<P:AsRef<OsStr> + fmt::Debug>(content:&str, target:&P) -> Result<PathBuf> {
-        trace!("writing content ({}bytes) to {:?}", content.len(), target);
-        let mut file = File::create(Path::new(target))?;
-        file.write_all(content.as_bytes())?;
-        file.sync_all()?;
-        Ok(Path::new(target).to_owned())
-    }
-
-    pub fn write_to_file(&self, content:&str, bill_type:&BillType,ext:&str) -> Result<PathBuf> {
-        match *bill_type{
-            BillType::Offer   => self.write_to_offer_file(content, ext),
-            BillType::Invoice => self.write_to_invoice_file(content, ext)
-        }
-    }
-
-    fn write_to_offer_file(&self, content:&str, ext:&str) -> Result<PathBuf> {
-        if let Some(target) = self.offer_file_name(ext){
-            Self::write_to_path(content, &self.dir().join(&target))
-        } else {bail!(ErrorKind::CantDetermineTargetFile)}
-    }
-
-    fn write_to_invoice_file(&self, content:&str, ext:&str) -> Result<PathBuf> {
-        if let Some(target) = self.invoice_file_name(ext){
-            Self::write_to_path(content, &self.dir().join(&target))
-        } else {bail!(ErrorKind::CantDetermineTargetFile)}
-    }
-
 
     /// Ready to produce offer.
     ///
@@ -275,22 +200,6 @@ impl Project {
         }
     }
 
-    /// TODO move to `IsProjectExt`
-    pub fn age(&self) -> Option<i64> {
-        self.modified_date().map(|date| (Utc::today().signed_duration_since(date)).num_days() )
-    }
-
-    #[cfg(feature="serialization")]
-    pub fn to_json(&self) -> Result<String> {
-        let complete: Complete = self.export();
-        Ok(serde_json::to_string(&complete)?)
-    }
-
-    #[cfg(not(feature="serialization"))]
-    pub fn to_json(&self) -> Result<String> {
-        bail!(error::ErrorKind::FeatureDeactivated)
-    }
-
     pub fn to_csv(&self, bill_type:&BillType) -> Result<String>{
         use std::fmt::Write;
         let (offer, invoice) = self.bills()?;
@@ -314,35 +223,16 @@ impl Project {
         Ok(csv_string)
     }
 
-    pub fn wages(&self) -> Option<Currency> {
-        if let (Some(total), Some(salary)) = (self.hours().total(), self.hours().salary()){
-            Some(total * salary)
-        } else{None}
-    }
-
-    pub fn sum_sold(&self) -> Result<Currency> {
-        let (_,invoice) = self.bills()?;
-        Ok(invoice.net_total())
-    }
-
     pub fn debug(&self) -> Debug {
         self.into()
     }
 
-    pub fn dump_yaml(&self) -> String {
-        use yaml_rust::emitter::YamlEmitter;
-        let mut buf = String::new();
-        {
-            let mut emitter = YamlEmitter::new(&mut buf);
-            emitter.dump(self.yaml()).unwrap();
-        }
-        buf
-    }
-
+    /// Check Templated for replacable markers
     pub fn empty_fields(&self) -> Vec<String>{
         self.file_content.list_keywords()
     }
 
+    /// Fill certain field
     pub fn replace_field(&self, field:&str, value:&str) -> Result<()> {
         // fills the template
         let filled = Templater::new(&self.file_content)
@@ -366,7 +256,7 @@ impl Project {
         }
     }
 
-    /// Time Since Event
+    /// Time between event and creation of invoice
     pub fn our_bad(&self) -> Option<Duration> {
         let event   = try_some!(self.event_date());
         let invoice = self.invoice().date().unwrap_or_else(Utc::today);
@@ -378,6 +268,7 @@ impl Project {
         }
     }
 
+    /// Time between creation of invoice and payment
     pub fn their_bad(&self) -> Option<Duration> {
         let invoice = self.invoice().date().unwrap_or_else(Utc::today);
         let payed   = self.payed_date().unwrap_or_else(Utc::today);
@@ -432,7 +323,7 @@ impl Project {
         let days_since_payed = (Utc::today().signed_duration_since(payed_date)).num_days();
         Todo::new().summary(&lformat!("{}: Hungry employees!", self.invoice().number_str().unwrap_or_else(String::new)))
             .description( &lformat!("Pay {}\nYou have had the money for {} days!",
-                                   self.employees_string(),
+                                   self.hours().employees_string().unwrap_or_else(String::new),
                                    days_since_payed))
             .due((payed_date + Duration::days(14)).and_hms(11, 10, 0))
             .done()
@@ -471,78 +362,139 @@ impl Project {
                        .done()
     }
 
-}
+    fn item_from_desc_and_value<'y>(&self, desc: &'y Yaml, values: &'y Yaml) -> product_error::Result<(BillItem<Product<'y>>,BillItem<Product<'y>>)> {
+        let get_f64 = |yaml, path|
+            self.get_direct(yaml,path)
+                .and_then(|y| y.as_f64()
+                               .or_else(|| y.as_i64()
+                                     .map(|y|y as f64)
+                                  )
+                         );
 
-impl ProvidesData for Project {
-    fn data(&self) -> &Yaml{
-        self.yaml()
-    }
-}
+        let product = Product::from_desc_and_value(desc, values, self.tax())?;
 
-impl IsProject for Project {
-    fn long_desc(&self) -> String {
-        use std::fmt::Write;
-        let mut out_string = String::new();
+        let offered = get_f64(values, "amount")
+                           .ok_or_else(
+                               || product_error::ErrorKind::MissingAmount(product.name.to_owned())
+                               )?;
 
-        if let Some(responsible) = self.responsible() {
-            out_string += &lformat!("Responsible: {}", responsible);
-        }
-
-        if let Some(employees) = self.hours().employees_string() {
-            writeln!(out_string, "\n{}", employees).unwrap();
-        }
-
-        out_string
-    }
-}
-
-impl Redeemable for Project {
-    fn bills(&self) -> product::Result<(Bill<Product>, Bill<Product>)> {
-        let mut offer: Bill<Product> = Bill::new();
-        let mut invoice: Bill<Product> = Bill::new();
-
-        let service = || Product {
-            name: "Service",
-            unit: Some("h"),
-            tax: Tax::new(0.0), // TODO this ought to be in the config
-            price: self.hours().salary().unwrap_or(Currency::new())
+        let sold = get_f64(values, "sold");
+        // TODO test this
+        let sold = if let Some(returned) = get_f64(values, "returned") {
+            // if "returned", there must be no "sold"
+            if sold.is_some() {
+                bail!(product_error::ErrorKind::AmbiguousAmounts(product.name.to_owned()));
+            }
+            if returned > offered {
+                bail!(product_error::ErrorKind::TooMuchReturned(product.name.to_owned()));
+            }
+            offered - returned
+        } else if let Some(sold) = sold {
+            sold
+        } else {
+            offered
         };
 
-        if let Some(total) = self.hours().total() {
-            if total.is_normal() {
-                offer.add_item(total, service());
-                invoice.add_item(total, service());
-            }
-        }
-
-        let raw_products =
-            self.get_hash("products")
-                .ok_or_else(||product_error::Error::from(product_error::ErrorKind::UnknownFormat))?;
-
-        // let document_tax =  // TODO activate this once the tax no longer 19%
-
-        for (desc,values) in raw_products {
-            let (offer_item, invoice_item) = self.item_from_desc_and_value(desc, values)?;
-            if offer_item.amount.is_normal()   { offer.add(offer_item); }
-            if invoice_item.amount.is_normal() { invoice.add(invoice_item); }
-        }
-
-        Ok((offer,invoice))
+        Ok(( BillItem{ amount: offered, product: product }, BillItem{ amount: sold, product: product }))
     }
 }
 
-impl Validatable for Project {
-    fn validate(&self) -> SpecResult {
-        let mut errors = ErrorList::new();
-        if self.name().is_none(){errors.push("name")}
-        if self.event_date().is_none(){errors.push("date")}
-        if self.responsible().is_none(){errors.push("manager")}
-        if self.format().is_none(){errors.push("format")}
-        //if hours::salary().is_none(){errors.push("salary")}
+/// Functionality to create output files
+pub trait Exportable {
+    /// Where to export to
+    fn export_dir(&self)  -> PathBuf;
 
-        if errors.is_empty(){ Ok(()) }
-        else { Err(errors) }
+    /// Filename of the offer output file.
+    fn offer_file_name(&self, extension:&str) -> Option<String>;
+
+    /// Filename of the invoice output file. **Carefull!** uses today's date.
+    fn invoice_file_name(&self, extension:&str) -> Option<String>;
+
+    fn output_file_exists(&self, bill_type: &BillType) -> bool {
+        match *bill_type{
+            BillType::Offer   => self.offer_file_exists(),
+            BillType::Invoice => self.invoice_file_exists()
+        }
     }
+
+    fn output_file(&self, bill_type: &BillType) -> Option<PathBuf> {
+        match *bill_type{
+            BillType::Offer   => self.offer_file(),
+            BillType::Invoice => self.invoice_file()
+        }
+    }
+
+    fn offer_file(&self) -> Option<PathBuf> {
+        let output_folder = get_valid_path(::CONFIG.get_str("output_path"));
+        let convert_ext  = ::CONFIG.get_str("document_export/output_extension");
+        match (output_folder, self.offer_file_name(convert_ext)) {
+            (Some(folder), Some(name)) => folder.join(&name).into(),
+            _ => None
+        }
+    }
+
+    fn invoice_file(&self) -> Option<PathBuf>{
+        let output_folder = get_valid_path(::CONFIG.get_str("output_path"));
+        let convert_ext  = ::CONFIG.get_str("document_export/output_extension");
+        match (output_folder, self.invoice_file_name(convert_ext)) {
+            (Some(folder), Some(name)) => folder.join(&name).into(),
+            _ => None
+        }
+    }
+
+    fn offer_file_exists(&self) -> bool {
+        self.offer_file().map(|f|f.exists()).unwrap_or(false)
+    }
+
+    fn invoice_file_exists(&self) -> bool {
+        self.invoice_file().map(|f|f.exists()).unwrap_or(false)
+    }
+
+    fn write_to_path<P:AsRef<OsStr> + fmt::Debug>(content:&str, target:&P) -> Result<PathBuf> {
+        trace!("writing content ({}bytes) to {:?}", content.len(), target);
+        let mut file = File::create(Path::new(target))?;
+        file.write_all(content.as_bytes())?;
+        file.sync_all()?;
+        Ok(Path::new(target).to_owned())
+    }
+
+    fn write_to_file(&self, content:&str, bill_type:&BillType,ext:&str) -> Result<PathBuf> {
+        match *bill_type{
+            BillType::Offer   => self.write_to_offer_file(content, ext),
+            BillType::Invoice => self.write_to_invoice_file(content, ext)
+        }
+    }
+
+    fn write_to_offer_file(&self, content:&str, ext:&str) -> Result<PathBuf> {
+        if let Some(target) = self.offer_file_name(ext){
+            Self::write_to_path(content, &self.export_dir().join(&target))
+        } else {bail!(ErrorKind::CantDetermineTargetFile)}
+    }
+
+    fn write_to_invoice_file(&self, content:&str, ext:&str) -> Result<PathBuf> {
+        if let Some(target) = self.invoice_file_name(ext){
+            Self::write_to_path(content, &self.export_dir().join(&target))
+        } else {bail!(ErrorKind::CantDetermineTargetFile)}
+    }
+}
+
+impl Exportable for Project {
+    fn export_dir(&self)  -> PathBuf { Storable::dir(self) }
+
+    fn offer_file_name(&self, extension: &str) -> Option<String>{
+        let num = try_some!(self.offer().number());
+        let name = slug::slugify(try_some!(IsProject::name(self)));
+        Some(format!("{} {}.{}", num, name, extension))
+    }
+
+    fn invoice_file_name(&self, extension: &str) -> Option<String>{
+        let num = try_some!(self.invoice().number_str());
+        let name = slug::slugify(try_some!(self.name()));
+        //let date = Local::today().format("%Y-%m-%d").to_string();
+        let date = try_some!(self.invoice().date()).format("%Y-%m-%d").to_string();
+        Some(format!("{} {} {}.{}",num,name,date,extension))
+    }
+
 }
 
 impl Storable for Project {
@@ -677,7 +629,7 @@ impl Storable for Project {
 
     /// Checks against a certain key-val pair.
     fn matches_filter(&self, key: &str, val: &str) -> bool{
-        self.get(key).map_or(false, |c| c.to_lowercase().contains(&val.to_lowercase()))
+        self.field(key).map_or(false, |c| c.to_lowercase().contains(&val.to_lowercase()))
     }
 
     /// UNIMPLEMENTED: Checks against a certain search term.
@@ -697,6 +649,37 @@ impl Storable for Project {
     }
 }
 
+/// This is returned by `[Product::client()](struct.Project.html#method.client)`.
+pub struct Client<'a> {
+    inner: &'a Project
+}
+
+/// This is returned by [`Product::offer()`](struct.Project.html#method.offer).
+pub struct Offer<'a> {
+    inner: &'a Project
+}
+
+/// This is returned by [`Product::invoice()`](struct.Project.html#method.invoice).
+pub struct Invoice<'a> {
+    inner: &'a Project
+}
+
+/// This is returned by [`Product::hours()`](struct.Project.html#method.hours).
+pub struct Hours<'a> {
+    inner: &'a Project
+}
+
+/// Output of `Project::debug()`.
+///
+/// A project is storable, contains products, and you can create an offer or invoice from it.
+#[derive(Debug)]
+pub struct Debug {
+    file_path: PathBuf,
+    //temp_dir: Option<PathBuf>, // TODO
+    git_status: Option<GitStatus>,
+    yaml: Yaml
+}
+
 impl<'a> From<&'a Project> for Debug {
     fn from(project: &'a Project) -> Debug {
         Debug {
@@ -707,152 +690,10 @@ impl<'a> From<&'a Project> for Debug {
     }
 }
 
-impl HasEvents for Project { }
-
 impl fmt::Debug for Project {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         //write!(f, "{:?}", self.debug())
         write!(f, "{:?}{:?}", self.name(), self.file())
-    }
-}
-
-
-
-
-
-/// This is returned by `[Product::client()](struct.Project.html#method.client)`.
-pub struct Client<'a> {
-    inner: &'a Project
-}
-
-impl<'a> ProvidesData for Client<'a> {
-    fn data(&self) -> &Yaml{
-        self.inner.data()
-    }
-}
-
-impl<'a> IsClient for Client<'a> { }
-
-impl<'a> Validatable for Client<'a> {
-    fn validate(&self) -> SpecResult {
-        let mut errors = self.field_exists( &[
-                                             //"client/email", // TODO make this a requirement
-                                             "client/address",
-                                             "client/title",
-                                             "client/last_name",
-                                             "client/first_name"
-                                             ]);
-
-
-        if self.addressing().is_none() {
-            errors.push("client_addressing");
-        }
-        if !errors.is_empty() {
-            return Err(errors);
-        }
-
-        Ok(())
-    }
-}
-
-
-
-
-
-/// This is returned by [`Product::offer()`](struct.Project.html#method.offer).
-pub struct Offer<'a> {
-    inner: &'a Project
-}
-
-impl<'a> ProvidesData for Offer<'a> {
-    fn data(&self) -> &Yaml{
-        self.inner.data()
-    }
-}
-
-impl<'a> Offerable for Offer<'a> { }
-
-impl<'a> Validatable for Offer<'a> {
-    fn validate(&self) -> SpecResult {
-        //if IsProject::canceled(self) {
-        //    return Err(vec!["canceled"]);
-        //}
-
-        let mut errors = self.field_exists(&["offer.date", "offer.appendix", "manager"]);
-        if Offerable::date(self).is_none() {
-            errors.push("offer_date_format");
-        }
-
-        if !errors.is_empty() {
-            return Err(errors);
-        }
-
-        Ok(())
-
-    }
-}
-
-
-
-
-
-/// This is returned by [`Product::invoice()`](struct.Project.html#method.invoice).
-pub struct Invoice<'a> {
-    inner: &'a Project
-}
-
-impl<'a> ProvidesData for Invoice<'a> {
-    fn data(&self) -> &Yaml{
-        self.inner.data()
-    }
-}
-
-impl<'a> Invoicable for Invoice<'a> { }
-
-impl<'a> Validatable for Invoice<'a> {
-    fn validate(&self) -> SpecResult {
-        let mut errors = self.field_exists(&["invoice.number"]);
-
-        // if super::offer::validate(yaml).is_err() {errors.push("offer")}
-        if self.date().is_none() {
-            errors.push("invoice_date");
-        }
-
-        if !errors.is_empty() {
-            return Err(errors);
-        }
-
-        Ok(())
-    }
-}
-
-
-
-
-
-/// This is returned by [`Product::hours()`](struct.Project.html#method.hours).
-pub struct Hours<'a> {
-    inner: &'a Project
-}
-
-impl<'a> ProvidesData for Hours<'a> {
-    fn data(&self) -> &Yaml{
-        self.inner.data()
-    }
-}
-
-impl<'a> HasEmployees for Hours<'a> { }
-
-impl<'a> Validatable for Hours<'a> {
-    fn validate(&self) -> SpecResult {
-        let mut errors = ErrorList::new();
-        if !self.employees_payed() { errors.push("employees_payed"); }
-
-        if !errors.is_empty() {
-            return Err(errors);
-        }
-
-        Ok(())
     }
 }
 

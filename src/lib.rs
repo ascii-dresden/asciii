@@ -38,9 +38,15 @@ extern crate open;
 extern crate semver;
 extern crate term_size;
 extern crate icalendar;
-#[cfg(feature="serialization")] extern crate serde;
+
+#[cfg(feature="serde")] extern crate serde;
+#[cfg(feature="serde")] #[macro_use] extern crate serde_derive;
+
 #[cfg(feature="serialization")] extern crate serde_json;
-#[cfg(feature="serialization")] #[macro_use] extern crate serde_derive;
+#[cfg(feature="deserialization")] extern crate serde_yaml;
+#[cfg(feature="deserialization")] extern crate ordered_float;
+#[cfg(feature="deserialization")] extern crate num_traits;
+
 #[macro_use] extern crate error_chain;
 #[macro_use] extern crate log;
 #[macro_use] extern crate prettytable;

@@ -5,13 +5,13 @@ use super::Project;
 use super::spec::*;
 
 /// Fields that are accessible but are not directly found in the file format.
-/// This is used to get fields that are computed through an ordinary `get("responsible")`
+/// This is used to get fields that are computed through an ordinary `field("responsible")`
 custom_derive! {
     #[derive(Debug,
              IterVariants(ComputedFields), IterVariantNames(ComputedFieldNames),
              EnumFromStr
              )]
-    /// `Project::get()` allows accessing fields within the raw `yaml` data structure.
+    /// `Project::field()` allows accessing fields within the raw `yaml` data structure.
     /// Computed fields are fields that are not present in the document but computed.
     ///
     /// `ComputedFields` is an automatically generated type that allows iterating of the variants of
@@ -34,6 +34,7 @@ custom_derive! {
         Employees,
         ClientFullName,
         Wages,
+        Deserializes,
 
         /// Sorting index
         SortIndex,
@@ -73,12 +74,14 @@ impl ComputedField {
 
             ComputedField::Employees         => project.hours().employees_string(),
             ComputedField::ClientFullName    => project.client().full_name(),
-            ComputedField::Wages             => project.wages().map(|c| util::currency_to_string(&c)),
+            ComputedField::Deserializes      => Some(format!("{:?}", project.from_yaml().is_ok())),
+            ComputedField::Wages             => project.hours().gross_wages().map(|c| util::currency_to_string(&c)),
             ComputedField::Invalid           => None,
             ComputedField::Format            => project.format().map(|f|f.to_string()),
-            ComputedField::Dir               => project.dir().parent()
-                .and_then(|d| d.strip_prefix(&storage).ok())
-                .map(|d| d.display().to_string())
+            ComputedField::Dir               => project.dir()
+                                                       .parent()
+                                                       .and_then(|d| d.strip_prefix(&storage).ok())
+                                                       .map(|d| d.display().to_string())
 
             // _ => None
         }

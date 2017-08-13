@@ -1,7 +1,6 @@
 #![allow(trivial_casts)]
 
 use std::{io, fmt, time};
-use std::error::Error as ErrorTrait;
 
 use project;
 // use project::error::ProjectError;

@@ -2,6 +2,7 @@
 
 use std::{io, fmt};
 #[cfg(feature="serialization")] use serde_json;
+#[cfg(feature="deserialization")] use serde_yaml;
 use util::yaml;
 
 use super::product;
@@ -19,7 +20,8 @@ error_chain!{
         Io(io::Error);
         Fmt(fmt::Error);
         Yaml(yaml::YamlError);
-        Serde(serde_json::Error) #[cfg(feature="serialization")];
+        Serialize(serde_json::Error) #[cfg(feature="serialization")];
+        Deserialize(serde_yaml::Error) #[cfg(feature="deserialization")];
     }
 
     errors {

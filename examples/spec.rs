@@ -27,8 +27,8 @@ fn main() {
         // let (_offer, invoice) = spec::billing::bills().unwrap();
         // println!("Products:  {:#?}", invoice.as_items().iter().map(|item|format!("{:?}",item)).collect::<Vec<_>>());
         println!("--------------");
-        println!("hours:     {:?}h * {}", project.hours().total(), project.hours().salary() .map(|c| c.postfix().to_string()).unwrap_or_else(|| String::from("0€")));
-        println!("caterers:  {:?}", project.employees_string());
+        println!("hours:     {:?}h * {}", project.hours().total_time(), project.hours().salary() .map(|c| c.postfix().to_string()).unwrap_or_else(|| String::from("0€")));
+        println!("caterers:  {:?}", project.hours().employees_string());
         println!("\n\n\n");
     }
 
