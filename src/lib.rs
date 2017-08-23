@@ -99,7 +99,12 @@ lazy_static!{
 #[cfg(feature="version_string")]
 lazy_static!{
     /// Human readable, no semantic versioning.
-    pub static ref VERSION: String = format!("{} - {}", env!("CARGO_PKG_VERSION"), include_str!("../.most_recent_commit"));
+    pub static ref VERSION: String = format!("{} - {} ({}, {})",
+                                             env!("CARGO_PKG_VERSION"),
+                                             include_str!("../.most_recent_commit"),
+                                             env!("BUILD_DATE"),
+                                             env!("PROFILE"),
+                                             );
 }
 
 #[derive(Debug, Copy, Clone)]

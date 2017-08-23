@@ -1,13 +1,16 @@
+extern crate chrono;
 extern crate crowbook_intl;
+
 use std::path::PathBuf;
 use std::env;
 use std::fs::File;
 use std::io::Write;
 use std::process::{Command, Output};
 
+use chrono::prelude::*;
 use crowbook_intl::{Localizer, Extractor};
 
-fn execute_git(command:&str, args:&[&str]) -> Output{
+fn execute_git(command:&str, args:&[&str]) -> Output {
     let workdir = ".";
     let gitdir  = "./.git";
 
@@ -21,7 +24,7 @@ fn execute_git(command:&str, args:&[&str]) -> Output{
         .unwrap_or_else(|e| { panic!("git_failed {}", e) })
 }
 
-fn gen_commit_file(){
+fn gen_commit_file() {
     let git_log    = String::from_utf8(execute_git("log", &["--oneline", r##"--format=%h"##]).stdout).unwrap();
     let count = git_log.lines().count().to_string();
     let last_commit= git_log.lines().nth(0).unwrap().to_string();
@@ -46,7 +49,11 @@ fn generate_localization() {
     localizer.write_macro_file(dest_path).unwrap();
 }
 
-fn main(){
+fn main() {
+    // passing variables to rustc
+    println!("cargo:rustc-env=PROFILE={}", env::var("PROFILE").unwrap_or("unknown profile".into()));
+    println!("cargo:rustc-env=BUILD_DATE={}", Utc::now().format("%F"));
+
     if env::var("CARGO_FEATURE_LOCALIZE") == Ok(String::from("1")) {
         generate_localization();
     }
