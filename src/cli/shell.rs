@@ -59,7 +59,9 @@ pub fn launch_shell() -> Result<()>{
 
     let exit_cmds = ["exit", "quit", "stop", "kill", "halt"];
 
-    let username = CONFIG.get_str("user.name").split_whitespace().nth(0).map(|name| name.to_lowercase());
+    let username = CONFIG.get_str_or("user.name")
+                         .and_then(|full_name| full_name.split_whitespace().nth(0))
+                         .map(|name| name.to_lowercase());
     let shell_key = "asciii > ";
     let ps1 = if let Some(username) = username {
         format!("{}@{}", username, shell_key)
