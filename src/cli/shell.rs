@@ -3,6 +3,8 @@ use rustyline::error::ReadlineError;
 use rustyline::Editor;
 use rustyline::Result as LineResult;
 
+use asciii::CONFIG;
+
 use std::collections::BTreeSet;
 use clap::App;
 use super::app::with_cli;
@@ -55,23 +57,29 @@ pub fn launch_shell() -> Result<()>{
     rl.set_completer(Some(clap_compl));
     //if rl.load_history("history.txt").is_err() { debug!("No previous shell history."); }
 
-    let exit_cmds = ["exit", "stop", "kill", "halt"];
+    let exit_cmds = ["exit", "quit", "stop", "kill", "halt"];
+
+    let username = CONFIG.get_str("user.name").split_whitespace().nth(0).map(|name| name.to_lowercase());
+    let shell_key = "asciii > ";
+    let ps1 = if let Some(username) = username {
+        format!("{}@{}", username, shell_key)
+    } else {
+        String::from(shell_key)
+    };
 
     loop {
-        let readline = rl.readline("asciii > ");
+        let readline = rl.readline(&ps1);
         match readline {
             Ok(line) => {
                 rl.add_history_entry(line.as_ref());
 
                 if exit_cmds.contains(&line.trim()){
-                    println!("Byebye");
                     break;
                 }
 
                 // this operators are not allowed
                 if line.contains(">") || line.contains(">") || line.contains("|") {
                     error!("What do you think this is? A shell?");
-                    break
                 }
 
                 let mut argv: Vec<_> = line.trim().split(" ").collect();

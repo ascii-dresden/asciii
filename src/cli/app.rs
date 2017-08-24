@@ -43,6 +43,7 @@ pub fn with_cli<F> (app_handler:F) where F: Fn(App) {
                         .arg(Arg::with_name("editor")
                              .help(lformat!("Override the configured editor").as_ref())
                              .long("editor")
+                             .takes_value(true)
                              .short("e"))
 
                         .arg(Arg::with_name("manager")
@@ -604,6 +605,12 @@ pub fn with_cli<F> (app_handler:F) where F: Fn(App) {
                              .short("e")
                              .long("edit")
                             )
+
+                        .arg(Arg::with_name("editor")
+                             .help(lformat!("Override the configured editor").as_ref())
+                             .long("editor")
+                             .takes_value(true)
+                             )
 
                         .arg(Arg::with_name("show")
                              .help(lformat!("Show a specific config value").as_ref())

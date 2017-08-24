@@ -96,25 +96,25 @@ pub fn pass_to_command<T:AsRef<OsStr>>(editor:&Option<&str>, paths:&[T]) {
     if paths.is_empty() {
         warn!("non of the provided paths could be found")
     } else if let Some(ref editor) = *editor {
-    if paths.len() < 5 || really (&format!("you are about to open {} files\n{:#?}\nAre you sure about this?", paths.len(), paths))
-    {
-        let editor_config = editor
-            .split_whitespace()
-            .collect::<Vec<&str>>();
+        if paths.len() < 5 || really (&format!("you are about to open {} files\n{:#?}\nAre you sure about this?", paths.len(), paths))
+        {
+            let editor_config = editor
+                .split_whitespace()
+                .collect::<Vec<&str>>();
 
-        let (editor_command,args) = editor_config.split_first().unwrap() ;
-        info!("launching {:?} with {:?} and {:?}",
-              editor_command,
-              args.join(" "),
-              paths);
+            let (editor_command,args) = editor_config.split_first().unwrap() ;
+            info!("launching {:?} with {:?} and {:?}",
+                  editor_command,
+                  args.join(" "),
+                  paths);
 
-        Command::new(editor_command)
-            .args(args)
-            .args(&paths)
-            .status()
-            .unwrap_or_else(|e| { panic!("failed to execute process: {}", e) });
+            Command::new(editor_command)
+                .args(args)
+                .args(&paths)
+                .status()
+                .unwrap_or_else(|e| { panic!("failed to execute process: {}", e) });
 
-    }
+        }
     } else {
         for path in paths{
             open::that(path).unwrap();
