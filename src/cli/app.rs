@@ -38,6 +38,7 @@ pub fn with_cli<F> (app_handler:F) where F: Fn(App) {
                         .arg(Arg::with_name("template")
                              .help(lformat!("Use a specific template").as_ref())
                              .long("template")
+                             .takes_value(true)
                              .short("t"))
 
                         .arg(Arg::with_name("editor")
