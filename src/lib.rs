@@ -65,7 +65,6 @@ extern crate env_logger; // TODO featuregate logging in libasciii
 #[macro_use]
 pub mod util;
 pub mod config;
-pub mod manual;
 
 pub mod project;
 pub mod storage;

@@ -5,13 +5,11 @@
 extern crate chrono;
 extern crate term; // TODO consolidate term, ansi_term and terminal_size
 extern crate open;
-extern crate icalendar;
 
 #[cfg(feature="shell")]
 extern crate rustyline;
 
 extern crate prettytable;
-extern crate maplit;
 #[macro_use] extern crate log;
 #[macro_use] extern crate clap;
 #[macro_use] extern crate error_chain;

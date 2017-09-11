@@ -51,7 +51,7 @@ git2 = {version = "0.6", default-features= false, optional = true}
 pretty_assertions = "*"
 
 [features]
-default = ["document_export", "git_statuses", "shell", "serialization", "deserialization", "version_string"]
+default = ["document_export", "git_statuses", "serialization", "deserialization", "localize"]
 document_export = ["handlebars", "serialization"]
 serde_base = ["serde", "serde_derive"]
 serialization = ["serde_base", "serde_json"]
