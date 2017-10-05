@@ -115,6 +115,7 @@ pub fn dues() -> Result<Dues> {
     let acc_sum_sold: Currency = open_payments(&projects);
     let acc_wages = open_wages(&projects);
     let unpayed_employees = unpayed_employees(&projects);
+
     Ok(Dues{ acc_sum_sold, acc_wages, unpayed_employees})
 }
 

@@ -572,6 +572,14 @@ pub fn with_cli<F> (app_handler:F) where F: Fn(App) {
                              .long("invoice")
                              )
 
+                        .arg(Arg::with_name("archive")
+                             .help(lformat!("Pick an archived project").as_ref())
+                             .short("a")
+                             .long("archive")
+                             .min_values(0)
+                             .takes_value(true)
+                            )
+
                         .arg(Arg::with_name("template")
                              .help(lformat!("Use a particular template").as_ref())
                              .short("t")
@@ -701,7 +709,6 @@ pub fn with_cli<F> (app_handler:F) where F: Fn(App) {
                         .about(lformat!("Add file contents to the git-index").as_ref())
                         .arg(Arg::with_name("search_term")
                              .help(lformat!("Search term, possibly event name").as_ref())
-                             .required(true)
                              .multiple(true)
                             )
                         .arg(Arg::with_name("archive")
@@ -716,6 +723,10 @@ pub fn with_cli<F> (app_handler:F) where F: Fn(App) {
                              .short("t")
                              .long("template")
                             )
+                        .arg(Arg::with_name("all")
+                             .help(lformat!("Add all projects").as_ref())
+                             .short("A")
+                             .long("all"))
 
                        )
 
@@ -835,7 +846,6 @@ pub fn match_matches(matches: &ArgMatches) {
      ("cleanup",   Some(sub_m)) => subcommands::git_cleanup(sub_m),
      ("status",    _          ) => subcommands::git_status(),
      ("add",       Some(sub_m)) => subcommands::git_add(sub_m),
-     //("unadd",     Some(sub_m)) => subcommands::git_unadd(sub_m),
      ("commit",    _          ) => subcommands::git_commit(),
      ("push",      _          ) => subcommands::git_push(),
      ("stash",     _          ) => subcommands::git_stash(),

@@ -63,7 +63,7 @@ impl fmt::Display for YamlError {
             YamlError::Io(ref err) => write!(f, "{}", err)
         }
     }
- }
+}
 
 /// Wrapper that opens and parses a `.yml` file.
 pub fn open( path:&Path ) -> Result<Yaml, YamlError> {
@@ -76,7 +76,7 @@ pub fn open( path:&Path ) -> Result<Yaml, YamlError> {
 }
 
 /// Ruby like API to yaml-rust.
-pub fn parse( file_content:&str ) -> Result<Yaml, YamlError> {
+pub fn parse(file_content: &str) -> Result<Yaml, YamlError> {
     Ok(
         YamlLoader::load_from_str(&file_content)?
         .get(0)

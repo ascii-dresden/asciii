@@ -85,13 +85,27 @@ pub fn git_remote() -> Result<()> {
 
 /// Command ADD
 pub fn git_add(matches: &ArgMatches) -> Result<()> {
+    trace!("git_add {:#?}", matches);
     let storage = storage::setup_with_git::<Project>()?;
-    let paths = matches_to_paths(matches, &storage)?;
     let repo = storage.repository().unwrap();
-    if repo.add(&paths).success() {
-        Ok(())
+    let paths = matches_to_paths(matches, &storage)?;
+
+    if matches.is_present("all") {
+        if repo.add_all().success() {
+            Ok(())
+        } else {
+            Err("git add did not exit successfully".into())
+        }
+    } else if matches.is_present("search_terms") {
+
+        if repo.add(&paths).success() {
+            Ok(())
+        } else {
+            Err("git add did not exit successfully".into())
+        }
+
     } else {
-        Err("git add did not exit successfully".into())
+        Err("Nothing selected".into())
     }
 }
 

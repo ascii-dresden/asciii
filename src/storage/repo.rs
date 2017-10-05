@@ -194,6 +194,11 @@ impl Repository {
         self.execute_git("add", &[], paths)
     }
 
+    pub fn add_all(&self) -> ExitStatus {
+        info!("adding all to git");
+        self.execute_git("add", &["--all"], &[])
+    }
+
     pub fn commit(&self) -> ExitStatus {
         // TODO override git editor with asciii editor
         self.execute_git("commit", &[], &[])
