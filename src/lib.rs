@@ -54,6 +54,7 @@ extern crate icalendar;
 #[macro_use] extern crate maplit;
 #[macro_use] extern crate custom_derive;
 #[macro_use] extern crate enum_derive;
+extern crate rayon;
 
 extern crate crowbook_intl_runtime;
 #[macro_use] pub mod localize_macros;

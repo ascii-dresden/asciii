@@ -19,6 +19,7 @@
 //! ```
 //!
 
+use rayon::prelude::*;
 
 use std::fs;
 use std::env::{self, home_dir, current_dir};
@@ -226,7 +227,7 @@ impl<L:Storable> Storage<L> {
         trace!("initializing storage, with git");
         Ok( Storage{
             repository: Some(Repository::new(root.as_ref())?),
-            .. Self::new(root,working,archive,template)?
+            .. Self::new(root, working, archive, template)?
         })
     }
 
@@ -419,28 +420,6 @@ impl<L:Storable> Storage<L> {
         project.set_file(&target_file);
 
         Ok(project)
-    }
-
-    /// Does something with matching projects.
-    ///
-    /// #[deprecated(note="evil error eating monster")]
-    pub fn with_projects<F>(&self, dir:StorageDir, search_terms:Option<&[&str]>, f:F) -> StorageResult<()>
-        where F:Fn(L)
-    {
-        trace!("Storage::with_projects({:?})", search_terms);
-        let projects = if let Some(search_terms) = search_terms {
-            self.search_projects_any(dir, search_terms)?
-        } else {
-            self.open_projects(dir)?
-        };
-
-        if projects.is_empty() {
-            return Err(format!("Nothing found for {:?}", search_terms).into())
-        }
-        for project in projects {
-            f(project);
-        }
-        Ok(())
     }
 
     /// Moves a project folder from `/working` dir to `/archive/$year`.
@@ -751,15 +730,32 @@ impl<L:Storable> Storage<L> {
                 projects
             },
             Dir(dir) => self.open_projects_dir(dir)?,
-            Paths(ref paths) =>
-                ProjectList {
-                    projects:paths.iter()
-                        .filter_map(|path| self.open_project(path))
-                        .collect::<Vec<L>>()
-                },
+            Paths(ref paths) => self.open_paths(paths),
             Unintiailzed => unreachable!()
         };
         Ok(projects)
+    }
+
+    fn open_paths(&self, paths: &[PathBuf]) -> ProjectList<L> {
+        let mut projects = paths.par_iter()
+            .filter_map(|path| Self::open_project(path))
+            .collect::<Vec<L>>();
+        if cfg!(feature="git_statuses") {
+            if let Some(ref repo) = self.repository {
+                return projects
+                    .drain(..)
+                    .map(|mut project| {
+                        let dir = project.dir();
+                        project.set_git_status(repo.get_status(&dir));
+                        project
+                    })
+                    .collect();
+            }
+        }
+
+        ProjectList {
+            projects
+        }
     }
 
     /// Behaves like `list_project_files()` but also opens projects directly.
@@ -776,12 +772,7 @@ impl<L:Storable> Storage<L> {
             },
             _ =>
                 self.list_project_folders(directory)
-                .map(|paths| ProjectList{
-                    projects:paths.iter()
-                        .filter_map(|path|self.open_project(path))
-                        .collect::<Vec<L>>()
-                }
-                )
+                .map(|p| self.open_paths(&p))
         }
     }
 
@@ -807,8 +798,7 @@ impl<L:Storable> Storage<L> {
         })
     }
 
-    #[cfg(not(feature="git_statuses"))]
-    fn open_project(&self, path:&PathBuf) -> Option<L>{
+    fn open_project(path: &PathBuf) -> Option<L>{
         match L::open_folder(path) {
             Ok(project) => Some(project) ,
             Err(err) => {
@@ -817,24 +807,6 @@ impl<L:Storable> Storage<L> {
             }
         }
     }
-
-
-    #[cfg(feature="git_statuses")]
-    fn open_project(&self, path:&PathBuf) -> Option<L>{
-        match L::open_folder(path) {
-            Ok(mut project) => {
-                if let Some(ref repo) = self.repository{
-                    project.set_git_status(repo.get_status(path));
-                }
-                Some(project) // "return"
-            },
-            Err(err) => {
-                warn!("Erroneous Project: {}\n {:#?}", path.display(), err);
-                None
-            }
-        }
-    }
-
 
 }
 
