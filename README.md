@@ -2,6 +2,8 @@
 
 The **a**dvanced but **s**imple **c**ommandline **i**nterface for **i**nvoice **i**nvocation.
 
+NoSql, blockchain based, serverless, cross-platform project management tool.
+
 Here I rewrite the original [ascii-invoicer](http://github.com/ascii-dresden/ascii-invoicer) in Rust. Why? Because!
 
 ## Introduction

@@ -96,7 +96,7 @@ fn unpayed_employees(projects: &[Project]) -> HashMap<String, Currency> {
                             .flat_map(|e| e.into_iter());
 
     for employee in employees {
-        let mut bucket = buckets.entry(employee.name.clone()).or_insert(Currency::new());
+        let bucket = buckets.entry(employee.name.clone()).or_insert(Currency::new());
         *bucket = *bucket + employee.salary;
     }
     buckets

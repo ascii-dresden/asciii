@@ -348,11 +348,11 @@ msgstr "Erzeuge Dokumente aus Projekten"
 
 #: /home/hendrik/code/rust/asciii/src/cli/app.rs:513
 msgid "Manually pass a file path"
-msgstr ""
+msgstr "Dateinamen manuell angeben"
 
 #: /home/hendrik/code/rust/asciii/src/cli/app.rs:519
 msgid "Manually pass a output folder"
-msgstr ""
+msgstr "Zielverzeichniss manuell angeben"
 
 #: /home/hendrik/code/rust/asciii/src/cli/app.rs:525
 msgid "Do it against better judgement"
@@ -365,11 +365,11 @@ msgstr "Erzeuge das finale Produkte nicht"
 
 #: /home/hendrik/code/rust/asciii/src/cli/app.rs:536
 msgid "Only prints to stdout"
-msgstr ""
+msgstr "Printet nur nach stdout"
 
 #: /home/hendrik/code/rust/asciii/src/cli/app.rs:541
 msgid "Open the pdf file afterwards."
-msgstr ""
+msgstr "Öffne die erzeugt PDF hinterher"
 
 #: /home/hendrik/code/rust/asciii/src/cli/app.rs:551
 msgid "Produce an offer document"
@@ -435,11 +435,11 @@ msgstr "Zeige den Status des Arbeitsverzeichnisses"
 
 #: /home/hendrik/code/rust/asciii/src/cli/app.rs:666
 msgid "Pull and merge new commits from remote"
-msgstr ""
+msgstr "neue commits pullen und direkt mergen"
 
 #: /home/hendrik/code/rust/asciii/src/cli/app.rs:669
 msgid "git pull with --rebase"
-msgstr ""
+msgstr "git pull mit --rebase"
 
 #: /home/hendrik/code/rust/asciii/src/cli/app.rs:676
 msgid "(experimental) starts interactive shell"
@@ -447,7 +447,7 @@ msgstr "(experimental) startet eine interaktive shell"
 
 #: /home/hendrik/code/rust/asciii/src/cli/app.rs:680
 msgid "git diff"
-msgstr ""
+msgstr "git diff"
 
 #: /home/hendrik/code/rust/asciii/src/cli/app.rs:693
 #: /home/hendrik/code/rust/asciii/src/cli/app.rs:714
@@ -474,7 +474,7 @@ msgstr "Zeit Informationen über den git-remote"
 
 #: /home/hendrik/code/rust/asciii/src/cli/app.rs:750
 msgid "Upload locally saved changes to the remote"
-msgstr ""
+msgstr "Lade lokale Änderungen zum remote hoch"
 
 #: /home/hendrik/code/rust/asciii/src/cli/app.rs:753
 msgid "equals git stash"
@@ -490,11 +490,11 @@ msgstr "Zeite Commitlog"
 
 #: /home/hendrik/code/rust/asciii/src/cli/app.rs:779
 msgid "Generates completion for bash, zsh, etc"
-msgstr ""
+msgstr "Generiert completions für bash, zsh, etc"
 
 #: /home/hendrik/code/rust/asciii/src/cli/app.rs:781
 msgid "what shell to generate completion for (bash, zsh, fish,PowerShell)"
-msgstr ""
+msgstr "für was genau sollen completions erzeugt werden"
 
 #: /home/hendrik/code/rust/asciii/src/cli/app.rs:790
 msgid "Opens the online documentation, please read it"
@@ -506,7 +506,7 @@ msgstr "Gibt asciiis Version aus"
 
 #: /home/hendrik/code/rust/asciii/src/cli/app.rs:852
 msgid "please specify either bash, zsh, fish or powershell"
-msgstr ""
+msgstr "Bitte spezifizere entweder 'bash', 'zsh', 'fish' oder 'powershell'"
 
 #: /home/hendrik/code/rust/asciii/src/cli/app.rs:863
 msgid "Date Format must be DD.MM.YYYY"
@@ -514,11 +514,11 @@ msgstr "Das Datum muss das Format TT.MM.JJJJ haben"
 
 #: /home/hendrik/code/rust/asciii/src/cli/subcommands/mod.rs:330
 msgid "You have to provide either a search term or path"
-msgstr ""
+msgstr "Du musst entweder einen Suchbegriff oder Pfad angeben"
 
 #: /home/hendrik/code/rust/asciii/src/document_export/mod.rs:175
 msgid "Can't make sense of {}"
-msgstr ""
+msgstr "{} verstehe ich nicht"
 
 #: /home/hendrik/code/rust/asciii/src/lib.rs:84
 msgid "Documentation at: {}"
