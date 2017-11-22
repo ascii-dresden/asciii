@@ -1,5 +1,11 @@
 # asciii
 
+[![travis](https://img.shields.io/travis/ascii-dresden/asciii.svg)](https://travis-ci.org/ascii-dresden/asciii/)
+[![license](https://img.shields.io/crates/l/asciii.svg)](https://crates.io/crates/asciii/)
+[![crates.io](https://img.shields.io/crates/d/asciii.svg)](https://crates.io/crates/asciii)
+[![version](https://img.shields.io/crates/v/asciii.svg)](https://crates.io/crates/asciii/)
+[![documentation](https://docs.rs/asciii/badge.svg)](https://docs.rs/asciii/)
+
 The **a**dvanced but **s**imple **c**ommandline **i**nterface for **i**nvoice **i**nvocation.
 
 NoSql, blockchain based, serverless, cross-platform project management tool.
