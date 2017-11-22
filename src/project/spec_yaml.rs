@@ -316,12 +316,12 @@ impl HasEvents for Project {
 }
 
 /// Returns a product from Service
-fn service_to_product<'a, T: HasEmployees>(s: T) -> Option<Product<'a>> {
+fn service_to_product<'a, T: HasEmployees>(s: &T) -> Option<Product<'a>> {
     if let Some(salary) = s.salary() {
         Some(Product {
             name: "Service",
             unit: Some("h"),
-            tax: s.tax().unwrap_or(Tax::new(0.0)),
+            tax: s.tax().unwrap_or_else(|| Tax::new(0.0)),
             price: salary
         })
     } else {
@@ -348,7 +348,7 @@ impl Redeemable for Project {
         let mut offer: Bill<Product> = Bill::new();
         let mut invoice: Bill<Product> = Bill::new();
 
-        let service = service_to_product(self.hours())
+        let service = service_to_product(&self.hours())
             .expect("cannot create product from employees, salary or tax missing");
 
         if let Some(total) = self.hours().total_time() {

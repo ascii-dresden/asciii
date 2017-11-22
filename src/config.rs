@@ -17,7 +17,10 @@ use std::env::{self, home_dir, current_dir};
 use util::yaml::{self, Yaml, YamlError};
 
 /// Name of the configfile
-pub const DEFAULT_LOCATION: &'static str = ".asciii.yml";
+pub const DEFAULT_LOCATION: &str = ".asciii.yml";
+
+/// Default configuration that will be used if a value is not set in yaml file at `DEFAULT_LOCATION`
+pub const DEFAULT_CONFIG: &str = include_str!("./default_config.yml");
 
 /// Looks for a configuration yaml in your `HOME_DIR`
 #[derive(Debug)]
@@ -107,7 +110,7 @@ impl ConfigReader {
 
     /// Returns the string in the position or an empty string
     pub fn var_get_str(&self, key:&str) -> String {
-        Self::var_get(key).unwrap_or(self.get_str(&key).into())
+        Self::var_get(key).unwrap_or_else(|| self.get_str(&key).into())
     }
 
     /// Returns the string in the position or an empty string
@@ -161,8 +164,6 @@ impl ConfigReader {
 
 }
 
-/// Default configuration that will be used if a value is not set in yaml file at `DEFAULT_LOCATION`
-pub const DEFAULT_CONFIG: &'static str = include_str!("./default_config.yml");
 
 #[test]
 fn simple_reading() {

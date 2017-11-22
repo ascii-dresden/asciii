@@ -412,20 +412,17 @@ pub fn config(matches: &ArgMatches) -> Result<()> {
 
         if local.exists() {
             error!("{:?} already exists, can't overwrite", local);
-        } else {
-            if let Ok(mut file) = fs::File::create(local){
-                for line in config::DEFAULT_CONFIG.lines()
-                    .take_while(|l| !l.contains("BREAK"))
-                    {
-                        file.write_fmt(format_args!("{}\n", line))
-                            .expect("cannot write this line to the config file");
-                    }
-                let editor = matches.value_of("editor")
-                    .or( CONFIG.get("user/editor").and_then(|e|e.as_str()));
-                config_edit(&editor);
-            }
+        } else if let Ok(mut file) = fs::File::create(local){
+            for line in config::DEFAULT_CONFIG.lines()
+                .take_while(|l| !l.contains("BREAK"))
+                {
+                    file.write_fmt(format_args!("{}\n", line))
+                        .expect("cannot write this line to the config file");
+                }
+            let editor = matches.value_of("editor")
+                                .or( CONFIG.get("user/editor").and_then(|e|e.as_str()));
+            config_edit(&editor);
         }
-
     }
 
     else if matches.is_present("edit") {

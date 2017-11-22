@@ -48,6 +48,7 @@ pub fn combine_specresults(specs: Vec<SpecResult>) -> SpecResult {
                      )
 }
 
+#[derive(Default)]
 pub struct ErrorList {
     pub errors: Vec<String>
 }
@@ -55,7 +56,7 @@ pub struct ErrorList {
 impl ErrorList {
     pub fn new() -> Self{
         ErrorList {
-            errors: Vec::new()
+            errors: Default::default()
         }
     }
 

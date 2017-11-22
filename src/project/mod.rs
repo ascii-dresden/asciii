@@ -94,13 +94,13 @@ impl Project {
 
     /// import from yaml file
     #[cfg(feature="deserialization")]
-    pub fn from_yaml(&self) -> Result<import::Project> {
+    pub fn parse_yaml(&self) -> Result<import::Project> {
         import::from_str(&self.file_content)
     }
 
     /// (feature deactivated) import from yaml file
     #[cfg(not(feature="deserialization"))]
-    pub fn from_yaml(&self) -> Result<()> {
+    pub fn parse_yaml(&self) -> Result<()> {
         bail!(error::ErrorKind::FeatureDeactivated)
     }
 

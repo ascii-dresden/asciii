@@ -166,7 +166,7 @@ pub fn to_currency(f: f64) -> Currency {
 pub fn to_local_file(file:&Path, ext:&str) -> PathBuf {
     let mut _tmpfile = file.to_owned();
     _tmpfile.set_extension(ext);
-    Path::new(_tmpfile.file_name().unwrap().into()).to_owned()
+    Path::new(_tmpfile.file_name().unwrap()).to_owned()
 }
 
 pub fn naive_time_from_str(string:&str) -> Option<NaiveTime> {

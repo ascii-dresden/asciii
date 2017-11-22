@@ -5,6 +5,7 @@ use std::str::FromStr;
 
 use ::cli::error::*;
 
+#[allow(unknown_lints, cyclomatic_complexity)]
 pub fn with_cli<F> (app_handler:F) where F: Fn(App) {
     app_handler(
         App::new("asciii")

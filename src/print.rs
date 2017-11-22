@@ -101,7 +101,7 @@ pub fn path_rows(projects:&[Project], list_config:&ListConfig) -> Vec<Row>{
         .map(|project| {
             let row_style = if list_config.use_colors {project_to_style(project)}else{""};
             Row::new(vec![
-                     cell!(project.invoice().number_str().unwrap_or("".into())),
+                     cell!(project.invoice().number_str().unwrap_or_else(String::new)),
                      cell!(project.short_desc()).style_spec(row_style),
                      cell!(project.file().display()),
 
@@ -128,9 +128,9 @@ pub fn simple_rows(projects:&[Project], list_config:&ListConfig) -> Vec<Row>{
                      .style_spec(row_style),
 
                      //cell!(project.manager()),
-                     cell!(project.invoice().number_str().unwrap_or("".into())),
+                     cell!(project.invoice().number_str().unwrap_or_else(String::new)),
 
-                     cell!(project.modified_date().map(|d|d.format("%d.%m.%Y").to_string()).unwrap_or("no_date".into())),
+                     cell!(project.modified_date().map(|d|d.format("%d.%m.%Y").to_string()).unwrap_or_else(|| "no_date".into())),
                      //cell!(project.file().display()),
             ])
         })
@@ -182,11 +182,11 @@ pub fn verbose_rows(projects:&[Project], list_config:&ListConfig) -> Vec<Row>{
                 //cell!(project.index().unwrap_or(String::from(""))),
 
                 // R042
-                cell!(project.invoice().number_str().unwrap_or("".into()))
+                cell!(project.invoice().number_str().unwrap_or_else(String::new))
                     .style_spec(row_style),
 
                 // Date
-                cell!(project.modified_date().unwrap_or(Utc::today()).format("%d.%m.%Y").to_string())
+                cell!(project.modified_date().unwrap_or_else(Utc::today).format("%d.%m.%Y").to_string())
                     .style_spec(row_style),
 
                 // status "✓  ✓  ✗"
@@ -198,7 +198,7 @@ pub fn verbose_rows(projects:&[Project], list_config:&ListConfig) -> Vec<Row>{
                 //cell!(output_file_exists(project, Project::offer_file_name)),
                 //cell!(output_file_exists(project, Project::invoice_file_name)),
 
-                cell!(r->project.sum_sold().map(|i|currency_to_string(&i)).unwrap_or(String::from("none"))),
+                cell!(r->project.sum_sold().map(|i|currency_to_string(&i)).unwrap_or_else(|_| String::from("none"))),
                 //cell!(project.wages().map(|i|i.to_string()).unwrap_or(String::from("none"))),
                 //cell!(project.sum_sold_and_wages().map(|i|i.to_string()).unwrap_or(String::from("none"))),
             ]);
@@ -221,9 +221,9 @@ pub fn verbose_rows(projects:&[Project], list_config:&ListConfig) -> Vec<Row>{
             if list_config.show_errors{
                 cells.extend_from_slice( &[
                                          // Errors
-                                         cell!(validation1.err().map(|errs| errs.join(", ")).unwrap_or("".to_owned())),
-                                         cell!(validation2.err().map(|errs| errs.join(", ")).unwrap_or("".to_owned())),
-                                         cell!(validation3.err().map(|errs| errs.join(", ")).unwrap_or("".to_owned())),
+                                         cell!(validation1.err().map(|errs| errs.join(", ")).unwrap_or_else(String::new)),
+                                         cell!(validation2.err().map(|errs| errs.join(", ")).unwrap_or_else(String::new)),
+                                         cell!(validation3.err().map(|errs| errs.join(", ")).unwrap_or_else(String::new)),
                 ]);
             }
 
@@ -253,9 +253,9 @@ pub fn dynamic_rows(projects:&[Project], list_config:&ListConfig) -> Vec<Row>{
 
                     cells.extend_from_slice( &[
                                              // Errors
-                                             cell!(validation.0.err().map(|errs| errs.join(", ")).unwrap_or("".to_owned())),
-                                             cell!(validation.1.err().map(|errs| errs.join(", ")).unwrap_or("".to_owned())),
-                                             cell!(validation.2.err().map(|errs| errs.join(", ")).unwrap_or("".to_owned())),
+                                             cell!(validation.0.err().map(|errs| errs.join(", ")).unwrap_or_else(String::new)),
+                                             cell!(validation.1.err().map(|errs| errs.join(", ")).unwrap_or_else(String::new)),
+                                             cell!(validation.2.err().map(|errs| errs.join(", ")).unwrap_or_else(String::new)),
                     ]);
                 }
             }

@@ -108,18 +108,18 @@ fn output_template_path(template_name:&str) -> Result<PathBuf> {
 
 /// Creates the latex files within each projects directory, either for Invoice or Offer.
 #[cfg(feature="document_export")]
+#[allow(cyclomatic_complexity)]
 fn project_to_doc(project: &Project, config: &ExportConfig) -> Result<Option<PathBuf>> {
     trace!("exporting a document: {:#?}", config);
 
     let &ExportConfig {
-        select: _,
         template_name,
         bill_type,
         output: output_path,
         dry_run,
         force,
         print_only,
-        open: _
+        ..
     } = config;
 
     // init_export_config()

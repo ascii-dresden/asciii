@@ -18,8 +18,8 @@ use super::error::{SpecResult, ErrorList};
 use super::product::Product;
 use super::product::error::Result as ProductResult;
 
-pub fn print_specresult(label: &str, result: SpecResult) {
-    match result {
+pub fn print_specresult(label: &str, result: &SpecResult) {
+match *result {
         Ok(_) => println!("{}: ✓", label),
         Err(ref errs) => println!("{}: ✗\n{}", label, errs)
     }
@@ -162,12 +162,12 @@ pub trait HasEmployees {
     fn total_time(&self) -> Option<f64>;
 
     /// Returns a product from Service
-    fn to_product<'a>(&'a self) -> Option<Product<'a>> {
+    fn to_product(&self) -> Option<Product> {
         if let Some(salary) = self.salary() {
             Some(Product {
                 name: "Service",
                 unit: Some("h"),
-                tax: self.tax().unwrap_or(Tax::new(0.0)),
+                tax: self.tax().unwrap_or_else(|| Tax::new(0.0)),
                 price: salary
             })
         } else {

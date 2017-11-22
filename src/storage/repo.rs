@@ -37,6 +37,7 @@ impl GitStatus {
         Attr::Reverse
     }
 
+    #[allow(match_same_arms)]
     pub fn to_style(&self) -> (Color,Option<Attr>) {
         match *self{
         // => write!(f, "{:?}",  self)
@@ -53,8 +54,9 @@ impl GitStatus {
 }
 
 impl fmt::Display for GitStatus {
+    
+    #[allow(match_same_arms)]
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-// X ✘ ✓
         match *self{
         // => write!(f, "{:?}", self)
          GitStatus::Conflict        => write!(f, "~"),

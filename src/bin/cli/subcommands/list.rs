@@ -1,13 +1,14 @@
-use clap::ArgMatches;
+
 use chrono::prelude::*;
+use clap::ArgMatches;
 
 use asciii::CONFIG;
-use asciii::storage::*;
 use asciii::print::{self, ListConfig, ListMode};
-use asciii::project::spec::IsProject;
 use asciii::project::{Project, ComputedField};
+use asciii::project::spec::IsProject;
+use asciii::storage::*;
 
-use ::cli::error::*;
+use cli::error::*;
 
 use std::path::PathBuf;
 
@@ -26,17 +27,17 @@ pub fn list(matches: &ArgMatches) -> Result<()> {
                                     matches.is_present("nothing"),
                                     matches.is_present("csv"));
 
-        let extra_details = matches.values_of("details").map(|v| v.collect::<Vec<&str>>());
+        let extra_details = matches.values_of("details")
+                                   .map(|v| v.collect::<Vec<&str>>());
         let config_details = CONFIG.get_strs("list/extra_details");
 
         let mut list_config = ListConfig {
             sort_by: matches.value_of("sort")
-                            .unwrap_or_else(|| {
-                                CONFIG.get_str("list/sort")
-                            }),
+                            .unwrap_or_else(|| CONFIG.get_str("list/sort")),
             mode: list_mode,
             details: extra_details.or(config_details),
-            filter_by: matches.values_of("filter").map(|v| v.collect::<Vec<&str>>()),
+            filter_by: matches.values_of("filter")
+                              .map(|v| v.collect::<Vec<&str>>()),
             show_errors: matches.is_present("errors"),
 
             ..Default::default()
@@ -50,36 +51,35 @@ pub fn list(matches: &ArgMatches) -> Result<()> {
         }
 
         // list archive of year `archive`
-        let dir =
-            if matches.is_present("archive"){
-                let archive_year = matches.value_of("archive")
-                    .and_then(|y|y.parse::<i32>().ok())
-                    .unwrap_or(Utc::today().year());
-                StorageDir::Archive(archive_year)
+        let dir = if matches.is_present("archive") {
+            let archive_year = matches.value_of("archive")
+                                      .and_then(|y| y.parse::<i32>().ok())
+                                      .unwrap_or(Utc::today().year());
+            StorageDir::Archive(archive_year)
+        } else if matches.is_present("year") {
+            let year = matches.value_of("year")
+                              .and_then(|y| y.parse::<i32>().ok())
+                              .unwrap_or(Utc::today().year());
+            StorageDir::Year(year)
+        }
+        // or list all, but sort by date
+        else if matches.is_present("all") {
+            // sort by date on --all of not overriden
+            if !matches.is_present("sort") {
+                list_config.sort_by = "date"
             }
+            StorageDir::All
+        }
+        // or list normal
+        else {
+            StorageDir::Working
+        };
 
-            else if matches.is_present("year"){
-                let year = matches.value_of("year")
-                    .and_then(|y|y.parse::<i32>().ok())
-                    .unwrap_or(Utc::today().year());
-                StorageDir::Year(year)
-            }
-
-            // or list all, but sort by date
-            else if matches.is_present("all"){
-                // sort by date on --all of not overriden
-                if !matches.is_present("sort"){ list_config.sort_by = "date" }
-                StorageDir::All }
-
-            // or list normal
-            else { StorageDir::Working };
-
-        Ok(
-        if matches.is_present("broken"){
-            list_broken_projects(dir)? // XXX Broken
-        } else {
-            list_projects(dir, &list_config)?
-        })
+        Ok(if matches.is_present("broken") {
+               list_broken_projects(dir)? // XXX Broken
+           } else {
+               list_projects(dir, &list_config)?
+           })
     }
 }
 
@@ -94,7 +94,7 @@ pub fn list(matches: &ArgMatches) -> Result<()> {
 /// which it prints with `print::print_projects()`
 fn list_projects(dir: StorageDir, list_config: &ListConfig) -> Result<()> {
     let storage = if CONFIG.get_bool("list/gitstatus") {
-setup_with_git::<Project>()?
+        setup_with_git::<Project>()?
     } else {
         setup::<Project>()?
     };
@@ -109,11 +109,23 @@ setup_with_git::<Project>()?
 
     // sorting
     match list_config.sort_by {
-        "manager" => projects.sort_by(|pa,pb| pa.responsible().cmp( &pb.responsible())),
-        "date"    => projects.sort_by(|pa,pb| pa.modified_date().cmp( &pb.modified_date())),
-        "name"    => projects.sort_by(|pa,pb| pa.short_desc().cmp( &pb.short_desc())),
-        "index"   => projects.sort_by(|pa,pb| pa.index().unwrap_or("zzzz".to_owned()).cmp( &pb.index().unwrap_or("zzzz".to_owned()))), // TODO rename to ident
-        _         => projects.sort_by(|pa,pb| pa.index().unwrap_or("zzzz".to_owned()).cmp( &pb.index().unwrap_or("zzzz".to_owned()))),
+        "manager" => projects.sort_by(|pa, pb| pa.responsible().cmp(&pb.responsible())),
+        "date" => projects.sort_by(|pa, pb| pa.modified_date().cmp(&pb.modified_date())),
+        "name" => projects.sort_by(|pa, pb| pa.short_desc().cmp(&pb.short_desc())),
+        "index" => {
+            projects.sort_by(|pa, pb| {
+                                 pa.index()
+                                   .unwrap_or("zzzz".to_owned())
+                                   .cmp(&pb.index().unwrap_or("zzzz".to_owned()))
+                             })
+        } // TODO rename to ident
+        _ => {
+            projects.sort_by(|pa, pb| {
+                                 pa.index()
+                                   .unwrap_or("zzzz".to_owned())
+                                   .cmp(&pb.index().unwrap_or("zzzz".to_owned()))
+                             })
+        }
     }
 
     // fit screen
@@ -123,13 +135,13 @@ setup_with_git::<Project>()?
         // TODO room for improvement
         print::print_projects(print::simple_rows(&projects, list_config));
     } else {
-        debug!("list_mode: {:?}", list_config.mode );
-        match list_config.mode{
-            ListMode::Csv     => print::print_csv(&projects),
-            ListMode::Paths   => print::print_projects(print::path_rows(&projects, list_config)),
-            ListMode::Simple  => print::print_projects(print::simple_rows(&projects, list_config)),
-            ListMode::Verbose => print::print_projects(print::verbose_rows(&projects,list_config)),
-            ListMode::Nothing => print::print_projects(print::dynamic_rows(&projects,list_config)),
+        debug!("list_mode: {:?}", list_config.mode);
+        match list_config.mode {
+            ListMode::Csv => print::print_csv(&projects),
+            ListMode::Paths => print::print_projects(print::path_rows(&projects, list_config)),
+            ListMode::Simple => print::print_projects(print::simple_rows(&projects, list_config)),
+            ListMode::Verbose => print::print_projects(print::verbose_rows(&projects, list_config)),
+            ListMode::Nothing => print::print_projects(print::dynamic_rows(&projects, list_config)),
         }
     }
     Ok(())
@@ -177,16 +189,27 @@ pub fn list_computed_fields() -> Result<()> {
 }
 
 //#[deprecated(note="move to impl ListMode and then to asciii::actions")]
-fn decide_mode(simple:bool, verbose:bool, paths:bool,nothing:bool, csv:bool) -> ListMode {
-    if csv{     ListMode::Csv }
-    else if nothing{ ListMode::Nothing }
-    else if paths{   ListMode::Paths }
-    else {
-        match (simple, verbose, CONFIG.get_bool("list/verbose")){
-            (false, true,  _   ) => {debug!("-v overwrites config"); ListMode::Verbose },
-            (false,    _, true ) => {debug!("-v from config");ListMode::Verbose},
-                          _      => {debug!("simple mode");ListMode::Simple},
+fn decide_mode(simple: bool, verbose: bool, paths: bool, nothing: bool, csv: bool) -> ListMode {
+    if csv {
+        ListMode::Csv
+    } else if nothing {
+        ListMode::Nothing
+    } else if paths {
+        ListMode::Paths
+    } else {
+        match (simple, verbose, CONFIG.get_bool("list/verbose")) {
+            (false, true, _) => {
+                debug!("-v overwrites config");
+                ListMode::Verbose
+            }
+            (false, _, true) => {
+                debug!("-v from config");
+                ListMode::Verbose
+            }
+            _ => {
+                debug!("simple mode");
+                ListMode::Simple
+            }
         }
     }
 }
-
