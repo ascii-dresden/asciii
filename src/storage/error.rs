@@ -11,10 +11,9 @@ mod git2 {
     pub use super::super::repo::GitError as Error;
 }
 
-
 use templater;
 
-
+#[allow(missing_docs)]
 error_chain!{
     types {
         StorageError, ErrorKind, ResultExt, Result;

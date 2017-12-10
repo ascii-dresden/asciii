@@ -7,6 +7,7 @@ use super::spec::*;
 /// Fields that are accessible but are not directly found in the file format.
 /// This is used to get fields that are computed through an ordinary `field("responsible")`
 custom_derive! {
+#[allow(missing_docs)]
     #[derive(Debug,
              IterVariants(ComputedFields), IterVariantNames(ComputedFieldNames),
              EnumFromStr
@@ -19,6 +20,7 @@ custom_derive! {
     pub enum ComputedField{
         /// Usually `storage`, or in legacy part of `signature`
         Responsible,
+        /// Consecutive Offer number
         OfferNumber,
         /// Pretty version of `invoice/number`: "`R042`"
         InvoiceNumber,
@@ -26,23 +28,34 @@ custom_derive! {
         InvoiceNumberLong,
         ///Overall Cost Project, including taxes
         Name,
+        /// Amount of money owed by the customer
         Final,
+        /// Age of the Project in days
         Age,
+        /// Time in weeks it took to write the invoice
         OurBad,
+        /// Time in weeks it took the custumer to pay invoice
         TheirBad,
+        /// Year of the event
         Year,
+        /// List of emplyees
         Employees,
+        /// Full Name of the customer
         ClientFullName,
+        /// Sum of the wages payed to the employees
         Wages,
+        /// *experimental* indicates whether the project file adheres to the spec
         Deserializes,
-
         /// Sorting index
         SortIndex,
+        /// Date of the main event
         Date,
-        Invalid,
-
+        /// Version of the project file format
         Format,
-        Dir
+        /// Directory the project is currently stored in
+        Dir,
+        /// Invalid Option
+        Invalid
     }
 }
 
@@ -76,12 +89,12 @@ impl ComputedField {
             ComputedField::ClientFullName    => project.client().full_name(),
             ComputedField::Deserializes      => Some(format!("{:?}", project.parse_yaml().is_ok())),
             ComputedField::Wages             => project.hours().gross_wages().map(|c| util::currency_to_string(&c)),
-            ComputedField::Invalid           => None,
             ComputedField::Format            => project.format().map(|f|f.to_string()),
             ComputedField::Dir               => project.dir()
                                                        .parent()
                                                        .and_then(|d| d.strip_prefix(&storage).ok())
-                                                       .map(|d| d.display().to_string())
+                                                       .map(|d| d.display().to_string()),
+            ComputedField::Invalid           => None
 
             // _ => None
         }

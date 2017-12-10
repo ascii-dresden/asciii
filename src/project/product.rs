@@ -1,11 +1,14 @@
 //! Takes care of instantiating the Product.
 //! All of the calculating is done by `extern crate bill`.
 
+#![allow(missing_docs)]
+
 use bill::{Currency, BillProduct, Tax};
 
 use util::yaml;
 use util::to_currency;
 
+/// Errors for `asciii::product`.
 pub mod error{
     #![allow(trivial_casts)]
     error_chain!{

@@ -8,547 +8,555 @@ msgid ""
 msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 
-#: /home/hendrik/code/rust/asciii/src/actions/mod.rs:49
+#: /Users/hendrik/code/rust/asciii/src/actions/mod.rs:49
 msgid "INum"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/actions/mod.rs:50
+#: /Users/hendrik/code/rust/asciii/src/actions/mod.rs:50
 msgid "Designation"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/actions/mod.rs:51
+#: /Users/hendrik/code/rust/asciii/src/actions/mod.rs:51
 msgid "Date"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/actions/mod.rs:52
+#: /Users/hendrik/code/rust/asciii/src/actions/mod.rs:52
 msgid "InvoiceDate"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/actions/mod.rs:53
+#: /Users/hendrik/code/rust/asciii/src/actions/mod.rs:53
 msgid "Caterer"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/actions/mod.rs:54
+#: /Users/hendrik/code/rust/asciii/src/actions/mod.rs:54
 msgid "Responsible"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/actions/mod.rs:55
+#: /Users/hendrik/code/rust/asciii/src/actions/mod.rs:55
 msgid "Payed on"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/actions/mod.rs:56
+#: /Users/hendrik/code/rust/asciii/src/actions/mod.rs:56
 msgid "Amount"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/actions/mod.rs:57
+#: /Users/hendrik/code/rust/asciii/src/actions/mod.rs:57
 msgid "Canceled"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:14
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:14
 msgid "The ascii invoicer III"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:21
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:21
 msgid "set's a a new instance"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:23
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:23
 msgid "Remote repository"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:26
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:26
 msgid "where to clone to"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:34
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:34
 msgid "Create a new project"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:37
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:37
 msgid "Project name"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:41
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:41
 msgid "Manually set the date of the project"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:48
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:48
 msgid "Override the description of the project"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:53
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:53
 msgid "Use a specific template"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:59 /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:261 /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:467 /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:645
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:59 /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:261 /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:467 /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:645
 msgid "Override the configured editor"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:65
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:65
 msgid "Override the manager of the project"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:71
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:71
 msgid "Manually set the start time of the project"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:76
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:76
 msgid "Manually set the end time of the project"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:81
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:81
 msgid "Overrides the duration of the event"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:86
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:86
 msgid "Do not edit the file after creation"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:93
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:93
 msgid "List Projects"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:96
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:96
 msgid "list archived projects of a specific year, defaults to the current year"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:105 /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:480 /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:506
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:105 /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:480 /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:506
 msgid "List projects from that year, archived or not"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:113
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:113
 msgid "Add extra fields to print for each project listed"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:120
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:120
 msgid "Filter selection by field content"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:127
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:127
 msgid "Show Errors for each project"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:132
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:132
 msgid "Show colors"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:137
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:137
 msgid "Show colors for each project"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:143
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:143
 msgid "Show non-verbose list"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:147
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:147
 msgid "Print in csv form"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:153
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:153
 msgid "Opposite of simple"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:160
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:160
 msgid "Sort by :"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:167 /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:514
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:167 /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:514
 msgid "List all projects, ever"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:172
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:172
 msgid "List templates"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:178
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:178
 msgid "List years in archive"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:182
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:182
 msgid "List paths to each project file"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:194
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:194
 msgid "List all computed data fields that can be used with --details"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:200
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:200
 msgid "Print nothing, expect the fields supplied via --details"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:207
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:207
 msgid "Open storage path"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:209
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:209
 msgid "Open path to templates instead"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:218
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:218
 msgid "Open path to created documents instead"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:227 /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:447
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:227 /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:447
 msgid "Open path to current binary instead"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:240
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:240
 msgid "Edit a specific project"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:242 /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:314 /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:404 /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:574 /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:616 /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:705 /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:725 /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:759 /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:784
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:242 /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:314 /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:404 /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:574 /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:616 /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:711 /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:731 /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:765 /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:790
 msgid "Search term, possibly event name"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:248 /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:341 /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:418 /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:590
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:248 /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:341 /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:418 /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:590
 msgid "Pick an archived project"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:255
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:255
 msgid "Edit a template file, use `list --templates` to learn which."
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:269
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:269
 msgid "Move a Project into the archive"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:271
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:271
 msgid "Search terms to match the project"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:278
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:278
 msgid "Archives the project, even though it is not completely valid"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:284
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:284
 msgid "Archives all projects that can be archived"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:290
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:290
 msgid "Override the year"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:298
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:298
 msgid "Move a Project out of the archive"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:300
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:300
 msgid "Specify the Archiv"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:304
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:304
 msgid "The name of the project, duh!"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:312
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:312
 msgid "Display a specific project"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:320
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:320
 msgid "Show project as JSON"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:325
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:325
 msgid "Show project as iCal"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:330
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:330
 msgid "Show project as raw yaml"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:334
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:334
 msgid "Shows a particular detail"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:349
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:349
 msgid "Shows fields that can be filled automatically"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:355
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:355
 msgid "Shows the errors in this project"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:361
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:361
 msgid "Show fields in templates that are filled"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:368
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:368
 msgid "List files that belong to a project"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:372
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:372
 msgid "Display values in invoice mode"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:378
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:378
 msgid "Display values in offer mode"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:389
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:389
 msgid "Show as csv"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:402
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:402
 msgid "Set a value in a project file"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:409
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:409
 msgid "Which field to set"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:414
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:414
 msgid "What to put in the field"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:427
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:427
 msgid "Show storage path"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:429
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:429
 msgid "Shows templates path instead"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:438
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:438
 msgid "Shows path to created documents instead"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:460
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:460
 msgid "Open an archive instead"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:472
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:472
 msgid "Open the working directory in an editor"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:478
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:478
 msgid "Produces a CSV report for a given year"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:491
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:491
 msgid "List archived projects of a specific year, defaults to the current year"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:500
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:500
 msgid "Include open tasks"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:520
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:520
 msgid "Experimental: open dues"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:523 /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:529
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:523 /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:529
 msgid "Show unpayed wages"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:537
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:537
 msgid "Creates documents from projects"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:541
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:541
 msgid "Manually pass a file path"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:547
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:547
 msgid "Manually pass a output folder"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:553
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:553
 msgid "Do it against better judgement"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:558 /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:610
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:558 /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:610
 msgid "Do not create final output file"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:564
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:564
 msgid "Only prints to stdout"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:569
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:569
 msgid "Open the pdf file afterwards."
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:579
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:579
 msgid "Produce an offer document"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:585
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:585
 msgid "Produce an invoice document"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:598
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:598
 msgid "Use a particular template"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:606
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:606
 msgid "Deletes a project"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:621 /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:709 /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:729 /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:764 /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:788
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:621 /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:715 /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:735 /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:770 /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:794
 msgid "list archived projects"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:637
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:637
 msgid "Show and edit your config"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:639
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:639
 msgid "Edit your config"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:651
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:651
 msgid "Show a specific config value"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:658 /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:664
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:658
 msgid "Show default config"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:671
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:664
+msgid "set the root folder in the config"
+msgstr ""
+
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:670
+msgid "Show the location of the config file"
+msgstr ""
+
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:677
 msgid "Create config file."
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:680
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:686
 msgid "(experimental) starts interactive shell"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:684
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:690
 msgid "Show your name from config"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:689
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:695
 msgid "Show the working tree status"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:694
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:700
 msgid "Pull and merge new commits from remote"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:697
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:703
 msgid "git pull with --rebase"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:703
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:709
 msgid "git diff"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:716 /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:736 /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:771 /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:795
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:722 /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:742 /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:777 /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:801
 msgid "A template"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:723
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:729
 msgid "Add file contents to the git-index"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:741
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:747
 msgid "Add all projects"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:749
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:755
 msgid "Save changes locally"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:753
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:759
 msgid "Upload locally saved changes to the remote"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:757
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:763
 msgid "cleans changes and untracked files in project folder"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:777
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:783
 msgid "equals git stash"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:778
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:784
 msgid "equals git pop"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:782
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:788
 msgid "Show commit logs"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:802
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:808
 msgid "Show information about the remote"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:807
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:813
 msgid "Generates completion for bash, zsh, etc"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:809
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:815
 msgid "what shell to generate completion for (bash, zsh, fish,PowerShell)"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:818
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:824
 msgid "Prints version of this tool"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:822
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:828
 msgid "Opens the online documentation, please read it"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:881
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:887
 msgid "please specify either bash, zsh, fish or powershell"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:892
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:898
 msgid "Date Format must be DD.MM.YYYY"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/bin/cli/subcommands/mod.rs:341
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/subcommands/mod.rs:341
 msgid "You have to provide either a search term or path"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/document_export/mod.rs:175
+#: /Users/hendrik/code/rust/asciii/src/document_export/mod.rs:175
 msgid "Can't make sense of {}"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/lib.rs:90
+#: /Users/hendrik/code/rust/asciii/src/lib.rs:92
 msgid "Documentation at: {}"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/project/computed_field.rs:66
+#: /Users/hendrik/code/rust/asciii/src/project/computed_field.rs:79
 msgid "{} days"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/project/computed_field.rs:68 /home/hendrik/code/rust/asciii/src/project/computed_field.rs:69
+#: /Users/hendrik/code/rust/asciii/src/project/computed_field.rs:81 /Users/hendrik/code/rust/asciii/src/project/computed_field.rs:82
 msgid "{} weeks"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/project/mod.rs:316
+#: /Users/hendrik/code/rust/asciii/src/project/mod.rs:317
 msgid "Create an Invoice"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/project/mod.rs:324
+#: /Users/hendrik/code/rust/asciii/src/project/mod.rs:325
 msgid "{}: Hungry employees!"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/project/mod.rs:325
+#: /Users/hendrik/code/rust/asciii/src/project/mod.rs:326
 msgid "Pay {}\nYou have had the money for {} days!"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/project/mod.rs:335
+#: /Users/hendrik/code/rust/asciii/src/project/mod.rs:336
 msgid "Inquire about: \"{event}\"!"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/project/mod.rs:336
+#: /Users/hendrik/code/rust/asciii/src/project/mod.rs:337
 msgid "{inum }{event:?} on {invoice_date} ({days} days ago) was already invoiced but is still not marked as payed.\nPlease check for incoming payments! You can ask {client} ({mail})."
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/project/mod.rs:346
+#: /Users/hendrik/code/rust/asciii/src/project/mod.rs:347
 msgid "{rnum}: payment is {weeks} weeks late: \"{event}\""
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/project/mod.rs:358
+#: /Users/hendrik/code/rust/asciii/src/project/mod.rs:359
 msgid "Archive {}"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/project/mod.rs:359
+#: /Users/hendrik/code/rust/asciii/src/project/mod.rs:360
 msgid "{:?} has been finished for {} days, get rid of it!"
 msgstr ""
 
-#: /home/hendrik/code/rust/asciii/src/project/spec_yaml.rs:202
+#: /Users/hendrik/code/rust/asciii/src/project/spec_yaml.rs:202
 msgid "Responsible: {}"
 msgstr ""
 

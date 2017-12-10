@@ -34,7 +34,9 @@ use chrono::prelude::*;
 /// Wrapper around `io::Error` and `yaml_rust::scanner::ScanError`.
 #[derive(Debug)]
 pub enum YamlError{
+    /// wrapped `io` Error
     Io(io::Error),
+    /// wrapped `scan` Error
     Scan(ScanError)
 }
 

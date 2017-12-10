@@ -1,4 +1,5 @@
 #![allow(trivial_casts)]
+#![allow(missing_docs)]
 
 use std::{io, fmt};
 #[cfg(feature="serialization")] use serde_json;

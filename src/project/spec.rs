@@ -28,12 +28,15 @@ match *result {
 
 /// Every other trait in this module ought to be `Validatable`
 pub trait Validatable {
+    /// Checks for certain errors
     fn validate(&self) -> SpecResult;
 
+    /// Returns true if valid
     fn is_valid(&self) -> bool {
         self.validate().is_ok()
     }
 
+    /// Returns list of found errors
     fn errors(&self) -> Option<ErrorList>{
         self.validate().err()
     }
@@ -63,7 +66,9 @@ pub trait IsProject {
     fn long_desc(&self) -> String;
 }
 
+/// Extended functionality for projects
 pub trait IsProjectExt {
+    /// Number of days since creation of the project
     fn age(&self) -> Option<i64>;
 }
 
@@ -79,11 +84,13 @@ impl<T> IsProjectExt for T where T: Storable {
 
 /// Stage 1: requirements for an offer
 pub trait Offerable {
+    /// Raised if the offer number is reused
     fn appendix(&self) -> Option<i64>;
 
     /// When was the offer created
     fn date(&self) -> Option<Date<Utc>>;
 
+    /// ID of an the offer
     fn number(&self) -> Option<String>;
 }
 
@@ -124,18 +131,28 @@ pub trait Invoicable {
     /// When was the invoice created
     fn date(&self) -> Option<Date<Utc>>;
 
+    /// invoice number as a string
     fn number_str(&self) -> Option<String>;
 
+    /// invoice number as a long string
     fn number_long_str(&self) -> Option<String>;
 
     /// An official identifier
     fn official(&self) -> Option<String>;
 }
 
+/// Represents an Employee
 pub struct Employee {
+    /// Name of the Employee
     pub name: String,
+
+    /// Amount of Currency the employees receives per hour
     pub salary: Currency,
+
+    /// Number of hours the employee worked on this project
     pub time: f64,
+
+    /// Salary times hours
     pub wage: Currency,
 }
 
@@ -158,7 +175,8 @@ pub trait HasEmployees {
 
 
     /// Full number of service hours
-    /// TODO test this against old format
+    ///
+    /// `TODO` test this against old format
     fn total_time(&self) -> Option<f64>;
 
     /// Returns a product from Service
@@ -175,15 +193,16 @@ pub trait HasEmployees {
         }
     }
 
-    /// Nicely formated list of employees with their respective service hours
+    /// Nicely formatted list of employees with their respective service hours
     fn employees_string(&self) -> Option<String>;
 
-    /// List of employees and ther respective service hours
-
+    /// List of employees and their respective service hours
     fn employees(&self) -> Option<Vec<Employee>>;
 
+    /// Check if the employees have been payed
     fn employees_payed(&self) -> bool;
 
+    /// Sum of wages for the project
     fn wages(&self) -> Option<Currency>;
 }
 
@@ -197,6 +216,7 @@ pub trait Redeemable: IsProject {
     /// If was the project payed
     fn is_payed(&self) -> bool;
 
+    /// Returns a bill for the offer and one for the invoice.
     fn bills(&self) -> ProductResult<(Bill<Product>, Bill<Product>)>;
 
     /// When what is the MWsT of the project.
@@ -210,16 +230,27 @@ pub trait Redeemable: IsProject {
 
 }
 
+/// Holds the time of the beginning and end of an event
 #[derive(Debug)]
 pub struct EventTime {
+    /// Start of the event
     pub start: NaiveTime,
+
+    /// End of the event
     pub end:   NaiveTime
 }
 
+/// Describes either the coarse begin and end date of the event
+/// or holds a list of distinct `EventTime`s
 #[derive(Debug)]
 pub struct Event {
+    /// Begin of the event
     pub begin: Date<Utc>,
+
+    /// End of the event
     pub end: Option<Date<Utc>>,
+
+    /// Set of of times
     pub times: Vec<EventTime>
 }
 
@@ -243,8 +274,10 @@ pub trait HasEvents {
     /// Produces a list of `DateRange`s for the event.
     fn events(&self) -> Option<Vec<Event>>;
 
+    /// Returns a list of `Event`s
     fn times(&self,yaml: &Yaml) -> Option<Vec<EventTime>>;
 
+    /// Returns the location of the event
     fn location(&self) -> Option<&str>;
 
 }

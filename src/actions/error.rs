@@ -6,6 +6,7 @@ use project;
 // use project::error::ProjectError;
 use storage::error::StorageError;
 
+#[allow(missing_doc)]
 error_chain!{
     types {
         Error, ErrorKind, ResultExt, Result;

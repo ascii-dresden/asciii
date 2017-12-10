@@ -73,6 +73,7 @@ impl Project {
     /// Access to inner data
     pub fn yaml(&self) -> &Yaml{ &self.yaml }
 
+    /// Opens a project from file path;
     pub fn open<S: AsRef<OsStr> + ?Sized>(pathish: &S) -> Result<Project> {
         let file_path = Path::new(&pathish);
         let file_content = File::open(&file_path)
@@ -80,7 +81,7 @@ impl Project {
                                     let mut content = String::new();
                                     file.read_to_string(&mut content).map(|_| content)
                                 })?;
-        Ok(Project{
+        Ok(Project {
             file_path: file_path.to_owned(),
             _temp_dir: None,
             git_status: None,

@@ -24,7 +24,6 @@ use std::env;
 use crowbook_intl_runtime::set_lang;
 
 pub mod cli;
-pub mod manual;
 
 fn setup_locale() {
     if let Ok(env_lang) = env::var("LANG") {

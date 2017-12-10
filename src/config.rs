@@ -123,7 +123,7 @@ impl ConfigReader {
 
     /// Returns the a vec of &strs if possible
     pub fn get_strs(&self, key:&str) -> Option<Vec<&str>> {
-        try_some!(self.get(key))
+        self.get(key)?
             .as_vec()
             .map(|v| v.iter()
                       .filter_map(|s|s.as_str())

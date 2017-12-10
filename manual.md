@@ -1,9 +1,6 @@
-The **official asciii Handbook**.
+# The **official asciii Handbook**.
 
-This user documentation has been ripped off straight from the [original
-README](https://github.com/ascii-dresden/ascii-invoicer/), so please forgive if you find any
-mistakes or unimplemented material,
-please **[file an issue immediately](https://github.com/ascii-dresden/asciii/issues/new)**.
+Please **[file an issue immediately](https://github.com/ascii-dresden/asciii/issues/new)** if you find anything inaccurate about this documentation or any bugs in the software.
 
 1. [Introduction](#introduction)
 1. [Installation](#installation)
@@ -11,11 +8,10 @@ please **[file an issue immediately](https://github.com/ascii-dresden/asciii/iss
 1. [File Format](#file-format)
 1. [File Structure](#file-structure)
 
-# ascii invoicer
 
 ## Introduction
 
-The ascii-invoicer is a command-line tool that manages projects and stores them not in a database but in folders.
+The ascii invoicer is a command-line tool that manages projects.
 New projects can be created from templates and are stored in the working directory.
 Projects can be archived, each year will have its own archive.
 A project consists of a folder containing a yaml file describing it and a number of attached files,
@@ -25,18 +21,28 @@ You can create preliminary offers and invoices from your projects.
 
 ## Installation
 
+Most of theses installation paths will build from source so you need the following build requirements.
+
+### Build Requirements
+
+* `rust` ≥ 1.17.0
+* `cargo`
+* `cmake`
+* `git`
+* `zlib1g-dev`
+
+### Crates.io
+
+Since version 3.1.3 `asciii` can be installed via `cargo install asciii`.
+
 ### Archlinux User Repository
 
 You find the AUR package [asciii-git](https://aur.archlinux.org/packages/asciii-git), or contact me personally about the inofficial repo with the binary packages.
 Debian and Windows packages are on the way.
 
-### Build Requirements
+### Manuall install from git.
 
-* rustc ≥ 1.11.0
-* cargo
-* optionally: for full feature completeness you also need cmake to build libgit2
-
-Just run `cargo build --release` or `cargo install --path .`
+Just clone https://github.com/ascii-dresden/asciii/ and run `cargo install`.
 
 ### Requirements
 
@@ -268,6 +274,14 @@ some of which remain in the project file. These can be replaced with the `asciii
 * `show`: `display`
 * `log`: `history`
 
+
+## Logging
+
+`asciii` uses Rusts [env_logger](http://doc.rust-lang.org/log/env_logger).
+To enable logging you have to set `ASCIII_LOG=debug`.
+Besides `debug`, you can also use `trace`, `warn` or `error`.
+You can enable logging per-module logging like this: `ASCIII_LOG=storage=debug`.
+Modules are all top-level files and folders in `src/`.
 
 ## Pro tips
 

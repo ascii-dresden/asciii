@@ -14,14 +14,9 @@ use open;
 
 pub mod yaml;
 
-//#[export_macro]
-macro_rules! try_some {
-    ($expr:expr) => (match $expr {
-        Some(val) => val,
-        None => return None,
-    });
-}
-
+/// Sets up logging initially.
+///
+/// After calling this function the global logger will look for the environment variable `ASCIII_LOG`.
 pub fn setup_log() {
     let format = |record: &LogRecord| {
         let location = record.location();
@@ -157,25 +152,28 @@ pub fn currency_to_string(currency:&Currency) -> String {
     currency.postfix().to_string()
 }
 
-// TODO there may be cases where an f64 can't be converted into Currency
+/// Creates a currecny from an `f64`
+///
+/// This is functionality which was explicitely left out of the `Claude` crate.
 pub fn to_currency(f: f64) -> Currency {
     Currency{ symbol: ::CONFIG.get_char("currency"), value: (f * 1000.0) as i64} / 10
 }
 
-// tiny little helper
-pub fn to_local_file(file:&Path, ext:&str) -> PathBuf {
+/// Changes the extension of a given `Path`
+pub fn to_local_file(file: &Path, ext: &str) -> PathBuf {
     let mut _tmpfile = file.to_owned();
     _tmpfile.set_extension(ext);
     Path::new(_tmpfile.file_name().unwrap()).to_owned()
 }
 
-pub fn naive_time_from_str(string:&str) -> Option<NaiveTime> {
+/// Creates a `chrono::NaiveTime` from a string that looks like `23:59:58` or only `12:05`.
+pub fn naive_time_from_str(string: &str) -> Option<NaiveTime> {
     let t:Vec<u32> = string
         .splitn(2, |p| p == '.' || p == ':')
         .map(|s|s.parse().unwrap_or(0))
         .collect();
 
-    if let (Some(h),m) = (t.get(0),t.get(1).unwrap_or(&0)){
+    if let (Some(h),m) = (t.get(0), t.get(1).unwrap_or(&0)) {
         if *h < 24 && *m < 60 {
             return Some(NaiveTime::from_hms(*h,*m,0))
         }
