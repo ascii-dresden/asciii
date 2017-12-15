@@ -16,6 +16,19 @@ pub fn with_cli<F> (app_handler:F) where F: Fn(App) {
             .after_help(asciii::DOCUMENTATION_URL)
 
 
+            .subcommand(SubCommand::with_name("bootstrap")
+                        .aliases(&["boot", "clone"])
+                        .about(lformat!("set's a a new instance").as_ref())
+                        .arg(Arg::with_name("repo")
+                             .help(lformat!("Remote repository").as_ref())
+                             .required(true))
+                        .arg(Arg::with_name("to")
+                             .help(lformat!("where to clone to").as_ref())
+                             .long("to")
+                             .takes_value(true)
+                             .required(false))
+                       )
+
 
             .subcommand(SubCommand::with_name("new")
                         .about(lformat!("Create a new project").as_ref())
@@ -647,8 +660,14 @@ pub fn with_cli<F> (app_handler:F) where F: Fn(App) {
                              .long("default")
                             )
 
+                        .arg(Arg::with_name("set root")
+                             .help(lformat!("set the root folder in the config").as_ref())
+                             .long("set-root")
+                             .takes_value(true)
+                            )
+
                         .arg(Arg::with_name("location")
-                             .help(lformat!("Show default config").as_ref())
+                             .help(lformat!("Show the location of the config file").as_ref())
                              .short("l")
                              .long("location")
                             )
@@ -815,6 +834,7 @@ pub fn with_cli<F> (app_handler:F) where F: Fn(App) {
 /// Starting point for handling commandline matches
 pub fn match_matches(matches: &ArgMatches) {
     let res = match matches.subcommand() {
+     ("bootstrap", Some(sub_m)) => subcommands::bootstrap(sub_m),
      ("list",      Some(sub_m)) => subcommands::list(sub_m),
      ("csv",       Some(sub_m)) => subcommands::csv(sub_m),
      ("new",       Some(sub_m)) => subcommands::new(sub_m),

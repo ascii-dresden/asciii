@@ -8,6 +8,7 @@ use icalendar::Calendar;
 use std::fmt::Write;
 use std::path::PathBuf;
 use std::collections::HashMap;
+use std::process::Command;
 
 use util;
 use storage::{self, StorageDir, Storable};
@@ -211,4 +212,12 @@ pub fn calendar_with_tasks(dir: StorageDir, show_tasks:bool) -> Result<String> {
     Ok(cal.to_string())
 }
 
-
+/// Clone the repo
+///
+pub fn clone_remote(url: &str, target: &str) -> Result<()> {
+    Command::new("git")
+        .args(&["clone", url, target])
+        .status()
+        .unwrap_or_else(|e| { panic!("failed to execute process: {}", e) });
+    Ok(())
+}

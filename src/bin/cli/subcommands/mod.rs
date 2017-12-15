@@ -157,6 +157,16 @@ pub fn matches_to_paths(matches: &ArgMatches, storage: &Storage<Project>) -> Res
 
 
 
+/// Command BOOTSTRAP
+pub fn bootstrap(matches: &ArgMatches) -> Result<()> {
+    let repo = matches.value_of("repo").unwrap();
+    let to = matches.value_of("to").unwrap_or("~/.asciii");
+    
+
+    Ok(actions::clone_remote(repo, to)?)
+}
+
+
 /// Command CSV
 pub fn csv(matches: &ArgMatches) -> Result<()> {
     use chrono::{Local, Datelike};
@@ -459,6 +469,13 @@ fn config_edit(editor: &Option<&str>) {
 
 /// Command CONFIG --default
 fn config_show_default() -> Result<()> {
+    println!("{}", config::DEFAULT_CONFIG);
+    Ok(())
+}
+
+
+/// Command CONFIG --set-root
+fn config_set(matches: &ArgMatches) -> Result<()> {
     println!("{}", config::DEFAULT_CONFIG);
     Ok(())
 }
