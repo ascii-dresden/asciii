@@ -142,6 +142,7 @@ pub fn simple_rows(projects:&[Project], list_config:&ListConfig) -> Vec<Row>{
 /// produces the rows used in `print_projects()`
 #[inline]
 pub fn verbose_rows(projects:&[Project], list_config:&ListConfig) -> Vec<Row>{
+    trace!("verbose_rows {:#?}", list_config);
     projects.iter().enumerate()
         .map(|(i, project)| {
             //trace!("configuring row: {:?}", project.name());
@@ -198,7 +199,7 @@ pub fn verbose_rows(projects:&[Project], list_config:&ListConfig) -> Vec<Row>{
                 //cell!(output_file_exists(project, Project::offer_file_name)),
                 //cell!(output_file_exists(project, Project::invoice_file_name)),
 
-                cell!(r->project.sum_sold().map(|i|currency_to_string(&i)).unwrap_or_else(|_| String::from("none"))),
+                cell!(r->project.sum_sold().map(|i|currency_to_string(&i)).unwrap_or_else(|e| format!("{}", e))),
                 //cell!(project.wages().map(|i|i.to_string()).unwrap_or(String::from("none"))),
                 //cell!(project.sum_sold_and_wages().map(|i|i.to_string()).unwrap_or(String::from("none"))),
             ]);
@@ -269,7 +270,7 @@ pub fn dynamic_rows(projects:&[Project], list_config:&ListConfig) -> Vec<Row>{
 /// This doesn't do much, except taking a Vec of Rows and printing it,
 /// the interesting code is in `dynamic_rows()`, `verbose_rows()`, `path_rows()` or `simple_rows()`.
 /// This Documentations is redundant, infact, it is already longer than the function itself.
-pub fn print_projects(rows:Vec<Row>){
+pub fn print_projects(rows: Vec<Row>){
     trace!("starting table print");
     let mut table = Table::init(rows);
     table.set_format(FormatBuilder::new().column_separator(' ').padding(0,0).build());
@@ -311,19 +312,19 @@ fn table_with_borders(table:&mut Table){
                     );
 }
 
-pub fn show_details(project:&Project, bill_type:&BillType) {
+pub fn show_details(project:&Project, bill_type: BillType) {
     trace!("print::show_details()");
     println!("{}: {}", bill_type.to_string(), project.short_desc());
 
     let (offer, invoice) = match project.bills() {
         Ok(tuple) => tuple,
         Err(e) => {
-            error!("{}", e);
+            error!("{}, sorry", e);
             return
         }
     };
 
-    let bill = match *bill_type {
+    let bill = match bill_type {
         BillType::Offer => offer,
         BillType::Invoice => invoice
     };

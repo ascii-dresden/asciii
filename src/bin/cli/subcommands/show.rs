@@ -47,7 +47,7 @@ pub fn show(m: &ArgMatches) -> Result<()> {
         show_template(search_terms[0])
     } else {
         for p in setup::<Project>()?.open_projects(selection)? {
-            print::show_details(&p, &bill_type)
+            print::show_details(&p, bill_type)
         }
         Ok(())
     }

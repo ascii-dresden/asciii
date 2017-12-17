@@ -168,7 +168,7 @@ impl IsProject for Project {
     }
 
     fn event_date(&self) -> Option<Date<Utc>>{
-        self.get_dmy( "event.dates.0.begin")
+        self.get_dmy("event.dates.0.begin")
         .or_else(||self.get_dmy("created"))
         .or_else(||self.get_dmy("date"))
         // probably the dd-dd.mm.yyyy format
@@ -261,14 +261,14 @@ impl HasEvents for Project {
 
     #[allow(unused_qualifications)]
     fn events(&self) -> Option<Vec<spec::Event>> {
-        let dates = try_some!(ProvidesData::get(self, "event.dates/").and_then(|a| a.as_vec()));
+        let dates = ProvidesData::get(self, "event.dates/").and_then(|a| a.as_vec())?;
         dates.into_iter()
             .map(|h| {
 
-                let begin = try_some!(
+                let begin =
                     self.get_direct(h, "begin")
                     .and_then(|y|y.as_str())
-                    .and_then(|d|self.parse_dmy_date(d)));
+                    .and_then(|d|self.parse_dmy_date(d))?;
 
                 let end =
                     self.get_direct(h, "end")
@@ -286,7 +286,7 @@ impl HasEvents for Project {
     }
 
     fn times(&self,yaml: &Yaml) -> Option<Vec<EventTime>> {
-        let times = try_some!(self.get_direct(yaml, "times").and_then(|l|l.as_vec()));
+        let times = self.get_direct(yaml, "times").and_then(|l|l.as_vec())?;
         times.into_iter()
             .map(|h| {
 
@@ -418,6 +418,7 @@ impl<'a> ProvidesData for Client<'a> {
 impl<'a> IsClient for Client<'a> {
     fn email(&self) -> Option<&str> {
         self.get_str("client/email")
+        .or_else(|| self.get_str("email"))
     }
 
     fn address(&self) -> Option<&str> {
@@ -466,10 +467,10 @@ impl<'a> IsClient for Client<'a> {
             let lang = ::CONFIG.get_str("defaults/lang");
 
             let gend_path = "gender_matches/".to_owned() + &salute.to_lowercase();
-            let gend = ::CONFIG.get_str(&gend_path);
+            let gend = ::CONFIG.get_str_or(&gend_path)?;
 
             let addr_path = "lang_addressing/".to_owned() + &lang.to_lowercase() + "/" + gend;
-            let addr = ::CONFIG.get_str(&addr_path);
+            let addr = ::CONFIG.get_str_or(&addr_path)?;
 
             last_name.and(Some(format!("{} {} {}", addr, salute, last_name.unwrap_or(""))))
         } else {
@@ -571,7 +572,7 @@ impl<'a> Invoicable for Invoice<'a> {
     }
 
     fn number_long_str(&self) -> Option<String> {
-        let year = try_some!(self.date()).year();
+        let year = self.date()?.year();
         // TODO Length or format should be a setting
         self.number().map(|n| format!("R{}-{:03}", year, n))
     }
@@ -669,8 +670,8 @@ impl<'a> HasEmployees for Hours<'a> {
                          )
                      .filter(|&(_, h)| h > 0f64 )
                      .map(|(name, time)| {
-                          let wage = try_some!(self.salary()) * time;
-                          let salary = try_some!(self.salary());
+                          let wage = self.salary()? * time;
+                          let salary = self.salary()?;
                           Some( Employee { name, time, wage, salary })
                       })
                      .collect::< Option<Vec<Employee>> >()

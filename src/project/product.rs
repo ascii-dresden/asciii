@@ -30,11 +30,13 @@ pub mod error{
             AmbiguousAmounts(t:String){
                 description("more returned than provided")
             }
-            MissingAmount(t:String){
-                description("invalid price")
+            MissingAmount(t: String){
+                description("invalid price"),
+                display("missing amount of {:?}", t)
             }
-            TooMuchReturned(t:String){
-                description("invalid format")
+            TooMuchReturned(t: String){
+                description("invalid format"),
+                display("too much returned of {:?}", t)
             }
         }
     }

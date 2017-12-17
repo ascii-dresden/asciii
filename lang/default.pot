@@ -524,35 +524,35 @@ msgstr ""
 msgid "{} weeks"
 msgstr ""
 
-#: /Users/hendrik/code/rust/asciii/src/project/mod.rs:317
+#: /Users/hendrik/code/rust/asciii/src/project/mod.rs:309
 msgid "Create an Invoice"
 msgstr ""
 
-#: /Users/hendrik/code/rust/asciii/src/project/mod.rs:325
+#: /Users/hendrik/code/rust/asciii/src/project/mod.rs:317
 msgid "{}: Hungry employees!"
 msgstr ""
 
-#: /Users/hendrik/code/rust/asciii/src/project/mod.rs:326
+#: /Users/hendrik/code/rust/asciii/src/project/mod.rs:318
 msgid "Pay {}\nYou have had the money for {} days!"
 msgstr ""
 
-#: /Users/hendrik/code/rust/asciii/src/project/mod.rs:336
+#: /Users/hendrik/code/rust/asciii/src/project/mod.rs:328
 msgid "Inquire about: \"{event}\"!"
 msgstr ""
 
-#: /Users/hendrik/code/rust/asciii/src/project/mod.rs:337
+#: /Users/hendrik/code/rust/asciii/src/project/mod.rs:329
 msgid "{inum }{event:?} on {invoice_date} ({days} days ago) was already invoiced but is still not marked as payed.\nPlease check for incoming payments! You can ask {client} ({mail})."
 msgstr ""
 
-#: /Users/hendrik/code/rust/asciii/src/project/mod.rs:347
+#: /Users/hendrik/code/rust/asciii/src/project/mod.rs:339
 msgid "{rnum}: payment is {weeks} weeks late: \"{event}\""
 msgstr ""
 
-#: /Users/hendrik/code/rust/asciii/src/project/mod.rs:359
+#: /Users/hendrik/code/rust/asciii/src/project/mod.rs:351
 msgid "Archive {}"
 msgstr ""
 
-#: /Users/hendrik/code/rust/asciii/src/project/mod.rs:360
+#: /Users/hendrik/code/rust/asciii/src/project/mod.rs:352
 msgid "{:?} has been finished for {} days, get rid of it!"
 msgstr ""
 

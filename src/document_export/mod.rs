@@ -59,7 +59,7 @@ use super::BillType;
 ///
 /// Returns path to created file, potenially in a `tempdir`.
 // pub fn fill_template<E:Serialize>(document:E, template_file:&Path) -> PathBuf{
-pub fn fill_template<E, P>(document: &E, bill_type:&BillType, template_path: P) -> Result<String>
+pub fn fill_template<E, P>(document: &E, bill_type: BillType, template_path: P) -> Result<String>
     where E: Serialize, P:AsRef<Path>
 {
     let mut handlebars = Handlebars::new();
@@ -71,7 +71,7 @@ pub fn fill_template<E, P>(document: &E, bill_type:&BillType, template_path: P) 
 
     handlebars.register_template_file("document", template_path).unwrap();
 
-    let packed = match *bill_type {
+    let packed = match bill_type {
         BillType::Offer => pack_data(document, false),
         BillType::Invoice => pack_data(document, true)
     };
@@ -160,7 +160,7 @@ fn project_to_doc(project: &Project, config: &ExportConfig) -> Result<Option<Pat
 
     if let (Some(outfile), Some(dyn_bill)) = (outfile_tex, dyn_bill_type) {
         let exported_project: project::export::Complete = project.export();
-        let filled = fill_template(&exported_project, &dyn_bill, &template_path)?;
+        let filled = fill_template(&exported_project, dyn_bill, &template_path)?;
 
         let pdffile = util::to_local_file(&outfile, convert_ext);
 

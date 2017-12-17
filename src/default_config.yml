@@ -3,7 +3,7 @@ user:
   name: #"The Unnamed Manager"
   editor: #"vim -O"
 
-path: "~"
+path: "~/.asciii_projects"
 output_path: "."
 list:
   colors:    false
@@ -14,7 +14,7 @@ list:
   extra_details: #[OurBad, Caterers] # see asciii list --computed for all options
 
 dirs:
-  storage: asciii_projects
+  storage: "."
   working: working
   archive: archive
   templates: templates

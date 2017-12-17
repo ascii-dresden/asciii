@@ -28,14 +28,6 @@ use storage::ErrorKind as StorageErrorKind;
 use storage::repo::GitStatus;
 use templater::{Templater, IsKeyword};
 
-//#[export_macro]
-macro_rules! try_some {
-    ($expr:expr) => (match $expr {
-        Some(val) => val,
-        None => return None,
-    });
-}
-
 pub mod product;
 pub mod spec;
 mod spec_yaml;
@@ -259,7 +251,7 @@ impl Project {
 
     /// Time between event and creation of invoice
     pub fn our_bad(&self) -> Option<Duration> {
-        let event   = try_some!(self.event_date());
+        let event   = self.event_date()?;
         let invoice = self.invoice().date().unwrap_or_else(Utc::today);
         let diff = invoice.signed_duration_since(event);
         if diff > Duration::zero() {
@@ -483,16 +475,16 @@ impl Exportable for Project {
     fn export_dir(&self)  -> PathBuf { Storable::dir(self) }
 
     fn offer_file_name(&self, extension: &str) -> Option<String>{
-        let num = try_some!(self.offer().number());
-        let name = slug::slugify(try_some!(IsProject::name(self)));
+        let num = self.offer().number()?;
+        let name = slug::slugify(IsProject::name(self)?);
         Some(format!("{} {}.{}", num, name, extension))
     }
 
     fn invoice_file_name(&self, extension: &str) -> Option<String>{
-        let num = try_some!(self.invoice().number_str());
-        let name = slug::slugify(try_some!(self.name()));
+        let num = self.invoice().number_str()?;
+        let name = slug::slugify(self.name()?);
         //let date = Local::today().format("%Y-%m-%d").to_string();
-        let date = try_some!(self.invoice().date()).format("%Y-%m-%d").to_string();
+        let date = self.invoice().date()?.format("%Y-%m-%d").to_string();
         Some(format!("{} {} {}.{}",num,name,date,extension))
     }
 
