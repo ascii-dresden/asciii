@@ -204,7 +204,7 @@ fn project_to_doc(project: &Project, config: &ExportConfig) -> Result<Option<Pat
 
             let mut outfile_path = project.write_to_file(&filled, &dyn_bill, output_ext)?;
             debug!("{} vs\n        {}", outfile.display(), outfile_path.display());
-            util::pass_to_command(&Some(convert_tool), &[&outfile_path]);
+            util::pass_to_command(Some(convert_tool), &[&outfile_path]);
 
             // clean up expected log and aux files etc
             for trash_ext in trash_exts.iter().filter_map(|x|*x) {

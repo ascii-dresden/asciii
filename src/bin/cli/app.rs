@@ -27,6 +27,12 @@ pub fn with_cli<F> (app_handler:F) where F: Fn(App) {
                              .long("to")
                              .takes_value(true)
                              .required(false))
+                        .arg(Arg::with_name("editor")
+                             .help(lformat!("Override the configured editor").as_ref())
+                             .long("editor")
+                             .takes_value(true)
+                             .short("e"))
+
                        )
 
 

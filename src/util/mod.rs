@@ -45,8 +45,8 @@ pub fn freeze() {
 }
 
 /// Asks for confirmation
-pub fn really(msg:&str) -> bool {
-    println!("{} ", msg);
+pub fn really(msg: &str) -> bool {
+    println!("{} [y/N]", msg);
     let mut answer = String::new();
     if io::stdin().read_line(&mut answer).is_err(){ return false; }
     ["yes", "y",
@@ -94,7 +94,7 @@ pub fn replace_home_tilde(p:&Path) -> PathBuf{
 ///
 /// This is by far the most important function of all utility functions.
 //TODO use https://crates.io/crates/open (supports linux, windows, mac)
-pub fn pass_to_command<T:AsRef<OsStr>>(editor:&Option<&str>, paths:&[T]) {
+pub fn pass_to_command<T:AsRef<OsStr>>(editor: Option<&str>, paths:&[T]) {
 
     let paths = paths.iter()
                       .map(|o|PathBuf::from(&o))
@@ -104,7 +104,7 @@ pub fn pass_to_command<T:AsRef<OsStr>>(editor:&Option<&str>, paths:&[T]) {
 
     if paths.is_empty() {
         warn!("non of the provided paths could be found")
-    } else if let Some(ref editor) = *editor {
+    } else if let Some(ref editor) = editor {
         if paths.len() < 5 || really (&format!("you are about to open {} files\n{:#?}\nAre you sure about this?", paths.len(), paths))
         {
             let editor_config = editor

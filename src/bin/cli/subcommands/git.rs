@@ -168,7 +168,7 @@ pub fn git_cleanup(matches: &ArgMatches) -> Result<()> {
     let repo = storage.repository().unwrap();
     // TODO implement `.and()` for exitstatus
 
-    if util::really(&format!("Do you really want to reset any changes you made to:\n {:?}\n[y|N]",
+    if util::really(&format!("Do you really want to reset any changes you made to:\n {:?}\n",
                              paths)) && !(repo.checkout(&paths).success() && repo.clean(&paths).success())
     {
         return Err("clean was not successfull".into());

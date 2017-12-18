@@ -156,7 +156,7 @@ pub fn delete_project_confirmation(dir: StorageDir, search_terms:&[&str]) -> Res
     let storage = storage::setup_with_git::<Project>()?;
     for project in storage.search_projects_any(dir, search_terms)? {
         storage.delete_project_if(&project,
-                || util::really(&format!("you want me to delete {:?} [y/N]", project.dir())) && util::really("really? [y/N]")
+                || util::really(&lformat!("really?"))
                 )?
     }
     Ok(())

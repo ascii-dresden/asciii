@@ -78,7 +78,7 @@ pub fn new(matches: &ArgMatches) -> Result<()> {
 
     let project_file = storage.create_project(project_name, template_name, &fill_data)?.file();
     if edit {
-        util::pass_to_command(&editor, &[project_file]);
+        util::pass_to_command(editor, &[project_file]);
     }
     Ok(())
 }
@@ -161,7 +161,12 @@ pub fn matches_to_paths(matches: &ArgMatches, storage: &Storage<Project>) -> Res
 
 /// Command BOOTSTRAP
 pub fn bootstrap(matches: &ArgMatches) -> Result<()> {
+
     let repo = matches.value_of("repo").unwrap();
+    let editor = matches.value_of("editor")
+                        .or( CONFIG.get("user.editor")
+                                   .and_then(|e|e.as_str()));
+
     let default_to = get_storage_path()
         .to_str()
         .map(ToString::to_string)
@@ -169,7 +174,10 @@ pub fn bootstrap(matches: &ArgMatches) -> Result<()> {
 
     let to = matches.value_of("to").unwrap_or(&default_to);
     trace!("cloning {:?} to {:?}", repo, to);
-    Ok(actions::clone_remote(repo, to)?)
+    actions::clone_remote(repo, to)?;
+    config_init(editor);
+
+    Ok(())
 }
 
 
@@ -198,20 +206,20 @@ pub fn edit(matches: &ArgMatches) -> Result<()> {
 
     if matches.is_present("template") {
         with_templates(search_term,
-                       |template_paths:&[PathBuf]| util::pass_to_command(&editor, template_paths)
+                       |template_paths:&[PathBuf]| util::pass_to_command(editor, template_paths)
                        )?;
 
     } else if let Some(archive) = matches.value_of("archive") {
         let archive = archive.parse::<i32>().unwrap();
-        edit_projects(StorageDir::Archive(archive), &search_terms, &editor)?;
+        edit_projects(StorageDir::Archive(archive), &search_terms, editor)?;
     } else {
-        edit_projects(StorageDir::Working, &search_terms, &editor)?;
+        edit_projects(StorageDir::Working, &search_terms, editor)?;
     }
     Ok(())
 }
 
 
-fn edit_projects(dir: StorageDir, search_terms: &[&str], editor: &Option<&str>) -> Result<()> {
+fn edit_projects(dir: StorageDir, search_terms: &[&str], editor: Option<&str>) -> Result<()> {
     let storage = setup::<Project>()?;
     let mut all_projects = Vec::new();
     for search_term in search_terms {
@@ -227,7 +235,7 @@ fn edit_projects(dir: StorageDir, search_terms: &[&str], editor: &Option<&str>) 
         bail!("Nothing found for {:?}", search_terms);
     } else {
         let all_paths = all_projects.iter().map(|p| p.file()).collect::<Vec<PathBuf>>();
-        util::pass_to_command(&editor, &all_paths);
+        util::pass_to_command(editor, &all_paths);
         Ok(())
     }
 }
@@ -240,7 +248,7 @@ pub fn workspace(matches: &ArgMatches) -> Result<()> {
     let editor = matches.value_of("editor")
         .or(CONFIG.get("user/editor")
                   .and_then(|e| e.as_str()));
-    util::pass_to_command(&editor, &[storage.working_dir()]);
+    util::pass_to_command(editor, &[storage.working_dir()]);
     Ok(())
 }
 
@@ -271,7 +279,7 @@ pub fn set(m: &ArgMatches) -> Result<()> {
         if !project.empty_fields().contains(&field) {
             return Err(format!("{:?} was not found in {}", field, project.short_desc()).into());
         }
-        if util::really(&format!("do you want to set the field {} in {:?} [y|N]",
+        if util::really(&format!("do you want to set the field {} in {:?}",
                                  field,
                                  project.short_desc())) {
             project.replace_field(&field, &value).map_err(|e| e.into())
@@ -414,6 +422,10 @@ pub fn unarchive(matches: &ArgMatches) -> Result<()> {
 }
 
 pub fn config(matches: &ArgMatches) -> Result<()> {
+    let editor = matches.value_of("editor")
+                        .or(CONFIG.get("user.editor")
+                                  .and_then(|e|e.as_str()));
+
     if let Some(path) = matches.value_of("show") {
         config_show(path)?;
     }
@@ -423,58 +435,11 @@ pub fn config(matches: &ArgMatches) -> Result<()> {
     }
 
     else if matches.is_present("init") {
-        let local = config::ConfigReader::path_home();
-
-        println!("config location: {:?}", local);
-        if local.exists() {
-            error!("{:?} already exists, can't overwrite", local);
-
-        } else if let Ok(mut file) = fs::File::create(local){
-
-            let content;
-            let mut template = Templater::new(config::DEFAULT_CONFIG).finalize();
-            trace!("default config keywords: {:#?}", template.list_keywords());
-
-            if util::really(&lformat!("do you want to set your name?")) {
-                let name = util::git_user_name().and_then(|user_name| {
-                    if util::really(&lformat!("Is your name {:?}", user_name)) {
-                        Some(user_name)
-                    } else {
-                        None
-                    }
-                }).unwrap_or_else(||{
-                    println!("{}", lformat!("What is your name?"));
-                    let mut your_name = String::new();
-                    io::stdin().read_line(&mut your_name).unwrap();
-                    your_name
-                });
-
-                template.fill_in_field("YOUR-FULL-NAME", &name);
-                content = template.filled;
-            } else {
-                content = config::DEFAULT_CONFIG.to_owned();
-            }
-
-
-
-            for line in content.lines()
-                .take_while(|l| !l.contains("-BREAK-"))
-            {
-                file.write_fmt(format_args!("{}\n", line))
-                    .expect("cannot write this line to the config file");
-            }
-
-            let editor = matches.value_of("editor")
-                                .or( CONFIG.get("user.editor").and_then(|e|e.as_str()));
-            config_edit(&editor);
-        }
+        config_init(editor);
     }
 
     else if matches.is_present("edit") {
-        let editor = matches.value_of("editor")
-                            .or(CONFIG.get("user/editor")
-                                      .and_then(|e| e.as_str()));
-        config_edit(&editor);
+        config_edit(editor);
     }
 
     else if matches.is_present("default") {
@@ -484,6 +449,55 @@ pub fn config(matches: &ArgMatches) -> Result<()> {
 }
 
 
+/// Command CONFIG --init
+///
+/// # Warning! Interactive
+/// This command will prompt the user for input on the commandline
+///
+pub fn config_init(editor: Option<&str>) {
+    let local = config::ConfigReader::path_home();
+
+    if local.exists() {
+        error!("{:?} already exists, can't overwrite", local);
+
+    } else if let Ok(mut file) = fs::File::create(local){
+
+        let content;
+        let mut template = Templater::new(config::DEFAULT_CONFIG).finalize();
+        trace!("default config keywords: {:#?}", template.list_keywords());
+
+        if util::really(&lformat!("do you want to set your name?")) {
+            let name = util::git_user_name().and_then(|user_name| {
+                if util::really(&lformat!("Is your name {:?}", user_name)) {
+                    Some(user_name)
+                } else {
+                    None
+                }
+            }).unwrap_or_else(||{
+                println!("{}", lformat!("What is your name?"));
+                let mut your_name = String::new();
+                io::stdin().read_line(&mut your_name).unwrap();
+                your_name
+            });
+
+            template.fill_in_field("YOUR-FULL-NAME", &name);
+            content = template.filled;
+        } else {
+            content = config::DEFAULT_CONFIG.to_owned();
+        }
+
+
+
+        for line in content.lines()
+            .take_while(|l| !l.contains("-BREAK-"))
+        {
+            file.write_fmt(format_args!("{}\n", line))
+                .expect("cannot write this line to the config file");
+        }
+
+        config_edit(editor);
+    }
+}
 
 /// Command CONFIG --show
 pub fn config_show(path: &str) -> Result<()> {
@@ -493,7 +507,7 @@ pub fn config_show(path: &str) -> Result<()> {
 }
 
 /// Command CONFIG --edit
-fn config_edit(editor: &Option<&str>) {
+fn config_edit(editor: Option<&str>) {
     let local = config::ConfigReader::path_home();
     if local.exists() {
         util::pass_to_command(editor, &[&CONFIG.path]);
