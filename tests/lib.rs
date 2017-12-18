@@ -29,6 +29,7 @@ fn list_path_content(path:&Path) -> Vec<PathBuf> {
 mod regression {
     use super::*;
     use asciii::storage::Storable;
+    use asciii::BillType;
 
     #[test]
     fn open_old_projects() {
@@ -47,8 +48,9 @@ mod regression {
             assert_eq!(export1, export2);
     }
 
+    /// This tests that old projects and new projects produce the exaxt same export format
     #[test]
-    fn open_eql_projects() {
+    fn open_eqjl_projects() {
         for files in list_path_content(Path::new("./tests/eql_projects")).windows(2) {
             let (file1, file2) = (&files[0], &files[1]);
 
@@ -67,6 +69,21 @@ mod regression {
             compare_exports::<Complete>(&project1, &project2);
             compare_exports::<Service>(&project1, &project2);
         }
+    }
+
+    #[test]
+    fn test_document_export() {
+        println!("🤷🏽‍♂️");
+        for file in list_path_content(Path::new("./tests/eql_projects")) {
+            println!("opening {}", file.display());
+            let project = Project::open_file(&file).unwrap();
+
+            let template = "./templates/export.tex.hbs";
+            let exported_project: Complete = project.export();
+
+            let filled = asciii::document_export::fill_template(&exported_project, BillType::Offer, template).unwrap();
+        }
+
     }
 }
 

@@ -1,6 +1,7 @@
 use std::path::{Path, PathBuf};
 use std::ffi::OsStr;
 use std::{env, fs};
+use std::io;
 use std::io::Write;
 use std::collections::HashMap;
 
@@ -9,8 +10,9 @@ use clap::ArgMatches;
 use chrono::prelude::*;
 
 use asciii::{self, CONFIG, config, util, actions};
-use asciii::storage::*;
 use asciii::project::Project;
+use asciii::storage::*;
+use asciii::templater::Templater;
 
 #[cfg(feature="document_export")] use asciii::document_export;
 #[cfg(feature="document_export")] use asciii::BillType;
@@ -160,9 +162,13 @@ pub fn matches_to_paths(matches: &ArgMatches, storage: &Storage<Project>) -> Res
 /// Command BOOTSTRAP
 pub fn bootstrap(matches: &ArgMatches) -> Result<()> {
     let repo = matches.value_of("repo").unwrap();
-    let to = matches.value_of("to").unwrap_or("~/.asciii");
+    let default_to = get_storage_path()
+        .to_str()
+        .map(ToString::to_string)
+        .expect("storage page not accessible");
 
-
+    let to = matches.value_of("to").unwrap_or(&default_to);
+    trace!("cloning {:?} to {:?}", repo, to);
     Ok(actions::clone_remote(repo, to)?)
 }
 
@@ -418,19 +424,48 @@ pub fn config(matches: &ArgMatches) -> Result<()> {
 
     else if matches.is_present("init") {
         let local = config::ConfigReader::path_home();
-        println!("config location: {:?}", local);
 
+        println!("config location: {:?}", local);
         if local.exists() {
             error!("{:?} already exists, can't overwrite", local);
+
         } else if let Ok(mut file) = fs::File::create(local){
-            for line in config::DEFAULT_CONFIG.lines()
-                .take_while(|l| !l.contains("BREAK"))
-                {
-                    file.write_fmt(format_args!("{}\n", line))
-                        .expect("cannot write this line to the config file");
-                }
+
+            let content;
+            let mut template = Templater::new(config::DEFAULT_CONFIG).finalize();
+            trace!("default config keywords: {:#?}", template.list_keywords());
+
+            if util::really(&lformat!("do you want to set your name?")) {
+                let name = util::git_user_name().and_then(|user_name| {
+                    if util::really(&lformat!("Is your name {:?}", user_name)) {
+                        Some(user_name)
+                    } else {
+                        None
+                    }
+                }).unwrap_or_else(||{
+                    println!("{}", lformat!("What is your name?"));
+                    let mut your_name = String::new();
+                    io::stdin().read_line(&mut your_name).unwrap();
+                    your_name
+                });
+
+                template.fill_in_field("YOUR-FULL-NAME", &name);
+                content = template.filled;
+            } else {
+                content = config::DEFAULT_CONFIG.to_owned();
+            }
+
+
+
+            for line in content.lines()
+                .take_while(|l| !l.contains("-BREAK-"))
+            {
+                file.write_fmt(format_args!("{}\n", line))
+                    .expect("cannot write this line to the config file");
+            }
+
             let editor = matches.value_of("editor")
-                                .or( CONFIG.get("user/editor").and_then(|e|e.as_str()));
+                                .or( CONFIG.get("user.editor").and_then(|e|e.as_str()));
             config_edit(&editor);
         }
     }

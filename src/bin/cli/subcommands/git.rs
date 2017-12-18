@@ -40,6 +40,10 @@ pub fn git_commit() -> Result<()> {
     }
 }
 
+/// Get git `user.name`
+///
+/// `git config --local user.name`
+
 /// Command REMOTE
 /// exact replica of `git remote -v`
 #[cfg(not(feature = "git_statuses"))]

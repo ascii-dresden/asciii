@@ -55,6 +55,20 @@ pub fn really(msg:&str) -> bool {
         .contains(&answer.trim())
 }
 
+pub fn git_user_name() -> Option<String> {
+    Command::new("git")
+        .args(&["config", "user.name"])
+        .output()
+        .map_err(|e| {
+            error!("failed to execute process: {}", e);
+            e
+        })
+        .ok()
+        .and_then(|out| String::from_utf8(out.stdout).ok())
+        .map(|s| s.trim().to_owned())
+}
+
+
 /// Shells out to print directory structure
 pub fn ls(path:&str){
     println!("find {}", path); // TODO implement in here with walkdir

@@ -214,9 +214,10 @@ pub fn calendar_with_tasks(dir: StorageDir, show_tasks:bool) -> Result<String> {
 
 /// Clone the repo
 ///
-pub fn clone_remote(url: &str, target: &str) -> Result<()> {
+pub fn clone_remote(url: &str, to: &str) -> Result<()> {
+    trace!("cloning {:?} to {:?}", url, to);
     Command::new("git")
-        .args(&["clone", url, target])
+        .args(&["clone", url, to])
         .status()
         .unwrap_or_else(|e| { panic!("failed to execute process: {}", e) });
     Ok(())

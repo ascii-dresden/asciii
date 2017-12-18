@@ -1,7 +1,3 @@
-#![cfg_attr(feature = "lints", allow(unstable_features))]
-#![cfg_attr(feature = "lints", feature(plugin))]
-#![cfg_attr(feature = "lints", plugin(clippy))]
-
 extern crate chrono;
 extern crate term; // TODO consolidate term, ansi_term and terminal_size
 extern crate open;

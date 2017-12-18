@@ -54,7 +54,7 @@ impl GitStatus {
 }
 
 impl fmt::Display for GitStatus {
-    
+
     #[allow(match_same_arms)]
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self{

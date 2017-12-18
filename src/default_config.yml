@@ -1,27 +1,27 @@
 ---
 user:
-  name: #"The Unnamed Manager"
+  name: ##YOUR-FULL-NAME##
   editor: #"vim -O"
 
-path: "~/.asciii_projects"
+path: "~"
 output_path: "."
 list:
-  colors:    false
-  verbose:   false
+  colors:    true
+  verbose:   true
   sort:      index
-  gitstatus: false
+  gitstatus: true
 
   extra_details: #[OurBad, Caterers] # see asciii list --computed for all options
 
+## CAREFUL HERE -BREAK- everything below here will not be copied over
 dirs:
-  storage: "."
+  storage: ".asciii_projects"
   working: working
   archive: archive
   templates: templates
 
 template: default # default template
 
-## CAREFUL HERE BREAK everything below here will not be copied over
 extensions:
   project_file: yml
   project_template: tyml
