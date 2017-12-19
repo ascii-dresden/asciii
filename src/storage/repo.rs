@@ -192,7 +192,7 @@ impl Repository {
     }
 
     pub fn add(&self, paths:&[PathBuf]) -> ExitStatus {
-        info!("adding to git\n {:?}", paths);
+        info!("adding to git: {:?}", paths);
         self.execute_git("add", &[], paths)
     }
 

@@ -3,6 +3,7 @@
 
 #![allow(trivial_casts)]
 use std::{io, fmt};
+use std::path::PathBuf;
 use ::project;
 #[cfg(feature="git_statuses")] use git2;
 
@@ -45,6 +46,10 @@ error_chain!{
         ProjectDoesNotExist {
             description("No project was found matching this description.")
         }
+        NoProjectFile(p: PathBuf) {
+            description("This project folder does not contain a project file."),
+            display("The project folder {:?} does not contain a project file.", p)
+        }
         StoragePathNotAbsolute {
             description("Top Level storage path is not absolute.")
         }
@@ -56,6 +61,9 @@ error_chain!{
         }
         GitProcessFailed {
             description("Calling `git` failed")
+        }
+        RepoUnintialized {
+            description("Git Repository was not initiliazed.")
         }
     }
 }

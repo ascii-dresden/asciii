@@ -1,6 +1,6 @@
 //! Implementations of `ProjectList`
 
-use std::collections::HashMap;
+use linked_hash_map::LinkedHashMap;
 use std::iter::IntoIterator;
 use std::ops::{Deref, DerefMut};
 
@@ -8,7 +8,7 @@ use super::{Storable, Year};
 
 // TODO turn back on as soon as this is a feature
 //pub type ProjectsByYear<P: Storable + Sized> = HashMap<Year, ProjectList<P>>;
-pub type ProjectsByYear<P> = HashMap<Year, ProjectList<P>>;
+pub type ProjectsByYear<P> = LinkedHashMap<Year, ProjectList<P>>;
 
 #[derive(Debug)]
 /// Container keeping all opened projects.

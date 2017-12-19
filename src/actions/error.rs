@@ -1,5 +1,6 @@
 #![allow(trivial_casts)]
 
+use toml;
 use std::{io, fmt, time};
 
 use project;
@@ -18,6 +19,7 @@ error_chain!{
         Io(io::Error);
         Fmt(fmt::Error);
         Time(time::SystemTimeError);
+        Toml(toml::de::Error);
         Project(project::error::Error);
         Storage(StorageError);
     }
@@ -25,6 +27,9 @@ error_chain!{
     errors {
         ActionError{
             description("unexpected response from service")
+        }
+        AddingFailed{
+            description("Adding Failed")
         }
     }
 }

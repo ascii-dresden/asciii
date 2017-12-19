@@ -240,6 +240,32 @@ fn edit_projects(dir: StorageDir, search_terms: &[&str], editor: Option<&str>) -
     }
 }
 
+/// Command META
+pub fn meta(matches: &ArgMatches) -> Result<()> {
+    let storage = setup::<Project>()?;
+    if let Some(matches) = matches.subcommand_matches("edit") {
+        let editor = matches.value_of("editor")
+                            .or(CONFIG.get("user.editor")
+                                      .and_then(|e|e.as_str()));
+        trace!("--> editing");
+        if let Ok(path) = storage.get_extra_file("meta.toml") {
+            util::pass_to_command(editor, &[path]);
+        }
+    }
+
+    if let Some(matches) = matches.subcommand_matches("store") {
+        trace!("--> storing");
+        actions::store_meta()?;
+    }
+
+    if let Some(matches) = matches.subcommand_matches("dump") {
+        trace!("--> dumping");
+        let meta = actions::parse_meta();
+        println!("{:#?}", meta);
+    }
+    Ok(())
+}
+
 /// Command WORKSPACE
 pub fn workspace(matches: &ArgMatches) -> Result<()> {
     println!("{:?}", matches);
