@@ -1,5 +1,6 @@
-use super::spec::*;
+
 use super::Project;
+use super::spec::*;
 use bill::{Bill, ItemList, Tax};
 use util::currency_to_string;
 

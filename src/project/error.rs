@@ -61,11 +61,11 @@ impl ErrorList {
         }
     }
 
-    pub fn push(&mut self, error:&str) {
+    pub fn push(&mut self, error: &str) {
         self.errors.push(error.into());
     }
 
-    pub fn combine_with(&self, other:&Self) -> Self{
+    pub fn combine_with(&self, other: &Self) -> Self {
         let mut new = ErrorList::new();
         for err in self.errors.iter().chain(other.errors.iter()) {
             new.push(err)
@@ -73,7 +73,7 @@ impl ErrorList {
         new
     }
 
-    pub fn is_empty(&self) -> bool{
+    pub fn is_empty(&self) -> bool {
         self.errors.is_empty()
     }
 }

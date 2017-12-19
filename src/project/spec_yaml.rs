@@ -9,6 +9,7 @@ use yaml_rust::yaml::Hash as YamlHash;
 use super::*;
 use super::spec::*;
 use super::product::error::Result as ProductResult;
+use super::product::error::ErrorKind as ProductErrorKind;
 use util::yaml;
 use util::to_currency;
 
@@ -27,7 +28,7 @@ pub trait ProvidesData {
     ///
     /// Splits path string
     /// and replaces `Yaml::Null` and `Yaml::BadValue`.
-    fn get<'a>(&'a self, path:&str) -> Option<&'a Yaml> {
+    fn get<'a>(&'a self, path: &str) -> Option<&'a Yaml> {
         self.get_direct(self.data(), path)
     }
 
@@ -35,36 +36,36 @@ pub trait ProvidesData {
     ///
     /// Splits path string
     /// and replaces `Yaml::Null` and `Yaml::BadValue`.
-    fn get_direct<'a>(&'a self, data:&'a Yaml, path:&str) -> Option<&'a Yaml> {
+    fn get_direct<'a>(&'a self, data: &'a Yaml, path: &str) -> Option<&'a Yaml> {
         // TODO this can be without copying
         let path = path.split(|p| p == '/' || p == '.')
-                      .filter(|k|!k.is_empty())
-                      .collect::<Vec<&str>>();
+                       .filter(|k| !k.is_empty())
+                       .collect::<Vec<&str>>();
         match self.get_path(data, &path) {
             Some(&Yaml::BadValue) |
             Some(&Yaml::Null) => None,
-            content => content
+            content => content,
         }
     }
 
     /// Returns content at `path` in the yaml document.
     /// TODO make this generic over the type of data to support more than just `Yaml`.
-    fn get_path<'a>(&'a self, data:&'a Yaml, path:&[&str]) -> Option<&'a Yaml>{
+    fn get_path<'a>(&'a self, data: &'a Yaml, path: &[&str]) -> Option<&'a Yaml> {
         if let Some((&path, remainder)) = path.split_first() {
             match *data {
                 // go further into the rabit hole
                 Yaml::Hash(ref hash) => {
-                    if remainder.is_empty(){
+                    if remainder.is_empty() {
                         hash.get(&Yaml::String(path.to_owned()))
                     } else {
                         hash.get(&Yaml::String(path.to_owned()))
                             .and_then(|c| self.get_path(c, remainder))
                     }
-                },
+                }
                 // interpret component as index
                 Yaml::Array(ref vec) => {
                     if let Ok(index) = path.parse::<usize>() {
-                        if remainder.is_empty(){
+                        if remainder.is_empty() {
                             vec.get(index)
                         } else {
                             vec.get(index).and_then(|c| self.get_path(c, remainder))
@@ -82,30 +83,33 @@ pub trait ProvidesData {
     /// Gets a `&str` value.
     ///
     /// Same mentality as `yaml_rust`, only returns `Some`, if it's a `Yaml::String`.
-    fn get_str<'a>(&'a self, path:&str) -> Option<&'a str> {
-        self.get(path).and_then(|y|y.as_str())
+    fn get_str<'a>(&'a self, path: &str) -> Option<&'a str> {
+        self.get(path).and_then(|y| y.as_str())
     }
 
     /// Gets an `Int` value.
     ///
     /// Same mentality as `yaml_rust`, only returns `Some`, if it's a `Yaml::Int`.
-    fn get_int<'a>(&'a self, path:&str) -> Option<i64> {
-        self.get(path).and_then(|y|y.as_i64())
+    fn get_int<'a>(&'a self, path: &str) -> Option<i64> {
+        self.get(path).and_then(|y| y.as_i64())
     }
 
     /// Gets a Date in `dd.mm.YYYY` format.
-    fn get_dmy(&self, path:&str) -> Option<Date<Utc>> {
-        self.get(path).and_then(|y|y.as_str()).and_then(|d|self.parse_dmy_date(d))
+    fn get_dmy(&self, path: &str) -> Option<Date<Utc>> {
+        self.get(path)
+            .and_then(|y| y.as_str())
+            .and_then(|d| self.parse_dmy_date(d))
     }
 
     /// Interprets `"25.12.2016"` as date.
-    fn parse_dmy_date(&self, date_str:&str) -> Option<Date<Utc>>{
+    fn parse_dmy_date(&self, date_str: &str) -> Option<Date<Utc>> {
         let date = date_str.split('.')
-            .map(|f|f.parse().unwrap_or(0))
-            .collect::<Vec<i32>>();
-        if date.len() >=2 && date[0] > 0 && date[2] > 1900 {
+                           .map(|f| f.parse().unwrap_or(0))
+                           .collect::<Vec<i32>>();
+        if date.len() >= 2 && date[0] > 0 && date[2] > 1900 {
             // XXX this neglects the old "01-05.12.2015" format
-            Utc.ymd_opt(date[2], date[1] as u32, date[0] as u32).single()
+            Utc.ymd_opt(date[2], date[1] as u32, date[0] as u32)
+               .single()
         } else {
             None
         }
@@ -116,9 +120,10 @@ pub trait ProvidesData {
     /// **Careful** this is a bit sweeter then ordinary `YAML1.2`,
     /// this will interpret `"yes"` and `"no"` as booleans, similar to `YAML1.1`.
     /// Actually it will interpret any string but `"yes"` als `false`.
-    fn get_bool(&self, path:&str) -> Option<bool> {
+    fn get_bool(&self, path: &str) -> Option<bool> {
         self.get(path)
-            .and_then(|y| y
+            .and_then(|y| {
+            y
                       .as_bool()
                       // allowing it to be a str: "yes" or "no"
                       .or_else(|| y.as_str()
@@ -128,36 +133,41 @@ pub trait ProvidesData {
                                      //"no" => false,
                                      _ => false
                                  })
-                         ))
+                         )
+        })
     }
 
     fn field_exists<'a>(&'a self, paths: &[&'a str]) -> ErrorList {
         let mut errors = ErrorList::new();
         for err in paths.into_iter()
-            .map(|i|*i)
-                .filter(|path| self.get(path).is_none()) {
-                    errors.push(err);
-                }
+                        .map(|i| *i)
+                        .filter(|path| self.get(path).is_none())
+        {
+            errors.push(err);
+        }
         errors
 
     }
 
     /// Gets `Some(Yaml::Hash)` or `None`.
     //pub fn get_hash<'a>(yaml:&'a Yaml, key:&str) -> Option<&'a BTreeMap<Yaml,Yaml>> {
-    fn get_hash<'a>(&'a self, path:&str) -> Option<&'a YamlHash> {
-        self.get(path).and_then(|y|y.as_hash())
+    fn get_hash<'a>(&'a self, path: &str) -> Option<&'a YamlHash> {
+        self.get(path).and_then(|y| y.as_hash())
     }
 
     /// Gets a `Float` value.
     ///
     /// Also takes a `Yaml::I64` and reinterprets it.
-    fn get_f64(&self, path:&str) -> Option<f64> {
-        self.get(path).and_then(|y| y.as_f64().or_else(|| y.as_i64().map(|y|y as f64)))
+    fn get_f64(&self, path: &str) -> Option<f64> {
+        self.get(path)
+            .and_then(|y| y.as_f64().or_else(|| y.as_i64().map(|y| y as f64)))
     }
 }
 
 impl ProvidesData for Project {
-    fn data(&self) -> &Yaml{ self.yaml() }
+    fn data(&self) -> &Yaml {
+        self.yaml()
+    }
 }
 
 impl IsProject for Project {
@@ -167,7 +177,7 @@ impl IsProject for Project {
             .or_else(|| self.get_str("event"))
     }
 
-    fn event_date(&self) -> Option<Date<Utc>>{
+    fn event_date(&self) -> Option<Date<Utc>> {
         self.get_dmy("event.dates.0.begin")
         .or_else(||self.get_dmy("created"))
         .or_else(||self.get_dmy("date"))
@@ -180,11 +190,11 @@ impl IsProject for Project {
     //#[deprecated(note="Ambiguous: what format? use \"Version\"")]
     fn format(&self) -> Option<Version> {
         self.get_str("meta.format")
-            .or_else(||self.get_str("format"))
+            .or_else(|| self.get_str("format"))
             .and_then(|s| Version::from_str(s).ok())
     }
 
-    fn canceled(&self) -> bool{
+    fn canceled(&self) -> bool {
         self.get_bool("canceled").unwrap_or(false)
     }
 
@@ -220,7 +230,9 @@ impl HasEvents for Project {
                     let mut cal_event = CalEvent::new();
                     cal_event.description(&self.long_desc());
 
-                    if let Some(location) = self.location() { cal_event.location(location); }
+                    if let Some(location) = self.location() {
+                        cal_event.location(location);
+                    }
 
                     if let Some(end) = event.end {
                         cal_event.start_date(event.begin);
@@ -237,9 +249,11 @@ impl HasEvents for Project {
 
                         let mut cal_event = CalEvent::new();
                         cal_event.description(&self.long_desc());
-                        if let Some(location) = self.location() { cal_event.location(location); }
+                        if let Some(location) = self.location() {
+                            cal_event.location(location);
+                        }
 
-                        if let Some(end)   = event.begin.and_time(time.end) {
+                        if let Some(end) = event.begin.and_time(time.end) {
                             cal_event.ends(end);
                         }
 
@@ -261,53 +275,53 @@ impl HasEvents for Project {
 
     #[allow(unused_qualifications)]
     fn events(&self) -> Option<Vec<spec::Event>> {
-        let dates = ProvidesData::get(self, "event.dates/").and_then(|a| a.as_vec())?;
+        let dates = ProvidesData::get(self, "event.dates/")
+            .and_then(|a| a.as_vec())?;
         dates.into_iter()
-            .map(|h| {
+             .map(|h| {
 
-                let begin =
-                    self.get_direct(h, "begin")
-                    .and_then(|y|y.as_str())
-                    .and_then(|d|self.parse_dmy_date(d))?;
+            let begin = self.get_direct(h, "begin")
+                            .and_then(|y| y.as_str())
+                            .and_then(|d| self.parse_dmy_date(d))?;
 
-                let end =
-                    self.get_direct(h, "end")
-                    .and_then(|y|y.as_str())
-                    .and_then(|d|self.parse_dmy_date(d));
+            let end = self.get_direct(h, "end")
+                          .and_then(|y| y.as_str())
+                          .and_then(|d| self.parse_dmy_date(d));
 
-                Some( spec::Event{
-                    begin: begin,
-                    end: end,
-                    times: self.times(h).unwrap_or_else(Vec::new)
-                })
-            })
-
-        .collect()
+            Some(spec::Event {
+                     begin: begin,
+                     end: end,
+                     times: self.times(h).unwrap_or_else(Vec::new),
+                 })
+        })
+             .collect()
     }
 
-    fn times(&self,yaml: &Yaml) -> Option<Vec<EventTime>> {
-        let times = self.get_direct(yaml, "times").and_then(|l|l.as_vec())?;
+    fn times(&self, yaml: &Yaml) -> Option<Vec<EventTime>> {
+        let times = self.get_direct(yaml, "times").and_then(|l| l.as_vec())?;
         times.into_iter()
-            .map(|h| {
+             .map(|h| {
 
-                let begin = self.get_direct(h, "begin")
-                    .and_then(|y|y.as_str())
-                    .or(Some("00.00"))
-                    .and_then(util::naive_time_from_str);
+            let begin = self.get_direct(h, "begin")
+                            .and_then(|y| y.as_str())
+                            .or(Some("00.00"))
+                            .and_then(util::naive_time_from_str);
 
-                let end   = self.get_direct(h, "end")
-                    .and_then(|y|y.as_str())
-                    .and_then(util::naive_time_from_str)
-                    .or(begin); // TODO assume a duration of one hour instead
+            let end = self.get_direct(h, "end")
+                          .and_then(|y| y.as_str())
+                          .and_then(util::naive_time_from_str)
+                          .or(begin); // TODO assume a duration of one hour instead
 
-                if let (Some(begin),Some(end)) = (begin,end) {
-                    Some( EventTime{
-                        start: begin,
-                        end: end
-                    })
-                } else { None }
-            })
-        .collect()
+            if let (Some(begin), Some(end)) = (begin, end) {
+                Some(EventTime {
+                         start: begin,
+                         end: end,
+                     })
+            } else {
+                None
+            }
+        })
+             .collect()
     }
 
     fn location(&self) -> Option<&str> {
@@ -316,16 +330,16 @@ impl HasEvents for Project {
 }
 
 /// Returns a product from Service
-fn service_to_product<'a, T: HasEmployees>(s: &T) -> Option<Product<'a>> {
+fn service_to_product<'a, T: HasEmployees>(s: &T) -> ProductResult<Product<'a>> {
     if let Some(salary) = s.salary() {
-        Some(Product {
-            name: "Service",
-            unit: Some("h"),
-            tax: s.tax().unwrap_or_else(|| Tax::new(0.0)),
-            price: salary
-        })
+        Ok(Product {
+                 name: "Service",
+                 unit: Some("h"),
+                 tax: s.tax().unwrap_or_else(|| Tax::new(0.0)),
+                 price: salary,
+             })
     } else {
-        None
+        bail!(ProductErrorKind::InvalidServerSection)
     }
 }
 
@@ -348,8 +362,8 @@ impl Redeemable for Project {
         let mut offer: Bill<Product> = Bill::new();
         let mut invoice: Bill<Product> = Bill::new();
 
-        let service = service_to_product(&self.hours())
-            .expect("cannot create product from employees, salary or tax missing");
+        let service = service_to_product(&self.hours())?;
+       //  .("cannot create product from employees, salary or tax missing");
 
         if let Some(total) = self.hours().total_time() {
             if total.is_normal() {
@@ -360,32 +374,46 @@ impl Redeemable for Project {
 
         let raw_products =
             self.get_hash("products")
-                .ok_or_else(||product::error::Error::from(product::error::ErrorKind::UnknownFormat))?;
+                .ok_or_else(|| product::error::Error::from(product::error::ErrorKind::UnknownFormat))?;
 
         // let document_tax =  // TODO activate this once the tax no longer 19%
 
-        for (desc,values) in raw_products {
+        for (desc, values) in raw_products {
             let (offer_item, invoice_item) = self.item_from_desc_and_value(desc, values)?;
-            if offer_item.amount.is_normal()   { offer.add(offer_item); }
-            if invoice_item.amount.is_normal() { invoice.add(invoice_item); }
+            if offer_item.amount.is_normal() {
+                offer.add(offer_item);
+            }
+            if invoice_item.amount.is_normal() {
+                invoice.add(invoice_item);
+            }
         }
 
-        Ok((offer,invoice))
+        Ok((offer, invoice))
     }
-
 }
 
 impl Validatable for Project {
     fn validate(&self) -> SpecResult {
         let mut errors = ErrorList::new();
-        if self.name().is_none(){errors.push("name")}
-        if self.event_date().is_none(){errors.push("date")}
-        if self.responsible().is_none(){errors.push("manager")}
-        if self.format().is_none(){errors.push("format")}
+        if self.name().is_none() {
+            errors.push("name")
+        }
+        if self.event_date().is_none() {
+            errors.push("date")
+        }
+        if self.responsible().is_none() {
+            errors.push("manager")
+        }
+        if self.format().is_none() {
+            errors.push("format")
+        }
         //if hours::salary().is_none(){errors.push("salary")}
 
-        if errors.is_empty(){ Ok(()) }
-        else { Err(errors) }
+        if errors.is_empty() {
+            Ok(())
+        } else {
+            Err(errors)
+        }
     }
 }
 
@@ -393,7 +421,9 @@ impl Validatable for Project {
 impl Validatable for Redeemable {
     fn validate(&self) -> SpecResult {
         let mut errors = ErrorList::new();
-        if self.payed_date().is_none() { errors.push("payed_date"); }
+        if self.payed_date().is_none() {
+            errors.push("payed_date");
+        }
 
         if let Some(format) = self.format() {
             if format < Version::parse("2.0.0").unwrap() {
@@ -410,7 +440,7 @@ impl Validatable for Redeemable {
 }
 
 impl<'a> ProvidesData for Client<'a> {
-    fn data(&self) -> &Yaml{
+    fn data(&self) -> &Yaml {
         self.inner.data()
     }
 }
@@ -418,12 +448,12 @@ impl<'a> ProvidesData for Client<'a> {
 impl<'a> IsClient for Client<'a> {
     fn email(&self) -> Option<&str> {
         self.get_str("client/email")
-        .or_else(|| self.get_str("email"))
+            .or_else(|| self.get_str("email"))
     }
 
     fn address(&self) -> Option<&str> {
         self.get_str("client/address")
-        .or_else(|| self.get_str("address"))
+            .or_else(|| self.get_str("address"))
     }
 
     fn title(&self) -> Option<&str> {
@@ -433,7 +463,7 @@ impl<'a> IsClient for Client<'a> {
     }
 
     fn salute(&self) -> Option<&str> {
-        self.title().and_then(|s|s.split_whitespace().nth(0))
+        self.title().and_then(|s| s.split_whitespace().nth(0))
     }
 
     fn first_name(&self) -> Option<&str> {
@@ -452,13 +482,12 @@ impl<'a> IsClient for Client<'a> {
         let first = self.first_name();
         let last = self.last_name();
         first.and(last)
-             .and(Some(format!("{} {}",
-                               first.unwrap_or(""),
-                               last.unwrap_or(""))))
+             .and(Some(format!("{} {}", first.unwrap_or(""), last.unwrap_or(""))))
     }
 
     fn addressing(&self) -> Option<String> {
-        if let Some(salute) = self.salute().and_then(|salute| salute.split_whitespace().nth(0))
+        if let Some(salute) = self.salute()
+                                  .and_then(|salute| salute.split_whitespace().nth(0))
         // only the first word
         {
             let last_name = self.last_name();
@@ -481,13 +510,11 @@ impl<'a> IsClient for Client<'a> {
 
 impl<'a> Validatable for Client<'a> {
     fn validate(&self) -> SpecResult {
-        let mut errors = self.field_exists( &[
-                                             //"client/email", // TODO make this a requirement
+        let mut errors = self.field_exists(&[//"client/email", // TODO make this a requirement
                                              "client/address",
                                              "client/title",
                                              "client/last_name",
-                                             "client/first_name"
-                                             ]);
+                                             "client/first_name"]);
 
 
         if self.addressing().is_none() {
@@ -502,7 +529,7 @@ impl<'a> Validatable for Client<'a> {
 }
 
 impl<'a> ProvidesData for Offer<'a> {
-    fn data(&self) -> &Yaml{
+    fn data(&self) -> &Yaml {
         self.inner.data()
     }
 }
@@ -549,7 +576,7 @@ impl<'a> Validatable for Offer<'a> {
 }
 
 impl<'a> ProvidesData for Invoice<'a> {
-    fn data(&self) -> &Yaml{
+    fn data(&self) -> &Yaml {
         self.inner.data()
     }
 }
@@ -600,7 +627,7 @@ impl<'a> Validatable for Invoice<'a> {
 }
 
 impl<'a> ProvidesData for Hours<'a> {
-    fn data(&self) -> &Yaml{
+    fn data(&self) -> &Yaml {
         self.inner.data()
     }
 }
@@ -623,18 +650,16 @@ impl<'a> HasEmployees for Hours<'a> {
     fn net_wages(&self) -> Option<Currency> {
         let triple = (self.total_time(), self.salary(), self.tax());
         match triple {
-            ( Some(total_time), Some(salary), Some(tax))
-                => Some(total_time * salary * (tax.value() + 1f64)),
+            (Some(total_time), Some(salary), Some(tax)) => Some(total_time * salary * (tax.value() + 1f64)),
             // covering the legacy case where Services always had Tax=0%
-            ( Some(total_time), Some(salary), None)
-                => Some(total_time * salary),
-            _ => None
+            (Some(total_time), Some(salary), None) => Some(total_time * salary),
+            _ => None,
         }
     }
 
     fn gross_wages(&self) -> Option<Currency> {
         let tuple = (self.total_time(), self.salary());
-        if let ( Some(total_time), Some(salary)) = tuple {
+        if let (Some(total_time), Some(salary)) = tuple {
             Some(total_time * salary)
         } else {
             None
@@ -643,60 +668,70 @@ impl<'a> HasEmployees for Hours<'a> {
 
     fn total_time(&self) -> Option<f64> {
         self.employees()
-            .map(|e|e.iter()
-                     .fold(0f64, |acc, e| acc + e.time))
+            .map(|e| {
+                     e.iter()
+                      .fold(0f64, |acc, e| acc + e.time)
+                 })
     }
 
     fn employees_string(&self) -> Option<String> {
         self.employees()
-            .map(|e|e.iter()
-            .filter(|e| e.time as u32 > 0)
-            .map(|e| format!("{}: ({}h {})", e.name, e.time, (e.salary * e.time).postfix()))
-            .collect::<Vec<String>>()
-            .join(", "))
+            .map(|e| {
+            e.iter()
+             .filter(|e| e.time as u32 > 0)
+             .map(|e| {
+                      format!("{}: ({}h {})",
+                              e.name,
+                              e.time,
+                              (e.salary * e.time).postfix())
+                  })
+             .collect::<Vec<String>>()
+             .join(", ")
+        })
     }
 
     fn employees(&self) -> Option<Vec<Employee>> {
-        let employees =
-        self.get_hash("hours.caterers")
-            .or_else(||self.get_hash("hours.employees"));
+        let employees = self.get_hash("hours.caterers")
+                            .or_else(|| self.get_hash("hours.employees"));
 
         if let Some(employees) = employees {
             employees.iter()
-                     .map(|(c, h)| (
-                             c.as_str().unwrap_or("").into(),
-                             make_float(h)
-                             )
-                         )
-                     .filter(|&(_, h)| h > 0f64 )
+                     .map(|(c, h)| (c.as_str().unwrap_or("").into(), make_float(h)))
+                     .filter(|&(_, h)| h > 0f64)
                      .map(|(name, time)| {
-                          let wage = self.salary()? * time;
-                          let salary = self.salary()?;
-                          Some( Employee { name, time, wage, salary })
-                      })
-                     .collect::< Option<Vec<Employee>> >()
+                let wage = self.salary()? * time;
+                let salary = self.salary()?;
+                Some(Employee {
+                         name,
+                         time,
+                         wage,
+                         salary,
+                     })
+            })
+                     .collect::<Option<Vec<Employee>>>()
         } else {
             None
         }
     }
 
     fn employees_payed(&self) -> bool {
-        self.employees().is_none()
-        ||
-        self.wages_date().is_some()
+        self.employees().is_none() || self.wages_date().is_some()
     }
 
     fn wages(&self) -> Option<Currency> {
         if let (Some(total), Some(salary)) = (self.total_time(), self.salary()) {
             Some(total * salary)
-        } else{None}
+        } else {
+            None
+        }
     }
 }
 
 // helper for HasEmployees::employees()
 fn make_float(h: &Yaml) -> f64 {
-    h.as_f64().or_else(|| h.as_i64().map(|f|f as f64 ))
-        .unwrap_or(0f64)
+    h.as_f64()
+     .or_else(|| h.as_i64().map(|f| f as f64))
+     .unwrap_or(0f64)
 }
 
 
@@ -704,7 +739,9 @@ fn make_float(h: &Yaml) -> f64 {
 impl<'a> Validatable for Hours<'a> {
     fn validate(&self) -> SpecResult {
         let mut errors = ErrorList::new();
-        if !self.employees_payed() { errors.push("employees_payed"); }
+        if !self.employees_payed() {
+            errors.push("employees_payed");
+        }
 
         if !errors.is_empty() {
             return Err(errors);
@@ -713,4 +750,3 @@ impl<'a> Validatable for Hours<'a> {
         Ok(())
     }
 }
-
