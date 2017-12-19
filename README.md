@@ -19,7 +19,17 @@ The ascii-invoicer is a command-line tool that manages projects and stores them 
 
 ## Installation
 
+To use \(experimental\) features use the `--feature` flag.
+
+Features like
+
+- shell
+- server
+
+are available.
+
 ### Archlinux
+
 You can install the package `asciii-git` from the AUR.
 
 ### macOS
@@ -32,16 +42,30 @@ $ brew install asciii
 ```
 
 ### Using cargo
-Just plain old `cargo install --git https://github.com/ascii-dresden/asciii` will do.
+
+Just plain old `cargo install --git https://github.com/ascii-dresden/asciii` or `cargo install asciii` will do.
 
 ### Requirements
 
 You need at least `rustc`, `cargo`, `cmake`, `git` and `zlib1g-dev` to run this.
 
-
 ## Development
 
 **Hint!** After the first build you can removed the content of `build.rs`s `fn main()` during dev for significantly improved compile times :D
+
+### Ubuntu 16.04
+
+We recommend installing [rustup](https://github.com/rust-lang-nursery/rustup.rs) with the following command:
+
+```sh
+$ curl https://sh.rustup.rs -sSf | sh
+```
+
+This installs `rustc`, `cargo`, `rustup` and other standard tools.
+
+#### Ubuntu Requirements
+
+You need at least `cmake` and `zlib1g-dev` to run this.
 
 ## Usage
 After installation simply run `asciii` and it will present you with a list of possible subcommands. `asciii help list` will give you a comprehensive explanation of  what `asciii list` does.

@@ -4,8 +4,8 @@ extern crate serde;
 extern crate serde_json;
 
 use asciii::project::Project;
-use asciii::storage::{self,StorageDir};
 use asciii::project::export::*;
+use asciii::storage::{self, StorageDir};
 
 fn json_serde(project: &Project) -> String {
     let exported: Complete = project.export();
@@ -19,4 +19,3 @@ fn main() {
     let project = &projects[2];
     println!("{}\n", json_serde(&project));
 }
-

@@ -607,16 +607,16 @@ impl Storable for Project {
     }
 
     /// Opens a yaml and parses it.
-    fn open_folder(folder_path:&Path) -> StorageResult<Project>{
+    fn open_folder(folder_path: &Path) -> StorageResult<Project>{
         let project_file_extension = ::CONFIG.get_to_string("extensions.project_file");
         let file_path = list_path_content(folder_path)?.iter()
             .filter(|f|f.extension().unwrap_or(&OsStr::new("")) == project_file_extension.as_str())
             .nth(0).map(|b|b.to_owned())
-            .ok_or(StorageErrorKind::ProjectDoesNotExist)?;
+            .ok_or_else(|| StorageErrorKind::NoProjectFile(folder_path.to_owned()))?;
         Self::open_file(&file_path)
     }
 
-    fn open_file(file_path:&Path) -> StorageResult<Project>{
+    fn open_file(file_path:&Path) -> StorageResult<Project> {
         Ok(Project::open(file_path)?)
     }
 

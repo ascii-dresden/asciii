@@ -4,8 +4,12 @@
 use chrono::prelude::*;
 use bill::Currency;
 use icalendar::Calendar;
+use toml;
 
 use std::fmt::Write;
+use std::fs::File;
+use std::io::Read;
+
 use std::path::PathBuf;
 use std::collections::HashMap;
 use std::process::Command;
@@ -221,4 +225,47 @@ pub fn clone_remote(url: &str, to: &str) -> Result<()> {
         .status()
         .unwrap_or_else(|e| { panic!("failed to execute process: {}", e) });
     Ok(())
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+/// Shared extra information stored in the repo
+pub struct MetaStore {
+    pub api: ApiKeys
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+/// ApiKeys store
+pub struct ApiKeys {
+    pub keys: Vec<String>,
+    pub users: HashMap<String, String>
+}
+
+
+/// Parses meta store
+pub fn parse_meta() -> Result<MetaStore> {
+    let path = storage::setup::<Project>()?.get_extra_file("meta.toml")?;
+    let file_content = File::open(&path).and_then(|mut file| {
+        let mut content = String::new();
+        file.read_to_string(&mut content).map(|_| content)
+    })?;
+
+    let store: MetaStore = toml::from_str(&file_content)?;
+
+    Ok(store)
+}
+
+/// get ApiKeys for server
+pub fn get_api_keys() -> Result<ApiKeys> {
+    Ok(parse_meta()?.api)
+}
+
+pub fn store_meta() -> Result<()> {
+    let storage = storage::setup_with_git::<Project>()?;
+    let repo = storage.get_repository()?;
+    let path = storage.get_extra_file("meta.toml")?;
+    if repo.add(&[path]).success() {
+        Ok(())
+    } else {
+        bail!(ErrorKind::AddingFailed)
+    }
 }
