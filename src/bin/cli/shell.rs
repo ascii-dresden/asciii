@@ -1,6 +1,6 @@
 use rustyline::completion;
 use rustyline::error::ReadlineError;
-use rustyline::{Config, Cmd, CompletionType, CompletionType, Config, EditMode, Editor, KeyPress};
+use rustyline::Editor;
 use rustyline::Result as LineResult;
 
 use asciii::CONFIG;
@@ -51,13 +51,7 @@ pub fn launch_shell() -> Result<()>{
 
     //let file_compl = FilenameCompleter::new();
     let clap_compl = ClapCompleter::from_app(&app);
-    let config = Config::builder()
-        .history_ignore_space(true)
-        .completion_type(CompletionType::List)
-        .build();
-    let mut rl = Editor::with_config();
-    rl.bind_sequence(KeyPress::Meta('N'), Cmd::HistorySearchForward);
-    rl.bind_sequence(KeyPress::Meta('P'), Cmd::HistorySearchBackward);
+    let mut rl = Editor::new();
 
     //rl.set_completer(Some(file_compl));
     rl.set_completer(Some(clap_compl));
@@ -95,12 +89,8 @@ pub fn launch_shell() -> Result<()>{
                 // you have to insert the binary name since clap expects it
                 argv.insert(0, "prog");
                 debug!("shell: {} -> {:?}", line, argv);
-                match app.get_matches_from_safe_borrow(argv.iter()) {
-                    Ok(matches) => {
-                        println!("{:#?}", argv);
-                        rl.add_history_entry(argv);
-                        super::match_matches(&matches)
-                    },
+                match app.get_matches_from_safe_borrow(argv) {
+                    Ok(matches) => super::match_matches(&matches),
                     Err(e) => println!("{}", e.message)
                 }
 
