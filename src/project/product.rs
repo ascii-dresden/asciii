@@ -38,6 +38,10 @@ pub mod error{
                 description("invalid format"),
                 display("too much returned of {:?}", t)
             }
+            InvalidServerSection {
+                description("Cannot Parse Service")
+            }
+
         }
     }
 }

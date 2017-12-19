@@ -1,7 +1,8 @@
 //! Implementations of `ProjectList`
 
-use std::ops::{Deref, DerefMut};
 use std::collections::HashMap;
+use std::iter::IntoIterator;
+use std::ops::{Deref, DerefMut};
 
 use super::{Storable, Year};
 
@@ -44,8 +45,6 @@ impl<L: Storable> ProjectList<L> {
         self.filter_by_key_val(key, &val[1..]);
     }
 }
-
-use std::iter::IntoIterator;
 
 impl<L: Storable> IntoIterator for ProjectList<L> {
     type Item = L;

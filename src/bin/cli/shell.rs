@@ -1,7 +1,6 @@
 use rustyline::completion;
 use rustyline::error::ReadlineError;
-use rustyline::{Config, Editor, CompletionType};
-use rustyline::{Cmd, Config, CompletionType, Editor, EditMode, KeyPress};
+use rustyline::{Config, Cmd, CompletionType, CompletionType, Config, EditMode, Editor, KeyPress};
 use rustyline::Result as LineResult;
 
 use asciii::CONFIG;

@@ -100,7 +100,7 @@ pub fn git_add(matches: &ArgMatches) -> Result<()> {
         } else {
             Err("git add did not exit successfully".into())
         }
-    } else if matches.is_present("search_terms") {
+    } else if matches.is_present("search_term") {
 
         if repo.add(&paths).success() {
             Ok(())

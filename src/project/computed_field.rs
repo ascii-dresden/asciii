@@ -1,5 +1,6 @@
-use util;
+
 use storage::{self, Storable};
+use util;
 
 use super::Project;
 use super::spec::*;
@@ -70,34 +71,56 @@ impl ComputedField {
         let storage = storage::get_storage_path();
 
         match *self {
-            ComputedField::Responsible       => project.responsible().map(|s| s.to_owned()),
-            ComputedField::OfferNumber       => project.offer().number(),
-            ComputedField::InvoiceNumber     => project.invoice().number_str(),
+            ComputedField::Responsible => project.responsible().map(|s| s.to_owned()),
+            ComputedField::OfferNumber => project.offer().number(),
+            ComputedField::InvoiceNumber => project.invoice().number_str(),
             ComputedField::InvoiceNumberLong => project.invoice().number_long_str(),
-            ComputedField::Name              => Some(project.name().map(ToString::to_string).unwrap_or_else(|| project.file_name())), // TODO remove name() from `Storable`, storables only need a slug()
-            ComputedField::Final             => project.sum_sold().map(|c| util::currency_to_string(&c)).ok(),
-            ComputedField::Age               => project.age().map(|a| lformat!("{} days", a)),
+            ComputedField::Name => {
+                Some(project.name()
+                            .map(ToString::to_string)
+                            .unwrap_or_else(|| project.file_name()))
+            } // TODO remove name() from `Storable`, storables only need a slug()
+            ComputedField::Final => {
+                project.sum_sold()
+                       .map(|c| util::currency_to_string(&c))
+                       .ok()
+            }
+            ComputedField::Age => project.age().map(|a| lformat!("{} days", a)),
 
-            ComputedField::OurBad            => project.our_bad()  .map(|a| lformat!("{} weeks", a.num_weeks().abs())),
-            ComputedField::TheirBad          => project.their_bad().map(|a| lformat!("{} weeks", a.num_weeks().abs())),
+            ComputedField::OurBad => {
+                project.our_bad()
+                       .map(|a| lformat!("{} weeks", a.num_weeks().abs()))
+            }
+            ComputedField::TheirBad => {
+                project.their_bad()
+                       .map(|a| lformat!("{} weeks", a.num_weeks().abs()))
+            }
 
-            ComputedField::Year              => project.year().map(|i|i.to_string()),
-            ComputedField::Date              => project.modified_date().map(|d| d.format("%Y.%m.%d").to_string()),
-            ComputedField::SortIndex         => project.index(),
+            ComputedField::Year => project.year().map(|i| i.to_string()),
+            ComputedField::Date => {
+                project.modified_date()
+                       .map(|d| d.format("%Y.%m.%d").to_string())
+            }
+            ComputedField::SortIndex => project.index(),
 
-            ComputedField::Employees         => project.hours().employees_string(),
-            ComputedField::ClientFullName    => project.client().full_name(),
-            ComputedField::Deserializes      => Some(format!("{:?}", project.parse_yaml().is_ok())),
-            ComputedField::Wages             => project.hours().gross_wages().map(|c| util::currency_to_string(&c)),
-            ComputedField::Format            => project.format().map(|f|f.to_string()),
-            ComputedField::Dir               => project.dir()
-                                                       .parent()
-                                                       .and_then(|d| d.strip_prefix(&storage).ok())
-                                                       .map(|d| d.display().to_string()),
-            ComputedField::Invalid           => None
+            ComputedField::Employees => project.hours().employees_string(),
+            ComputedField::ClientFullName => project.client().full_name(),
+            ComputedField::Deserializes => Some(format!("{:?}", project.parse_yaml().is_ok())),
+            ComputedField::Wages => {
+                project.hours()
+                       .gross_wages()
+                       .map(|c| util::currency_to_string(&c))
+            }
+            ComputedField::Format => project.format().map(|f| f.to_string()),
+            ComputedField::Dir => {
+                project.dir()
+                       .parent()
+                       .and_then(|d| d.strip_prefix(&storage).ok())
+                       .map(|d| d.display().to_string())
+            }
+            ComputedField::Invalid => None,
 
             // _ => None
         }
     }
 }
-
