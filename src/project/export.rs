@@ -1,4 +1,3 @@
-
 use super::Project;
 use super::spec::*;
 use bill::{Bill, ItemList, Tax};
@@ -255,6 +254,7 @@ pub struct Complete {
     offer: Offer,
     invoice: Invoice,
     bills: Bills,
+    checks: Checks,
 }
 
 
@@ -267,6 +267,29 @@ impl ExportTarget<Complete> for Project {
             offer: self.export(),
             invoice: self.export(),
             bills: self.export(),
+            checks: self.export(),
+        }
+    }
+}
+
+#[derive(Debug, PartialEq)]
+#[cfg_attr(feature = "serialization", derive(Serialize))]
+pub struct Checks {
+    ready_for_offer: bool,
+    ready_for_invoice: bool,
+    ready_for_archive: bool,
+    payed_by_customer: bool,
+    payed_employees: bool,
+}
+
+impl ExportTarget<Checks> for Project {
+    fn export(&self) -> Checks {
+        Checks {
+            ready_for_offer: self.is_ready_for_offer().is_ok(),
+            ready_for_invoice: self.is_ready_for_invoice().is_ok(),
+            ready_for_archive: self.is_ready_for_archive().is_ok(),
+            payed_by_customer: self.is_payed(),
+            payed_employees: self.hours().employees_payed(),
         }
     }
 }
