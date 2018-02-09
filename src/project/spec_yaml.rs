@@ -696,7 +696,8 @@ impl<'a> HasEmployees for Hours<'a> {
 
         if let Some(employees) = employees {
             employees.iter()
-                     .map(|(c, h)| (c.as_str().unwrap_or("").into(), make_float(h)))
+                     .map(|(c, h)| {(c.as_str().unwrap_or("").into(), make_float(h))
+                     })
                      .filter(|&(_, h)| h > 0f64)
                      .map(|(name, time)| {
                 let wage = self.salary()? * time;

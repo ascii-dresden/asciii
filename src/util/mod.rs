@@ -1,14 +1,13 @@
 //! Utility functions that are needed all over the places.
 #![allow(dead_code)]
 use std::{io, fs};
-use std::env::{self, home_dir, current_dir};
+use std::env::{home_dir, current_dir};
 use std::ffi::OsStr;
 use std::path::{Path, PathBuf};
 use std::process::{self, Command, ExitStatus};
 use chrono::NaiveTime;
 
-use log::{LogRecord, LogLevelFilter};
-use env_logger::LogBuilder;
+use env_logger;
 
 use open;
 
@@ -18,25 +17,8 @@ pub mod yaml;
 ///
 /// After calling this function the global logger will look for the environment variable `ASCIII_LOG`.
 pub fn setup_log() {
-    let format = |record: &LogRecord| {
-        let location = record.location();
-        format!("{level}::{location}:  {args}",
-        location = location.module_path(),
-        level = record.level(),
-        args  = record.args())
-    };
-
-    let mut builder = LogBuilder::new();
-    builder
-        .format(format)
-        .filter(None, LogLevelFilter::Info);
-
     let log_var ="ASCIII_LOG";
-    if env::var(log_var).is_ok() {
-       builder.parse(&env::var(log_var).unwrap());
-    }
-
-    builder.init().unwrap();
+    env_logger::init_from_env(log_var);
 }
 
 /// Freezes the program until for inspection

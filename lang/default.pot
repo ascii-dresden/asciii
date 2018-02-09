@@ -53,7 +53,7 @@ msgid "The ascii invoicer III"
 msgstr ""
 
 #: /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:21
-msgid "set's a a new instance"
+msgid "set's up a new instance"
 msgstr ""
 
 #: /home/hendrik/code/rust/asciii/src/bin/cli/app.rs:23
