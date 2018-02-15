@@ -243,6 +243,7 @@ fn edit_projects(dir: StorageDir, search_terms: &[&str], editor: Option<&str>) -
 /// Command META
 pub fn meta(matches: &ArgMatches) -> Result<()> {
     let storage = setup::<Project>()?;
+    trace!("meta --> {:#?}", matches);
     if let Some(matches) = matches.subcommand_matches("edit") {
         let editor = matches.value_of("editor")
                             .or(CONFIG.get("user.editor")

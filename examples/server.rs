@@ -17,10 +17,12 @@ extern crate base64;
 use rocket::response::NamedFile;
 use itertools::Itertools;
 
+use asciii::actions;
 use asciii::project::Project;
 use asciii::storage::{self, ProjectList, Storage, StorageDir, Storable};
 use linked_hash_map::LinkedHashMap;
 
+use std::error::Error;
 use std::path::{Path, PathBuf};
 use std::sync::Mutex;
 use std::sync::mpsc::{sync_channel, SyncSender};
@@ -253,9 +255,15 @@ impl<'a, 'r> FromRequest<'a, 'r> for ApiKey {
             .map(|s| s.split(':').map(ToOwned::to_owned).collect::<Vec<_>>());
 
         if let Some(auth) = auth {
-            match (auth.get(0), auth.get(1)) {
-                (Some(user), Some(pass)) => Outcome::Success(ApiKey::UsernamePassword(user.to_owned(), pass.to_owned())),
-                _ => Outcome::Failure((Status::BadRequest, ()))
+            let authorization = match (auth.get(0), auth.get(1)) {
+                (Some(user), Some(pass)) => ApiKey::UsernamePassword(user.to_owned(), pass.to_owned()),
+                _ => return Outcome::Failure((Status::BadRequest, ()))
+            };
+
+            if validate_authorization(&authorization) {
+                Outcome::Success(authorization)
+            } else {
+                Outcome::Failure((Status::Unauthorized, ()))
             }
         } else {
             error!("{:#?}", request);
@@ -264,10 +272,23 @@ impl<'a, 'r> FromRequest<'a, 'r> for ApiKey {
     }
 }
 
+fn validate_authorization(given_key: &ApiKey) -> bool {
+    // TODO: load keys at const intervals
+    let users = match actions::get_api_keys() {
+        Ok(keys) => keys.users,
+        Err(e) => {error!("{}", e); return false},
+    };
+    match *given_key {
+        ApiKey::Key(_) => false,
+        ApiKey::UsernamePassword(ref user, ref password) => {
+            users.iter().any(|(u, p)| u == user && p == password)
+        }
+    }
+}
+
 use rocket::response::content::{self, Content};
 #[get("/authorization")]
 fn authorization(api_key: ApiKey) -> content::Json<String> {
-
     content::Json(serde_json::to_string(&api_key).unwrap())
 }
 
