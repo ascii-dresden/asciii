@@ -50,8 +50,9 @@ impl ConfigReader{
             local:  yaml::open(&local_path).unwrap_or(Yaml::Null)
         });
 
-        if !home_path.exists(){
-            warn!("{} does not exist, falling back to defaults", home_path.display())
+        if !home_path.exists() {
+            warn!("{} does not exist, falling back to defaults",
+                   home_path.display())
         }
 
         if let (Some(home_dir),Ok(current_dir)) = (home_dir(), current_dir()) {
