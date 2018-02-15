@@ -51,8 +51,7 @@ impl ConfigReader{
         });
 
         if !home_path.exists() {
-            warn!("{} does not exist, falling back to defaults",
-                   home_path.display())
+            warn!("{} does not exist, falling back to defaults", home_path.display())
         }
 
         if let (Some(home_dir),Ok(current_dir)) = (home_dir(), current_dir()) {
