@@ -47,7 +47,13 @@ cataloge:
   product: &suppe        { name: Suppe           , price: 3.10 , unit: Portion }
   product: &obstplatte   { name: Obstplatte      , price: 30.00 , unit: stk }
 
+
 products:
+  "Milchschokolade":
+    price: 25.6
+    amount: 4
+    sold:   5
+
   *kaffee:
     amount: 4
     sold:   5
@@ -75,4 +81,11 @@ invoicer_version: 3.0.0-dev (3.0.0-alpha)
 template: default
 format: 2.4.0
 created: 11.11.2011
+
+tax: 0.19
+meta:
+  invoicer_version: 3.1.0 - build 294 (6882ab9)
+  template: default
+  format: 3.0.0
+
 ...

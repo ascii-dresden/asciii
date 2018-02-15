@@ -3,14 +3,14 @@ use std::fmt;
 use std::path::{Path, PathBuf};
 #[cfg(feature="git_statuses")]
 use std::collections::HashMap;
-use std::process::{Command,ExitStatus};
+use std::process::{Command, ExitStatus};
 
 #[cfg(not(feature="git_statuses"))]
 use std::error::Error;
 
 #[cfg(feature="git_statuses")]
 use git2;
-use term::{color,Attr};
+use term::{color, Attr};
 use term::color::Color;
 
 /// More Rustacious way of representing a git status
@@ -37,6 +37,7 @@ impl GitStatus {
         Attr::Reverse
     }
 
+    #[allow(match_same_arms)]
     pub fn to_style(&self) -> (Color,Option<Attr>) {
         match *self{
         // => write!(f, "{:?}",  self)
@@ -53,8 +54,9 @@ impl GitStatus {
 }
 
 impl fmt::Display for GitStatus {
+
+    #[allow(match_same_arms)]
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-// X ✘ ✓
         match *self{
         // => write!(f, "{:?}", self)
          GitStatus::Conflict        => write!(f, "~"),
@@ -194,6 +196,11 @@ impl Repository {
         self.execute_git("add", &[], paths)
     }
 
+    pub fn add_all(&self) -> ExitStatus {
+        info!("adding all to git");
+        self.execute_git("add", &["--all"], &[])
+    }
+
     pub fn commit(&self) -> ExitStatus {
         // TODO override git editor with asciii editor
         self.execute_git("commit", &[], &[])
@@ -241,8 +248,8 @@ impl Repository {
         self.execute_git("remote", &[], &[])
     }
 
-    pub fn log(&self) -> ExitStatus {
-        self.execute_git("log", &[], &[])
+    pub fn log(&self, paths:&[PathBuf]) -> ExitStatus {
+        self.execute_git("log", &[ "--graph", "--pretty=format:'%Cred%h%Creset -%C(bold yellow)%d%Creset %C() %s %C(reset) ( %C(yellow)%an%Creset %C(green)%cr )'", "--abbrev-commit", "--date=relative" ], paths)
     }
 }
 

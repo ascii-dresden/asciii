@@ -1,23 +1,24 @@
 //! Utility functions that are needed all over the places.
 #![allow(dead_code)]
-use std::io;
-use std::env::{home_dir,current_dir};
+use std::{io, fs};
+use std::env::{home_dir, current_dir};
 use std::ffi::OsStr;
-use std::fs;
-use std::path::{Path,PathBuf};
-use std::process;
-use std::process::{Command, ExitStatus};
+use std::path::{Path, PathBuf};
+use std::process::{self, Command, ExitStatus};
+use chrono::NaiveTime;
+
+use env_logger;
 
 use open;
 
 pub mod yaml;
 
-#[export_macro]
-macro_rules! try_some {
-    ($expr:expr) => (match $expr {
-        Some(val) => val,
-        None => return None,
-    });
+/// Sets up logging initially.
+///
+/// After calling this function the global logger will look for the environment variable `ASCIII_LOG`.
+pub fn setup_log() {
+    let log_var ="ASCIII_LOG";
+    env_logger::init_from_env(log_var);
 }
 
 /// Freezes the program until for inspection
@@ -26,8 +27,8 @@ pub fn freeze() {
 }
 
 /// Asks for confirmation
-pub fn really(msg:&str) -> bool {
-    println!("{} ", msg);
+pub fn really(msg: &str) -> bool {
+    println!("{} [y/N]", msg);
     let mut answer = String::new();
     if io::stdin().read_line(&mut answer).is_err(){ return false; }
     ["yes", "y",
@@ -36,10 +37,24 @@ pub fn really(msg:&str) -> bool {
         .contains(&answer.trim())
 }
 
+pub fn git_user_name() -> Option<String> {
+    Command::new("git")
+        .args(&["config", "user.name"])
+        .output()
+        .map_err(|e| {
+            error!("failed to execute process: {}", e);
+            e
+        })
+        .ok()
+        .and_then(|out| String::from_utf8(out.stdout).ok())
+        .map(|s| s.trim().to_owned())
+}
+
+
 /// Shells out to print directory structure
 pub fn ls(path:&str){
-    println!("tree {}", path);
-    let output = Command::new("tree")
+    println!("find {}", path); // TODO implement in here with walkdir
+    let output = Command::new("find")
         .arg(&path)
         .output()
         .unwrap_or_else(|e| { panic!("failed to execute process: {}", e) });
@@ -61,7 +76,7 @@ pub fn replace_home_tilde(p:&Path) -> PathBuf{
 ///
 /// This is by far the most important function of all utility functions.
 //TODO use https://crates.io/crates/open (supports linux, windows, mac)
-pub fn pass_to_command<T:AsRef<OsStr>>(editor:&Option<&str>, paths:&[T]) {
+pub fn pass_to_command<T:AsRef<OsStr>>(editor: Option<&str>, paths:&[T]) {
 
     let paths = paths.iter()
                       .map(|o|PathBuf::from(&o))
@@ -71,26 +86,26 @@ pub fn pass_to_command<T:AsRef<OsStr>>(editor:&Option<&str>, paths:&[T]) {
 
     if paths.is_empty() {
         warn!("non of the provided paths could be found")
-    } else if let Some(ref editor) = *editor {
-    if paths.len() < 5 || really (&format!("you are about to open {} files\n{:#?}\nAre you sure about this?", paths.len(), paths))
-    {
-        let editor_config = editor
-            .split_whitespace()
-            .collect::<Vec<&str>>();
+    } else if let Some(ref editor) = editor {
+        if paths.len() < 5 || really (&format!("you are about to open {} files\n{:#?}\nAre you sure about this?", paths.len(), paths))
+        {
+            let editor_config = editor
+                .split_whitespace()
+                .collect::<Vec<&str>>();
 
-        let (editor_command,args) = editor_config.split_first().unwrap() ;
-        info!("launching {:?} with {:?} and {:?}",
-              editor_command,
-              args.join(" "),
-              paths);
+            let (editor_command,args) = editor_config.split_first().unwrap() ;
+            info!("launching {:?} with {:?} and {:?}",
+                  editor_command,
+                  args.join(" "),
+                  paths);
 
-        Command::new(editor_command)
-            .args(args)
-            .args(&paths)
-            .status()
-            .unwrap_or_else(|e| { panic!("failed to execute process: {}", e) });
+            Command::new(editor_command)
+                .args(args)
+                .args(&paths)
+                .status()
+                .unwrap_or_else(|e| { panic!("failed to execute process: {}", e) });
 
-    }
+        }
     } else {
         for path in paths{
             open::that(path).unwrap();
@@ -107,27 +122,6 @@ pub fn delete_file_if<F,P:AsRef<OsStr>>(path:P, confirmed:F) -> io::Result<()>
         debug!("$ rm {}", path.display());
         fs::remove_file(&path)
     } else {Ok(())}
-}
-
-/// Interprets storage path from config.
-///
-/// Even if it starts with `~` or is a relatetive path.
-/// This is by far the most important function of all utility functions.
-pub fn get_storage_path() -> PathBuf
-{
-    let storage_path = PathBuf::from(::CONFIG.get_str("path")
-            .expect("Faulty config: field path does not contain a string value"))
-        .join( ::CONFIG.get_str("dirs/storage")
-            .expect("Faulty config: field dirs/storage does not contain a string value"));
-
-    // TODO make replace tilde a Trait function
-    let storage_path = replace_home_tilde(&storage_path);
-
-    if !storage_path.is_absolute(){
-        current_dir().unwrap().join(storage_path)
-    } else {
-        storage_path
-    }
 }
 
 /// takes a path that could be relative or contains a `~` and turn it into a path that exists
@@ -154,4 +148,50 @@ pub fn currency_to_string(currency:&Currency) -> String {
     currency.postfix().to_string()
 }
 
+/// Creates a currecny from an `f64`
+///
+/// This is functionality which was explicitely left out of the `Claude` crate.
+pub fn to_currency(f: f64) -> Currency {
+    Currency{ symbol: ::CONFIG.get_char("currency"), value: (f * 1000.0) as i64} / 10
+}
+
+/// Changes the extension of a given `Path`
+pub fn to_local_file(file: &Path, ext: &str) -> PathBuf {
+    let mut _tmpfile = file.to_owned();
+    _tmpfile.set_extension(ext);
+    Path::new(_tmpfile.file_name().unwrap()).to_owned()
+}
+
+/// Creates a `chrono::NaiveTime` from a string that looks like `23:59:58` or only `12:05`.
+pub fn naive_time_from_str(string: &str) -> Option<NaiveTime> {
+    let t:Vec<u32> = string
+        .splitn(2, |p| p == '.' || p == ':')
+        .map(|s|s.parse().unwrap_or(0))
+        .collect();
+
+    if let (Some(h),m) = (t.get(0), t.get(1).unwrap_or(&0)) {
+        if *h < 24 && *m < 60 {
+            return Some(NaiveTime::from_hms(*h,*m,0))
+        }
+    }
+
+    None
+}
+
+#[test]
+fn test_naive_time_from_str() {
+    assert_eq!(Some(NaiveTime::from_hms(9,15,0)), naive_time_from_str("9.15"));
+    assert_eq!(Some(NaiveTime::from_hms(9,0,0)),  naive_time_from_str("9."));
+    assert_eq!(Some(NaiveTime::from_hms(9,0,0)),  naive_time_from_str("9"));
+    assert_eq!(Some(NaiveTime::from_hms(23,0,0)), naive_time_from_str("23.0"));
+    assert_eq!(Some(NaiveTime::from_hms(23,59,0)), naive_time_from_str("23.59"));
+    assert_eq!(None, naive_time_from_str("24.0"));
+    assert_eq!(None, naive_time_from_str("25.0"));
+    assert_eq!(None, naive_time_from_str("0.60"));
+
+    assert_eq!(Some(NaiveTime::from_hms(9,15,0)), naive_time_from_str("9:15"));
+    assert_eq!(Some(NaiveTime::from_hms(9,0,0)),  naive_time_from_str("9:"));
+    assert_eq!(Some(NaiveTime::from_hms(9,0,0)),  naive_time_from_str("9"));
+    assert_eq!(Some(NaiveTime::from_hms(23,0,0)), naive_time_from_str("23:0"));
+}
 

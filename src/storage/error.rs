@@ -1,9 +1,9 @@
 //! Error that may occur in Storage
 //!
+
 #![allow(trivial_casts)]
-use std::io;
-use std::fmt;
-use util::yaml;
+use std::{io, fmt};
+use ::project;
 #[cfg(feature="git_statuses")] use git2;
 
 #[cfg(not(feature="git_statuses"))]
@@ -11,10 +11,9 @@ mod git2 {
     pub use super::super::repo::GitError as Error;
 }
 
-
 use templater;
 
-
+#[allow(missing_docs)]
 error_chain!{
     types {
         StorageError, ErrorKind, ResultExt, Result;
@@ -23,9 +22,9 @@ error_chain!{
     foreign_links {
         Io(io::Error);
         Fmt(fmt::Error);
-        Yaml(yaml::YamlError);
         Git(git2::Error);
-        Template(templater::TemplateError);
+        Project(project::error::Error); // TODO this should be generic
+        Template(templater::TemplateError); // this should also not be here (inversion)
     }
 
     errors {

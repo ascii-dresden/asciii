@@ -1,14 +1,14 @@
 //! Simple templating functionality through keyword replacement.
 //!
 //! Replaces `##KEYWORDS##` in Strings.
-use std::{io,fmt};
-use std::io::Read;
+use std::fmt;
+use std::io::{self, Read};
 use std::fs::File;
 use std::path::Path;
 use std::error::Error;
 use std::collections::HashMap;
 
-use regex::{Regex,Captures};
+use regex::{Regex, Captures};
 use std::ops::Deref;
 
 /// Simple template style keyword replacement.
@@ -55,14 +55,15 @@ impl<U:Deref<Target=str>> IsKeyword for U {
     fn get_keyword(&self) -> Option<String> {
         Regex::new(REGEX).expect("broken regex")
             .captures(self)
-            .and_then(|caps| caps.at(1).map(|c| c.to_owned()))
+            .and_then(|caps| caps.get(1).map(|c| c.as_str().to_owned()))
     }
 
     /// Well, it lists the keywords in a string, duh!
     fn list_keywords(&self) -> Vec<String>{
         Regex::new(REGEX).expect("broken regex")
             .captures_iter(self)
-            .map(|c|c.at(1).unwrap().to_owned())
+            .filter_map(|c|c.get(1))
+            .map(|c|c.as_str().to_owned())
             .collect()
     }
 
@@ -85,8 +86,8 @@ impl<U:Deref<Target=str>> IsKeyword for U {
         where F:Fn(&str) -> String{
         Regex::new(REGEX).expect("broken regex")
             .replace_all(self, |caps:&Captures| {
-                closure(caps.at(1).unwrap())
-            })
+                closure(caps.get(1).unwrap().as_str())
+            }).into()
     }
 }
 

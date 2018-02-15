@@ -1,13 +1,14 @@
 //! Takes care of instantiating the Product.
 //! All of the calculating is done by `extern crate bill`.
 
+#![allow(missing_docs)]
+
 use bill::{Currency, BillProduct, Tax};
 
 use util::yaml;
-use util::yaml::Yaml;
+use util::to_currency;
 
-use super::spec::to_currency;
-
+/// Errors for `asciii::product`.
 pub mod error{
     #![allow(trivial_casts)]
     error_chain!{
@@ -29,12 +30,18 @@ pub mod error{
             AmbiguousAmounts(t:String){
                 description("more returned than provided")
             }
-            MissingAmount(t:String){
-                description("invalid price")
+            MissingAmount(t: String){
+                description("invalid price"),
+                display("missing amount of {:?}", t)
             }
-            TooMuchReturned(t:String){
-                description("invalid format")
+            TooMuchReturned(t: String){
+                description("invalid format"),
+                display("too much returned of {:?}", t)
             }
+            InvalidServerSection {
+                description("Cannot Parse Service")
+            }
+
         }
     }
 }
@@ -47,6 +54,7 @@ pub use self::error::*;
 /// Products are mapped to `Bill`s by `BillItems`,
 /// these are implemented by `bill`.
 #[derive(Copy,Clone,Debug)]
+#[cfg_attr(feature = "serialization", derive(Serialize))]
 pub struct Product<'a> {
     pub name: &'a str,
     pub unit: Option<&'a str>,
@@ -55,43 +63,45 @@ pub struct Product<'a> {
 }
 
 
-impl<'a> Product<'a>{
-    pub fn from_old_format<'y>(name: &'y str, values: &'y Yaml) -> Result<Product<'y>> {
-        let default_tax = ::CONFIG.get_f64("defaults/tax")
+impl<'a> Product<'a> {
+
+    fn from_old_format<'y>( name: &'y str, values: &'y yaml::Yaml, local_tax: Option<Tax>) -> Result<Product<'y>> {
+        let default_tax = ::CONFIG.get_f64("defaults/tax").map(Tax::new)
             .expect("Faulty config: field defaults/tax does not contain a value");
-        Ok(Product {
-            name: name,
-            unit: yaml::get_str(values, "unit"),
-            price: yaml::get_f64(values, "price")
-                .map(to_currency)
-                .ok_or_else(||Error::from(ErrorKind::InvalidPrice(name.to_string())))
-                ?,
-            tax: yaml::get_f64(values, "tax").unwrap_or(default_tax).into(),
-        })
+
+        let product_tax = yaml::get_f64(values, "tax").map(Tax::new);
+        let tax = product_tax.or(local_tax).unwrap_or(default_tax);
+
+        let unit = yaml::get_str(values, "unit");
+        let price = yaml::get_f64(values, "price")
+            .map(to_currency)
+            .ok_or_else(||Error::from(ErrorKind::InvalidPrice(name.to_string())))?;
+
+        Ok(Product { name, unit, price, tax })
     }
 
-    pub fn from_new_format(desc: &Yaml) -> Result<Product> {
+    fn from_new_format<'y>(desc: &'y yaml::Yaml, values: &'y yaml::Yaml, local_tax: Option<Tax>) -> Result<Product<'y>> {
 
-        //TODO read default tax from document
-        let default_tax = ::CONFIG.get_f64("defaults/tax")
+        let default_tax = ::CONFIG.get_f64("defaults/tax").map(Tax::new)
             .expect("Faulty config: field defaults/tax does not contain a value");
+
+        let desc_tax = yaml::get_f64(desc, "tax").map(Tax::new);
+        let values_tax = yaml::get_f64(values, "tax").map(Tax::new);
+        let tax = values_tax.or(desc_tax).or(local_tax).unwrap_or(default_tax);
 
         let name = yaml::get_str(desc, "name").unwrap_or("unnamed");
-
-        Ok(Product {
-            name: name,
-            unit: yaml::get_str(desc, "unit"),
-            price: yaml::get_f64(desc, "price")
+        let price = yaml::get_f64(desc, "price")
                 .ok_or_else(||Error::from(ErrorKind::InvalidPrice(name.to_string())))
-                .map(to_currency)?,
-            tax: yaml::get_f64(desc, "tax").unwrap_or(default_tax).into(),
-        })
+                .map(to_currency)?;
+        let unit = yaml::get_str(desc, "unit");
+
+        Ok(Product { name, unit, price, tax })
     }
 
-    pub fn from_desc_and_value<'y>(desc: &'y Yaml, values: &'y Yaml) -> Result<Product<'y>> {
+    pub fn from_desc_and_value<'y>(desc: &'y yaml::Yaml, values: &'y yaml::Yaml, local_tax: Option<Tax>) -> Result<Product<'y>> {
         match *desc {
-            yaml::Yaml::String(ref name) => Self::from_old_format(name, values),
-            yaml::Yaml::Hash(_) => Self::from_new_format(desc),
+            yaml::Yaml::String(ref name) => Self::from_old_format(name, values, local_tax),
+            yaml::Yaml::Hash(_) => Self::from_new_format(desc, values, local_tax),
             _ => Err(ErrorKind::UnknownFormat.into()),
         }
     }

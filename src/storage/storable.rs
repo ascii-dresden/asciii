@@ -5,7 +5,7 @@ use std::{fs,io};
 use std::path::{Path, PathBuf};
 use std::collections::HashMap;
 
-use chrono::{Date, UTC, Datelike};
+use chrono::{Date, Utc, Datelike};
 
 use super::StorageResult;
 use super::repo::GitStatus;
@@ -16,9 +16,9 @@ pub type FolderPath = Path;
 pub type FilePathBuf = PathBuf;
 pub type FolderPathBuf = PathBuf;
 
-pub trait Storable:Send+Sync{
+pub trait Storable: Send+Sync{
     /// opens a projectfolder
-    fn open(&FolderPath) -> StorageResult<Self> where Self: Sized;
+    fn open_folder(&FolderPath) -> StorageResult<Self> where Self: Sized;
     fn open_file(&FilePath) -> StorageResult<Self> where Self: Sized;
 
     /// creates in tempfile
@@ -28,7 +28,7 @@ pub trait Storable:Send+Sync{
     fn ident(&self) -> String{ self.dir().file_stem().and_then(|s|s.to_str()).unwrap().to_owned() }
 
     fn short_desc(&self) -> String;
-    fn modified_date(&self) -> Option<Date<UTC>>;
+    fn modified_date(&self) -> Option<Date<Utc>>;
     fn year(&self) -> Option<i32>{ self.modified_date().map(|d|d.year()) }
 
     /// Deletes the project if the passed in closure returns `true`
@@ -62,13 +62,18 @@ pub trait Storable:Send+Sync{
     fn get_git_status(&self) -> GitStatus{GitStatus::Unknown}
 
     /// Main Projectfile extension
-    fn file_extension() -> &'static str {"PROJECT"}
+    fn file_extension() -> String {String::from("PROJECT")}
 
     /// Path to project file
     fn file(&self) -> FilePathBuf;
 
+    /// Filename as fallback
+    fn file_name(&self) -> String {
+        self.file().file_name().expect("filename ended in ..").to_string_lossy().into()
+    }
+
     /// Path to project folder
-    fn dir(&self)  -> FolderPathBuf{ self.file().parent().unwrap().to_owned() }
+    fn dir(&self)  -> FolderPathBuf { self.file().parent().unwrap().to_owned() }
 
     fn matches_filter(&self, key: &str, val: &str) -> bool;
     fn matches_search(&self, term: &str) -> bool;

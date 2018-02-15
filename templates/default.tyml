@@ -68,9 +68,9 @@ hours:
 
 manager: ##MANAGER##
 
-#canceled: yes
+canceled: no
+tax: ##TAX##
 #lang:
-#tax: ##TAX##
 
 #messages: # read default-settings.yml on how to overwrite
 

@@ -1,7 +1,9 @@
 #![allow(trivial_casts)]
+#![allow(missing_docs)]
 
-use std::io;
-use std::fmt;
+use std::{io, fmt};
+#[cfg(feature="serialization")] use serde_json;
+#[cfg(feature="deserialization")] use serde_yaml;
 use util::yaml;
 
 use super::product;
@@ -16,12 +18,17 @@ error_chain!{
     }
 
     foreign_links {
-        Io(io::Error) ;
-        Fmt(fmt::Error) ;
-        Yaml(yaml::YamlError) ;
+        Io(io::Error);
+        Fmt(fmt::Error);
+        Yaml(yaml::YamlError);
+        Serialize(serde_json::Error) #[cfg(feature="serialization")];
+        Deserialize(serde_yaml::Error) #[cfg(feature="deserialization")];
     }
 
     errors {
+        FeatureDeactivated{
+            description("This feature is not enabled in this build")
+        }
         CantDetermineTargetFile{
             description("Cannot determine target file name")
         }
@@ -42,6 +49,7 @@ pub fn combine_specresults(specs: Vec<SpecResult>) -> SpecResult {
                      )
 }
 
+#[derive(Default)]
 pub struct ErrorList {
     pub errors: Vec<String>
 }
@@ -49,15 +57,15 @@ pub struct ErrorList {
 impl ErrorList {
     pub fn new() -> Self{
         ErrorList {
-            errors: Vec::new()
+            errors: Default::default()
         }
     }
 
-    pub fn push(&mut self, error:&str) {
+    pub fn push(&mut self, error: &str) {
         self.errors.push(error.into());
     }
 
-    pub fn combine_with(&self, other:&Self) -> Self{
+    pub fn combine_with(&self, other: &Self) -> Self {
         let mut new = ErrorList::new();
         for err in self.errors.iter().chain(other.errors.iter()) {
             new.push(err)
@@ -65,7 +73,7 @@ impl ErrorList {
         new
     }
 
-    pub fn is_empty(&self) -> bool{
+    pub fn is_empty(&self) -> bool {
         self.errors.is_empty()
     }
 }
