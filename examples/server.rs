@@ -14,6 +14,8 @@ extern crate rocket;
 extern crate rocket_contrib;
 extern crate base64;
 
+extern crate openssl_probe;
+
 use rocket::response::NamedFile;
 use itertools::Itertools;
 
@@ -27,7 +29,6 @@ use std::path::{Path, PathBuf};
 use std::sync::Mutex;
 use std::sync::mpsc::{sync_channel, SyncSender};
 use std::thread;
-
 
 pub struct ProjectLoader {
     storage: Storage<Project>,
@@ -293,6 +294,7 @@ fn authorization(api_key: ApiKey) -> content::Json<String> {
 }
 
 fn main() {
+    openssl_probe::init_ssl_cert_env_vars();
     rocket::ignite()
         .mount("/", routes![static_files])
         .mount("/cal/plain", routes![calendar::cal_plain, calendar::cal_plain_params])

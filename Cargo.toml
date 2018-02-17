@@ -52,6 +52,10 @@ rocket = {version = "0.3", optional = true }
 rocket_codegen = {version = "0.3", optional = true }
 rocket_contrib = {version = "0.3", optional = true }
 
+# for statically linked OpenSSL
+openssl-sys = { version = "0.9", optional = true }
+openssl-probe = { version = "0.1.2", optional = true }
+
 bill = {version= "0.2", features=["serialization"]}
 icalendar = "0.3"
 
@@ -85,7 +89,7 @@ default = ["document_export", "git_statuses", "serialization", "deserialization"
 document_export = ["handlebars", "serialization"]
 serde_base = ["serde", "serde_derive"]
 serialization = ["serde_base", "serde_json"]
-server = ["rocket", "rocket_codegen", "rocket_contrib" ]
+server = ["rocket", "rocket_codegen", "rocket_contrib","openssl-sys","openssl-probe" ]
 deserialization = ["serde_base","serde_yaml", "ordered-float", "num-traits"]
 git_statuses = ["git2"]
 shell = ["rustyline"]
