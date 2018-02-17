@@ -3,6 +3,7 @@ FROM ubuntu:16.04 AS builder
 # can be overridden for special toolchain\
 # yields completly new image when changed
 ARG TOOLCHAIN=nightly-2018-02-15
+ARG TARGET=x86_64-unknown-linux-musl
 
 # install build deps
 RUN export DEBIAN_FRONTEND=noninteractive \
@@ -31,14 +32,14 @@ RUN export DEBIAN_FRONTEND=noninteractive \
 USER rust
 RUN  mkdir -p /home/rust/libs /home/rust/src \
  # set the default target
- &&  printf '[build]\ntarget = "x86_64-unknown-linux-musl"' \
+ &&  printf '[build]\ntarget = "%s"' "$TARGET" \
      | install -D -o rust /dev/stdin /home/rust/.cargo/config
 
 ENV PATH=/home/rust/.cargo/bin:/usr/local/musl/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
 RUN curl https://sh.rustup.rs -sSf | \
     sh -s -- -y --default-toolchain $TOOLCHAIN \
- && rustup target add x86_64-unknown-linux-musl
+ && rustup target add $TARGET
 
 WORKDIR /home/rust/libs
 
@@ -95,36 +96,36 @@ RUN BUILDMODE=$(bash -c 'echo ${BUILDMODE/dev/}') \
 
 # alter interpreter
 RUN set -x; BUILDMODE=$(bash -c 'echo ${BUILDMODE/dev/debug}') \
- && ARTIFACT="$(find target/ -name $BINARY -type f | head -1)" \
+ && ARTIFACT="$(find target/$TARGET/$BUILDMODE/ -name $BINARY -type f | head -1)" \
  && patchelf --set-interpreter /lib/ld-musl-x86_64.so.1 "$ARTIFACT"
 
 # strip binary
 RUN set -x; BUILDMODE=$(bash -c 'echo ${BUILDMODE/dev/debug}') \
- && ARTIFACT="$(find target/$BUILDMODE/ -name $BINARY -type f | head -1)" \
+ && ARTIFACT="$(find target/$TARGET/$BUILDMODE/ -name $BINARY -type f | head -1)" \
  && strip -s "$ARTIFACT"
 
 # provide artifacts at same place
 RUN set -x; BUILDMODE=$(bash -c 'echo ${BUILDMODE/dev/debug}') \
- && ARTIFACT="$(find target/$BUILDMODE/ -name $BINARY -type f | head -1)" \
- && sudo install -m 0755 -o root -g root "$ARTIFACT" /$BINARY
+ && ARTIFACT="$(find target/$TARGET/$BUILDMODE/ -name $BINARY -type f | head -1)" \
+ && sudo install -D -m 0755 -o root -g root "$ARTIFACT" /dist/bin/$BINARY
 
 FROM alpine:3.7 AS compressor
-RUN apk add --no-cache upx
-COPY --from=builder /$BINARY /$BINARY
+RUN  apk add --no-cache upx
+COPY --from=builder /dist /dist
 # for some reason upxd binary segfaults, so leave it for now
 # ARG UPX_ARGS=-6
-# RUN upx ${UPX_ARGS} /$BINARY
+# RUN find /dist -type f | xargs -n1 -t upx ${UPX_ARGS}
 
 FROM alpine:3.7 AS composer
 RUN  apk add --no-cache tini
-RUN  adduser -h / -S -D $BINARY
+RUN  adduser -h / -S -D asciii
 # files for tini
 RUN  install -D -m 0755 -o 0 -g 0 /sbin/tini                                                /stage1/bin/tini
 RUN  install -D -m 0755 -o 0 -g 0 /lib/ld-musl-x86_64.so.1                                  /stage1/lib/ld-musl-x86_64.so.1
 RUN  grep -e root -e asciii -e nobody /etc/passwd | install -D -o 0 -g 0 -m 0644 /dev/stdin /stage1/etc/passwd
 # files for $BINARY
 RUN  install -D -m 0755 -o 0 -g 0 /lib/libz.so.1     /stage2/lib/libz.so.1
-COPY --from=composer /$BINARY                        /stage2/bin/$BINARY
+COPY --from=compressor /dist/                        /stage2/
 
 FROM scratch
 USER asciii
@@ -135,8 +136,8 @@ ENV  ROCKET_ENV=production \
      ROCKET_SECRET_KEY=GVH5hYGVw1xTQyUHtx8MrDkuUmYSBJFbMsGwdSREQwk= \
      CORS_ALLOWED_ORIGINS="http://localhost:8080"
 
-COPY --from=finisher /stage1 /
+COPY --from=composer /stage1 /
 ENTRYPOINT ["tini","--"]
 
-COPY --from=finisher /stage2 /
-CMD ["asciii-$BINARY"]
+COPY --from=composer /stage2 /
+CMD ["server"]
