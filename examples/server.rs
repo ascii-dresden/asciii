@@ -16,6 +16,8 @@ extern crate base64;
 
 extern crate openssl_probe;
 
+extern crate rocket_cors;
+
 use rocket::response::NamedFile;
 use itertools::Itertools;
 
@@ -29,6 +31,9 @@ use std::path::{Path, PathBuf};
 use std::sync::Mutex;
 use std::sync::mpsc::{sync_channel, SyncSender};
 use std::thread;
+
+use rocket::http::Method;
+use rocket_cors::{AllowedOrigins, AllowedHeaders};
 
 pub struct ProjectLoader {
     storage: Storage<Project>,
@@ -295,7 +300,8 @@ fn authorization(api_key: ApiKey) -> content::Json<String> {
 
 fn main() {
     openssl_probe::init_ssl_cert_env_vars();
-    rocket::ignite()
+
+    let server = rocket::ignite()
         .mount("/", routes![static_files])
         .mount("/cal/plain", routes![calendar::cal_plain, calendar::cal_plain_params])
         .mount("/cal", routes![calendar::cal, calendar::cal_params])
@@ -306,6 +312,25 @@ fn main() {
                                projects::all_full,
                                projects::by_name,
                                authorization,
-        ])
-        .launch();
+        ]);
+
+    if let Ok(env_cors) = std::env::var("CORS_ALLOWED_ORIGINS") {
+
+        println!("Adding CORS Data {}",env_cors);
+        let env_allowed_origins = &[env_cors.as_str()];
+        let (allowed_origins, failed_origins) = AllowedOrigins::some(env_allowed_origins);
+        assert!(failed_origins.is_empty());
+        let options = rocket_cors::Cors {
+            allowed_origins: allowed_origins,
+            allowed_methods: vec![Method::Get].into_iter().map(From::from).collect(),
+            allowed_headers: AllowedHeaders::some(&["Authorization", "Accept"]),
+            allow_credentials: true,
+            ..Default::default()
+        };
+
+        server.attach(options)
+    } else {
+        server
+    }.launch();
+
 }
