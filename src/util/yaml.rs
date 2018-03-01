@@ -68,7 +68,7 @@ impl fmt::Display for YamlError {
 }
 
 /// Wrapper that opens and parses a `.yml` file.
-pub fn open( path:&Path ) -> Result<Yaml, YamlError> {
+pub fn open(path: &Path) -> Result<Yaml, YamlError> {
     let file_content = File::open(&path)
                              .and_then(|mut file| {
                                  let mut content = String::new();

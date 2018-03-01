@@ -1,7 +1,10 @@
-use super::Project;
-use super::spec::*;
 use bill::{Bill, ItemList, Tax};
 use util::currency_to_string;
+
+use storage::storable::Storable;
+use super::Project;
+use super::spec::*;
+use super::computed_field::ComputedField;
 
 pub trait ExportTarget<T> {
     fn export(&self) -> T;
@@ -255,6 +258,7 @@ pub struct Complete {
     invoice: Invoice,
     bills: Bills,
     checks: Checks,
+    extras: Extras,
 }
 
 
@@ -268,6 +272,7 @@ impl ExportTarget<Complete> for Project {
             invoice: self.export(),
             bills: self.export(),
             checks: self.export(),
+            extras: self.export(),
         }
     }
 }
@@ -280,6 +285,7 @@ pub struct Checks {
     ready_for_archive: bool,
     payed_by_customer: bool,
     payed_employees: bool,
+    canceled: bool,
 }
 
 impl ExportTarget<Checks> for Project {
@@ -290,6 +296,29 @@ impl ExportTarget<Checks> for Project {
             ready_for_archive: self.is_ready_for_archive().is_ok(),
             payed_by_customer: self.is_payed(),
             payed_employees: self.hours().employees_payed(),
+            canceled: self.canceled(),
+        }
+    }
+}
+
+#[derive(Debug, PartialEq)]
+#[cfg_attr(feature = "serialization", derive(Serialize))]
+pub struct Extras {
+    dir: Option<String>,
+    age: Option<i64>,
+    our_bad: Option<i64>,
+    their_bad: Option<i64>,
+    sort_index: Option<String>,
+}
+
+impl ExportTarget<Extras> for Project {
+    fn export(&self) -> Extras {
+        Extras {
+            dir: ComputedField::Dir.get(self),
+            age: self.age(),
+            our_bad: self.our_bad().map(|d| d.num_days()),
+            their_bad: self.their_bad().map(|d| d.num_days()),
+            sort_index: self.index(),
         }
     }
 }

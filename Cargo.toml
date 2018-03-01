@@ -43,8 +43,22 @@ custom_derive = "0.1"
 open = "1.2"
 error-chain = "0.11"
 crowbook-intl-runtime = "0.1"
-rustyline = {version = "1.0.0", optional = true }
 rayon = "1.0"
+itertools = "0.7"
+base64 = "0.9"
+rustyline = {version = "1.0.0", optional = true }
+linked-hash-map = {version = "0.5", features = ["serde_impl"]}
+
+rocket = {version = "0.3", optional = true }
+rocket_codegen = {version = "0.3", optional = true }
+rocket_contrib = {version = "0.3", optional = true }
+
+# for statically linked OpenSSL
+openssl-sys = { version = "0.9", optional = true }
+openssl-probe = { version = "0.1.2", optional = true }
+
+# asciii-server CORS-support
+rocket_cors = { version = "0.2", optional = true }
 
 bill = {version= "0.2", features=["serialization"]}
 icalendar = "0.3"
@@ -75,15 +89,18 @@ git2 = {version = "0.6", default-features= false, optional = true}
 pretty_assertions = "0.5"
 
 [features]
-default = ["document_export", "git_statuses", "serialization", "deserialization"]
+default = ["cli", "document_export", "git_statuses", "serialization", "deserialization"]
 document_export = ["handlebars", "serialization"]
 serde_base = ["serde", "serde_derive"]
 serialization = ["serde_base", "serde_json"]
+server = ["rocket", "rocket_codegen", "rocket_contrib", "rocket_cors", "openssl-sys", "openssl-probe",
+"serialization" ]
 deserialization = ["serde_base","serde_yaml", "ordered-float", "num-traits"]
 git_statuses = ["git2"]
 shell = ["rustyline"]
 version_string = []
 localize = []
+cli= []
 nightly = []
 
 [profile.release]
@@ -93,6 +110,13 @@ lto = true
 test = false
 doc = false
 name = "asciii"
+required-features = ["cli"]
+
+[[bin]]
+test = false
+doc = false
+name = "asciii-server"
+required-features = ["server"]
 
 [build-dependencies]
 chrono = "0.4"

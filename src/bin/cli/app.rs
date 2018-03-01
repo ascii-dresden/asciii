@@ -190,11 +190,11 @@ pub fn with_cli<F> (app_handler:F) where F: Fn(App) {
                              .short("p")
                             )
 
-                        //.arg(Arg::with_name("broken")
-                        //     .help(lformat!("List broken projects  without project file").as_ref())
-                        //     .long("broken")
-                        //     .short("b")
-                        //    )
+                        .arg(Arg::with_name("broken")
+                             .help(lformat!("List broken projects  without project file").as_ref())
+                             .long("broken")
+                             .short("b")
+                            )
 
                         .arg(Arg::with_name("computed_fields")
                              .help(lformat!("List all computed data fields that can be used with --details").as_ref())
@@ -270,6 +270,27 @@ pub fn with_cli<F> (app_handler:F) where F: Fn(App) {
                              .takes_value(true)
                             )
                         )
+
+            .subcommand(SubCommand::with_name("meta")
+                .subcommand(SubCommand::with_name("edit")
+                        .about(lformat!("Edit the meta data store").as_ref())
+
+                        .arg(Arg::with_name("template")
+                             .help(lformat!("Edit a template file, use `list --templates` to learn which.").as_ref())
+                             .short("t")
+                             .long("template")
+                            )
+
+                        .arg(Arg::with_name("editor")
+                             .help(lformat!("Override the configured editor").as_ref())
+                             .short("e")
+                             .long("editor")
+                             .takes_value(true)
+                            )
+                        )
+                .subcommand(SubCommand::with_name("store"))
+                .subcommand(SubCommand::with_name("dump"))
+                )
 
             .subcommand(SubCommand::with_name("archive")
                         .about(lformat!("Move a Project into the archive").as_ref())
@@ -403,6 +424,7 @@ pub fn with_cli<F> (app_handler:F) where F: Fn(App) {
                         //     .short("m")
                         //    )
                     )
+
             .subcommand(SubCommand::with_name("set")
                         .aliases(&["ed"])
                         .about(lformat!("Set a value in a project file").as_ref())
@@ -845,6 +867,7 @@ pub fn match_matches(matches: &ArgMatches) {
      ("csv",       Some(sub_m)) => subcommands::csv(sub_m),
      ("new",       Some(sub_m)) => subcommands::new(sub_m),
      ("edit",      Some(sub_m)) => subcommands::edit(sub_m),
+     ("meta",      Some(sub_m)) => subcommands::meta(sub_m),
      ("workspace", Some(sub_m)) => subcommands::workspace(sub_m),
      ("set",       Some(sub_m)) => subcommands::set(sub_m),
      ("show",      Some(sub_m)) => subcommands::show(sub_m),

@@ -18,7 +18,7 @@ custom_derive! {
     ///
     /// `ComputedFields` is an automatically generated type that allows iterating of the variants of
     /// this Enum.
-    pub enum ComputedField{
+    pub enum ComputedField {
         /// Usually `storage`, or in legacy part of `signature`
         Responsible,
         /// Consecutive Offer number
@@ -27,7 +27,7 @@ custom_derive! {
         InvoiceNumber,
         /// Pretty version of `invoice/number` including year: "`R2016-042`"
         InvoiceNumberLong,
-        ///Overall Cost Project, including taxes
+        /// Name
         Name,
         /// Amount of money owed by the customer
         Final,
