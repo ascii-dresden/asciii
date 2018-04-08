@@ -78,18 +78,18 @@ impl From<git2::Status> for GitStatus{
     fn from(status:git2::Status) -> Self{
         match status{
             //s if s.contains(git2::STATUS_CURRENT)          => GitStatus::Current,
-            s if s.contains(git2::STATUS_INDEX_NEW)        => GitStatus::IndexNew,
-            s if s.contains(git2::STATUS_INDEX_MODIFIED)   => GitStatus::IndexModified ,
-            s if s.contains(git2::STATUS_INDEX_DELETED)    => GitStatus::IndexDeleted,
-            s if s.contains(git2::STATUS_INDEX_RENAMED)    => GitStatus::IndexRenamed,
-            s if s.contains(git2::STATUS_INDEX_TYPECHANGE) => GitStatus::IndexTypechange,
-            s if s.contains(git2::STATUS_WT_NEW)           => GitStatus::WorkingNew,
-            s if s.contains(git2::STATUS_WT_MODIFIED)      => GitStatus::WorkingModified,
-            s if s.contains(git2::STATUS_WT_DELETED)       => GitStatus::WorkingDeleted,
-            s if s.contains(git2::STATUS_WT_TYPECHANGE)    => GitStatus::WorkingTypechange,
-            s if s.contains(git2::STATUS_WT_RENAMED)       => GitStatus::WorkingRenamed,
-            s if s.contains(git2::STATUS_IGNORED)          => GitStatus::Ignored,
-            s if s.contains(git2::STATUS_CONFLICTED)       => GitStatus::Conflict,
+            s if s.contains(git2::Status::INDEX_NEW)        => GitStatus::IndexNew,
+            s if s.contains(git2::Status::INDEX_MODIFIED)   => GitStatus::IndexModified ,
+            s if s.contains(git2::Status::INDEX_DELETED)    => GitStatus::IndexDeleted,
+            s if s.contains(git2::Status::INDEX_RENAMED)    => GitStatus::IndexRenamed,
+            s if s.contains(git2::Status::INDEX_TYPECHANGE) => GitStatus::IndexTypechange,
+            s if s.contains(git2::Status::WT_NEW)           => GitStatus::WorkingNew,
+            s if s.contains(git2::Status::WT_MODIFIED)      => GitStatus::WorkingModified,
+            s if s.contains(git2::Status::WT_DELETED)       => GitStatus::WorkingDeleted,
+            s if s.contains(git2::Status::WT_TYPECHANGE)    => GitStatus::WorkingTypechange,
+            s if s.contains(git2::Status::WT_RENAMED)       => GitStatus::WorkingRenamed,
+            s if s.contains(git2::Status::IGNORED)          => GitStatus::Ignored,
+            s if s.contains(git2::Status::CONFLICTED)       => GitStatus::Conflict,
             _                                              => GitStatus::Unknown
         }
     }
