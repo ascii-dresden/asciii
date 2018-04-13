@@ -89,17 +89,18 @@ pub static DOCUMENTATION_URL: &'static str  = "https://docs.rs/asciii/";
 
 /// Contains a list of enabled features
 pub static ENABLED_FEATURES: &'static str = concat!(
-    "Enabled features:\n",
-    "    document_export: ", cfg!(feature = "document_export"), "\n",
-    "    shell:           ", cfg!(feature = "shell"), "\n",
-    "    server:          ", cfg!(feature = "server"), "\n",
-    "    version_string:  ", cfg!(feature = "version_string"), "\n",
-    "    localization:    ", cfg!(feature = "localization"), "\n",
-    "    git_statuses:    ", cfg!(feature = "git_statuses"), "\n",
-    "    serialization:   ", cfg!(feature = "serialization"), "\n",
-    "    deserialization: ", cfg!(feature = "deserialization"), "\n",
-    "    cli:             ", cfg!(feature = "cli"), "\n",
-    "    meta_store:      ", cfg!(feature = "meta_store"), "\n",
+    r#"{ "enabled_features": {"#,
+    r#"   "document_export": "#, cfg!(feature = "document_export"), ",\n",
+    r#"   "shell":           "#, cfg!(feature = "shell"), ",\n",
+    r#"   "server":          "#, cfg!(feature = "server"), ",\n",
+    r#"   "version_string":  "#, cfg!(feature = "version_string"), ",\n",
+    r#"   "localization":    "#, cfg!(feature = "localization"), ",\n",
+    r#"   "git_statuses":    "#, cfg!(feature = "git_statuses"), ",\n",
+    r#"   "serialization":   "#, cfg!(feature = "serialization"), ",\n",
+    r#"   "deserialization": "#, cfg!(feature = "deserialization"), ",\n",
+    r#"   "cli":             "#, cfg!(feature = "cli"), ",\n",
+    r#"   "meta_store":      "#, cfg!(feature = "meta_store"), "\n",
+    "} }"
     );
 
 lazy_static!{
