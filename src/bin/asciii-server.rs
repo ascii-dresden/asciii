@@ -142,17 +142,17 @@ mod server {
             use std::convert::TryInto;
 
             #[get("/", rank=2)]
-            fn cal() -> Result<content::Content<String>, String> {
+            fn cal(api_key: ApiKey) -> Result<content::Content<String>, String> {
                 cal_params(Dir{ year:None, all:None })
             }
 
             #[get("/", rank=2)]
-            fn cal_plain() -> Result<content::Plain<String>, String> {
+            fn cal_plain(api_key: ApiKey) -> Result<content::Plain<String>, String> {
                 cal_plain_params(Dir{ year:None, all:None })
             }
 
             #[get("/?<dir>", rank=1)]
-            fn cal_params(dir: Dir) -> Result<content::Content<String>, String> {
+            fn cal_params(api_key: ApiKey, dir: Dir) -> Result<content::Content<String>, String> {
                 let storage_dir = dir.try_into()?;
 
                 actions::calendar(storage_dir)
@@ -161,7 +161,7 @@ mod server {
             }
 
             #[get("/?<dir>", rank=1)]
-            fn cal_plain_params(dir:Dir) -> Result<content::Plain<String>, String> {
+            fn cal_plain_params(api_key: ApiKey, dir: Dir) -> Result<content::Plain<String>, String> {
                 let storage_dir = dir.try_into()?;
                 actions::calendar(storage_dir)
                     .map(|s| content::Plain(s) )
@@ -177,16 +177,17 @@ mod server {
             use asciii::storage::{Storable, Year};
             use serde_json;
             use rocket::response::content;
+            use ::ApiKey;
 
             #[get("/projects/year")]
-            fn years() -> content::Json<String> {
+            fn years(api_key: ApiKey) -> content::Json<String> {
                 ::CHANNEL.send(()).unwrap();
                 let loader = ::PROJECTS.lock().unwrap();
                 content::Json(serde_json::to_string(&loader.years).unwrap())
             }
 
             #[get("/full_projects/year/<year>")]
-            fn full_by_year(year: Year) -> content::Json<String> {
+            fn full_by_year(api_key: ApiKey, year: Year) -> content::Json<String> {
                 ::CHANNEL.send(()).unwrap();
                 let loader = ::PROJECTS.lock().unwrap();
                 let exported = loader.projects_map.iter()
@@ -201,7 +202,7 @@ mod server {
             }
 
             #[get("/projects/year/<year>")]
-            fn by_year(year: Year) -> content::Json<String> {
+            fn by_year(api_key: ApiKey, year: Year) -> content::Json<String> {
                 ::CHANNEL.send(()).unwrap();
                 let loader = ::PROJECTS.lock().unwrap();
                 let exported = loader.projects_map.iter()
@@ -213,7 +214,7 @@ mod server {
             }
 
             #[get("/full_projects")]
-            fn all_full(api_key: ::ApiKey) -> content::Json<String> {
+            fn all_full(api_key: ApiKey) -> content::Json<String> {
                 let loader = ::PROJECTS.lock().unwrap();
                 let list = loader.projects_map.iter()
                                 .map(|(ident, p)| {
@@ -226,7 +227,7 @@ mod server {
             }
 
             #[get("/projects")]
-            fn all_names() -> content::Json<String> {
+            fn all_names(api_key: ApiKey) -> content::Json<String> {
                 let loader = ::PROJECTS.lock().unwrap();
                 let list = loader.projects_map.iter()
                                 .map(|(ident, _)| ident)
@@ -236,7 +237,7 @@ mod server {
             }
 
             #[get("/projects/<name>")]
-            fn by_name(name: String) -> Option<content::Json<String>> {
+            fn by_name(api_key: ApiKey, name: String) -> Option<content::Json<String>> {
                 let loader = ::PROJECTS.lock().unwrap();
                 let list = loader.projects_map.iter()
                                 .map(|(ident, p)| {
@@ -290,7 +291,7 @@ impl<'a, 'r> FromRequest<'a, 'r> for ApiKey {
 
 fn validate_authorization(given_key: &ApiKey) -> bool {
     // TODO: load keys at const intervals
-    let users = match actions::get_api_keys() {
+    let users = match actions::meta_store::get_api_keys() {
         Ok(keys) => keys.users,
         Err(e) => {error!("{}", e); return false},
     };

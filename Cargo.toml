@@ -95,7 +95,18 @@ document_export = ["handlebars", "serialization"]
 serde_base = ["serde", "serde_derive"]
 serialization = ["serde_base", "serde_json"]
 deserialization = ["serde_base","serde_yaml", "ordered-float", "num-traits"]
-server = ["rocket", "rocket_codegen", "rocket_contrib", "rocket_cors", "openssl-sys", "openssl-probe", "serialization", "base64", "itertools" ]
+server = [
+    "base64",
+    "itertools",
+    "meta_store",
+    "openssl-probe",
+    "openssl-sys",
+    "rocket",
+    "rocket_codegen",
+    "rocket_contrib",
+    "rocket_cors",
+    "serialization",
+]
 git_statuses = ["git2"]
 meta_store = ["serde_base"]
 shell = ["rustyline"]
