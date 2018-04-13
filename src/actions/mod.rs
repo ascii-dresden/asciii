@@ -4,11 +4,8 @@
 use chrono::prelude::*;
 use bill::Currency;
 use icalendar::Calendar;
-use toml;
 
 use std::fmt::Write;
-use std::fs::File;
-use std::io::Read;
 
 use std::path::PathBuf;
 use std::collections::HashMap;
@@ -227,45 +224,66 @@ pub fn clone_remote(url: &str, to: &str) -> Result<()> {
     Ok(())
 }
 
-#[derive(Debug, Serialize, Deserialize)]
-/// Shared extra information stored in the repo
-pub struct MetaStore {
-    pub api: ApiKeys
-}
+#[cfg(feature="meta_store")]
+pub mod meta_store {
 
-#[derive(Debug, Serialize, Deserialize)]
-/// ApiKeys store
-pub struct ApiKeys {
-    pub keys: Vec<String>,
-    pub users: HashMap<String, String>
-}
+    use ::storage;
+    use ::project::Project;
 
+    use super::error::*;
 
-/// Parses meta store
-pub fn parse_meta() -> Result<MetaStore> {
-    let path = storage::setup::<Project>()?.get_extra_file("meta.toml")?;
-    let file_content = File::open(&path).and_then(|mut file| {
-        let mut content = String::new();
-        file.read_to_string(&mut content).map(|_| content)
-    })?;
+    use toml;
+    use std::fs::File;
+    use std::io::Read;
+    use std::path::PathBuf;
+    use std::collections::HashMap;
 
-    let store: MetaStore = toml::from_str(&file_content)?;
-
-    Ok(store)
-}
-
-/// get ApiKeys for server
-pub fn get_api_keys() -> Result<ApiKeys> {
-    Ok(parse_meta()?.api)
-}
-
-pub fn store_meta() -> Result<()> {
-    let storage = storage::setup_with_git::<Project>()?;
-    let repo = storage.get_repository()?;
-    let path = storage.get_extra_file("meta.toml")?;
-    if repo.add(&[path]).success() {
-        Ok(())
-    } else {
-        bail!(ErrorKind::AddingFailed)
+    /// Shared extra information stored in the repo
+    #[derive(Debug, Serialize, Deserialize)]
+    pub struct MetaStore {
+        pub api: ApiKeys
     }
+
+    /// ApiKeys store
+    #[derive(Debug, Serialize, Deserialize)]
+    pub struct ApiKeys {
+        pub keys: Vec<String>,
+        pub users: HashMap<String, String>
+    }
+
+
+    /// Parses meta store
+    pub fn parse() -> Result<MetaStore> {
+        let path = storage::setup::<Project>()?.get_extra_file("meta.toml")?;
+        let file_content = File::open(&path).and_then(|mut file| {
+            let mut content = String::new();
+            file.read_to_string(&mut content).map(|_| content)
+        })?;
+
+        let store: MetaStore = toml::from_str(&file_content)?;
+
+        Ok(store)
+    }
+
+    /// get ApiKeys for server
+    pub fn get_api_keys() -> Result<ApiKeys> {
+        Ok(parse()?.api)
+    }
+
+    pub fn store() -> Result<()> {
+        let storage = storage::setup_with_git::<Project>()?;
+        let repo = storage.get_repository()?;
+        let path = path()?;
+        if repo.add(&[path]).success() {
+            Ok(())
+        } else {
+            bail!(ErrorKind::AddingFailed)
+        }
+    }
+
+    pub fn path() -> Result<PathBuf> {
+        let storage = storage::setup_with_git::<Project>()?;
+        Ok(storage.get_extra_file("meta.toml")?)
+    }
+
 }

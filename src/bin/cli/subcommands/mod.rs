@@ -241,6 +241,7 @@ fn edit_projects(dir: StorageDir, search_terms: &[&str], editor: Option<&str>) -
 }
 
 /// Command META
+#[cfg(feature="meta_store")]
 pub fn meta(matches: &ArgMatches) -> Result<()> {
     let storage = setup::<Project>()?;
     trace!("meta --> {:#?}", matches);
@@ -254,17 +255,25 @@ pub fn meta(matches: &ArgMatches) -> Result<()> {
         }
     }
 
-    if let Some(matches) = matches.subcommand_matches("store") {
+    if matches.is_present("store") {
         trace!("--> storing");
-        actions::store_meta()?;
+        actions::meta_store::store()?;
     }
 
-    if let Some(matches) = matches.subcommand_matches("dump") {
+    if matches.is_present("dump") {
         trace!("--> dumping");
-        let meta = actions::parse_meta();
-        println!("{:#?}", meta);
+        if let Ok(meta) = actions::meta_store::parse() {
+            println!("{:#?}", meta);
+        } else {
+            error!("unable to parse");
+        }
     }
     Ok(())
+}
+
+#[cfg(not(feature="meta_store"))]
+pub fn meta(_: &ArgMatches) -> Result<()> {
+    bail!("MetaStore functionality not built-in with this release!");
 }
 
 /// Command WORKSPACE
@@ -554,6 +563,12 @@ fn config_show_default() -> Result<()> {
 pub fn doc() -> Result<()> {
     open::that(asciii::DOCUMENTATION_URL).unwrap(); //TODO
     //.and_then(|es| if !es.success() {Err("open-error".into())} else {Ok(())} )  ?
+    Ok(())
+}
+
+
+pub fn features() -> Result<()> {
+    println!("{}", asciii::ENABLED_FEATURES);
     Ok(())
 }
 

@@ -1,6 +1,6 @@
 [package]
 name = "asciii"
-version = "3.2.0"
+version = "3.3.0-dev"
 authors = ["Hendrik Sollich <hendrik@hoodie.de>"]
 license = "MIT/Apache-2.0"
 readme = "README.md"
@@ -94,14 +94,14 @@ default = ["cli", "document_export", "git_statuses", "serialization", "deseriali
 document_export = ["handlebars", "serialization"]
 serde_base = ["serde", "serde_derive"]
 serialization = ["serde_base", "serde_json"]
-server = ["rocket", "rocket_codegen", "rocket_contrib", "rocket_cors", "openssl-sys", "openssl-probe",
-"serialization", "base64", "itertools" ]
 deserialization = ["serde_base","serde_yaml", "ordered-float", "num-traits"]
+server = ["rocket", "rocket_codegen", "rocket_contrib", "rocket_cors", "openssl-sys", "openssl-probe", "serialization", "base64", "itertools" ]
 git_statuses = ["git2"]
+meta_store = ["serde_base"]
 shell = ["rustyline"]
 version_string = []
-localize = []
-cli= []
+localization = []
+cli = []
 nightly = []
 
 [profile.release]

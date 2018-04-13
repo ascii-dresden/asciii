@@ -12,9 +12,11 @@ pub fn with_cli<F> (app_handler:F) where F: Fn(App) {
             .author(crate_authors!())
             .version(asciii::VERSION.as_ref())
             .about(lformat!("The ascii invoicer III").as_ref())
-            .settings(&[AppSettings::SubcommandRequiredElseHelp,AppSettings::ColoredHelp,AppSettings::DeriveDisplayOrder])
-            .after_help(asciii::DOCUMENTATION_URL)
-
+            .settings(&[
+                AppSettings::SubcommandRequiredElseHelp,
+                AppSettings::ColoredHelp,
+                AppSettings::DeriveDisplayOrder
+            ])
 
             .subcommand(SubCommand::with_name("bootstrap")
                         .aliases(&["boot", "clone"])
@@ -272,6 +274,11 @@ pub fn with_cli<F> (app_handler:F) where F: Fn(App) {
                         )
 
             .subcommand(SubCommand::with_name("meta")
+                .settings(&[
+                    AppSettings::SubcommandRequiredElseHelp,
+                    AppSettings::ColoredHelp,
+                    AppSettings::DeriveDisplayOrder
+                ])
                 .subcommand(SubCommand::with_name("edit")
                         .about(lformat!("Edit the meta data store").as_ref())
 
@@ -856,6 +863,10 @@ pub fn with_cli<F> (app_handler:F) where F: Fn(App) {
                 .about(lformat!("Opens the online documentation, please read it").as_ref())
             )
 
+            .subcommand(SubCommand::with_name("features")
+                .about(lformat!("Prints enabled Features").as_ref())
+            )
+
         );
 }
 
@@ -886,6 +897,7 @@ pub fn match_matches(matches: &ArgMatches) {
 
      ("doc",       _          ) => subcommands::doc(),
      ("version",   _          ) => subcommands::version(),
+     ("features",  _          ) => subcommands::features(),
 
      ("dues",      Some(sub_m)) => subcommands::dues(sub_m),
      ("shell",     Some(sub_m)) => subcommands::shell(sub_m),

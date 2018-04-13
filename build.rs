@@ -54,7 +54,7 @@ fn main() {
     println!("cargo:rustc-env=PROFILE={}", env::var("PROFILE").unwrap_or("unknown profile".into()));
     println!("cargo:rustc-env=BUILD_DATE={}", Utc::now().format("%F"));
 
-    if env::var("CARGO_FEATURE_LOCALIZE") == Ok(String::from("1")) {
+    if env::var("CARGO_FEATURE_LOCALIZATION") == Ok(String::from("1")) {
         generate_localization();
     }
     if env::var("CARGO_FEATURE_VERSION_STRING") == Ok(String::from("1")) {
