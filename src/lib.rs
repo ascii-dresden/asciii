@@ -100,7 +100,9 @@ pub static ENABLED_FEATURES: &'static str = concat!(
     r#"   "deserialization": "#, cfg!(feature = "deserialization"), ",\n",
     r#"   "cli":             "#, cfg!(feature = "cli"), ",\n",
     r#"   "meta_store":      "#, cfg!(feature = "meta_store"), "\n",
-    "} }"
+    "},",
+    r#""version": ""#, env!("CARGO_PKG_VERSION"), r#"""#,
+    "}"
     );
 
 lazy_static!{

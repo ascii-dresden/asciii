@@ -14,7 +14,10 @@ extern crate rocket;
 extern crate rocket_contrib;
 extern crate base64;
 extern crate openssl_probe;
+extern crate ring;
 extern crate rocket_cors;
+
+use ring::{digest, test as digest_test};
 
 use rocket::http::Method;
 use rocket::Outcome;
@@ -133,6 +136,7 @@ mod server {
 
         pub mod calendar {
             use super::super::Dir;
+            use ::Authorization;
 
             use rocket::response::content::{self, Content};
             use rocket::http::ContentType;
@@ -141,18 +145,19 @@ mod server {
 
             use std::convert::TryInto;
 
+
             #[get("/", rank=2)]
-            fn cal(api_key: ApiKey) -> Result<content::Content<String>, String> {
-                cal_params(Dir{ year:None, all:None })
+            fn cal(authorization: Authorization) -> Result<content::Content<String>, String> {
+                cal_params(authorization, Dir{ year:None, all:None })
             }
 
             #[get("/", rank=2)]
-            fn cal_plain(api_key: ApiKey) -> Result<content::Plain<String>, String> {
-                cal_plain_params(Dir{ year:None, all:None })
+            fn cal_plain(authorization: Authorization) -> Result<content::Plain<String>, String> {
+                cal_plain_params(authorization, Dir{ year:None, all:None })
             }
 
             #[get("/?<dir>", rank=1)]
-            fn cal_params(api_key: ApiKey, dir: Dir) -> Result<content::Content<String>, String> {
+            fn cal_params(_authorization: Authorization, dir: Dir) -> Result<content::Content<String>, String> {
                 let storage_dir = dir.try_into()?;
 
                 actions::calendar(storage_dir)
@@ -161,7 +166,7 @@ mod server {
             }
 
             #[get("/?<dir>", rank=1)]
-            fn cal_plain_params(api_key: ApiKey, dir: Dir) -> Result<content::Plain<String>, String> {
+            fn cal_plain_params(_authorization: Authorization, dir: Dir) -> Result<content::Plain<String>, String> {
                 let storage_dir = dir.try_into()?;
                 actions::calendar(storage_dir)
                     .map(|s| content::Plain(s) )
@@ -177,17 +182,17 @@ mod server {
             use asciii::storage::{Storable, Year};
             use serde_json;
             use rocket::response::content;
-            use ::ApiKey;
+            use ::Authorization;
 
             #[get("/projects/year")]
-            fn years(api_key: ApiKey) -> content::Json<String> {
+            fn years(_authorization: Authorization) -> content::Json<String> {
                 ::CHANNEL.send(()).unwrap();
                 let loader = ::PROJECTS.lock().unwrap();
                 content::Json(serde_json::to_string(&loader.years).unwrap())
             }
 
             #[get("/full_projects/year/<year>")]
-            fn full_by_year(api_key: ApiKey, year: Year) -> content::Json<String> {
+            fn full_by_year(_authorization: Authorization, year: Year) -> content::Json<String> {
                 ::CHANNEL.send(()).unwrap();
                 let loader = ::PROJECTS.lock().unwrap();
                 let exported = loader.projects_map.iter()
@@ -202,7 +207,7 @@ mod server {
             }
 
             #[get("/projects/year/<year>")]
-            fn by_year(api_key: ApiKey, year: Year) -> content::Json<String> {
+            fn by_year(_authorization: Authorization, year: Year) -> content::Json<String> {
                 ::CHANNEL.send(()).unwrap();
                 let loader = ::PROJECTS.lock().unwrap();
                 let exported = loader.projects_map.iter()
@@ -214,7 +219,7 @@ mod server {
             }
 
             #[get("/full_projects")]
-            fn all_full(api_key: ApiKey) -> content::Json<String> {
+            fn all_full(_authorization: Authorization) -> content::Json<String> {
                 let loader = ::PROJECTS.lock().unwrap();
                 let list = loader.projects_map.iter()
                                 .map(|(ident, p)| {
@@ -227,7 +232,7 @@ mod server {
             }
 
             #[get("/projects")]
-            fn all_names(api_key: ApiKey) -> content::Json<String> {
+            fn all_names(_authorization: Authorization) -> content::Json<String> {
                 let loader = ::PROJECTS.lock().unwrap();
                 let list = loader.projects_map.iter()
                                 .map(|(ident, _)| ident)
@@ -237,7 +242,7 @@ mod server {
             }
 
             #[get("/projects/<name>")]
-            fn by_name(api_key: ApiKey, name: String) -> Option<content::Json<String>> {
+            fn by_name(_authorization: Authorization, name: String) -> Option<content::Json<String>> {
                 let loader = ::PROJECTS.lock().unwrap();
                 let list = loader.projects_map.iter()
                                 .map(|(ident, p)| {
@@ -254,14 +259,19 @@ mod server {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-pub enum ApiKey {
-    Key(String),
+pub enum Authorization<'a> {
+    ApiKey(&'a str),
     UsernamePassword(String, String),
 }
 
-impl<'a, 'r> FromRequest<'a, 'r> for ApiKey {
+impl<'a, 'r> FromRequest<'a, 'r> for Authorization<'a> {
     type Error = ();
-    fn from_request(request: &'a Request<'r>) -> request::Outcome<ApiKey, ()> {
+    fn from_request(request: &'a Request<'r>) -> request::Outcome<Authorization<'a>, ()> {
+
+        if let Some(key) = request.headers().get("x-api-key").nth(0) {
+            return validate_authorization(Authorization::ApiKey(key));
+        }
+
         let auth = request
             .headers()
             .get("Authorization")
@@ -273,46 +283,78 @@ impl<'a, 'r> FromRequest<'a, 'r> for ApiKey {
 
         if let Some(auth) = auth {
             let authorization = match (auth.get(0), auth.get(1)) {
-                (Some(user), Some(pass)) => ApiKey::UsernamePassword(user.to_owned(), pass.to_owned()),
+                (Some(user), Some(pass)) => Authorization::UsernamePassword(user.to_owned(), pass.to_owned()),
                 _ => return Outcome::Failure((Status::BadRequest, ()))
             };
 
-            if validate_authorization(&authorization) {
-                Outcome::Success(authorization)
-            } else {
-                Outcome::Failure((Status::Unauthorized, ()))
-            }
+            return validate_authorization(authorization);
+
         } else {
-            error!("{:#?}", request);
-            Outcome::Failure((Status::BadRequest, ()))
+            Outcome::Failure((Status::Unauthorized, ()))
         }
     }
 }
 
-fn validate_authorization(given_key: &ApiKey) -> bool {
+fn validate_authorization<'a>(authorization: Authorization<'a>) -> request::Outcome<Authorization<'a>, ()> {
     // TODO: load keys at const intervals
-    let users = match actions::meta_store::get_api_keys() {
-        Ok(keys) => keys.users,
-        Err(e) => {error!("{}", e); return false},
+    let credentials = match actions::meta_store::get_api_keys() {
+        Ok(keys) => keys,
+        Err(e) => {
+            error!("No Users Stored: {}", e);
+            return Outcome::Failure((Status::InternalServerError, ()));
+        },
     };
-    match *given_key {
-        ApiKey::Key(_) => false,
-        ApiKey::UsernamePassword(ref user, ref password) => {
-            users.iter().any(|(u, p)| u == user && p == password)
+
+    let is_valid = match authorization {
+        Authorization::ApiKey(ref key) => {
+            credentials.keys.iter().any(|k| k == key)
+        },
+        Authorization::UsernamePassword(ref user, ref password) => {
+            credentials.users.iter().any(|(u, expected_hex)| {
+                let hashed_password = digest::digest(&digest::SHA256, password.as_bytes());
+                if let Ok(expected) = digest_test::from_hex(expected_hex) {
+                    u == user && hashed_password.as_ref() == expected.as_slice()
+                } else {
+                    println!("bad hash: {}", expected_hex);
+                    false
+                }
+            })
         }
+    };
+
+    if is_valid {
+        Outcome::Success(authorization)
+    } else {
+        Outcome::Failure((Status::Unauthorized, ()))
     }
 }
 
 #[get("/authorization")]
-fn authorization(api_key: ApiKey) -> content::Json<String> {
-    content::Json(serde_json::to_string(&api_key).unwrap())
+fn authorization(authorization: Authorization) -> content::Json<String> {
+    match &authorization {
+        Authorization::ApiKey(key) => {
+            let hashed_key = digest::digest(&digest::SHA256, key.as_bytes());
+            println!("{}: {:?}", key, hashed_key);
+        },
+        Authorization::UsernamePassword(username,password) => {
+            let hashed_pass = digest::digest(&digest::SHA256, password.as_bytes());
+            println!("{}: {:?}", password, hashed_pass);
+        },
+    }
+    content::Json(serde_json::to_string(&authorization).unwrap())
 }
 
+#[get("/features")]
+fn features() -> content::Json<&'static str> {
+    content::Json(asciii::ENABLED_FEATURES)
+}
+
+// TODO: test with drill and/or noir
 fn main() {
     openssl_probe::init_ssl_cert_env_vars();
 
     use server::endpoints;
-    use server::endpoints::{calendar, projects, static_files};
+    use server::endpoints::{calendar, projects};
 
     let server = rocket::ignite()
         .mount("/", routes![endpoints::static_files]) // TODO: might be a rocket bug
@@ -325,6 +367,7 @@ fn main() {
                                projects::all_full,
                                projects::by_name,
                                authorization,
+                               features,
         ]);
 
     if let Ok(env_cors) = std::env::var("CORS_ALLOWED_ORIGINS") {
