@@ -11,6 +11,7 @@ repository = "https://github.com/ascii-dresden/asciii/"
 documentation = "https://docs.rs/asciii/"
 
 build = true
+autobins = false
 
 include = [
     ".gitignore",
@@ -34,7 +35,7 @@ log = "0.4"
 env_logger = "0.5" # default feature requires regex
 yaml-rust = "0.4"
 chrono = "0.4"
-regex = "0.2"
+regex = "1.0"
 lazy_static = "1.0"
 maplit = "1.0"
 clap = "2"
@@ -60,7 +61,7 @@ openssl-probe = { version = "0.1.2", optional = true }
 # asciii-server CORS-support
 rocket_cors = { version = "0.2", optional = true }
 
-bill = {version= "0.2", features=["serialization"]}
+bill = {version= "0.3", features=["serialization"]}
 icalendar = "0.3"
 
 slug = "0.1"
