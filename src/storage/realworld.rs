@@ -3,7 +3,7 @@ use std::path::{Path,PathBuf};
 use super::*;
 use super::tests::TestProject;
 
-const STORAGE:&'static str = "/home/hendrik/ascii/caterings";
+const STORAGE: &'static str = "/home/hendrik/ascii/caterings";
 
 fn setup() -> (PathBuf, Storage<TestProject>) {
     let storage_path = PathBuf::from(STORAGE);

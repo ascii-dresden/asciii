@@ -254,12 +254,12 @@ pub fn meta(matches: &ArgMatches) -> Result<()> {
         }
     }
 
-    if let Some(matches) = matches.subcommand_matches("store") {
+    if let Some(_matches) = matches.subcommand_matches("store") {
         trace!("--> storing");
         actions::store_meta()?;
     }
 
-    if let Some(matches) = matches.subcommand_matches("dump") {
+    if let Some(_matches) = matches.subcommand_matches("dump") {
         trace!("--> dumping");
         let meta = actions::parse_meta();
         println!("{:#?}", meta);

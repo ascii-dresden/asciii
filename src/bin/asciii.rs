@@ -1,5 +1,4 @@
 extern crate chrono;
-extern crate term; // TODO consolidate term, ansi_term and terminal_size
 extern crate open;
 
 #[cfg(feature="shell")]

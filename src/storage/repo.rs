@@ -10,8 +10,8 @@ use std::error::Error;
 
 #[cfg(feature="git_statuses")]
 use git2;
-use term::{color, Attr};
-use term::color::Color;
+use prettytable::{color, Attr};
+use prettytable::color::Color;
 
 /// More Rustacious way of representing a git status
 #[derive(Debug,Clone)]

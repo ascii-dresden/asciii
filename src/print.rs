@@ -7,7 +7,7 @@ use prettytable::Table;
 use prettytable::row::Row;
 use prettytable::cell::Cell;
 use prettytable::format::{LineSeparator, LinePosition, FormatBuilder};
-use term::{Attr, color};
+use prettytable::{Attr, color};
 use term_size;
 
 use super::BillType;

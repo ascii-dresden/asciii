@@ -32,7 +32,6 @@ extern crate chrono;
 extern crate regex;
 extern crate slug;
 extern crate tempdir;
-extern crate term;
 extern crate bill;
 extern crate open;
 extern crate toml;
