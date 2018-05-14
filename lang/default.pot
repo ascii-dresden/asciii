@@ -204,7 +204,7 @@ msgstr ""
 msgid "Edit a specific project"
 msgstr ""
 
-#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:248 /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:341 /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:432 /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:602 /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:644 /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:739 /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:759 /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:793 /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:818
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:248 /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:341 /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:432 /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:602 /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:644 /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:739 /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:764 /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:798 /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:823
 msgid "Search term, possibly event name"
 msgstr ""
 
@@ -396,7 +396,7 @@ msgstr ""
 msgid "Deletes a project"
 msgstr ""
 
-#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:649 /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:743 /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:763 /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:798 /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:822
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:649 /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:743 /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:768 /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:803 /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:827
 msgid "list archived projects"
 msgstr ""
 
@@ -452,67 +452,71 @@ msgstr ""
 msgid "git diff"
 msgstr ""
 
-#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:750 /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:770 /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:805 /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:829
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:750
+msgid "Changes between the index and your last commit"
+msgstr ""
+
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:755 /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:775 /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:810 /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:834
 msgid "A template"
 msgstr ""
 
-#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:757
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:762
 msgid "Add file contents to the git-index"
 msgstr ""
 
-#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:775
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:780
 msgid "Add all projects"
 msgstr ""
 
-#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:783
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:788
 msgid "Save changes locally"
 msgstr ""
 
-#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:787
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:792
 msgid "Upload locally saved changes to the remote"
 msgstr ""
 
-#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:791
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:796
 msgid "cleans changes and untracked files in project folder"
 msgstr ""
 
-#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:811
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:816
 msgid "equals git stash"
 msgstr ""
 
-#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:812
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:817
 msgid "equals git pop"
 msgstr ""
 
-#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:816
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:821
 msgid "Show commit logs"
 msgstr ""
 
-#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:836
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:841
 msgid "Show information about the remote"
 msgstr ""
 
-#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:841
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:846
 msgid "Generates completion for bash, zsh, etc"
 msgstr ""
 
-#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:843
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:848
 msgid "what shell to generate completion for (bash, zsh, fish,PowerShell)"
 msgstr ""
 
-#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:852
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:857
 msgid "Prints version of this tool"
 msgstr ""
 
-#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:856
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:861
 msgid "Opens the online documentation, please read it"
 msgstr ""
 
-#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:916
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:921
 msgid "please specify either bash, zsh, fish or powershell"
 msgstr ""
 
-#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:927
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:932
 msgid "Date Format must be DD.MM.YYYY"
 msgstr ""
 

@@ -231,9 +231,8 @@ impl Repository {
         self.execute_git("push", &["origin", "master"], &[])
     }
 
-    pub fn diff(&self,paths:&[PathBuf]) -> ExitStatus {
-        let paths:Vec<&str> = paths.iter().filter_map(|p|p.to_str()).collect();
-        self.execute_git("diff", &paths, &[])
+    pub fn diff(&self, paths: &[PathBuf], flags: &[&str]) -> ExitStatus {
+        self.execute_git("diff", flags, &paths)
     }
 
     pub fn pull(&self) -> ExitStatus {

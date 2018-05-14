@@ -119,7 +119,12 @@ pub fn git_diff(matches: &ArgMatches) -> Result<()> {
     let storage = storage::setup_with_git::<Project>()?;
     let paths = matches_to_paths(matches, &storage)?;
     let repo = storage.repository().unwrap();
-    if !repo.diff(&paths).success() {
+    let flags = if matches.is_present("staged") {
+        vec!["--staged"]
+    } else {
+        Vec::new()
+    };
+    if !repo.diff(&paths, &flags).success() {
         return Err("git diff did not exit successfully".into());
     }
     Ok(())
