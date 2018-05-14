@@ -1,9 +1,10 @@
 //! Error that may occur in Storage
 //!
+
 #![allow(trivial_casts)]
-use std::io;
-use std::fmt;
-use util::yaml;
+use std::{io, fmt};
+use std::path::PathBuf;
+use ::project;
 #[cfg(feature="git_statuses")] use git2;
 
 #[cfg(not(feature="git_statuses"))]
@@ -11,10 +12,9 @@ mod git2 {
     pub use super::super::repo::GitError as Error;
 }
 
-
 use templater;
 
-
+#[allow(missing_docs)]
 error_chain!{
     types {
         StorageError, ErrorKind, ResultExt, Result;
@@ -23,9 +23,9 @@ error_chain!{
     foreign_links {
         Io(io::Error);
         Fmt(fmt::Error);
-        Yaml(yaml::YamlError);
         Git(git2::Error);
-        Template(templater::TemplateError);
+        Project(project::error::Error); // TODO this should be generic
+        Template(templater::TemplateError); // this should also not be here (inversion)
     }
 
     errors {
@@ -46,6 +46,10 @@ error_chain!{
         ProjectDoesNotExist {
             description("No project was found matching this description.")
         }
+        NoProjectFile(p: PathBuf) {
+            description("This project folder does not contain a project file."),
+            display("The project folder {:?} does not contain a project file.", p)
+        }
         StoragePathNotAbsolute {
             description("Top Level storage path is not absolute.")
         }
@@ -57,6 +61,9 @@ error_chain!{
         }
         GitProcessFailed {
             description("Calling `git` failed")
+        }
+        RepoUnintialized {
+            description("Git Repository was not initiliazed.")
         }
     }
 }

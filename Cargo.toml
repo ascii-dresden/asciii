@@ -1,61 +1,107 @@
 [package]
 name = "asciii"
-version = "3.1.0"
+version = "3.2.0"
 authors = ["Hendrik Sollich <hendrik@hoodie.de>"]
 license = "MIT/Apache-2.0"
+readme = "README.md"
+description = """The advanced but simple commandline interface for invoice invocation.
+This is an internal tool of the Studentencafe ascii in Dresden and therefore specialized for our use cases."""
+homepage = "https://github.com/ascii-dresden/asciii/"
+repository = "https://github.com/ascii-dresden/asciii/"
+documentation = "https://docs.rs/asciii/"
 
 build = true
+autobins = false
+
+include = [
+    ".gitignore",
+    ".travis.yml",
+    "Cargo.toml",
+    "History.md",
+    "README.md",
+    "build.rs",
+    "lang/*",
+    "src/default_config.yml",
+    "src/**/*.rs",
+    "tests/**/*.rs"
+]
+exclude = [
+    "*.pdf",
+    "pkg"
+]
 
 [dependencies]
-
-log = "0.3"
-env_logger = "0.4" # default feature requires regex
-yaml-rust = {version = "0.3", features = ["preserve_order"]}
-chrono = "0.3"
-regex = "0.2"
-lazy_static = "0.2"
-maplit = "0.1"
+log = "0.4"
+env_logger = "0.5" # default feature requires regex
+yaml-rust = "0.4"
+chrono = "0.4"
+regex = "1.0"
+lazy_static = "1.0"
+maplit = "1.0"
 clap = "2"
 enum_derive = "0.1"
 custom_derive = "0.1"
-open = "1.1"
-ordered-float = "0.4"
-error-chain = "0.9"
-crowbook-intl-runtime = "0.1.0"
-rustyline = {git="https://github.com/kkawakam/rustyline/", rev="1ae47dc", optional = true }
+open = "1.2"
+error-chain = "0.11"
+crowbook-intl-runtime = "0.1"
+rayon = "1.0"
+itertools = "0.7"
+base64 = "0.9"
+rustyline = {version = "1.0.0", optional = true }
+linked-hash-map = {version = "0.5", features = ["serde_impl"]}
 
-bill = {git="https://github.com/hoodie/bill-rs"}
-#icalendar = {git="https://github.com/hoodie/icalendar-rs"}
+rocket = {version = "0.3", optional = true }
+rocket_codegen = {version = "0.3", optional = true }
+rocket_contrib = {version = "0.3", optional = true }
+
+# for statically linked OpenSSL
+openssl-sys = { version = "0.9", optional = true }
+openssl-probe = { version = "0.1.2", optional = true }
+
+# asciii-server CORS-support
+rocket_cors = { version = "0.2", optional = true }
+
+bill = {version= "0.3", features=["serialization"]}
 icalendar = "0.3"
-#icalendar = {path="../icalendar-rs"}
 
 slug = "0.1"
 tempdir = "0.3"
-semver = "0.6"
-term_size = "0.2"
+semver = "0.9"
+term_size = "0.3"
 
 term = "0.4"
 prettytable-rs = { version = "0.6", default-features= false}
 
-# feature: lints
-#herbie-lint = {version = "*", optional = true}
-
 # feature: document_export
-handlebars = {version = "0.22", optional = true}
-rustc-serialize = {version = "0.3", optional = true}
+handlebars = {version = "0.32", optional = true}
+
+serde         = {version = "1.0", optional = true}
+serde_json    = {version = "1.0", optional = true}
+serde_yaml    = {version = "0.7", optional = true}
+serde_derive  = {version = "1.0", optional = true}
+ordered-float = {version = "0.5", optional = true}
+num-traits    = {version = "0.2", optional = true}
+toml          = "0.4"
 
 # feature: git_statuses
-git2 = {version = "0.6", default-features= false, optional = true}
+git2 = {version = "0.7", default-features = false, optional = true}
 
-# planned optional features: termprint, term resize, xdg-open, web server :D
+[dev-dependencies]
+pretty_assertions = "0.5"
 
 [features]
-default = ["document_export", "git_statuses", "shell"]
-document_export = ["json", "handlebars"]
-json = ["rustc-serialize"]
+default = ["cli", "document_export", "git_statuses", "serialization", "deserialization"]
+document_export = ["handlebars", "serialization"]
+serde_base = ["serde", "serde_derive"]
+serialization = ["serde_base", "serde_json"]
+server = ["rocket", "rocket_codegen", "rocket_contrib", "rocket_cors", "openssl-sys", "openssl-probe",
+"serialization" ]
+deserialization = ["serde_base","serde_yaml", "ordered-float", "num-traits"]
 git_statuses = ["git2"]
 shell = ["rustyline"]
 version_string = []
+localize = []
+cli= []
 nightly = []
 
 [profile.release]
@@ -65,7 +111,14 @@ lto = true
 test = false
 doc = false
 name = "asciii"
+required-features = ["cli"]
+
+[[bin]]
+test = false
+doc = false
+name = "asciii-server"
+required-features = ["server"]
 
 [build-dependencies]
-clap = "2"
-crowbook-intl = "0.2.0"
+chrono = "0.4"
+crowbook-intl = "0.2"

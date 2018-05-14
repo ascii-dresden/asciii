@@ -1,17 +1,16 @@
-use std::process::{Command,Output};
+extern crate chrono;
+extern crate crowbook_intl;
 
-//#[macro_use] extern crate clap;
-//use clap::Shell;
-//include!("src/cli/app.rs");
-//fn gen_completions(){
-//    let mut app = build_cli();
-//    app.gen_completions("asciii",
-//                        Shell::Bash,
-//                        ".")
-//
-//}
+use std::path::PathBuf;
+use std::env;
+use std::fs::File;
+use std::io::Write;
+use std::process::{Command, Output};
 
-fn execute_git(command:&str, args:&[&str]) -> Output{
+use chrono::prelude::*;
+use crowbook_intl::{Localizer, Extractor};
+
+fn execute_git(command:&str, args:&[&str]) -> Output {
     let workdir = ".";
     let gitdir  = "./.git";
 
@@ -25,24 +24,16 @@ fn execute_git(command:&str, args:&[&str]) -> Output{
         .unwrap_or_else(|e| { panic!("git_failed {}", e) })
 }
 
-use std::fs::File;
-use std::io::Write;
-
-fn gen_commit_file(){
+fn gen_commit_file() {
     let git_log    = String::from_utf8(execute_git("log", &["--oneline", r##"--format=%h"##]).stdout).unwrap();
     let count = git_log.lines().count().to_string();
     let last_commit= git_log.lines().nth(0).unwrap().to_string();
-    let description = format!("build {} ({})", count.trim(), last_commit.trim());
+    let description = format!("commit {} ({})", count.trim(), last_commit.trim());
     println!("description string= {:?}",description);
     let mut f = File::create(".most_recent_commit").unwrap();
     f.write_all(description.as_bytes()).unwrap();
 }
 
-extern crate crowbook_intl;
-use std::path::Path;
-use std::env;
-use crowbook_intl::{Localizer, Extractor};
- 
 fn generate_localization() {
     // Generate a `lang/default.pot` containing strings used to call `lformat!`
     let mut extractor = Extractor::new();
@@ -53,13 +44,20 @@ fn generate_localization() {
     let mut localizer = Localizer::new(&extractor);
     localizer.add_lang("de", include_str!(concat!(env!("CARGO_MANIFEST_DIR"), "/lang/de.po"))).unwrap();
     // Use env::var instead of env! to avoid problems when cross-compiling
-    let dest_path = Path::new(&env::var("OUT_DIR").unwrap())
+    let dest_path = PathBuf::from(env::var_os("OUT_DIR").unwrap())
        .join("localize_macros.rs");
     localizer.write_macro_file(dest_path).unwrap();
 }
 
-fn main(){
-    //gen_commit_file();
-    //gen_completions();
-    generate_localization();
+fn main() {
+    // passing variables to rustc
+    println!("cargo:rustc-env=PROFILE={}", env::var("PROFILE").unwrap_or("unknown profile".into()));
+    println!("cargo:rustc-env=BUILD_DATE={}", Utc::now().format("%F"));
+
+    if env::var("CARGO_FEATURE_LOCALIZE") == Ok(String::from("1")) {
+        generate_localization();
+    }
+    if env::var("CARGO_FEATURE_VERSION_STRING") == Ok(String::from("1")) {
+        gen_commit_file();
+    }
 }

@@ -1,17 +1,12 @@
 extern crate asciii;
 
-use std::error::Error;
-
-use asciii::actions;
+use asciii::actions::calendar_and_tasks as calendar;
 use asciii::storage::StorageDir;
+
 
 fn main() {
 
     let dir = StorageDir::All;
 
-    match actions::calendar(dir, true) {
-        Ok(cal) => println!("{}", cal),
-        Err(er) => println!("{}", er.description())
-    }
-
+    println!("{}", calendar(dir).unwrap())
 }

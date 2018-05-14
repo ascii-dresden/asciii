@@ -1,14 +1,14 @@
 //! Simple templating functionality through keyword replacement.
 //!
 //! Replaces `##KEYWORDS##` in Strings.
-use std::{io,fmt};
-use std::io::Read;
+use std::fmt;
+use std::io::{self, Read};
 use std::fs::File;
 use std::path::Path;
 use std::error::Error;
 use std::collections::HashMap;
 
-use regex::{Regex,Captures};
+use regex::{Regex, Captures};
 use std::ops::Deref;
 
 /// Simple template style keyword replacement.

@@ -23,3 +23,11 @@ pkg
 .direnv
 .envrc
 templates/latex
+asciii.fish
+asciii.bash-completion
+_asciii
+_asciii.ps1
+.DS_Store
+src/localize_macros_static.rs
+*.rustfmt
+.idea/

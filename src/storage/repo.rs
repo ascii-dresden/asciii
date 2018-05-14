@@ -3,14 +3,14 @@ use std::fmt;
 use std::path::{Path, PathBuf};
 #[cfg(feature="git_statuses")]
 use std::collections::HashMap;
-use std::process::{Command,ExitStatus};
+use std::process::{Command, ExitStatus};
 
 #[cfg(not(feature="git_statuses"))]
 use std::error::Error;
 
 #[cfg(feature="git_statuses")]
 use git2;
-use term::{color,Attr};
+use term::{color, Attr};
 use term::color::Color;
 
 /// More Rustacious way of representing a git status
@@ -37,6 +37,7 @@ impl GitStatus {
         Attr::Reverse
     }
 
+    #[allow(match_same_arms)]
     pub fn to_style(&self) -> (Color,Option<Attr>) {
         match *self{
         // => write!(f, "{:?}",  self)
@@ -53,8 +54,9 @@ impl GitStatus {
 }
 
 impl fmt::Display for GitStatus {
+
+    #[allow(match_same_arms)]
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-// X ✘ ✓
         match *self{
         // => write!(f, "{:?}", self)
          GitStatus::Conflict        => write!(f, "~"),
@@ -76,18 +78,18 @@ impl From<git2::Status> for GitStatus{
     fn from(status:git2::Status) -> Self{
         match status{
             //s if s.contains(git2::STATUS_CURRENT)          => GitStatus::Current,
-            s if s.contains(git2::STATUS_INDEX_NEW)        => GitStatus::IndexNew,
-            s if s.contains(git2::STATUS_INDEX_MODIFIED)   => GitStatus::IndexModified ,
-            s if s.contains(git2::STATUS_INDEX_DELETED)    => GitStatus::IndexDeleted,
-            s if s.contains(git2::STATUS_INDEX_RENAMED)    => GitStatus::IndexRenamed,
-            s if s.contains(git2::STATUS_INDEX_TYPECHANGE) => GitStatus::IndexTypechange,
-            s if s.contains(git2::STATUS_WT_NEW)           => GitStatus::WorkingNew,
-            s if s.contains(git2::STATUS_WT_MODIFIED)      => GitStatus::WorkingModified,
-            s if s.contains(git2::STATUS_WT_DELETED)       => GitStatus::WorkingDeleted,
-            s if s.contains(git2::STATUS_WT_TYPECHANGE)    => GitStatus::WorkingTypechange,
-            s if s.contains(git2::STATUS_WT_RENAMED)       => GitStatus::WorkingRenamed,
-            s if s.contains(git2::STATUS_IGNORED)          => GitStatus::Ignored,
-            s if s.contains(git2::STATUS_CONFLICTED)       => GitStatus::Conflict,
+            s if s.contains(git2::Status::INDEX_NEW)        => GitStatus::IndexNew,
+            s if s.contains(git2::Status::INDEX_MODIFIED)   => GitStatus::IndexModified ,
+            s if s.contains(git2::Status::INDEX_DELETED)    => GitStatus::IndexDeleted,
+            s if s.contains(git2::Status::INDEX_RENAMED)    => GitStatus::IndexRenamed,
+            s if s.contains(git2::Status::INDEX_TYPECHANGE) => GitStatus::IndexTypechange,
+            s if s.contains(git2::Status::WT_NEW)           => GitStatus::WorkingNew,
+            s if s.contains(git2::Status::WT_MODIFIED)      => GitStatus::WorkingModified,
+            s if s.contains(git2::Status::WT_DELETED)       => GitStatus::WorkingDeleted,
+            s if s.contains(git2::Status::WT_TYPECHANGE)    => GitStatus::WorkingTypechange,
+            s if s.contains(git2::Status::WT_RENAMED)       => GitStatus::WorkingRenamed,
+            s if s.contains(git2::Status::IGNORED)          => GitStatus::Ignored,
+            s if s.contains(git2::Status::CONFLICTED)       => GitStatus::Conflict,
             _                                              => GitStatus::Unknown
         }
     }
@@ -190,8 +192,13 @@ impl Repository {
     }
 
     pub fn add(&self, paths:&[PathBuf]) -> ExitStatus {
-        info!("adding to git\n {:?}", paths);
+        info!("adding to git: {:?}", paths);
         self.execute_git("add", &[], paths)
+    }
+
+    pub fn add_all(&self) -> ExitStatus {
+        info!("adding all to git");
+        self.execute_git("add", &["--all"], &[])
     }
 
     pub fn commit(&self) -> ExitStatus {
@@ -241,8 +248,8 @@ impl Repository {
         self.execute_git("remote", &[], &[])
     }
 
-    pub fn log(&self) -> ExitStatus {
-        self.execute_git("log", &[], &[])
+    pub fn log(&self, paths:&[PathBuf]) -> ExitStatus {
+        self.execute_git("log", &[ "--graph", "--pretty=format:'%Cred%h%Creset -%C(bold yellow)%d%Creset %C() %s %C(reset) ( %C(yellow)%an%Creset %C(green)%cr )'", "--abbrev-commit", "--date=relative" ], paths)
     }
 }
 

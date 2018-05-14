@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+
+set -eo pipefail
+[[ -z "${TRACE:+x}" ]] || set -x
+
+vars() {
+	true
+}
+
+release_version() {
+	echo "3.1.0"
+}
+
+release_on_github() {
+	local src="$1"
+	local dst="$(basename "$src")"
+	echo "releasing $src as $bin as version $(release_version)"
+}
+
+github_release_process() {
+	local artifact_dir="$1"
+	for release_binary in "$artifact_dir"/*; do
+		release_on_github "$(realpath "$release_binary")"
+	done
+	true
+}
+
+docker_release_process() {
+	local docker_image="$1"
+	true
+}
+
+main() {
+	local platform="$1"
+	[[ $# -le 0 ]] || shift
+	case "$platform" in
+		github)
+			github_release_process "${@}"
+		;;
+		docker)
+			docker_release_process "${@}"
+		;;
+	esac
+}
+
+vars
+main "${@}"

@@ -1,0 +1,22 @@
+NAME=asciii
+VERSION=3.1.0
+BUILD=1
+
+.PHONY: package
+
+all: package
+	@true
+
+build-dep:
+	apt-get update
+	apt-get install -y cmake zlib1g-dev
+
+target/release/asciii:
+	cargo build --release --all-features
+
+fpm:
+	apt-get install -y ruby ruby-dev rubygems gcc make
+  gem install --no-ri --no-rdoc fpm
+
+package: target/release/asciii fpm
+  fpm -s dir -t deb -n asciii -v 3.1.0-2 --prefix /usr/bin --chdir target/release --depends 'libc6 >= 2.19' --depends 'libgcc1 >= 4.9' asciii

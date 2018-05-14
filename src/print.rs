@@ -12,9 +12,8 @@ use term_size;
 
 use super::BillType;
 
-use project::Project;
-use project::spec::{IsProject, Redeemable, Invoicable, HasEmployees};
-use project::spec::events::HasEvents;
+use project::{Project, Exportable};
+use project::spec::{IsProject, Redeemable, Invoicable, HasEmployees, HasEvents};
 use project::error::SpecResult;
 use storage::Storable;
 use util::currency_to_string;
@@ -40,7 +39,7 @@ impl<'a> Default for ListConfig<'a>{
             mode:         if ::CONFIG.get_bool("list/verbose"){ ListMode::Verbose } else{ ListMode::Simple },
             git_status:   ::CONFIG.get_bool("list/gitstatus"),
             show_errors:  false,
-            sort_by:      ::CONFIG.get_str("list/sort").expect("Faulty config: list/sort does not contain a value"),
+            sort_by:      ::CONFIG.get_str("list/sort"),
             filter_by:    None,
             use_colors:   ::CONFIG.get_bool("list/colors"),
             details:      None,
@@ -50,10 +49,9 @@ impl<'a> Default for ListConfig<'a>{
 
 // TODO move `payed_to_cell` into computed_field.rs
 fn payed_to_cell(project:&Project) -> Cell {
-    let sym = ::CONFIG.get_str("currency")
-        .expect("Faulty config: currency does not contain a value");
+    let sym = ::CONFIG.get_str("currency");
 
-    match (project.payed_by_client(), project.hours().employees_payed()) {
+    match (project.is_payed(), project.hours().employees_payed()) {
         (false,false) => Cell::new("✗").with_style(Attr::ForegroundColor(color::RED)),
         (_,    false) |
         (false, _   ) => Cell::new(sym).with_style(Attr::ForegroundColor(color::YELLOW)),
@@ -103,7 +101,7 @@ pub fn path_rows(projects:&[Project], list_config:&ListConfig) -> Vec<Row>{
         .map(|project| {
             let row_style = if list_config.use_colors {project_to_style(project)}else{""};
             Row::new(vec![
-                     cell!(project.invoice().number_str().unwrap_or("".into())),
+                     cell!(project.invoice().number_str().unwrap_or_else(String::new)),
                      cell!(project.short_desc()).style_spec(row_style),
                      cell!(project.file().display()),
 
@@ -130,9 +128,9 @@ pub fn simple_rows(projects:&[Project], list_config:&ListConfig) -> Vec<Row>{
                      .style_spec(row_style),
 
                      //cell!(project.manager()),
-                     cell!(project.invoice().number_str().unwrap_or("".into())),
+                     cell!(project.invoice().number_str().unwrap_or_else(String::new)),
 
-                     cell!(project.modified_date().map(|d|d.format("%d.%m.%Y").to_string()).unwrap_or("no_date".into())),
+                     cell!(project.modified_date().map(|d|d.format("%d.%m.%Y").to_string()).unwrap_or_else(|| "no_date".into())),
                      //cell!(project.file().display()),
             ])
         })
@@ -144,6 +142,7 @@ pub fn simple_rows(projects:&[Project], list_config:&ListConfig) -> Vec<Row>{
 /// produces the rows used in `print_projects()`
 #[inline]
 pub fn verbose_rows(projects:&[Project], list_config:&ListConfig) -> Vec<Row>{
+    trace!("verbose_rows {:#?}", list_config);
     projects.iter().enumerate()
         .map(|(i, project)| {
             //trace!("configuring row: {:?}", project.name());
@@ -184,11 +183,11 @@ pub fn verbose_rows(projects:&[Project], list_config:&ListConfig) -> Vec<Row>{
                 //cell!(project.index().unwrap_or(String::from(""))),
 
                 // R042
-                cell!(project.invoice().number_str().unwrap_or("".into()))
+                cell!(project.invoice().number_str().unwrap_or_else(String::new))
                     .style_spec(row_style),
 
                 // Date
-                cell!(project.modified_date().unwrap_or(UTC::today()).format("%d.%m.%Y").to_string())
+                cell!(project.modified_date().unwrap_or_else(Utc::today).format("%d.%m.%Y").to_string())
                     .style_spec(row_style),
 
                 // status "✓  ✓  ✗"
@@ -200,7 +199,7 @@ pub fn verbose_rows(projects:&[Project], list_config:&ListConfig) -> Vec<Row>{
                 //cell!(output_file_exists(project, Project::offer_file_name)),
                 //cell!(output_file_exists(project, Project::invoice_file_name)),
 
-                cell!(r->project.sum_sold().map(|i|currency_to_string(&i)).unwrap_or(String::from("none"))),
+                cell!(r->project.sum_sold().map(|i|currency_to_string(&i)).unwrap_or_else(|e| format!("{}", e))),
                 //cell!(project.wages().map(|i|i.to_string()).unwrap_or(String::from("none"))),
                 //cell!(project.sum_sold_and_wages().map(|i|i.to_string()).unwrap_or(String::from("none"))),
             ]);
@@ -209,7 +208,7 @@ pub fn verbose_rows(projects:&[Project], list_config:&ListConfig) -> Vec<Row>{
             if let Some(ref details) = list_config.details{
                 cells.extend_from_slice(
                     &details.iter().map(|d|
-                                 cell!( project.get(&d).unwrap_or_else(String::new)),
+                                 cell!( project.field(&d).unwrap_or_else(String::new)),
                                  ).collect::<Vec<Cell>>()
                     );
             }
@@ -223,9 +222,9 @@ pub fn verbose_rows(projects:&[Project], list_config:&ListConfig) -> Vec<Row>{
             if list_config.show_errors{
                 cells.extend_from_slice( &[
                                          // Errors
-                                         cell!(validation1.err().map(|errs| errs.join(", ")).unwrap_or("".to_owned())),
-                                         cell!(validation2.err().map(|errs| errs.join(", ")).unwrap_or("".to_owned())),
-                                         cell!(validation3.err().map(|errs| errs.join(", ")).unwrap_or("".to_owned())),
+                                         cell!(validation1.err().map(|errs| errs.join(", ")).unwrap_or_else(String::new)),
+                                         cell!(validation2.err().map(|errs| errs.join(", ")).unwrap_or_else(String::new)),
+                                         cell!(validation3.err().map(|errs| errs.join(", ")).unwrap_or_else(String::new)),
                 ]);
             }
 
@@ -247,7 +246,7 @@ pub fn dynamic_rows(projects:&[Project], list_config:&ListConfig) -> Vec<Row>{
             if let Some(ref details) = list_config.details{
                 cells.extend_from_slice(
                     &details.iter().map(|d|
-                                        cell!( project.get(&d).unwrap_or_else(String::new)).style_spec(row_style),
+                                        cell!( project.field(&d).unwrap_or_else(String::new)).style_spec(row_style),
                                         ).collect::<Vec<Cell>>()
                     );
                 if list_config.show_errors{
@@ -255,9 +254,9 @@ pub fn dynamic_rows(projects:&[Project], list_config:&ListConfig) -> Vec<Row>{
 
                     cells.extend_from_slice( &[
                                              // Errors
-                                             cell!(validation.0.err().map(|errs| errs.join(", ")).unwrap_or("".to_owned())),
-                                             cell!(validation.1.err().map(|errs| errs.join(", ")).unwrap_or("".to_owned())),
-                                             cell!(validation.2.err().map(|errs| errs.join(", ")).unwrap_or("".to_owned())),
+                                             cell!(validation.0.err().map(|errs| errs.join(", ")).unwrap_or_else(String::new)),
+                                             cell!(validation.1.err().map(|errs| errs.join(", ")).unwrap_or_else(String::new)),
+                                             cell!(validation.2.err().map(|errs| errs.join(", ")).unwrap_or_else(String::new)),
                     ]);
                 }
             }
@@ -271,7 +270,7 @@ pub fn dynamic_rows(projects:&[Project], list_config:&ListConfig) -> Vec<Row>{
 /// This doesn't do much, except taking a Vec of Rows and printing it,
 /// the interesting code is in `dynamic_rows()`, `verbose_rows()`, `path_rows()` or `simple_rows()`.
 /// This Documentations is redundant, infact, it is already longer than the function itself.
-pub fn print_projects(rows:Vec<Row>){
+pub fn print_projects(rows: Vec<Row>){
     trace!("starting table print");
     let mut table = Table::init(rows);
     table.set_format(FormatBuilder::new().column_separator(' ').padding(0,0).build());
@@ -313,19 +312,19 @@ fn table_with_borders(table:&mut Table){
                     );
 }
 
-pub fn show_details(project:&Project, bill_type:&BillType) {
+pub fn show_details(project:&Project, bill_type: BillType) {
     trace!("print::show_details()");
     println!("{}: {}", bill_type.to_string(), project.short_desc());
 
     let (offer, invoice) = match project.bills() {
         Ok(tuple) => tuple,
         Err(e) => {
-            error!("{}", e);
+            error!("{}, sorry", e);
             return
         }
     };
 
-    let bill = match *bill_type {
+    let bill = match bill_type {
         BillType::Offer => offer,
         BillType::Invoice => invoice
     };
@@ -360,7 +359,7 @@ pub fn show_details(project:&Project, bill_type:&BillType) {
             table.add_row( row!["",
                                 "",
                                 "",
-                                cell!(r->format!("+{}%",*tax*100f64)),
+                                cell!(r->format!("+{}%",**tax*100f64)),
                                 cell!(r->format!("{}", itemlist.tax_sum().postfix()))
                                 //cell!(r->itemlist.net_sum().postfix())
             ]);
@@ -378,6 +377,6 @@ pub fn show_details(project:&Project, bill_type:&BillType) {
         }
     }
 
-    println!("{}", project.employees_string());
+    println!("{}", project.hours().employees_string().unwrap_or_else(String::new));
 
 }
