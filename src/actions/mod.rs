@@ -7,8 +7,7 @@ use icalendar::Calendar;
 use toml;
 
 use std::fmt::Write;
-use std::fs::File;
-use std::io::Read;
+use std::fs;
 
 use std::path::PathBuf;
 use std::collections::HashMap;
@@ -244,11 +243,7 @@ pub struct ApiKeys {
 /// Parses meta store
 pub fn parse_meta() -> Result<MetaStore> {
     let path = storage::setup::<Project>()?.get_extra_file("meta.toml")?;
-    let file_content = File::open(&path).and_then(|mut file| {
-        let mut content = String::new();
-        file.read_to_string(&mut content).map(|_| content)
-    })?;
-
+    let file_content = fs::read_to_string(&path)?;
     let store: MetaStore = toml::from_str(&file_content)?;
 
     Ok(store)

@@ -28,7 +28,7 @@ fn setup_locale() {
     }
 }
 
-fn main(){
+fn main() {
     asciii::util::setup_log();
     setup_locale();
 

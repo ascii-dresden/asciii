@@ -20,8 +20,8 @@
 #![allow(dead_code)]
 
 use std::fmt;
-use std::io::{self, Read};
-use std::fs::File;
+use std::io;
+use std::fs;
 use std::path::Path;
 use std::error::Error;
 
@@ -69,11 +69,8 @@ impl fmt::Display for YamlError {
 
 /// Wrapper that opens and parses a `.yml` file.
 pub fn open(path: &Path) -> Result<Yaml, YamlError> {
-    let file_content = File::open(&path)
-                             .and_then(|mut file| {
-                                 let mut content = String::new();
-                                 file.read_to_string(&mut content).map(|_| content)
-                             })?;
+
+    let file_content = fs::read_to_string(&path)?;
     parse( &file_content )
 }
 

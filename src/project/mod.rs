@@ -2,7 +2,7 @@
 //!
 //! This module implements all functionality of a project.
 
-use std::fs::File;
+use std::fs::{self, File};
 use std::io::prelude::*;
 use std::ffi::OsStr;
 use std::fmt;
@@ -68,11 +68,7 @@ impl Project {
     /// Opens a project from file path;
     pub fn open<S: AsRef<OsStr> + ?Sized>(pathish: &S) -> Result<Project> {
         let file_path = Path::new(&pathish);
-        let file_content = File::open(&file_path)
-                                .and_then(|mut file| {
-                                    let mut content = String::new();
-                                    file.read_to_string(&mut content).map(|_| content)
-                                })?;
+        let file_content = fs::read_to_string(&file_path)?;
         Ok(Project {
             file_path: file_path.to_owned(),
             _temp_dir: None,

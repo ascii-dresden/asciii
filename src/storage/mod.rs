@@ -370,11 +370,10 @@ impl<L:Storable> Storage<L> {
         trace!("listing template files (.{})", template_file_extension);
         let template_files =
         list_path_content(&self.templates_dir())?
-            .iter()
+            .into_iter()
             .filter(|p|p.extension()
                         .unwrap_or_else(|| OsStr::new("")) == OsStr::new(template_file_extension)
                         )
-            .cloned()
             .collect::<Vec<PathBuf>>();
         ensure!(!template_files.is_empty(), ErrorKind::TemplateNotFound);
         Ok(template_files)
@@ -393,9 +392,9 @@ impl<L:Storable> Storage<L> {
 
     /// Returns the Path to the template file by the given name, maybe.
     pub fn get_template_file(&self, name:&str) -> StorageResult<PathBuf> {
-        self.list_template_files()?.iter()
+        self.list_template_files()?
+            .into_iter()
             .filter(|f|f.file_stem().unwrap_or_else(||OsStr::new("")) == name)
-            .cloned()
             .nth(0).ok_or_else(||ErrorKind::TemplateNotFound.into())
     }
 
@@ -728,9 +727,9 @@ impl<L:Storable> Storage<L> {
     /// Produces a list of empty project folders.
     pub fn list_empty_project_dirs(&self, directory:StorageDir) -> StorageResult<Vec<PathBuf>> {
         trace!("listing empty project dirs {:?}-directory", directory);
-        let projects = self.list_project_folders(directory)?.iter()
+        let projects = self.list_project_folders(directory)?
+            .into_iter()
             .filter(|dir| self.get_project_file(dir).is_err())
-            .cloned()
             .collect();
         Ok(projects)
     }
@@ -738,7 +737,8 @@ impl<L:Storable> Storage<L> {
     /// Produces a list of project files.
     pub fn list_project_files(&self, directory:StorageDir) -> StorageResult<Vec<PathBuf>> {
         trace!("listing project files in {:?}-directory", directory);
-        self.list_project_folders(directory)?.iter()
+        self.list_project_folders(directory)?
+            .iter()
             .map(|dir| self.get_project_file(dir))
             .collect()
     }

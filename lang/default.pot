@@ -8,43 +8,43 @@ msgid ""
 msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 
-#: /Users/hendrik/code/rust/asciii/src/actions/mod.rs:53
+#: /Users/hendrik/code/rust/asciii/src/actions/mod.rs:52
 msgid "INum"
 msgstr ""
 
-#: /Users/hendrik/code/rust/asciii/src/actions/mod.rs:54
+#: /Users/hendrik/code/rust/asciii/src/actions/mod.rs:53
 msgid "Designation"
 msgstr ""
 
-#: /Users/hendrik/code/rust/asciii/src/actions/mod.rs:55
+#: /Users/hendrik/code/rust/asciii/src/actions/mod.rs:54
 msgid "Date"
 msgstr ""
 
-#: /Users/hendrik/code/rust/asciii/src/actions/mod.rs:56
+#: /Users/hendrik/code/rust/asciii/src/actions/mod.rs:55
 msgid "InvoiceDate"
 msgstr ""
 
-#: /Users/hendrik/code/rust/asciii/src/actions/mod.rs:57
+#: /Users/hendrik/code/rust/asciii/src/actions/mod.rs:56
 msgid "Caterer"
 msgstr ""
 
-#: /Users/hendrik/code/rust/asciii/src/actions/mod.rs:58
+#: /Users/hendrik/code/rust/asciii/src/actions/mod.rs:57
 msgid "Responsible"
 msgstr ""
 
-#: /Users/hendrik/code/rust/asciii/src/actions/mod.rs:59
+#: /Users/hendrik/code/rust/asciii/src/actions/mod.rs:58
 msgid "Payed on"
 msgstr ""
 
-#: /Users/hendrik/code/rust/asciii/src/actions/mod.rs:60
+#: /Users/hendrik/code/rust/asciii/src/actions/mod.rs:59
 msgid "Amount"
 msgstr ""
 
-#: /Users/hendrik/code/rust/asciii/src/actions/mod.rs:61
+#: /Users/hendrik/code/rust/asciii/src/actions/mod.rs:60
 msgid "Canceled"
 msgstr ""
 
-#: /Users/hendrik/code/rust/asciii/src/actions/mod.rs:163
+#: /Users/hendrik/code/rust/asciii/src/actions/mod.rs:162
 msgid "really?"
 msgstr ""
 
@@ -536,7 +536,7 @@ msgstr ""
 msgid "Can't make sense of {}"
 msgstr ""
 
-#: /Users/hendrik/code/rust/asciii/src/lib.rs:95
+#: /Users/hendrik/code/rust/asciii/src/lib.rs:94
 msgid "Documentation at: {}"
 msgstr ""
 
@@ -548,35 +548,35 @@ msgstr ""
 msgid "{} weeks"
 msgstr ""
 
-#: /Users/hendrik/code/rust/asciii/src/project/mod.rs:309
+#: /Users/hendrik/code/rust/asciii/src/project/mod.rs:305
 msgid "Create an Invoice"
 msgstr ""
 
-#: /Users/hendrik/code/rust/asciii/src/project/mod.rs:317
+#: /Users/hendrik/code/rust/asciii/src/project/mod.rs:313
 msgid "{}: Hungry employees!"
 msgstr ""
 
-#: /Users/hendrik/code/rust/asciii/src/project/mod.rs:318
+#: /Users/hendrik/code/rust/asciii/src/project/mod.rs:314
 msgid "Pay {}\nYou have had the money for {} days!"
 msgstr ""
 
-#: /Users/hendrik/code/rust/asciii/src/project/mod.rs:328
+#: /Users/hendrik/code/rust/asciii/src/project/mod.rs:324
 msgid "Inquire about: \"{event}\"!"
 msgstr ""
 
-#: /Users/hendrik/code/rust/asciii/src/project/mod.rs:329
+#: /Users/hendrik/code/rust/asciii/src/project/mod.rs:325
 msgid "{inum }{event:?} on {invoice_date} ({days} days ago) was already invoiced but is still not marked as payed.\nPlease check for incoming payments! You can ask {client} ({mail})."
 msgstr ""
 
-#: /Users/hendrik/code/rust/asciii/src/project/mod.rs:339
+#: /Users/hendrik/code/rust/asciii/src/project/mod.rs:335
 msgid "{rnum}: payment is {weeks} weeks late: \"{event}\""
 msgstr ""
 
-#: /Users/hendrik/code/rust/asciii/src/project/mod.rs:351
+#: /Users/hendrik/code/rust/asciii/src/project/mod.rs:347
 msgid "Archive {}"
 msgstr ""
 
-#: /Users/hendrik/code/rust/asciii/src/project/mod.rs:352
+#: /Users/hendrik/code/rust/asciii/src/project/mod.rs:348
 msgid "{:?} has been finished for {} days, get rid of it!"
 msgstr ""
 

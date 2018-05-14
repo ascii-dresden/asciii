@@ -90,12 +90,13 @@ pretty_assertions = "0.5"
 
 [features]
 default = ["cli", "document_export", "git_statuses", "serialization", "deserialization"]
+full_tool = ["cli", "document_export", "git_statuses", "serialization", "deserialization", "localize", "version_string", "shell"]
 document_export = ["handlebars", "serialization"]
 serde_base = ["serde", "serde_derive"]
 serialization = ["serde_base", "serde_json"]
+deserialization = ["serde_base","serde_yaml", "ordered-float", "num-traits"]
 server = ["rocket", "rocket_codegen", "rocket_contrib", "rocket_cors", "openssl-sys", "openssl-probe",
 "serialization" ]
-deserialization = ["serde_base","serde_yaml", "ordered-float", "num-traits"]
 git_statuses = ["git2"]
 shell = ["rustyline"]
 version_string = []

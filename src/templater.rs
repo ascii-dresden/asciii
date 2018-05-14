@@ -2,8 +2,8 @@
 //!
 //! Replaces `##KEYWORDS##` in Strings.
 use std::fmt;
-use std::io::{self, Read};
-use std::fs::File;
+use std::io;
+use std::fs;
 use std::path::Path;
 use std::error::Error;
 use std::collections::HashMap;
@@ -111,13 +111,8 @@ impl Templater{
         }
     }
 
-    pub fn from_file(path:&Path) -> Result<Templater, io::Error> {
-        let template = File::open(&path)
-            .and_then(|mut file| {
-                let mut content = String::new();
-                file.read_to_string(&mut content).map(|_| content)
-            })?;
-
+    pub fn from_file(path: &Path) -> Result<Templater, io::Error> {
+        let template = fs::read_to_string(&path)?;
         Ok(Templater::new(&template))
     }
 
