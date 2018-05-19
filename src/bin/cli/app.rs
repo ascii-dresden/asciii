@@ -272,6 +272,7 @@ pub fn with_cli<F> (app_handler:F) where F: Fn(App) {
                         )
 
             .subcommand(SubCommand::with_name("meta")
+                .settings(&[AppSettings::SubcommandRequiredElseHelp])
                 .subcommand(SubCommand::with_name("edit")
                         .about(lformat!("Edit the meta data store").as_ref())
 

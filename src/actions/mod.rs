@@ -4,10 +4,11 @@
 use chrono::prelude::*;
 use bill::Currency;
 use icalendar::Calendar;
+#[cfg(feature = "meta")]
 use toml;
 
 use std::fmt::Write;
-use std::fs;
+#[cfg(feature = "meta")] use std::fs;
 
 use std::path::PathBuf;
 use std::collections::HashMap;
@@ -226,13 +227,17 @@ pub fn clone_remote(url: &str, to: &str) -> Result<()> {
     Ok(())
 }
 
-#[derive(Debug, Serialize, Deserialize)]
 /// Shared extra information stored in the repo
+#[cfg_attr(feature = "meta", derive(Serialize))]
+#[cfg_attr(feature = "meta", derive(Deserialize))]
+#[derive(Debug)]
 pub struct MetaStore {
     pub api: ApiKeys
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[cfg_attr(feature = "meta", derive(Serialize))]
+#[cfg_attr(feature = "meta", derive(Deserialize))]
+#[derive(Debug)]
 /// ApiKeys store
 pub struct ApiKeys {
     pub keys: Vec<String>,
@@ -241,6 +246,7 @@ pub struct ApiKeys {
 
 
 /// Parses meta store
+#[cfg(feature = "meta")]
 pub fn parse_meta() -> Result<MetaStore> {
     let path = storage::setup::<Project>()?.get_extra_file("meta.toml")?;
     let file_content = fs::read_to_string(&path)?;
@@ -250,6 +256,7 @@ pub fn parse_meta() -> Result<MetaStore> {
 }
 
 /// get ApiKeys for server
+#[cfg(feature = "meta")]
 pub fn get_api_keys() -> Result<ApiKeys> {
     Ok(parse_meta()?.api)
 }

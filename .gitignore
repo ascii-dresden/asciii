@@ -31,3 +31,4 @@ _asciii.ps1
 src/localize_macros_static.rs
 *.rustfmt
 .idea/
+static/*

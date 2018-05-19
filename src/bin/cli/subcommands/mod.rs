@@ -579,7 +579,7 @@ pub fn dues(matches: &ArgMatches) -> Result<()> {
 }
 
 // pub fn open_path(matches:&ArgMatches){path(matches, |path| {open::that(path).unwrap();})}
-pub fn open_path(m: &ArgMatches) -> Result<()> {
+pub fn open_path(m: &ArgMatches) -> Result<()> { // FIXME:
     if m.is_present("search_term") {
         // let bill_type = infer_bill_type(m);
         // let template_name = "document";
