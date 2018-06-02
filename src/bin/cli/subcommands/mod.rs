@@ -241,6 +241,13 @@ fn edit_projects(dir: StorageDir, search_terms: &[&str], editor: Option<&str>) -
 }
 
 /// Command META
+#[cfg(not(feature = "meta"))]
+pub fn meta(_matches: &ArgMatches) -> Result<()> {
+    bail!("Meta functionality not built-in with this release!");
+}
+
+/// Command META
+#[cfg(feature = "meta")]
 pub fn meta(matches: &ArgMatches) -> Result<()> {
     let storage = setup::<Project>()?;
     trace!("meta --> {:#?}", matches);
