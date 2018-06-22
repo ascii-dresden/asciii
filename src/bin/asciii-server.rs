@@ -19,14 +19,10 @@ extern crate openssl_probe;
 extern crate rocket_cors;
 
 use rocket::response::NamedFile;
-use itertools::Itertools;
 
 use asciii::actions;
-use asciii::project::Project;
-use asciii::storage::{self, ProjectList, Storage, StorageDir, Storable};
-use linked_hash_map::LinkedHashMap;
+use asciii::storage::StorageDir;
 
-use std::error::Error;
 use std::path::{Path, PathBuf};
 use std::sync::Mutex;
 use std::sync::mpsc::{sync_channel, SyncSender};
@@ -35,44 +31,7 @@ use std::thread;
 use rocket::http::Method;
 use rocket_cors::{AllowedOrigins, AllowedHeaders};
 
-pub struct ProjectLoader {
-    storage: Storage<Project>,
-    years: Vec<i32>,
-    projects_all: ProjectList<Project>,
-    projects_map: LinkedHashMap<String, Project>,
-}
-
-impl<'a> ProjectLoader {
-    pub fn new() -> Self {
-
-        let storage = storage::setup().unwrap();
-        let projects_all = storage.open_projects(StorageDir::All).unwrap();
-        let projects_map = storage.open_projects(StorageDir::All)
-            .unwrap()
-            .into_iter()
-            .map(|p| (format!("{}-{}",
-                              Storable::year(&p).unwrap(),
-                              Storable::ident(&p)),
-                              p))
-            .collect();
-        let years = projects_all.iter()
-                                    .filter_map(|p: &Project| p.year())
-                                    .unique()
-                                    .collect::<Vec<_>>();
-
-        Self {
-            storage,
-            years,
-            projects_all,
-            projects_map,
-        }
-    }
-
-    pub fn update(&mut self) {
-        debug!("updating projects");
-        self.projects_all = self.storage.open_projects(StorageDir::All).unwrap();
-    }
-}
+use asciii::server::ProjectLoader;
 
 #[derive(FromForm, Debug)]
 struct Dir {
@@ -201,7 +160,7 @@ mod projects {
     }
 
     #[get("/full_projects")]
-    fn all_full(api_key: ::ApiKey) -> content::Json<String> {
+    fn all_full(_api_key: ::ApiKey) -> content::Json<String> {
         let loader = ::PROJECTS.lock().unwrap();
         let list = loader.projects_map.iter()
                          .map(|(ident, p)| {
@@ -292,7 +251,7 @@ fn validate_authorization(given_key: &ApiKey) -> bool {
     }
 }
 
-use rocket::response::content::{self, Content};
+use rocket::response::content;
 #[get("/authorization")]
 fn authorization(api_key: ApiKey) -> content::Json<String> {
     content::Json(serde_json::to_string(&api_key).unwrap())
