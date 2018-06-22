@@ -86,7 +86,6 @@ pub mod templater;
 
 pub use yaml_rust::Yaml;
 
-// TODO keep this up to date after move
 pub static DOCUMENTATION_URL: &'static str  = "https://docs.rs/asciii/";
 
 lazy_static!{
@@ -112,19 +111,4 @@ lazy_static!{
                                              env!("BUILD_DATE"),
                                              env!("PROFILE"),
                                              );
-}
-
-#[derive(Debug, Copy, Clone)]
-pub enum BillType{
-    Offer,
-    Invoice
-}
-
-impl ToString for BillType{
-    fn to_string(&self) -> String {
-        match *self{
-            BillType::Offer => "Offer",
-            BillType::Invoice => "Invoice"
-        }.to_owned()
-    }
 }

@@ -583,6 +583,11 @@ pub fn with_cli<F> (app_handler:F) where F: Fn(App) {
                              .long("force")
                             )
 
+                        .arg(Arg::with_name("pdf-only")
+                             .help(lformat!("Only create the PDF file").as_ref())
+                             .long("pdf")
+                            )
+
                         .arg(Arg::with_name("dry-run")
                              .help(lformat!("Do not create final output file").as_ref())
                              .short("d")
@@ -701,7 +706,6 @@ pub fn with_cli<F> (app_handler:F) where F: Fn(App) {
                              .long("location")
                             )
 
-                        // TODO unimplemented!()
                         .arg(Arg::with_name("init")
                              .help(lformat!("Create config file.").as_ref())
                              .short("i")

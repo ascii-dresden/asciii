@@ -1,6 +1,6 @@
 //! Utility functions that are needed all over the places.
 #![allow(dead_code)]
-use std::{io, fs};
+use std::{env, io, fs};
 use std::env::{home_dir, current_dir};
 use std::ffi::OsStr;
 use std::path::{Path, PathBuf};
@@ -8,6 +8,7 @@ use std::process::{self, Command, ExitStatus};
 use chrono::NaiveTime;
 
 use env_logger;
+use log::LevelFilter;
 
 use open;
 
@@ -18,7 +19,17 @@ pub mod yaml;
 /// After calling this function the global logger will look for the environment variable `ASCIII_LOG`.
 pub fn setup_log() {
     let log_var ="ASCIII_LOG";
-    env_logger::init_from_env(log_var);
+    let mut logger = env_logger::Builder::from_env(log_var);
+
+    if let Err(_) = env::var(log_var) {
+        logger
+            .default_format_level(true)
+            .default_format_timestamp(false)
+            .default_format_module_path(false)
+            .filter_level(LevelFilter::Info);
+    }
+
+    logger.init();
 }
 
 /// Freezes the program until for inspection

@@ -21,7 +21,6 @@ use bill::BillItem;
 use icalendar::*;
 use semver::Version;
 
-use super::BillType;
 use util::{yaml, get_valid_path};
 use storage::{Storable, StorageResult, list_path_content};
 use storage::ErrorKind as StorageErrorKind;
@@ -295,7 +294,8 @@ impl Project {
 
                 // everything's all set to close this
                 (Some(_),       Some(_),       Some(wages)) if days_since(wages) > 7 => { cal.push(self.task_close_project(wages)); },
-                _ => {warn!("weird task edgecase in {:?}:\n{:?}", self.file(), (event, invoice, payed, wages) )}
+                _ => warn!("{}", lformat!("weird task edgecase in {:?}:\n{:?}", self.file(), (event, invoice, payed, wages) ))
+
             }
         }
         cal
@@ -388,16 +388,31 @@ impl Project {
     }
 }
 
+#[derive(Debug, Copy, Clone)]
+pub enum BillType{
+    Offer,
+    Invoice
+}
+
+impl ToString for BillType{
+    fn to_string(&self) -> String {
+        match *self{
+            BillType::Offer => "Offer",
+            BillType::Invoice => "Invoice"
+        }.to_owned()
+    }
+}
+
 /// Functionality to create output files
 pub trait Exportable {
     /// Where to export to
     fn export_dir(&self)  -> PathBuf;
 
     /// Filename of the offer output file.
-    fn offer_file_name(&self, extension:&str) -> Option<String>;
+    fn offer_file_name(&self, extension: &str) -> Option<String>;
 
     /// Filename of the invoice output file. **Carefull!** uses today's date.
-    fn invoice_file_name(&self, extension:&str) -> Option<String>;
+    fn invoice_file_name(&self, extension: &str) -> Option<String>;
 
     fn output_file_exists(&self, bill_type: &BillType) -> bool {
         match *bill_type{
@@ -439,31 +454,54 @@ pub trait Exportable {
         self.invoice_file().map(|f|f.exists()).unwrap_or(false)
     }
 
-    fn write_to_path<P:AsRef<OsStr> + fmt::Debug>(content:&str, target:&P) -> Result<PathBuf> {
+    fn write_to_path<P:AsRef<OsStr> + fmt::Debug>(content: &str, target: &P) -> Result<()> {
         trace!("writing content ({}bytes) to {:?}", content.len(), target);
         let mut file = File::create(Path::new(target))?;
         file.write_all(content.as_bytes())?;
         file.sync_all()?;
-        Ok(Path::new(target).to_owned())
+        Ok(())
     }
 
-    fn write_to_file(&self, content:&str, bill_type:&BillType,ext:&str) -> Result<PathBuf> {
+    fn full_file_path(&self, bill_type: &BillType, ext: &str) -> Result<PathBuf> {
+        match *bill_type {
+            BillType::Offer   => self.full_offer_file_path(ext),
+            BillType::Invoice => self.full_invoice_file_path(ext)
+        }
+    }
+
+    fn full_offer_file_path(&self, ext: &str) -> Result<PathBuf> {
+        if let Some(target) = self.offer_file_name(ext) {
+            Ok(self.export_dir().join(&target))
+        } else {
+            bail!(ErrorKind::CantDetermineTargetFile)
+        }
+    }
+
+    fn full_invoice_file_path(&self, ext: &str) -> Result<PathBuf> {
+        if let Some(target) = self.invoice_file_name(ext) {
+            Ok(self.export_dir().join(&target))
+        } else {
+            bail!(ErrorKind::CantDetermineTargetFile)
+        }
+    }
+
+    fn write_to_file(&self, content: &str, bill_type: &BillType, ext: &str) -> Result<PathBuf> {
         match *bill_type{
             BillType::Offer   => self.write_to_offer_file(content, ext),
             BillType::Invoice => self.write_to_invoice_file(content, ext)
         }
     }
 
-    fn write_to_offer_file(&self, content:&str, ext:&str) -> Result<PathBuf> {
-        if let Some(target) = self.offer_file_name(ext){
-            Self::write_to_path(content, &self.export_dir().join(&target))
-        } else {bail!(ErrorKind::CantDetermineTargetFile)}
+    fn write_to_offer_file(&self, content: &str, ext: &str) -> Result<PathBuf> {
+        let full_path = self.full_offer_file_path(ext)?;
+        Self::write_to_path(content, &full_path)?;
+        Ok(full_path)
     }
 
-    fn write_to_invoice_file(&self, content:&str, ext:&str) -> Result<PathBuf> {
-        if let Some(target) = self.invoice_file_name(ext){
-            Self::write_to_path(content, &self.export_dir().join(&target))
-        } else {bail!(ErrorKind::CantDetermineTargetFile)}
+    fn write_to_invoice_file(&self, content: &str, ext: &str) -> Result<PathBuf> {
+        let full_path = self.full_invoice_file_path(ext)?;
+        Self::write_to_path(content, &full_path)?;
+        Ok(full_path)
     }
 }
 

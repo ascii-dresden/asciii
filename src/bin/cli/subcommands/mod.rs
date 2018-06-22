@@ -15,7 +15,7 @@ use asciii::storage::*;
 use asciii::templater::Templater;
 
 #[cfg(feature="document_export")] use asciii::document_export;
-#[cfg(feature="document_export")] use asciii::BillType;
+#[cfg(feature="document_export")] use asciii::project::BillType;
 
 // simple_rows, verbose_rows,
 // path_rows, dynamic_rows,
@@ -368,6 +368,7 @@ fn matches_to_export_config<'a>(m: &'a ArgMatches) -> Option<ExportConfig<'a>> {
             bill_type:     bill_type,
             output:        m.value_of("output").map(Path::new),
             dry_run:       m.is_present("dry-run"),
+            pdf_only:      m.is_present("pdf-only"),
             force:         m.is_present("force"),
             print_only:    m.is_present("print-only"),
             open:          m.is_present("open")

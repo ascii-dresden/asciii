@@ -1,10 +1,10 @@
 use clap::ArgMatches;
 
-use asciii::{BillType, print};
+use asciii::print;
 use asciii::storage::*;
 //use asciii::storage::error::*;
 
-use asciii::project::{spec, Project};
+use asciii::project::{spec, BillType, Project};
 use asciii::project::spec::HasEvents;
 use asciii::templater::Templater;
 

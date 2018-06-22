@@ -12,6 +12,7 @@ use handlebars::{RenderError, Handlebars, no_escape, Helper, RenderContext};
 
 use util;
 use project::{self, Project, Exportable};
+use project::BillType::{self, Invoice, Offer};
 use project::export::ExportTarget;
 use storage::error::StorageError;
 use storage::{self, Storable, StorageSelection};
@@ -53,8 +54,6 @@ fn count_helper(h: &Helper, _: &Handlebars, rc: &mut RenderContext) -> ::std::re
     Ok(())
 }
 
-use super::BillType;
-
 /// Takes a `T: Serialize` and a template path and does it's thing.
 ///
 /// Returns path to created file, potenially in a `tempdir`.
@@ -72,8 +71,8 @@ pub fn fill_template<E, P>(document: &E, bill_type: BillType, template_path: P) 
     handlebars.register_template_file("document", template_path).unwrap();
 
     let packed = match bill_type {
-        BillType::Offer => pack_data(document, false),
-        BillType::Invoice => pack_data(document, true)
+        Offer => pack_data(document, false),
+        Invoice => pack_data(document, true)
     };
 
     Ok(handlebars.render("document", &packed)
@@ -81,10 +80,10 @@ pub fn fill_template<E, P>(document: &E, bill_type: BillType, template_path: P) 
                            .replace(">", "}"))?)
 }
 
-fn file_age(path:&Path) -> Result<time::Duration> {
+fn file_age(path: &Path) -> Result<time::Duration> {
     let metadata = fs::metadata(path)?;
-    let accessed = metadata.accessed()?;
-    Ok(accessed.elapsed()?)
+    let modified = metadata.modified()?;
+    Ok(modified.elapsed()?)
 }
 
 fn output_template_path(template_name:&str) -> Result<PathBuf> {
@@ -118,6 +117,7 @@ fn project_to_doc(project: &Project, config: &ExportConfig) -> Result<Option<Pat
         output: output_path,
         dry_run,
         force,
+        pdf_only,
         print_only,
         ..
     } = config;
@@ -142,29 +142,32 @@ fn project_to_doc(project: &Project, config: &ExportConfig) -> Result<Option<Pat
     let ready_for_invoice = project.is_ready_for_invoice();
     let project_file = project.file();
 
-    use BillType::*;
     let (dyn_bill_type, outfile_tex):
         (Option<BillType>, Option<PathBuf>) =
          match (bill_type, ready_for_offer, ready_for_invoice)
     {
-        (Some(Offer),   Ok(_),  _     )  |
-        (None,          Ok(_),  Err(_))  => (Some(Offer), Some(project.dir().join(project.offer_file_name(output_ext).expect("this should have been cought by ready_for_offer()")))),
-        (Some(Invoice), _,      Ok(_))  |
-        (None,          _,      Ok(_))  => (Some(Invoice), Some(project.dir().join(project.invoice_file_name(output_ext).expect("this should have been cought by ready_for_invoice()")))),
-        (Some(Offer),   Err(e), _    )  => {error!("cannot create an offer, check out:{}",e);(None,None)},
+        (Some(Offer),   Ok(_),  _     ) |
+        (None,          Ok(_),  Err(_)) => (Some(Offer), Some(project.dir()
+                                                                    .join(project.offer_file_name(output_ext)
+                                                                                 .expect("this should have been cought by ready_for_offer()")))),
+        (Some(Invoice), _,      Ok(_) ) |
+        (None,          _,      Ok(_) ) => (Some(Invoice), Some(project.dir()
+                                                                       .join(project.invoice_file_name(output_ext)
+                                                                                    .expect("this should have been cought by ready_for_invoice()")))),
+        (Some(Offer),   Err(e), _     ) => {error!("cannot create an offer, check out:{}",e);(None,None)},
         (Some(Invoice), _,      Err(e)) => {error!("cannot create an invoice, check out:{}",e);(None,None)},
         (_,         Err(e),     Err(_)) => {error!("Neither an Offer nor an Invoice can be created from this project\n please check out {}", e);(None,None)}
     };
 
     // }
 
-    if let (Some(outfile), Some(dyn_bill)) = (outfile_tex, dyn_bill_type) {
+    if let (Some(tex_file), Some(dyn_bill)) = (outfile_tex, dyn_bill_type) {
         let exported_project: project::export::Complete = project.export();
         let filled = fill_template(&exported_project, dyn_bill, &template_path)?;
 
-        let pdffile = util::to_local_file(&outfile, convert_ext);
+        let pdffile = util::to_local_file(&tex_file, convert_ext);
 
-        let target = if let Some(output_path) = output_path {
+        let document_file = if let Some(output_path) = output_path {
             if output_path.is_dir() { // if dir, use my name and place in there
                 trace!("output_path is dir");
                 output_path.join(&pdffile)
@@ -172,27 +175,29 @@ fn project_to_doc(project: &Project, config: &ExportConfig) -> Result<Option<Pat
                 trace!("output_path is file");
                 output_path.to_owned()
             } else {
-                warn!("{}", lformat!("Can't make sense of {}", output_path.display()));
+                println!("{}", lformat!("WARNING: Can't make sense of {}", output_path.display()));
                 output_folder.join(&pdffile)
             }
         } else {
             output_folder.join(&pdffile)
         };
 
-        debug!("output target will be {:?}", target);
+        debug!("document file will be {:?}", document_file);
+
+        let defy = force || pdf_only;
 
         // ok, so apparently we can create a tex file, so lets do it
-        if !force && target.exists() && file_age(&target)? < file_age(&project_file)? {
+        if !defy && document_file.exists() && file_age(&tex_file)? < file_age(&project_file)? {
             // no wait, nothing has changed, so lets save ourselves the work
-            info!("nothing to be done, {} is younger than {}
-                         use --force if you don't agree",
-                         //use --pdf to only rebuild the pdf",
-                  target.display(),
-                  project_file.display());
-            Ok(Some(target))
+            use std::ffi::OsStr;
+            info!("Nothing to do!\n{} is younger than {}\n\nuse --force if you don't agree\nuse --pdf to only render the pdf again",
+                  tex_file.file_name().and_then(OsStr::to_str).unwrap(),
+                  project_file.file_name().and_then(OsStr::to_str).unwrap()
+                  );
+            Ok(None)
 
-        } else  if dry_run { // just testing what is possible
-            warn!("Dry run! This does not produce any output:\n * {}\n * {}", outfile.display(), pdffile.display());
+        } else if dry_run { // just testing what is possible
+            warn!("Dry run! This does not produce any output:\n * {}\n * {}", tex_file.display(), pdffile.display());
             Ok(None)
 
         } else if print_only { // for debugging or pipelining purposes
@@ -200,15 +205,24 @@ fn project_to_doc(project: &Project, config: &ExportConfig) -> Result<Option<Pat
             println!("{}", filled);
             Ok(None)
 
+
         } else { // ok, we really have to work
 
-            let mut outfile_path = project.write_to_file(&filled, &dyn_bill, output_ext)?;
-            debug!("{} vs\n        {}", outfile.display(), outfile_path.display());
+            let mut outfile_path =
+            if pdf_only {
+                info!("recreating the pdf");
+                debug!("{:?} -> {:?}", tex_file, document_file);
+                project.full_file_path(&dyn_bill, output_ext)?
+            } else {
+                let mut outfile_path = project.write_to_file(&filled, &dyn_bill, output_ext)?;
+                debug!("{} vs\n        {}", tex_file.display(), outfile_path.display());
+                outfile_path
+            };
             util::pass_to_command(Some(convert_tool), &[&outfile_path]);
 
             // clean up expected log and aux files etc
             for trash_ext in trash_exts.iter().filter_map(|x|*x) {
-                let trash_file = util::to_local_file(&outfile, trash_ext);
+                let trash_file = util::to_local_file(&tex_file, trash_ext);
                 if  trash_file.exists() {
                     fs::remove_file(&trash_file)?;
                     debug!("just deleted: {}", trash_file.display())
@@ -225,12 +239,12 @@ fn project_to_doc(project: &Project, config: &ExportConfig) -> Result<Option<Pat
                 } else {
                     outfile_path
                 };
-                debug!("now there is be a {:?} -> {:?}", file, target);
-                fs::rename(&file, &target)?;
+                debug!("now there is be a {:?} -> {:?}", file, document_file);
+                fs::rename(&file, &document_file)?;
             } else {
                 bail!(error::ErrorKind::NoPdfCreated);
             }
-            Ok(Some(target))
+            Ok(Some(document_file))
         }
 
     } else {
@@ -245,6 +259,7 @@ pub struct ExportConfig<'a> {
     pub bill_type: Option<BillType>,
     pub output: Option<&'a Path>,
     pub dry_run: bool,
+    pub pdf_only: bool,
     pub force: bool,
     pub print_only: bool,
     pub open: bool,
@@ -258,6 +273,7 @@ impl<'a> Default for ExportConfig<'a> {
             bill_type: None,
             output: None,
             dry_run: false,
+            pdf_only: false,
             force: false,
             print_only: false,
             open: true

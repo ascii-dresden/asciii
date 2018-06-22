@@ -1,7 +1,5 @@
 //! All the printing code lives here.
 
-use std::error::Error;
-
 use chrono::prelude::*;
 use prettytable::Table;
 use prettytable::row::Row;
@@ -10,9 +8,8 @@ use prettytable::format::{LineSeparator, LinePosition, FormatBuilder};
 use prettytable::{Attr, color};
 use term_size;
 
-use super::BillType;
 
-use project::{Project, Exportable};
+use project::{BillType, Project, Exportable};
 use project::spec::{IsProject, Redeemable, Invoicable, HasEmployees, HasEvents};
 use project::error::SpecResult;
 use storage::Storable;
@@ -47,7 +44,7 @@ impl<'a> Default for ListConfig<'a>{
     }
 }
 
-// TODO move `payed_to_cell` into computed_field.rs
+// TODO: move `payed_to_cell` into computed_field.rs
 fn payed_to_cell(project:&Project) -> Cell {
     let sym = ::CONFIG.get_str("currency");
 
