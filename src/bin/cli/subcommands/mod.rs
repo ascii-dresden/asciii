@@ -594,7 +594,10 @@ pub fn open_path(m: &ArgMatches) -> Result<()> { // FIXME:
         // let (search_terms, dir) = matches_to_search(m);
         unimplemented!()
     } else {
-        path(m, |path| { Ok(open::that(path).map(|_| ())?) })?;
+        path(m, |path| {
+            debug!("opening {:?}", path);
+            Ok(open::that(path).map(|_| ())?)
+            })?;
     }
     Ok(())
 }
@@ -612,7 +615,7 @@ pub fn path<F>(m: &ArgMatches, action: F) -> Result<()>
     let exe = env::current_exe()?;
 
     Ok(if m.is_present("templates") {
-        action(&PathBuf::from(path)
+        action(&util::replace_home_tilde(Path::new(path))
             .join(storage_path)
             .join(templates_path)
             )?
