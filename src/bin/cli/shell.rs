@@ -104,7 +104,7 @@ pub fn launch_shell() -> Result<()>{
                 break
             },
             Err(err) => {
-                println!("Error: {:?}", err);
+                error!("{:?}", err);
                 break
             }
         }

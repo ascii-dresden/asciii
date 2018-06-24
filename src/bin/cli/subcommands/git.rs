@@ -67,18 +67,18 @@ pub fn git_remote() -> Result<()> {
             if let Some(name) = remote_name {
 
                 if let Ok(remote) = repo.find_remote(name) {
-                    println!("{}  {} (fetch)\n{}  {} (push)",
+                    println!("{}", lformat!("{}  {} (fetch)\n{}  {} (push)",
                     remote.name().unwrap_or("no name"),
                     remote.url().unwrap_or("no url"),
                     remote.name().unwrap_or("no name"),
                     remote.pushurl().or(remote.url()).unwrap_or(""),
-                    );
+                    ));
                 } else {
-                    println!("no remote")
+                    error!("{}", lformat!("no remote"))
                 }
 
             } else {
-                println!("no remote name")
+                error!("{}", lformat!("no remote name"))
             }
         }
 

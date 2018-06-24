@@ -208,10 +208,14 @@ fn project_to_doc(project: &Project, config: &ExportConfig) -> Result<Option<Pat
 
         } else { // ok, we really have to work
 
-            let mut outfile_path =
-            if pdf_only {
+            let mut outfile_path = if pdf_only {
+                let (tex_age, project_age) = (file_age(&tex_file)?, file_age(&project_file)?);
                 info!("recreating the pdf");
                 debug!("{:?} -> {:?}", tex_file, document_file);
+                debug!("{:?} -> {:?}", tex_age, project_age);
+                if project_age < tex_age && !util::really(&lformat!("Project file is younger than pdf, continue anyway?")) {
+                    return Ok(None)
+                }
                 project.full_file_path(&dyn_bill, output_ext)?
             } else {
                 let mut outfile_path = project.write_to_file(&filled, &dyn_bill, output_ext)?;

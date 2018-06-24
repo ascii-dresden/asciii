@@ -275,7 +275,7 @@ fn main() {
 
     if let Ok(env_cors) = std::env::var("CORS_ALLOWED_ORIGINS") {
 
-        println!("Adding CORS Data {}",env_cors);
+        debug!("Adding CORS Data {}",env_cors);
         let env_allowed_origins = &[env_cors.as_str()];
         let (allowed_origins, failed_origins) = AllowedOrigins::some(env_allowed_origins);
         assert!(failed_origins.is_empty());

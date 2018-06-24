@@ -915,7 +915,7 @@ pub fn match_matches(matches: &ArgMatches) {
      _                          => Ok(())
     };
     if let Err(e) = res {
-        println!("{}", e)
+        error!("{}", e)
     }
 }
 

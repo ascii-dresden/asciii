@@ -177,7 +177,7 @@ pub fn archive_all_projects() -> Result<Vec<PathBuf>> {
     for project in storage.open_projects(StorageDir::Working)?
                         .iter()
                         .filter(|p| p.is_ready_for_archive().is_ok()) {
-        println!(" we could get rid of: {}", project.name().unwrap_or(""));
+        info!("{}", lformat!("we could get rid of: {}", project.name().unwrap_or("")));
         moved_files.push(project.dir());
         moved_files.append(&mut storage.archive_project(&project, project.year().unwrap())?);
     }
