@@ -714,7 +714,7 @@ impl<L:Storable> Storage<L> {
             },
             StorageDir::All           => {
                 let mut all:Vec<PathBuf> = Vec::new();
-                for year in self.list_years()?{
+                for year in self.list_years()? {
                     all.append(&mut list_path_content(&self.archive_dir().join(year.to_string()))?);
                 }
                 all.append(&mut list_path_content(&self.working_dir())?);
@@ -776,7 +776,15 @@ impl<L:Storable> Storage<L> {
     }
 
     fn open_paths(&self, paths: &[PathBuf]) -> ProjectList<L> {
+        trace!("open_paths({:?})", paths);
         let mut projects = paths.par_iter()
+            .filter(|path|
+                if let Ok(meta) = path.metadata() {
+                    meta.is_dir()
+                } else {
+                    false
+                }
+            )
             .filter_map(|path| Self::open_project(path).ok())
             .collect::<Vec<L>>();
 
