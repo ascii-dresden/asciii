@@ -6,12 +6,10 @@ use std::ops::{Deref, DerefMut};
 
 use super::{Storable, Year};
 
-// TODO turn back on as soon as this is a feature
-//pub type ProjectsByYear<P: Storable + Sized> = HashMap<Year, ProjectList<P>>;
 pub type ProjectsByYear<P> = LinkedHashMap<Year, ProjectList<P>>;
 
-#[derive(Debug)]
 /// Container keeping all opened projects.
+#[derive(Debug)]
 pub struct Projects<P: Storable + Sized> {
     /// working directory
     pub working: ProjectList<P>,

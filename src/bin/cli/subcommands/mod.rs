@@ -10,6 +10,8 @@ use clap::ArgMatches;
 use chrono::prelude::*;
 
 use asciii::{self, CONFIG, config, util, actions};
+use asciii::project::Exportable;
+
 use asciii::project::Project;
 use asciii::storage::*;
 use asciii::templater::Templater;
@@ -613,8 +615,35 @@ pub fn path<F>(m: &ArgMatches, action: F) -> Result<()>
         let selection = matches_to_selection(m);
         let projects = storage.open_projects(&selection)?;
         debug!("opening project folder {:?} -> {:#?}", selection, projects);
+
         for project in projects.iter() {
-            action(&project.dir())?;
+            if m.is_present("offer") {
+                debug!("offer file for {:?}", project.offer_file());
+
+                if let Some(offer_file) = &project.offer_file() {
+                    if offer_file.exists() {
+                        action(&offer_file)?;
+                    } else {
+                        warn!("{}", lformat!("{} does not exist", offer_file.display()));
+                    }
+                }
+
+            } else if m.is_present("invoice") {
+                debug!("invoice file for {:?}", project.invoice_file());
+                if let Some(invoice_file) = &project.invoice_file() {
+                    if invoice_file.exists() {
+                        action(&invoice_file)?;
+                    } else {
+                        warn!("{}", lformat!("{} does not exist", invoice_file.display()));
+                    }
+                }
+
+
+
+            } else {
+                debug!("executing action file for {:?}", project.dir());
+                action(&project.dir())?;
+            }
         }
     }
     else if m.is_present("templates") {
