@@ -587,22 +587,15 @@ pub fn dues(matches: &ArgMatches) -> Result<()> {
 }
 
 // pub fn open_path(matches:&ArgMatches){path(matches, |path| {open::that(path).unwrap();})}
-pub fn open_path(m: &ArgMatches) -> Result<()> { // FIXME:
-    if m.is_present("search_term") {
-        // let bill_type = infer_bill_type(m);
-        // let template_name = "document";
-        // let (search_terms, dir) = matches_to_search(m);
-        unimplemented!()
-    } else {
-        path(m, |path| {
-            debug!("opening {:?}", path);
-            Ok(open::that(path).map(|_| ())?)
-            })?;
-    }
+pub fn open_path(m: &ArgMatches) -> Result<()> {
+    path(m, |path| {
+        debug!("opening {:?}", path);
+        Ok(open::that(path).map(|_| ())?)
+    })?;
     Ok(())
 }
 
-// TODO return result!
+/// Command PATH
 pub fn path<F>(m: &ArgMatches, action: F) -> Result<()>
     where F: Fn(&Path) -> Result<()>
 {
@@ -614,7 +607,17 @@ pub fn path<F>(m: &ArgMatches, action: F) -> Result<()>
 
     let exe = env::current_exe()?;
 
-    Ok(if m.is_present("templates") {
+    Ok(
+    if m.is_present("search_term") {
+        let storage = setup::<Project>()?;
+        let selection = matches_to_selection(m);
+        let projects = storage.open_projects(&selection)?;
+        debug!("opening project folder {:?} -> {:#?}", selection, projects);
+        for project in projects.iter() {
+            action(&project.dir())?;
+        }
+    }
+    else if m.is_present("templates") {
         action(&util::replace_home_tilde(Path::new(path))
             .join(storage_path)
             .join(templates_path)
