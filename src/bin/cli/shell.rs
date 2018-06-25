@@ -76,7 +76,11 @@ pub fn launch_shell() -> Result<()>{
                 rl.add_history_entry(line.as_ref());
 
                 if exit_cmds.contains(&line.trim()){
-                    break;
+                    break
+                }
+
+                if line.trim().len() == 0 {
+                    continue
                 }
 
                 // this operators are not allowed
