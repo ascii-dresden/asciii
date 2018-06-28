@@ -1,4 +1,4 @@
-****# asciii
+# asciii
 
 [![travis](https://img.shields.io/travis/ascii-dresden/asciii.svg)](https://travis-ci.org/ascii-dresden/asciii/)
 [![license](https://img.shields.io/crates/l/asciii.svg)](https://crates.io/crates/asciii/)
