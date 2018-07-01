@@ -2,8 +2,8 @@
 //!
 //!
 
-// #![feature(external_doc)]
-// #![doc(include = "../manual.md")]
+#![cfg_attr(feature = "manual", feature(external_doc))]
+#![cfg_attr(feature = "manual", doc(include = "../manual.md"))]
 
 #![warn(//missing_docs,
         //missing_copy_implementations,

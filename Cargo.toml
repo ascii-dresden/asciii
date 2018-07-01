@@ -103,6 +103,7 @@ version_string = []
 localize = []
 cli= []
 nightly = []
+manual = []
 
 [profile.release]
 lto = true
