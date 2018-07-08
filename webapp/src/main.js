@@ -16,8 +16,8 @@ getYears().then(years => app.set({ years }));
 
 getProjectsWorkingDir()
 	.then(projects => app.set({
+		selectedYear: "working",
 		projects,
-		selectedYear: "working directory"
 	}));
 
 export default app;

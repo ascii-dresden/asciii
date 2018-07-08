@@ -21,14 +21,17 @@
 
     export default {
         components: { ProjectList, Years, ProjectView },
+        onstate(diff) {
+            console.dir(diff);
+        },
         methods: {
-            selectYear(year) {
-                if (year === 'working') {
-                    getProjectsWorkingDir()
-                        .then(projects => this.set({projects, selectedYear: year}));
+            async selectYear(selectedYear) {
+                if (selectedYear === 'working') {
+                    this.set({ selectedYear });
+                    this.set({ projects: await getProjectsWorkingDir() });
                 } else {
-                    getProjectsByYear(year)
-                        .then(projects => this.set({projects, selectedYear: year}));
+                    this.set({ selectedYear });
+                    this.set({ projects: await getProjectsByYear(selectedYear) });
                 }
             },
 

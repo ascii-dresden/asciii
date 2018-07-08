@@ -111,4 +111,17 @@ lazy_static!{
                                              env!("BUILD_DATE"),
                                              env!("PROFILE"),
                                              );
+
+    /// Human readable, no semantic versioning.
+    pub static ref VERSION_JSON: String = format!(r#"{{
+        "version": "{version}",
+        "commit": "{commit}",
+        "built": "{built}",
+        "profile": "{profile}"
+        }}"#,
+        version = env!("CARGO_PKG_VERSION"),
+        commit = include_str!("../.most_recent_commit"),
+        built = env!("BUILD_DATE"),
+        profile = env!("PROFILE"),
+    );
 }

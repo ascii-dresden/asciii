@@ -1,26 +1,57 @@
+<style>
+    #flex {
+        display: flex;
+        flex-wrap: wrap
+    }
+    .bills {
+        display: flex;
+        flex-wrap: wrap;
+    }
+</style>
+
+<hr/>
+
 <h2>{project.event.name}</h2>
-{project.client.full_name}
 
-<h3>offer</h3>
+<span id="flex">
+    <address>
+        {project.client.full_name}
+        {#if project.client.email}
+        (<a href="mailto:{project.client.email} ">✉️ {project.client.email}</a>)
+        {/if}
+        <pre>{project.client.address}</pre>
+        {#if project.invoice.official}
+        <strong>{project.invoice.official}</strong>
+        {/if}
+    </address>
 
-<ul>
-    {#each project.bills.offer as {name,price,amount,cost}}
-    <li>{amount}x {name} ({price}) {cost}</li>
-    {/each}
-</ul>
-{project.offer.gross_total}
+    <table>
+        <tr>
+            <th> Angebot </th> <th> Rechnung</th>
+        </tr>
+        <tr>
+            <td> {project.offer.number} </td> <td> {project.invoice.number_long} </td>
+        </tr>
+    </table>
+</span>
 
-<h3>invoice</h3>
-
-<ul>
-    {#each project.bills.invoice as {name,price,amount,cost}}
-    <li>{amount}x {name} ({price}) {cost}</li>
-    {/each}
-</ul>
-{project.invoice.gross_total}
+<div class="bills">
+    <BillTable
+        name="offer"
+        date={project.offer.date}
+        bill={project.bills.offer}
+        desc={project.offer} />
+    <BillTable
+        name="invoice"
+        date={project.invoice.date}
+        bill={project.bills.invoice}
+        desc={project.invoice} />
+</div>
 
 <script>
+    import BillTable from './Bill.html';
     export default {
+        components: { BillTable },
         onstate({ current: { project } }) {
             console.dir({ project })
         }

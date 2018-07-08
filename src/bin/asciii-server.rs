@@ -60,7 +60,7 @@ lazy_static! {
         let (tx, rx) = sync_channel::<()>(1);
 
         thread::spawn(move || {
-            println!("background thread");
+            debug!("background thread");
             let mut count = 0;
             loop {
                 rx.recv().unwrap();
@@ -135,6 +135,7 @@ mod projects {
     fn years() -> content::Json<String> {
         ::CHANNEL.send(()).unwrap();
         let loader = ::PROJECTS.lock().unwrap();
+
         content::Json(serde_json::to_string(&loader.state.years).unwrap())
     }
 
@@ -148,13 +149,13 @@ mod projects {
                          })
                          .collect::<LinkedHashMap<_,_>>();
 
-        content::Json(serde_json::to_string(&list).unwrap())
+        ::CHANNEL.send(()).unwrap();
 
+        content::Json(serde_json::to_string(&list).unwrap())
     }
 
     #[get("/full_projects/year/<year>")]
     fn full_by_year(year: Year) -> content::Json<String> {
-        ::CHANNEL.send(()).unwrap();
         let loader = ::PROJECTS.lock().unwrap();
         let exported = loader.state.mapped.iter()
             .filter(|&(_, p)| if let Some(y) = Storable::year(p) {y == year } else {false})
@@ -164,17 +165,20 @@ mod projects {
             })
             .collect::<LinkedHashMap<String, Complete>>();
 
+        ::CHANNEL.send(()).unwrap();
+
         content::Json(serde_json::to_string(&exported).unwrap())
     }
 
     #[get("/projects/year/<year>")]
     fn by_year(year: Year) -> content::Json<String> {
-        ::CHANNEL.send(()).unwrap();
         let loader = ::PROJECTS.lock().unwrap();
         let exported = loader.state.mapped.iter()
             .filter(|&(_, p)| if let Some(y) = Storable::year(p) {y == year } else {false})
             .map(|(ident, _)| ident.as_str())
             .collect::<Vec<&str>>();
+
+        ::CHANNEL.send(()).unwrap();
 
         content::Json(serde_json::to_string(&exported).unwrap())
     }
@@ -189,6 +193,8 @@ mod projects {
                          })
                          .collect::<LinkedHashMap<_,_>>();
 
+        ::CHANNEL.send(()).unwrap();
+
         content::Json(serde_json::to_string(&list).unwrap())
     }
 
@@ -198,6 +204,8 @@ mod projects {
         let list = loader.state.mapped.iter()
                          .map(|(ident, _)| ident)
                          .collect::<Vec<_>>();
+
+        ::CHANNEL.send(()).unwrap();
 
         content::Json(serde_json::to_string(&list).unwrap())
     }
@@ -211,6 +219,8 @@ mod projects {
                              (ident, exported)
                          })
                          .collect::<LinkedHashMap<_,_>>();
+
+        ::CHANNEL.send(()).unwrap();
 
          list.get(&name)
              .map(|p| content::Json(serde_json::to_string( p).unwrap()))
@@ -277,6 +287,12 @@ fn authorization(api_key: ApiKey) -> content::Json<String> {
     content::Json(serde_json::to_string(&api_key).unwrap())
 }
 
+#[get("/version")]
+fn version() -> content::Json<&'static str> {
+    let version: &str = asciii::VERSION_JSON.as_ref();
+    content::Json(version)
+}
+
 fn main() {
     openssl_probe::init_ssl_cert_env_vars();
 
@@ -292,6 +308,7 @@ fn main() {
                                projects::all_full,
                                projects::by_name,
                                authorization,
+                               version
         ]);
 
     if let Ok(env_cors) = std::env::var("CORS_ALLOWED_ORIGINS") {

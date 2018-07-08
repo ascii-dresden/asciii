@@ -159,9 +159,11 @@ pub fn spec() -> Result<()> {
 pub fn delete_project_confirmation(dir: StorageDir, search_terms:&[&str]) -> Result<()> {
     let storage = storage::setup_with_git::<Project>()?;
     for project in storage.search_projects_any(dir, search_terms)? {
-        storage.delete_project_if(&project,
-                || util::really(&lformat!("really?"))
-                )?
+        storage.delete_project_if(&project, || {
+                    let file = project.file();
+                    let desc = project.name().or(file.to_str()).unwrap();
+                    util::really( &lformat!("do you realy want to delete {}?", desc))
+                })?
     }
     Ok(())
 }

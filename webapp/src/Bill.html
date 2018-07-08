@@ -1,0 +1,51 @@
+<style>
+    h3>span { font-size: 80%; }
+    .bill { min-width: 25em }
+    td.cost { text-align: right; }
+    td.number { text-align: right; }
+    td.tax {
+        text-align: right;
+        font-weight: bold;
+    }
+    td.total {
+        text-align: right;
+        border-top: 1px solid black;
+    }
+</style>
+
+<div class="bill">
+
+{#if name}
+<h3>
+    {name} {#if date} <span>{date}</span>{/if}
+</h3>
+{/if}
+
+<table>
+    {#each bill as {name, price, amount, cost, price}, index}
+    <tr>
+        <td class="number">{index + 1}</td>
+        <td>{name} ({price})</td>
+        <td class="number">{amount}x</td>
+        <td class="cost">{price}</td>
+        <td class="cost">{cost}</td>
+    </tr>
+    {/each}
+
+    {#each desc.sums as {gross_sum, tax_sum, tax_value}}
+    <tr>
+        <td class="number" colspan="4"></td>
+        <td class="number" colspan="1">{desc.gross_total}</td>
+    </tr>
+    <tr>
+        <td class="tax" colspan="4">{tax_value}%</td>
+        <td class="number" colspan="1">{tax_sum}</td>
+    </tr>
+    {/each}
+    <tr>
+        <td class="number" colspan="4"></td>
+        <td class="total">{desc.net_total}</td>
+    </tr>
+</table>
+
+</div>
