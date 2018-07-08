@@ -1,0 +1,40 @@
+<h1>asciii web</h1>
+
+<Years years={years} on:select="selectYear(event.year)"/>
+
+<h2> {#if selectedYear} {selectedYear} {/if} </h2>
+
+<ProjectList projects={projects} on:select="selectProject(event.project)"/>
+
+{#if selectedProject}
+    <ProjectView project={selectedProject}/>
+{/if}
+
+<style>
+</style>
+
+<script>
+    import ProjectList from './ProjectList.html';
+    import ProjectView from './ProjectView.html';
+    import Years from './Years.html';
+    import { getProjectsByYear, getProjectsWorkingDir } from './getters';
+
+    export default {
+        components: { ProjectList, Years, ProjectView },
+        methods: {
+            selectYear(year) {
+                if (year === 'working') {
+                    getProjectsWorkingDir()
+                        .then(projects => this.set({projects, selectedYear: year}));
+                } else {
+                    getProjectsByYear(year)
+                        .then(projects => this.set({projects, selectedYear: year}));
+                }
+            },
+
+            selectProject(selectedProject) {
+                this.set({selectedProject})
+            }
+        }
+    };
+</script>

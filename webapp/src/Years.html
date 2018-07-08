@@ -1,0 +1,12 @@
+<style>
+</style>
+
+<button on:click="fire('select', {year: 'working'})"> working dir</button>
+{#each years as year}
+<button on:click="fire('select', {year})"> {year} </button>
+{/each}
+
+<script>
+    export default {
+    };
+</script>

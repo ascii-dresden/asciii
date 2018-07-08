@@ -1,0 +1,28 @@
+<h2>{project.event.name}</h2>
+{project.client.full_name}
+
+<h3>offer</h3>
+
+<ul>
+    {#each project.bills.offer as {name,price,amount,cost}}
+    <li>{amount}x {name} ({price}) {cost}</li>
+    {/each}
+</ul>
+{project.offer.gross_total}
+
+<h3>invoice</h3>
+
+<ul>
+    {#each project.bills.invoice as {name,price,amount,cost}}
+    <li>{amount}x {name} ({price}) {cost}</li>
+    {/each}
+</ul>
+{project.invoice.gross_total}
+
+<script>
+    export default {
+        onstate({ current: { project } }) {
+            console.dir({ project })
+        }
+    }
+</script>

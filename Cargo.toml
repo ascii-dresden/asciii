@@ -23,7 +23,8 @@ include = [
     "lang/*",
     "src/default_config.yml",
     "src/**/*.rs",
-    "tests/**/*.rs"
+    "tests/**/*.rs",
+    "webapp/**/*"
 ]
 exclude = [
     "*.pdf",

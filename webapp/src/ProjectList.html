@@ -1,0 +1,36 @@
+<style>
+    td.checkbox {
+        text-align: center;
+        width: 20px;
+        overflow: hidden;
+        display: inline-block;
+        white-space: nowrap;
+    }
+</style>
+
+<table>
+    {#each projects as [key, project], index}
+    <tr on:click="fire('select', {project})">
+        <td>{index + 1}</td>
+        <td>{project.event.name}</td>
+        <td>{project.event.manager}</td>
+        <td>{project.invoice.number || ''}</td>
+        <td>{project.event.date}</td>
+        <td class="checkbox">{project.checks.ready_for_offer ? '✔' : '𝘅'}</td>
+        <td class="checkbox">{project.checks.ready_for_invoice ? '✔' : '𝘅'}</td>
+        <td class="checkbox">{project.checks.ready_for_archive ? '✔' : '𝘅'}</td>
+        <td class="checkbox">{project.checks.payed_by_customer ? '✔' : '𝘅'}</td>
+    </tr>
+    {/each}
+</table>
+
+<script>
+    export default {
+        methods: {
+            select(project) {
+                console.dir({ project });
+                this.fire(selectProject, project);
+            }
+        }
+    };
+</script>
