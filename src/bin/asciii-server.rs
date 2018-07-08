@@ -23,6 +23,7 @@ use rocket::response::NamedFile;
 use asciii::actions;
 use asciii::storage::StorageDir;
 
+use std::io;
 use std::path::{Path, PathBuf};
 use std::sync::Mutex;
 use std::sync::mpsc::{sync_channel, SyncSender};
@@ -75,9 +76,14 @@ lazy_static! {
     };
 }
 
+#[get("/")]
+fn index() -> io::Result<NamedFile> {
+    NamedFile::open("webapp/public/index.html")
+}
+
 #[get("/<file..>", rank=5)]
 fn static_files(file: PathBuf) -> Option<NamedFile> {
-    NamedFile::open(Path::new("static/").join(file)).ok()
+    NamedFile::open(Path::new("webapp/public/").join(file)).ok()
 }
 
 mod calendar {
@@ -129,14 +135,28 @@ mod projects {
     fn years() -> content::Json<String> {
         ::CHANNEL.send(()).unwrap();
         let loader = ::PROJECTS.lock().unwrap();
-        content::Json(serde_json::to_string(&loader.years).unwrap())
+        content::Json(serde_json::to_string(&loader.state.years).unwrap())
+    }
+
+    #[get("/projects/workingdir")]
+    fn working_dir() -> content::Json<String> {
+        let loader = ::PROJECTS.lock().unwrap();
+        let list = loader.state.working.iter()
+                         .map(|(ident, p)| {
+                             let exported: Complete = p.export();
+                             (ident, exported)
+                         })
+                         .collect::<LinkedHashMap<_,_>>();
+
+        content::Json(serde_json::to_string(&list).unwrap())
+
     }
 
     #[get("/full_projects/year/<year>")]
     fn full_by_year(year: Year) -> content::Json<String> {
         ::CHANNEL.send(()).unwrap();
         let loader = ::PROJECTS.lock().unwrap();
-        let exported = loader.projects_map.iter()
+        let exported = loader.state.mapped.iter()
             .filter(|&(_, p)| if let Some(y) = Storable::year(p) {y == year } else {false})
             .map(|(ident, p)| {
                 let exported: Complete = p.export();
@@ -151,7 +171,7 @@ mod projects {
     fn by_year(year: Year) -> content::Json<String> {
         ::CHANNEL.send(()).unwrap();
         let loader = ::PROJECTS.lock().unwrap();
-        let exported = loader.projects_map.iter()
+        let exported = loader.state.mapped.iter()
             .filter(|&(_, p)| if let Some(y) = Storable::year(p) {y == year } else {false})
             .map(|(ident, _)| ident.as_str())
             .collect::<Vec<&str>>();
@@ -162,7 +182,7 @@ mod projects {
     #[get("/full_projects")]
     fn all_full(_api_key: ::ApiKey) -> content::Json<String> {
         let loader = ::PROJECTS.lock().unwrap();
-        let list = loader.projects_map.iter()
+        let list = loader.state.mapped.iter()
                          .map(|(ident, p)| {
                              let exported: Complete = p.export();
                              (ident, exported)
@@ -175,7 +195,7 @@ mod projects {
     #[get("/projects")]
     fn all_names() -> content::Json<String> {
         let loader = ::PROJECTS.lock().unwrap();
-        let list = loader.projects_map.iter()
+        let list = loader.state.mapped.iter()
                          .map(|(ident, _)| ident)
                          .collect::<Vec<_>>();
 
@@ -185,7 +205,7 @@ mod projects {
     #[get("/projects/<name>")]
     fn by_name(name: String) -> Option<content::Json<String>> {
         let loader = ::PROJECTS.lock().unwrap();
-        let list = loader.projects_map.iter()
+        let list = loader.state.mapped.iter()
                          .map(|(ident, p)| {
                              let exported: Complete = p.export();
                              (ident, exported)
@@ -261,12 +281,13 @@ fn main() {
     openssl_probe::init_ssl_cert_env_vars();
 
     let server = rocket::ignite()
-        .mount("/", routes![static_files])
+        .mount("/", routes![index, static_files])
         .mount("/cal/plain", routes![calendar::cal_plain, calendar::cal_plain_params])
         .mount("/cal", routes![calendar::cal, calendar::cal_params])
         .mount("/api", routes![projects::years,
                                projects::by_year,
                                projects::full_by_year,
+                               projects::working_dir,
                                projects::all_names,
                                projects::all_full,
                                projects::by_name,
