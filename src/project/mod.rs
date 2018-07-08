@@ -23,6 +23,7 @@ use semver::Version;
 
 use util::{yaml, get_valid_path};
 use storage::{Storable, StorageResult, list_path_content};
+use storage::StorableAndTempDir;
 use storage::ErrorKind as StorageErrorKind;
 use storage::repo::GitStatus;
 use templater::{Templater, IsKeyword};
@@ -52,9 +53,9 @@ pub use self::computed_field::ComputedField;
 ///
 /// A project is storable, contains products, and you can create an offer or invoice from it.
 /// The main implementation is done in [`spec`](spec/index.html).
+#[derive(Clone)]
 pub struct Project {
     file_path: PathBuf,
-    _temp_dir: Option<TempDir>,
     git_status: Option<GitStatus>,
     file_content: String,
     yaml: Yaml
@@ -70,7 +71,6 @@ impl Project {
         let file_content = fs::read_to_string(&file_path)?;
         Ok(Project {
             file_path: file_path.to_owned(),
-            _temp_dir: None,
             git_status: None,
             yaml: yaml::parse(&file_content).unwrap_or_else(|e|{
                 error!("syntax error in {}\n  {}", file_path.display(), e);
@@ -102,6 +102,8 @@ impl Project {
         buf
     }
 
+
+
     #[cfg(feature="serialization")]
     /// export to JSON
     pub fn to_json(&self) -> Result<String> {
@@ -119,7 +121,6 @@ impl Project {
     pub fn from_file_content(content: &str) -> Result<Project> {
         Ok(Project{
             file_path: PathBuf::new(),
-            _temp_dir: None,
             git_status: None,
             yaml: yaml::parse(&content).unwrap(),
             file_content: String::from(content),
@@ -263,7 +264,7 @@ impl Project {
         Some(invoice.signed_duration_since(payed))
     }
 
-    /// What I need to do
+     /// What I need to do
     ///
     /// Produces an iCal calendar from this project.
     pub fn to_tasks(&self) -> Calendar {
@@ -529,7 +530,7 @@ impl Storable for Project {
         ::CONFIG.get_to_string("extensions.project_file")
     }
 
-    fn from_template(project_name:&str,template:&Path, fill: &HashMap<&str,String>) -> StorageResult<Project> {
+    fn from_template(project_name: &str, template:&Path, fill: &HashMap<&str, String>) -> StorageResult<StorableAndTempDir<Self>> {
         let template_name = template.file_stem().unwrap().to_str().unwrap();
 
         let event_date = (Utc::today() + Duration::days(14)).format("%d.%m.%Y").to_string();
@@ -578,12 +579,16 @@ impl Storable for Project {
         };
 
         // project now lives in the temp_file
-        Ok(Project{
+        let project = Project {
             file_path: temp_file,
-            _temp_dir: Some(temp_dir),
             git_status: None,
             file_content: filled,
             yaml: yaml
+        };
+
+        Ok(StorableAndTempDir {
+            storable: project,
+            temp_dir
         })
     }
 

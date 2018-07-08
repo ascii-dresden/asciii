@@ -42,7 +42,7 @@ pub mod repo;
 pub mod error;
 pub use self::error::{StorageError, ErrorKind};
 pub mod storable;
-pub use self::storable::Storable;
+pub use self::storable::*;
 
 
 // TODO rely more on IoError, it has most of what you need
@@ -424,7 +424,7 @@ impl<L:Storable> Storage<L> {
 
     /// Takes a template file and stores it in the working directory,
     /// in a new project directory according to it's name.
-    pub fn create_project(&self, project_name:&str, template_name:&str, fill_data: &HashMap<&str, String>) -> StorageResult<L> {
+    pub fn create_project(&self, project_name: &str, template_name: &str, fill_data: &HashMap<&str, String>) -> StorageResult<L> {
         debug!("creating a project\n name: {name}\n template: {tmpl}",
                name = project_name,
                tmpl = template_name
@@ -447,7 +447,7 @@ impl<L:Storable> Storage<L> {
 
         let template_path = self.get_template_file(template_name)?;
 
-        trace!("crating project using concrete Project implementation of from_template");
+        trace!("creating project using concrete Project implementation of from_template");
         let mut project = L::from_template(&project_name, &template_path, &fill_data)?;
 
         // TODO Hand of creation entirely to Storable implementation
@@ -457,7 +457,7 @@ impl<L:Storable> Storage<L> {
         trace!("copied project file succesfully");
         project.set_file(&target_file);
 
-        Ok(project)
+        Ok(project.storable)
     }
 
     /// Moves a project folder from `/working` dir to `/archive/$year`.

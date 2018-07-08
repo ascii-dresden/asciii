@@ -2,10 +2,12 @@
 //!
 
 use std::{fs,io};
+use std::ops::{Deref, DerefMut};
 use std::path::{Path, PathBuf};
 use std::collections::HashMap;
 
 use chrono::{Date, Utc, Datelike};
+use tempdir::TempDir;
 
 use super::StorageResult;
 use super::repo::GitStatus;
@@ -16,13 +18,14 @@ pub type FolderPath = Path;
 pub type FilePathBuf = PathBuf;
 pub type FolderPathBuf = PathBuf;
 
-pub trait Storable: Send+Sync{
+pub trait Storable: Send+Sync {
+
     /// opens a projectfolder
     fn open_folder(&FolderPath) -> StorageResult<Self> where Self: Sized;
     fn open_file(&FilePath) -> StorageResult<Self> where Self: Sized;
 
     /// creates in tempfile
-    fn from_template(project_name:&str,template:&Path, data:&HashMap<&str, String>) -> StorageResult<Self> where Self: Sized;
+    fn from_template(project_name: &str, template: &Path, data: &HashMap<&str, String>) -> StorageResult<StorableAndTempDir<Self>> where Self: Sized;
 
     /// For file names
     fn ident(&self) -> String{ self.dir().file_stem().and_then(|s|s.to_str()).unwrap().to_owned() }
@@ -32,9 +35,7 @@ pub trait Storable: Send+Sync{
     fn year(&self) -> Option<i32>{ self.modified_date().map(|d|d.year()) }
 
     /// Deletes the project if the passed in closure returns `true`
-    fn delete_project_dir_if<F>(&self, confirmed:F) -> io::Result<()>
-        where F: Fn()->bool
-    {
+    fn delete_project_dir_if(&self, confirmed: impl Fn()->bool) -> io::Result<()> {
         let folder = self.dir();
         if confirmed(){
             debug!("$ rm {}", folder.display());
@@ -80,3 +81,27 @@ pub trait Storable: Send+Sync{
 
     fn is_ready_for_archive(&self) -> bool;
 }
+
+pub struct StorableAndTempDir<S: Storable> {
+    pub storable: S,
+    pub temp_dir: TempDir,
+}
+
+impl<S: Storable> Deref for StorableAndTempDir<S> {
+    type Target = S;
+    fn deref(&self) -> &S {
+        &self.storable
+    }
+}
+
+impl<S: Storable> DerefMut for StorableAndTempDir<S> {
+    fn deref_mut(&mut self) -> &mut S {
+        &mut self.storable
+    }
+}
+
+// impl<S: Storable> Into<S> for StorableAndTempDir<S> {
+//     fn into(self) -> S {
+//         self.storable
+//     }
+// }
