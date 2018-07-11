@@ -27,7 +27,8 @@ module.exports = {
 						skipIntroByDefault: true,
 						nestedTransitions: true,
 						emitCss: true,
-						hotReload: true
+						hotReload: true,
+						immutable: true
 					}
 				}
 			},

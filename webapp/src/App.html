@@ -1,4 +1,17 @@
+<style>
+    footer {
+        position:absolute;
+        bottom: 0;
+        font-size: 15px;
+        font-family: monospace
+
+    }
+
+</style>
+
+<header>
 <h1>asciii web</h1>
+</header>
 
 <Years years={years} on:select="selectYear(event.year)"/>
 
@@ -7,22 +20,29 @@
 <ProjectList projects={projects} on:select="selectProject(event.project)"/>
 
 {#if selectedProject}
-    <ProjectView project={selectedProject}/>
+<ProjectView project={selectedProject} on:close="unselectProject()"/>
 {/if}
 
-<style>
-</style>
+<footer>
+{#if versionInfo}
+    {versionInfo.version} - {versionInfo.built}
+    {versionInfo.commit} | {versionInfo.profile}
+{/if}
+</footer>
 
 <script>
     import ProjectList from './ProjectList.html';
     import ProjectView from './ProjectView.html';
     import Years from './Years.html';
+
     import { getProjectsByYear, getProjectsWorkingDir } from './getters';
+
+    let projectView;
 
     export default {
         components: { ProjectList, Years, ProjectView },
         onstate(diff) {
-            console.dir(diff);
+            // console.dir(diff);
         },
         methods: {
             async selectYear(selectedYear) {
@@ -36,7 +56,11 @@
             },
 
             selectProject(selectedProject) {
-                this.set({selectedProject})
+                this.set({ selectedProject })
+            },
+
+            unselectProject() {
+                this.set({ selectedProject: null })
             }
         }
     };

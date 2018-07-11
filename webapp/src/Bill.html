@@ -33,6 +33,7 @@
     {/each}
 
     {#each desc.sums as {gross_sum, tax_sum, tax_value}}
+    {#if tax_value > 0}
     <tr>
         <td class="number" colspan="4"></td>
         <td class="number" colspan="1">{desc.gross_total}</td>
@@ -41,6 +42,7 @@
         <td class="tax" colspan="4">{tax_value}%</td>
         <td class="number" colspan="1">{tax_sum}</td>
     </tr>
+    {/if}
     {/each}
     <tr>
         <td class="number" colspan="4"></td>

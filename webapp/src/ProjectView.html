@@ -7,13 +7,18 @@
         display: flex;
         flex-wrap: wrap;
     }
+    button.close {
+        float:right;
+    }
 </style>
 
 <hr/>
 
+
+<button class="close" on:click="fire('close')">X</button>
 <h2>{project.event.name}</h2>
 
-<span id="flex">
+<span id="flex" transition:slide>
     <address>
         {project.client.full_name}
         {#if project.client.email}
@@ -35,7 +40,7 @@
     </table>
 </span>
 
-<div class="bills">
+<div class="bills" transition:slide>
     <BillTable
         name="offer"
         date={project.offer.date}
@@ -50,10 +55,19 @@
 
 <script>
     import BillTable from './Bill.html';
+    import { slide } from 'svelte-transitions';
     export default {
         components: { BillTable },
-        onstate({ current: { project } }) {
-            console.dir({ project })
-        }
+        // onstate({ current: { project } }) {
+        //     console.dir({ project })
+        //     console.table( project.bills.offer)
+        //     console.table( project.bills.invoice)
+        // }
+        methods: {
+            closeView() {
+                this.destroy()
+            },
+        },
+        transitions: {slide}
     }
 </script>

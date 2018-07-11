@@ -1,5 +1,4 @@
 <style>
-
     #project-list {
         min-width: 40em
     }
@@ -20,9 +19,9 @@
 </style>
 
 
-<input bind:value=search /> {filteredProjects.length}
 
 <div id="projects">
+<input bind:value=search placeholder="filter"/> {filteredProjects.length}
 <table id="project-list">
     {#each filteredProjects as [key, project], index}
     <tr on:click="fire('select', {project})">
@@ -41,30 +40,38 @@
 </div>
 
 <script>
+
     export default {
         methods: {
-            select(project) {
-                console.dir({ project });
-                this.fire(selectProject, project);
-            }
         },
+
         data() {
             return {
                 search: ''
             };
         },
+
         computed: {
             filteredProjects: ({ search, projects }) => {
-                search = search.toLowerCase();
+                search = search.toLowerCase()
+                const search_in = hay => hay && hay.toLowerCase().includes(search)
+
                 return projects.filter(([, project]) => {
-                    const name = project.event.name && project.event.name.toLowerCase()
-                    const manager = project.event.manager.toLowerCase()
-                    return (
-                        name && name.includes(search)
-                        || manager.includes(search)
-                    )
+                    const {
+                        event: {name, manager},
+                        client: {full_name},
+                        invoice: {number_long, number: invoice_number},
+                    } = project;
+
+                    return search.length === 0 ||[
+                        name,
+                        manager,
+                        full_name,
+                        number_long,
+                        invoice_number
+                    ].some(search_in);
                 });
             },
-        }
+        },
     };
 </script>

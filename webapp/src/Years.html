@@ -1,12 +1,14 @@
 <style>
 </style>
 
-<button on:click="fire('select', {year: 'working'})"> working dir</button>
 {#each years as year}
-<button on:click="fire('select', {year})"> {year} </button>
+<button on:click="fire('select', {year})" transition:fade> {year} </button>
 {/each}
 
 <script>
+    import { fade } from 'svelte-transitions';
+
     export default {
+        transitions: {fade}
     };
 </script>
