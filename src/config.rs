@@ -12,8 +12,11 @@
 //#![warn(missing_debug_implementations)]
 
 
-use std::env::{self, home_dir, current_dir};
+use std::env::{self, current_dir};
 use std::path::{Path, PathBuf};
+
+use dirs::home_dir;
+
 use util::yaml::{self, Yaml, YamlError};
 
 /// Name of the configfile

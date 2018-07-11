@@ -1,11 +1,13 @@
 //! Utility functions that are needed all over the places.
 #![allow(dead_code)]
 use std::{env, io, fs};
-use std::env::{home_dir, current_dir};
+use std::env::current_dir;
 use std::ffi::OsStr;
 use std::path::{Path, PathBuf};
 use std::process::{self, Command, ExitStatus};
 use chrono::NaiveTime;
+
+use dirs::home_dir;
 
 use env_logger;
 use log::LevelFilter;
@@ -80,7 +82,7 @@ pub fn ls(path:&str){
 /// **TODO** ~ must be first character
 pub fn replace_home_tilde(p:&Path) -> PathBuf{
     let path = p.to_str().unwrap();
-    PathBuf::from( path.replace("~",home_dir().unwrap().to_str().unwrap()))
+    PathBuf::from(path.replace("~", home_dir().unwrap().to_str().unwrap()))
 }
 
 /// Opens the passed paths in the editor set int config.

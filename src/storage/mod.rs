@@ -20,9 +20,10 @@
 //!
 
 use rayon::prelude::*;
+use dirs::home_dir;
 
 use std::fs;
-use std::env::{self, home_dir, current_dir};
+use std::env::{self, current_dir};
 use std::path::{Path, PathBuf};
 use std::marker::PhantomData;
 
@@ -152,7 +153,7 @@ pub fn list_path_content(path:&Path) -> StorageResult<Vec<PathBuf>> {
 
 fn replace_home_tilde(p:&Path) -> PathBuf{
     let path = p.to_str().unwrap();
-    PathBuf::from( path.replace("~",home_dir().unwrap().to_str().unwrap()))
+    PathBuf::from( path.replace("~", home_dir().unwrap().to_str().unwrap()))
 }
 
 /// Interprets storage path from config.
