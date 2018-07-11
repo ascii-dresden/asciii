@@ -880,7 +880,19 @@ pub fn with_cli<F> (app_handler:F) where F: Fn(App) {
                        )
 
             .subcommand(SubCommand::with_name("version")
-                .about(lformat!("Prints version of this tool").as_ref())
+                .about(lformat!("Prints version information").as_ref())
+                .group(ArgGroup::with_name("flags")
+                    .args(&[ "verbose", "json" ])
+                    )
+                .arg(Arg::with_name("verbose")
+                        .help(lformat!("show also build information").as_ref())
+                        .long("verbose")
+                        .short("v")
+                    )
+                .arg(Arg::with_name("json")
+                        .help(lformat!("show verbose version as json").as_ref())
+                        .long("json")
+                    )
             )
 
             .subcommand(SubCommand::with_name("doc")
@@ -916,7 +928,7 @@ pub fn match_matches(matches: &ArgMatches) {
      ("spec",      Some(sub_m)) => subcommands::spec(sub_m),
 
      ("doc",       _          ) => subcommands::doc(),
-     ("version",   _          ) => subcommands::version(),
+     ("version",   Some(sub_m)) => subcommands::version(sub_m),
 
      ("dues",      Some(sub_m)) => subcommands::dues(sub_m),
      ("shell",     Some(sub_m)) => subcommands::shell(sub_m),

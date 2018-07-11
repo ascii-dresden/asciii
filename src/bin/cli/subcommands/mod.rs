@@ -568,8 +568,14 @@ pub fn doc() -> Result<()> {
 }
 
 /// Command VERSION
-pub fn version() -> Result<()> {
-    println!("{}", *asciii::VERSION);
+pub fn version(matches: &ArgMatches) -> Result<()> {
+    if matches.is_present("verbose") {
+        println!("{}", *asciii::VERSION_VERBOSE);
+    } else if matches.is_present("json") {
+        println!("{}", *asciii::VERSION_JSON);
+    } else {
+        println!("{}", *asciii::VERSION);
+    }
     Ok(())
 }
 

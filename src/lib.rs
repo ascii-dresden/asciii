@@ -96,16 +96,21 @@ lazy_static!{
     pub static ref DOCHINT: String = lformat!("Documentation at: {}", DOCUMENTATION_URL);
 }
 
-#[cfg(not(feature="version_string"))]
-lazy_static!{
-    /// Human readable, no semantic versioning.
+lazy_static! {
     pub static ref VERSION: &'static str = env!("CARGO_PKG_VERSION");
 }
 
-#[cfg(feature="version_string")]
-lazy_static!{
+#[cfg(not(feature="version_string"))]
+lazy_static! {
     /// Human readable, no semantic versioning.
-    pub static ref VERSION: String = format!("{} - {} ({}, {})",
+    pub static ref VERSION_VERBOSE: &'static str = env!("CARGO_PKG_VERSION");
+    pub static ref VERSION_JSON: String = format!(r#"{{"version": "{}"}}"#, env!("CARGO_PKG_VERSION"));
+}
+
+#[cfg(feature="version_string")]
+lazy_static! {
+    /// Human readable, no semantic versioning.
+    pub static ref VERSION_VERBOSE: String = format!("{} - {} ({}, {})",
                                              env!("CARGO_PKG_VERSION"),
                                              include_str!("../.most_recent_commit"),
                                              env!("BUILD_DATE"),
@@ -113,12 +118,8 @@ lazy_static!{
                                              );
 
     /// Human readable, no semantic versioning.
-    pub static ref VERSION_JSON: String = format!(r#"{{
-        "version": "{version}",
-        "commit": "{commit}",
-        "built": "{built}",
-        "profile": "{profile}"
-        }}"#,
+    pub static ref VERSION_JSON: String = format!(
+        r#"{{ "version": "{version}", "commit": "{commit}", "built": "{built}", "profile": "{profile}" }}"#,
         version = env!("CARGO_PKG_VERSION"),
         commit = include_str!("../.most_recent_commit"),
         built = env!("BUILD_DATE"),
