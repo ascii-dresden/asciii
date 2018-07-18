@@ -1,0 +1,5 @@
+[book]
+authors = ["Hendrik Sollich"]
+multilingual = true
+src = "src"
+title = "asciii Handbook"
