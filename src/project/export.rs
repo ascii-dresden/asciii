@@ -258,6 +258,7 @@ pub struct Complete {
     invoice: Invoice,
     bills: Bills,
     checks: Checks,
+    errors: Errors,
     extras: Extras,
 }
 
@@ -272,6 +273,7 @@ impl ExportTarget<Complete> for Project {
             invoice: self.export(),
             bills: self.export(),
             checks: self.export(),
+            errors: self.export(),
             extras: self.export(),
         }
     }
@@ -297,6 +299,26 @@ impl ExportTarget<Checks> for Project {
             payed_by_customer: self.is_payed(),
             payed_employees: self.hours().employees_payed(),
             canceled: self.canceled(),
+            // errors: self.is_ready_for_offer().err().map(|list| list.errors)
+        }
+    }
+}
+
+#[derive(Debug, PartialEq)]
+#[cfg_attr(feature = "serialization", derive(Serialize))]
+pub struct Errors {
+    ready_for_offer:   Vec<String>,
+    ready_for_invoice: Vec<String>,
+    ready_for_archive: Vec<String>,
+}
+
+
+impl ExportTarget<Errors> for Project {
+    fn export(&self) -> Errors {
+        Errors {
+            ready_for_offer:   self.is_ready_for_offer()  .err().into_iter().flat_map(|x|x.errors).collect(),
+            ready_for_invoice: self.is_ready_for_invoice().err().into_iter().flat_map(|x|x.errors).collect(),
+            ready_for_archive: self.is_ready_for_archive().err().into_iter().flat_map(|x|x.errors).collect(),
         }
     }
 }

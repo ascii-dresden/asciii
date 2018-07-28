@@ -409,11 +409,9 @@ impl Validatable for Project {
         }
         //if hours::salary().is_none(){errors.push("salary")}
 
-        if errors.is_empty() {
-            Ok(())
-        } else {
-            Err(errors)
-        }
+        ensure!( errors.is_empty(), errors);
+
+        Ok(())
     }
 }
 
@@ -431,9 +429,7 @@ impl Validatable for Redeemable {
             }
         }
 
-        if !errors.is_empty() {
-            bail!(errors);
-        }
+        ensure!(errors.is_empty(), errors);
 
         Ok(())
     }
