@@ -1,34 +1,28 @@
 <style>
-    footer {
-        position:absolute;
-        bottom: 0;
-        font-size: 15px;
-        font-family: monospace
-
-    }
-
 </style>
 
 <header>
-<h1>asciii web</h1>
+{#if versionInfo}
+<h6> {versionInfo.version} - {versionInfo.built} {versionInfo.commit} | {versionInfo.profile} </h6>
+{/if}
 </header>
 
-<Years years={years} on:select="selectYear(event.year)"/>
 
-<h2> {#if selectedYear} {selectedYear} {/if} </h2>
+<div class="container">
+    <nav class="navbar navbar-light bg-light">
+        <a class="navbar-brand" href="#">
+            <strong>asciii web</strong>
+        </a>
+        <Years years={years} selectedYear={selectedYear} on:select="selectYear(event.year)" />
+    </nav>
 
-<ProjectList projects={projects} on:select="selectProject(event.project)"/>
+    <ProjectList projects={projects} selectedYear={selectedYear} on:select="selectProject(event.project)"/>
 
-{#if selectedProject}
-<ProjectView project={selectedProject} on:close="unselectProject()"/>
-{/if}
+    {#if selectedProject}
+    <ProjectView project={selectedProject} on:close="unselectProject()"/>
+    {/if}
 
-<footer>
-{#if versionInfo}
-    {versionInfo.version} - {versionInfo.built}
-    {versionInfo.commit} | {versionInfo.profile}
-{/if}
-</footer>
+</div>
 
 <script>
     import ProjectList from './ProjectList.html';

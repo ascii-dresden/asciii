@@ -6,8 +6,10 @@ const app = new App({
 	data: {
 		years	: [],
 		projects: [],
+		selectedYear: null,
 		selectedProject: null,
-		versionInfo: null
+		versionInfo: null,
+
 	}
 });
 

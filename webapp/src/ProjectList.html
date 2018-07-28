@@ -1,8 +1,4 @@
 <style>
-    #project-list {
-        min-width: 40em
-    }
-
     #projects {
         height: 250px;
         max-height: 250px;
@@ -20,38 +16,69 @@
 
 
 
+<div class="input-group mb-3">
+    <div class="input-group-prepend">
+        <span class="input-group-text" id="inputGroup-sizing-sm">
+            {filteredProjects.length}
+        </span>
+    </div>
+    <input bind:value=search placeholder="filter" type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm">
+    <div class="input-group-prepend">
+        {#if search}
+        <span class="input-group-text" id="inputGroup-sizing-sm">
+            <button type="button" class="close" aria-label="Close" on:click="clearSearch()">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </span>
+        {/if}
+    </div>
+</div>
 <div id="projects">
-<input bind:value=search placeholder="filter"/> {filteredProjects.length}
-<table id="project-list">
-    {#each filteredProjects as [key, project], index}
-    <tr on:click="fire('select', {project})">
-        <td>{index + 1}</td>
-        <td>{project.event.name}</td>
-        <td>{project.event.manager}</td>
-        <td>{project.invoice.number || ''}</td>
-        <td>{project.event.date}</td>
-        <td class="checkbox">{project.checks.ready_for_offer ? '✔' : '𝘅'}</td>
-        <td class="checkbox">{project.checks.ready_for_invoice ? '✔' : '𝘅'}</td>
-        <td class="checkbox">{project.checks.ready_for_archive ? '✔' : '𝘅'}</td>
-        <td class="checkbox">{project.checks.payed_by_customer ? '✔' : '𝘅'}</td>
-    </tr>
-    {/each}
-</table>
+    <table id="project-list" class="table table-striped">
+        {#each filteredProjects as [key, project], index}
+        <tr on:click="fire('select', {project})">
+            <td>{index + 1}</td>
+            <td>{project.event.name}</td>
+            <td>{project.event.manager}</td>
+            <td>{project.invoice.number || ''}</td>
+            <td>{project.event.date}</td>
+            <td class="checkbox" data-toggle="tooltip" data-placement="bottom" title="{project.errors.ready_for_offer }">
+                {boolSym(project.checks.ready_for_offer )}
+            </td>
+            <td class="checkbox" data-toggle="tooltip" data-placement="bottom" title="{project.errors.ready_for_invoice}">
+                {boolSym(project.checks.ready_for_invoice)}
+            </td>
+            <td class="checkbox" data-toggle="tooltip" data-placement="bottom" title="{project.errors.ready_for_archive}">
+                {boolSym(project.checks.ready_for_archive)}
+            </td>
+            <td class="checkbox">
+                {boolSym(project.checks.payed_by_customer)}
+            </td>
+        </tr>
+        {/each}
+    </table>
 </div>
 
 <script>
+    const boolSym = val => val ? '✔' : '𝘅';
 
     export default {
         methods: {
+            boolSym,
+            clearSearch() {
+                this.set({search: ''})
+            }
         },
 
         data() {
             return {
+                boolSym,
                 search: ''
             };
         },
 
         computed: {
+
             filteredProjects: ({ search, projects }) => {
                 search = search.toLowerCase()
                 const search_in = hay => hay && hay.toLowerCase().includes(search)

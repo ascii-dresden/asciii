@@ -1,14 +1,20 @@
 <style>
 </style>
-
-{#each years as year}
-<button on:click="fire('select', {year})" transition:fade> {year} </button>
+<div class="btn-group" role="group" aria-label="Basic example">
+{#each yearsReversed as year}
+{#if selectedYear == year}
+<button on:click="fire('select', {year})" type="button" class="btn btn-secondary"> {year} </button>
+{:else}
+<button on:click="fire('select', {year})" type="button" class="btn btn-light"> {year} </button>
+{/if}
 {/each}
+</div>
 
 <script>
-    import { fade } from 'svelte-transitions';
 
     export default {
-        transitions: {fade}
+        computed: {
+            yearsReversed: ({years}) => years.reverse()
+        }
     };
 </script>
