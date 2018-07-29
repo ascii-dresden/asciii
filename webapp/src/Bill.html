@@ -1,6 +1,4 @@
 <style>
-    h3>span { font-size: 80%; }
-    .bill { min-width: 25em }
     td.cost { text-align: right; }
     td.number { text-align: right; }
     td.tax {
@@ -13,41 +11,65 @@
     }
 </style>
 
-<div class="bill">
+<div class="card">
+    <div class="card-body">
 
-{#if name}
-<h3>
-    {name} {#if date} <span>{date}</span>{/if}
-</h3>
-{/if}
-
-<table>
-    {#each bill as {name, price, amount, cost, price}, index}
-    <tr>
-        <td class="number">{index + 1}</td>
-        <td>{name} ({price})</td>
-        <td class="number">{amount}x</td>
-        <td class="cost">{price}</td>
-        <td class="cost">{cost}</td>
-    </tr>
-    {/each}
-
-    {#each desc.sums as {gross_sum, tax_sum, tax_value}}
-    {#if tax_value > 0}
-    <tr>
-        <td class="number" colspan="4"></td>
-        <td class="number" colspan="1">{desc.gross_total}</td>
-    </tr>
-    <tr>
-        <td class="tax" colspan="4">{tax_value}%</td>
-        <td class="number" colspan="1">{tax_sum}</td>
-    </tr>
+    {#if name}
+    <h3 class="card-title">
+        {name} {#if date} <small>{date}</small>{/if}
+    </h3>
     {/if}
-    {/each}
-    <tr>
-        <td class="number" colspan="4"></td>
-        <td class="total">{desc.net_total}</td>
-    </tr>
-</table>
+
+        <div class="card-text">
+            Nummer: {#if id} {id} {:else} − {/if}
+        </div>
+
+        <table class="table table-light table-responsive">
+            <thead class="thead-light">
+            <tr>
+                <th class="number"></th>
+                <th>Produkt</th>
+                <th class="number">Anzahl</th>
+                <th class="cost">Einzelpreis</th>
+                <th class="cost">Kosten</th>
+            </tr>
+            </thead>
+            <tbody>
+            {#each bill as {name, price, amount, cost, price, tax}, index}
+            <tr>
+                <td class="number">{index + 1}</td>
+                <td class="checkbox"
+                    data-toggle="tooltip"
+                    data-placement="bottom"
+                    title="{tax * 100}%"
+                >{name}</td>
+                <td class="number">{amount}x</td>
+                <td class="cost">{price}</td>
+                <td class="cost">{cost}</td>
+            </tr>
+            {/each}
+            </tbody>
+
+            <tfoot class="table-borderless table-sm">
+            {#each desc.sums as {gross_sum, tax_sum, tax_value}}
+            {#if tax_value > 0}
+            <tr>
+                <td class="number" colspan="4"></td>
+                <td class="number" colspan="1">{desc.gross_total}</td>
+            </tr>
+            <tr>
+                <td class="tax" colspan="4">{tax_value}%</td>
+                <td class="number" colspan="1">{tax_sum}</td>
+            </tr>
+            {/if}
+            {/each}
+            <tr>
+                <td class="number" colspan="4"></td>
+                <td class="total">{desc.net_total}</td>
+            </tr>
+            </tfoot>
+        </table>
+
+    </div>
 
 </div>

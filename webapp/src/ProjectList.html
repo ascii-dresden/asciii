@@ -7,10 +7,11 @@
 
     td.checkbox {
         text-align: center;
-        width: 20px;
+        width: 90px;
         overflow: hidden;
         display: inline-block;
         white-space: nowrap;
+        font-weight: bold;
     }
 </style>
 
@@ -33,34 +34,42 @@
         {/if}
     </div>
 </div>
-<div id="projects">
-    <table id="project-list" class="table table-striped">
+
+<div id="projects" class="container-fluid">
+<div class="table-responsive">
+    <table id="project-list" class="table table-striped table-sm">
+        <tbody>
         {#each filteredProjects as [key, project], index}
-        <tr on:click="fire('select', {project})">
+        <tr on:click="fire('select', {project})" transition:fly>
             <td>{index + 1}</td>
             <td>{project.event.name}</td>
             <td>{project.event.manager}</td>
             <td>{project.invoice.number || ''}</td>
             <td>{project.event.date}</td>
-            <td class="checkbox" data-toggle="tooltip" data-placement="bottom" title="{project.errors.ready_for_offer }">
-                {boolSym(project.checks.ready_for_offer )}
-            </td>
-            <td class="checkbox" data-toggle="tooltip" data-placement="bottom" title="{project.errors.ready_for_invoice}">
-                {boolSym(project.checks.ready_for_invoice)}
-            </td>
-            <td class="checkbox" data-toggle="tooltip" data-placement="bottom" title="{project.errors.ready_for_archive}">
-                {boolSym(project.checks.ready_for_archive)}
-            </td>
             <td class="checkbox">
+            <span class="checkbox" data-toggle="tooltip" data-placement="bottom" title="{project.errors.ready_for_offer }">
+                {boolSym(project.checks.ready_for_offer )}
+            </span>
+            <span class="checkbox" data-toggle="tooltip" data-placement="bottom" title="{project.errors.ready_for_invoice}">
+                {boolSym(project.checks.ready_for_invoice)}
+            </span>
+            <span class="checkbox" data-toggle="tooltip" data-placement="bottom" title="{project.errors.ready_for_archive}">
+                {boolSym(project.checks.ready_for_archive)}
+            </span>
+            <span class="checkbox">
                 {boolSym(project.checks.payed_by_customer)}
+            </span>
             </td>
         </tr>
         {/each}
+        </tbody>
     </table>
+</div>
 </div>
 
 <script>
-    const boolSym = val => val ? '✔' : '𝘅';
+    import {fly} from 'svelte-transitions';
+    const boolSym = val => val ? '✔' : '𝗫';
 
     export default {
         methods: {
@@ -78,7 +87,6 @@
         },
 
         computed: {
-
             filteredProjects: ({ search, projects }) => {
                 search = search.toLowerCase()
                 const search_in = hay => hay && hay.toLowerCase().includes(search)
@@ -100,5 +108,6 @@
                 });
             },
         },
+        transitions: {fly}
     };
 </script>

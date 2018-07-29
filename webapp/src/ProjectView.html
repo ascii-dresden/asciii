@@ -3,10 +3,6 @@
         display: flex;
         flex-wrap: wrap
     }
-    .bills {
-        display: flex;
-        flex-wrap: wrap;
-    }
     button.close {
         float:right;
     }
@@ -20,60 +16,78 @@
         <button type="button" class="close" aria-label="Close" on:click="fire('close')">
                 <span aria-hidden="true">&times;</span>
         </button>
-        <h2 class="card-title">{project.event.name}</h2>
 
-        <span id="flex" transition:slide>
-            <address class="container">
-                {project.client.full_name}
-                {#if project.client.email}
-                (<a href="mailto:{project.client.email} ">✉️ {project.client.email}</a>)
-                {/if}
-                <pre>{project.client.address}</pre>
-                {#if project.invoice.official}
-                <strong>{project.invoice.official}</strong>
-                {/if}
-            </address>
+        <h2 class="card-title">
+            {#if project.checks.canceled}
+            <small> 🚫 Abgesagt </small>
+            {/if}
+            {project.event.name}
+        </h2>
 
-            <table class="table">
-                <tr>
-                    <th> Angebot </th> <th> Rechnung</th>
-                </tr>
-                <tr>
-                    <td> {project.offer.number} </td> <td> {project.invoice.number_long} </td>
-                </tr>
-            </table>
-        </span>
+        <div class="container" transition:slide>
+            <div class="row">
+                <div class="col-9">
+                    <span id="flex">
+                        <address class="container">
+                            {project.client.full_name} {#if project.client.email} (
+                            <a href="mailto:{project.client.email} ">✉️ {project.client.email}</a>) {/if}
+                            <pre>{project.client.address}</pre> {#if project.invoice.official}
+                            <strong>{project.invoice.official}</strong>
+                            {/if}
+                        </address>
+                    </span>
+                </div>
+                <div class="col-3">
+                    {project.event.manager}
+                    <ul class="list-inline">
+                    {#each project.errors.ready_for_invoice as error}
+                        <li>❌ {error}</li>
+                    {/each}
+                    </ul>
 
-        <div class="bills" transition:slide>
-            <BillTable
-                name="offer"
-                date={project.offer.date}
-                bill={project.bills.offer}
-                desc={project.offer} />
-            <BillTable
-                name="invoice"
-                date={project.invoice.date}
-                bill={project.bills.invoice}
-                desc={project.invoice} />
+                    <ul class="list-inline">
+                    {#each project.errors.ready_for_archive  as error}
+                        <li>❌ {error}</li>
+                    {/each}
+                    </ul>
+                </div>
+            </div>
         </div>
+
+        <div class="container" transition:slide>
+            <div class="row">
+                <div class="col" transition:fade>
+                    <BillTable
+                        name="Angebot"
+                        id="{project.offer.number}"
+                        date={project.offer.date}
+                        bill={project.bills.offer}
+                        desc={project.offer} />
+                </div>
+                <div class="col" transition:fade>
+                    <BillTable
+                        name="Rechnung"
+                        id="{project.invoice.number_long}"
+                        date={project.invoice.date}
+                        bill={project.bills.invoice}
+                        desc={project.invoice} />
+                </div>
+            </div>
+        </div>
+
     </div>
 </div>
 
 <script>
     import BillTable from './Bill.html';
-    import { slide } from 'svelte-transitions';
+    import { slide, fade } from 'svelte-transitions';
     export default {
         components: { BillTable },
-        // onstate({ current: { project } }) {
-        //     console.dir({ project })
-        //     console.table( project.bills.offer)
-        //     console.table( project.bills.invoice)
-        // }
         methods: {
             closeView() {
                 this.destroy()
             },
         },
-        transitions: {slide}
+        transitions: {slide, fade}
     }
 </script>
