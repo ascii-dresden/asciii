@@ -521,18 +521,26 @@ msgid "what shell to generate completion for (bash, zsh, fish,PowerShell)"
 msgstr ""
 
 #: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:883
-msgid "Prints version of this tool"
+msgid "Prints version information"
 msgstr ""
 
-#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:887
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:888
+msgid "show also build information"
+msgstr ""
+
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:893
+msgid "show verbose version as json"
+msgstr ""
+
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:899
 msgid "Opens the online documentation, please read it"
 msgstr ""
 
-#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:947
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:959
 msgid "please specify either bash, zsh, fish or powershell"
 msgstr ""
 
-#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:958
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/app.rs:970
 msgid "Date Format must be DD.MM.YYYY"
 msgstr ""
 
@@ -564,7 +572,7 @@ msgstr ""
 msgid "What is your name?"
 msgstr ""
 
-#: /Users/hendrik/code/rust/asciii/src/bin/cli/subcommands/mod.rs:627 /Users/hendrik/code/rust/asciii/src/bin/cli/subcommands/mod.rs:637
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/subcommands/mod.rs:633 /Users/hendrik/code/rust/asciii/src/bin/cli/subcommands/mod.rs:643
 msgid "{} does not exist"
 msgstr ""
 
@@ -576,7 +584,7 @@ msgstr ""
 msgid "Project file is younger than pdf, continue anyway?"
 msgstr ""
 
-#: /Users/hendrik/code/rust/asciii/src/lib.rs:96
+#: /Users/hendrik/code/rust/asciii/src/lib.rs:97
 msgid "Documentation at: {}"
 msgstr ""
 

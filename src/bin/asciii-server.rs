@@ -2,25 +2,30 @@
 #![plugin(rocket_codegen)]
 
 extern crate asciii;
-extern crate serde;
-extern crate serde_json;
-#[macro_use] extern crate serde_derive;
-#[macro_use] extern crate log;
-#[macro_use] extern crate lazy_static;
-extern crate linked_hash_map;
+extern crate base64;
+#[cfg(feature = "webapp")]
+#[macro_use]
+extern crate include_dir;
 extern crate itertools;
-
+#[macro_use]
+extern crate lazy_static;
+extern crate linked_hash_map;
+#[macro_use]
+extern crate log;
+extern crate openssl_probe;
 extern crate rocket;
 extern crate rocket_contrib;
-extern crate base64;
-
-extern crate openssl_probe;
-
 extern crate rocket_cors;
+extern crate serde;
+#[macro_use]
+extern crate serde_derive;
+extern crate serde_json;
 
+use rocket::http::Method;
 use rocket::response::NamedFile;
-
+use rocket_cors::{AllowedOrigins, AllowedHeaders};
 use asciii::actions;
+use asciii::server::ProjectLoader;
 use asciii::storage::StorageDir;
 
 use std::io;
@@ -29,10 +34,8 @@ use std::sync::Mutex;
 use std::sync::mpsc::{sync_channel, SyncSender};
 use std::thread;
 
-use rocket::http::Method;
-use rocket_cors::{AllowedOrigins, AllowedHeaders};
-
-use asciii::server::ProjectLoader;
+#[cfg(feature = "webapp")]
+static WEBAPP_DIR: include_dir::Dir = include_dir!("./webapp/public");
 
 #[derive(FromForm, Debug)]
 struct Dir {
@@ -76,14 +79,38 @@ lazy_static! {
     };
 }
 
+#[cfg(not(feature = "webapp"))]
 #[get("/")]
 fn index() -> io::Result<NamedFile> {
     NamedFile::open("webapp/public/index.html")
 }
 
+#[cfg(not(feature = "webapp"))]
 #[get("/<file..>", rank=5)]
-fn static_files(file: PathBuf) -> Option<NamedFile> {
+fn files(file: PathBuf) -> Option<NamedFile> {
     NamedFile::open(Path::new("webapp/public/").join(file)).ok()
+}
+
+#[cfg(feature = "webapp")]
+#[get("/")]
+/// Index.html directly embedded in the binary
+fn index() -> Option<content::Html<&'static str>> {
+    WEBAPP_DIR.get_file("index.html").and_then(|file| file.contents_utf8())
+    .map(content::Html)
+}
+
+#[cfg(feature= "webapp")]
+#[get("/<file_path..>", rank=5)]
+fn files(file_path: PathBuf) -> Option<content::Content<&'static str>> {
+    use rocket::http::ContentType;
+    use std::ffi::OsStr;
+
+    WEBAPP_DIR.get_file(&file_path)
+    .and_then(|file| file.contents_utf8())
+    .map(|file| match file_path.extension()  {
+        Some(ext) if ext == OsStr::new("css") => content::Content(ContentType::new("text", "css"), file),
+        _ => content::Content(ContentType::new("text", "plain"), file)
+    })
 }
 
 mod calendar {
@@ -297,7 +324,7 @@ fn main() {
     openssl_probe::init_ssl_cert_env_vars();
 
     let server = rocket::ignite()
-        .mount("/", routes![index, static_files])
+        .mount("/", routes![index, files])
         .mount("/cal/plain", routes![calendar::cal_plain, calendar::cal_plain_params])
         .mount("/cal", routes![calendar::cal, calendar::cal_params])
         .mount("/api", routes![projects::years,

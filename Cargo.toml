@@ -56,6 +56,7 @@ dirs = "1.0"
 rocket = {version = "0.3", optional = true }
 rocket_codegen = {version = "0.3", optional = true }
 rocket_contrib = {version = "0.3", optional = true }
+include_dir = {version = "0.2", optional = true }
 
 # for statically linked OpenSSL
 openssl-sys = { version = "0.9", optional = true }
@@ -94,11 +95,14 @@ pretty_assertions = "0.5"
 [features]
 default = ["cli", "document_export", "git_statuses", "serialization", "deserialization"]
 full_tool = ["cli", "document_export", "git_statuses", "serialization", "deserialization", "localize", "version_string", "shell", "meta"]
+server = ["rocket", "rocket_codegen", "rocket_contrib", "rocket_cors", "openssl-sys", "openssl-probe", "serialization", "version_string", "meta"]
+webapp = ["server", "include_dir" ] # build the frontend app
+
 document_export = ["handlebars", "serialization"]
 serde_base = ["serde", "serde_derive"]
 serialization = ["serde_base", "serde_json"]
 deserialization = ["serde_base","serde_yaml", "ordered-float", "num-traits"]
-server = ["rocket", "rocket_codegen", "rocket_contrib", "rocket_cors", "openssl-sys", "openssl-probe", "serialization", "version_string", "meta" ]
+
 meta = [ "serialization", "deserialization" ]
 git_statuses = ["git2"]
 shell = ["rustyline"]

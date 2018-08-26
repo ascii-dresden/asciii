@@ -32,3 +32,4 @@ src/localize_macros_static.rs
 *.rustfmt
 .idea/
 static/*
+node_modules

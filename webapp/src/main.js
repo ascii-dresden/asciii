@@ -9,7 +9,6 @@ const app = new App({
 		selectedYear: null,
 		selectedProject: null,
 		versionInfo: null,
-
 	}
 });
 
