@@ -855,6 +855,14 @@ impl<L:Storable> Storage<L> {
         project
     }
 
+    pub fn last_commit(&self) -> StorageResult<Option<String>> {
+        if let Some(repo) = self.repository() {
+            Ok(Some(repo.last()?))
+        } else {
+            Ok(None)
+        }
+    }
+
 }
 
 impl<P:Storable> fmt::Debug for Storage<P>{

@@ -1,17 +1,18 @@
 #![allow(dead_code, unused_variables)]
 use std::fmt;
 use std::path::{Path, PathBuf};
+
 #[cfg(feature="git_statuses")]
 use std::collections::HashMap;
 use std::process::{Command, ExitStatus};
-
-#[cfg(not(feature="git_statuses"))]
 use std::error::Error;
 
 #[cfg(feature="git_statuses")]
-use git2;
+use git2::{self, Signature, Sort, Commit, ObjectType, Time, DiffOptions, Pathspec, DiffFormat};
+
 use prettytable::{color, Attr};
 use prettytable::color::Color;
+
 
 /// More Rustacious way of representing a git status
 #[derive(Debug,Clone)]
@@ -97,7 +98,7 @@ impl From<git2::Status> for GitStatus{
 
 /// Convenience Wrapper for `git2::Repository`
 #[cfg(feature="git_statuses")]
-pub struct Repository{
+pub struct Repository {
     /// Git Repository for StorageDir
     pub repo: git2::Repository,
     pub workdir: PathBuf,
@@ -107,7 +108,7 @@ pub struct Repository{
 
 /// Convenience Wrapper for `git2::Repository`
 #[cfg(not(feature="git_statuses"))]
-pub struct Repository{
+pub struct Repository {
     /// Git Repository for StorageDir
     pub workdir: PathBuf,
 }
@@ -115,7 +116,7 @@ pub struct Repository{
 impl Repository {
 
     #[cfg(feature="git_statuses")]
-    pub fn new(path:&Path) -> Result<Self, git2::Error>{
+    pub fn new(path: &Path) -> Result<Self, git2::Error>{
         let repo = git2::Repository::open(path)?;
         let statuses = Self::cache_statuses(&repo)?;
         Ok(
@@ -133,7 +134,7 @@ impl Repository {
     }
 
     #[cfg(feature="git_statuses")]
-    fn cache_statuses(repo:&git2::Repository) -> Result<HashMap<PathBuf, GitStatus>, git2::Error>{
+    fn cache_statuses(repo:&git2::Repository) -> Result<HashMap<PathBuf, GitStatus>, git2::Error> {
         let repo_path = repo.path().parent().unwrap().to_owned();
 
         let git_statuses = repo.statuses( Some( git2::StatusOptions::new()
@@ -160,18 +161,29 @@ impl Repository {
     }
 
     /// Returns the status to a given path
-    #[cfg(feature="git_statuses")]
-    pub fn get_status(&self,path:&Path) -> GitStatus{
+    #[cfg(feature="git_statuses") ]
+    pub fn get_status(&self,path:&Path) -> GitStatus {
         self.statuses.get(path).unwrap_or(&GitStatus::Unknown).to_owned()
     }
 
     /// INERT: Returns the status to a given path
     #[cfg(not(feature="git_statuses"))]
-    pub fn get_status(&self,path:&Path) -> GitStatus{
+    pub fn get_status(&self,path:&Path) -> GitStatus {
         GitStatus::Unknown
     }
 
-    fn execute_git(&self, command:&str, args:&[&str], paths: &[PathBuf]) -> ExitStatus{
+
+    pub fn last(&self) -> Result<String, git2::Error> {
+
+        let mut revwalk = self.repo.revwalk()?;
+        revwalk.set_sorting(Sort::TIME);
+        Ok(revwalk.map(|x| {
+            let commit = 
+                        format!("{:?}", x)
+        }).collect())
+    }
+
+    fn execute_git(&self, command:&str, args:&[&str], paths: &[PathBuf]) -> ExitStatus {
         let gitdir  = self.workdir.join(".git");
         debug!("{:?}", Command::new("git")
                  .args(&["--work-tree", self.workdir.to_str().unwrap()])
@@ -250,6 +262,7 @@ impl Repository {
     pub fn log(&self, paths:&[PathBuf]) -> ExitStatus {
         self.execute_git("log", &[ "--graph", "--pretty=format:'%Cred%h%Creset -%C(bold yellow)%d%Creset %C() %s %C(reset) ( %C(yellow)%an%Creset %C(green)%cr )'", "--abbrev-commit", "--date=relative" ], paths)
     }
+
 }
 
 #[cfg(not(feature="git_statuses"))]
@@ -268,3 +281,4 @@ impl fmt::Display for GitError{
             write!(f, "{}", self.description())
     }
 }
+

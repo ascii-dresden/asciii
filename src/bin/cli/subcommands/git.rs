@@ -7,6 +7,13 @@ use super::matches_to_paths;
 use cli::error::*;
 
 /// Command LOG
+pub fn git_last() -> Result<()> {
+    let storage = storage::setup_with_git::<Project>()?;
+    println!("{:?}", storage.last_commit()?);
+    Ok(())
+}
+
+/// Command LOG
 pub fn git_log(matches: &ArgMatches) -> Result<()> {
     let storage = storage::setup_with_git::<Project>()?;
     let paths = matches_to_paths(matches, &storage)?;

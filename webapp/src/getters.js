@@ -10,19 +10,19 @@ const normalizeProjects = raw_projects =>
         .sort(sortProjects);
 
 export const getProjectsByYear = year =>
-    fetch(`http://localhost:8000/api/full_projects/year/${year}/`)
+    fetch(`/api/full_projects/year/${year}/`)
         .then(getJson)
         .then(normalizeProjects);
 
 export const getProjectsWorkingDir = () =>
-    fetch(`http://localhost:8000/api/projects/workingdir/`)
+    fetch(`/api/projects/workingdir/`)
         .then(getJson)
         .then(normalizeProjects);
 
 export const getYears = () =>
-    fetch(`http://localhost:8000/api/projects/year`)
+    fetch(`/api/projects/year`)
         .then(getJson);
 
 export const getVersion = () =>
-    fetch(`http://localhost:8000/api/version`)
+    fetch(`/api/version`)
         .then(getJson);

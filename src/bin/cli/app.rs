@@ -842,6 +842,8 @@ pub fn with_cli<F> (app_handler:F) where F: Fn(App) {
             .subcommand(SubCommand::with_name("stash").about(lformat!("equals git stash").as_ref()))
             .subcommand(SubCommand::with_name("pop").about(lformat!("equals git pop").as_ref()))
 
+            .subcommand(SubCommand::with_name("last").about(lformat!("show the last git commit").as_ref()))
+
             .subcommand(SubCommand::with_name("log")
                         .aliases(&["lg", "hist", "history"])
                         .about(lformat!("Show commit logs").as_ref())
@@ -944,6 +946,7 @@ pub fn match_matches(matches: &ArgMatches) {
      ("stash",     _          ) => subcommands::git_stash(),
      ("pop",       _          ) => subcommands::git_stash_pop(),
      ("log",       Some(sub_m)) => subcommands::git_log(sub_m),
+     ("last",      _          ) => subcommands::git_last(),
      ("complete",  Some(sub_m)) => generate_completions(sub_m),
      _                          => Ok(())
     };
