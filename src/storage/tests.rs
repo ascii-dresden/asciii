@@ -13,12 +13,11 @@ use super::*;
 #[allow(dead_code)]
 pub struct TestProject {
     file_path: PathBuf,
-    temp_dir: Option<TempDir>
 }
 
 impl Storable for TestProject{
     // creates in tempfile
-    fn from_template(project_name:&str,template:&Path, _fill:&HashMap<&str, String>) -> StorageResult<Self> where Self: Sized{
+    fn from_template(project_name: &str, template: &Path, _fill: &HashMap<&str, String>) -> StorageResult<StorableAndTempDir<Self>> where Self: Sized {
         // generates a temp file
         let temp_dir  = TempDir::new_in("./target/debug/build/",&project_name).unwrap();
         let temp_file = temp_dir.path().join(project_name);
@@ -27,11 +26,16 @@ impl Storable for TestProject{
         fs::copy(template, &temp_file)?;
 
         // project now lives in the temp_file
-        Ok(TestProject{
+        let project = TestProject {
             file_path: temp_file,
-            temp_dir: Some(temp_dir),
+        };
+
+        Ok(StorableAndTempDir {
+            storable: project,
+            temp_dir
         })
     }
+
     fn short_desc(&self) -> String{ self.file().file_stem().unwrap().to_str().unwrap().to_owned() }
     fn modified_date(&self) -> Option<Date<Utc>>{ Some(Utc::today()) }
     fn file(&self) -> PathBuf{ self.file_path.to_owned() }
@@ -45,8 +49,7 @@ impl Storable for TestProject{
 
     fn open_file(path:&Path) -> StorageResult<Self>{
         Ok(TestProject{
-            file_path: PathBuf::from(path),
-            temp_dir: None
+            file_path: PathBuf::from(path)
         })
     }
     fn matches_filter(&self, _key: &str, _val: &str) -> bool {false}
