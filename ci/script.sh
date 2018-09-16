@@ -4,20 +4,18 @@ set -ex
 
 # TODO This is the "test phase", tweak it as you see fit
 main() {
-
-    # ci/most_recent_commit.sh
-
     cross build --target $TARGET
-    # cross build --target $TARGET --release
+    cross build --target $TARGET --release
 
     if [ ! -z $DISABLE_TESTS ]; then
         return
     fi
 
-    # cross test --target $TARGET
-    # cross test --target $TARGET --release
-    # cross run --target $TARGET
-    # cross run --target $TARGET --release
+    cross test --target $TARGET
+    cross test --target $TARGET --release
+
+    cross run --bin asciii --target $TARGET -- version --verbose
+    cross run --bin asciii --target $TARGET --release -- version --verbose
 }
 
 # we don't run the "test phase" when doing deploys
