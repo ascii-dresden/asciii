@@ -19,7 +19,7 @@ The ascii-invoicer is a command-line tool that manages projects and stores them 
 
 ## Installation
 
-To use \(experimental\) features use the `--feature` flag.
+To use \(experimental\) features use the `--features` flag.
 Please check the `Cargo.toml` for an up-to-date list of features.
 To get a full cli tool build with the feature `full_tool`.
 

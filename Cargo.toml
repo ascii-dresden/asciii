@@ -94,7 +94,7 @@ pretty_assertions = "0.5"
 
 [features]
 default = ["cli", "document_export", "git_statuses", "serialization", "deserialization"]
-full_tool = ["cli", "document_export", "git_statuses", "serialization", "deserialization", "localize", "version_string", "shell", "meta"]
+full_tool = ["cli", "document_export", "git_statuses", "serialization", "deserialization", "shell", "meta"]
 server = ["rocket", "rocket_codegen", "rocket_contrib", "rocket_cors", "openssl-sys", "openssl-probe", "serialization", "version_string", "meta"]
 webapp = ["server", "include_dir" ] # build the frontend app
 

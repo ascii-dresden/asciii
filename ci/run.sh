@@ -2,14 +2,17 @@
 
 set -ex
 
-echo "toolchain versions\n------------------"
+main() {
+  echo "toolchain versions\n------------------"
 
-rustc -vV
-cargo -vV
+  rustc -vV
+  cargo -vV
 
-cargo build --target $TARGET
-cargo build --target $TARGET --release
+  cargo check --target $TARGET --features full_tool
+  cargo build --target $TARGET --features full_tool --release
+  cargo test --target $TARGET --features full_tool
+}
 
 if [ -z "$SKIP_TESTS" ]; then
-  cargo test --target $TARGET
+  main
 fi
