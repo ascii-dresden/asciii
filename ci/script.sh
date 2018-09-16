@@ -14,8 +14,8 @@ main() {
     cross test --target $TARGET
     cross test --target $TARGET --release
 
-    cross run --bin asciii --target $TARGET
-    cross run --bin asciii --target $TARGET --release
+    cross run --bin asciii --target $TARGET -- version --verbose
+    cross run --bin asciii --target $TARGET --release -- version --verbose
 }
 
 # we don't run the "test phase" when doing deploys
