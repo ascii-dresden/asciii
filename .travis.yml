@@ -1,7 +1,7 @@
-sudo: required
 dist: trusty
-services: docker
 language: rust
+services: docker
+sudo: required
 
 matrix:
   include:
@@ -54,6 +54,26 @@ script:
     else
       PATH=$HOME/rust/bin:$PATH sh ci/run.sh;
     fi
+
+deploy:
+  # TODO update `api_key.secure`
+  # - Create a `public_repo` GitHub token. Go to: https://github.com/settings/tokens/new
+  # - Encrypt it: `travis encrypt 0123456789012345678901234567890123456789
+  # - Paste the output down here
+  api_key:
+    secure: "cpwZPs76IJnoKGZs1QwyNo6P8tIjm7S+W9NmjJAyvKKDMR/Bz5rcC7ZH9gfJN1ymlh8zt38T5Zrrq6Ukc67c8ei+tNCUqWUi5pWSTN8jhNFvFpMppfbU7lkcuyHQdVV8pVvu4524FUuxpVby0ni3JdKjD8OM4IDD0UMjxHiP14A5U/V2kPNT769E/R2Vhq/xbTuvDk6WNcBLgODbbYNyE0XYmTVbWlusIpszJzGIks9FkfByT4BKmeaaxHjOgMRJ8270EL+7J2fFvMchNoRPTXqmfjDb9ex7UeMIeaH2WzcEGxuN/v060p8g7FnFy5IvV+YczKd28zegbu3vLBbNfO349prd15MZ9HY7KaWwX3MdGUFNojZnmnrmVDGK9pUsnlNoO6BhYXNleqG1m5gov8pw6vD+gz0QCU20oVtZZ7LIMHYq2CSv7lrcw+6c1Dg6fGwPs+4iAElWiKnvMbv2jlYN0RFM3hYwX/Tuw70FYD4joaXZNqpTLMvJ6DML8sXkjyZsex2OdcSZjWqF2yObOaVXhhoPDxsYRx3d+i5NiWN3ECBL8fLQGlDLzfstJp/A1sA5rrsaZL50WQrlHXH4Y2bZAbNsDf9IVrnzmxtJn4dvus78gng7pEz3siSEKVaWsbp+2CXYO/oiiIYtjCcVH10QPtnYLYZgEH9UYjiIqxY="
+
+  file_glob: true
+  file: $CRATE_NAME-$TRAVIS_TAG-$TARGET.*
+  on:
+    # TODO Here you can pick which targets will generate binary releases
+    # In this example, there are some targets that are tested using the stable
+    # and nightly channels. This condition makes sure there is only one release
+    # for such targets and that's generated using the stable channel
+    condition: $TRAVIS_RUST_VERSION = stable
+    tags: true
+  provider: releases
+  skip_cleanup: true
 
 cache: cargo
 before_cache:
