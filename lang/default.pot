@@ -576,11 +576,11 @@ msgstr ""
 msgid "{} does not exist"
 msgstr ""
 
-#: /Users/hendrik/code/rust/asciii/src/document_export/mod.rs:184
+#: /Users/hendrik/code/rust/asciii/src/document_export/mod.rs:180
 msgid "WARNING: Can't make sense of {}"
 msgstr ""
 
-#: /Users/hendrik/code/rust/asciii/src/document_export/mod.rs:222
+#: /Users/hendrik/code/rust/asciii/src/document_export/mod.rs:218
 msgid "Project file is younger than pdf, continue anyway?"
 msgstr ""
 
