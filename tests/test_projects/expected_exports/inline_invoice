@@ -1,0 +1,93 @@
+\documentclass[11pt,utf8]{/Users/hendrik/.asciii_projects/templates/latex/ascii-brief}
+\Logo {/Users/hendrik/.asciii_projects/templates/latex/ascii-logo.png}
+
+
+\lochermarke
+\faltmarken
+\fenstermarken
+\trennlinien
+%%\klassisch
+
+\Name                {}
+\Strasse             {}
+\Universitaet        {}
+\Fakultaet           {}
+\Zusatz              {}
+\RetourAdresse       {}
+\Ort                 {}
+\Land                {}
+\Telefon             {}
+\Telefax             {}
+\Telex               {}
+\HTTP                {}
+\EMail               {}
+\Bank                {}
+\BLZ                 {}
+\IBAN                {}
+\BIC                 {}
+\Konto               {}
+\Steuernummer        {}
+
+\Unterschrift        {Hendrik Sollich}
+\Postvermerk         {}
+\Adresse             {Graf Zahl\newline Nummernhöllenstraße 666\newline 01234 Countilvania\newline }
+
+
+\Datum               {06.12.2014}
+\Betreff             {Rechnung}
+\RechnungsNummer     {R2014-041}
+\AngebotsNummer      {A20141107-1}
+
+
+
+
+\Veranstaltung       {Party Hard}
+\Anrede              {Sehr geehrter Herr Zahl,}
+\Gruss               {Mit freundlichen Grüßen}{1cm}
+
+%\Anlagen             {Anlagen}
+%\Verteiler           {Verteiler}
+
+\begin{document}
+\begin{ascii-brief}
+
+
+
+wir bedanken uns für Ihren Auftrag für das Catering am 03.11.2014 und erlauben uns Ihnen folgende Rechnung zu stellen:
+
+
+\begin{center}
+\begin{tabular}{rp{7cm}rrr}
+  \textbf{Nr.} & \textbf{Bezeichnung}&    \textbf{Menge}    &    \textbf{EP}    &    \textbf{Preis}    \\
+  \midrule
+1 & Kaffee  (1l)  & 5 & 2,50€ & 12,50€ \\
+2 & Tee  (1l)  & 3 & 1,75€ & 5,25€ \\
+3 & halbe Brötchen  (stk)  & 40 & 1,16€ & 46,40€ \\
+4 & Donuts  (stk)  & 20 & 1,00€ & 20,00€ \\
+5 & Kuchen  (stk)  & 30 & 0,94€ & 28,20€ \\
+6 & Club-Mate  (0.5l)  & 27 & 0,60€ & 16,20€ \\
+7 & Premium-Cola  (0.5l)  & 22 & 0,85€ & 18,70€ \\
+8 & Mineralwasser  (1l)  & 3 & 0,61€ & 1,83€ \\
+9 & Orangensaft  (1l)  & 3 & 1,86€ & 5,58€ \\
+10 & Apfelsaft  (1l)  & 2 & 1,64€ & 3,28€ \\
+11 & Service  (h)  & 4.4 & 8,50€ & 37,40€ \\
+
+
+
+\bottomrule[1pt]
+\multicolumn{4}{r}{Netto MwSt.}   & 157,94€  \\
+\multicolumn{4}{r}{+MwSt. 1900\%}   & 3000,86€  \\
+\multicolumn{4}{r}{MwSt. 0\%}  & 37,40€  \\
+\multicolumn{4}{r}{\textbf{Gesamtpreis}}  & 3196,20€ \\
+\end{tabular}
+\end{center}
+
+
+
+
+Wir bitten um eine Begleichung des Betrags innerhalb von 14 Tagen nach Erhalt der Rechnung.
+
+
+\end{ascii-brief}
+\end{document}
+

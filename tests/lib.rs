@@ -1,15 +1,13 @@
-extern crate asciii;
 #[macro_use] extern crate log;
 #[macro_use] extern crate pretty_assertions;
 
+extern crate asciii;
+
 use std::fs;
 use std::ffi::OsStr;
-use std::fmt::Debug;
 use std::path::{Path, PathBuf};
 
 use asciii::project::Project;
-//use asciii::project::spec::*;
-use asciii::project::export::*;
 
 /// Basically `ls`, returns a list of paths.
 fn list_path_content(path:&Path) -> Vec<PathBuf> {
@@ -27,6 +25,47 @@ fn list_path_content(path:&Path) -> Vec<PathBuf> {
 
 #[cfg(all(feature="serialization",test))]
 mod regression {
+    mod document_export{
+        use asciii::{
+            project::{ BillType, Project, export::{Complete, ExportTarget} },
+            document_export::fill_template
+        };
+
+        fn export(path: &str, bill_type: BillType) -> String {
+            let p = Project::open(path).unwrap();
+            let exported: Complete = p.export();
+            fill_template(&exported, bill_type, "./templates/export.tex.hbs").unwrap()
+        }
+
+        #[test]
+        fn current_offer() {
+            let exported = export("./tests/test_projects/current.yml", BillType::Offer);
+            let expected = include_str!("./test_projects/expected_exports/current_offer");
+            assert_eq!(exported, expected)
+        }
+
+        #[test]
+        fn current_invoice() {
+            let exported = export("./tests/test_projects/current.yml", BillType::Invoice);
+            let expected = include_str!("./test_projects/expected_exports/current_invoice");
+            assert_eq!(exported, expected)
+        }
+
+        #[test]
+        fn inline_offer() {
+            let exported = export("./tests/test_projects/inline.yml", BillType::Offer);
+            let expected = include_str!("./test_projects/expected_exports/inline_offer");
+            assert_eq!(exported, expected)
+        }
+
+        #[test]
+        fn inline_invoice() {
+            let exported = export("./tests/test_projects/inline.yml", BillType::Invoice);
+            let expected = include_str!("./test_projects/expected_exports/inline_invoice");
+            assert_eq!(exported, expected)
+        }
+
+    }
 }
 
 

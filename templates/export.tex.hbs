@@ -88,15 +88,15 @@ hiermit möchten wir Ihnen für die gastronomische Betreuung Ihrer Veranstaltung
   \textbf{Nr.} & \textbf{Bezeichnung}&    \textbf{Menge}    &    \textbf{EP}    &    \textbf{Preis}    \\
   \midrule
 {{~#with bills}}
-  {{~#if ../../is_invoice}}
-    {{~#with invoice}}
-      {{~#> items}}{{/items}}
-    {{/with~}}
-  {{else}}
-    {{~#with offer}}
-      {{~#> items}}{{/items}}
-    {{/with~}}
-  {{/if~}}
+{{~#if ../../is_invoice}}
+{{~#with invoice}}
+{{~#> items}}{{/items}}
+{{/with~}}
+{{else}}
+{{~#with offer}}
+{{~#> items}}{{/items}}
+{{/with~}}
+{{/if~}}
 {{/with}}
 
 \bottomrule[1pt]
