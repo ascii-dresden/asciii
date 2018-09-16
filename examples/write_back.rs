@@ -19,7 +19,7 @@ fn main() {
         let name = project.name().unwrap_or("xx");
         let export: Complete = project.export();
         match project.parse_yaml() {
-            Ok(p)  => println!("{}", retoml(&export)),
+            Ok(_p)  => println!("{}", retoml(&export)),
             Err(e) => println!("cannot parse {} {:#?}", name, e),
         }
     }

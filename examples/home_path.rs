@@ -1,11 +1,11 @@
-use std::path::Path;
-use std::path::PathBuf;
-//use std::fs::Metadata;
-//use std::ffi::OsString;
+extern crate dirs;
 
-fn replace_home_tilde(p:&Path) -> PathBuf{
+use std::path::{Path, PathBuf};
+use dirs::home_dir;
+
+fn replace_home_tilde(p: &Path) -> PathBuf {
     let path = p.to_str().unwrap();
-    PathBuf::from( path.replace("~",std::env::home_dir().unwrap().to_str().unwrap()))
+    PathBuf::from( path.replace("~", home_dir().unwrap().to_str().unwrap()))
 }
 
 fn main(){

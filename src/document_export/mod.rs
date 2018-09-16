@@ -8,7 +8,7 @@ use std::path::{Path, PathBuf};
 use serde::ser::Serialize;
 
 use open;
-use handlebars::{RenderError, Handlebars, no_escape, Helper, RenderContext};
+use handlebars::{RenderError, Handlebars, no_escape, Helper, RenderContext, HelperDef, Context, Output, HelperResult};
 
 use util;
 use project::{self, Project, Exportable};
@@ -28,7 +28,6 @@ struct PackData<'a, T: 'a + Serialize> {
     is_invoice: bool
 }
 
-
 fn pack_data<E: Serialize>(document: &E, is_invoice: bool) -> PackData<E> {
     PackData {
         document: document,
@@ -37,21 +36,27 @@ fn pack_data<E: Serialize>(document: &E, is_invoice: bool) -> PackData<E> {
     }
 }
 
-fn inc_helper(h: &Helper, _: &Handlebars, rc: &mut RenderContext) -> ::std::result::Result<(), RenderError> {
-    // just for example, add error check for unwrap
-    let param = h.param(0).expect("no param passed to inc_helper").value();
+#[derive(Clone, Copy)]
+struct IncHelper;
+
+impl HelperDef for IncHelper {
+  fn call<'reg: 'rc, 'rc>(&self, h: &Helper, _: &Handlebars, _: &Context, _: &mut RenderContext, out: &mut Output) -> HelperResult {
+    let param = h.param(0).unwrap().value();
     debug!("inc_helper({:?})", param);
-    let rendered = format!("{}", param.as_u64().expect("param can't be converted to u64") + 1);
-    rc.writer.write_all(rendered.into_bytes().as_ref())?;
+    out.write(&format!("{}", param.as_u64().expect("param can't be converted to u64") + 1))?;
     Ok(())
+  }
 }
 
-fn count_helper(h: &Helper, _: &Handlebars, rc: &mut RenderContext) -> ::std::result::Result<(), RenderError> {
+#[derive(Clone, Copy)]
+struct CountHelper;
+
+impl HelperDef for CountHelper {
+  fn call<'reg: 'rc, 'rc>(&self, h: &Helper, _: &Handlebars, _: &Context, _: &mut RenderContext, out: &mut Output) -> HelperResult {
     let count = h.param(0).unwrap().value().as_array().map_or(0, |a|a.len());
-    //println!("count_helper{:?}", param);
-    let rendered = format!("{}", count);
-    rc.writer.write_all(rendered.into_bytes().as_ref())?;
+    out.write(&format!("{}", count))?;
     Ok(())
+  }
 }
 
 /// Takes a `T: Serialize` and a template path and does it's thing.
@@ -65,8 +70,9 @@ pub fn fill_template<E, P>(document: &E, bill_type: BillType, template_path: P) 
 
     handlebars.register_escape_fn(no_escape);
     handlebars.register_escape_fn(|data| data.replace("\n", r#"\newline "#));
-    handlebars.register_helper("inc",   Box::new(inc_helper));
-    handlebars.register_helper("count", Box::new(count_helper));
+
+    handlebars.register_helper("inc",   Box::new(IncHelper));
+    // handlebars.register_helper("count", Box::new(count_helper));
 
     handlebars.register_template_file("document", template_path).unwrap();
 
