@@ -1,38 +1,63 @@
-sudo: required
+
+
+
 dist: trusty
-services: docker
 language: rust
+services: docker
+sudo: required
+
+
+
+
+env:
+  global:
+    # TODO Update this to match the name of your project.
+    - CRATE_NAME=asciii
+    - RUST_BACKTRACE=1
 
 matrix:
   include:
-    - os: linux
-      env: TARGET=i686-unknown-linux-gnu
-           DOCKER=quay.io/ascii/i686-unknown-linux-gnu:latest
-    - os: linux
-      env: TARGET=x86_64-unknown-linux-gnu
-           DOCKER=quay.io/ascii/x86_64-unknown-linux-gnu:latest
-    - os: osx
-      env: TARGET=i686-apple-darwin
+    # - os: linux
+    #   env: TARGET=i686-unknown-linux-gnu
+    #        DOCKER=quay.io/ascii/i686-unknown-linux-gnu:latest
+    # - os: linux
+    #   env: TARGET=x86_64-unknown-linux-gnu
+    #        DOCKER=quay.io/ascii/x86_64-unknown-linux-gnu:latest
+    # - os: osx
+    #   env: TARGET=i686-apple-darwin
     - os: osx
       env: TARGET=x86_64-apple-darwin
-
+           SKIP_TESTS=1
     # Just testing for right cross compilers for these targets.
+    # - os: linux
+    #   env: TARGET=x86_64-unknown-linux-gnu
+    #        DOCKER=quay.io/ascii/x86_64-unknown-linux-gnu:latest
+    - os: linux
+      env: TARGET=x86_64-unknown-linux-musl
+           DOCKER=quay.io/ascii/i686-unknown-linux-musl:latest
     - os: linux
       env: TARGET=i686-unknown-linux-musl
            DOCKER=quay.io/ascii/i686-unknown-linux-musl:latest
            SKIP_TESTS=1
-    - os: linux
-      env: TARGET=i686-pc-windows-gnu
-           DOCKER=quay.io/ascii/i686-pc-windows-gnu:latest
-           SKIP_TESTS=1
+    # - os: linux
+    #   env: TARGET=i686-pc-windows-gnu
+    #        DOCKER=quay.io/ascii/i686-pc-windows-gnu:latest
+    #        SKIP_TESTS=1
     - os: linux
       env: TARGET=x86_64-pc-windows-gnu
            DOCKER=quay.io/ascii/x86_64-pc-windows-gnu:latest
            SKIP_TESTS=1
 
+before_install:
+  - set -e
+  - rustup self update
+
 install:
+  - sh ci/install.sh
   - curl https://static.rust-lang.org/rustup.sh |
     sh -s -- --prefix=$HOME/rust --with-target=$TARGET
+  - source ~/.cargo/env || true
+
 
 script:
   - if [ ! -z "$DOCKER" ]; then
@@ -54,6 +79,30 @@ script:
     else
       PATH=$HOME/rust/bin:$PATH sh ci/run.sh;
     fi
+
+after_script: set +e
+
+before_deploy:
+  - sh ci/before_deploy.sh
+
+deploy:
+  # TODO update `api_key.secure`
+  # - Create a `public_repo` GitHub token. Go to: https://github.com/settings/tokens/new
+  # - Encrypt it: `travis encrypt 0123456789012345678901234567890123456789
+  # - Paste the output down here
+  api_key:
+    secure: "oqulSaMfkOAgll1UU2TQ28jey70kSSPW6DCx3J1HQdEZXH2zGL6HZWiauu6hxIBoyNx9CQ7tHlXGJ5Xo3ebmEu/1UZfNwQ3FX8TgS1e8VmIvQI8ZZGBhlG2bi4tN+equHRKx/J9+zXrgJV0FKSCU4Zar3A0AgbV+Jc0Yrzo2RBJj0jFRo3JNe+4vIaWPB43zPaJKJr4faaTmQI9ikNJOQZh0fte3sFL0H7AzY5/mi1T8I3fhaagUOl/fLEFXxMmpBY5+dr0pLO68QS1l3ChpCdCjnOXdjchqtaMpM/E6PrK0baXmn7laxkNXVC0Ia7RMPmYsSCmBCp+KhgGQwn3krqW0rSehZH+w4XuQFun5Tx9zfL+S7K8M7lLivJwBuT6LchLhSexL0YxHoBveUTwNTaHew3doSmLRm9tQn/wIeWgujyVyWXLkrzF5KUvkFVJE7JPlfUHf1LbmIyUoH+e4Yuao73/mczgBitYbSl9eUut4QuQi9Ld+KDCO4xgaQv/mDZHTlBdQ2UXvERBKd1ryzzjOUTP+jUQrtqgUc0shasMcb7Scx09rE0+5yakoQLYC8xHy3BX1jCGVZi4ri065yX/V82BSt3BNGDiPiHx2McYrwewWcpbyJI2+NRy2Me7YafZz2VNaL5gIiqRn0qQA5P4eHy+HzwirRDCG+Iu5CK8="
+  file_glob: true
+  file: $CRATE_NAME-$TRAVIS_TAG-$TARGET.*
+  on:
+    # TODO Here you can pick which targets will generate binary releases
+    # In this example, there are some targets that are tested using the stable
+    # and nightly channels. This condition makes sure there is only one release
+    # for such targets and that's generated using the stable channel
+    condition: $TRAVIS_RUST_VERSION = stable
+    tags: true
+  provider: releases
+  skip_cleanup: true
 
 cache: cargo
 before_cache:
