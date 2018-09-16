@@ -22,17 +22,18 @@ pub mod error;
 use self::error::*;
 
 #[cfg_attr(feature = "serialization", derive(Serialize))]
-struct PackData<'a, T: 'a + Serialize> {
+struct DocAndStorage<'a, T: 'a + Serialize> {
     document: &'a T,
-    storage: storage::Paths,
+    storage: Option<storage::Paths>,
     is_invoice: bool
 }
-
-fn pack_data<E: Serialize>(document: &E, is_invoice: bool) -> PackData<E> {
-    PackData {
-        document: document,
-        storage: storage::setup::<Project>().unwrap().paths(),
-        is_invoice: is_invoice
+impl<'a, T: 'a + Serialize> DocAndStorage<'a, T> {
+    fn from(document: &T, bill_type: BillType) -> DocAndStorage<T> {
+        DocAndStorage {
+            document: document,
+            storage: storage::setup::<Project>().ok().map(|s| s.paths()),
+            is_invoice: bill_type == Invoice
+        }
     }
 }
 
@@ -76,12 +77,7 @@ pub fn fill_template<E, P>(document: &E, bill_type: BillType, template_path: P) 
 
     handlebars.register_template_file("document", template_path).unwrap();
 
-    let packed = match bill_type {
-        Offer => pack_data(document, false),
-        Invoice => pack_data(document, true)
-    };
-
-    Ok(handlebars.render("document", &packed)
+    Ok(handlebars.render("document", &DocAndStorage::from(document, bill_type))
                  .map(|r| r.replace("<", "{")
                            .replace(">", "}"))?)
 }
