@@ -103,7 +103,7 @@ fn show_ical(selection: StorageSelection) -> Result<()> {
 }
 
 fn show_detail(selection: StorageSelection, detail: &str) -> Result<()> {
-    for p in setup::<Project>()?.open_projects(&selection)? {
+    for p in setup::<Project>()?.open_projects(selection.clone())? {
         println!("{}",
                  p.field(detail)
                   .unwrap_or_else(|| format!("No {:?} found", selection)))
@@ -113,7 +113,7 @@ fn show_detail(selection: StorageSelection, detail: &str) -> Result<()> {
 
 fn show_csv(selection: StorageSelection) -> Result<()> {
     for p in setup::<Project>()?.open_projects(selection)? {
-        println!("{}", p.to_csv(&BillType::Invoice)?)
+        println!("{}", p.to_csv(BillType::Invoice)?)
     }
     Ok(())
 }

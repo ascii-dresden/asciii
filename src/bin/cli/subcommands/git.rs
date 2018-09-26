@@ -60,7 +60,7 @@ pub fn git_remote() -> Result<()> {
     let storage = storage::setup_with_git::<Project>()?;
 
     if let Some(r) = storage.repository() {
-        let ref repo = r.repo;
+        let repo = &r.repo;
 
         for remote_name in repo.remotes().unwrap().iter() {
 
@@ -71,7 +71,7 @@ pub fn git_remote() -> Result<()> {
                     remote.name().unwrap_or("no name"),
                     remote.url().unwrap_or("no url"),
                     remote.name().unwrap_or("no name"),
-                    remote.pushurl().or(remote.url()).unwrap_or(""),
+                    remote.pushurl().or_else(|| remote.url()).unwrap_or(""),
                     ));
                 } else {
                     error!("{}", lformat!("no remote"))

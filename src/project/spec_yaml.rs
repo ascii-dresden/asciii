@@ -289,8 +289,8 @@ impl HasEvents for Project {
                           .and_then(|d| self.parse_dmy_date(d));
 
             Some(spec::Event {
-                     begin: begin,
-                     end: end,
+                     begin,
+                     end,
                      times: self.times(h).unwrap_or_else(Vec::new),
                  })
         })
@@ -302,7 +302,7 @@ impl HasEvents for Project {
         times.into_iter()
              .map(|h| {
 
-            let begin = self.get_direct(h, "begin")
+            let start = self.get_direct(h, "begin")
                             .and_then(|y| y.as_str())
                             .or(Some("00.00"))
                             .and_then(util::naive_time_from_str);
@@ -310,12 +310,12 @@ impl HasEvents for Project {
             let end = self.get_direct(h, "end")
                           .and_then(|y| y.as_str())
                           .and_then(util::naive_time_from_str)
-                          .or(begin); // TODO assume a duration of one hour instead
+                          .or(start); // TODO assume a duration of one hour instead
 
-            if let (Some(begin), Some(end)) = (begin, end) {
+            if let (Some(start), Some(end)) = (start, end) {
                 Some(EventTime {
-                         start: begin,
-                         end: end,
+                         start,
+                         end,
                      })
             } else {
                 None

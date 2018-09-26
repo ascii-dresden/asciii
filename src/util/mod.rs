@@ -23,7 +23,7 @@ pub fn setup_log() {
     let log_var ="ASCIII_LOG";
     let mut logger = env_logger::Builder::from_env(log_var);
 
-    if let Err(_) = env::var(log_var) {
+    if env::var(log_var).is_err() {
         logger
             .default_format_level(true)
             .default_format_timestamp(false)

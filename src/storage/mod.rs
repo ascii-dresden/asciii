@@ -295,7 +295,7 @@ impl<L:Storable> Storage<L> {
 
     /// Getter for Storage::templates, returns `Result`.
     pub fn get_repository(&self) -> StorageResult<&Repository> {
-        self.repository.as_ref().ok_or(ErrorKind::RepoUnintialized.into())
+        self.repository.as_ref().ok_or_else(|| ErrorKind::RepoUnintialized.into())
     }
 
     /// Returns a struct containing all configured paths of this `Storage`.

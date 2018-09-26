@@ -366,8 +366,8 @@ fn matches_to_export_config<'a>(m: &'a ArgMatches) -> Option<ExportConfig<'a>> {
 
     let mut config = ExportConfig {
             select:        StorageSelection::Unintiailzed,
-            template_name: template_name,
-            bill_type:     bill_type,
+            template_name,
+            bill_type,
             output:        m.value_of("output").map(Path::new),
             dry_run:       m.is_present("dry-run"),
             pdf_only:      m.is_present("pdf-only"),

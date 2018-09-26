@@ -76,7 +76,7 @@ impl Project {
                 error!("syntax error in {}\n  {}", file_path.display(), e);
                 Yaml::Null
             }),
-            file_content: file_content,
+            file_content,
         })
     }
 
@@ -189,10 +189,10 @@ impl Project {
         }
     }
 
-    pub fn to_csv(&self, bill_type:&BillType) -> Result<String>{
+    pub fn to_csv(&self, bill_type: BillType) -> Result<String>{
         use std::fmt::Write;
         let (offer, invoice) = self.bills()?;
-        let bill = match *bill_type{ BillType::Offer => offer, BillType::Invoice => invoice };
+        let bill = match bill_type{ BillType::Offer => offer, BillType::Invoice => invoice };
         let mut csv_string = String::new();
         let splitter = ";";
 
@@ -206,7 +206,7 @@ impl Project {
                                         write!(&mut csv_string, "{};",  item.amount.to_string())?;
                                         write!(&mut csv_string, "{:.2};",  item.product.price.as_float())?;
                                         write!(&mut csv_string, "{:.2};",  item.product.tax)?;
-                                        write!(&mut csv_string, "{:.2}\n", (item.product.price * item.amount).as_float())?;
+                                        writeln!(&mut csv_string, "{:.2}", (item.product.price * item.amount).as_float())?;
             }
         }
         Ok(csv_string)
@@ -385,7 +385,7 @@ impl Project {
             offered
         };
 
-        Ok(( BillItem{ amount: offered, product: product }, BillItem{ amount: sold, product: product }))
+        Ok(( BillItem{ amount: offered, product }, BillItem{ amount: sold, product }))
     }
 }
 
@@ -551,13 +551,13 @@ impl Storable for Project {
         };
 
         // fills the template
-        let filled = Templater::from_file(template)?
+        let file_content = Templater::from_file(template)?
             .fill_in_data(&fill).fix()
             .fill_in_data(&default_fill)
             .finalize()
             .filled;
 
-        debug!("remaining template fields: {:#?}", filled.list_keywords());
+        debug!("remaining template fields: {:#?}", file_content.list_keywords());
 
         // generates a temp file
         let temp_dir  = TempDir::new(project_name).unwrap();
@@ -565,14 +565,14 @@ impl Storable for Project {
 
         // write into a file
         let mut file = File::create(&temp_file)?;
-        file.write_all(filled.as_bytes())?;
+        file.write_all(file_content.as_bytes())?;
         file.sync_all()?;
 
-        let yaml = match yaml::parse(&filled){
+        let yaml = match yaml::parse(&file_content){
             Ok(y) => y,
             Err(e) => {
                 error!("The created document is no valid yaml. SORRY!\n{}\n\n{}",
-                       filled.lines().enumerate().map(|(n,l)| format!("{:>3}. {}\n",n,l)).collect::<String>(), //line numbers :D
+                       file_content.lines().enumerate().map(|(n,l)| format!("{:>3}. {}\n",n,l)).collect::<String>(), //line numbers :D
                        e.description());
                 bail!(error::Error::from_kind(ErrorKind::Yaml(e)))
             }
@@ -582,8 +582,8 @@ impl Storable for Project {
         let project = Project {
             file_path: temp_file,
             git_status: None,
-            file_content: filled,
-            yaml: yaml
+            file_content,
+            yaml
         };
 
         Ok(StorableAndTempDir {

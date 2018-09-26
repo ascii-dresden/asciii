@@ -54,12 +54,12 @@ pub fn list(matches: &ArgMatches) -> Result<()> {
         let dir = if matches.is_present("archive") {
             let archive_year = matches.value_of("archive")
                                       .and_then(|y| y.parse::<i32>().ok())
-                                      .unwrap_or(Utc::today().year());
+                                      .unwrap_or_else(|| Utc::today().year());
             StorageDir::Archive(archive_year)
         } else if matches.is_present("year") {
             let year = matches.value_of("year")
                               .and_then(|y| y.parse::<i32>().ok())
-                              .unwrap_or(Utc::today().year());
+                              .unwrap_or_else(|| Utc::today().year());
             StorageDir::Year(year)
         }
         // or list all, but sort by date
@@ -115,15 +115,15 @@ fn list_projects(dir: StorageDir, list_config: &ListConfig) -> Result<()> {
         "index" => {
             projects.sort_by(|pa, pb| {
                                  pa.index()
-                                   .unwrap_or("zzzz".to_owned())
-                                   .cmp(&pb.index().unwrap_or("zzzz".to_owned()))
+                                   .unwrap_or_else(|| "zzzz".to_owned())
+                                   .cmp(&pb.index().unwrap_or_else(|| "zzzz".to_owned()))
                              })
         } // TODO rename to ident
         _ => {
             projects.sort_by(|pa, pb| {
                                  pa.index()
-                                   .unwrap_or("zzzz".to_owned())
-                                   .cmp(&pb.index().unwrap_or("zzzz".to_owned()))
+                                   .unwrap_or_else(|| "zzzz".to_owned())
+                                   .cmp(&pb.index().unwrap_or_else(|| "zzzz".to_owned()))
                              })
         }
     }

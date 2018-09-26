@@ -129,13 +129,13 @@ pub struct Sum {
 use super::product::Product;
 fn sums_from_bill(bill: &Bill<Product>) -> Vec<Sum> {
     bill.iter()
-        .map(|(tax, list)| Sum::from_itemlist(tax, list))
+        .map(|(tax, list)| Sum::from_itemlist(*tax, list))
         .rev()
         .collect::<Vec<_>>()
 }
 
 impl Sum {
-    pub fn from_itemlist(tax: &Tax, list: &ItemList<Product>) -> Sum {
+    pub fn from_itemlist(tax: Tax, list: &ItemList<Product>) -> Sum {
         let gross_sum = list.gross_sum();
         let tax_sum = list.tax_sum();
         Sum {

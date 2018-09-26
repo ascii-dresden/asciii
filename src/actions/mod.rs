@@ -161,7 +161,7 @@ pub fn delete_project_confirmation(dir: StorageDir, search_terms:&[&str]) -> Res
     for project in storage.search_projects_any(dir, search_terms)? {
         storage.delete_project_if(&project, || {
                     let file = project.file();
-                    let desc = project.name().or(file.to_str()).unwrap();
+                    let desc = project.name().or_else(|| file.to_str()).unwrap();
                     util::really( &lformat!("do you realy want to delete {}?", desc))
                 })?
     }

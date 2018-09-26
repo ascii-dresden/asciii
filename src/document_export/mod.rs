@@ -27,6 +27,7 @@ struct DocAndStorage<'a, T: 'a + Serialize> {
     storage: Option<storage::Paths>,
     is_invoice: bool
 }
+
 impl<'a, T: 'a + Serialize> DocAndStorage<'a, T> {
     fn from(document: &T, bill_type: BillType) -> DocAndStorage<T> {
         DocAndStorage {
@@ -109,7 +110,6 @@ fn output_template_path(template_name:&str) -> Result<PathBuf> {
 
 /// Creates the latex files within each projects directory, either for Invoice or Offer.
 #[cfg(feature="document_export")]
-#[allow(cyclomatic_complexity)]
 fn project_to_doc(project: &Project, config: &ExportConfig) -> Result<Option<PathBuf>> {
     trace!("exporting a document: {:#?}", config);
 
