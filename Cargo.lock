@@ -33,7 +33,7 @@ dependencies = [
 
 [[package]]
 name = "asciii"
-version = "3.4.0-rc"
+version = "3.4.0"
 dependencies = [
  "base64 0.9.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "bill 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)",

@@ -111,7 +111,7 @@ lazy_static! {
     /// Human readable, no semantic versioning.
     pub static ref VERSION_VERBOSE: String = format!("{} - {} ({}, {})",
                                              env!("CARGO_PKG_VERSION"),
-                                             include_str!("../.most_recent_commit"),
+                                             env!("GIT_DESCRIPTION"),
                                              env!("BUILD_DATE"),
                                              env!("PROFILE"),
                                              );
@@ -120,7 +120,7 @@ lazy_static! {
     pub static ref VERSION_JSON: String = format!(
         r#"{{ "version": "{version}", "commit": "{commit}", "built": "{built}", "profile": "{profile}" }}"#,
         version = env!("CARGO_PKG_VERSION"),
-        commit = include_str!("../.most_recent_commit"),
+        commit = env!("GIT_DESCRIPTION"),
         built = env!("BUILD_DATE"),
         profile = env!("PROFILE"),
     );
