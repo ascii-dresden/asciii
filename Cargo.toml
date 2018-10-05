@@ -1,6 +1,6 @@
 [package]
 name = "asciii"
-version = "3.3.0"
+version = "3.4.0-rc"
 authors = ["Hendrik Sollich <hendrik@hoodie.de>"]
 license = "MIT/Apache-2.0"
 readme = "README.md"
@@ -94,7 +94,8 @@ pretty_assertions = "0.5"
 
 [features]
 default = ["cli", "document_export", "git_statuses", "serialization", "deserialization"]
-full_tool = ["cli", "document_export", "git_statuses", "serialization", "deserialization", "localize", "version_string", "shell", "meta"]
+travis_compatible = ["cli", "document_export", "git_statuses", "serialization", "deserialization", "shell", "meta"]
+full_tool = ["travis_compatible", "localize", "version_string"]
 server = ["rocket", "rocket_codegen", "rocket_contrib", "rocket_cors", "openssl-sys", "openssl-probe", "serialization", "version_string", "meta"]
 webapp = ["server", "include_dir" ] # build the frontend app
 
