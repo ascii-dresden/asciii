@@ -44,7 +44,7 @@ Just plain old `cargo install --git https://github.com/ascii-dresden/asciii` or 
 
 ### Requirements
 
-You need at least `rustc`, `cargo`, `cmake`, `git` and `zlib1g-dev` to run this.
+You need at least `rustc`, `cargo`, `cmake`, `git` and `zlib1g-dev` to run this. If you want to use `webapp` feature make sure `yarn` is installed.
 
 ## Development
 
