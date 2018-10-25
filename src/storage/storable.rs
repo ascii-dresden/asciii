@@ -21,8 +21,8 @@ pub type FolderPathBuf = PathBuf;
 pub trait Storable: Send+Sync {
 
     /// opens a projectfolder
-    fn open_folder(&FolderPath) -> StorageResult<Self> where Self: Sized;
-    fn open_file(&FilePath) -> StorageResult<Self> where Self: Sized;
+    fn open_folder(_: &FolderPath) -> StorageResult<Self> where Self: Sized;
+    fn open_file(_: &FilePath) -> StorageResult<Self> where Self: Sized;
 
     /// creates in tempfile
     fn from_template(project_name: &str, template: &Path, data: &HashMap<&str, String>) -> StorageResult<StorableAndTempDir<Self>> where Self: Sized;
@@ -55,7 +55,7 @@ pub trait Storable: Send+Sync {
     /// Tell a project its own git status after opening
     ///
     /// This depoends on the feature `git_statuses`
-    fn set_git_status(&mut self, GitStatus){}
+    fn set_git_status(&mut self, _: GitStatus){}
 
     /// Ask a project for its gitstatus
     ///
