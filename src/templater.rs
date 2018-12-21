@@ -85,7 +85,7 @@ impl<U:Deref<Target=str>> IsKeyword for U {
     fn map_keywords<F>(&self, closure: F) -> String
         where F:Fn(&str) -> String{
         Regex::new(REGEX).expect("broken regex")
-            .replace_all(self, |caps:&Captures| {
+            .replace_all(self, |caps:&Captures<'_>| {
                 closure(caps.get(1).unwrap().as_str())
             }).into()
     }
@@ -175,7 +175,7 @@ pub enum TemplateError{
 }
 
 impl fmt::Display for TemplateError{
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result{
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result{
         match *self {
             TemplateError::Incomplete(ref list) => write!(f, "{} ({:?})", self.description(), list),
         }
@@ -184,7 +184,7 @@ impl fmt::Display for TemplateError{
 
 impl Error for TemplateError{
     fn description(&self) -> &str{ "The template was not filled completely." }
-    fn cause(&self) -> Option<&Error>{None}
+    fn cause(&self) -> Option<&dyn Error>{None}
 }
 
 use std::borrow::ToOwned;
@@ -201,6 +201,8 @@ impl ToOwned for Templater{
 
 #[cfg(test)]
 mod test{
+    use maplit::hashmap;
+    
     use super::Templater;
     const TEMPLATE:&'static str = r##"This tests ##TEST## for ##ATTR## ##SUBJ##."##;
 

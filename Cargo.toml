@@ -9,6 +9,7 @@ This is an internal tool of the Studentencafe ascii in Dresden and therefore spe
 homepage = "https://github.com/ascii-dresden/asciii/"
 repository = "https://github.com/ascii-dresden/asciii/"
 documentation = "https://docs.rs/asciii/"
+edition = "2018"
 
 build = true
 autobins = false

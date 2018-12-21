@@ -12,6 +12,7 @@ use std::error::Error;
 use git2;
 use prettytable::{color, Attr};
 use prettytable::color::Color;
+use log::{info, debug};
 
 /// More Rustacious way of representing a git status
 #[derive(Debug,Clone)]
@@ -54,7 +55,7 @@ impl GitStatus {
 
 impl fmt::Display for GitStatus {
 
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match *self{
         // => write!(f, "{:?}", self)
          GitStatus::Conflict        => write!(f, "~"),
@@ -113,7 +114,7 @@ pub struct Repository{
 impl Repository {
 
     #[cfg(feature="git_statuses")]
-    pub fn new(path:&Path) -> Result<Self, git2::Error>{
+    pub fn try_new(path:&Path) -> Result<Self, git2::Error>{
         let repo = git2::Repository::open(path)?;
         let statuses = Self::cache_statuses(&repo)?;
         Ok(
@@ -126,7 +127,7 @@ impl Repository {
     }
 
     #[cfg(not(feature="git_statuses"))]
-    pub fn new(path:&Path) -> Result<Self, GitError>{
+    pub fn try_new(path:&Path) -> Result<Self, GitError>{
         Ok( Repository{ workdir: path.to_owned()})
     }
 

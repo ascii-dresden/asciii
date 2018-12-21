@@ -1,7 +1,7 @@
 #[macro_use] extern crate log;
 #[macro_use] extern crate pretty_assertions;
 
-extern crate asciii;
+use asciii;
 
 use std::fs;
 use std::ffi::OsStr;

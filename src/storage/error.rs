@@ -1,18 +1,18 @@
+#![allow(trivial_casts)]
 //! Error that may occur in Storage
 //!
+#[cfg(feature="git_statuses")] use git2;
 
-#![allow(trivial_casts)]
 use std::{io, fmt};
 use std::path::PathBuf;
-use ::project;
-#[cfg(feature="git_statuses")] use git2;
+use crate::project;
+use crate::templater;
 
 #[cfg(not(feature="git_statuses"))]
 mod git2 {
     pub use super::super::repo::GitError as Error;
 }
 
-use templater;
 
 #[allow(missing_docs)]
 error_chain!{

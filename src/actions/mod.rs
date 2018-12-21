@@ -6,6 +6,7 @@ use bill::Currency;
 use icalendar::Calendar;
 #[cfg(feature = "meta")]
 use toml;
+use log::{info, trace};
 
 use std::fmt::Write;
 #[cfg(feature = "meta")] use std::fs;
@@ -14,10 +15,10 @@ use std::path::PathBuf;
 use std::collections::HashMap;
 use std::process::Command;
 
-use util;
-use storage::{self, StorageDir, Storable};
-use project::Project;
-use project::spec::*;
+use crate::util;
+use crate::storage::{self, StorageDir, Storable};
+use crate::project::Project;
+use crate::project::spec::*;
 
 pub mod error;
 use self::error::*;
@@ -128,7 +129,7 @@ pub fn dues() -> Result<Dues> {
 /// TODO make this not panic :D
 /// TODO move this to `spec::all_the_things`
 pub fn spec() -> Result<()> {
-    use project::spec::*;
+    use crate::project::spec::*;
     let projects = storage::setup::<Project>()?.open_projects(StorageDir::Working)?;
     //let projects = super::execute(||storage.open_projects(StorageDir::All));
     for project in projects {

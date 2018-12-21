@@ -21,6 +21,7 @@
 
 use rayon::prelude::*;
 use dirs::home_dir;
+use log::{info, debug, trace, error, warn};
 
 use std::fs;
 use std::env::{self, current_dir};
@@ -162,8 +163,8 @@ fn replace_home_tilde(p:&Path) -> PathBuf{
 /// This is by far the most important function of all utility functions.
 pub fn get_storage_path() -> PathBuf
 {
-    let storage_path = PathBuf::from(::CONFIG.var_get_str("path"))
-            .join(::CONFIG.var_get_str("dirs/storage"));
+    let storage_path = PathBuf::from(crate::CONFIG.var_get_str("path"))
+            .join(crate::CONFIG.var_get_str("dirs/storage"));
 
     // TODO make replace tilde a Trait function
     let storage_path = replace_home_tilde(&storage_path);
@@ -179,10 +180,10 @@ pub fn get_storage_path() -> PathBuf
 /// Sets up an instance of `Storage`.
 pub fn setup<L:Storable>() -> StorageResult<Storage<L>> {
     trace!("storage::setup()");
-    let working   = ::CONFIG.get_str_or("dirs/working").ok_or("Faulty config: dirs/working does not contain a value")?;
-    let archive   = ::CONFIG.get_str_or("dirs/archive").ok_or("Faulty config: dirs/archive does not contain a value")?;
-    let templates = ::CONFIG.get_str_or("dirs/templates").ok_or("Faulty config: dirs/templates does not contain a value")?;
-    let storage   = Storage::new(get_storage_path(), working, archive, templates)?;
+    let working   = crate::CONFIG.get_str_or("dirs/working").ok_or("Faulty config: dirs/working does not contain a value")?;
+    let archive   = crate::CONFIG.get_str_or("dirs/archive").ok_or("Faulty config: dirs/archive does not contain a value")?;
+    let templates = crate::CONFIG.get_str_or("dirs/templates").ok_or("Faulty config: dirs/templates does not contain a value")?;
+    let storage   = Storage::try_new(get_storage_path(), working, archive, templates)?;
     storage.health_check()?;
     Ok(storage)
 }
@@ -190,13 +191,13 @@ pub fn setup<L:Storable>() -> StorageResult<Storage<L>> {
 /// Sets up an instance of `Storage`, with git turned on.
 pub fn setup_with_git<L:Storable>() -> StorageResult<Storage<L>> {
     trace!("storage::setup_with_git()");
-    let working   = ::CONFIG.get_str_or("dirs/working").ok_or("Faulty config: dirs/working does not contain a value")?;
-    let archive   = ::CONFIG.get_str_or("dirs/archive").ok_or("Faulty config: dirs/archive does not contain a value")?;
-    let templates = ::CONFIG.get_str_or("dirs/templates").ok_or("Faulty config: dirs/templates does not contain a value")?;
+    let working   = crate::CONFIG.get_str_or("dirs/working").ok_or("Faulty config: dirs/working does not contain a value")?;
+    let archive   = crate::CONFIG.get_str_or("dirs/archive").ok_or("Faulty config: dirs/archive does not contain a value")?;
+    let templates = crate::CONFIG.get_str_or("dirs/templates").ok_or("Faulty config: dirs/templates does not contain a value")?;
     let storage   = if env::var("ASCIII_NO_GIT").is_ok() {
-        Storage::new(get_storage_path(), working, archive, templates)?
+        Storage::try_new(get_storage_path(), working, archive, templates)?
     } else {
-        Storage::new_with_git(get_storage_path(), working, archive, templates)?
+        Storage::try_new_with_git(get_storage_path(), working, archive, templates)?
     };
 
     storage.health_check()?;
@@ -219,7 +220,7 @@ fn slugify(string:&str) -> String{ slug::slugify(string) }
 impl<L:Storable> Storage<L> {
 
     /// Inits storage, does not check existence, yet. TODO
-    pub fn new<P: AsRef<Path>>(root:P, working:&str, archive:&str, template:&str) -> StorageResult<Self> {
+    pub fn try_new<P: AsRef<Path>>(root:P, working:&str, archive:&str, template:&str) -> StorageResult<Self> {
         trace!("initializing storage, root: {}", root.as_ref().display());
         let root = root.as_ref();
         if root.is_absolute(){
@@ -238,11 +239,11 @@ impl<L:Storable> Storage<L> {
     }
 
     /// Inits storage with git capabilities.
-    pub fn new_with_git<P: AsRef<Path>>(root:P, working:&str, archive:&str, template:&str) -> StorageResult<Self> {
+    pub fn try_new_with_git<P: AsRef<Path>>(root:P, working:&str, archive:&str, template:&str) -> StorageResult<Self> {
         trace!("initializing storage, with git");
         Ok( Storage{
-            repository: Some(Repository::new(root.as_ref())?),
-            .. Self::new(root, working, archive, template)?
+            repository: Some(Repository::try_new(root.as_ref())?),
+            .. Self::try_new(root, working, archive, template)?
         })
     }
 
@@ -367,7 +368,7 @@ impl<L:Storable> Storage<L> {
     /// Produces a list of files in the `template_dir()`
     pub fn list_template_files(&self) -> StorageResult<Vec<PathBuf>> {
         // TODO this is the only reference to `CONFIG`, lets get rid of it
-        let template_file_extension = ::CONFIG.get_str("extensions/project_template");
+        let template_file_extension = crate::CONFIG.get_str("extensions/project_template");
         trace!("listing template files (.{})", template_file_extension);
         let template_files =
         list_path_content(&self.templates_dir())?
@@ -858,7 +859,7 @@ impl<L:Storable> Storage<L> {
 }
 
 impl<P:Storable> fmt::Debug for Storage<P>{
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result
     {
         write!(f, "Storage: storage  = {storage:?}
                           working  = {working:?}

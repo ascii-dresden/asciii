@@ -7,7 +7,7 @@ const STORAGE: &'static str = "/home/hendrik/ascii/caterings";
 
 fn setup() -> (PathBuf, Storage<TestProject>) {
     let storage_path = PathBuf::from(STORAGE);
-    let storage = Storage::new(&storage_path, "working", "archive", "templates").unwrap();
+    let storage = Storage::try_new(&storage_path, "working", "archive", "templates").unwrap();
     (storage_path, storage)
 }
 

@@ -3,9 +3,9 @@
 use toml;
 use std::{io, fmt, time};
 
-use project;
+use crate::project;
 // use project::error::ProjectError;
-use storage::error::StorageError;
+use crate::storage::error::StorageError;
 
 error_chain!{
     types {

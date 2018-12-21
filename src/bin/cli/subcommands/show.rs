@@ -11,12 +11,12 @@ use asciii::templater::Templater;
 use super::{matches_to_search, matches_to_selection};
 
 use super::path;
-use cli::error::*;
+use crate::cli::error::*;
 
 use std::fs;
 
 /// Command SHOW
-pub fn show(m: &ArgMatches) -> Result<()> {
+pub fn show(m: &ArgMatches<'_>) -> Result<()> {
     let (search_terms, _) = matches_to_search(m);
     let selection = matches_to_selection(m);
 
@@ -30,7 +30,7 @@ pub fn show(m: &ArgMatches) -> Result<()> {
     if m.is_present("files") {
         show_files(selection)
     } else if let Some(detail) = m.value_of("detail") {
-        show_detail(selection, detail)
+        show_detail(&selection, detail)
     } else if m.is_present("empty fields") {
         show_empty_fields(selection)
     } else if m.is_present("errors") {
@@ -102,7 +102,7 @@ fn show_ical(selection: StorageSelection) -> Result<()> {
     Ok(())
 }
 
-fn show_detail(selection: StorageSelection, detail: &str) -> Result<()> {
+fn show_detail(selection: &StorageSelection, detail: &str) -> Result<()> {
     for p in setup::<Project>()?.open_projects(selection.clone())? {
         println!("{}",
                  p.field(detail)
@@ -118,11 +118,12 @@ fn show_csv(selection: StorageSelection) -> Result<()> {
     Ok(())
 }
 
-pub fn show_path(matches: &ArgMatches) -> Result<()> {
-    Ok(path(matches, |path| {
+pub fn show_path(matches: &ArgMatches<'_>) -> Result<()> {
+    path(matches, |path| {
         println!("{}", path.display());
         Ok(())
-    })?)
+    })?;
+    Ok(())
 }
 
 /// Command SHOW --template

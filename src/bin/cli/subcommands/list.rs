@@ -1,6 +1,7 @@
 
 use chrono::prelude::*;
 use clap::ArgMatches;
+use log::debug;
 
 use asciii::CONFIG;
 use asciii::print::{self, ListConfig, ListMode};
@@ -8,18 +9,18 @@ use asciii::project::{Project, ComputedField};
 use asciii::project::spec::IsProject;
 use asciii::storage::*;
 
-use cli::error::*;
+use crate::cli::error::*;
 
 use std::path::PathBuf;
 
 /// Command LIST
-pub fn list(matches: &ArgMatches) -> Result<()> {
+pub fn list(matches: &ArgMatches<'_>) -> Result<()> {
     if matches.is_present("templates") {
-        Ok(list_templates()?)
+        list_templates()?; Ok(())
     } else if matches.is_present("years") {
-        Ok(list_years()?)
+        list_years()?; Ok(())
     } else if matches.is_present("computed_fields") {
-        Ok(list_computed_fields()?)
+        list_computed_fields()?; Ok(())
     } else {
         let list_mode = decide_mode(matches.is_present("simple"),
                                     matches.is_present("verbose"),
@@ -75,11 +76,12 @@ pub fn list(matches: &ArgMatches) -> Result<()> {
             StorageDir::Working
         };
 
-        Ok(if matches.is_present("broken") {
-               list_broken_projects(dir)? // XXX Broken
+        if matches.is_present("broken") {
+               list_broken_projects(dir)?; // XXX Broken
            } else {
-               list_projects(dir, &list_config)?
-           })
+               list_projects(dir, &list_config)?;
+           }
+        Ok(())
     }
 }
 
@@ -92,7 +94,7 @@ pub fn list(matches: &ArgMatches) -> Result<()> {
 /// * `print::verbose_rows()`
 ///
 /// which it prints with `print::print_projects()`
-fn list_projects(dir: StorageDir, list_config: &ListConfig) -> Result<()> {
+fn list_projects(dir: StorageDir, list_config: &ListConfig<'_>) -> Result<()> {
     let storage = if CONFIG.get_bool("list/gitstatus") {
         setup_with_git::<Project>()?
     } else {

@@ -1,8 +1,8 @@
-extern crate asciii;
-extern crate serde;
-extern crate serde_yaml;
-extern crate serde_json;
-extern crate toml;
+use asciii;
+
+use serde_yaml;
+use serde_json;
+
 
 use serde::Serialize;
 

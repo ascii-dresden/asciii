@@ -8,6 +8,7 @@ use std::collections::HashMap;
 
 use chrono::{Date, Utc, Datelike};
 use tempdir::TempDir;
+use log::debug;
 
 use super::StorageResult;
 use super::repo::GitStatus;

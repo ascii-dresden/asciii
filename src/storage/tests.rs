@@ -4,8 +4,9 @@ use std::collections::HashMap;
 
 use chrono::prelude::*;
 use tempdir::TempDir;
+use maplit::hashmap;
 
-use util;
+use crate::util;
 use super::*;
 
 // TODO add tests for file or directories in return values
@@ -69,7 +70,7 @@ const TEST_PROJECTS:[&'static str;4] = [
 fn setup() -> (TempDir, PathBuf, Storage<TestProject>) {
     let dir = TempDir::new_in(Path::new("."),"storage_test").unwrap();
     let storage_path = dir.path().join("storage_test");
-    let storage = Storage::new(&storage_path, "working", "archive", "templates").unwrap();
+    let storage = Storage::try_new(&storage_path, "working", "archive", "templates").unwrap();
     (dir, storage_path, storage)
 }
 

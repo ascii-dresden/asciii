@@ -7,13 +7,15 @@ use prettytable::cell::Cell;
 use prettytable::format::{LineSeparator, LinePosition, FormatBuilder};
 use prettytable::{Attr, color};
 use term_size;
+use log::{debug, trace, error};
+use prettytable::{cell, row};
 
 
-use project::{BillType, Project, Exportable};
-use project::spec::{IsProject, Redeemable, Invoicable, HasEmployees, HasEvents};
-use project::error::SpecResult;
-use storage::Storable;
-use util::currency_to_string;
+use crate::project::{BillType, Project, Exportable};
+use crate::project::spec::{IsProject, Redeemable, Invoicable, HasEmployees, HasEvents};
+use crate::project::error::SpecResult;
+use crate::storage::Storable;
+use crate::util::currency_to_string;
 
 /// Configuration for this list output.
 #[derive(Debug)]
@@ -33,12 +35,12 @@ pub enum ListMode{ Simple, Verbose, Nothing, Paths, Csv }
 impl<'a> Default for ListConfig<'a>{
     fn default() -> ListConfig<'a>{
         ListConfig{
-            mode:         if ::CONFIG.get_bool("list/verbose"){ ListMode::Verbose } else{ ListMode::Simple },
-            git_status:   ::CONFIG.get_bool("list/gitstatus"),
+            mode:         if crate::CONFIG.get_bool("list/verbose"){ ListMode::Verbose } else{ ListMode::Simple },
+            git_status:   crate::CONFIG.get_bool("list/gitstatus"),
             show_errors:  false,
-            sort_by:      ::CONFIG.get_str("list/sort"),
+            sort_by:      crate::CONFIG.get_str("list/sort"),
             filter_by:    None,
-            use_colors:   ::CONFIG.get_bool("list/colors"),
+            use_colors:   crate::CONFIG.get_bool("list/colors"),
             details:      None,
         }
     }
@@ -46,7 +48,7 @@ impl<'a> Default for ListConfig<'a>{
 
 // TODO: move `payed_to_cell` into computed_field.rs
 fn payed_to_cell(project:&Project) -> Cell {
-    let sym = ::CONFIG.get_str("currency");
+    let sym = crate::CONFIG.get_str("currency");
 
     match (project.is_payed(), project.hours().employees_payed()) {
         (false,false) => Cell::new("✗").with_style(Attr::ForegroundColor(color::RED)),
@@ -80,10 +82,10 @@ fn project_to_style(project:&Project) -> &str{
         }
         return match age{
             _ if age > 28  => "Fm",
-              1 ... 28     => "Fc",
+              1 ..= 28     => "Fc",
                     0      => "Fyb",
-             -7 ... -1     => "Fr",
-            -14 ... -8     => "Fy",
+             -7 ..= -1     => "Fr",
+            -14 ..= -8     => "Fy",
             _ if age < -14 => "Fg",
             _              => "d"
         };
@@ -92,7 +94,7 @@ fn project_to_style(project:&Project) -> &str{
 }
 
 /// produces the rows used in `print_projects()`
-pub fn path_rows(projects:&[Project], list_config:&ListConfig) -> Vec<Row>{
+pub fn path_rows(projects:&[Project], list_config:&ListConfig<'_>) -> Vec<Row>{
     projects
         .iter()
         .map(|project| {
@@ -110,7 +112,7 @@ pub fn path_rows(projects:&[Project], list_config:&ListConfig) -> Vec<Row>{
 }
 
 /// Triggered by `list --simple`, usually you set this in your config under `list/verbose: false`.
-pub fn simple_rows(projects:&[Project], list_config:&ListConfig) -> Vec<Row>{
+pub fn simple_rows(projects:&[Project], list_config:&ListConfig<'_>) -> Vec<Row>{
     projects
         .iter()
         .map(|project| {
@@ -138,7 +140,7 @@ pub fn simple_rows(projects:&[Project], list_config:&ListConfig) -> Vec<Row>{
 ///
 /// produces the rows used in `print_projects()`
 #[inline]
-pub fn verbose_rows(projects:&[Project], list_config:&ListConfig) -> Vec<Row>{
+pub fn verbose_rows(projects:&[Project], list_config:&ListConfig<'_>) -> Vec<Row>{
     trace!("verbose_rows {:#?}", list_config);
     projects.iter().enumerate()
         .map(|(i, project)| {
@@ -232,7 +234,7 @@ pub fn verbose_rows(projects:&[Project], list_config:&ListConfig) -> Vec<Row>{
 /// Triggered by `list --nothing`
 ///
 /// This prints nothing unless you tell it to with `--details`
-pub fn dynamic_rows(projects:&[Project], list_config:&ListConfig) -> Vec<Row>{
+pub fn dynamic_rows(projects:&[Project], list_config:&ListConfig<'_>) -> Vec<Row>{
     projects
         .iter()
         .map(|project| {
@@ -281,7 +283,7 @@ pub fn print_projects(rows: Vec<Row>){
 
 /// Prints Projects as CSV
 pub fn print_csv_year(year:i32){
-    match ::actions::csv(year) {
+    match crate::actions::csv(year) {
         Ok(csv) => println!("{}", csv),
         Err(err) => println!("{}", err.description())
     }
@@ -289,7 +291,7 @@ pub fn print_csv_year(year:i32){
 
 /// Prints Projects as CSV
 pub fn print_csv(projects:&[Project]){
-    match ::actions::projects_to_csv(projects) {
+    match crate::actions::projects_to_csv(projects) {
         Ok(csv) => println!("{}", csv),
         Err(err) => println!("{}", err.description())
     }

@@ -16,8 +16,9 @@ use std::env::{self, current_dir};
 use std::path::{Path, PathBuf};
 
 use dirs::home_dir;
+use log::warn;
 
-use util::yaml::{self, Yaml, YamlError};
+use crate::util::yaml::{self, Yaml, YamlError};
 
 /// Name of the configfile
 pub const DEFAULT_LOCATION: &str = ".asciii.yml";
@@ -43,7 +44,7 @@ impl ConfigReader {
     }
 
     /// Opens config from `self.path()` and parses Yaml right away.
-    pub fn new() -> Result<ConfigReader, YamlError> {
+    pub fn try_new() -> Result<ConfigReader, YamlError> {
         let home_path = ConfigReader::path_home();
         let local_path = Path::new(DEFAULT_LOCATION);
 
@@ -121,9 +122,9 @@ impl ConfigReader {
         yaml::get_str(&self.local, key)
             .or_else(|| yaml::get_str(&self.custom, key))
             .or_else(|| yaml::get_str(&self.defaults, key))
-            .expect(&format!("Config file {} in field {} does not contain a string value",
+            .unwrap_or_else(|| panic!("{}", format!("Config file {} in field {} does not contain a string value",
                              DEFAULT_LOCATION,
-                             key))
+                             key)))
     }
 
     /// Returns the a vec of &strs if possible
@@ -146,9 +147,9 @@ impl ConfigReader {
         yaml::get_to_string(&self.local, key)
             .or_else(|| yaml::get_to_string(&self.custom, key))
             .or_else(|| yaml::get_to_string(&self.defaults, key))
-            .expect(&format!("Config file {} in field {} does not contain a value",
+            .unwrap_or_else(|| panic!("{}", format!("Config file {} in field {} does not contain a value",
                              DEFAULT_LOCATION,
-                             key))
+                             key)))
     }
 
     /// Tries to get the config field as float
@@ -167,9 +168,9 @@ impl ConfigReader {
     pub fn get_bool(&self, key: &str) -> bool {
         self.get(key)
             .and_then(|y| y.as_bool())
-            .expect(&format!("Config file {} in field {} does not contain a boolean value",
+            .unwrap_or_else(|| panic!("{}", format!("Config file {} in field {} does not contain a boolean value",
                              DEFAULT_LOCATION,
-                             key))
+                             key)))
     }
 }
 
@@ -181,7 +182,7 @@ fn simple_reading() {
     }
 
     //assert!(ConfigReader::path_home().exists());
-    let config = ConfigReader::new().unwrap();
+    let config = ConfigReader::try_new().unwrap();
 
     assert_eq!(config.get("list/colors").unwrap().as_bool().unwrap(),
                config.get_bool("list/colors"));
