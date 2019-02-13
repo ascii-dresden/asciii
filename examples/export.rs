@@ -1,7 +1,5 @@
 #![allow(dead_code)]
-extern crate asciii;
-extern crate serde;
-extern crate serde_json;
+use serde_json;
 
 use asciii::project::Project;
 use asciii::project::export::*;

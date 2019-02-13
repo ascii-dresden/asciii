@@ -4,7 +4,7 @@
 use std::{io, fmt};
 #[cfg(feature="serialization")] use serde_json;
 #[cfg(feature="deserialization")] use serde_yaml;
-use util::yaml;
+use crate::util::yaml;
 
 use super::product;
 
@@ -98,7 +98,7 @@ impl<'a> From<&'a [&'a str]> for ErrorList {
 
 
 impl fmt::Display for ErrorList {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         for error in &self.errors {
             writeln!(f, " * {}", error)?
         }

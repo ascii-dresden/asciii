@@ -1,11 +1,13 @@
 use asciii;
 use clap::{App, AppSettings, Arg, ArgGroup, ArgMatches, SubCommand, Shell};
+use log::error;
 use super::subcommands;
 use std::str::FromStr;
 
-use ::cli::error::*;
+use crate::cli::error::*;
 
-pub fn with_cli<F> (app_handler:F) where F: Fn(App) {
+#[allow(clippy::cyclomatic_complexity)]
+pub fn with_cli<F> (app_handler:F) where F: Fn(App<'_, '_>) {
     app_handler(
         App::new("asciii")
             .author(crate_authors!())
@@ -902,7 +904,7 @@ pub fn with_cli<F> (app_handler:F) where F: Fn(App) {
 }
 
 /// Starting point for handling commandline matches
-pub fn match_matches(matches: &ArgMatches) {
+pub fn match_matches(matches: &ArgMatches<'_>) {
     let res = match matches.subcommand() {
      ("bootstrap", Some(sub_m)) => subcommands::bootstrap(sub_m),
      ("list",      Some(sub_m)) => subcommands::list(sub_m),
@@ -951,7 +953,7 @@ pub fn match_matches(matches: &ArgMatches) {
     }
 }
 
-pub fn generate_completions(matches: &ArgMatches) -> Result<()>{
+pub fn generate_completions(matches: &ArgMatches<'_>) -> Result<()>{
     if let Some(shell) = matches.value_of("shell").and_then(|s|Shell::from_str(s).ok()) {
         with_cli(|mut app| app.gen_completions("asciii", shell, ".") );
     } else {
@@ -963,6 +965,7 @@ pub fn generate_completions(matches: &ArgMatches) -> Result<()>{
 pub mod validators {
     use asciii::util::yaml::parse_dmy_date;
 
+    #[allow(clippy::needless_pass_by_value)]
     pub fn is_dmy(val: String) -> Result<(), String> {
         match parse_dmy_date(&val) {
             Some(_) => Ok(()),

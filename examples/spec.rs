@@ -1,4 +1,3 @@
-extern crate asciii;
 use std::path::Path;
 
 use asciii::project::spec::*;

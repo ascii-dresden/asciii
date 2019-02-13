@@ -1,6 +1,3 @@
-extern crate chrono;
-extern crate crowbook_intl;
-
 use std::env;
 use std::path::PathBuf;
 use std::process::Command;

@@ -14,19 +14,21 @@ use chrono::prelude::*;
 use chrono::Duration;
 use yaml_rust::Yaml;
 #[cfg(feature="serialization")] use serde_json;
+use maplit::hashmap;
 use slug;
 use tempdir::TempDir;
 
 use bill::BillItem;
 use icalendar::*;
 use semver::Version;
+use log::{debug, trace, error, warn};
 
-use util::{yaml, get_valid_path};
-use storage::{Storable, StorageResult, list_path_content};
-use storage::StorableAndTempDir;
-use storage::ErrorKind as StorageErrorKind;
-use storage::repo::GitStatus;
-use templater::{Templater, IsKeyword};
+use crate::util::{yaml, get_valid_path};
+use crate::storage::{Storable, StorageResult, list_path_content};
+use crate::storage::StorableAndTempDir;
+use crate::storage::ErrorKind as StorageErrorKind;
+use crate::storage::repo::GitStatus;
+use crate::templater::{Templater, IsKeyword};
 
 pub mod product;
 pub mod spec;
@@ -135,22 +137,22 @@ impl Project {
     }
 
     /// Returns the struct `Client`, which abstracts away client specific stuff.
-    pub fn client(&self) -> Client {
+    pub fn client(&self) -> Client<'_> {
         Client { inner: self }
     }
 
     /// Returns the struct `Offer`, which abstracts away offer specific stuff.
-    pub fn offer(&self) -> Offer {
+    pub fn offer(&self) -> Offer<'_> {
         Offer { inner: self }
     }
 
     /// Returns the struct `Invoice`, which abstracts away invoice specific stuff.
-    pub fn invoice(&self) -> Invoice {
+    pub fn invoice(&self) -> Invoice<'_> {
         Invoice { inner: self }
     }
 
     /// Returns the struct `Invoice`, which abstracts away invoice specific stuff.
-    pub fn hours(&self) -> Hours {
+    pub fn hours(&self) -> Hours<'_> {
         Hours { inner: self }
     }
 
@@ -430,8 +432,8 @@ pub trait Exportable {
     }
 
     fn offer_file(&self) -> Option<PathBuf> {
-        let output_folder = get_valid_path(::CONFIG.get_str("output_path"));
-        let convert_ext  = ::CONFIG.get_str("document_export/output_extension");
+        let output_folder = get_valid_path(crate::CONFIG.get_str("output_path"));
+        let convert_ext  = crate::CONFIG.get_str("document_export/output_extension");
         match (output_folder, self.offer_file_name(convert_ext)) {
             (Some(folder), Some(name)) => folder.join(&name).into(),
             _ => None
@@ -439,8 +441,8 @@ pub trait Exportable {
     }
 
     fn invoice_file(&self) -> Option<PathBuf>{
-        let output_folder = get_valid_path(::CONFIG.get_str("output_path"));
-        let convert_ext  = ::CONFIG.get_str("document_export/output_extension");
+        let output_folder = get_valid_path(crate::CONFIG.get_str("output_path"));
+        let convert_ext  = crate::CONFIG.get_str("document_export/output_extension");
         match (output_folder, self.invoice_file_name(convert_ext)) {
             (Some(folder), Some(name)) => folder.join(&name).into(),
             _ => None
@@ -527,7 +529,7 @@ impl Exportable for Project {
 
 impl Storable for Project {
     fn file_extension() -> String {
-        ::CONFIG.get_to_string("extensions.project_file")
+        crate::CONFIG.get_to_string("extensions.project_file")
     }
 
     fn from_template(project_name: &str, template:&Path, fill: &HashMap<&str, String>) -> StorageResult<StorableAndTempDir<Self>> {
@@ -542,12 +544,12 @@ impl Storable for Project {
             "PROJECT-NAME"  => project_name.to_owned(),
             "DATE-EVENT"    => event_date,
             "DATE-CREATED"  => created_date,
-            "TAX"           => ::CONFIG.get_to_string("defaults/tax"),
-            "SALARY"        => ::CONFIG.get_to_string("defaults/salary"),
-            "MANAGER"       => ::CONFIG.get_str_or("user/name").unwrap_or("").to_string(),
+            "TAX"           => crate::CONFIG.get_to_string("defaults/tax"),
+            "SALARY"        => crate::CONFIG.get_to_string("defaults/salary"),
+            "MANAGER"       => crate::CONFIG.get_str_or("user/name").unwrap_or("").to_string(),
             "TIME-START"    => String::new(),
             "TIME-END"      => String::new(),
-            "VERSION"       => ::VERSION.to_string(),
+            "VERSION"       => crate::VERSION.to_string(),
         };
 
         // fills the template
@@ -647,7 +649,7 @@ impl Storable for Project {
 
     /// Opens a yaml and parses it.
     fn open_folder(folder_path: &Path) -> StorageResult<Project>{
-        let project_file_extension = ::CONFIG.get_to_string("extensions.project_file");
+        let project_file_extension = crate::CONFIG.get_to_string("extensions.project_file");
         let file_path = list_path_content(folder_path)?.iter()
             .filter(|f|f.extension().unwrap_or(&OsStr::new("")) == project_file_extension.as_str())
             .nth(0).map(|b|b.to_owned())
@@ -723,7 +725,7 @@ impl<'a> From<&'a Project> for Debug {
 }
 
 impl fmt::Debug for Project {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         //write!(f, "{:?}", self.debug())
         write!(f, "{:?}{:?}", self.name(), self.file())
     }
@@ -733,9 +735,9 @@ impl fmt::Debug for Project {
 #[cfg(test)]
 mod test {
     use std::path::Path;
-    use ::project::spec::*;
-    use ::project::Project;
-    use ::storage::Storable;
+    use crate::project::spec::*;
+    use crate::project::Project;
+    use crate::storage::Storable;
 
     #[test]
     fn compare_basics(){

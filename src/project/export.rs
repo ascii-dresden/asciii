@@ -1,7 +1,7 @@
 use bill::{Bill, ItemList, Tax};
-use util::currency_to_string;
+use crate::util::currency_to_string;
 
-use storage::storable::Storable;
+use crate::storage::storable::Storable;
 use super::Project;
 use super::spec::*;
 use super::computed_field::ComputedField;
@@ -86,7 +86,7 @@ pub struct Employee {
     wage: String,
 }
 
-fn export_employee(e: &::project::spec::Employee) -> Employee {
+fn export_employee(e: &crate::project::spec::Employee) -> Employee {
     Employee {
         name: e.name.clone(),
         time: e.time,
@@ -127,7 +127,7 @@ pub struct Sum {
 }
 
 use super::product::Product;
-fn sums_from_bill(bill: &Bill<Product>) -> Vec<Sum> {
+fn sums_from_bill(bill: &Bill<Product<'_>>) -> Vec<Sum> {
     bill.iter()
         .map(|(tax, list)| Sum::from_itemlist(*tax, list))
         .rev()
@@ -135,7 +135,7 @@ fn sums_from_bill(bill: &Bill<Product>) -> Vec<Sum> {
 }
 
 impl Sum {
-    pub fn from_itemlist(tax: Tax, list: &ItemList<Product>) -> Sum {
+    pub fn from_itemlist(tax: Tax, list: &ItemList<Product<'_>>) -> Sum {
         let gross_sum = list.gross_sum();
         let tax_sum = list.tax_sum();
         Sum {
@@ -213,7 +213,7 @@ pub struct ExportProduct {
     tax: f64,
 }
 
-fn bill_products(bill: &Bill<Product>) -> Vec<ExportProduct> {
+fn bill_products(bill: &Bill<Product<'_>>) -> Vec<ExportProduct> {
     bill.as_items_with_tax()
         .into_iter()
         .map(|(tax, item)| {

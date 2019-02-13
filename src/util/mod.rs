@@ -11,6 +11,7 @@ use dirs::home_dir;
 
 use env_logger;
 use log::LevelFilter;
+use log::{info, debug, error, warn};
 
 use open;
 
@@ -165,7 +166,7 @@ pub fn currency_to_string(currency:&Currency) -> String {
 ///
 /// This is functionality which was explicitely left out of the `Claude` crate.
 pub fn to_currency(f: f64) -> Currency {
-    Currency{ symbol: ::CONFIG.get_char("currency"), value: (f * 1000.0) as i64} / 10
+    Currency{ symbol: crate::CONFIG.get_char("currency"), value: (f * 1000.0) as i64} / 10
 }
 
 /// Changes the extension of a given `Path`

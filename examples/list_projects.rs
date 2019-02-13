@@ -1,4 +1,4 @@
-extern crate asciii;
+use asciii;
 
 use asciii::project::Project;
 

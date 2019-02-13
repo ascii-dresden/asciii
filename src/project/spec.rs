@@ -13,7 +13,7 @@ use icalendar::Calendar;
 use semver::Version;
 use yaml_rust::Yaml;
 
-use storage::Storable;
+use crate::storage::Storable;
 use super::error::{SpecResult, ErrorList};
 use super::product::Product;
 use super::product::error::Result as ProductResult;
@@ -180,7 +180,7 @@ pub trait HasEmployees {
     fn total_time(&self) -> Option<f64>;
 
     /// Returns a product from Service
-    fn to_product(&self) -> Option<Product> {
+    fn to_product(&self) -> Option<Product<'_>> {
         if let Some(salary) = self.salary() {
             Some(Product {
                 name: "Service",
@@ -217,7 +217,7 @@ pub trait Redeemable: IsProject {
     fn is_payed(&self) -> bool;
 
     /// Returns a bill for the offer and one for the invoice.
-    fn bills(&self) -> ProductResult<(Bill<Product>, Bill<Product>)>;
+    fn bills(&self) -> ProductResult<(Bill<Product<'_>>, Bill<Product<'_>>)>;
 
     /// When what is the MWsT of the project.
     fn tax(&self) -> Option<Tax>;
@@ -255,7 +255,7 @@ pub struct Event {
 }
 
 impl fmt::Display for Event {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         if let Some(end) = self.end { writeln!(f, "start: {}\nend:  {}", self.begin, end) }
         else { writeln!(f, "start: {}", self.begin) }?;
         for time in &self.times {

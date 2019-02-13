@@ -1,18 +1,9 @@
-extern crate chrono;
-extern crate open;
-
-#[cfg(feature="shell")]
-extern crate rustyline;
-
-extern crate prettytable;
-#[macro_use] extern crate log;
 #[macro_use] extern crate clap;
 #[macro_use] extern crate error_chain;
 
-extern crate crowbook_intl_runtime;
 #[macro_use] pub mod localize_macros;
 
-extern crate asciii;
+use asciii;
 
 use std::env;
 

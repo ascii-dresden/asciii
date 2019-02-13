@@ -5,8 +5,8 @@
 
 use bill::{Currency, BillProduct, Tax};
 
-use util::yaml;
-use util::to_currency;
+use crate::util::yaml;
+use crate::util::to_currency;
 
 /// Errors for `asciii::product`.
 pub mod error{
@@ -66,7 +66,7 @@ pub struct Product<'a> {
 impl<'a> Product<'a> {
 
     fn from_old_format<'y>( name: &'y str, values: &'y yaml::Yaml, local_tax: Option<Tax>) -> Result<Product<'y>> {
-        let default_tax = ::CONFIG.get_f64("defaults/tax").map(Tax::new)
+        let default_tax = crate::CONFIG.get_f64("defaults/tax").map(Tax::new)
             .expect("Faulty config: field defaults/tax does not contain a value");
 
         let product_tax = yaml::get_f64(values, "tax").map(Tax::new);
@@ -82,7 +82,7 @@ impl<'a> Product<'a> {
 
     fn from_new_format<'y>(desc: &'y yaml::Yaml, values: &'y yaml::Yaml, local_tax: Option<Tax>) -> Result<Product<'y>> {
 
-        let default_tax = ::CONFIG.get_f64("defaults/tax").map(Tax::new)
+        let default_tax = crate::CONFIG.get_f64("defaults/tax").map(Tax::new)
             .expect("Faulty config: field defaults/tax does not contain a value");
 
         let desc_tax = yaml::get_f64(desc, "tax").map(Tax::new);

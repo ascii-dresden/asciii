@@ -1,4 +1,3 @@
-extern crate asciii;
 
 use asciii::actions::calendar_and_tasks as calendar;
 use asciii::storage::StorageDir;

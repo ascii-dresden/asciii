@@ -7,8 +7,10 @@ use asciii::CONFIG;
 
 use std::collections::BTreeSet;
 use clap::App;
+use log::{debug, error};
 use super::app::with_cli;
-use ::cli::error::*;
+
+use crate::cli::error::*;
 
 static ESCAPE_CHAR: Option<char> = Some('\\');
 
@@ -17,7 +19,7 @@ struct ClapCompleter{
 }
 
 impl ClapCompleter {
-    pub fn from_app(app:&App) -> Self {
+    pub fn from_app(app:&App<'_, '_>) -> Self {
         ClapCompleter {
             commands:
                 app.p.subcommands.iter()

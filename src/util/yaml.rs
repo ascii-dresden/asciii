@@ -48,7 +48,7 @@ impl Error for YamlError{
         }
     }
 
-    fn cause(&self) -> Option<&Error>{
+    fn cause(&self) -> Option<&dyn Error>{
         match *self{
             YamlError::Io(ref err) => err.cause(),
             YamlError::Scan(ref err) => err.cause()
@@ -59,7 +59,7 @@ impl Error for YamlError{
 impl From<io::Error> for YamlError { fn from(ioerror: io::Error)   -> YamlError{ YamlError::Io(ioerror) } }
 impl From<ScanError> for YamlError { fn from(scanerror: ScanError) -> YamlError{ YamlError::Scan(scanerror) } }
 impl fmt::Display for YamlError {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match *self{
             YamlError::Scan(ref err) => write!(f, "{}", err),
             YamlError::Io(ref err) => write!(f, "{}", err)

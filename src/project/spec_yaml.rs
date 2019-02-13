@@ -10,10 +10,10 @@ use super::*;
 use super::spec::*;
 use super::product::error::Result as ProductResult;
 use super::product::error::ErrorKind as ProductErrorKind;
-use util::yaml;
-use util::to_currency;
+use crate::util::yaml;
+use crate::util::to_currency;
 
-use util;
+use crate::util;
 
 /// Enables access to structured data via a simple path
 ///
@@ -140,7 +140,7 @@ pub trait ProvidesData {
     fn field_exists<'a>(&'a self, paths: &[&'a str]) -> ErrorList {
         let mut errors = ErrorList::new();
         for err in paths.into_iter()
-                        .map(|i| *i)
+                        .cloned()
                         .filter(|path| self.get(path).is_none())
         {
             errors.push(err);
@@ -358,9 +358,9 @@ impl Redeemable for Project {
         self.get_f64("tax").map(Tax::new)
     }
 
-    fn bills(&self) -> ProductResult<(Bill<Product>, Bill<Product>)> {
-        let mut offer: Bill<Product> = Bill::new();
-        let mut invoice: Bill<Product> = Bill::new();
+    fn bills(&self) -> ProductResult<(Bill<Product<'_>>, Bill<Product<'_>>)> {
+        let mut offer: Bill<Product<'_>> = Bill::new();
+        let mut invoice: Bill<Product<'_>> = Bill::new();
 
         let service = service_to_product(&self.hours())?;
        //  .("cannot create product from employees, salary or tax missing");
@@ -416,7 +416,7 @@ impl Validatable for Project {
 }
 
 
-impl Validatable for Redeemable {
+impl Validatable for dyn Redeemable {
     fn validate(&self) -> SpecResult {
         let mut errors = ErrorList::new();
         if self.payed_date().is_none() {
@@ -489,13 +489,13 @@ impl<'a> IsClient for Client<'a> {
             let last_name = self.last_name();
 
 
-            let lang = ::CONFIG.get_str("defaults/lang");
+            let lang = crate::CONFIG.get_str("defaults/lang");
 
             let gend_path = "gender_matches/".to_owned() + &salute.to_lowercase();
-            let gend = ::CONFIG.get_str_or(&gend_path)?;
+            let gend = crate::CONFIG.get_str_or(&gend_path)?;
 
             let addr_path = "lang_addressing/".to_owned() + &lang.to_lowercase() + "/" + gend;
-            let addr = ::CONFIG.get_str_or(&addr_path)?;
+            let addr = crate::CONFIG.get_str_or(&addr_path)?;
 
             last_name.and(Some(format!("{} {} {}", addr, salute, last_name.unwrap_or(""))))
         } else {

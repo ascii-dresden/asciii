@@ -9,29 +9,30 @@ use serde::ser::Serialize;
 
 use open;
 use handlebars::{RenderError, Handlebars, no_escape, Helper, RenderContext, HelperDef, Context, Output, HelperResult};
+use log::{info, debug, trace, error, warn};
 
-use util;
-use project::{self, Project, Exportable};
-use project::BillType::{self, Invoice, Offer};
-use project::export::ExportTarget;
-use storage::error::StorageError;
-use storage::{self, Storable, StorageSelection};
+use crate::util;
+use crate::project::{self, Project, Exportable};
+use crate::project::BillType::{self, Invoice, Offer};
+use crate::project::export::ExportTarget;
+use crate::storage::error::StorageError;
+use crate::storage::{self, Storable, StorageSelection};
 
 pub mod error;
 
 use self::error::*;
 
 #[cfg_attr(feature = "serialization", derive(Serialize))]
-struct DocAndStorage<'a, T: 'a + Serialize> {
+struct DocAndStorage<'a, T: Serialize> {
     document: &'a T,
     storage: Option<storage::Paths>,
     is_invoice: bool
 }
 
 impl<'a, T: 'a + Serialize> DocAndStorage<'a, T> {
-    fn from(document: &T, bill_type: BillType) -> DocAndStorage<T> {
+    fn from(document: &T, bill_type: BillType) -> DocAndStorage<'_, T> {
         DocAndStorage {
-            document: document,
+            document,
             storage: storage::setup::<Project>().ok().map(|s| s.paths()),
             is_invoice: bill_type == Invoice
         }
@@ -42,23 +43,25 @@ impl<'a, T: 'a + Serialize> DocAndStorage<'a, T> {
 struct IncHelper;
 
 impl HelperDef for IncHelper {
-  fn call<'reg: 'rc, 'rc>(&self, h: &Helper, _: &Handlebars, _: &Context, _: &mut RenderContext, out: &mut Output) -> HelperResult {
-    let param = h.param(0).unwrap().value();
-    debug!("inc_helper({:?})", param);
-    out.write(&format!("{}", param.as_u64().expect("param can't be converted to u64") + 1))?;
-    Ok(())
-  }
+    #[allow(clippy::extra_unused_lifetimes)]
+    fn call<'reg: 'rc, 'rc>(&self, h: &Helper<'_, '_>, _: &Handlebars, _: &Context, _: &mut RenderContext<'_>, out: &mut dyn Output) -> HelperResult {
+        let param = h.param(0).unwrap().value();
+        debug!("inc_helper({:?})", param);
+        out.write(&format!("{}", param.as_u64().expect("param can't be converted to u64") + 1))?;
+        Ok(())
+    }
 }
 
 #[derive(Clone, Copy)]
 struct CountHelper;
 
 impl HelperDef for CountHelper {
-  fn call<'reg: 'rc, 'rc>(&self, h: &Helper, _: &Handlebars, _: &Context, _: &mut RenderContext, out: &mut Output) -> HelperResult {
-    let count = h.param(0).unwrap().value().as_array().map_or(0, |a|a.len());
-    out.write(&format!("{}", count))?;
-    Ok(())
-  }
+    #[allow(clippy::extra_unused_lifetimes)]
+    fn call<'reg: 'rc, 'rc>(&self, h: &Helper<'_, '_>, _: &Handlebars, _: &Context, _: &mut RenderContext<'_>, out: &mut dyn Output) -> HelperResult {
+        let count = h.param(0).unwrap().value().as_array().map_or(0, |a|a.len());
+        out.write(&format!("{}", count))?;
+        Ok(())
+    }
 }
 
 /// Takes a `T: Serialize` and a template path and does it's thing.
@@ -91,10 +94,10 @@ fn file_age(path: &Path) -> Result<time::Duration> {
 
 fn output_template_path(template_name:&str) -> Result<PathBuf> {
     // construct_template_path(&template_name) {
-    let template_ext  = ::CONFIG.get_str("extensions/output_template");
+    let template_ext  = crate::CONFIG.get_str("extensions/output_template");
     let mut template_path = PathBuf::new();
     template_path.push(storage::get_storage_path());
-    template_path.push(::CONFIG.get_str("dirs/templates"));
+    template_path.push(crate::CONFIG.get_str("dirs/templates"));
     template_path.push(template_name);
     template_path.set_extension(template_ext);
     // }
@@ -110,7 +113,8 @@ fn output_template_path(template_name:&str) -> Result<PathBuf> {
 
 /// Creates the latex files within each projects directory, either for Invoice or Offer.
 #[cfg(feature="document_export")]
-fn project_to_doc(project: &Project, config: &ExportConfig) -> Result<Option<PathBuf>> {
+#[allow(clippy::cyclomatic_complexity)] // sorry
+fn project_to_doc(project: &Project, config: &ExportConfig<'_>) -> Result<Option<PathBuf>> {
     trace!("exporting a document: {:#?}", config);
 
     let &ExportConfig {
@@ -125,11 +129,11 @@ fn project_to_doc(project: &Project, config: &ExportConfig) -> Result<Option<Pat
     } = config;
 
     // init_export_config()
-    let output_ext    = ::CONFIG.get_str("extensions/output_file");
-    let convert_ext   = ::CONFIG.get_str("document_export/output_extension");
-    let convert_tool  = ::CONFIG.get_str("document_export/convert_tool");
-    let output_folder = util::get_valid_path(::CONFIG.get_str("output_path")).unwrap();
-    let trash_exts    = ::CONFIG.get("document_export/trash_extensions")
+    let output_ext    = crate::CONFIG.get_str("extensions/output_file");
+    let convert_ext   = crate::CONFIG.get_str("document_export/output_extension");
+    let convert_tool  = crate::CONFIG.get_str("document_export/convert_tool");
+    let output_folder = util::get_valid_path(crate::CONFIG.get_str("output_path")).unwrap();
+    let trash_exts    = crate::CONFIG.get("document_export/trash_extensions")
                                 .expect("Faulty default config")
                                 .as_vec().expect("Faulty default config")
                                 .into_iter()
@@ -220,7 +224,7 @@ fn project_to_doc(project: &Project, config: &ExportConfig) -> Result<Option<Pat
                 }
                 project.full_file_path(&dyn_bill, output_ext)?
             } else {
-                let mut outfile_path = project.write_to_file(&filled, &dyn_bill, output_ext)?;
+                let outfile_path = project.write_to_file(&filled, &dyn_bill, output_ext)?;
                 debug!("{} vs\n        {}", tex_file.display(), outfile_path.display());
                 outfile_path
             };
@@ -275,7 +279,7 @@ impl<'a> Default for ExportConfig<'a> {
     fn default() -> Self {
         Self {
             select: StorageSelection::default(),
-            template_name: ::CONFIG.get_str("document_export/default_template"),
+            template_name: crate::CONFIG.get_str("document_export/default_template"),
             bill_type: None,
             output: None,
             dry_run: false,
@@ -289,7 +293,7 @@ impl<'a> Default for ExportConfig<'a> {
 
 /// Creates the latex files within each projects directory, either for Invoice or Offer.
 #[cfg(feature="document_export")]
-pub fn projects_to_doc(config: &ExportConfig) -> Result<()> {
+pub fn projects_to_doc(config: &ExportConfig<'_>) -> Result<()> {
     let storage = storage::setup::<Project>()?;
     for p in storage.open_projects(&config.select)? {
         if let Some(path) = project_to_doc(&p, &config)? {
