@@ -7,7 +7,9 @@ use asciii::CONFIG;
 
 use std::collections::BTreeSet;
 use clap::App;
+use log::{debug, error};
 use super::app::with_cli;
+
 use crate::cli::error::*;
 
 static ESCAPE_CHAR: Option<char> = Some('\\');

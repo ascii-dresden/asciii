@@ -25,10 +25,6 @@
 //#![feature(alloc_system)]
 //extern crate alloc_system;
 
-use slug;
-use open;
-use toml;
-use term_size;
 use lazy_static::lazy_static;
 
 #[cfg(feature="serde")] #[macro_use] extern crate serde_derive;
@@ -48,8 +44,6 @@ use lazy_static::lazy_static;
 #[macro_use] pub mod localize_macros;
 
 #[cfg(feature="git_statuses")] extern crate git2;
-
-use env_logger;
 
 #[macro_use]
 pub mod util;
