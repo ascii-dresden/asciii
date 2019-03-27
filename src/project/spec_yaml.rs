@@ -139,7 +139,7 @@ pub trait ProvidesData {
 
     fn field_exists<'a>(&'a self, paths: &[&'a str]) -> ErrorList {
         let mut errors = ErrorList::new();
-        for err in paths.into_iter()
+        for err in paths.iter()
                         .cloned()
                         .filter(|path| self.get(path).is_none())
         {
@@ -277,7 +277,7 @@ impl HasEvents for Project {
     fn events(&self) -> Option<Vec<spec::Event>> {
         let dates = ProvidesData::get(self, "event.dates/")
             .and_then(|a| a.as_vec())?;
-        dates.into_iter()
+        dates.iter()
              .map(|h| {
 
             let begin = self.get_direct(h, "begin")
@@ -299,7 +299,7 @@ impl HasEvents for Project {
 
     fn times(&self, yaml: &Yaml) -> Option<Vec<EventTime>> {
         let times = self.get_direct(yaml, "times").and_then(|l| l.as_vec())?;
-        times.into_iter()
+        times.iter()
              .map(|h| {
 
             let start = self.get_direct(h, "begin")

@@ -306,7 +306,7 @@ impl Project {
 
     fn task_issue_invoice(&self, event_date: Date<Utc>) -> Todo {
         Todo::new().summary(&lformat!("Create an Invoice"))
-                   .due((event_date + Duration::days(14)).and_hms(11, 10, 0))
+                   .due(&(event_date + Duration::days(14)).and_hms(11, 10, 0))
                    .priority(6)
                    .done()
     }
@@ -317,7 +317,7 @@ impl Project {
             .description( &lformat!("Pay {}\nYou have had the money for {} days!",
                                    self.hours().employees_string().unwrap_or_else(String::new),
                                    days_since_payed))
-            .due((payed_date + Duration::days(14)).and_hms(11, 10, 0))
+            .due(&(payed_date + Duration::days(14)).and_hms(11, 10, 0))
             .done()
     }
 
@@ -417,15 +417,15 @@ pub trait Exportable {
     /// Filename of the invoice output file. **Carefull!** uses today's date.
     fn invoice_file_name(&self, extension: &str) -> Option<String>;
 
-    fn output_file_exists(&self, bill_type: &BillType) -> bool {
-        match *bill_type{
+    fn output_file_exists(&self, bill_type: BillType) -> bool {
+        match bill_type{
             BillType::Offer   => self.offer_file_exists(),
             BillType::Invoice => self.invoice_file_exists()
         }
     }
 
-    fn output_file(&self, bill_type: &BillType) -> Option<PathBuf> {
-        match *bill_type{
+    fn output_file(&self, bill_type: BillType) -> Option<PathBuf> {
+        match bill_type{
             BillType::Offer   => self.offer_file(),
             BillType::Invoice => self.invoice_file()
         }
@@ -465,8 +465,8 @@ pub trait Exportable {
         Ok(())
     }
 
-    fn full_file_path(&self, bill_type: &BillType, ext: &str) -> Result<PathBuf> {
-        match *bill_type {
+    fn full_file_path(&self, bill_type: BillType, ext: &str) -> Result<PathBuf> {
+        match bill_type {
             BillType::Offer   => self.full_offer_file_path(ext),
             BillType::Invoice => self.full_invoice_file_path(ext)
         }
@@ -488,8 +488,8 @@ pub trait Exportable {
         }
     }
 
-    fn write_to_file(&self, content: &str, bill_type: &BillType, ext: &str) -> Result<PathBuf> {
-        match *bill_type{
+    fn write_to_file(&self, content: &str, bill_type: BillType, ext: &str) -> Result<PathBuf> {
+        match bill_type{
             BillType::Offer   => self.write_to_offer_file(content, ext),
             BillType::Invoice => self.write_to_invoice_file(content, ext)
         }

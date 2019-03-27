@@ -136,7 +136,7 @@ fn project_to_doc(project: &Project, config: &ExportConfig<'_>) -> Result<Option
     let trash_exts    = crate::CONFIG.get("document_export/trash_extensions")
                                 .expect("Faulty default config")
                                 .as_vec().expect("Faulty default config")
-                                .into_iter()
+                                .iter()
                                 .map(|v|v.as_str()).collect::<Vec<_>>();
 
     let  template_path = output_template_path(template_name)?;
@@ -222,9 +222,9 @@ fn project_to_doc(project: &Project, config: &ExportConfig<'_>) -> Result<Option
                 if project_age < tex_age && !util::really(&lformat!("Project file is younger than pdf, continue anyway?")) {
                     return Ok(None)
                 }
-                project.full_file_path(&dyn_bill, output_ext)?
+                project.full_file_path(dyn_bill, output_ext)?
             } else {
-                let outfile_path = project.write_to_file(&filled, &dyn_bill, output_ext)?;
+                let outfile_path = project.write_to_file(&filled, dyn_bill, output_ext)?;
                 debug!("{} vs\n        {}", tex_file.display(), outfile_path.display());
                 outfile_path
             };
