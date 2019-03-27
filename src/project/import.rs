@@ -3,7 +3,7 @@ use ordered_float::OrderedFloat;
 use num_traits::Float;
 use std::collections::HashMap;
 
-use super::error::Result;
+use super::error::ProjectResult;
 
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(remote = "OrderedFloat")]
@@ -121,7 +121,7 @@ pub struct Meta {
     format: String,
 }
 
-pub fn from_str(content: &str) -> Result<Project> {
+pub fn from_str(content: &str) -> ProjectResult<Project> {
     Ok(serde_yaml::from_str(content)?)
 }
 

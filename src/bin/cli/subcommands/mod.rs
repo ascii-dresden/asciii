@@ -15,6 +15,7 @@ use asciii::project::Exportable;
 
 use asciii::project::Project;
 use asciii::storage::*;
+use asciii::actions::error::ActionError;
 use asciii::templater::Templater;
 
 #[cfg(feature="document_export")] use asciii::document_export;
@@ -235,7 +236,7 @@ fn edit_projects(dir: StorageDir, search_terms: &[&str], editor: Option<&str>) -
     }
 
     if all_projects.is_empty() {
-        bail!("Nothing found for {:?}", search_terms);
+        bail!(ActionError::NothingFound(search_terms.into_iter().map(ToString::to_string).collect()));
     } else {
         let all_paths = all_projects.iter().map(|p| p.file()).collect::<Vec<PathBuf>>();
         util::pass_to_command(editor, &all_paths);

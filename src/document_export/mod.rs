@@ -2,25 +2,26 @@
 //!
 //! Haven't decided on a templating engine yet, my own will probably not do.
 
-use std::{io,fmt,time,fs};
+use std::{time,fs};
 use std::path::{Path, PathBuf};
 
 use serde::ser::Serialize;
 
 use open;
-use handlebars::{RenderError, Handlebars, no_escape, Helper, RenderContext, HelperDef, Context, Output, HelperResult};
+use handlebars::{Handlebars, no_escape, Helper, RenderContext, HelperDef, Context, Output, HelperResult};
 use log::{info, debug, trace, error, warn};
 
 use crate::util;
 use crate::project::{self, Project, Exportable};
 use crate::project::BillType::{self, Invoice, Offer};
 use crate::project::export::ExportTarget;
-use crate::storage::error::StorageError;
 use crate::storage::{self, Storable, StorageSelection};
 
 pub mod error;
 
 use self::error::*;
+
+type Result<T> = ExportResult<T>;
 
 #[cfg_attr(feature = "serialization", derive(Serialize))]
 struct DocAndStorage<'a, T: Serialize> {
@@ -107,7 +108,7 @@ fn output_template_path(template_name:&str) -> Result<PathBuf> {
     if template_path.exists() {
         Ok(template_path)
     } else {
-        Err(format!("Template not found at {}", template_path.display()).into())
+        Err(ExportError::TemplateNotFoundAt(template_path))
     }
 }
 
@@ -252,13 +253,13 @@ fn project_to_doc(project: &Project, config: &ExportConfig<'_>) -> Result<Option
                 debug!("now there is be a {:?} -> {:?}", file, document_file);
                 fs::rename(&file, &document_file)?;
             } else {
-                bail!(error::ErrorKind::NoPdfCreated);
+                bail!(ExportError::NoPdfCreated);
             }
             Ok(Some(document_file))
         }
 
     } else {
-        bail!(error::ErrorKind::NoPdfCreated);
+        bail!(ExportError::NoPdfCreated);
     }
 }
 

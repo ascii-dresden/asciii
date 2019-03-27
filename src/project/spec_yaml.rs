@@ -8,8 +8,8 @@ use yaml_rust::yaml::Hash as YamlHash;
 
 use super::*;
 use super::spec::*;
-use super::product::error::Result as ProductResult;
-use super::product::error::ErrorKind as ProductErrorKind;
+use super::product::{ProductResult, ProductError};
+
 use crate::util::yaml;
 use crate::util::to_currency;
 
@@ -339,7 +339,7 @@ fn service_to_product<'a, T: HasEmployees>(s: &T) -> ProductResult<Product<'a>> 
                  price: salary,
              })
     } else {
-        bail!(ProductErrorKind::InvalidServerSection)
+        bail!(ProductError::InvalidServerSection)
     }
 }
 
@@ -374,7 +374,7 @@ impl Redeemable for Project {
 
         let raw_products =
             self.get_hash("products")
-                .ok_or_else(|| product::error::Error::from(product::error::ErrorKind::UnknownFormat))?;
+                .ok_or_else(|| ProductError::UnknownFormat)?;
 
         // let document_tax =  // TODO activate this once the tax no longer 19%
 

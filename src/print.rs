@@ -285,7 +285,7 @@ pub fn print_projects(rows: Vec<Row>){
 pub fn print_csv_year(year:i32){
     match crate::actions::csv(year) {
         Ok(csv) => println!("{}", csv),
-        Err(err) => println!("{}", err.description())
+        Err(err) => println!("{}", err),
     }
 }
 
@@ -293,7 +293,7 @@ pub fn print_csv_year(year:i32){
 pub fn print_csv(projects:&[Project]){
     match crate::actions::projects_to_csv(projects) {
         Ok(csv) => println!("{}", csv),
-        Err(err) => println!("{}", err.description())
+        Err(err) => println!("{}", err),
     }
 }
 

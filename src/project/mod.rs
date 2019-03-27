@@ -26,7 +26,7 @@ use log::{debug, trace, error, warn};
 use crate::util::{yaml, get_valid_path};
 use crate::storage::{Storable, StorageResult, list_path_content};
 use crate::storage::StorableAndTempDir;
-use crate::storage::ErrorKind as StorageErrorKind;
+use crate::storage::StorageError;
 use crate::storage::repo::GitStatus;
 use crate::templater::{Templater, IsKeyword};
 
@@ -45,9 +45,10 @@ use self::spec::{IsProject, IsClient};
 use self::spec::{Offerable, Invoicable, Redeemable, Validatable, HasEmployees};
 use self::spec_yaml::ProvidesData;
 
-use self::error::{ErrorKind, ErrorList, SpecResult, Result};
-use self::product::Product;
-use self::product::error as product_error;
+use self::error::{ProjectError, ErrorList, SpecResult, ProjectResult};
+use self::product::{Product, ProductError, ProductResult};
+
+type Result<T> = ProjectResult<T>;
 
 pub use self::computed_field::ComputedField;
 
@@ -108,7 +109,7 @@ impl Project {
 
     #[cfg(feature="serialization")]
     /// export to JSON
-    pub fn to_json(&self) -> Result<String> {
+    pub fn to_json(&self) -> ProjectResult<String> {
         let complete: Complete = self.export();
         Ok(serde_json::to_string(&complete)?)
     }
@@ -354,7 +355,7 @@ impl Project {
                        .done()
     }
 
-    fn item_from_desc_and_value<'y>(&self, desc: &'y Yaml, values: &'y Yaml) -> product_error::Result<(BillItem<Product<'y>>,BillItem<Product<'y>>)> {
+    fn item_from_desc_and_value<'y>(&self, desc: &'y Yaml, values: &'y Yaml) -> ProductResult<(BillItem<Product<'y>>,BillItem<Product<'y>>)> {
         let get_f64 = |yaml, path|
             self.get_direct(yaml,path)
                 .and_then(|y| y.as_f64()
@@ -367,7 +368,7 @@ impl Project {
 
         let offered = get_f64(values, "amount")
                            .ok_or_else(
-                               || product_error::ErrorKind::MissingAmount(product.name.to_owned())
+                               || ProductError::MissingAmount(product.name.to_owned())
                                )?;
 
         let sold = get_f64(values, "sold");
@@ -375,10 +376,10 @@ impl Project {
         let sold = if let Some(returned) = get_f64(values, "returned") {
             // if "returned", there must be no "sold"
             if sold.is_some() {
-                bail!(product_error::ErrorKind::AmbiguousAmounts(product.name.to_owned()));
+                bail!(ProductError::AmbiguousAmounts(product.name.to_owned()));
             }
             if returned > offered {
-                bail!(product_error::ErrorKind::TooMuchReturned(product.name.to_owned()));
+                bail!(ProductError::TooMuchReturned(product.name.to_owned()));
             }
             offered - returned
         } else if let Some(sold) = sold {
@@ -476,7 +477,7 @@ pub trait Exportable {
         if let Some(target) = self.offer_file_name(ext) {
             Ok(self.export_dir().join(&target))
         } else {
-            bail!(ErrorKind::CantDetermineTargetFile)
+            bail!(ProjectError::CantDetermineTargetFile)
         }
     }
 
@@ -484,7 +485,7 @@ pub trait Exportable {
         if let Some(target) = self.invoice_file_name(ext) {
             Ok(self.export_dir().join(&target))
         } else {
-            bail!(ErrorKind::CantDetermineTargetFile)
+            bail!(ProjectError::CantDetermineTargetFile)
         }
     }
 
@@ -576,7 +577,7 @@ impl Storable for Project {
                 error!("The created document is no valid yaml. SORRY!\n{}\n\n{}",
                        file_content.lines().enumerate().map(|(n,l)| format!("{:>3}. {}\n",n,l)).collect::<String>(), //line numbers :D
                        e.description());
-                bail!(error::Error::from_kind(ErrorKind::Yaml(e)))
+                bail!(StorageError::Yaml(e))
             }
         };
 
@@ -653,7 +654,7 @@ impl Storable for Project {
         let file_path = list_path_content(folder_path)?.iter()
             .filter(|f|f.extension().unwrap_or(&OsStr::new("")) == project_file_extension.as_str())
             .nth(0).map(|b|b.to_owned())
-            .ok_or_else(|| StorageErrorKind::NoProjectFile(folder_path.to_owned()))?;
+            .ok_or_else(|| StorageError::NoProjectFile(folder_path.to_owned()))?;
         Self::open_file(&file_path)
     }
 

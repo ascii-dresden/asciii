@@ -23,14 +23,16 @@ use crate::project::spec::*;
 pub mod error;
 use self::error::*;
 
+type Result<T> = ActionResult<T>;
+
 /// Helper method that passes projects matching the `search_terms` to the passt closure `f`
-pub fn with_projects<F>(dir:StorageDir, search_terms:&[&str], f:F) -> Result<()>
+pub fn with_projects<F>(dir:StorageDir, search_terms: &[&str], f:F) -> Result<()>
     where F:Fn(&Project)->Result<()>
 {
     trace!("with_projects({:?})", search_terms);
     let projects = storage::setup::<Project>()?.search_projects_any(dir, search_terms)?;
     if projects.is_empty() {
-        return Err(format!("Nothing found for {:?}", search_terms).into())
+        return Err(ActionError::NothingFound(search_terms.into_iter().map(ToString::to_string).collect() ));
     }
     for project in projects {
         f(&project)?;
@@ -271,6 +273,6 @@ pub fn store_meta() -> Result<()> {
     if repo.add(&[path]).success() {
         Ok(())
     } else {
-        bail!(ErrorKind::AddingFailed)
+        bail!(ActionError::AddingFailed)
     }
 }

@@ -15,8 +15,7 @@ use yaml_rust::Yaml;
 
 use crate::storage::Storable;
 use super::error::{SpecResult, ErrorList};
-use super::product::Product;
-use super::product::error::Result as ProductResult;
+use super::product::{Product, ProductResult};
 
 pub fn print_specresult(label: &str, result: &SpecResult) {
 match *result {

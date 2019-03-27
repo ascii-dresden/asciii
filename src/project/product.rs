@@ -4,49 +4,11 @@
 #![allow(missing_docs)]
 
 use bill::{Currency, BillProduct, Tax};
+use failure::Fail;
 
 use crate::util::yaml;
 use crate::util::to_currency;
 
-/// Errors for `asciii::product`.
-pub mod error{
-    #![allow(trivial_casts)]
-    error_chain!{
-        types {
-            Error, ErrorKind, ResultExt, Result;
-        }
-
-        links { }
-
-        foreign_links { }
-
-        errors {
-            InvalidPrice (product:String){
-                description("A product has either no or an invalid price.")
-                    display("Invalid price in {}", product)
-            }
-
-            UnknownFormat {}
-            AmbiguousAmounts(t:String){
-                description("more returned than provided")
-            }
-            MissingAmount(t: String){
-                description("invalid price"),
-                display("missing amount of {:?}", t)
-            }
-            TooMuchReturned(t: String){
-                description("invalid format"),
-                display("too much returned of {:?}", t)
-            }
-            InvalidServerSection {
-                description("Cannot Parse Service")
-            }
-
-        }
-    }
-}
-
-pub use self::error::*;
 
 //#[derive(Debug)] // manually implemented
 /// Stores properties of a product.
@@ -62,10 +24,32 @@ pub struct Product<'a> {
     pub price: Currency
 }
 
+pub type ProductResult<T> = ::std::result::Result<T, ProductError>;
+
+#[derive(Fail, Debug)]
+pub enum ProductError {
+    #[fail( display="Invalid price in {}", _0)]
+    InvalidPrice(String),
+
+    #[fail(display = "unknown format")]
+    UnknownFormat,
+    #[fail(display = "more returned than provided")]
+    AmbiguousAmounts(String),
+
+    #[fail(display = "missing amount of {:?}", _0)]
+    MissingAmount(String),
+    
+    #[fail(display = "too much returned of {:?}", _0)]
+    TooMuchReturned(String),
+
+    #[fail(display = "Cannot Parse Service")]
+    InvalidServerSection 
+}
+
 
 impl<'a> Product<'a> {
 
-    fn from_old_format<'y>( name: &'y str, values: &'y yaml::Yaml, local_tax: Option<Tax>) -> Result<Product<'y>> {
+    fn from_old_format<'y>( name: &'y str, values: &'y yaml::Yaml, local_tax: Option<Tax>) -> Result<Product<'y>, ProductError> {
         let default_tax = crate::CONFIG.get_f64("defaults/tax").map(Tax::new)
             .expect("Faulty config: field defaults/tax does not contain a value");
 
@@ -75,12 +59,12 @@ impl<'a> Product<'a> {
         let unit = yaml::get_str(values, "unit");
         let price = yaml::get_f64(values, "price")
             .map(to_currency)
-            .ok_or_else(||Error::from(ErrorKind::InvalidPrice(name.to_string())))?;
+            .ok_or_else(||ProductError::InvalidPrice(name.to_string()))?;
 
         Ok(Product { name, unit, price, tax })
     }
 
-    fn from_new_format<'y>(desc: &'y yaml::Yaml, values: &'y yaml::Yaml, local_tax: Option<Tax>) -> Result<Product<'y>> {
+    fn from_new_format<'y>(desc: &'y yaml::Yaml, values: &'y yaml::Yaml, local_tax: Option<Tax>) -> Result<Product<'y>, ProductError> {
 
         let default_tax = crate::CONFIG.get_f64("defaults/tax").map(Tax::new)
             .expect("Faulty config: field defaults/tax does not contain a value");
@@ -91,18 +75,18 @@ impl<'a> Product<'a> {
 
         let name = yaml::get_str(desc, "name").unwrap_or("unnamed");
         let price = yaml::get_f64(desc, "price")
-                .ok_or_else(||Error::from(ErrorKind::InvalidPrice(name.to_string())))
+                .ok_or_else(||ProductError::InvalidPrice(name.to_string()))
                 .map(to_currency)?;
         let unit = yaml::get_str(desc, "unit");
 
         Ok(Product { name, unit, price, tax })
     }
 
-    pub fn from_desc_and_value<'y>(desc: &'y yaml::Yaml, values: &'y yaml::Yaml, local_tax: Option<Tax>) -> Result<Product<'y>> {
+    pub fn from_desc_and_value<'y>(desc: &'y yaml::Yaml, values: &'y yaml::Yaml, local_tax: Option<Tax>) -> Result<Product<'y>, ProductError> {
         match *desc {
             yaml::Yaml::String(ref name) => Self::from_old_format(name, values, local_tax),
             yaml::Yaml::Hash(_) => Self::from_new_format(desc, values, local_tax),
-            _ => Err(ErrorKind::UnknownFormat.into()),
+            _ => Err(ProductError::UnknownFormat.into()),
         }
     }
 }

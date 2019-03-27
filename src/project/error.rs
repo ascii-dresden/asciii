@@ -1,39 +1,58 @@
 #![allow(trivial_casts)]
 #![allow(missing_docs)]
+#![allow(deprecated)]
 
-use std::{io, fmt};
+use failure::Fail;
+
 #[cfg(feature="serialization")] use serde_json;
 #[cfg(feature="deserialization")] use serde_yaml;
+
 use crate::util::yaml;
+use crate::project::product::ProductError;
 
-use super::product;
+use std::{io, fmt};
 
-error_chain!{
-    types {
-        Error, ErrorKind, ResultExt, Result;
-    }
 
-    links {
-        Product(product::Error, product::ErrorKind);
-    }
+#[derive(Fail, Debug)]
+pub enum ProjectError {
 
-    foreign_links {
-        Io(io::Error);
-        Fmt(fmt::Error);
-        Yaml(yaml::YamlError);
-        Serialize(serde_json::Error) #[cfg(feature="serialization")];
-        Deserialize(serde_yaml::Error) #[cfg(feature="deserialization")];
-    }
+    #[fail(display="This feature is not enabled in this build")]
+    Product(ProductError),
 
-    errors {
-        FeatureDeactivated{
-            description("This feature is not enabled in this build")
-        }
-        CantDetermineTargetFile{
-            description("Cannot determine target file name")
-        }
-    }
+    #[fail(display="This feature is not enabled in this build")]
+    FeatureDeactivated,
+
+    #[fail(display="Cannot determine target file name")]
+    CantDetermineTargetFile,
+
+    #[fail(display = "{}", _0)]
+    Io(#[cause] io::Error),
+
+    #[fail(display = "{}", _0)]
+    Fmt(#[cause] fmt::Error),
+
+    #[fail(display = "{}", _0)]
+    Yaml(#[cause] yaml::YamlError),
+
+    #[cfg(feature="serialization")]
+    #[fail(display = "{}", _0)]
+    Serialize(serde_json::Error),
+
+    #[cfg(feature="deserialization")]
+    #[fail(display = "{}", _0)]
+    Deserialize(serde_yaml::Error),
 }
+
+
+impl From<ProductError> for ProjectError { fn from(e: ProductError) -> ProjectError { ProjectError::Product(e) } }
+impl From<io::Error> for ProjectError { fn from(e: io::Error) -> ProjectError { ProjectError::Io(e) } }
+impl From<fmt::Error> for ProjectError { fn from(e: fmt::Error) -> ProjectError { ProjectError::Fmt(e) } }
+impl From<yaml::YamlError> for ProjectError { fn from(e: yaml::YamlError) -> ProjectError { ProjectError::Yaml(e) } }
+impl From<serde_json::Error> for ProjectError { fn from(e: serde_json::Error) -> ProjectError { ProjectError::Serialize(e) } }
+impl From<serde_yaml::Error> for ProjectError { fn from(e: serde_yaml::Error) -> ProjectError { ProjectError::Deserialize(e) } }
+
+
+pub type ProjectResult<T> = ::std::result::Result<T, ProjectError>;
 
 pub type SpecResult = ::std::result::Result<(), ErrorList>;
 

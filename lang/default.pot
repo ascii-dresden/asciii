@@ -8,47 +8,47 @@ msgid ""
 msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 
-#: /home/hendrik/code/ascii/asciii/src/actions/mod.rs:54
+#: /home/hendrik/code/ascii/asciii/src/actions/mod.rs:56
 msgid "INum"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/actions/mod.rs:55
+#: /home/hendrik/code/ascii/asciii/src/actions/mod.rs:57
 msgid "Designation"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/actions/mod.rs:56
+#: /home/hendrik/code/ascii/asciii/src/actions/mod.rs:58
 msgid "Date"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/actions/mod.rs:57
+#: /home/hendrik/code/ascii/asciii/src/actions/mod.rs:59
 msgid "InvoiceDate"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/actions/mod.rs:58
+#: /home/hendrik/code/ascii/asciii/src/actions/mod.rs:60
 msgid "Caterer"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/actions/mod.rs:59
+#: /home/hendrik/code/ascii/asciii/src/actions/mod.rs:61
 msgid "Responsible"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/actions/mod.rs:60
+#: /home/hendrik/code/ascii/asciii/src/actions/mod.rs:62
 msgid "Payed on"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/actions/mod.rs:61
+#: /home/hendrik/code/ascii/asciii/src/actions/mod.rs:63
 msgid "Amount"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/actions/mod.rs:62
+#: /home/hendrik/code/ascii/asciii/src/actions/mod.rs:64
 msgid "Canceled"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/actions/mod.rs:166
+#: /home/hendrik/code/ascii/asciii/src/actions/mod.rs:168
 msgid "do you realy want to delete {}?"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/actions/mod.rs:183
+#: /home/hendrik/code/ascii/asciii/src/actions/mod.rs:185
 msgid "we could get rid of: {}"
 msgstr ""
 
@@ -556,31 +556,31 @@ msgstr ""
 msgid "no remote name"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/subcommands/mod.rs:395
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/subcommands/mod.rs:396
 msgid "You have to provide either a search term or path"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/subcommands/mod.rs:511
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/subcommands/mod.rs:512
 msgid "do you want to set your name?"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/subcommands/mod.rs:513
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/subcommands/mod.rs:514
 msgid "Is your name {:?}"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/subcommands/mod.rs:519
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/subcommands/mod.rs:520
 msgid "What is your name?"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/subcommands/mod.rs:638 /home/hendrik/code/ascii/asciii/src/bin/cli/subcommands/mod.rs:648
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/subcommands/mod.rs:639 /home/hendrik/code/ascii/asciii/src/bin/cli/subcommands/mod.rs:649
 msgid "{} does not exist"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/document_export/mod.rs:184
+#: /home/hendrik/code/ascii/asciii/src/document_export/mod.rs:185
 msgid "WARNING: Can't make sense of {}"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/document_export/mod.rs:222
+#: /home/hendrik/code/ascii/asciii/src/document_export/mod.rs:223
 msgid "Project file is younger than pdf, continue anyway?"
 msgstr ""
 
@@ -596,39 +596,39 @@ msgstr ""
 msgid "{} weeks"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/project/mod.rs:300
+#: /home/hendrik/code/ascii/asciii/src/project/mod.rs:301
 msgid "weird task edgecase in {:?}:\n{:?}"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/project/mod.rs:308
+#: /home/hendrik/code/ascii/asciii/src/project/mod.rs:309
 msgid "Create an Invoice"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/project/mod.rs:316
+#: /home/hendrik/code/ascii/asciii/src/project/mod.rs:317
 msgid "{}: Hungry employees!"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/project/mod.rs:317
+#: /home/hendrik/code/ascii/asciii/src/project/mod.rs:318
 msgid "Pay {}\nYou have had the money for {} days!"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/project/mod.rs:327
+#: /home/hendrik/code/ascii/asciii/src/project/mod.rs:328
 msgid "Inquire about: \"{event}\"!"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/project/mod.rs:328
+#: /home/hendrik/code/ascii/asciii/src/project/mod.rs:329
 msgid "{inum }{event:?} on {invoice_date} ({days} days ago) was already invoiced but is still not marked as payed.\nPlease check for incoming payments! You can ask {client} ({mail})."
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/project/mod.rs:338
+#: /home/hendrik/code/ascii/asciii/src/project/mod.rs:339
 msgid "{rnum}: payment is {weeks} weeks late: \"{event}\""
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/project/mod.rs:350
+#: /home/hendrik/code/ascii/asciii/src/project/mod.rs:351
 msgid "Archive {}"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/project/mod.rs:351
+#: /home/hendrik/code/ascii/asciii/src/project/mod.rs:352
 msgid "{:?} has been finished for {} days, get rid of it!"
 msgstr ""
 

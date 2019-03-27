@@ -1,3 +1,5 @@
+#![allow(deprecated)]
+
 #[cfg(feature="localize")]
 include!(concat!(env!("OUT_DIR"), "/localize_macros.rs"));
 

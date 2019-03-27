@@ -50,8 +50,8 @@ impl Error for YamlError{
 
     fn cause(&self) -> Option<&dyn Error>{
         match *self{
-            YamlError::Io(ref err) => err.cause(),
-            YamlError::Scan(ref err) => err.cause()
+            YamlError::Io(ref err) => err.source(),
+            YamlError::Scan(ref err) => err.source()
         }
     }
 }
