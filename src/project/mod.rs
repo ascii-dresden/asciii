@@ -7,7 +7,6 @@ use std::io::prelude::*;
 use std::ffi::OsStr;
 use std::fmt;
 use std::path::{Path, PathBuf};
-use std::error::Error as ErrorTrait;
 use std::collections::HashMap;
 
 use chrono::prelude::*;
@@ -242,7 +241,7 @@ impl Project {
             Err(e) => {
                 error!("The resulting document is no valid yaml. SORRY!\n{}\n\n{}",
                        filled.lines().enumerate().map(|(n,l)| format!("{:>3}. {}\n",n,l)).collect::<String>(), //line numbers :D
-                       e.description());
+                       e);
                 bail!(e)
             }
         }
@@ -576,8 +575,8 @@ impl Storable for Project {
             Err(e) => {
                 error!("The created document is no valid yaml. SORRY!\n{}\n\n{}",
                        file_content.lines().enumerate().map(|(n,l)| format!("{:>3}. {}\n",n,l)).collect::<String>(), //line numbers :D
-                       e.description());
-                bail!(StorageError::Yaml(e))
+                       e);
+                bail!(e)
             }
         };
 

@@ -4,10 +4,6 @@
 use failure::Fail;
 
 use std::path::PathBuf;
-use std::{fmt, io};
-
-use crate::util::yaml;
-use crate::project::error::ProjectError;
 
 #[cfg(not(feature = "git_statuses"))]
 mod git2 {
@@ -59,25 +55,4 @@ pub enum StorageError {
     #[fail(display = "Nothing found for {:?}", _0)]
     NothingFound(Vec<String>),
 
-    #[fail(display = "{}", _0)]
-    Io(#[cause] io::Error),
-
-    #[fail(display = "{}", _0)]
-    Fmt(#[cause] fmt::Error),
-
-    #[fail(display = "{}", _0)]
-    Yaml(#[cause] yaml::YamlError),
-
-    #[fail(display = "{}", _0)]
-    Project(#[cause] ProjectError),
-
-    #[fail(display = "{}", _0)]
-    Git(#[cause] git2::Error),
 }
-
-impl From<io::Error>  for StorageError { fn from(e: io::Error) ->  StorageError { StorageError::Io(e) } }
-impl From<fmt::Error> for StorageError { fn from(e: fmt::Error) -> StorageError { StorageError::Fmt(e) } }
-impl From<yaml::YamlError> for StorageError { fn from(e: yaml::YamlError) -> StorageError { StorageError::Yaml(e) } }
-impl From<ProjectError> for StorageError { fn from(e: ProjectError) -> StorageError { StorageError::Project(e) } }
-
-impl From<git2::Error> for StorageError { fn from(e: git2::Error) -> StorageError { StorageError::Git(e) } }

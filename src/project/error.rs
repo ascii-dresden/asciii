@@ -2,53 +2,17 @@
 
 use failure::Fail;
 
-#[cfg(feature="serialization")] use serde_json;
-#[cfg(feature="deserialization")] use serde_yaml;
-
-use crate::util::yaml;
-use crate::project::product::ProductError;
-
-use std::{io, fmt};
-
+use std::fmt;
 
 #[derive(Fail, Debug)]
 pub enum ProjectError {
-
-    #[fail(display="This feature is not enabled in this build")]
-    Product(ProductError),
 
     #[fail(display="This feature is not enabled in this build")]
     FeatureDeactivated,
 
     #[fail(display="Cannot determine target file name")]
     CantDetermineTargetFile,
-
-    #[fail(display = "{}", _0)]
-    Io(#[cause] io::Error),
-
-    #[fail(display = "{}", _0)]
-    Fmt(#[cause] fmt::Error),
-
-    #[fail(display = "{}", _0)]
-    Yaml(#[cause] yaml::YamlError),
-
-    #[cfg(feature="serialization")]
-    #[fail(display = "{}", _0)]
-    Serialize(serde_json::Error),
-
-    #[cfg(feature="deserialization")]
-    #[fail(display = "{}", _0)]
-    Deserialize(serde_yaml::Error),
 }
-
-
-impl From<ProductError> for ProjectError { fn from(e: ProductError) -> ProjectError { ProjectError::Product(e) } }
-impl From<io::Error> for ProjectError { fn from(e: io::Error) -> ProjectError { ProjectError::Io(e) } }
-impl From<fmt::Error> for ProjectError { fn from(e: fmt::Error) -> ProjectError { ProjectError::Fmt(e) } }
-impl From<yaml::YamlError> for ProjectError { fn from(e: yaml::YamlError) -> ProjectError { ProjectError::Yaml(e) } }
-impl From<serde_json::Error> for ProjectError { fn from(e: serde_json::Error) -> ProjectError { ProjectError::Serialize(e) } }
-impl From<serde_yaml::Error> for ProjectError { fn from(e: serde_yaml::Error) -> ProjectError { ProjectError::Deserialize(e) } }
-
 
 pub type SpecResult = ::std::result::Result<(), ErrorList>;
 

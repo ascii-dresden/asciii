@@ -31,7 +31,7 @@ pub enum ProductError {
 
     #[fail(display = "unknown format")]
     UnknownFormat,
-    #[fail(display = "more returned than provided")]
+    #[fail(display = "more {:?} returned than provided", _0)]
     AmbiguousAmounts(String),
 
     #[fail(display = "missing amount of {:?}", _0)]

@@ -19,63 +19,23 @@
 
 #![allow(dead_code)]
 
-use std::fmt;
-use std::io;
 use std::fs;
 use std::path::Path;
-use std::error::Error;
 
 pub use yaml_rust::Yaml;
 use yaml_rust::YamlLoader;
 use yaml_rust::yaml::Hash as YamlHash;
-use yaml_rust::scanner::ScanError;
 use chrono::prelude::*;
 
-/// Wrapper around `io::Error` and `yaml_rust::scanner::ScanError`.
-#[derive(Debug)]
-pub enum YamlError{
-    /// wrapped `io` Error
-    Io(io::Error),
-    /// wrapped `scan` Error
-    Scan(ScanError)
-}
-
-impl Error for YamlError{
-    fn description(&self) -> &str{
-        match *self{
-            YamlError::Io(ref err) => err.description(),
-            YamlError::Scan(ref err) => err.description()
-        }
-    }
-
-    fn cause(&self) -> Option<&dyn Error>{
-        match *self{
-            YamlError::Io(ref err) => err.source(),
-            YamlError::Scan(ref err) => err.source()
-        }
-    }
-}
-
-impl From<io::Error> for YamlError { fn from(ioerror: io::Error)   -> YamlError{ YamlError::Io(ioerror) } }
-impl From<ScanError> for YamlError { fn from(scanerror: ScanError) -> YamlError{ YamlError::Scan(scanerror) } }
-impl fmt::Display for YamlError {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match *self{
-            YamlError::Scan(ref err) => write!(f, "{}", err),
-            YamlError::Io(ref err) => write!(f, "{}", err)
-        }
-    }
-}
-
 /// Wrapper that opens and parses a `.yml` file.
-pub fn open(path: &Path) -> Result<Yaml, YamlError> {
+pub fn open(path: &Path) -> Result<Yaml, failure::Error> {
 
     let file_content = fs::read_to_string(&path)?;
     parse( &file_content )
 }
 
 /// Ruby like API to yaml-rust.
-pub fn parse(file_content: &str) -> Result<Yaml, YamlError> {
+pub fn parse(file_content: &str) -> Result<Yaml, failure::Error> {
     Ok(
         YamlLoader::load_from_str(&file_content)?
         .get(0)
