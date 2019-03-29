@@ -9,7 +9,7 @@ use yaml_rust::yaml::Hash as YamlHash;
 
 use super::*;
 use super::spec::*;
-use super::product::{ProductResult, ProductError};
+use super::product::ProductError;
 
 use crate::util::{self, yaml, to_currency};
 
@@ -328,7 +328,7 @@ impl HasEvents for Project {
 }
 
 /// Returns a product from Service
-fn service_to_product<'a, T: HasEmployees>(s: &T) -> ProductResult<Product<'a>> {
+fn service_to_product<'a, T: HasEmployees>(s: &T) -> Result<Product<'a>, Error> {
     if let Some(salary) = s.salary() {
         Ok(Product {
                  name: "Service",
@@ -356,7 +356,7 @@ impl Redeemable for Project {
         self.get_f64("tax").map(Tax::new)
     }
 
-    fn bills(&self) -> ProductResult<(Bill<Product<'_>>, Bill<Product<'_>>)> {
+    fn bills(&self) -> Result<(Bill<Product<'_>>, Bill<Product<'_>>), Error> {
         let mut offer: Bill<Product<'_>> = Bill::new();
         let mut invoice: Bill<Product<'_>> = Bill::new();
 

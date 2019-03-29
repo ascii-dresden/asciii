@@ -1,13 +1,9 @@
-#![allow(trivial_casts)]
-
 use toml;
 use failure::Fail;
 use std::{io, fmt, time};
 
 use crate::project::error::ProjectError;
 use crate::storage::error::StorageError;
-
-pub type ActionResult<T> = Result<T, failure::Error>;
 
 #[derive(Fail, Debug)]
 pub enum ActionError {
@@ -38,9 +34,6 @@ pub enum ActionError {
 
     #[fail(display = "{}", _0)]
     Storage(#[cause] StorageError),
-
-    #[fail(display = "{}", _0)]
-    String(String),
 }
 
 impl From<io::Error>   for ActionError { fn from(e: io::Error) ->  ActionError { ActionError::Io(e) } }
@@ -50,5 +43,3 @@ impl From<toml::de::Error> for ActionError { fn from(e: toml::de::Error) -> Acti
 
 impl From <ProjectError> for ActionError {fn from(e: ProjectError) -> ActionError { ActionError::Project(e)} }
 impl From <StorageError> for ActionError {fn from(e: StorageError) -> ActionError { ActionError::Storage(e)} }
-impl From<String> for ActionError { fn from(e: String) -> ActionError { ActionError::String(e) } }
-impl From<&str> for ActionError { fn from(e: &str) -> ActionError { ActionError::String(e.into()) } }

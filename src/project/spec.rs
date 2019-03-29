@@ -9,13 +9,14 @@ use std::fmt;
 
 use bill::{Bill, Currency, Tax};
 use chrono::{Date, Utc, NaiveTime};
+use failure::Error;
 use icalendar::Calendar;
 use semver::Version;
 use yaml_rust::Yaml;
 
 use crate::storage::Storable;
 use super::error::{SpecResult, ErrorList};
-use super::product::{Product, ProductResult};
+use super::product::Product;
 
 
 pub fn print_specresult(label: &str, result: &SpecResult) {
@@ -217,13 +218,13 @@ pub trait Redeemable: IsProject {
     fn is_payed(&self) -> bool;
 
     /// Returns a bill for the offer and one for the invoice.
-    fn bills(&self) -> ProductResult<(Bill<Product<'_>>, Bill<Product<'_>>)>;
+    fn bills(&self) -> Result<(Bill<Product<'_>>, Bill<Product<'_>>), Error>;
 
     /// When what is the MWsT of the project.
     fn tax(&self) -> Option<Tax>;
 
     /// Sum of sold products
-    fn sum_sold(&self) -> ProductResult<Currency> {
+    fn sum_sold(&self) -> Result<Currency, Error> {
         let (_,invoice) = self.bills()?;
         Ok(invoice.net_total())
     }

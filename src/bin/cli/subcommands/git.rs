@@ -1,15 +1,14 @@
 use clap::ArgMatches;
-use failure::{bail, format_err};
+use failure::{bail, format_err, Error};
 use log::{trace, error};
 
 use asciii::{storage, util};
 use asciii::project::Project;
 
 use super::matches_to_paths;
-use crate::cli::error::*;
 
 /// Command LOG
-pub fn git_log(matches: &ArgMatches<'_>) -> Result<()> {
+pub fn git_log(matches: &ArgMatches<'_>) -> Result<(), Error> {
     let storage = storage::setup_with_git::<Project>()?;
     let paths = matches_to_paths(matches, &storage)?;
     let repo = storage.repository().unwrap();
@@ -21,7 +20,7 @@ pub fn git_log(matches: &ArgMatches<'_>) -> Result<()> {
 }
 
 /// Command STATUS
-pub fn git_status() -> Result<()> {
+pub fn git_status() -> Result<(), Error> {
     let storage = storage::setup_with_git::<Project>()?;
     let repo = storage.repository().unwrap();
     if !repo.status().success() {
@@ -32,7 +31,7 @@ pub fn git_status() -> Result<()> {
 }
 
 /// Command COMMIT
-pub fn git_commit() -> Result<()> {
+pub fn git_commit() -> Result<(), Error> {
     let storage = storage::setup_with_git::<Project>()?;
     let repo = storage.repository().unwrap();
     if !repo.commit().success() {
@@ -58,7 +57,7 @@ pub fn git_remote() -> Result<()> {
 /// Command REMOTE
 /// exact replica of `git remote -v`
 #[cfg(feature = "git_statuses")]
-pub fn git_remote() -> Result<()> {
+pub fn git_remote() -> Result<(), Error> {
     let storage = storage::setup_with_git::<Project>()?;
 
     if let Some(r) = storage.repository() {
@@ -90,7 +89,7 @@ pub fn git_remote() -> Result<()> {
 }
 
 /// Command ADD
-pub fn git_add(matches: &ArgMatches<'_>) -> Result<()> {
+pub fn git_add(matches: &ArgMatches<'_>) -> Result<(), Error> {
     trace!("git_add {:#?}", matches);
     let storage = storage::setup_with_git::<Project>()?;
     let repo = storage.repository().unwrap();
@@ -117,7 +116,7 @@ pub fn git_add(matches: &ArgMatches<'_>) -> Result<()> {
 
 
 /// Command DIFF
-pub fn git_diff(matches: &ArgMatches<'_>) -> Result<()> {
+pub fn git_diff(matches: &ArgMatches<'_>) -> Result<(), Error> {
     let storage = storage::setup_with_git::<Project>()?;
     let paths = matches_to_paths(matches, &storage)?;
     let repo = storage.repository().unwrap();
@@ -133,7 +132,7 @@ pub fn git_diff(matches: &ArgMatches<'_>) -> Result<()> {
 }
 
 /// Command PULL
-pub fn git_pull(matches: &ArgMatches<'_>) -> Result<()> {
+pub fn git_pull(matches: &ArgMatches<'_>) -> Result<(), Error> {
     let storage = storage::setup_with_git::<Project>()?;
     let repo = storage.repository().unwrap();
 
@@ -149,7 +148,7 @@ pub fn git_pull(matches: &ArgMatches<'_>) -> Result<()> {
 }
 
 /// Command PUSH
-pub fn git_push() -> Result<()> {
+pub fn git_push() -> Result<(), Error> {
     let storage = storage::setup_with_git::<Project>()?;
     let repo = storage.repository().unwrap();
     if !repo.push().success() {
@@ -159,7 +158,7 @@ pub fn git_push() -> Result<()> {
 }
 
 /// Command STASH
-pub fn git_stash() -> Result<()> {
+pub fn git_stash() -> Result<(), Error> {
     let storage = storage::setup_with_git::<Project>()?;
     let repo = storage.repository().unwrap();
     if !repo.stash().success() {
@@ -169,7 +168,7 @@ pub fn git_stash() -> Result<()> {
 }
 
 /// Command CLEANUP
-pub fn git_cleanup(matches: &ArgMatches<'_>) -> Result<()> {
+pub fn git_cleanup(matches: &ArgMatches<'_>) -> Result<(), Error> {
     let storage = storage::setup_with_git::<Project>()?;
     let paths = matches_to_paths(matches, &storage)?;
     let repo = storage.repository().unwrap();
@@ -184,7 +183,7 @@ pub fn git_cleanup(matches: &ArgMatches<'_>) -> Result<()> {
 }
 
 /// Command STASH POP
-pub fn git_stash_pop() -> Result<()> {
+pub fn git_stash_pop() -> Result<(), Error> {
     let storage = storage::setup_with_git::<Project>()?;
     let repo = storage.repository().unwrap();
     if !repo.stash_pop().success() {

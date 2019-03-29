@@ -17,7 +17,7 @@ use yaml_rust::Yaml;
 use maplit::hashmap;
 use slug;
 use tempdir::TempDir;
-use failure::bail;
+use failure::{bail, Error};
 
 use bill::BillItem;
 use icalendar::*;
@@ -25,7 +25,7 @@ use semver::Version;
 use log::{debug, trace, error, warn};
 
 use crate::util::{yaml, get_valid_path};
-use crate::storage::{Storable, StorageResult, list_path_content};
+use crate::storage::{Storable, list_path_content};
 use crate::storage::StorableAndTempDir;
 use crate::storage::StorageError;
 use crate::storage::repo::GitStatus;
@@ -47,10 +47,8 @@ use self::spec::{Offerable, Invoicable, Redeemable, Validatable, HasEmployees};
 use self::spec_yaml::ProvidesData;
 
 pub use self::error:: ErrorList;
-use self::error::{ProjectError, SpecResult, ProjectResult};
-use self::product::{Product, ProductError, ProductResult};
-
-type Result<T> = ProjectResult<T>;
+use self::error::{ProjectError, SpecResult};
+use self::product::{Product, ProductError};
 
 pub use self::computed_field::ComputedField;
 
@@ -71,7 +69,7 @@ impl Project {
     pub fn yaml(&self) -> &Yaml{ &self.yaml }
 
     /// Opens a project from file path;
-    pub fn open<S: AsRef<OsStr> + ?Sized>(pathish: &S) -> Result<Project> {
+    pub fn open<S: AsRef<OsStr> + ?Sized>(pathish: &S) -> Result<Project, Error> {
         let file_path = Path::new(&pathish);
         let file_content = fs::read_to_string(&file_path)?;
         Ok(Project {
@@ -87,13 +85,13 @@ impl Project {
 
     /// import from yaml file
     #[cfg(feature="deserialization")]
-    pub fn parse_yaml(&self) -> Result<import::Project> {
+    pub fn parse_yaml(&self) -> Result<import::Project, Error> {
         import::from_str(&self.file_content)
     }
 
     /// (feature deactivated) import from yaml file
     #[cfg(not(feature="deserialization"))]
-    pub fn parse_yaml(&self) -> Result<()> {
+    pub fn parse_yaml(&self) -> Result<(), Error> {
         bail!(error::ErrorKind::FeatureDeactivated)
     }
 
@@ -111,19 +109,19 @@ impl Project {
 
     #[cfg(feature="serialization")]
     /// export to JSON
-    pub fn to_json(&self) -> ProjectResult<String> {
+    pub fn to_json(&self) -> Result<String, Error> {
         let complete: Complete = self.export();
         Ok(serde_json::to_string(&complete)?)
     }
 
     #[cfg(not(feature="serialization"))]
     /// feature deactivateda) export to JSON
-    pub fn to_json(&self) -> Result<String> {
+    pub fn to_json(&self) -> Result<String, Error> {
         bail!(error::ErrorKind::FeatureDeactivated)
     }
 
     /// Used mostly for testing purposes
-    pub fn from_file_content(content: &str) -> Result<Project> {
+    pub fn from_file_content(content: &str) -> Result<Project, Error> {
         Ok(Project{
             file_path: PathBuf::new(),
             git_status: None,
@@ -194,7 +192,7 @@ impl Project {
         }
     }
 
-    pub fn to_csv(&self, bill_type: BillType) -> ProjectResult<String>{
+    pub fn to_csv(&self, bill_type: BillType) -> Result<String, Error>{
         use std::fmt::Write;
         let (offer, invoice) = self.bills()?;
         let bill = match bill_type{ BillType::Offer => offer, BillType::Invoice => invoice };
@@ -227,7 +225,7 @@ impl Project {
     }
 
     /// Fill certain field
-    pub fn replace_field(&self, field:&str, value:&str) -> Result<()> {
+    pub fn replace_field(&self, field:&str, value:&str) -> Result<(), Error> {
         // fills the template
         let filled = Templater::new(&self.file_content)
             .fill_in_field(field,value)
@@ -357,7 +355,7 @@ impl Project {
                        .done()
     }
 
-    fn item_from_desc_and_value<'y>(&self, desc: &'y Yaml, values: &'y Yaml) -> ProductResult<(BillItem<Product<'y>>,BillItem<Product<'y>>)> {
+    fn item_from_desc_and_value<'y>(&self, desc: &'y Yaml, values: &'y Yaml) -> Result<(BillItem<Product<'y>>,BillItem<Product<'y>>), Error> {
         let get_f64 = |yaml, path|
             self.get_direct(yaml,path)
                 .and_then(|y| y.as_f64()
@@ -460,7 +458,7 @@ pub trait Exportable {
         self.invoice_file().map(|f|f.exists()).unwrap_or(false)
     }
 
-    fn write_to_path<P:AsRef<OsStr> + fmt::Debug>(content: &str, target: &P) -> Result<()> {
+    fn write_to_path<P:AsRef<OsStr> + fmt::Debug>(content: &str, target: &P) -> Result<(), Error> {
         trace!("writing content ({}bytes) to {:?}", content.len(), target);
         let mut file = File::create(Path::new(target))?;
         file.write_all(content.as_bytes())?;
@@ -468,14 +466,14 @@ pub trait Exportable {
         Ok(())
     }
 
-    fn full_file_path(&self, bill_type: BillType, ext: &str) -> Result<PathBuf> {
+    fn full_file_path(&self, bill_type: BillType, ext: &str) -> Result<PathBuf, Error> {
         match bill_type {
             BillType::Offer   => self.full_offer_file_path(ext),
             BillType::Invoice => self.full_invoice_file_path(ext)
         }
     }
 
-    fn full_offer_file_path(&self, ext: &str) -> Result<PathBuf> {
+    fn full_offer_file_path(&self, ext: &str) -> Result<PathBuf, Error> {
         if let Some(target) = self.offer_file_name(ext) {
             Ok(self.export_dir().join(&target))
         } else {
@@ -483,7 +481,7 @@ pub trait Exportable {
         }
     }
 
-    fn full_invoice_file_path(&self, ext: &str) -> Result<PathBuf> {
+    fn full_invoice_file_path(&self, ext: &str) -> Result<PathBuf, Error> {
         if let Some(target) = self.invoice_file_name(ext) {
             Ok(self.export_dir().join(&target))
         } else {
@@ -491,20 +489,20 @@ pub trait Exportable {
         }
     }
 
-    fn write_to_file(&self, content: &str, bill_type: BillType, ext: &str) -> Result<PathBuf> {
+    fn write_to_file(&self, content: &str, bill_type: BillType, ext: &str) -> Result<PathBuf, Error> {
         match bill_type{
             BillType::Offer   => self.write_to_offer_file(content, ext),
             BillType::Invoice => self.write_to_invoice_file(content, ext)
         }
     }
 
-    fn write_to_offer_file(&self, content: &str, ext: &str) -> Result<PathBuf> {
+    fn write_to_offer_file(&self, content: &str, ext: &str) -> Result<PathBuf, Error> {
         let full_path = self.full_offer_file_path(ext)?;
         Self::write_to_path(content, &full_path)?;
         Ok(full_path)
     }
 
-    fn write_to_invoice_file(&self, content: &str, ext: &str) -> Result<PathBuf> {
+    fn write_to_invoice_file(&self, content: &str, ext: &str) -> Result<PathBuf, Error> {
         let full_path = self.full_invoice_file_path(ext)?;
         Self::write_to_path(content, &full_path)?;
         Ok(full_path)
@@ -535,7 +533,7 @@ impl Storable for Project {
         crate::CONFIG.get_to_string("extensions.project_file")
     }
 
-    fn from_template(project_name: &str, template:&Path, fill: &HashMap<&str, String>) -> StorageResult<StorableAndTempDir<Self>> {
+    fn from_template(project_name: &str, template:&Path, fill: &HashMap<&str, String>) -> Result<StorableAndTempDir<Self>, Error> {
         let template_name = template.file_stem().unwrap().to_str().unwrap();
 
         let event_date = (Utc::today() + Duration::days(14)).format("%d.%m.%Y").to_string();
@@ -651,7 +649,7 @@ impl Storable for Project {
     }
 
     /// Opens a yaml and parses it.
-    fn open_folder(folder_path: &Path) -> StorageResult<Project>{
+    fn open_folder(folder_path: &Path) -> Result<Project, Error>{
         let project_file_extension = crate::CONFIG.get_to_string("extensions.project_file");
         let file_path = list_path_content(folder_path)?.iter()
             .filter(|f|f.extension().unwrap_or(&OsStr::new("")) == project_file_extension.as_str())
@@ -660,7 +658,7 @@ impl Storable for Project {
         Self::open_file(&file_path)
     }
 
-    fn open_file(file_path:&Path) -> StorageResult<Project> {
+    fn open_file(file_path:&Path) -> Result<Project, Error> {
         Ok(Project::open(file_path)?)
     }
 

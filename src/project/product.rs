@@ -24,8 +24,6 @@ pub struct Product<'a> {
     pub price: Currency
 }
 
-pub type ProductResult<T> = ::std::result::Result<T, failure::Error>;
-
 #[derive(Fail, Debug)]
 pub enum ProductError {
     #[fail( display="Invalid price in {}", _0)]

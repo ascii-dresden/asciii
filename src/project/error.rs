@@ -1,6 +1,4 @@
-#![allow(trivial_casts)]
 #![allow(missing_docs)]
-#![allow(deprecated)]
 
 use failure::Fail;
 
@@ -9,7 +7,6 @@ use failure::Fail;
 
 use crate::util::yaml;
 use crate::project::product::ProductError;
-use super::spec::Validatable;
 
 use std::{io, fmt};
 
@@ -53,8 +50,6 @@ impl From<serde_json::Error> for ProjectError { fn from(e: serde_json::Error) ->
 impl From<serde_yaml::Error> for ProjectError { fn from(e: serde_yaml::Error) -> ProjectError { ProjectError::Deserialize(e) } }
 
 
-pub type ProjectResult<T> = ::std::result::Result<T, failure::Error>;
-
 pub type SpecResult = ::std::result::Result<(), ErrorList>;
 
 pub fn combine_specresults(specs: Vec<SpecResult>) -> SpecResult {
@@ -67,18 +62,6 @@ pub fn combine_specresults(specs: Vec<SpecResult>) -> SpecResult {
                           (Err(left_list), Err(right_list)) => Err(left_list.combine_with(&right_list))
                       }
                      )
-}
-
-pub fn all_check_out<T: Validatable>(specs: &[T]) -> SpecResult {
-    let errors = specs.iter()
-        .filter_map(Validatable::errors)
-        .flat_map(|err_list| err_list.into_iter())
-        .collect::<Vec<String>>();
-    if !errors.is_empty() {
-        Err(ErrorList::from_vec(errors))
-    } else {
-        Ok(())
-    }
 }
 
 #[derive(Debug, Default, Fail)]

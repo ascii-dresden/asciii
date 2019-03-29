@@ -1,4 +1,3 @@
-#![allow(trivial_casts)]
 //! Error that may occur in Storage
 //!
 #[cfg(feature = "git_statuses")]
@@ -60,9 +59,6 @@ pub enum StorageError {
     #[fail(display = "Nothing found for {:?}", _0)]
     NothingFound(Vec<String>),
 
-    #[fail(display = "{:?}", _0)]
-    String(String),
-
     #[fail(display = "{}", _0)]
     Io(#[cause] io::Error),
 
@@ -85,6 +81,3 @@ impl From<yaml::YamlError> for StorageError { fn from(e: yaml::YamlError) -> Sto
 impl From<ProjectError> for StorageError { fn from(e: ProjectError) -> StorageError { StorageError::Project(e) } }
 
 impl From<git2::Error> for StorageError { fn from(e: git2::Error) -> StorageError { StorageError::Git(e) } }
-
-impl From<String> for StorageError { fn from(e: String) -> StorageError { StorageError::String(e) } }
-impl From<&str> for StorageError { fn from(e: &str) -> StorageError { StorageError::String(e.into()) } }

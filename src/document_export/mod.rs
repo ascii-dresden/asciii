@@ -6,7 +6,7 @@ use std::{time,fs};
 use std::path::{Path, PathBuf};
 
 use serde::ser::Serialize;
-use failure::bail;
+use failure::{bail, Error};
 
 use open;
 use handlebars::{Handlebars, no_escape, Helper, RenderContext, HelperDef, Context, Output, HelperResult};
@@ -21,8 +21,6 @@ use crate::storage::{self, Storable, StorageSelection};
 pub mod error;
 
 use self::error::*;
-
-type Result<T> = ExportResult<T>;
 
 #[cfg_attr(feature = "serialization", derive(Serialize))]
 struct DocAndStorage<'a, T: Serialize> {
@@ -70,7 +68,7 @@ impl HelperDef for CountHelper {
 ///
 /// Returns path to created file, potenially in a `tempdir`.
 // pub fn fill_template<E:Serialize>(document:E, template_file:&Path) -> PathBuf{
-pub fn fill_template<E, P>(document: &E, bill_type: BillType, template_path: P) -> Result<String>
+pub fn fill_template<E, P>(document: &E, bill_type: BillType, template_path: P) -> Result<String, Error>
     where E: Serialize, P:AsRef<Path>
 {
     let mut handlebars = Handlebars::new();
@@ -88,13 +86,13 @@ pub fn fill_template<E, P>(document: &E, bill_type: BillType, template_path: P) 
                            .replace(">", "}"))?)
 }
 
-fn file_age(path: &Path) -> Result<time::Duration> {
+fn file_age(path: &Path) -> Result<time::Duration, Error> {
     let metadata = fs::metadata(path)?;
     let modified = metadata.modified()?;
     Ok(modified.elapsed()?)
 }
 
-fn output_template_path(template_name:&str) -> Result<PathBuf> {
+fn output_template_path(template_name:&str) -> Result<PathBuf, Error> {
     // construct_template_path(&template_name) {
     let template_ext  = crate::CONFIG.get_str("extensions/output_template");
     let mut template_path = PathBuf::new();
@@ -116,7 +114,7 @@ fn output_template_path(template_name:&str) -> Result<PathBuf> {
 /// Creates the latex files within each projects directory, either for Invoice or Offer.
 #[cfg(feature="document_export")]
 #[allow(clippy::cyclomatic_complexity)] // sorry
-fn project_to_doc(project: &Project, config: &ExportConfig<'_>) -> Result<Option<PathBuf>> {
+fn project_to_doc(project: &Project, config: &ExportConfig<'_>) -> Result<Option<PathBuf>, Error> {
     trace!("exporting a document: {:#?}", config);
 
     let &ExportConfig {
@@ -295,7 +293,7 @@ impl<'a> Default for ExportConfig<'a> {
 
 /// Creates the latex files within each projects directory, either for Invoice or Offer.
 #[cfg(feature="document_export")]
-pub fn projects_to_doc(config: &ExportConfig<'_>) -> Result<()> {
+pub fn projects_to_doc(config: &ExportConfig<'_>) -> Result<(), Error> {
     let storage = storage::setup::<Project>()?;
     for p in storage.open_projects(&config.select)? {
         if let Some(path) = project_to_doc(&p, &config)? {

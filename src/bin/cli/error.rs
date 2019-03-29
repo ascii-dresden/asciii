@@ -1,6 +1,3 @@
-#![allow(trivial_casts)]
-
-
 use failure::Fail;
 
 use asciii::actions::error::ActionError;
@@ -9,8 +6,6 @@ use asciii::project::error::ProjectError;
 use asciii::storage::error::StorageError;
 
 use std::{io, fmt, time};
-
-pub type Result<T> = std::result::Result<T, failure::Error>;
 
 #[cfg(feature="document_export")]
 

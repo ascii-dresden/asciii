@@ -7,10 +7,10 @@ use std::path::{Path, PathBuf};
 use std::collections::HashMap;
 
 use chrono::{Date, Utc, Datelike};
+use failure::Error;
 use tempdir::TempDir;
 use log::debug;
 
-use super::StorageResult;
 use super::repo::GitStatus;
 
 pub type FilePath = Path;
@@ -22,11 +22,11 @@ pub type FolderPathBuf = PathBuf;
 pub trait Storable: Send+Sync {
 
     /// opens a projectfolder
-    fn open_folder(_: &FolderPath) -> StorageResult<Self> where Self: Sized;
-    fn open_file(_: &FilePath) -> StorageResult<Self> where Self: Sized;
+    fn open_folder(_: &FolderPath) -> Result<Self, Error> where Self: Sized;
+    fn open_file(_: &FilePath) -> Result<Self, Error> where Self: Sized;
 
     /// creates in tempfile
-    fn from_template(project_name: &str, template: &Path, data: &HashMap<&str, String>) -> StorageResult<StorableAndTempDir<Self>> where Self: Sized;
+    fn from_template(project_name: &str, template: &Path, data: &HashMap<&str, String>) -> Result<StorableAndTempDir<Self>, Error> where Self: Sized;
 
     /// For file names
     fn ident(&self) -> String{ self.dir().file_stem().and_then(|s|s.to_str()).unwrap().to_owned() }
