@@ -204,7 +204,7 @@ mod test{
     use maplit::hashmap;
     
     use super::Templater;
-    const TEMPLATE:&'static str = r##"This tests ##TEST## for ##ATTR## ##SUBJ##."##;
+    const TEMPLATE: &str = r##"This tests ##TEST## for ##ATTR## ##SUBJ##."##;
 
    #[test]
    fn complete(){

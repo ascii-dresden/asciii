@@ -65,10 +65,6 @@ impl ErrorList {
         left_list.combine_with(&right_list)
     }
 
-    pub fn into_iter(self) -> impl Iterator<Item=String> {
-        self.errors.into_iter()
-    }
-
     pub fn is_empty(&self) -> bool {
         self.errors.is_empty()
     }

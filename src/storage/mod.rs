@@ -177,9 +177,9 @@ pub fn get_storage_path() -> PathBuf
 /// Sets up an instance of `Storage`.
 pub fn setup<L:Storable>() -> Result<Storage<L>, Error> {
     trace!("storage::setup()");
-    let working   = crate::CONFIG.get_str_or("dirs/working")  .ok_or(StorageError::FaultyConfig("dirs/working".into()))?;
-    let archive   = crate::CONFIG.get_str_or("dirs/archive")  .ok_or(StorageError::FaultyConfig("dirs/archive".into()))?;
-    let templates = crate::CONFIG.get_str_or("dirs/templates").ok_or(StorageError::FaultyConfig("dirs/templates".into()))?;
+    let working   = crate::CONFIG.get_str_or("dirs/working")  .ok_or_else(||StorageError::FaultyConfig("dirs/working".into()))?;
+    let archive   = crate::CONFIG.get_str_or("dirs/archive")  .ok_or_else(||StorageError::FaultyConfig("dirs/archive".into()))?;
+    let templates = crate::CONFIG.get_str_or("dirs/templates").ok_or_else(||StorageError::FaultyConfig("dirs/templates".into()))?;
     let storage   = Storage::try_new(get_storage_path(), working, archive, templates)?;
     storage.health_check()?;
     Ok(storage)
@@ -188,9 +188,9 @@ pub fn setup<L:Storable>() -> Result<Storage<L>, Error> {
 /// Sets up an instance of `Storage`, with git turned on.
 pub fn setup_with_git<L:Storable>() -> Result<Storage<L>, Error> {
     trace!("storage::setup_with_git()");
-    let working   = crate::CONFIG.get_str_or("dirs/working")  .ok_or(StorageError::FaultyConfig("dirs/working".into()))?;
-    let archive   = crate::CONFIG.get_str_or("dirs/archive")  .ok_or(StorageError::FaultyConfig("dirs/archive".into()))?;
-    let templates = crate::CONFIG.get_str_or("dirs/templates").ok_or(StorageError::FaultyConfig("dirs/templates".into()))?;
+    let working   = crate::CONFIG.get_str_or("dirs/working")  .ok_or_else(||StorageError::FaultyConfig("dirs/working".into()))?;
+    let archive   = crate::CONFIG.get_str_or("dirs/archive")  .ok_or_else(||StorageError::FaultyConfig("dirs/archive".into()))?;
+    let templates = crate::CONFIG.get_str_or("dirs/templates").ok_or_else(||StorageError::FaultyConfig("dirs/templates".into()))?;
     let storage   = if env::var("ASCIII_NO_GIT").is_ok() {
         Storage::try_new(get_storage_path(), working, archive, templates)?
     } else {
@@ -764,7 +764,7 @@ impl<L:Storable> Storage<L> {
                 let projects = self.search_projects_any(dir, &terms)?;
                 if projects.is_empty() {
                     failure::bail!(
-                        StorageError::NothingFound(search_terms.into_iter().map(ToString::to_string).collect())
+                        StorageError::NothingFound(search_terms.iter().map(ToString::to_string).collect())
                         );
                 }
                 projects

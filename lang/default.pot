@@ -596,39 +596,39 @@ msgstr ""
 msgid "{} weeks"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/project/mod.rs:301
+#: /home/hendrik/code/ascii/asciii/src/project/mod.rs:300
 msgid "weird task edgecase in {:?}:\n{:?}"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/project/mod.rs:309
+#: /home/hendrik/code/ascii/asciii/src/project/mod.rs:308
 msgid "Create an Invoice"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/project/mod.rs:317
+#: /home/hendrik/code/ascii/asciii/src/project/mod.rs:316
 msgid "{}: Hungry employees!"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/project/mod.rs:318
+#: /home/hendrik/code/ascii/asciii/src/project/mod.rs:317
 msgid "Pay {}\nYou have had the money for {} days!"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/project/mod.rs:328
+#: /home/hendrik/code/ascii/asciii/src/project/mod.rs:327
 msgid "Inquire about: \"{event}\"!"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/project/mod.rs:329
+#: /home/hendrik/code/ascii/asciii/src/project/mod.rs:328
 msgid "{inum }{event:?} on {invoice_date} ({days} days ago) was already invoiced but is still not marked as payed.\nPlease check for incoming payments! You can ask {client} ({mail})."
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/project/mod.rs:339
+#: /home/hendrik/code/ascii/asciii/src/project/mod.rs:338
 msgid "{rnum}: payment is {weeks} weeks late: \"{event}\""
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/project/mod.rs:351
+#: /home/hendrik/code/ascii/asciii/src/project/mod.rs:350
 msgid "Archive {}"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/project/mod.rs:352
+#: /home/hendrik/code/ascii/asciii/src/project/mod.rs:351
 msgid "{:?} has been finished for {} days, get rid of it!"
 msgstr ""
 

@@ -61,7 +61,7 @@ impl Storable for TestProject{
 
 
 // TODO implement failing cases
-const TEST_PROJECTS:[&'static str;4] = [
+const TEST_PROJECTS:[&str; 4] = [
     "test1", "test2",
     "foobar", "ich schreibe viel zu längliche projektnamen!",
 ];

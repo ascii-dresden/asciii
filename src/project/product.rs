@@ -84,7 +84,7 @@ impl<'a> Product<'a> {
         match *desc {
             yaml::Yaml::String(ref name) => Self::from_old_format(name, values, local_tax),
             yaml::Yaml::Hash(_) => Self::from_new_format(desc, values, local_tax),
-            _ => Err(ProductError::UnknownFormat.into()),
+            _ => Err(ProductError::UnknownFormat),
         }
     }
 }

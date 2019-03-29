@@ -235,7 +235,7 @@ fn edit_projects(dir: StorageDir, search_terms: &[&str], editor: Option<&str>) -
     }
 
     if all_projects.is_empty() {
-        bail!(ActionError::NothingFound(search_terms.into_iter().map(ToString::to_string).collect()));
+        bail!(ActionError::NothingFound(search_terms.iter().map(ToString::to_string).collect()));
     } else {
         let all_paths = all_projects.iter().map(|p| p.file()).collect::<Vec<PathBuf>>();
         util::pass_to_command(editor, &all_paths);
@@ -319,7 +319,7 @@ pub fn set(m: &ArgMatches<'_>) -> Result<(), Error> {
         if util::really(&format!("do you want to set the field {} in {:?}",
                                  field,
                                  project.short_desc())) {
-            project.replace_field(&field, &value).map_err(|e| e.into())
+            project.replace_field(&field, &value)
         } else {
             Err(format_err!("Don't want to"))
         }
