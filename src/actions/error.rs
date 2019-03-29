@@ -7,7 +7,7 @@ use std::{io, fmt, time};
 use crate::project::error::ProjectError;
 use crate::storage::error::StorageError;
 
-pub type ActionResult<T> = Result<T, ActionError>;
+pub type ActionResult<T> = Result<T, failure::Error>;
 
 #[derive(Fail, Debug)]
 pub enum ActionError {

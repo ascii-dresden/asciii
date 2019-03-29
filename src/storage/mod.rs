@@ -22,6 +22,7 @@
 use rayon::prelude::*;
 use dirs::home_dir;
 use log::{info, debug, trace, error, warn};
+use failure::{bail, ensure};
 
 use std::fs;
 use std::env::{self, current_dir};
@@ -33,7 +34,7 @@ pub type Year =  i32;
 
 /// Result returned by Storage
 /// TODO move to `error` module
-pub type StorageResult<T> = Result<T, StorageError>;
+pub type StorageResult<T> = Result<T, failure::Error>;
 
 #[cfg(test)] mod tests;
 #[cfg(test)] mod realworld;
@@ -180,9 +181,9 @@ pub fn get_storage_path() -> PathBuf
 /// Sets up an instance of `Storage`.
 pub fn setup<L:Storable>() -> StorageResult<Storage<L>> {
     trace!("storage::setup()");
-    let working   = crate::CONFIG.get_str_or("dirs/working").ok_or("Faulty config: dirs/working does not contain a value")?;
-    let archive   = crate::CONFIG.get_str_or("dirs/archive").ok_or("Faulty config: dirs/archive does not contain a value")?;
-    let templates = crate::CONFIG.get_str_or("dirs/templates").ok_or("Faulty config: dirs/templates does not contain a value")?;
+    let working   = crate::CONFIG.get_str_or("dirs/working")  .ok_or(StorageError::FaultyConfig("dirs/working".into()))?;
+    let archive   = crate::CONFIG.get_str_or("dirs/archive")  .ok_or(StorageError::FaultyConfig("dirs/archive".into()))?;
+    let templates = crate::CONFIG.get_str_or("dirs/templates").ok_or(StorageError::FaultyConfig("dirs/templates".into()))?;
     let storage   = Storage::try_new(get_storage_path(), working, archive, templates)?;
     storage.health_check()?;
     Ok(storage)
@@ -191,9 +192,9 @@ pub fn setup<L:Storable>() -> StorageResult<Storage<L>> {
 /// Sets up an instance of `Storage`, with git turned on.
 pub fn setup_with_git<L:Storable>() -> StorageResult<Storage<L>> {
     trace!("storage::setup_with_git()");
-    let working   = crate::CONFIG.get_str_or("dirs/working").ok_or("Faulty config: dirs/working does not contain a value")?;
-    let archive   = crate::CONFIG.get_str_or("dirs/archive").ok_or("Faulty config: dirs/archive does not contain a value")?;
-    let templates = crate::CONFIG.get_str_or("dirs/templates").ok_or("Faulty config: dirs/templates does not contain a value")?;
+    let working   = crate::CONFIG.get_str_or("dirs/working")  .ok_or(StorageError::FaultyConfig("dirs/working".into()))?;
+    let archive   = crate::CONFIG.get_str_or("dirs/archive")  .ok_or(StorageError::FaultyConfig("dirs/archive".into()))?;
+    let templates = crate::CONFIG.get_str_or("dirs/templates").ok_or(StorageError::FaultyConfig("dirs/templates".into()))?;
     let storage   = if env::var("ASCIII_NO_GIT").is_ok() {
         Storage::try_new(get_storage_path(), working, archive, templates)?
     } else {
@@ -766,7 +767,9 @@ impl<L:Storable> Storage<L> {
                 let terms = search_terms.iter().map(AsRef::as_ref).collect::<Vec<_>>(); // sorry about this
                 let projects = self.search_projects_any(dir, &terms)?;
                 if projects.is_empty() {
-                    return Err(format!("Nothing found for {:?}", search_terms).into())
+                    failure::bail!(
+                        StorageError::NothingFound(search_terms.into_iter().map(ToString::to_string).collect())
+                        );
                 }
                 projects
             },

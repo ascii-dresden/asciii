@@ -10,13 +10,14 @@ use asciii::storage::error::StorageError;
 
 use std::{io, fmt, time};
 
-pub type Result<T> = std::result::Result<T, CliError>;
+pub type Result<T> = std::result::Result<T, failure::Error>;
 
 #[cfg(feature="document_export")]
 
 #[derive(Fail, Debug)]
 pub enum CliError {
     #[fail(display = "This feature is not enabled in this build")]
+    #[allow(dead_code)]
     FeatureDeactivated,
 
     #[fail(display = "{}", _0)]

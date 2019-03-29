@@ -6,7 +6,7 @@ use crate::storage::error::StorageError;
 
 use std::{io, fmt, path::PathBuf, time};
 
-pub type ExportResult<T> = Result<T, ExportError>;
+pub type ExportResult<T> = Result<T, failure::Error>;
 
 #[derive(Fail, Debug)]
 pub enum ExportError {

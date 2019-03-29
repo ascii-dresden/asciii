@@ -17,6 +17,7 @@ use yaml_rust::Yaml;
 use maplit::hashmap;
 use slug;
 use tempdir::TempDir;
+use failure::bail;
 
 use bill::BillItem;
 use icalendar::*;
@@ -45,7 +46,8 @@ use self::spec::{IsProject, IsClient};
 use self::spec::{Offerable, Invoicable, Redeemable, Validatable, HasEmployees};
 use self::spec_yaml::ProvidesData;
 
-use self::error::{ProjectError, ErrorList, SpecResult, ProjectResult};
+pub use self::error:: ErrorList;
+use self::error::{ProjectError, SpecResult, ProjectResult};
 use self::product::{Product, ProductError, ProductResult};
 
 type Result<T> = ProjectResult<T>;
@@ -160,7 +162,7 @@ impl Project {
     /// Ready to produce offer.
     ///
     /// Ready to send an **offer** to the client.
-    pub fn is_ready_for_offer(&self) -> SpecResult{
+    pub fn is_ready_for_offer(&self) -> SpecResult {
         self::error::combine_specresults(
             vec![ self.offer().validate(),
                   self.client().validate(),
@@ -192,7 +194,7 @@ impl Project {
         }
     }
 
-    pub fn to_csv(&self, bill_type: BillType) -> Result<String>{
+    pub fn to_csv(&self, bill_type: BillType) -> ProjectResult<String>{
         use std::fmt::Write;
         let (offer, invoice) = self.bills()?;
         let bill = match bill_type{ BillType::Offer => offer, BillType::Invoice => invoice };

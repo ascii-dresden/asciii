@@ -3,6 +3,7 @@ use std::str::FromStr;
 use bill::{Bill, Currency, Tax};
 use icalendar::Event as CalEvent;
 use icalendar::{Component, Calendar};
+use failure::bail;
 use yaml_rust::Yaml;
 use yaml_rust::yaml::Hash as YamlHash;
 
@@ -10,10 +11,7 @@ use super::*;
 use super::spec::*;
 use super::product::{ProductResult, ProductError};
 
-use crate::util::yaml;
-use crate::util::to_currency;
-
-use crate::util;
+use crate::util::{self, yaml, to_currency};
 
 /// Enables access to structured data via a simple path
 ///
@@ -409,7 +407,9 @@ impl Validatable for Project {
         }
         //if hours::salary().is_none(){errors.push("salary")}
 
-        ensure!( errors.is_empty(), errors);
+        if !errors.is_empty() {
+            return Err(errors);
+        }
 
         Ok(())
     }
@@ -429,7 +429,9 @@ impl Validatable for dyn Redeemable {
             }
         }
 
-        ensure!(errors.is_empty(), errors);
+        if !errors.is_empty() {
+            return Err(errors);
+        }
 
         Ok(())
     }

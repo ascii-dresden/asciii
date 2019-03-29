@@ -34,7 +34,6 @@ use lazy_static::lazy_static;
 
 #[cfg(feature="server")] extern crate rocket;
 
-#[macro_use] extern crate error_chain;
 #[macro_use] extern crate custom_derive;
 #[macro_use] extern crate enum_derive;
 

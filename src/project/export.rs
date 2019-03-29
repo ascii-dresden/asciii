@@ -2,7 +2,7 @@ use bill::{Bill, ItemList, Tax};
 use crate::util::currency_to_string;
 
 use crate::storage::storable::Storable;
-use super::Project;
+use crate::project::Project;
 use super::spec::*;
 use super::computed_field::ComputedField;
 

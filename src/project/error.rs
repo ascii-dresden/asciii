@@ -9,6 +9,7 @@ use failure::Fail;
 
 use crate::util::yaml;
 use crate::project::product::ProductError;
+use super::spec::Validatable;
 
 use std::{io, fmt};
 
@@ -52,7 +53,7 @@ impl From<serde_json::Error> for ProjectError { fn from(e: serde_json::Error) ->
 impl From<serde_yaml::Error> for ProjectError { fn from(e: serde_yaml::Error) -> ProjectError { ProjectError::Deserialize(e) } }
 
 
-pub type ProjectResult<T> = ::std::result::Result<T, ProjectError>;
+pub type ProjectResult<T> = ::std::result::Result<T, failure::Error>;
 
 pub type SpecResult = ::std::result::Result<(), ErrorList>;
 
@@ -68,15 +69,33 @@ pub fn combine_specresults(specs: Vec<SpecResult>) -> SpecResult {
                      )
 }
 
-#[derive(Default)]
+pub fn all_check_out<T: Validatable>(specs: &[T]) -> SpecResult {
+    let errors = specs.iter()
+        .filter_map(Validatable::errors)
+        .flat_map(|err_list| err_list.into_iter())
+        .collect::<Vec<String>>();
+    if !errors.is_empty() {
+        Err(ErrorList::from_vec(errors))
+    } else {
+        Ok(())
+    }
+}
+
+#[derive(Debug, Default, Fail)]
 pub struct ErrorList {
     pub errors: Vec<String>
 }
 
 impl ErrorList {
-    pub fn new() -> Self{
+    pub fn new() -> Self {
         ErrorList {
             errors: Default::default()
+        }
+    }
+
+    pub fn from_vec(errors: Vec<String>) -> Self {
+        ErrorList {
+            errors
         }
     }
 
@@ -90,6 +109,17 @@ impl ErrorList {
             new.push(err)
         }
         new
+    }
+
+    pub fn combine_errors(lhs: &failure::Error, rhs: &failure::Error) -> Self {
+        let left_list = lhs.downcast_ref::<Self>().unwrap();
+        let right_list = rhs.downcast_ref::<Self>().unwrap();
+
+        left_list.combine_with(&right_list)
+    }
+
+    pub fn into_iter(self) -> impl Iterator<Item=String> {
+        self.errors.into_iter()
     }
 
     pub fn is_empty(&self) -> bool {
@@ -124,3 +154,4 @@ impl fmt::Display for ErrorList {
         Ok(())
     }
 }
+

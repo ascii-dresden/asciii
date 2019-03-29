@@ -155,7 +155,7 @@ fn list_broken_projects(dir: StorageDir) -> Result<()> {
     let invalid_files = storage.list_project_files(dir)?;
     let tups = invalid_files.iter()
                             .filter_map(|dir| Project::open_folder(dir).err().map(|e| (e, dir)))
-                            .collect::<Vec<(StorageError, &PathBuf)>>();
+                            .collect::<Vec<(failure::Error, &PathBuf)>>();
 
     for (err, path) in tups {
         println!("{}: {:?}", path.display(), err);

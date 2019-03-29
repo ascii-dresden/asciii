@@ -27,6 +27,9 @@ pub enum StorageError {
     #[fail(display = "There is no working directory.")]
     NoWorkingDir,
 
+    #[fail(display = "Faulty config: {} does not contain the expected value", _0)]
+    FaultyConfig(String),
+
     #[fail(display = "Conflicting Name, you tried to create a project already exists.")]
     ProjectFileExists,
 
@@ -53,6 +56,9 @@ pub enum StorageError {
 
     #[fail(display = "Git Repository was not initiliazed.")]
     RepoUnintialized,
+
+    #[fail(display = "Nothing found for {:?}", _0)]
+    NothingFound(Vec<String>),
 
     #[fail(display = "{:?}", _0)]
     String(String),

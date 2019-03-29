@@ -6,6 +6,7 @@ use std::{time,fs};
 use std::path::{Path, PathBuf};
 
 use serde::ser::Serialize;
+use failure::bail;
 
 use open;
 use handlebars::{Handlebars, no_escape, Helper, RenderContext, HelperDef, Context, Output, HelperResult};
@@ -108,7 +109,7 @@ fn output_template_path(template_name:&str) -> Result<PathBuf> {
     if template_path.exists() {
         Ok(template_path)
     } else {
-        Err(ExportError::TemplateNotFoundAt(template_path))
+        Err(ExportError::TemplateNotFoundAt(template_path).into())
     }
 }
 

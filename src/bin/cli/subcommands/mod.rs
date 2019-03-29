@@ -7,6 +7,7 @@ use std::collections::HashMap;
 
 use open;
 use clap::ArgMatches;
+use failure::{bail, format_err};
 use chrono::prelude::*;
 use log::{debug, trace, error, warn};
 
@@ -247,7 +248,7 @@ fn edit_projects(dir: StorageDir, search_terms: &[&str], editor: Option<&str>) -
 /// Command META
 #[cfg(not(feature = "meta"))]
 pub fn meta(_matches: &ArgMatches<'_>) -> Result<()> {
-    bail!("Meta functionality not built-in with this release!");
+    bail!(format_err!("Meta functionality not built-in with this release!"));
 }
 
 /// Command META
@@ -315,14 +316,14 @@ pub fn set(m: &ArgMatches<'_>) -> Result<()> {
     actions::with_projects(dir, &search_terms, |project| {
         println!("{}: {}", project.short_desc(), project.empty_fields().join(", "));
         if !project.empty_fields().contains(&field) {
-            return Err(format!("{:?} was not found in {}", field, project.short_desc()).into());
+            return Err(format_err!("{:?} was not found in {}", field, project.short_desc()));
         }
         if util::really(&format!("do you want to set the field {} in {:?}",
                                  field,
                                  project.short_desc())) {
             project.replace_field(&field, &value).map_err(|e| e.into())
         } else {
-            Err("Don't want to".into())
+            Err(format_err!("Don't want to"))
         }
     })?;
     Ok(())
@@ -692,6 +693,6 @@ pub fn shell(_matches: &ArgMatches<'_>) -> Result<()> {
 
 #[cfg(not(feature="shell"))]
 pub fn shell(_matches: &ArgMatches<'_>) -> Result<()> {
-    bail!("Shell functionality not built-in with this release!");
+    bail!(format_err!("Shell functionality not built-in with this release!"));
 }
 
