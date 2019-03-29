@@ -11,8 +11,6 @@ use asciii::storage::*;
 
 use crate::cli::error::*;
 
-use std::path::PathBuf;
-
 /// Command LIST
 pub fn list(matches: &ArgMatches<'_>) -> Result<()> {
     if matches.is_present("templates") {
@@ -152,13 +150,13 @@ fn list_projects(dir: StorageDir, list_config: &ListConfig<'_>) -> Result<()> {
 /// Command LIST --broken
 fn list_broken_projects(dir: StorageDir) -> Result<()> {
     let storage = setup::<Project>()?;
-    let invalid_files = storage.list_project_files(dir)?;
-    let tups = invalid_files.iter()
-                            .filter_map(|dir| Project::open_folder(dir).err().map(|e| (e, dir)))
-                            .collect::<Vec<(failure::Error, &PathBuf)>>();
+    let invalid_files = storage.list_project_folders(dir)?;
+    let errors = invalid_files.iter()
+                            .filter_map(|dir| Project::open_folder(dir).err())
+                            .collect::<Vec<failure::Error>>();
 
-    for (err, path) in tups {
-        println!("{}: {:?}", path.display(), err);
+    for err in errors {
+        println!("{}", err.as_fail());
     }
     Ok(())
 }
