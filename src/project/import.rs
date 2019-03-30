@@ -1,9 +1,9 @@
+use failure::Error;
 use serde_yaml;
 use ordered_float::OrderedFloat;
 use num_traits::Float;
-use std::collections::HashMap;
 
-use super::error::Result;
+use std::collections::HashMap;
 
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(remote = "OrderedFloat")]
@@ -121,7 +121,7 @@ pub struct Meta {
     format: String,
 }
 
-pub fn from_str(content: &str) -> Result<Project> {
+pub fn from_str(content: &str) -> Result<Project, Error> {
     Ok(serde_yaml::from_str(content)?)
 }
 

@@ -1,6 +1,6 @@
 [package]
 name = "asciii"
-version = "3.4.0"
+version = "3.5.0"
 authors = ["Hendrik Sollich <hendrik@hoodie.de>"]
 license = "MIT/Apache-2.0"
 readme = "README.md"
@@ -45,7 +45,6 @@ clap = "2"
 enum_derive = "0.1"
 custom_derive = "0.1"
 open = "1.2"
-error-chain = "0.12"
 crowbook-intl-runtime = "0.1"
 rayon = "1.0"
 itertools = "0.8"
@@ -53,6 +52,7 @@ base64 = "0.10"
 rustyline = {version = "1.0.0", optional = true }
 linked-hash-map = {version = "0.5", features = ["serde_impl"]}
 dirs = "1.0"
+failure = "0.1"
 
 rocket = {version = "0.4", optional = true }
 rocket_codegen = {version = "0.4", optional = true }
@@ -67,7 +67,7 @@ openssl-probe = { version = "0.1.2", optional = true }
 rocket_cors = { version = "0.4", optional = true }
 
 bill = {version= "0.4", features=["serialization"]}
-icalendar = "0.3"
+icalendar = "0.6"
 
 slug = "0.1"
 tempdir = "0.3"
@@ -85,7 +85,7 @@ serde_yaml    = {version = "0.8", optional = true}
 serde_derive  = {version = "1.0", optional = true}
 ordered-float = {version = "1.0", optional = true}
 num-traits    = {version = "0.2", optional = true}
-toml          = "0.4"
+toml          = "0.5"
 
 # feature: git_statuses
 git2 = {version = "0.8", default-features = false, optional = true}

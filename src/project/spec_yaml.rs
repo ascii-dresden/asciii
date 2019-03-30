@@ -3,17 +3,15 @@ use std::str::FromStr;
 use bill::{Bill, Currency, Tax};
 use icalendar::Event as CalEvent;
 use icalendar::{Component, Calendar};
+use failure::bail;
 use yaml_rust::Yaml;
 use yaml_rust::yaml::Hash as YamlHash;
 
 use super::*;
 use super::spec::*;
-use super::product::error::Result as ProductResult;
-use super::product::error::ErrorKind as ProductErrorKind;
-use crate::util::yaml;
-use crate::util::to_currency;
+use super::product::ProductError;
 
-use crate::util;
+use crate::util::{self, yaml, to_currency};
 
 /// Enables access to structured data via a simple path
 ///
@@ -330,7 +328,7 @@ impl HasEvents for Project {
 }
 
 /// Returns a product from Service
-fn service_to_product<'a, T: HasEmployees>(s: &T) -> ProductResult<Product<'a>> {
+fn service_to_product<'a, T: HasEmployees>(s: &T) -> Result<Product<'a>, Error> {
     if let Some(salary) = s.salary() {
         Ok(Product {
                  name: "Service",
@@ -339,7 +337,7 @@ fn service_to_product<'a, T: HasEmployees>(s: &T) -> ProductResult<Product<'a>> 
                  price: salary,
              })
     } else {
-        bail!(ProductErrorKind::InvalidServerSection)
+        bail!(ProductError::InvalidServerSection)
     }
 }
 
@@ -358,7 +356,7 @@ impl Redeemable for Project {
         self.get_f64("tax").map(Tax::new)
     }
 
-    fn bills(&self) -> ProductResult<(Bill<Product<'_>>, Bill<Product<'_>>)> {
+    fn bills(&self) -> Result<(Bill<Product<'_>>, Bill<Product<'_>>), Error> {
         let mut offer: Bill<Product<'_>> = Bill::new();
         let mut invoice: Bill<Product<'_>> = Bill::new();
 
@@ -374,7 +372,7 @@ impl Redeemable for Project {
 
         let raw_products =
             self.get_hash("products")
-                .ok_or_else(|| product::error::Error::from(product::error::ErrorKind::UnknownFormat))?;
+                .ok_or_else(|| ProductError::UnknownFormat)?;
 
         // let document_tax =  // TODO activate this once the tax no longer 19%
 
@@ -409,7 +407,9 @@ impl Validatable for Project {
         }
         //if hours::salary().is_none(){errors.push("salary")}
 
-        ensure!( errors.is_empty(), errors);
+        if !errors.is_empty() {
+            return Err(errors);
+        }
 
         Ok(())
     }
@@ -429,7 +429,9 @@ impl Validatable for dyn Redeemable {
             }
         }
 
-        ensure!(errors.is_empty(), errors);
+        if !errors.is_empty() {
+            return Err(errors);
+        }
 
         Ok(())
     }

@@ -3,7 +3,7 @@ use std::path::{Path,PathBuf};
 use super::*;
 use super::tests::TestProject;
 
-const STORAGE: &'static str = "/home/hendrik/ascii/caterings";
+const STORAGE: &str = "/home/hendrik/ascii/caterings";
 
 fn setup() -> (PathBuf, Storage<TestProject>) {
     let storage_path = PathBuf::from(STORAGE);
@@ -55,8 +55,6 @@ fn list_project_folders(){
     //let projects = storage.list_project_files(StorageDir::Archive(2015));
     let projects = storage.list_project_files(StorageDir::Working);
     println!("Projects");
-    for p in projects{
-        println!("{:#?}", p);
-    }
+    println!("{:#?}", projects);
 }
 

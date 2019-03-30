@@ -221,9 +221,9 @@ pub fn verbose_rows(projects:&[Project], list_config:&ListConfig<'_>) -> Vec<Row
             if list_config.show_errors{
                 cells.extend_from_slice( &[
                                          // Errors
-                                         cell!(validation1.err().map(|errs| errs.join(", ")).unwrap_or_else(String::new)),
-                                         cell!(validation2.err().map(|errs| errs.join(", ")).unwrap_or_else(String::new)),
-                                         cell!(validation3.err().map(|errs| errs.join(", ")).unwrap_or_else(String::new)),
+                                         cell!(validation1.err().map(|errs| errs.join("|")).unwrap_or_else(String::new)),
+                                         cell!(validation2.err().map(|errs| errs.join("|")).unwrap_or_else(String::new)),
+                                         cell!(validation3.err().map(|errs| errs.join("|")).unwrap_or_else(String::new)),
                 ]);
             }
 
@@ -253,9 +253,9 @@ pub fn dynamic_rows(projects:&[Project], list_config:&ListConfig<'_>) -> Vec<Row
 
                     cells.extend_from_slice( &[
                                              // Errors
-                                             cell!(validation.0.err().map(|errs| errs.join(", ")).unwrap_or_else(String::new)),
-                                             cell!(validation.1.err().map(|errs| errs.join(", ")).unwrap_or_else(String::new)),
-                                             cell!(validation.2.err().map(|errs| errs.join(", ")).unwrap_or_else(String::new)),
+                                             cell!(validation.0.err().map(|errs| errs.join("|")).unwrap_or_else(String::new)),
+                                             cell!(validation.1.err().map(|errs| errs.join("|")).unwrap_or_else(String::new)),
+                                             cell!(validation.2.err().map(|errs| errs.join("|")).unwrap_or_else(String::new)),
                     ]);
                 }
             }
@@ -285,7 +285,7 @@ pub fn print_projects(rows: Vec<Row>){
 pub fn print_csv_year(year:i32){
     match crate::actions::csv(year) {
         Ok(csv) => println!("{}", csv),
-        Err(err) => println!("{}", err.description())
+        Err(err) => println!("{}", err),
     }
 }
 
@@ -293,7 +293,7 @@ pub fn print_csv_year(year:i32){
 pub fn print_csv(projects:&[Project]){
     match crate::actions::projects_to_csv(projects) {
         Ok(csv) => println!("{}", csv),
-        Err(err) => println!("{}", err.description())
+        Err(err) => println!("{}", err),
     }
 }
 

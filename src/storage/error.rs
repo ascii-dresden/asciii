@@ -1,69 +1,58 @@
-#![allow(trivial_casts)]
 //! Error that may occur in Storage
 //!
-#[cfg(feature="git_statuses")] use git2;
+#[cfg(feature = "git_statuses")]
+use failure::Fail;
 
-use std::{io, fmt};
 use std::path::PathBuf;
-use crate::project;
-use crate::templater;
 
-#[cfg(not(feature="git_statuses"))]
+#[cfg(not(feature = "git_statuses"))]
 mod git2 {
     pub use super::super::repo::GitError as Error;
 }
 
 
-#[allow(missing_docs)]
-error_chain!{
-    types {
-        StorageError, ErrorKind, ResultExt, Result;
-    }
+#[derive(Fail, Debug)]
+pub enum StorageError {
+    #[fail(display = "The directory you passed cannot be used in this context. You perhaps passed `Templates` instead of `Archive` or `Working`")]
+    BadChoice,
 
-    foreign_links {
-        Io(io::Error);
-        Fmt(fmt::Error);
-        Git(git2::Error);
-        Project(project::error::Error); // TODO this should be generic
-        Template(templater::TemplateError); // this should also not be here (inversion)
-    }
+    #[fail(display = "The Project file has a broken name.")]
+    BadProjectFileName,
 
-    errors {
-        BadChoice {
-            description( "The directory you passed cannot be used in this context. You perhaps passed `Templates` instead of `Archive` or `Working`")}
-        BadProjectFileName {
-            description("The Project file has a broken name.")
-        }
-        NoWorkingDir {
-            description("There is no working directory.")
-        }
-        ProjectFileExists {
-            description("Conflicting Name, you tried to create a project already exists.")
-        }
-        ProjectDirExists {
-            description("Conflicting Name, you tried to create a project for which the project dir already exists.")
-        }
-        ProjectDoesNotExist {
-            description("No project was found matching this description.")
-        }
-        NoProjectFile(p: PathBuf) {
-            description("This project folder does not contain a project file."),
-            display("The project folder {:?} does not contain a project file.", p)
-        }
-        StoragePathNotAbsolute {
-            description("Top Level storage path is not absolute.")
-        }
-        InvalidDirStructure {
-            description("The filestructure under storage path does not correspond with the configuration.")
-        }
-        TemplateNotFound {
-            description("The described template file does not exist.")
-        }
-        GitProcessFailed {
-            description("Calling `git` failed")
-        }
-        RepoUnintialized {
-            description("Git Repository was not initiliazed.")
-        }
-    }
+    #[fail(display = "There is no working directory.")]
+    NoWorkingDir,
+
+    #[fail(display = "Faulty config: {} does not contain the expected value", _0)]
+    FaultyConfig(String),
+
+    #[fail(display = "Conflicting Name, you tried to create a project already exists.")]
+    ProjectFileExists,
+
+    #[fail(display = "Conflicting Name, you tried to create a project for which the project dir already exists.")]
+    ProjectDirExists,
+
+    #[fail(display = "No project was found matching this description.")]
+    ProjectDoesNotExist,
+
+    #[fail( display = "The project folder {:?} does not contain a project file.", _0)]
+    NoProjectFile(PathBuf),
+
+    #[fail(display = "Top Level storage path is not absolute.")]
+    StoragePathNotAbsolute,
+
+    #[fail(display = "The filestructure under storage path does not correspond with the configuration.")]
+    InvalidDirStructure,
+
+    #[fail(display = "The described template file does not exist.")]
+    TemplateNotFound,
+
+    #[fail(display = "Calling `git` failed")]
+    GitProcessFailed,
+
+    #[fail(display = "Git Repository was not initiliazed.")]
+    RepoUnintialized,
+
+    #[fail(display = "Nothing found for {:?}", _0)]
+    NothingFound(Vec<String>),
+
 }

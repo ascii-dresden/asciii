@@ -1,4 +1,5 @@
 use clap::ArgMatches;
+use failure::Error;
 
 use asciii::print;
 use asciii::storage::*;
@@ -11,12 +12,11 @@ use asciii::templater::Templater;
 use super::{matches_to_search, matches_to_selection};
 
 use super::path;
-use crate::cli::error::*;
 
 use std::fs;
 
 /// Command SHOW
-pub fn show(m: &ArgMatches<'_>) -> Result<()> {
+pub fn show(m: &ArgMatches<'_>) -> Result<(), Error> {
     let (search_terms, _) = matches_to_search(m);
     let selection = matches_to_selection(m);
 
@@ -53,7 +53,7 @@ pub fn show(m: &ArgMatches<'_>) -> Result<()> {
     }
 }
 
-fn show_files(selection: StorageSelection) -> Result<()> {
+fn show_files(selection: StorageSelection) -> Result<(), Error> {
     for project in setup::<Project>()?.open_projects(selection)? {
         println!("{}: ", project.dir().display());
         for entry in fs::read_dir(project.dir()).unwrap() {
@@ -63,7 +63,7 @@ fn show_files(selection: StorageSelection) -> Result<()> {
     Ok(())
 }
 
-fn show_errors(selection: StorageSelection) -> Result<()> {
+fn show_errors(selection: StorageSelection) -> Result<(), Error> {
     for p in setup::<Project>()?.open_projects(selection)? {
         println!("{}: ", p.short_desc());
         spec::print_specresult("offer", &p.is_ready_for_offer());
@@ -73,7 +73,7 @@ fn show_errors(selection: StorageSelection) -> Result<()> {
     Ok(())
 }
 
-fn show_empty_fields(selection: StorageSelection) -> Result<()> {
+fn show_empty_fields(selection: StorageSelection) -> Result<(), Error> {
     for p in setup::<Project>()?.open_projects(selection)? {
         println!("{}: {}", p.short_desc(), p.empty_fields().join(", "))
     }
@@ -81,28 +81,28 @@ fn show_empty_fields(selection: StorageSelection) -> Result<()> {
 }
 
 
-fn show_json(selection: StorageSelection) -> Result<()> {
+fn show_json(selection: StorageSelection) -> Result<(), Error> {
     for p in setup::<Project>()?.open_projects(selection)? {
         println!("{}", p.to_json()?)
     }
     Ok(())
 }
 
-fn show_yaml(selection: StorageSelection) -> Result<()> {
+fn show_yaml(selection: StorageSelection) -> Result<(), Error> {
     for p in setup::<Project>()?.open_projects(selection)? {
         println!("{}", p.dump_yaml())
     }
     Ok(())
 }
 
-fn show_ical(selection: StorageSelection) -> Result<()> {
+fn show_ical(selection: StorageSelection) -> Result<(), Error> {
     for p in setup::<Project>()?.open_projects(selection)? {
         p.to_ical().print()?
     }
     Ok(())
 }
 
-fn show_detail(selection: &StorageSelection, detail: &str) -> Result<()> {
+fn show_detail(selection: &StorageSelection, detail: &str) -> Result<(), Error> {
     for p in setup::<Project>()?.open_projects(selection.clone())? {
         println!("{}",
                  p.field(detail)
@@ -111,14 +111,14 @@ fn show_detail(selection: &StorageSelection, detail: &str) -> Result<()> {
     Ok(())
 }
 
-fn show_csv(selection: StorageSelection) -> Result<()> {
+fn show_csv(selection: StorageSelection) -> Result<(), Error> {
     for p in setup::<Project>()?.open_projects(selection)? {
         println!("{}", p.to_csv(BillType::Invoice)?)
     }
     Ok(())
 }
 
-pub fn show_path(matches: &ArgMatches<'_>) -> Result<()> {
+pub fn show_path(matches: &ArgMatches<'_>) -> Result<(), Error> {
     path(matches, |path| {
         println!("{}", path.display());
         Ok(())
@@ -127,7 +127,7 @@ pub fn show_path(matches: &ArgMatches<'_>) -> Result<()> {
 }
 
 /// Command SHOW --template
-fn show_template(name: &str) -> Result<()> {
+fn show_template(name: &str) -> Result<(), Error> {
     let templater = Templater::from_file(&setup::<Project>()?.get_template_file(name)?)?;
     println!("{:#?}", templater.list_keywords());
     Ok(())

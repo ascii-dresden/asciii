@@ -18,7 +18,7 @@ pub struct TestProject {
 
 impl Storable for TestProject{
     // creates in tempfile
-    fn from_template(project_name: &str, template: &Path, _fill: &HashMap<&str, String>) -> StorageResult<StorableAndTempDir<Self>> where Self: Sized {
+    fn from_template(project_name: &str, template: &Path, _fill: &HashMap<&str, String>) -> Result<StorableAndTempDir<Self>, Error> where Self: Sized {
         // generates a temp file
         let temp_dir  = TempDir::new_in("./target/debug/build/",&project_name).unwrap();
         let temp_file = temp_dir.path().join(project_name);
@@ -44,11 +44,11 @@ impl Storable for TestProject{
     fn index(&self) -> Option<String>{ Some("ZZ99".into()) }
     fn prefix(&self) -> Option<String>{ self.index() }
 
-    fn open_folder(path:&Path) -> StorageResult<Self>{
+    fn open_folder(path:&Path) -> Result<Self, Error>{
         Self::open_file(path)
     }
 
-    fn open_file(path:&Path) -> StorageResult<Self>{
+    fn open_file(path:&Path) -> Result<Self, Error>{
         Ok(TestProject{
             file_path: PathBuf::from(path)
         })
@@ -61,7 +61,7 @@ impl Storable for TestProject{
 
 
 // TODO implement failing cases
-const TEST_PROJECTS:[&'static str;4] = [
+const TEST_PROJECTS:[&str; 4] = [
     "test1", "test2",
     "foobar", "ich schreibe viel zu längliche projektnamen!",
 ];

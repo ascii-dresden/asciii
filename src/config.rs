@@ -18,7 +18,7 @@ use std::path::{Path, PathBuf};
 use dirs::home_dir;
 use log::warn;
 
-use crate::util::yaml::{self, Yaml, YamlError};
+use crate::util::yaml::{self, Yaml};
 
 /// Name of the configfile
 pub const DEFAULT_LOCATION: &str = ".asciii.yml";
@@ -44,7 +44,7 @@ impl ConfigReader {
     }
 
     /// Opens config from `self.path()` and parses Yaml right away.
-    pub fn try_new() -> Result<ConfigReader, YamlError> {
+    pub fn try_new() -> Result<ConfigReader, failure::Error> {
         let home_path = ConfigReader::path_home();
         let local_path = Path::new(DEFAULT_LOCATION);
 

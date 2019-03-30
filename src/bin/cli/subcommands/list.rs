@@ -2,6 +2,7 @@
 use chrono::prelude::*;
 use clap::ArgMatches;
 use log::debug;
+use failure::Error;
 
 use asciii::CONFIG;
 use asciii::print::{self, ListConfig, ListMode};
@@ -9,12 +10,9 @@ use asciii::project::{Project, ComputedField};
 use asciii::project::spec::IsProject;
 use asciii::storage::*;
 
-use crate::cli::error::*;
-
-use std::path::PathBuf;
 
 /// Command LIST
-pub fn list(matches: &ArgMatches<'_>) -> Result<()> {
+pub fn list(matches: &ArgMatches<'_>) -> Result<(), Error> {
     if matches.is_present("templates") {
         list_templates()?; Ok(())
     } else if matches.is_present("years") {
@@ -94,7 +92,7 @@ pub fn list(matches: &ArgMatches<'_>) -> Result<()> {
 /// * `print::verbose_rows()`
 ///
 /// which it prints with `print::print_projects()`
-fn list_projects(dir: StorageDir, list_config: &ListConfig<'_>) -> Result<()> {
+fn list_projects(dir: StorageDir, list_config: &ListConfig<'_>) -> Result<(), Error> {
     let storage = if CONFIG.get_bool("list/gitstatus") {
         setup_with_git::<Project>()?
     } else {
@@ -150,21 +148,21 @@ fn list_projects(dir: StorageDir, list_config: &ListConfig<'_>) -> Result<()> {
 }
 
 /// Command LIST --broken
-fn list_broken_projects(dir: StorageDir) -> Result<()> {
+fn list_broken_projects(dir: StorageDir) -> Result<(), Error> {
     let storage = setup::<Project>()?;
-    let invalid_files = storage.list_project_files(dir)?;
-    let tups = invalid_files.iter()
-                            .filter_map(|dir| Project::open_folder(dir).err().map(|e| (e, dir)))
-                            .collect::<Vec<(StorageError, &PathBuf)>>();
+    let invalid_files = storage.list_project_folders(dir)?;
+    let errors = invalid_files.iter()
+                            .filter_map(|dir| Project::open_folder(dir).err())
+                            .collect::<Vec<failure::Error>>();
 
-    for (err, path) in tups {
-        println!("{}: {:?}", path.display(), err);
+    for err in errors {
+        println!("{}", err.as_fail());
     }
     Ok(())
 }
 
 /// Command LIST --templates
-fn list_templates() -> Result<()> {
+fn list_templates() -> Result<(), Error> {
     let storage = setup::<Project>()?;
 
     for name in storage.list_template_names()? {
@@ -174,7 +172,7 @@ fn list_templates() -> Result<()> {
 }
 
 /// Command LIST --years
-pub fn list_years() -> Result<()> {
+pub fn list_years() -> Result<(), Error> {
     let storage = setup::<Project>()?;
     let years = storage.list_years()?;
     println!("{:?}", years);
@@ -182,7 +180,7 @@ pub fn list_years() -> Result<()> {
 }
 
 /// Command LIST --virt
-pub fn list_computed_fields() -> Result<()> {
+pub fn list_computed_fields() -> Result<(), Error> {
     println!("{:?}",
              ComputedField::iter_variant_names()
                  .filter(|v| *v != "Invalid")

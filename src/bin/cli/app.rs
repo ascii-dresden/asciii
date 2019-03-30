@@ -1,10 +1,9 @@
 use asciii;
 use clap::{App, AppSettings, Arg, ArgGroup, ArgMatches, SubCommand, Shell};
+use failure::Error;
 use log::error;
 use super::subcommands;
 use std::str::FromStr;
-
-use crate::cli::error::*;
 
 #[allow(clippy::cyclomatic_complexity)]
 pub fn with_cli<F> (app_handler:F) where F: Fn(App<'_, '_>) {
@@ -953,7 +952,7 @@ pub fn match_matches(matches: &ArgMatches<'_>) {
     }
 }
 
-pub fn generate_completions(matches: &ArgMatches<'_>) -> Result<()>{
+pub fn generate_completions(matches: &ArgMatches<'_>) -> Result<(), Error>{
     if let Some(shell) = matches.value_of("shell").and_then(|s|Shell::from_str(s).ok()) {
         with_cli(|mut app| app.gen_completions("asciii", shell, ".") );
     } else {

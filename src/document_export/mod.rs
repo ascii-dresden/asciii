@@ -2,20 +2,20 @@
 //!
 //! Haven't decided on a templating engine yet, my own will probably not do.
 
-use std::{io,fmt,time,fs};
+use std::{time,fs};
 use std::path::{Path, PathBuf};
 
 use serde::ser::Serialize;
+use failure::{bail, Error};
 
 use open;
-use handlebars::{RenderError, Handlebars, no_escape, Helper, RenderContext, HelperDef, Context, Output, HelperResult};
+use handlebars::{Handlebars, no_escape, Helper, RenderContext, HelperDef, Context, Output, HelperResult};
 use log::{info, debug, trace, error, warn};
 
 use crate::util;
 use crate::project::{self, Project, Exportable};
 use crate::project::BillType::{self, Invoice, Offer};
 use crate::project::export::ExportTarget;
-use crate::storage::error::StorageError;
 use crate::storage::{self, Storable, StorageSelection};
 
 pub mod error;
@@ -68,7 +68,7 @@ impl HelperDef for CountHelper {
 ///
 /// Returns path to created file, potenially in a `tempdir`.
 // pub fn fill_template<E:Serialize>(document:E, template_file:&Path) -> PathBuf{
-pub fn fill_template<E, P>(document: &E, bill_type: BillType, template_path: P) -> Result<String>
+pub fn fill_template<E, P>(document: &E, bill_type: BillType, template_path: P) -> Result<String, Error>
     where E: Serialize, P:AsRef<Path>
 {
     let mut handlebars = Handlebars::new();
@@ -86,13 +86,13 @@ pub fn fill_template<E, P>(document: &E, bill_type: BillType, template_path: P) 
                            .replace(">", "}"))?)
 }
 
-fn file_age(path: &Path) -> Result<time::Duration> {
+fn file_age(path: &Path) -> Result<time::Duration, Error> {
     let metadata = fs::metadata(path)?;
     let modified = metadata.modified()?;
     Ok(modified.elapsed()?)
 }
 
-fn output_template_path(template_name:&str) -> Result<PathBuf> {
+fn output_template_path(template_name:&str) -> Result<PathBuf, Error> {
     // construct_template_path(&template_name) {
     let template_ext  = crate::CONFIG.get_str("extensions/output_template");
     let mut template_path = PathBuf::new();
@@ -107,14 +107,14 @@ fn output_template_path(template_name:&str) -> Result<PathBuf> {
     if template_path.exists() {
         Ok(template_path)
     } else {
-        Err(format!("Template not found at {}", template_path.display()).into())
+        Err(ExportError::TemplateNotFoundAt(template_path).into())
     }
 }
 
 /// Creates the latex files within each projects directory, either for Invoice or Offer.
 #[cfg(feature="document_export")]
 #[allow(clippy::cyclomatic_complexity)] // sorry
-fn project_to_doc(project: &Project, config: &ExportConfig<'_>) -> Result<Option<PathBuf>> {
+fn project_to_doc(project: &Project, config: &ExportConfig<'_>) -> Result<Option<PathBuf>, Error> {
     trace!("exporting a document: {:#?}", config);
 
     let &ExportConfig {
@@ -252,13 +252,13 @@ fn project_to_doc(project: &Project, config: &ExportConfig<'_>) -> Result<Option
                 debug!("now there is be a {:?} -> {:?}", file, document_file);
                 fs::rename(&file, &document_file)?;
             } else {
-                bail!(error::ErrorKind::NoPdfCreated);
+                bail!(ExportError::NoPdfCreated);
             }
             Ok(Some(document_file))
         }
 
     } else {
-        bail!(error::ErrorKind::NoPdfCreated);
+        bail!(ExportError::NoPdfCreated);
     }
 }
 
@@ -293,7 +293,7 @@ impl<'a> Default for ExportConfig<'a> {
 
 /// Creates the latex files within each projects directory, either for Invoice or Offer.
 #[cfg(feature="document_export")]
-pub fn projects_to_doc(config: &ExportConfig<'_>) -> Result<()> {
+pub fn projects_to_doc(config: &ExportConfig<'_>) -> Result<(), Error> {
     let storage = storage::setup::<Project>()?;
     for p in storage.open_projects(&config.select)? {
         if let Some(path) = project_to_doc(&p, &config)? {

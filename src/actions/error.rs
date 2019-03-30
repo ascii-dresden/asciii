@@ -1,34 +1,14 @@
-#![allow(trivial_casts)]
+use failure::Fail;
 
-use toml;
-use std::{io, fmt, time};
+#[derive(Fail, Debug)]
+pub enum ActionError {
 
-use crate::project;
-// use project::error::ProjectError;
-use crate::storage::error::StorageError;
+    #[fail(display = "unexpected response from service")]
+    ActionError,
 
-error_chain!{
-    types {
-        Error, ErrorKind, ResultExt, Result;
-    }
+    #[fail(display = "Adding Failed")]
+    AddingFailed,
 
-    links { }
-
-    foreign_links {
-        Io(io::Error);
-        Fmt(fmt::Error);
-        Time(time::SystemTimeError);
-        Toml(toml::de::Error);
-        Project(project::error::Error);
-        Storage(StorageError);
-    }
-
-    errors {
-        ActionError{
-            description("unexpected response from service")
-        }
-        AddingFailed{
-            description("Adding Failed")
-        }
-    }
+    #[fail(display = "Nothing found for {:?}", _0)]
+    NothingFound(Vec<String>),
 }

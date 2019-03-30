@@ -1,38 +1,17 @@
-#![allow(trivial_casts)]
 #![allow(missing_docs)]
 
-use std::{io, fmt};
-#[cfg(feature="serialization")] use serde_json;
-#[cfg(feature="deserialization")] use serde_yaml;
-use crate::util::yaml;
+use failure::Fail;
 
-use super::product;
+use std::fmt;
 
-error_chain!{
-    types {
-        Error, ErrorKind, ResultExt, Result;
-    }
+#[derive(Fail, Debug)]
+pub enum ProjectError {
 
-    links {
-        Product(product::Error, product::ErrorKind);
-    }
+    #[fail(display="This feature is not enabled in this build")]
+    FeatureDeactivated,
 
-    foreign_links {
-        Io(io::Error);
-        Fmt(fmt::Error);
-        Yaml(yaml::YamlError);
-        Serialize(serde_json::Error) #[cfg(feature="serialization")];
-        Deserialize(serde_yaml::Error) #[cfg(feature="deserialization")];
-    }
-
-    errors {
-        FeatureDeactivated{
-            description("This feature is not enabled in this build")
-        }
-        CantDetermineTargetFile{
-            description("Cannot determine target file name")
-        }
-    }
+    #[fail(display="Cannot determine target file name")]
+    CantDetermineTargetFile,
 }
 
 pub type SpecResult = ::std::result::Result<(), ErrorList>;
@@ -49,15 +28,21 @@ pub fn combine_specresults(specs: Vec<SpecResult>) -> SpecResult {
                      )
 }
 
-#[derive(Default)]
+#[derive(Debug, Default, Fail)]
 pub struct ErrorList {
     pub errors: Vec<String>
 }
 
 impl ErrorList {
-    pub fn new() -> Self{
+    pub fn new() -> Self {
         ErrorList {
             errors: Default::default()
+        }
+    }
+
+    pub fn from_vec(errors: Vec<String>) -> Self {
+        ErrorList {
+            errors
         }
     }
 
@@ -71,6 +56,13 @@ impl ErrorList {
             new.push(err)
         }
         new
+    }
+
+    pub fn combine_errors(lhs: &failure::Error, rhs: &failure::Error) -> Self {
+        let left_list = lhs.downcast_ref::<Self>().unwrap();
+        let right_list = rhs.downcast_ref::<Self>().unwrap();
+
+        left_list.combine_with(&right_list)
     }
 
     pub fn is_empty(&self) -> bool {
@@ -105,3 +97,4 @@ impl fmt::Display for ErrorList {
         Ok(())
     }
 }
+

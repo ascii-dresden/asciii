@@ -1,23 +1,15 @@
-use super::*;
+use failure::Fail;
 
-error_chain!{
-    types {
-        Error, ErrorKind, ResultExt, Result;
-    }
+use std::path::PathBuf;
 
-    links { }
+#[derive(Fail, Debug)]
+pub enum ExportError {
+    #[fail(display = "No PDF Created")]
+    NoPdfCreated,
 
-    foreign_links {
-        Io(io::Error);
-        Fmt(fmt::Error);
-        Time(time::SystemTimeError);
-        Handlebar(RenderError);
-        Project(project::error::Error);
-        Storage(StorageError);
-    }
+    #[fail(display = "Nothing to do")]
+    NothingToDo,
 
-    errors {
-        NoPdfCreated{ description("No Pdf Created") }
-        NothingToDo{ description("Nothing to do") }
-    }
+    #[fail(display = "Template not found at {:?}", _0)]
+    TemplateNotFoundAt(PathBuf),
 }

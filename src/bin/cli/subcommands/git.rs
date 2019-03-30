@@ -1,41 +1,41 @@
 use clap::ArgMatches;
+use failure::{bail, format_err, Error};
 use log::{trace, error};
 
 use asciii::{storage, util};
 use asciii::project::Project;
 
 use super::matches_to_paths;
-use crate::cli::error::*;
 
 /// Command LOG
-pub fn git_log(matches: &ArgMatches<'_>) -> Result<()> {
+pub fn git_log(matches: &ArgMatches<'_>) -> Result<(), Error> {
     let storage = storage::setup_with_git::<Project>()?;
     let paths = matches_to_paths(matches, &storage)?;
     let repo = storage.repository().unwrap();
     if !repo.log(&paths).success() {
-        Err("git log did not exit successfully".into())
+        bail!(format_err!("git log did not exit successfully"));
     } else {
         Ok(())
     }
 }
 
 /// Command STATUS
-pub fn git_status() -> Result<()> {
+pub fn git_status() -> Result<(), Error> {
     let storage = storage::setup_with_git::<Project>()?;
     let repo = storage.repository().unwrap();
     if !repo.status().success() {
-        Err("git status did not exit successfully".into())
+        bail!(format_err!("git status did not exit successfully"));
     } else {
         Ok(())
     }
 }
 
 /// Command COMMIT
-pub fn git_commit() -> Result<()> {
+pub fn git_commit() -> Result<(), Error> {
     let storage = storage::setup_with_git::<Project>()?;
     let repo = storage.repository().unwrap();
     if !repo.commit().success() {
-        Err("git commit did not exit successfully".into())
+        bail!(format_err!("git commit did not exit successfully"));
     } else {
         Ok(())
     }
@@ -57,7 +57,7 @@ pub fn git_remote() -> Result<()> {
 /// Command REMOTE
 /// exact replica of `git remote -v`
 #[cfg(feature = "git_statuses")]
-pub fn git_remote() -> Result<()> {
+pub fn git_remote() -> Result<(), Error> {
     let storage = storage::setup_with_git::<Project>()?;
 
     if let Some(r) = storage.repository() {
@@ -89,7 +89,7 @@ pub fn git_remote() -> Result<()> {
 }
 
 /// Command ADD
-pub fn git_add(matches: &ArgMatches<'_>) -> Result<()> {
+pub fn git_add(matches: &ArgMatches<'_>) -> Result<(), Error> {
     trace!("git_add {:#?}", matches);
     let storage = storage::setup_with_git::<Project>()?;
     let repo = storage.repository().unwrap();
@@ -99,24 +99,24 @@ pub fn git_add(matches: &ArgMatches<'_>) -> Result<()> {
         if repo.add_all().success() {
             Ok(())
         } else {
-            Err("git add did not exit successfully".into())
+            bail!(format_err!("git add did not exit successfully"));
         }
     } else if matches.is_present("search_term") {
 
         if repo.add(&paths).success() {
             Ok(())
         } else {
-            Err("git add did not exit successfully".into())
+            bail!(format_err!("git add did not exit successfully"));
         }
 
     } else {
-        Err("Nothing selected".into())
+        bail!(format_err!("Nothing selected"));
     }
 }
 
 
 /// Command DIFF
-pub fn git_diff(matches: &ArgMatches<'_>) -> Result<()> {
+pub fn git_diff(matches: &ArgMatches<'_>) -> Result<(), Error> {
     let storage = storage::setup_with_git::<Project>()?;
     let paths = matches_to_paths(matches, &storage)?;
     let repo = storage.repository().unwrap();
@@ -126,13 +126,13 @@ pub fn git_diff(matches: &ArgMatches<'_>) -> Result<()> {
         Vec::new()
     };
     if !repo.diff(&paths, &flags).success() {
-        return Err("git diff did not exit successfully".into());
+        bail!(format_err!("git diff did not exit successfully"));
     }
     Ok(())
 }
 
 /// Command PULL
-pub fn git_pull(matches: &ArgMatches<'_>) -> Result<()> {
+pub fn git_pull(matches: &ArgMatches<'_>) -> Result<(), Error> {
     let storage = storage::setup_with_git::<Project>()?;
     let repo = storage.repository().unwrap();
 
@@ -142,33 +142,33 @@ pub fn git_pull(matches: &ArgMatches<'_>) -> Result<()> {
         repo.pull().success()
     };
     if !success {
-        return Err("git pull did not exit successfully".into());
+        bail!(format_err!("git pull did not exit successfully"));
     }
     Ok(())
 }
 
 /// Command PUSH
-pub fn git_push() -> Result<()> {
+pub fn git_push() -> Result<(), Error> {
     let storage = storage::setup_with_git::<Project>()?;
     let repo = storage.repository().unwrap();
     if !repo.push().success() {
-        return Err("git push did not exit successfully".into());
+        bail!(format_err!("git push did not exit successfully"));
     }
     Ok(())
 }
 
 /// Command STASH
-pub fn git_stash() -> Result<()> {
+pub fn git_stash() -> Result<(), Error> {
     let storage = storage::setup_with_git::<Project>()?;
     let repo = storage.repository().unwrap();
     if !repo.stash().success() {
-        return Err("git stash did not exit successfully".into());
+        bail!(format_err!("git stash did not exit successfully"));
     }
     Ok(())
 }
 
 /// Command CLEANUP
-pub fn git_cleanup(matches: &ArgMatches<'_>) -> Result<()> {
+pub fn git_cleanup(matches: &ArgMatches<'_>) -> Result<(), Error> {
     let storage = storage::setup_with_git::<Project>()?;
     let paths = matches_to_paths(matches, &storage)?;
     let repo = storage.repository().unwrap();
@@ -177,17 +177,17 @@ pub fn git_cleanup(matches: &ArgMatches<'_>) -> Result<()> {
     if util::really(&format!("Do you really want to reset any changes you made to:\n {:?}\n",
                              paths)) && !(repo.checkout(&paths).success() && repo.clean(&paths).success())
     {
-        return Err("clean was not successfull".into());
+        bail!(format_err!("clean was not successfull"));
     }
     Ok(())
 }
 
 /// Command STASH POP
-pub fn git_stash_pop() -> Result<()> {
+pub fn git_stash_pop() -> Result<(), Error> {
     let storage = storage::setup_with_git::<Project>()?;
     let repo = storage.repository().unwrap();
     if !repo.stash_pop().success() {
-        Err("git stash pop did not exit successfully".into())
+        bail!(format_err!("git stash pop did not exit successfully"));
     } else {
         Ok(())
     }

@@ -7,7 +7,6 @@
 /// Contains concrete implementation of each subcommand
 pub mod app;
 pub mod subcommands;
-mod error;
 
 #[cfg(feature="shell")]
 pub mod shell;
