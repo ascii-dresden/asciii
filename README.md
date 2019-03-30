@@ -23,7 +23,7 @@ To use \(experimental\) features use the `--features` flag.
 Please check the `Cargo.toml` for an up-to-date list of features.
 To get a full cli tool build with the feature `full_tool`.
 
-Minimum required version of rustc: `1.26`
+Minimum required version of rustc: `1.32`
 
 ### Archlinux
 
