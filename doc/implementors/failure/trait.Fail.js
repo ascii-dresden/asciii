@@ -1,0 +1,11 @@
+(function() {var implementors = {};
+implementors["asciii"] = [{text:"impl <a class=\"trait\" href=\"failure/trait.Fail.html\" title=\"trait failure::Fail\">Fail</a> for <a class=\"enum\" href=\"asciii/project/product/enum.ProductError.html\" title=\"enum asciii::project::product::ProductError\">ProductError</a>",synthetic:false,types:["asciii::project::product::ProductError"]},{text:"impl <a class=\"trait\" href=\"failure/trait.Fail.html\" title=\"trait failure::Fail\">Fail</a> for <a class=\"enum\" href=\"asciii/project/error/enum.ProjectError.html\" title=\"enum asciii::project::error::ProjectError\">ProjectError</a>",synthetic:false,types:["asciii::project::error::ProjectError"]},{text:"impl <a class=\"trait\" href=\"failure/trait.Fail.html\" title=\"trait failure::Fail\">Fail</a> for <a class=\"struct\" href=\"asciii/project/error/struct.ErrorList.html\" title=\"struct asciii::project::error::ErrorList\">ErrorList</a>",synthetic:false,types:["asciii::project::error::ErrorList"]},{text:"impl <a class=\"trait\" href=\"failure/trait.Fail.html\" title=\"trait failure::Fail\">Fail</a> for <a class=\"enum\" href=\"asciii/storage/error/enum.StorageError.html\" title=\"enum asciii::storage::error::StorageError\">StorageError</a>",synthetic:false,types:["asciii::storage::error::StorageError"]},{text:"impl <a class=\"trait\" href=\"failure/trait.Fail.html\" title=\"trait failure::Fail\">Fail</a> for <a class=\"enum\" href=\"asciii/actions/error/enum.ActionError.html\" title=\"enum asciii::actions::error::ActionError\">ActionError</a>",synthetic:false,types:["asciii::actions::error::ActionError"]},{text:"impl <a class=\"trait\" href=\"failure/trait.Fail.html\" title=\"trait failure::Fail\">Fail</a> for <a class=\"enum\" href=\"asciii/document_export/error/enum.ExportError.html\" title=\"enum asciii::document_export::error::ExportError\">ExportError</a>",synthetic:false,types:["asciii::document_export::error::ExportError"]},];
+implementors["failure"] = [];
+
+            if (window.register_implementors) {
+                window.register_implementors(implementors);
+            } else {
+                window.pending_implementors = implementors;
+            }
+        
+})()

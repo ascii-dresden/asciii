@@ -1,1 +1,1 @@
-initSidebarItems({"trait":[["Storable",""]],"type":[["FilePath",""],["FilePathBuf",""],["FolderPath",""],["FolderPathBuf",""]]});
+initSidebarItems({"struct":[["StorableAndTempDir",""]],"trait":[["Storable",""]],"type":[["FilePath",""],["FilePathBuf",""],["FolderPath",""],["FolderPathBuf",""]]});

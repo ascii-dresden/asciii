@@ -1,59 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="generator" content="rustdoc">
-    <meta name="description" content="API documentation for the Rust `storage` mod in crate `asciii`.">
-    <meta name="keywords" content="rust, rustlang, rust-lang, storage">
-
-    <title>asciii::storage - Rust</title>
-
-    <link rel="stylesheet" type="text/css" href="../../rustdoc.css">
-    <link rel="stylesheet" type="text/css" href="../../main.css">
-    
-
-    
-    
-</head>
-<body class="rustdoc">
-    <!--[if lte IE 8]>
-    <div class="warning">
-        This old browser is unsupported and will most likely display funky
-        things.
-    </div>
-    <![endif]-->
-
-    
-
-    <nav class="sidebar">
-        
-        <p class='location'><a href='../index.html'>asciii</a></p><script>window.sidebarCurrent = {name: 'storage', ty: 'mod', relpath: '../'};</script><script defer src="../sidebar-items.js"></script>
-    </nav>
-
-    <nav class="sub">
-        <form class="search-form js-only">
-            <div class="search-container">
-                <input class="search-input" name="search"
-                       autocomplete="off"
-                       placeholder="Click or press ‘S’ to search, ‘?’ for more options…"
-                       type="search">
-            </div>
-        </form>
-    </nav>
-
-    <section id='main' class="content mod">
-<h1 class='fqn'><span class='in-band'>Module <a href='../index.html'>asciii</a>::<wbr><a class='mod' href=''>storage</a></span><span class='out-of-band'><span id='render-detail'>
-                   <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
-                       [<span class='inner'>&#x2212;</span>]
-                   </a>
-               </span><a id='src-884' class='srclink' href='../../src/asciii/src/storage/mod.rs.html#1-667' title='goto source code'>[src]</a></span></h1>
-<div class='docblock'><p>Manages file structure of templates, working directory and archives.</p>
-
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="API documentation for the Rust `storage` mod in crate `asciii`."><meta name="keywords" content="rust, rustlang, rust-lang, storage"><title>asciii::storage - Rust</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css"><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc mod"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><p class='location'>Module storage</p><div class="sidebar-elems"><div class="block items"><ul><li><a href="#reexports">Re-exports</a></li><li><a href="#modules">Modules</a></li><li><a href="#structs">Structs</a></li><li><a href="#enums">Enums</a></li><li><a href="#functions">Functions</a></li><li><a href="#types">Type Definitions</a></li></ul></div><p class='location'><a href='../index.html'>asciii</a></p><script>window.sidebarCurrent = {name: 'storage', ty: 'mod', relpath: '../'};</script><script defer src="../sidebar-items.js"></script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><h1 class='fqn'><span class='out-of-band'><span id='render-detail'><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class='inner'>&#x2212;</span>]</a></span><a class='srclink' href='../../src/asciii/storage/mod.rs.html#1-873' title='goto source code'>[src]</a></span><span class='in-band'>Module <a href='../index.html'>asciii</a>::<wbr><a class="mod" href=''>storage</a></span></h1><div class='docblock'><p>Manages file structure of templates, working directory and archives.</p>
 <p>This module takes care of project file management.</p>
-
 <p>Your ordinary file structure would look something like this:</p>
-
 <pre><code class="language-bash"># root dir
 ├── working
 │   └── Project1
@@ -66,136 +13,22 @@
 │           └── R036 Project3 2014-10-08.tex
 ...
 </code></pre>
-</div><h2 id='reexports' class='section-header'><a href="#reexports">Reexports</a></h2>
-<table><tr><td><code>pub use self::error::{<a class='struct' href='../../asciii/storage/error/struct.StorageError.html' title='asciii::storage::error::StorageError'>StorageError</a>, <a class='enum' href='../../asciii/storage/error/enum.ErrorKind.html' title='asciii::storage::error::ErrorKind'>ErrorKind</a>};</code></td></tr><tr><td><code>pub use self::<a class='mod'
-                                       href='./storable/index.html'>storable</a>::<a class='trait' href='../../asciii/storage/storable/trait.Storable.html' title='asciii::storage::storable::Storable'>Storable</a>;</code></td></tr></table><h2 id='modules' class='section-header'><a href="#modules">Modules</a></h2>
-<table>
-                       <tr class=' module-item'>
-                           <td><a class='mod' href='error/index.html'
-                                  title='asciii::storage::error'>error</a></td>
-                           <td class='docblock-short'>
-                                <p>Error that may occur in Storage</p>
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class='mod' href='repo/index.html'
-                                  title='asciii::storage::repo'>repo</a></td>
-                           <td class='docblock-short'>
-                                
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class='mod' href='storable/index.html'
-                                  title='asciii::storage::storable'>storable</a></td>
-                           <td class='docblock-short'>
-                                <p>Contains the <code>Storable</code> trait that storable projects must implement.</p>
-                           </td>
-                       </tr></table><h2 id='structs' class='section-header'><a href="#structs">Structs</a></h2>
-<table>
-                       <tr class=' module-item'>
-                           <td><a class='struct' href='struct.ProjectList.html'
-                                  title='asciii::storage::ProjectList'>ProjectList</a></td>
-                           <td class='docblock-short'>
-                                <p>Wrapper around <code>Vec&lt;Storable&gt;</code></p>
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class='struct' href='struct.Storage.html'
-                                  title='asciii::storage::Storage'>Storage</a></td>
-                           <td class='docblock-short'>
-                                <p>Manages project file storage.</p>
-                           </td>
-                       </tr></table><h2 id='enums' class='section-header'><a href="#enums">Enums</a></h2>
-<table>
-                       <tr class=' module-item'>
-                           <td><a class='enum' href='enum.StorageDir.html'
-                                  title='asciii::storage::StorageDir'>StorageDir</a></td>
-                           <td class='docblock-short'>
-                                <p>Used to identify what directory you are talking about.</p>
-                           </td>
-                       </tr></table><h2 id='functions' class='section-header'><a href="#functions">Functions</a></h2>
-<table>
-                       <tr class=' module-item'>
-                           <td><a class='fn' href='fn.list_path_content.html'
-                                  title='asciii::storage::list_path_content'>list_path_content</a></td>
-                           <td class='docblock-short'>
-                                <p>Basically <code>ls</code>, returns a list of paths.</p>
-                           </td>
-                       </tr></table><h2 id='types' class='section-header'><a href="#types">Type Definitions</a></h2>
-<table>
-                       <tr class=' module-item'>
-                           <td><a class='type' href='type.StorageResult.html'
-                                  title='asciii::storage::StorageResult'>StorageResult</a></td>
-                           <td class='docblock-short'>
-                                <p>Result returned by Storage
-TODO move to <code>error</code> module</p>
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class='type' href='type.Year.html'
-                                  title='asciii::storage::Year'>Year</a></td>
-                           <td class='docblock-short'>
-                                <p>Year = <code>i32</code></p>
-                           </td>
-                       </tr></table></section>
-    <section id='search' class="content hidden"></section>
-
-    <section class="footer"></section>
-
-    <aside id="help" class="hidden">
-        <div>
-            <h1 class="hidden">Help</h1>
-
-            <div class="shortcuts">
-                <h2>Keyboard Shortcuts</h2>
-
-                <dl>
-                    <dt>?</dt>
-                    <dd>Show this help dialog</dd>
-                    <dt>S</dt>
-                    <dd>Focus the search field</dd>
-                    <dt>&larrb;</dt>
-                    <dd>Move up in search results</dd>
-                    <dt>&rarrb;</dt>
-                    <dd>Move down in search results</dd>
-                    <dt>&#9166;</dt>
-                    <dd>Go to active search result</dd>
-                    <dt>+</dt>
-                    <dd>Collapse/expand all sections</dd>
-                </dl>
-            </div>
-
-            <div class="infos">
-                <h2>Search Tricks</h2>
-
-                <p>
-                    Prefix searches with a type followed by a colon (e.g.
-                    <code>fn:</code>) to restrict the search to a given type.
-                </p>
-
-                <p>
-                    Accepted types are: <code>fn</code>, <code>mod</code>,
-                    <code>struct</code>, <code>enum</code>,
-                    <code>trait</code>, <code>type</code>, <code>macro</code>,
-                    and <code>const</code>.
-                </p>
-
-                <p>
-                    Search functions by type signature (e.g.
-                    <code>vec -> usize</code> or <code>* -> vec</code>)
-                </p>
-            </div>
-        </div>
-    </aside>
-
-    
-
-    <script>
-        window.rootPath = "../../";
-        window.currentCrate = "asciii";
-    </script>
-    <script src="../../jquery.js"></script>
-    <script src="../../main.js"></script>
-    <script defer src="../../search-index.js"></script>
-</body>
-</html>
+</div><h2 id='reexports' class='section-header'><a href="#reexports">Re-exports</a></h2>
+<table><tr><td><code>pub use self::error::<a class="enum" href="../../asciii/storage/error/enum.StorageError.html" title="enum asciii::storage::error::StorageError">StorageError</a>;</code></td></tr><tr><td><code>pub use self::<a class="mod" href="../../asciii/storage/storable/index.html" title="mod asciii::storage::storable">storable</a>::*;</code></td></tr></table><h2 id='modules' class='section-header'><a href="#modules">Modules</a></h2>
+<table><tr class='module-item'><td><a class="mod" href="error/index.html" title='asciii::storage::error mod'>error</a></td><td class='docblock-short'><p>Error that may occur in Storage</p>
+</td></tr><tr class='module-item'><td><a class="mod" href="repo/index.html" title='asciii::storage::repo mod'>repo</a></td><td class='docblock-short'></td></tr><tr class='module-item'><td><a class="mod" href="storable/index.html" title='asciii::storage::storable mod'>storable</a></td><td class='docblock-short'><p>Contains the <code>Storable</code> trait that storable projects must implement.</p>
+</td></tr></table><h2 id='structs' class='section-header'><a href="#structs">Structs</a></h2>
+<table><tr class='module-item'><td><a class="struct" href="struct.Paths.html" title='asciii::storage::Paths struct'>Paths</a></td><td class='docblock-short'></td></tr><tr class='module-item'><td><a class="struct" href="struct.ProjectList.html" title='asciii::storage::ProjectList struct'>ProjectList</a></td><td class='docblock-short'><p>Wrapper around <code>Vec&lt;Storable&gt;</code></p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.Projects.html" title='asciii::storage::Projects struct'>Projects</a></td><td class='docblock-short'><p>Container keeping all opened projects.</p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.Storage.html" title='asciii::storage::Storage struct'>Storage</a></td><td class='docblock-short'><p>Manages project file storage.</p>
+</td></tr></table><h2 id='enums' class='section-header'><a href="#enums">Enums</a></h2>
+<table><tr class='module-item'><td><a class="enum" href="enum.StorageDir.html" title='asciii::storage::StorageDir enum'>StorageDir</a></td><td class='docblock-short'><p>Used to identify what directory you are talking about.</p>
+</td></tr><tr class='module-item'><td><a class="enum" href="enum.StorageSelection.html" title='asciii::storage::StorageSelection enum'>StorageSelection</a></td><td class='docblock-short'><p>A description from which we can open Storables</p>
+</td></tr></table><h2 id='functions' class='section-header'><a href="#functions">Functions</a></h2>
+<table><tr class='module-item'><td><a class="fn" href="fn.get_storage_path.html" title='asciii::storage::get_storage_path fn'>get_storage_path</a></td><td class='docblock-short'><p>Interprets storage path from config.</p>
+</td></tr><tr class='module-item'><td><a class="fn" href="fn.list_path_content.html" title='asciii::storage::list_path_content fn'>list_path_content</a></td><td class='docblock-short'><p>Basically <code>ls</code>, returns a list of paths.</p>
+</td></tr><tr class='module-item'><td><a class="fn" href="fn.setup.html" title='asciii::storage::setup fn'>setup</a></td><td class='docblock-short'><p>Sets up an instance of <code>Storage</code>.</p>
+</td></tr><tr class='module-item'><td><a class="fn" href="fn.setup_with_git.html" title='asciii::storage::setup_with_git fn'>setup_with_git</a></td><td class='docblock-short'><p>Sets up an instance of <code>Storage</code>, with git turned on.</p>
+</td></tr></table><h2 id='types' class='section-header'><a href="#types">Type Definitions</a></h2>
+<table><tr class='module-item'><td><a class="type" href="type.ProjectsByYear.html" title='asciii::storage::ProjectsByYear type'>ProjectsByYear</a></td><td class='docblock-short'></td></tr><tr class='module-item'><td><a class="type" href="type.Year.html" title='asciii::storage::Year type'>Year</a></td><td class='docblock-short'><p>Year = <code>i32</code></p>
+</td></tr></table></section><section id="search" class="content hidden"></section><section class="footer"></section><aside id="help" class="hidden"><div><h1 class="hidden">Help</h1><div class="shortcuts"><h2>Keyboard Shortcuts</h2><dl><dt><kbd>?</kbd></dt><dd>Show this help dialog</dd><dt><kbd>S</kbd></dt><dd>Focus the search field</dd><dt><kbd>↑</kbd></dt><dd>Move up in search results</dd><dt><kbd>↓</kbd></dt><dd>Move down in search results</dd><dt><kbd>↹</kbd></dt><dd>Switch tab</dd><dt><kbd>&#9166;</kbd></dt><dd>Go to active search result</dd><dt><kbd>+</kbd></dt><dd>Expand all sections</dd><dt><kbd>-</kbd></dt><dd>Collapse all sections</dd></dl></div><div class="infos"><h2>Search Tricks</h2><p>Prefix searches with a type followed by a colon (e.g., <code>fn:</code>) to restrict the search to a given type.</p><p>Accepted types are: <code>fn</code>, <code>mod</code>, <code>struct</code>, <code>enum</code>, <code>trait</code>, <code>type</code>, <code>macro</code>, and <code>const</code>.</p><p>Search functions by type signature (e.g., <code>vec -> usize</code> or <code>* -> vec</code>)</p><p>Search multiple things at once by splitting your query with comma (e.g., <code>str,u8</code> or <code>String,struct:Vec,test</code>)</p></div></div></aside><script>window.rootPath = "../../";window.currentCrate = "asciii";</script><script src="../../aliases.js"></script><script src="../../main.js"></script><script defer src="../../search-index.js"></script></body></html>

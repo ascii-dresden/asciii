@@ -1,1 +1,1 @@
-initSidebarItems({"enum":[["ErrorKind",""]],"struct":[["Error",""]],"trait":[["ChainErr",""]],"type":[["Result",""]]});
+initSidebarItems({"enum":[["ProjectError",""]],"fn":[["combine_specresults",""]],"struct":[["ErrorList",""]],"type":[["SpecResult",""]]});

@@ -1,1 +1,1 @@
-initSidebarItems({"mod":[["error",""]],"struct":[["Product","Stores properties of a product."]]});
+initSidebarItems({"enum":[["ProductError",""]],"struct":[["Product","Stores properties of a product."]]});

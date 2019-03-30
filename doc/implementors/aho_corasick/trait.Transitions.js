@@ -1,5 +1,5 @@
 (function() {var implementors = {};
-implementors["aho_corasick"] = [];implementors["asciii"] = [];implementors["asciii"] = [];implementors["asciii"] = [];implementors["asciii"] = [];
+implementors["aho_corasick"] = [];
 
             if (window.register_implementors) {
                 window.register_implementors(implementors);

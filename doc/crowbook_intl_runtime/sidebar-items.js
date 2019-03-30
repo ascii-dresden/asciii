@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["set_lang","Sets the lang that the program should be using."]]});

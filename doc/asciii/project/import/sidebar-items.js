@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["ProductDesc",""]],"fn":[["from_str",""]],"struct":[["Client",""],["Event",""],["Hours",""],["Meta",""],["Number",""],["OrderedFloatDef",""],["Product",""],["Project",""],["ProjectDate",""],["Time",""]]});

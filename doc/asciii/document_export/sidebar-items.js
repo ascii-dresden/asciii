@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["fill_template","Takes a `T: Serialize` and a template path and does it's thing."],["projects_to_doc","Creates the latex files within each projects directory, either for Invoice or Offer."]],"mod":[["error",""]],"struct":[["ExportConfig",""]]});

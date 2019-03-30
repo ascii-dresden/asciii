@@ -1,228 +1,252 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="generator" content="rustdoc">
-    <meta name="description" content="API documentation for the Rust `asciii` crate.">
-    <meta name="keywords" content="rust, rustlang, rust-lang, asciii">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="API documentation for the Rust `asciii` crate."><meta name="keywords" content="rust, rustlang, rust-lang, asciii"><title>asciii - Rust</title><link rel="stylesheet" type="text/css" href="../normalize.css"><link rel="stylesheet" type="text/css" href="../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../dark.css"><link rel="stylesheet" type="text/css" href="../light.css" id="themeStyle"><script src="../storage.js"></script><noscript><link rel="stylesheet" href="../noscript.css"></noscript><style type="text/css">#crate-search{background-image:url("../down-arrow.svg");}</style></head><body class="rustdoc mod"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><p class='location'>Crate asciii</p><div class="sidebar-elems"><a id='all-types' href='all.html'><p>See all asciii's items</p></a><div class="block items"><ul><li><a href="#modules">Modules</a></li><li><a href="#structs">Structs</a></li><li><a href="#enums">Enums</a></li><li><a href="#statics">Statics</a></li></ul></div><p class='location'></p><script>window.sidebarCurrent = {name: 'asciii', ty: 'mod', relpath: '../'};</script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../settings.html"><img src="../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><h1 class='fqn'><span class='out-of-band'><span id='render-detail'><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class='inner'>&#x2212;</span>]</a></span><a class='srclink' href='../src/asciii/lib.rs.html#1-102' title='goto source code'>[src]</a></span><span class='in-band'>Crate <a class="mod" href=''>asciii</a></span></h1><div class='docblock'><p>Thank you for choosing <code>asciii</code>, the new and improved <code>ascii</code>.</p>
+<h1 id="the-official-asciii-handbook" class="section-header"><a href="#the-official-asciii-handbook">The <strong>official asciii Handbook</strong>.</a></h1>
+<p>Please <strong><a href="https://github.com/ascii-dresden/asciii/issues/new">file an issue immediately</a></strong> if you find anything inaccurate about this documentation or any bugs in the software.</p>
+<ol>
+<li><a href="#introduction">Introduction</a></li>
+<li><a href="#installation">Installation</a></li>
+<li><a href="#usage">Usage</a></li>
+<li><a href="#file-format">File Format</a></li>
+<li><a href="#file-structure">File Structure</a></li>
+</ol>
+<h2 id="introduction" class="section-header"><a href="#introduction">Introduction</a></h2>
+<p>The ascii invoicer is a command-line tool that manages projects.
+New projects can be created from templates and are stored in the working directory.
+Projects can be archived, each year will have its own archive.
+A project consists of a folder containing a yaml file describing it and a number of attached files,
+such tex files.
+Projects can contain products and personal.
+You can create preliminary offers and invoices from your projects.</p>
+<h2 id="installation" class="section-header"><a href="#installation">Installation</a></h2>
+<p>Most of theses installation paths will build from source so you need the following build requirements.</p>
+<h3 id="build-requirements" class="section-header"><a href="#build-requirements">Build Requirements</a></h3>
+<ul>
+<li><code>rust</code> ≥ 1.17.0</li>
+<li><code>cargo</code></li>
+<li><code>cmake</code></li>
+<li><code>git</code></li>
+<li><code>zlib1g-dev</code></li>
+</ul>
+<h3 id="cratesio" class="section-header"><a href="#cratesio">Crates.io</a></h3>
+<p>Since version 3.1.3 <code>asciii</code> can be installed via <code>cargo install asciii</code>.</p>
+<h3 id="archlinux-user-repository" class="section-header"><a href="#archlinux-user-repository">Archlinux User Repository</a></h3>
+<p>You find the AUR package <a href="https://aur.archlinux.org/packages/asciii-git">asciii-git</a>, or contact me personally about the inofficial repo with the binary packages.
+Debian and Windows packages are on the way.</p>
+<h3 id="manuall-install-from-git" class="section-header"><a href="#manuall-install-from-git">Manuall install from git.</a></h3>
+<p>Just clone https://github.com/ascii-dresden/asciii/ and run <code>cargo install</code>.</p>
+<h3 id="requirements" class="section-header"><a href="#requirements">Requirements</a></h3>
+<ul>
+<li>linux, mac osx, windows7+</li>
+<li>git for sync</li>
+<li>pdflatex/xelatex to produce documents</li>
+<li>an editor that can highlight yaml</li>
+</ul>
+<h2 id="usage" class="section-header"><a href="#usage">Usage</a></h2>
+<p>You should be able to learn everything there is to know about the command line interface by just typing in <code>asciii help</code>
+Each of these sections starts with a list of commands.
+Read the help to each command with <code>asciii help [COMMAND]</code> to find out about all parameters, especially <em>list</em> has quite a few of them.</p>
+<h3 id="get-started-with" class="section-header"><a href="#get-started-with">Get started with</a></h3>
+<pre><code class="language-bash">asciii help [COMMAND]               # Describe available commands or one specific command
+asciii list                         # List current Projects
+asciii show NAMES                   # Shows information about a project in different ways
+</code></pre>
+<h3 id="project-life-cycle" class="section-header"><a href="#project-life-cycle">Project Life-Cycle</a></h3>
+<pre><code class="language-bash">asciii new NAME                     # Creating a new project
+asciii edit NAMES                   # Edit project
+asciii make NAME                    # Creates an Offer
 
-    <title>asciii - Rust</title>
+asciii edit NAMES                   # Edit project
+asciii make NAME                    # Creates an Invoice
 
-    <link rel="stylesheet" type="text/css" href="../rustdoc.css">
-    <link rel="stylesheet" type="text/css" href="../main.css">
-    
+asciii archive NAME                 # Move project to archive
+asciii unarchive YEAR NAME          # reopen an archived project
+asciii delete NAME                  # If you really have to
+</code></pre>
+<h3 id="git-features" class="section-header"><a href="#git-features">GIT Features</a></h3>
+<pre><code class="language-bash">asciii add NAMES
+asciii commit
+asciii pull / push
+asciii cleanup
+asciii status, log, diff, stash, pop
+</code></pre>
+<p>These commands behave similar to the original git commands.
+The only difference is that you select projects just like you do with other ascii commands (see edit, display, offer, invoice).
+Commit uses -m (like in git) but unlike git does not (yet) open an editor if you leave out the message.</p>
+<h4 id="careful" class="section-header"><a href="#careful">CAREFUL:</a></h4>
+<p>These commands are meant as a convenience, they ARE NOT however a <em>complete</em> replacement for git!
+You should always pull before you start working and push right after you are done in order to avoid merge conflicts.
+If you do run into such problems go to storage directory <code>cd $(ascii path)</code> and resolve them using git.</p>
+<p>Personal advice N°1: use <code>git pull --rebase</code></p>
+<p>Personal advice N°2: add this to your <code>.bash_aliases</code>:
+<code>alias agit=&quot;git --git-dir=$(ascii path)/.git --work-tree=$(ascii path)&quot;</code></p>
+<h3 id="more-details" class="section-header"><a href="#more-details">More Details</a></h3>
+<p>The commands <code>asciii list</code> and <code>asciii display</code> (equals <code>ascii show</code>) allow to display all sorts of details from a project.
+You can describe the exact field you wish to view via path like string.
+To display the clients email for instance</p>
+<pre><code class="language-yaml">client:
+  email: jon.doe@example.com
+</code></pre>
+<p>you pass in:</p>
+<p><code>asciii show -d client/email</code> will display the clients email.
+<code>asciii show -d invoice/date</code> will display the date of the invoice.</p>
+<p><code>asciii list --details</code> will add columns to the table.
+For example try <code>asciii list --details client/email</code>.
+As some fields are computed you have to use a different syntax to access them,
+try for instance <code>asciii list -d ClientFullName</code>.
+For a full list run <code>asciii list --computed</code>.</p>
+<h3 id="exporting" class="section-header"><a href="#exporting">Exporting</a></h3>
+<p>Currently <code>asciii</code> only supports csv export.
+You can export the entire list of projects in a year with</p>
+<pre><code class="language-bash">asciii csv [year]     # Prints a CSV list of current year into CSV
+asciii list --csv     # prints the same configuration (sorted, filtered) as `list` would.
+</code></pre>
+<p>You can pipe the csv into column (<code>asciii csv | column -ts\;</code>) to display the table in you terminal.</p>
+<h3 id="miscellaneous" class="section-header"><a href="#miscellaneous">Miscellaneous</a></h3>
+<pre><code class="language-bash">asciii path      # Return projects storage path
+asciii config -e # Edit configuration
+asciii templates # List or add templates
+asciii whoami    # Invoke settings --show user/name
+asciii version   # Display version
+</code></pre>
+<h2 id="file-format" class="section-header"><a href="#file-format">File Format</a></h2>
+<p>Every project consists of a project folder containig at least a <code>.yml</code> file.
+<a href="https://en.wikipedia.org/w/YAML">yaml</a>] is a structured file format, similar to json.
+Infact: it is a superset of json.</p>
+<h3 id="document-structure" class="section-header"><a href="#document-structure">Document structure</a></h3>
+<p>A project file contains several sections, most of which you neither have to fill out manually nor right away be a valid project. The</p>
+<h4 id="client" class="section-header"><a href="#client">Client</a></h4>
+<p>This describes the clients name and address. Please note that the field <code>client/address</code> mentions the clients name too.
+The field <code>client/title</code> is used to determine the clients gender, so the first word must be one of the listed options.
+<code>client/email</code> is not required though highly recommended.</p>
+<pre><code class="language-yaml">client:
+  title: Mr # or: &quot;Mrs&quot;, &quot;Ms&quot;, &quot;Herr&quot;, &quot;Frau&quot; - after which anything can follow
+  first_name: John
+  last_name:  Doe
 
-    
-    
-</head>
-<body class="rustdoc">
-    <!--[if lte IE 8]>
-    <div class="warning">
-        This old browser is unsupported and will most likely display funky
-        things.
-    </div>
-    <![endif]-->
+  email:
+  address: |
+    John Doe
+    Nöthnitzerstraße 46
+    01187 Dresden
+</code></pre>
+<p>The event files can be filled</p>
+<ul>
+<li><code>event:</code></li>
+<li><code>offer:</code></li>
+<li><code>invoice:</code></li>
+<li><code>products:</code></li>
+<li><code>hours:</code></li>
+</ul>
+<h3 id="products" class="section-header"><a href="#products">Products</a></h3>
+<p>There are two alternative formats for describing separate products.
+The first is the direct version, describing each product in situ.
+The second one makes use of the <code>cataloge</code> and only references entries.
+If you need to add a product for a separate occasion,
+just use the direct format.
+If you want to make changes to the catalogue, please consider changing the <a href="#templates">template</a>.</p>
+<pre><code class="language-yaml">  &quot;Sekt  (0,75l)&quot;:
+    amount: 4
+    price: 6.0
+    sold: 2
+  &quot;Belegte Brötchen&quot;:
+    amount: 90
+    price: 1.16
+</code></pre>
+<pre><code class="language-yaml">cataloge:
+  product: &amp;kaffee       { name: Kaffee, price: 2.5, unit: 1l  }
 
-    
-
-    <nav class="sidebar">
-        
-        <p class='location'></p><script>window.sidebarCurrent = {name: 'asciii', ty: 'mod', relpath: '../'};</script>
-    </nav>
-
-    <nav class="sub">
-        <form class="search-form js-only">
-            <div class="search-container">
-                <input class="search-input" name="search"
-                       autocomplete="off"
-                       placeholder="Click or press ‘S’ to search, ‘?’ for more options…"
-                       type="search">
-            </div>
-        </form>
-    </nav>
-
-    <section id='main' class="content mod">
-<h1 class='fqn'><span class='in-band'>Crate <a class='mod' href=''>asciii</a></span><span class='out-of-band'><span id='render-detail'>
-                   <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
-                       [<span class='inner'>&#x2212;</span>]
-                   </a>
-               </span><a id='src-0' class='srclink' href='../src/asciii/src/lib.rs.html#1-94' title='goto source code'>[src]</a></span></h1>
-<div class='docblock'><p>Thank you for choosing <code>asciii</code>, the new and improved <code>ascii</code>.</p>
-
-<p><strong>For pure user documentation please refer to the <a href="manual/index.html">user manual</a>.</strong>
-This contains user and developer documentation together.</p>
-
-<p>Please check out <a href="cli/index.html">cli</a> too.</p>
+products:
+  *kaffee:
+    amount: 60
+</code></pre>
+<h2 id="file-structure" class="section-header"><a href="#file-structure">File Structure</a></h2>
+<p>Your config-file is located in ~/.asciii.yml but you can also access it using <code>asciii config --edit</code>.
+The projects directory contains working, archive and templates. If you start with a blank slate you might want to put the templates folder into the storage folder (not well tested yet).</p>
+<p>By default in your <code>path</code> folder you fill find:</p>
+<pre><code class="language-bash">caterings
+├── archive
+│   ├── 2013
+│   │   ├── Foobar1
+│   │   │   └── Foobar1.yml
+│   │   └── Foobar2
+│   │       ├── Foobar2.yml
+│   │       └── R007 Foobar2 2013-02-11.tex
+│   └── 2014
+│       ├── canceled_foobar1
+│       │   ├── A20141009-1 foobar.tex
+│       │   └── foobar1.yml
+│       ├── R029_foobar2
+│       │   └── R029 foobar2 2014-09-10.tex
+│       └── R036_foobar3
+│           ├── foobar3.yml
+│           └── R036 foobar3 2014-10-08.tex
+├── templates
+│   ├── default.yml.erb
+│   └── document.tex.erb
+└── working
+    ├── Foobar1
+    │   ├── A20141127-1 Foobar1.tex
+    │   └── Foobar1.yml
+    ├── Foobar2
+    │   ├── A20141124-1 Foobar2.tex
+    │   └── Foobar2.yml
+    └── Foobar3
+        ├── A20140325-1 Foobar3.tex
+        ├── A20140327-1 Foobar3.tex
+        ├── R008 Foobar3 2014-03-31.tex
+        └── Foobar3.yml
+</code></pre>
+<h2 id="templates" class="section-header"><a href="#templates">Templates</a></h2>
+<p>Templates can be found in <code>$storagedir/templates</code>.
+The default file extension for templates is <code>.tyml</code>.
+You should <strong>always</strong> have at least a <code>default.tyml</code>, but you can add your won</p>
+<h3 id="template-replacement" class="section-header"><a href="#template-replacement">Template Replacement</a></h3>
+<p>Templates and project files can contain <code>##FILL-TAGS##</code> some of which are filled when creating a <code>new</code> project from a template,
+some of which remain in the project file. These can be replaced with the <code>asciii set</code> command.</p>
+<h2 id="aliases" class="section-header"><a href="#aliases">Aliases</a></h2>
+<ul>
+<li><code>list</code>: <code>-l</code>, <code>l</code>, <code>ls</code>, <code>dir</code>, <code>la</code></li>
+<li><code>show</code>: <code>display</code></li>
+<li><code>log</code>: <code>history</code></li>
+</ul>
+<h2 id="logging" class="section-header"><a href="#logging">Logging</a></h2>
+<p><code>asciii</code> uses Rusts <a href="http://doc.rust-lang.org/log/env_logger">env_logger</a>.
+To enable logging you have to set <code>ASCIII_LOG=debug</code>.
+Besides <code>debug</code>, you can also use <code>trace</code>, <code>warn</code> or <code>error</code>.
+You can enable logging per-module logging like this: <code>ASCIII_LOG=storage=debug</code>.
+Modules are all top-level files and folders in <code>src/</code>.</p>
+<h2 id="pro-tips" class="section-header"><a href="#pro-tips">Pro tips</a></h2>
+<ol>
+<li>
+<p>Check out <code>repl asciii</code>!
+You should copy <a href="src/repl/ascii">repl-file</a> into ~/.repl/ascii and install rlwrap to take advantage of all the repl goodness such as autocompletion and history.</p>
+</li>
+<li>
+<p>Check out <code>xclip</code>!
+You can pipe the output of <code>ascii show</code> or <code>ascii show --csv</code> to xclip and paste to your email program or into a spreadsheet tool like libreoffice calc.</p>
+</li>
+</ol>
+<h2 id="known-issues" class="section-header"><a href="#known-issues">Known Issues</a></h2>
+<p>Some strings may cause problems when rendering latex, e.g.
+a client called <code>&quot;ABC GmbH &amp; Co. KG&quot;</code>.
+The <code>&quot;&amp;&quot;</code> causes latex to fail, <code>\&amp;&quot;</code> bugs the yaml parser but <code>&quot;\\&amp;&quot;</code> will do the trick.
+asciii list -dCaterers -fCaterers:hendrik</p>
 </div><h2 id='modules' class='section-header'><a href="#modules">Modules</a></h2>
-<table>
-                       <tr class=' module-item'>
-                           <td><a class='mod' href='actions/index.html'
-                                  title='asciii::actions'>actions</a></td>
-                           <td class='docblock-short'>
-                                <p>General actions</p>
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class='mod' href='config/index.html'
-                                  title='asciii::config'>config</a></td>
-                           <td class='docblock-short'>
-                                <p>Handles config files and default config.</p>
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class='mod' href='fill_docs/index.html'
-                                  title='asciii::fill_docs'>fill_docs</a></td>
-                           <td class='docblock-short'>
-                                <p>Fills export templates to create tex documents.</p>
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class='mod' href='manual/index.html'
-                                  title='asciii::manual'>manual</a></td>
-                           <td class='docblock-short'>
-                                <p>The <strong>official asciii Handbook</strong>.</p>
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class='mod' href='print/index.html'
-                                  title='asciii::print'>print</a></td>
-                           <td class='docblock-short'>
-                                <p>All the printing code lives here.</p>
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class='mod' href='project/index.html'
-                                  title='asciii::project'>project</a></td>
-                           <td class='docblock-short'>
-                                <p>Project file parsing and evaluation.</p>
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class='mod' href='storage/index.html'
-                                  title='asciii::storage'>storage</a></td>
-                           <td class='docblock-short'>
-                                <p>Manages file structure of templates, working directory and archives.</p>
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class='mod' href='templater/index.html'
-                                  title='asciii::templater'>templater</a></td>
-                           <td class='docblock-short'>
-                                <p>Simple templating functionality through keyword replacement.</p>
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class='mod' href='util/index.html'
-                                  title='asciii::util'>util</a></td>
-                           <td class='docblock-short'>
-                                <p>Utility functions that are needed all over the places.</p>
-                           </td>
-                       </tr></table><h2 id='structs' class='section-header'><a href="#structs">Structs</a></h2>
-<table>
-                       <tr class=' module-item'>
-                           <td><a class='struct' href='struct.CONFIG.html'
-                                  title='asciii::CONFIG'>CONFIG</a></td>
-                           <td class='docblock-short'>
-                                <p>Static <code>ConfigReader</code> to be able to access the configuration from everywhere.</p>
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class='struct' href='struct.DOCHINT.html'
-                                  title='asciii::DOCHINT'>DOCHINT</a></td>
-                           <td class='docblock-short'>
-                                <p>Hint for app to point at <code>asciii::DOCUMENTATION_URL</code></p>
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class='struct' href='struct.VERSION.html'
-                                  title='asciii::VERSION'>VERSION</a></td>
-                           <td class='docblock-short'>
-                                <p>Human readable, no semantic versioning.</p>
-                           </td>
-                       </tr></table><h2 id='enums' class='section-header'><a href="#enums">Enums</a></h2>
-<table>
-                       <tr class=' module-item'>
-                           <td><a class='enum' href='enum.BillType.html'
-                                  title='asciii::BillType'>BillType</a></td>
-                           <td class='docblock-short'>
-                                
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class='enum' href='enum.Yaml.html'
-                                  title='asciii::Yaml'>Yaml</a></td>
-                           <td class='docblock-short'>
-                                <p>A YAML node is stored as this <code>Yaml</code> enumeration, which provides an easy way to
+<table><tr class='module-item'><td><a class="mod" href="actions/index.html" title='asciii::actions mod'>actions</a></td><td class='docblock-short'><p>General actions</p>
+</td></tr><tr class='module-item'><td><a class="mod" href="config/index.html" title='asciii::config mod'>config</a></td><td class='docblock-short'><p>Handles config files and default config.</p>
+</td></tr><tr class='module-item'><td><a class="mod" href="document_export/index.html" title='asciii::document_export mod'>document_export</a></td><td class='docblock-short'><p>Fills export templates to create tex documents.</p>
+</td></tr><tr class='module-item'><td><a class="mod" href="localize_macros/index.html" title='asciii::localize_macros mod'>localize_macros</a></td><td class='docblock-short'><p>Autogenerated localization macros kudos to <a href="https://crates.io/crates/crowbook-intl">crowbook-intl</a>.</p>
+</td></tr><tr class='module-item'><td><a class="mod" href="print/index.html" title='asciii::print mod'>print</a></td><td class='docblock-short'><p>All the printing code lives here.</p>
+</td></tr><tr class='module-item'><td><a class="mod" href="project/index.html" title='asciii::project mod'>project</a></td><td class='docblock-short'><p>Project file parsing and evaluation.</p>
+</td></tr><tr class='module-item'><td><a class="mod" href="storage/index.html" title='asciii::storage mod'>storage</a></td><td class='docblock-short'><p>Manages file structure of templates, working directory and archives.</p>
+</td></tr><tr class='module-item'><td><a class="mod" href="templater/index.html" title='asciii::templater mod'>templater</a></td><td class='docblock-short'><p>Simple templating functionality through keyword replacement.</p>
+</td></tr><tr class='module-item'><td><a class="mod" href="util/index.html" title='asciii::util mod'>util</a></td><td class='docblock-short'><p>Utility functions that are needed all over the places.</p>
+</td></tr></table><h2 id='structs' class='section-header'><a href="#structs">Structs</a></h2>
+<table><tr class='module-item'><td><a class="struct" href="struct.CONFIG.html" title='asciii::CONFIG struct'>CONFIG</a></td><td class='docblock-short'><p>Static <code>ConfigReader</code> to be able to access the configuration from everywhere.</p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.DOCHINT.html" title='asciii::DOCHINT struct'>DOCHINT</a></td><td class='docblock-short'><p>Hint for app to point at <code>asciii::DOCUMENTATION_URL</code></p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.VERSION.html" title='asciii::VERSION struct'>VERSION</a></td><td class='docblock-short'></td></tr><tr class='module-item'><td><a class="struct" href="struct.VERSION_JSON.html" title='asciii::VERSION_JSON struct'>VERSION_JSON</a></td><td class='docblock-short'><p>Human readable, no semantic versioning.</p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.VERSION_VERBOSE.html" title='asciii::VERSION_VERBOSE struct'>VERSION_VERBOSE</a></td><td class='docblock-short'><p>Human readable, no semantic versioning.</p>
+</td></tr></table><h2 id='enums' class='section-header'><a href="#enums">Enums</a></h2>
+<table><tr class='module-item'><td><a class="enum" href="enum.Yaml.html" title='asciii::Yaml enum'>Yaml</a></td><td class='docblock-short'><p>A YAML node is stored as this <code>Yaml</code> enumeration, which provides an easy way to
 access your YAML document.</p>
-                           </td>
-                       </tr></table><h2 id='statics' class='section-header'><a href="#statics">Statics</a></h2>
-<table>
-                       <tr class=' module-item'>
-                           <td><a class='static' href='static.DOCUMENTATION_URL.html'
-                                  title='asciii::DOCUMENTATION_URL'>DOCUMENTATION_URL</a></td>
-                           <td class='docblock-short'>
-                                
-                           </td>
-                       </tr></table></section>
-    <section id='search' class="content hidden"></section>
-
-    <section class="footer"></section>
-
-    <aside id="help" class="hidden">
-        <div>
-            <h1 class="hidden">Help</h1>
-
-            <div class="shortcuts">
-                <h2>Keyboard Shortcuts</h2>
-
-                <dl>
-                    <dt>?</dt>
-                    <dd>Show this help dialog</dd>
-                    <dt>S</dt>
-                    <dd>Focus the search field</dd>
-                    <dt>&larrb;</dt>
-                    <dd>Move up in search results</dd>
-                    <dt>&rarrb;</dt>
-                    <dd>Move down in search results</dd>
-                    <dt>&#9166;</dt>
-                    <dd>Go to active search result</dd>
-                    <dt>+</dt>
-                    <dd>Collapse/expand all sections</dd>
-                </dl>
-            </div>
-
-            <div class="infos">
-                <h2>Search Tricks</h2>
-
-                <p>
-                    Prefix searches with a type followed by a colon (e.g.
-                    <code>fn:</code>) to restrict the search to a given type.
-                </p>
-
-                <p>
-                    Accepted types are: <code>fn</code>, <code>mod</code>,
-                    <code>struct</code>, <code>enum</code>,
-                    <code>trait</code>, <code>type</code>, <code>macro</code>,
-                    and <code>const</code>.
-                </p>
-
-                <p>
-                    Search functions by type signature (e.g.
-                    <code>vec -> usize</code> or <code>* -> vec</code>)
-                </p>
-            </div>
-        </div>
-    </aside>
-
-    
-
-    <script>
-        window.rootPath = "../";
-        window.currentCrate = "asciii";
-    </script>
-    <script src="../jquery.js"></script>
-    <script src="../main.js"></script>
-    <script defer src="../search-index.js"></script>
-</body>
-</html>
+</td></tr></table><h2 id='statics' class='section-header'><a href="#statics">Statics</a></h2>
+<table><tr class='module-item'><td><a class="static" href="static.DOCUMENTATION_URL.html" title='asciii::DOCUMENTATION_URL static'>DOCUMENTATION_URL</a></td><td class='docblock-short'></td></tr></table></section><section id="search" class="content hidden"></section><section class="footer"></section><aside id="help" class="hidden"><div><h1 class="hidden">Help</h1><div class="shortcuts"><h2>Keyboard Shortcuts</h2><dl><dt><kbd>?</kbd></dt><dd>Show this help dialog</dd><dt><kbd>S</kbd></dt><dd>Focus the search field</dd><dt><kbd>↑</kbd></dt><dd>Move up in search results</dd><dt><kbd>↓</kbd></dt><dd>Move down in search results</dd><dt><kbd>↹</kbd></dt><dd>Switch tab</dd><dt><kbd>&#9166;</kbd></dt><dd>Go to active search result</dd><dt><kbd>+</kbd></dt><dd>Expand all sections</dd><dt><kbd>-</kbd></dt><dd>Collapse all sections</dd></dl></div><div class="infos"><h2>Search Tricks</h2><p>Prefix searches with a type followed by a colon (e.g., <code>fn:</code>) to restrict the search to a given type.</p><p>Accepted types are: <code>fn</code>, <code>mod</code>, <code>struct</code>, <code>enum</code>, <code>trait</code>, <code>type</code>, <code>macro</code>, and <code>const</code>.</p><p>Search functions by type signature (e.g., <code>vec -> usize</code> or <code>* -> vec</code>)</p><p>Search multiple things at once by splitting your query with comma (e.g., <code>str,u8</code> or <code>String,struct:Vec,test</code>)</p></div></div></aside><script>window.rootPath = "../";window.currentCrate = "asciii";</script><script src="../aliases.js"></script><script src="../main.js"></script><script defer src="../search-index.js"></script></body></html>

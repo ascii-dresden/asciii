@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["Bills",""],["Checks",""],["Client",""],["Complete",""],["Employee","TODO move this type to spec"],["Errors",""],["Event",""],["ExportProduct",""],["Extras",""],["Invoice",""],["Offer",""],["Service",""],["Sum",""]],"trait":[["ExportTarget",""]]});

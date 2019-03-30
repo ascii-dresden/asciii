@@ -1,5 +1,5 @@
 (function() {var implementors = {};
-implementors["byteorder"] = [];implementors["asciii"] = [];implementors["asciii"] = [];implementors["asciii"] = [];
+implementors["byteorder"] = [];
 
             if (window.register_implementors) {
                 window.register_implementors(implementors);

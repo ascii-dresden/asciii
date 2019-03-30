@@ -1,5 +1,5 @@
 (function() {var implementors = {};
-implementors["prettytable"] = [];implementors["asciii"] = [];implementors["asciii"] = [];implementors["asciii"] = [];
+implementors["prettytable"] = [];
 
             if (window.register_implementors) {
                 window.register_implementors(implementors);
