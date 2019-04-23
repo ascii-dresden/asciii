@@ -39,7 +39,7 @@ pub fn parse(file_content: &str) -> Result<Yaml, failure::Error> {
     Ok(
         YamlLoader::load_from_str(&file_content)?
         .get(0)
-        .map(|i|i.to_owned())
+        .map(ToOwned::to_owned)
         .unwrap_or_else(||Yaml::from_str("[]"))
       )
 }
@@ -76,7 +76,7 @@ pub fn parse_dmy_date_range(date_str:&str) -> Option<Date<Utc>>{
 /// Gets `Some(Yaml::Hash)` or `None`.
 //pub fn get_hash<'a>(yaml:&'a Yaml, key:&str) -> Option<&'a BTreeMap<Yaml,Yaml>> {
 pub fn get_hash<'a>(yaml:&'a Yaml, key:&str) -> Option<&'a YamlHash> {
-    get(yaml,key).and_then(|y|y.as_hash())
+    get(yaml,key).and_then(Yaml::as_hash)
 }
 
 /// Gets a `Bool` value.
@@ -111,7 +111,7 @@ pub fn get_f64(yaml:&Yaml, key:&str) -> Option<f64> {
 ///
 /// Same mentality as `yaml_rust`, only returns `Some`, if it's a `Yaml::Int`.
 pub fn get_int(yaml:&Yaml, key:&str) -> Option<i64> {
-    get(yaml,key).and_then(|y|y.as_i64())
+    get(yaml,key).and_then(Yaml::as_i64)
 }
 
 //TODO this would be nice
@@ -123,7 +123,7 @@ pub fn get_int(yaml:&Yaml, key:&str) -> Option<i64> {
 ///
 /// Same mentality as `yaml_rust`, only returns `Some`, if it's a `Yaml::String`.
 pub fn get_str<'a>(yaml:&'a Yaml, key:&str) -> Option<&'a str> {
-    get(yaml,key).and_then(|y|y.as_str())
+    get(yaml,key).and_then(Yaml::as_str)
 }
 
 /// same as `get_str()`, but owned.
@@ -146,7 +146,7 @@ pub fn get_to_string(yaml:&Yaml, key:&str) -> Option<String> {
 
 /// Gets a Date in `dd.mm.YYYY` format.
 pub fn get_dmy(yaml:&Yaml, key:&str) -> Option<Date<Utc>> {
-    get(yaml,key).and_then(|y|y.as_str()).and_then(|d|parse_dmy_date(d))
+    get(yaml,key).and_then(Yaml::as_str).and_then(|d|parse_dmy_date(d))
 }
 
 /// Wrapper around `get_path()`.

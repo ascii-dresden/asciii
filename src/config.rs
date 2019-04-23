@@ -71,7 +71,7 @@ impl ConfigReader {
 
     fn envify_path(path: &str) -> String {
         path.split(|c| c == '/' || c == '.')
-            .map(|word| word.to_uppercase())
+            .map(str::to_uppercase)
             .fold(String::from("ASCIII"), |mut acc, w| {
             acc.push_str("_");
             acc.push_str(&w);
@@ -133,7 +133,7 @@ impl ConfigReader {
             .as_vec()
             .map(|v| {
                      v.iter()
-                      .filter_map(|s| s.as_str())
+                      .filter_map(Yaml::as_str)
                       .collect()
                  })
     }
@@ -167,7 +167,7 @@ impl ConfigReader {
     /// You should have a default config for everything that you use.
     pub fn get_bool(&self, key: &str) -> bool {
         self.get(key)
-            .and_then(|y| y.as_bool())
+            .and_then(Yaml::as_bool)
             .unwrap_or_else(|| panic!("{}", format!("Config file {} in field {} does not contain a boolean value",
                              DEFAULT_LOCATION,
                              key)))

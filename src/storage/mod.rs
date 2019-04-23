@@ -144,7 +144,7 @@ pub fn list_path_content(path:&Path) -> Result<Vec<PathBuf>, Error> {
     }
 
     Ok(fs::read_dir(path)?
-        .filter_map(|entry| entry.ok())
+        .filter_map(Result::ok)
         .map(|entry| entry.path())
         .collect::<Vec<PathBuf>>())
 }
@@ -610,7 +610,7 @@ impl<L:Storable> Storage<L> {
 
         // must be in a dir that parses into a year
         let parent_is_num =  archived_dir.parent()
-            .and_then(|p| p.file_stem())
+            .and_then(Path::file_stem)
             .and_then(OsStr::to_str)
             .map_or(false, |s| s.parse::<i32>().is_ok());
 
@@ -695,7 +695,7 @@ impl<L:Storable> Storage<L> {
     fn get_project_dir_from_archive(&self, name:&str, year:Year) -> Result<PathBuf, Error> {
         for project_file in &self.list_project_files(StorageDir::Archive(year))?{
             if project_file.ends_with(slugify(name) + "."+ &L::file_extension()) {
-                return project_file.parent().map(|p|p.to_owned()).ok_or_else (|| StorageError::ProjectDoesNotExist.into());
+                return project_file.parent().map(ToOwned::to_owned).ok_or_else (|| StorageError::ProjectDoesNotExist.into());
             }
         }
         bail!(StorageError::ProjectDoesNotExist)

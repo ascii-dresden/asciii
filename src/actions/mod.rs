@@ -100,7 +100,7 @@ fn unpayed_employees(projects: &[Project]) -> HashMap<String, Currency> {
     let employees = projects.iter()
                             .filter(|p| !p.canceled() && p.age().unwrap_or(0) > 0)
                             .filter_map(|p| p.hours().employees())
-                            .flat_map(|e| e.into_iter());
+                            .flat_map(IntoIterator::into_iter);
 
     for employee in employees {
         let bucket = buckets.entry(employee.name.clone()).or_insert_with(Currency::new);
@@ -151,8 +151,8 @@ pub fn spec() -> Result<(), Error> {
         project.age().map(|a|format!("{} days", a)).unwrap();
         project.modified_date().map(|d|d.year().to_string()).unwrap();
         project.sum_sold().map(|c|util::currency_to_string(&c)).unwrap();
-        project.responsible().map(|s|s.to_owned()).unwrap();
-        project.name().map(|s|s.to_owned()).unwrap();
+        project.responsible().map(ToOwned::to_owned).unwrap();
+        project.name().map(ToOwned::to_owned).unwrap();
     }
 
     Ok(())

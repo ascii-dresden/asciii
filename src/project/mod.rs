@@ -611,7 +611,7 @@ impl Storable for Project {
 
     fn short_desc(&self) -> String {
         self.name()
-            .map(|n|n.to_owned())
+            .map(ToOwned::to_owned)
             .unwrap_or_else(|| format!("unnamed: {:?}",
                                        self.dir()
                                            .file_name()
@@ -652,7 +652,7 @@ impl Storable for Project {
         let project_file_extension = crate::CONFIG.get_to_string("extensions.project_file");
         let file_path = list_path_content(folder_path)?.iter()
             .filter(|f|f.extension().unwrap_or(&OsStr::new("")) == project_file_extension.as_str())
-            .nth(0).map(|b|b.to_owned())
+            .nth(0).map(ToOwned::to_owned)
             .ok_or_else(|| StorageError::NoProjectFile(folder_path.to_owned()))?;
         Self::open_file(&file_path)
     }

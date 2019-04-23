@@ -11,7 +11,7 @@ pub trait ExportTarget<T> {
 }
 
 fn opt_str(opt: Option<&str>) -> Option<String> {
-    opt.map(|e| e.to_owned())
+    opt.map(ToOwned::to_owned)
 }
 
 #[derive(Debug, PartialEq)]

@@ -7,6 +7,7 @@ use std::path::{Path, PathBuf};
 
 use serde::ser::Serialize;
 use failure::{bail, Error};
+use yaml_rust::Yaml;
 
 use open;
 use handlebars::{Handlebars, no_escape, Helper, RenderContext, HelperDef, Context, Output, HelperResult};
@@ -58,7 +59,7 @@ struct CountHelper;
 impl HelperDef for CountHelper {
     #[allow(clippy::extra_unused_lifetimes)]
     fn call<'reg: 'rc, 'rc>(&self, h: &Helper<'_, '_>, _: &Handlebars, _: &Context, _: &mut RenderContext<'_>, out: &mut dyn Output) -> HelperResult {
-        let count = h.param(0).unwrap().value().as_array().map_or(0, |a|a.len());
+        let count = h.param(0).unwrap().value().as_array().map_or(0, Vec::len);
         out.write(&format!("{}", count))?;
         Ok(())
     }
@@ -137,7 +138,7 @@ fn project_to_doc(project: &Project, config: &ExportConfig<'_>) -> Result<Option
                                 .expect("Faulty default config")
                                 .as_vec().expect("Faulty default config")
                                 .iter()
-                                .map(|v|v.as_str()).collect::<Vec<_>>();
+                                .map(Yaml::as_str).collect::<Vec<_>>();
 
     let  template_path = output_template_path(template_name)?;
     debug!("converting with {:?}", convert_tool);

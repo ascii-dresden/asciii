@@ -29,7 +29,7 @@ pub trait Storable: Send+Sync {
     fn from_template(project_name: &str, template: &Path, data: &HashMap<&str, String>) -> Result<StorableAndTempDir<Self>, Error> where Self: Sized;
 
     /// For file names
-    fn ident(&self) -> String{ self.dir().file_stem().and_then(|s|s.to_str()).unwrap().to_owned() }
+    fn ident(&self) -> String{ self.dir().file_stem().and_then(std::ffi::OsStr::to_str).unwrap().to_owned() }
 
     fn short_desc(&self) -> String;
     fn modified_date(&self) -> Option<Date<Utc>>;

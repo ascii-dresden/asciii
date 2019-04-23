@@ -27,7 +27,7 @@ pub fn list(matches: &ArgMatches<'_>) -> Result<(), Error> {
                                     matches.is_present("csv"));
 
         let extra_details = matches.values_of("details")
-                                   .map(|v| v.collect::<Vec<&str>>());
+                                   .map(Iterator::collect);
         let config_details = CONFIG.get_strs("list/extra_details");
 
         let mut list_config = ListConfig {
@@ -36,7 +36,7 @@ pub fn list(matches: &ArgMatches<'_>) -> Result<(), Error> {
             mode: list_mode,
             details: extra_details.or(config_details),
             filter_by: matches.values_of("filter")
-                              .map(|v| v.collect::<Vec<&str>>()),
+                              .map(Iterator::collect),
             show_errors: matches.is_present("errors"),
 
             ..Default::default()

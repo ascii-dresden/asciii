@@ -71,7 +71,7 @@ impl ComputedField {
         let storage = storage::get_storage_path();
 
         match *self {
-            ComputedField::Responsible => project.responsible().map(|s| s.to_owned()),
+            ComputedField::Responsible => project.responsible().map(ToOwned::to_owned),
             ComputedField::OfferNumber => project.offer().number(),
             ComputedField::InvoiceNumber => project.invoice().number_str(),
             ComputedField::InvoiceNumberLong => project.invoice().number_long_str(),

@@ -82,20 +82,20 @@ pub trait ProvidesData {
     ///
     /// Same mentality as `yaml_rust`, only returns `Some`, if it's a `Yaml::String`.
     fn get_str<'a>(&'a self, path: &str) -> Option<&'a str> {
-        self.get(path).and_then(|y| y.as_str())
+        self.get(path).and_then(Yaml::as_str)
     }
 
     /// Gets an `Int` value.
     ///
     /// Same mentality as `yaml_rust`, only returns `Some`, if it's a `Yaml::Int`.
     fn get_int<'a>(&'a self, path: &str) -> Option<i64> {
-        self.get(path).and_then(|y| y.as_i64())
+        self.get(path).and_then(Yaml::as_i64)
     }
 
     /// Gets a Date in `dd.mm.YYYY` format.
     fn get_dmy(&self, path: &str) -> Option<Date<Utc>> {
         self.get(path)
-            .and_then(|y| y.as_str())
+            .and_then(Yaml::as_str)
             .and_then(|d| self.parse_dmy_date(d))
     }
 
@@ -150,7 +150,7 @@ pub trait ProvidesData {
     /// Gets `Some(Yaml::Hash)` or `None`.
     //pub fn get_hash<'a>(yaml:&'a Yaml, key:&str) -> Option<&'a BTreeMap<Yaml,Yaml>> {
     fn get_hash<'a>(&'a self, path: &str) -> Option<&'a YamlHash> {
-        self.get(path).and_then(|y| y.as_hash())
+        self.get(path).and_then(Yaml::as_hash)
     }
 
     /// Gets a `Float` value.
@@ -274,16 +274,16 @@ impl HasEvents for Project {
     #[allow(unused_qualifications)]
     fn events(&self) -> Option<Vec<spec::Event>> {
         let dates = ProvidesData::get(self, "event.dates/")
-            .and_then(|a| a.as_vec())?;
+            .and_then(Yaml::as_vec)?;
         dates.iter()
              .map(|h| {
 
             let begin = self.get_direct(h, "begin")
-                            .and_then(|y| y.as_str())
+                            .and_then(Yaml::as_str)
                             .and_then(|d| self.parse_dmy_date(d))?;
 
             let end = self.get_direct(h, "end")
-                          .and_then(|y| y.as_str())
+                          .and_then(Yaml::as_str)
                           .and_then(|d| self.parse_dmy_date(d));
 
             Some(spec::Event {
@@ -296,17 +296,17 @@ impl HasEvents for Project {
     }
 
     fn times(&self, yaml: &Yaml) -> Option<Vec<EventTime>> {
-        let times = self.get_direct(yaml, "times").and_then(|l| l.as_vec())?;
+        let times = self.get_direct(yaml, "times").and_then(Yaml::as_vec)?;
         times.iter()
              .map(|h| {
 
             let start = self.get_direct(h, "begin")
-                            .and_then(|y| y.as_str())
+                            .and_then(Yaml::as_str)
                             .or(Some("00.00"))
                             .and_then(util::naive_time_from_str);
 
             let end = self.get_direct(h, "end")
-                          .and_then(|y| y.as_str())
+                          .and_then(Yaml::as_str)
                           .and_then(util::naive_time_from_str)
                           .or(start); // TODO assume a duration of one hour instead
 
@@ -549,7 +549,7 @@ impl<'a> Offerable for Offer<'a> {
             .map(|s| format!("{}-{}", s, num))
 
         // old spec
-        .or_else(|| self.get_str("manumber").map(|s|s.to_string()))
+        .or_else(|| self.get_str("manumber").map(ToString::to_string))
     }
 }
 

@@ -10,6 +10,7 @@ use clap::ArgMatches;
 use failure::{bail, format_err, Error};
 use chrono::prelude::*;
 use log::{debug, trace, error, warn};
+use yaml_rust::Yaml;
 
 use asciii::{self, CONFIG, config, util, actions};
 use asciii::project::Exportable;
@@ -43,7 +44,7 @@ pub use self::show::*;
 // #[deprecated(note="move to asciii::actions")]
 pub fn new(matches: &ArgMatches<'_>) -> Result<(), Error> {
     let project_name = matches.value_of("name").expect("You did not pass a \"Name\"!");
-    let editor = CONFIG.get("user/editor").and_then(|e| e.as_str());
+    let editor = CONFIG.get("user/editor").and_then(Yaml::as_str);
 
     let template_name = matches.value_of("template")
         .or_else(||CONFIG.get("template").unwrap().as_str())
@@ -118,7 +119,7 @@ fn matches_to_dir(matches: &ArgMatches<'_>) -> StorageDir {
 fn matches_to_search<'a>(matches: &'a ArgMatches<'_>) -> (Vec<&'a str>, StorageDir) {
     let search_terms = matches
         .values_of("search_term")
-        .map(|v| v.collect::<Vec<&str>>())
+        .map(Iterator::collect)
         .unwrap_or_else(Vec::new);
 
     debug!("matches_to_search: --archive={:?}", matches.value_of("archive"));
@@ -133,7 +134,7 @@ fn matches_to_search<'a>(matches: &'a ArgMatches<'_>) -> (Vec<&'a str>, StorageD
 /// This is more general than `with_projects`, as this includes templates too.
 pub fn matches_to_paths(matches: &ArgMatches<'_>, storage: &Storage<Project>) -> Result<Vec<PathBuf>, Error> {
     let search_terms = matches.values_of("search_term")
-                              .map(|v| v.collect::<Vec<&str>>())
+                              .map(Iterator::collect)
                               .unwrap_or_else(Vec::new);
 
     if matches.is_present("template") {
@@ -155,7 +156,7 @@ pub fn matches_to_paths(matches: &ArgMatches<'_>, storage: &Storage<Project>) ->
 
         Ok(storage.search_projects_any(dir, &search_terms)?
             .iter()
-            .map(|project| project.dir())
+            .map(Storable::dir)
             .collect::<Vec<_>>())
     }
 }
@@ -168,7 +169,7 @@ pub fn bootstrap(matches: &ArgMatches<'_>) -> Result<(), Error> {
     let repo = matches.value_of("repo").unwrap();
     let editor = matches.value_of("editor")
                         .or_else(|| CONFIG.get("user.editor")
-                                   .and_then(|e|e.as_str()));
+                                   .and_then(Yaml::as_str));
 
     let default_to = get_storage_path()
         .to_str()
@@ -205,7 +206,7 @@ pub fn edit(matches: &ArgMatches<'_>) -> Result<(), Error> {
 
     let editor = matches.value_of("editor")
         .or_else(|| CONFIG.get("user/editor")
-                  .and_then(|e| e.as_str()));
+                  .and_then(Yaml::as_str));
 
     if matches.is_present("template") {
         with_templates(search_term,
@@ -237,7 +238,7 @@ fn edit_projects(dir: StorageDir, search_terms: &[&str], editor: Option<&str>) -
     if all_projects.is_empty() {
         bail!(ActionError::NothingFound(search_terms.iter().map(ToString::to_string).collect()));
     } else {
-        let all_paths = all_projects.iter().map(|p| p.file()).collect::<Vec<PathBuf>>();
+        let all_paths = all_projects.iter().map(Storable::file).collect::<Vec<PathBuf>>();
         util::pass_to_command(editor, &all_paths);
         Ok(())
     }
@@ -284,7 +285,7 @@ pub fn workspace(matches: &ArgMatches<'_>) -> Result<(), Error> {
 
     let editor = matches.value_of("editor")
         .or_else(|| CONFIG.get("user/editor")
-                  .and_then(|e| e.as_str()));
+                  .and_then(Yaml::as_str));
     util::pass_to_command(editor, &[storage.working_dir()]);
     Ok(())
 }
@@ -306,7 +307,7 @@ pub fn set(m: &ArgMatches<'_>) -> Result<(), Error> {
     let field = m.value_of("field name")
                             .unwrap()
                             .chars()
-                            .flat_map(|c| c.to_uppercase())
+                            .flat_map(char::to_uppercase)
                             .collect::<String>();
     let value = m.value_of("field value").unwrap();
     let (search_terms, dir) = matches_to_search(m);
@@ -363,7 +364,7 @@ fn infer_bill_type(m: &ArgMatches<'_>) -> Option<BillType> {
 fn matches_to_export_config<'a>(m: &'a ArgMatches<'_>) -> Option<ExportConfig<'a>> {
 
     let template_name = m.value_of("template")
-                         .or_else(||CONFIG.get("document_export/default_template").and_then(|e| e.as_str()))
+                         .or_else(||CONFIG.get("document_export/default_template").and_then(Yaml::as_str))
                          .unwrap();
     let bill_type = infer_bill_type(m);
 
@@ -466,7 +467,7 @@ pub fn unarchive(matches: &ArgMatches<'_>) -> Result<(), Error> {
 pub fn config(matches: &ArgMatches<'_>) -> Result<(), Error> {
     let editor = matches.value_of("editor")
                         .or_else(|| CONFIG.get("user.editor")
-                                  .and_then(|e|e.as_str()));
+                                  .and_then(Yaml::as_str));
 
     if let Some(path) = matches.value_of("show") {
         config_show(path)?;
