@@ -54,17 +54,10 @@ linked-hash-map = {version = "0.5", features = ["serde_impl"]}
 dirs = "1.0"
 failure = "0.1"
 
-rocket = {version = "0.4", optional = true }
-rocket_codegen = {version = "0.4", optional = true }
-rocket_contrib = {version = "0.4", optional = true }
-include_dir = {version = "0.2", optional = true }
-
-# for statically linked OpenSSL
-openssl-sys = { version = "0.9", optional = true }
-openssl-probe = { version = "0.1.2", optional = true }
-
-# asciii-server CORS-support
-rocket_cors = { version = "0.4", optional = true }
+actix = { version = "0.8.0-betsa", optional = true }
+actix-web = { version = "1.0.0-beta", optional = true }
+actix-files = { version = "0.1.0-beta", optional = true }
+actix-web-actors = { version = "1.0.0-alpha", optional = true }
 
 bill = {version= "0.4", features=["serialization"]}
 icalendar = "0.6"
@@ -94,11 +87,11 @@ git2 = {version = "0.8", default-features = false, optional = true}
 pretty_assertions = "0.5"
 
 [features]
-default = ["cli", "document_export", "git_statuses", "serialization", "deserialization"]
+default = ["cli", "document_export", "git_statuses", "serialization", "deserialization", "server"]
 travis_compatible = ["cli", "document_export", "git_statuses", "serialization", "deserialization", "shell", "meta", "version_string"]
 full_tool = ["travis_compatible", "localize"]
-server = ["rocket", "rocket_codegen", "rocket_contrib", "rocket_cors", "openssl-sys", "openssl-probe", "serialization", "version_string", "meta"]
-webapp = ["server", "include_dir" ] # build the frontend app
+server= ["actix", "actix-files", "actix-web", "actix-web-actors"]
+webapp = ["server"]
 
 document_export = ["handlebars", "serialization"]
 serde_base = ["serde", "serde_derive"]
@@ -126,7 +119,7 @@ required-features = ["cli"]
 [[bin]]
 test = false
 doc = false
-name = "asciii-server"
+name = "asciii-web"
 required-features = ["server"]
 
 [build-dependencies]

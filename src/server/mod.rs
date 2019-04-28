@@ -1,10 +1,11 @@
 #![cfg(feature = "server")]
+use log::debug;
 
 use linked_hash_map::LinkedHashMap;
 use itertools::Itertools;
 
-use ::project::Project;
-use ::storage::{self, ProjectList, Storage, StorageDir, Storable};
+use crate::project::Project;
+use crate::storage::{self, ProjectList, Storage, StorageDir, Storable};
 
 pub struct ProjectLoader {
     pub storage: Storage<Project>,
