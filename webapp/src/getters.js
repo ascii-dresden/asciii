@@ -10,12 +10,12 @@ const normalizeProjects = raw_projects =>
         .sort(sortProjects);
 
 export const getProjectsByYear = year =>
-    fetch(`http://localhost:8000/api/full_projects/year/${year}/`)
+    fetch(`http://localhost:8000/api/full_projects/year/${year}`)
         .then(getJson)
         .then(normalizeProjects);
 
 export const getProjectsWorkingDir = () =>
-    fetch(`http://localhost:8000/api/projects/workingdir/`)
+    fetch(`http://localhost:8000/api/full_projects/workingdir`)
         .then(getJson)
         .then(normalizeProjects);
 

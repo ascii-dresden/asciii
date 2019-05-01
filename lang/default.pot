@@ -584,7 +584,7 @@ msgstr ""
 msgid "Project file is younger than pdf, continue anyway?"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/lib.rs:70
+#: /home/hendrik/code/ascii/asciii/src/lib.rs:68
 msgid "Documentation at: {}"
 msgstr ""
 

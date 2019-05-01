@@ -32,8 +32,6 @@ use lazy_static::lazy_static;
 #[cfg(feature="serialization")] extern crate serde_json;
 #[cfg(feature="deserialization")] extern crate serde_yaml;
 
-#[cfg(feature="server")] extern crate rocket;
-
 #[macro_use] extern crate custom_derive;
 #[macro_use] extern crate enum_derive;
 
