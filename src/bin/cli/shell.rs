@@ -62,7 +62,7 @@ pub fn launch_shell() -> Result<(), Error> {
 
     let username = CONFIG.get_str_or("user.name")
                          .and_then(|full_name| full_name.split_whitespace().nth(0))
-                         .map(|name| name.to_lowercase());
+                         .map(str::to_lowercase);
     let shell_key = "asciii > ";
     let ps1 = if let Some(username) = username {
         format!("{}@{}", username, shell_key)
@@ -80,16 +80,16 @@ pub fn launch_shell() -> Result<(), Error> {
                     break
                 }
 
-                if line.trim().len() == 0 {
+                if line.trim().is_empty() {
                     continue
                 }
 
                 // this operators are not allowed
-                if line.contains(">") || line.contains(">") || line.contains("|") {
+                if line.contains('>') || line.contains('>') || line.contains('|') {
                     error!("What do you think this is? A shell?");
                 }
 
-                let mut argv: Vec<_> = line.trim().split(" ").collect();
+                let mut argv: Vec<_> = line.trim().split(' ').collect();
 
                 // you have to insert the binary name since clap expects it
                 argv.insert(0, "prog");

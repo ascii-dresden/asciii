@@ -258,7 +258,7 @@ pub fn meta(matches: &ArgMatches<'_>) -> Result<(), Error> {
     if let Some(matches) = matches.subcommand_matches("edit") {
         let editor = matches.value_of("editor")
                             .or_else(|| CONFIG.get("user.editor")
-                                      .and_then(|e|e.as_str()));
+                                      .and_then(Yaml::as_str));
         trace!("--> editing");
         if let Ok(path) = storage.get_extra_file("meta.toml") {
             util::pass_to_command(editor, &[path]);

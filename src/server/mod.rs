@@ -1,4 +1,5 @@
 #![cfg(feature = "server")]
+#![allow(clippy::new_without_default)]
 use log::debug;
 
 use linked_hash_map::LinkedHashMap;
@@ -26,7 +27,7 @@ fn reinitialize(storage: &Storage<Project>) -> State {
 
     let working = storage.open_projects(StorageDir::Working).unwrap()
         .into_iter()
-        .map(|p| (format!("{}", Storable::ident(&p)), p))
+        .map(|p| (Storable::ident(&p).to_string(), p))
         .collect();
 
     let mapped = all.iter()
@@ -38,7 +39,7 @@ fn reinitialize(storage: &Storage<Project>) -> State {
         .collect();
 
     let years = all.iter()
-                   .filter_map(|p: &Project| p.year())
+                   .filter_map(Project::year)
                    .unique()
                    .collect::<Vec<_>>();
 
