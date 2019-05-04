@@ -26,6 +26,7 @@ include = [
     "src/default_config.yml",
     "src/**/*.rs",
     "tests/**/*.rs",
+    "webapp/public/*",
 ]
 exclude = [
     "*.pdf",
