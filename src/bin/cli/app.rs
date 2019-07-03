@@ -904,6 +904,10 @@ pub fn with_cli<F> (app_handler:F) where F: Fn(App<'_, '_>) {
                 .about(lformat!("Opens the online documentation, please read it").as_ref())
             )
 
+            .subcommand(SubCommand::with_name("web")
+                .about(lformat!("Opens the WebInterface 🤯").as_ref())
+            )
+
         );
 }
 
@@ -933,6 +937,7 @@ pub fn match_matches(matches: &ArgMatches<'_>) {
      ("spec",      Some(sub_m)) => subcommands::spec(sub_m),
 
      ("doc",       _          ) => subcommands::doc(),
+     ("web",       _          ) => subcommands::web(),
      ("version",   Some(sub_m)) => subcommands::version(sub_m),
 
      ("dues",      Some(sub_m)) => subcommands::dues(sub_m),

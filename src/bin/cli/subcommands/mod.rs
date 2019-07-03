@@ -7,7 +7,7 @@ use std::collections::HashMap;
 
 use open;
 use clap::ArgMatches;
-use failure::{bail, format_err, Error};
+use failure::{bail, format_err, Error, ResultExt};
 use chrono::prelude::*;
 use log::{debug, trace, error, warn};
 use yaml_rust::Yaml;
@@ -567,8 +567,20 @@ fn config_show_default() -> Result<(), Error> {
 
 /// Command DOC
 pub fn doc() -> Result<(), Error> {
-    open::that(asciii::DOCUMENTATION_URL).unwrap(); //TODO
+    open::that(asciii::DOCUMENTATION_URL)?;
     //.and_then(|es| if !es.success() {Err("open-error".into())} else {Ok(())} )  ?
+    Ok(())
+}
+
+/// Command WEB
+pub fn web() -> Result<(), Error> {
+    std::process::Command::new("asciii-web").status().context("asciii-web wasn't found, it's likely not installed correctly")?;
+    // .map_err(|e| match e.kind() {
+    //     std::io::ErrorKind::NotFound => {
+    //         format_err!("asciii-web wasn't found, it's likely not installed correctly").context(e)
+    //     },
+    //     _ => e.into()
+    // })?;
     Ok(())
 }
 
