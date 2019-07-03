@@ -114,7 +114,7 @@ fn output_template_path(template_name:&str) -> Result<PathBuf, Error> {
 
 /// Creates the latex files within each projects directory, either for Invoice or Offer.
 #[cfg(feature="document_export")]
-#[allow(clippy::cyclomatic_complexity)] // sorry
+#[allow(clippy::cognitive_complexity)] // sorry
 fn project_to_doc(project: &Project, config: &ExportConfig<'_>) -> Result<Option<PathBuf>, Error> {
     trace!("exporting a document: {:#?}", config);
 

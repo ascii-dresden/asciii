@@ -556,23 +556,23 @@ msgstr ""
 msgid "no remote name"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/subcommands/mod.rs:396
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/subcommands/mod.rs:395
 msgid "You have to provide either a search term or path"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/subcommands/mod.rs:512
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/subcommands/mod.rs:511
 msgid "do you want to set your name?"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/subcommands/mod.rs:514
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/subcommands/mod.rs:513
 msgid "Is your name {:?}"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/subcommands/mod.rs:520
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/subcommands/mod.rs:519
 msgid "What is your name?"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/subcommands/mod.rs:639 /home/hendrik/code/ascii/asciii/src/bin/cli/subcommands/mod.rs:649
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/subcommands/mod.rs:638 /home/hendrik/code/ascii/asciii/src/bin/cli/subcommands/mod.rs:648
 msgid "{} does not exist"
 msgstr ""
 
@@ -584,7 +584,7 @@ msgstr ""
 msgid "Project file is younger than pdf, continue anyway?"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/lib.rs:68
+#: /home/hendrik/code/ascii/asciii/src/lib.rs:69
 msgid "Documentation at: {}"
 msgstr ""
 

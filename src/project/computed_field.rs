@@ -5,8 +5,8 @@ use crate::util;
 use super::Project;
 use super::spec::*;
 
-/// Fields that are accessible but are not directly found in the file format.
-/// This is used to get fields that are computed through an ordinary `field("responsible")`
+// Fields that are accessible but are not directly found in the file format.
+// This is used to get fields that are computed through an ordinary `field("responsible")`
 custom_derive! {
 #[allow(missing_docs)]
     #[derive(Debug,

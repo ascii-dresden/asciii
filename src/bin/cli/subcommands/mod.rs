@@ -187,7 +187,6 @@ pub fn bootstrap(matches: &ArgMatches<'_>) -> Result<(), Error> {
 
 /// Command CSV
 pub fn csv(matches: &ArgMatches<'_>) -> Result<(), Error> {
-    use chrono::{Local, Datelike};
     let year = matches.value_of("year")
                       .and_then(|y| y.parse::<i32>().ok())
                       .unwrap_or_else(|| Local::now().year());

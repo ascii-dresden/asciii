@@ -13,9 +13,10 @@
         )]
 
 #![recursion_limit = "1024"]
-#![deny( trivial_casts, trivial_numeric_casts,)]
+#![deny(trivial_casts, trivial_numeric_casts)]
 
-#![warn( unused_import_braces, unused_qualifications)]
+#![warn(unused_import_braces, unused_qualifications)]
+#![allow(clippy::identity_conversion)]
 
 #![cfg_attr(feature = "lints", allow(unstable_features))]
 #![cfg_attr(feature = "lints", feature(plugin))]

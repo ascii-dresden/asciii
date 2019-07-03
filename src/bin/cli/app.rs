@@ -5,7 +5,7 @@ use log::error;
 use super::subcommands;
 use std::str::FromStr;
 
-#[allow(clippy::cyclomatic_complexity)]
+#[allow(clippy::cognitive_complexity)]
 pub fn with_cli<F> (app_handler:F) where F: Fn(App<'_, '_>) {
     app_handler(
         App::new("asciii")
