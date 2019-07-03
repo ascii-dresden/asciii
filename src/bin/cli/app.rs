@@ -1,7 +1,7 @@
 use asciii;
 use clap::{App, AppSettings, Arg, ArgGroup, ArgMatches, SubCommand, Shell};
-use failure::Error;
-use log::error;
+use failure::{Error, format_err};
+use log::{info, error};
 use super::subcommands;
 use std::str::FromStr;
 
@@ -15,6 +15,11 @@ pub fn with_cli<F> (app_handler:F) where F: Fn(App<'_, '_>) {
             .settings(&[AppSettings::SubcommandRequiredElseHelp,AppSettings::ColoredHelp,AppSettings::DeriveDisplayOrder])
             .after_help(asciii::DOCUMENTATION_URL)
 
+            .arg(Arg::with_name("debug")
+                 .help(lformat!("Print errors with full backtrace").as_ref())
+                 .long("debug")
+                 .short("d")
+                 )
 
             .subcommand(SubCommand::with_name("bootstrap")
                         .aliases(&["boot", "clone"])
@@ -945,10 +950,15 @@ pub fn match_matches(matches: &ArgMatches<'_>) {
      ("pop",       _          ) => subcommands::git_stash_pop(),
      ("log",       Some(sub_m)) => subcommands::git_log(sub_m),
      ("complete",  Some(sub_m)) => generate_completions(sub_m),
-     _                          => Ok(())
+     _                          => Err(format_err!("unhandled command"))
     };
     if let Err(e) = res {
-        println!("{}", e)
+        if matches.is_present("debug") {
+            println!("{:?}", e)
+        } else {
+            error!("{}", e);
+            info!("use --debug to see a backtracke");
+        }
     }
 }
 
