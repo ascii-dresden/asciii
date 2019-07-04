@@ -2,8 +2,8 @@
 
 use chrono::prelude::*;
 use prettytable::Table;
-use prettytable::row::Row;
-use prettytable::cell::Cell;
+use prettytable::Row;
+use prettytable::Cell;
 use prettytable::format::{LineSeparator, LinePosition, FormatBuilder};
 use prettytable::{Attr, color};
 use term_size;
