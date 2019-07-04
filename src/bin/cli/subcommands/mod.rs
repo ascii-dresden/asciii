@@ -425,7 +425,7 @@ pub fn delete(m: &ArgMatches<'_>) -> Result<(), Error> {
 }
 
 #[cfg(not(feature="document_export"))]
-pub fn make(_: &ArgMatches) -> Result<()> {
+pub fn make(_: &ArgMatches) -> Result<(), Error> {
     error!("Make functionality not built-in with this release!");
     Ok(())
 }

@@ -1,6 +1,5 @@
 //! Error that may occur in Storage
 //!
-#[cfg(feature = "git_statuses")]
 use failure::Fail;
 
 use std::path::PathBuf;

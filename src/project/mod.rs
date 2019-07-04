@@ -91,7 +91,7 @@ impl Project {
     /// (feature deactivated) import from yaml file
     #[cfg(not(feature="deserialization"))]
     pub fn parse_yaml(&self) -> Result<(), Error> {
-        bail!(error::ErrorKind::FeatureDeactivated)
+        bail!(error::ProjectError::FeatureDeactivated)
     }
 
     pub fn dump_yaml(&self) -> String {
@@ -116,7 +116,7 @@ impl Project {
     #[cfg(not(feature="serialization"))]
     /// feature deactivateda) export to JSON
     pub fn to_json(&self) -> Result<String, Error> {
-        bail!(error::ErrorKind::FeatureDeactivated)
+        bail!(error::ProjectError::FeatureDeactivated)
     }
 
     /// Used mostly for testing purposes

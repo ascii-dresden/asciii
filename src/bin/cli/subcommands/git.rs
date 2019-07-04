@@ -48,7 +48,7 @@ pub fn git_commit() -> Result<(), Error> {
 /// Command REMOTE
 /// exact replica of `git remote -v`
 #[cfg(not(feature = "git_statuses"))]
-pub fn git_remote() -> Result<()> {
+pub fn git_remote() -> Result<(), Error> {
     let storage = storage::setup_with_git::<Project>()?;
     storage.repository().unwrap().remote();
     Ok(())
