@@ -229,7 +229,7 @@ fn project_to_doc(project: &Project, config: &ExportConfig<'_>) -> Result<Option
                 debug!("{} vs\n        {}", tex_file.display(), outfile_path.display());
                 outfile_path
             };
-            util::pass_to_command(Some(convert_tool), &[&outfile_path]);
+            util::pass_to_command(Some(convert_tool), &[&outfile_path])?;
 
             // clean up expected log and aux files etc
             for trash_ext in trash_exts.iter().filter_map(|x|*x) {

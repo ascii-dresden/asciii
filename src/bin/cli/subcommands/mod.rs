@@ -82,7 +82,7 @@ pub fn new(matches: &ArgMatches<'_>) -> Result<(), Error> {
 
     let project_file = storage.create_project(project_name, template_name, &fill_data)?.file();
     if edit {
-        util::pass_to_command(editor, &[project_file]);
+        util::pass_to_command(editor, &[project_file])?;
     }
     Ok(())
 }
@@ -179,7 +179,7 @@ pub fn bootstrap(matches: &ArgMatches<'_>) -> Result<(), Error> {
     let to = matches.value_of("to").unwrap_or(&default_to);
     trace!("cloning {:?} to {:?}", repo, to);
     actions::clone_remote(repo, to)?;
-    config_init(editor);
+    config_init(editor)?;
 
     Ok(())
 }
@@ -208,9 +208,7 @@ pub fn edit(matches: &ArgMatches<'_>) -> Result<(), Error> {
                   .and_then(Yaml::as_str));
 
     if matches.is_present("template") {
-        with_templates(search_term,
-                       |template_paths:&[PathBuf]| util::pass_to_command(editor, template_paths)
-                       )?;
+        with_templates(search_term, |template_paths:&[PathBuf]| util::pass_to_command(editor, template_paths))?;
 
     } else if let Some(archive) = matches.value_of("archive") {
         let archive = archive.parse::<i32>().unwrap();
@@ -238,7 +236,7 @@ fn edit_projects(dir: StorageDir, search_terms: &[&str], editor: Option<&str>) -
         bail!(ActionError::NothingFound(search_terms.iter().map(ToString::to_string).collect()));
     } else {
         let all_paths = all_projects.iter().map(Storable::file).collect::<Vec<PathBuf>>();
-        util::pass_to_command(editor, &all_paths);
+        util::pass_to_command(editor, &all_paths)?;
         Ok(())
     }
 }
@@ -260,7 +258,7 @@ pub fn meta(matches: &ArgMatches<'_>) -> Result<(), Error> {
                                       .and_then(Yaml::as_str));
         trace!("--> editing");
         if let Ok(path) = storage.get_extra_file("meta.toml") {
-            util::pass_to_command(editor, &[path]);
+            util::pass_to_command(editor, &[path])?;
         }
     }
 
@@ -285,19 +283,19 @@ pub fn workspace(matches: &ArgMatches<'_>) -> Result<(), Error> {
     let editor = matches.value_of("editor")
         .or_else(|| CONFIG.get("user/editor")
                   .and_then(Yaml::as_str));
-    util::pass_to_command(editor, &[storage.working_dir()]);
+    util::pass_to_command(editor, &[storage.working_dir()])?;
     Ok(())
 }
 
 /// Command EDIT --template
 pub fn with_templates<F>(name: &str, action: F) -> Result<(), Error>
-    where F: FnOnce(&[PathBuf])
+    where F: FnOnce(&[PathBuf]) -> Result<(), Error>
 {
     let template_paths = setup::<Project>()?.list_template_files()?
         .into_iter() // drain?
         .filter(|f|f.file_stem() .unwrap_or_else(||OsStr::new("")) == name)
         .collect::<Vec<PathBuf>>();
-    action(template_paths.as_slice());
+    action(template_paths.as_slice())?;
     Ok(())
 }
 
@@ -477,11 +475,11 @@ pub fn config(matches: &ArgMatches<'_>) -> Result<(), Error> {
     }
 
     else if matches.is_present("init") {
-        config_init(editor);
+        config_init(editor)?;
     }
 
     else if matches.is_present("edit") {
-        config_edit(editor);
+        config_edit(editor)?;
     }
 
     else if matches.is_present("default") {
@@ -496,7 +494,7 @@ pub fn config(matches: &ArgMatches<'_>) -> Result<(), Error> {
 /// # Warning! Interactive
 /// This command will prompt the user for input on the commandline
 ///
-pub fn config_init(editor: Option<&str>) {
+pub fn config_init(editor: Option<&str>) -> Result<(), Error> {
     let local = config::ConfigReader::path_home();
 
     if local.exists() {
@@ -537,8 +535,10 @@ pub fn config_init(editor: Option<&str>) {
                 .expect("cannot write this line to the config file");
         }
 
-        config_edit(editor);
+        config_edit(editor)?;
     }
+
+    Ok(())
 }
 
 /// Command CONFIG --show
@@ -549,13 +549,15 @@ pub fn config_show(path: &str) -> Result<(), Error> {
 }
 
 /// Command CONFIG --edit
-fn config_edit(editor: Option<&str>) {
+fn config_edit(editor: Option<&str>) -> Result<(), Error> {
     let local = config::ConfigReader::path_home();
     if local.exists() {
-        util::pass_to_command(editor, &[&CONFIG.path]);
+        util::pass_to_command(editor, &[&CONFIG.path])?;
     } else {
         error!("Cannot open {:?}, run `asciii config --init` to create it.", local)
     }
+
+    Ok(())
 }
 
 /// Command CONFIG --default
@@ -574,13 +576,9 @@ pub fn doc() -> Result<(), Error> {
 
 /// Command WEB
 pub fn web() -> Result<(), Error> {
-    std::process::Command::new("asciii-web").status().context("asciii-web wasn't found, it's likely not installed correctly")?;
-    // .map_err(|e| match e.kind() {
-    //     std::io::ErrorKind::NotFound => {
-    //         format_err!("asciii-web wasn't found, it's likely not installed correctly").context(e)
-    //     },
-    //     _ => e.into()
-    // })?;
+    std::process::Command::new("asciii-web")
+        .status()
+        .context("asciii-web wasn't found, it's likely not installed correctly")?;
     Ok(())
 }
 

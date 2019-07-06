@@ -961,7 +961,7 @@ pub fn match_matches(matches: &ArgMatches<'_>) {
         if matches.is_present("debug") {
             println!("{:?}", e)
         } else {
-            error!("{}", e);
+            error!("{} (Cause: {})", e, e.find_root_cause());
             info!("use --debug to see a backtracke");
         }
     }

@@ -8,6 +8,7 @@ use std::process::{self, Command, ExitStatus};
 use chrono::NaiveTime;
 
 use dirs::home_dir;
+use failure::{Error, ResultExt};
 
 use env_logger;
 use log::LevelFilter;
@@ -90,7 +91,7 @@ pub fn replace_home_tilde(p:&Path) -> PathBuf{
 ///
 /// This is by far the most important function of all utility functions.
 //TODO use https://crates.io/crates/open (supports linux, windows, mac)
-pub fn pass_to_command<T:AsRef<OsStr>>(editor: Option<&str>, paths:&[T]) {
+pub fn pass_to_command<T:AsRef<OsStr>>(editor: Option<&str>, paths:&[T]) -> Result<(), Error> {
 
     let paths = paths.iter()
                       .map(|o|PathBuf::from(&o))
@@ -117,7 +118,7 @@ pub fn pass_to_command<T:AsRef<OsStr>>(editor: Option<&str>, paths:&[T]) {
                 .args(args)
                 .args(&paths)
                 .status()
-                .unwrap_or_else(|e| { panic!("failed to execute process: {}", e) });
+                .context("failed to execute process")?;
 
         }
     } else {
@@ -125,6 +126,8 @@ pub fn pass_to_command<T:AsRef<OsStr>>(editor: Option<&str>, paths:&[T]) {
             open::that(path).unwrap();
         }
     }
+
+    Ok(())
 }
 
 /// Deletes the file if the passed in closure returns `true`
