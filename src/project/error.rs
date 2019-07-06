@@ -75,14 +75,6 @@ impl ErrorList {
         self.errors
     }
 
-    pub fn into_result(self) -> Result<(), Self> {
-
-        if !self.is_empty() {
-            return Err(self);
-        }
-
-        Ok(())
-    }
 }
 
 use std::ops::Deref;
@@ -90,6 +82,16 @@ impl Deref for ErrorList {
     type Target = [String];
     fn deref(&self) -> &[String] {
         &self.errors
+    }
+}
+
+impl From<&[&str]> for ErrorList {
+    fn from(errs: &[&str]) -> Self {
+        let mut list = ErrorList::new();
+        for e in errs {
+            list.errors.push(e.to_string());
+        }
+        list
     }
 }
 
@@ -104,6 +106,15 @@ impl FromIterator<String> for ErrorList {
 
 }
 
+impl Into<Result<(), ErrorList>> for ErrorList {
+    fn into(self) -> Result<(), ErrorList> {
+        if self.is_empty() {
+            Ok(())
+        } else {
+            Err(self)
+        }
+    }
+}
 
 impl fmt::Display for ErrorList {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {

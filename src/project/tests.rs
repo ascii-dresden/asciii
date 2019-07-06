@@ -1,9 +1,4 @@
-use bill::Currency;
-use crate::util::yaml;
-
-use super::spec;
-use super::product::ProductError;
-
+#![allow(unused_imports, dead_code)]
 use std::path::Path;
 use crate::project::spec::*;
 use crate::project::{error::ErrorList, Project};
@@ -57,22 +52,78 @@ fn compare_basics(){
 pub mod client {
   use super::*;
 
-  static CLIENT_TEST_DOC: &'static str = r#"
-  client:
-    title:      Herr # Frau, Professor, Professorin
-    first_name: Graf
-    last_name:  Zahl
-
-    email: this.man@example.com
-    address: |
-      Graf Zahl
-      Nummernhöllenstraße 666
-      01234 Countilvania
-  "#;
-
   #[test]
   fn validate_stage1() {
-      parse_project(CLIENT_TEST_DOC).client().validate().unwrap();
+      let doc = r#"
+      client:
+        title:      Herr # Frau, Professor, Professorin
+        first_name: Graf
+        last_name:  Zahl
+        email: this.man@example.com
+        address: |
+          Graf Zahl
+          Nummernhöllenstraße 666
+          01234 Countilvania
+      "#;
+
+      parse_project(&doc).client().validate().unwrap();
+  }
+
+  #[test]
+  fn missing_address() {
+      let doc = r#"
+      client:
+        title:      Herr # Frau, Professor, Professorin
+        first_name: Graf
+        last_name:  Zahl
+        email: this.man@example.com
+      "#;
+      assert_eq!(
+        parse_project(&doc).client().validate(),
+        Err(ErrorList::from(&["client/address"][..]))
+      );
+  }
+
+  #[test]
+  fn missing_title() {
+      let doc = r#"
+      client:
+        first_name: Graf
+        last_name:  Zahl
+        email: this.man@example.com
+        address: |
+          Graf Zahl
+          Nummernhöllenstraße 666
+          01234 Countilvania
+      "#;
+      assert_eq!(
+        parse_project(&doc).client().validate(),
+        Err(ErrorList::from(&[
+          "client/title",
+          "client_addressing"
+        ][..]))
+      );
+  }
+
+  #[test]
+  fn missing_last_name() {
+      let doc = r#"
+      client:
+        title:      Herr # Frau, Professor, Professorin
+        first_name: Graf
+        email: this.man@example.com
+        address: |
+          Graf Zahl
+          Nummernhöllenstraße 666
+          01234 Countilvania
+      "#;
+      assert_eq!(
+        parse_project(&doc).client().validate(),
+        Err(ErrorList::from(&[
+          "client/last_name",
+          "client_addressing"
+        ][..]))
+      );
   }
 
 }
@@ -82,35 +133,36 @@ pub mod client {
 pub mod offer {
   use super::*;
 
-  static OFFER_TEST_DOC: &'static str = r#"
-  offer:
-    date: 07.11.2014
-    appendix: 1
-  manager: somebody
-  "#;
-
   #[test]
   fn validate_stage2() {
-      let errors = parse_project(OFFER_TEST_DOC).offer().validate();
+      let doc = r#"
+      offer:
+        date: 07.11.2014
+        appendix: 1
+      manager: somebody
+      "#;
+
+      let errors = parse_project(&doc).offer().validate();
       println!("{:#?}", errors);
       assert!(errors.is_ok());
   }
 
 }
 
+
 pub mod invoice {
   use super::*;
 
-  static INVOICE_TEST_DOC: &'static str = r#"
-  invoice:
-    number: 41
-    date: 06.12.2014
-    payed_date: 08.12.2014
-  "#;
-
   #[test]
   fn validate_stage3() {
-      let errors = parse_project(INVOICE_TEST_DOC).invoice().validate();
+      let doc = r#"
+      invoice:
+        number: 41
+        date: 06.12.2014
+        payed_date: 08.12.2014
+      "#;
+
+      let errors = parse_project(&doc).invoice().validate();
       println!("{:#?}", errors);
       assert!(errors.is_ok());
   }
@@ -118,19 +170,22 @@ pub mod invoice {
 
   #[test]
   fn validate_stage3_missing_date() {
-    let raw = r#"
-  invoice:
-    number: 41
-    payed_date: 08.12.2014
-  "#;
+      let doc = r#"
+        invoice:
+          number: 41
+          payed_date: 08.12.2014
+        "#;
 
-      let errors = parse_project(raw).invoice().validate();
+      let errors = parse_project(doc).invoice().validate();
       println!("{:#?}", errors);
-      assert_eq!(errors.err().map(|el|el.into_vec()), Some(vec![
-        String::from("invoice.date")]));
+      assert_eq!(
+        errors.err().map(|el|el.into_vec()),
+        Some(vec![String::from("invoice.date")])
+        );
   }
 }
 
+/*
 
 mod product {
   use super::*;
@@ -155,29 +210,29 @@ mod product {
 
 
 
-//  #[test]
-//  fn validate_products() {
-//      let doc = yaml::parse(PRODUCT_TEST_DOC_VALID).unwrap();
-//
-//      println!("{:#?}", doc);
-//      let products = spec::products::invoice_items(&doc).unwrap();
-//      println!("Products {:#?}", products);
-//      assert_eq!(products[0].product.name, "Kaffee");
-//      assert_eq!(products[0].amount_offered, 5f64);
-//      assert_eq!(products[0].amount_sold, 5f64);
-//      assert_eq!(products[0].cost_sold_before_tax(),
-//                Currency(Some('€'), 12_50));
-//      assert_eq!(products[0].cost_sold_after_tax(),
-//                Currency(Some('€'), 14_88));
-//
-//      assert_eq!(products[1].product.name, "Tee");
-//      assert_eq!(products[1].amount_offered, 6f64);
-//      assert_eq!(products[1].amount_sold, 2f64);
-//
-//      assert_eq!(products[2].product.name, "Wasser");
-//      assert_eq!(products[2].amount_offered, 6f64);
-//      assert_eq!(products[2].amount_sold, 2f64);
-//  }
+  //  #[test]
+  //  fn validate_products() {
+  //      let doc = yaml::parse(PRODUCT_TEST_DOC_VALID).unwrap();
+  //
+  //      println!("{:#?}", doc);
+  //      let products = spec::products::invoice_items(&doc).unwrap();
+  //      println!("Products {:#?}", products);
+  //      assert_eq!(products[0].product.name, "Kaffee");
+  //      assert_eq!(products[0].amount_offered, 5f64);
+  //      assert_eq!(products[0].amount_sold, 5f64);
+  //      assert_eq!(products[0].cost_sold_before_tax(),
+  //                Currency(Some('€'), 12_50));
+  //      assert_eq!(products[0].cost_sold_after_tax(),
+  //                Currency(Some('€'), 14_88));
+  //
+  //      assert_eq!(products[1].product.name, "Tee");
+  //      assert_eq!(products[1].amount_offered, 6f64);
+  //      assert_eq!(products[1].amount_sold, 2f64);
+  //
+  //      assert_eq!(products[2].product.name, "Wasser");
+  //      assert_eq!(products[2].amount_offered, 6f64);
+  //      assert_eq!(products[2].amount_sold, 2f64);
+  //  }
 
 
 
@@ -240,48 +295,48 @@ mod product {
                                   #            27.84 aber 27.09
   "#;
 
-//  fn compare_sum(doc_string: &str, want: i64) {
-//      let doc_string_plus_catalogue = [PRODUCT_CATALOG, doc_string].join("\n");
-//
-//      let doc = yaml::parse(&doc_string_plus_catalogue).unwrap();
-//      let products = spec::products::invoice_items(&doc).unwrap();
-//      let sum_offered = spec::products::sum_offered(&products);
-//      let sum_sold = spec::products::sum_sold(&products);
-//
-//      // assert_eq!(sum_sold.1, 334_79);
-//      assert_eq!(sum_sold.1, want);
-//  }
+  //  fn compare_sum(doc_string: &str, want: i64) {
+  //      let doc_string_plus_catalogue = [PRODUCT_CATALOG, doc_string].join("\n");
+  //
+  //      let doc = yaml::parse(&doc_string_plus_catalogue).unwrap();
+  //      let products = spec::products::invoice_items(&doc).unwrap();
+  //      let sum_offered = spec::products::sum_offered(&products);
+  //      let sum_sold = spec::products::sum_sold(&products);
+  //
+  //      // assert_eq!(sum_sold.1, 334_79);
+  //      assert_eq!(sum_sold.1, want);
+  //  }
 
-//  #[test]
-//  fn check_prices() {
-//      let doc = yaml::parse(&[PRODUCT_CATALOG, PRODUCT_TEST_SUM_UP1].join("\n")).unwrap();
-//      let products = spec::products::invoice_items(&doc).unwrap();
-//      assert_eq!(products[0].product.name, "Apfelsaft");
-//      assert_eq!(products[0].product.price.1, 164);
-//      assert_eq!(products[1].product.name, "Kaffee");
-//      assert_eq!(products[2].product.name, "Kekse");
-//
-//      let odd_prices = r#"products: { *broetchen:    { amount: 40 } } "#;
-//
-//      let doc = yaml::parse(&[PRODUCT_CATALOG, odd_prices].join("\n")).unwrap();
-//      let products = spec::products::invoice_items(&doc).unwrap();
-//      assert_eq!(products[0].product.name, "halbe Brötchen");
-//      assert_eq!(products[0].product.price.1, 116);
-//  }
-//
-//   #[test]
-//   fn sum_up_products1() {
-//       compare_sum(PRODUCT_TEST_SUM_UP1, 180_50);
-//   }
-//   #[test]
-//   fn sum_up_products2() {
-//       compare_sum(PRODUCT_TEST_SUM_UP2, 60_70);
-//   }
-//   #[test]
-//   fn sum_up_products3() {
-//       compare_sum(PRODUCT_TEST_SUM_UP3, 65_28);
-//   }
-  // #[test] fn sum_up_products4(){ compare_sum(PRODUCT_TEST_SUM_UP4, 27_09); }
+  //  #[test]
+  //  fn check_prices() {
+  //      let doc = yaml::parse(&[PRODUCT_CATALOG, PRODUCT_TEST_SUM_UP1].join("\n")).unwrap();
+  //      let products = spec::products::invoice_items(&doc).unwrap();
+  //      assert_eq!(products[0].product.name, "Apfelsaft");
+  //      assert_eq!(products[0].product.price.1, 164);
+  //      assert_eq!(products[1].product.name, "Kaffee");
+  //      assert_eq!(products[2].product.name, "Kekse");
+  //
+  //      let odd_prices = r#"products: { *broetchen:    { amount: 40 } } "#;
+  //
+  //      let doc = yaml::parse(&[PRODUCT_CATALOG, odd_prices].join("\n")).unwrap();
+  //      let products = spec::products::invoice_items(&doc).unwrap();
+  //      assert_eq!(products[0].product.name, "halbe Brötchen");
+  //      assert_eq!(products[0].product.price.1, 116);
+  //  }
+  //
+  //   #[test]
+  //   fn sum_up_products1() {
+  //       compare_sum(PRODUCT_TEST_SUM_UP1, 180_50);
+  //   }
+  //   #[test]
+  //   fn sum_up_products2() {
+  //       compare_sum(PRODUCT_TEST_SUM_UP2, 60_70);
+  //   }
+  //   #[test]
+  //   fn sum_up_products3() {
+  //       compare_sum(PRODUCT_TEST_SUM_UP3, 65_28);
+  //   }
+    // #[test] fn sum_up_products4(){ compare_sum(PRODUCT_TEST_SUM_UP4, 27_09); }
 
   static PRODUCT_TEST_DOC_INVALID1: &'static str = r#"
   --- # sold and returend
@@ -341,3 +396,5 @@ mod product {
 //   }
 
 }
+
+*/

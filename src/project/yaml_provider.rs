@@ -130,6 +130,7 @@ pub trait YamlProvider {
             .and_then(|y| y.as_f64().or_else(|| y.as_i64().map(|y| y as f64)))
     }
 
+    #[deprecated]
     fn field_exists<'a>(&'a self, paths: &[&'a str]) -> ErrorList {
         let mut errors = ErrorList::new();
         for err in paths.iter()
@@ -143,23 +144,28 @@ pub trait YamlProvider {
 
 }
 
-pub fn check_fields<'a, F: 'a>(src: &'a YamlProvider, paths: &'a [&'a str], check: F) -> impl Iterator<Item = String> + 'a
+pub fn search_errors<'a, F: 'a>(src: &'a YamlProvider, paths: &'a [&'a str], check: F) -> impl Iterator<Item = String> + 'a
     where F: Fn(&'a Yaml) -> bool
 {
-    return paths.iter()
+    paths.iter()
         .filter(move |path| src.get(path).map(|y| !check(y)).unwrap_or(true))
+            .flat_map(|paths| paths.split('|').nth(0))
             .map(ToString::to_string)
 }
 
-pub fn field_exists<'a>(_yaml: &'a Yaml) -> bool {
-   false 
-}
+// pub fn field_exists(_yaml: &Yaml) -> bool {
+//    false 
+// }
 
-pub fn field_is_integer<'a>(yaml: &'a Yaml) -> bool {
+pub fn field_is_integer(yaml: &Yaml) -> bool {
     yaml.as_i64().is_some()
 }
 
-pub fn field_is_dmy<'a>(yaml: &'a Yaml) -> bool {
+pub fn field_is_string(yaml: &Yaml) -> bool {
+    yaml.as_str().is_some()
+}
+
+pub fn field_is_dmy(yaml: &Yaml) -> bool {
     yaml.as_str().and_then(parse_dmy_date).is_some()
 }
 

@@ -358,21 +358,18 @@ impl<'a> IsClient for Client<'a> {
 
 impl<'a> Validatable for Client<'a> {
     fn validate(&self) -> SpecResult {
-        let mut errors = self.field_exists(&[//"client/email", // TODO make this a requirement
+        let mut errors = search_errors(self, &[//"client/email", // TODO make this a requirement
                                              "client/address",
                                              "client/title",
                                              "client/last_name",
-                                             "client/first_name"]);
+                                             "client/first_name"], field_is_string)
+                                             .collect::<ErrorList>();
 
 
         if self.addressing().is_none() {
             errors.push("client_addressing");
         }
-        if !errors.is_empty() {
-            return Err(errors);
-        }
-
-        Ok(())
+        errors.into() 
     }
 }
 
@@ -409,16 +406,16 @@ impl<'a> Validatable for Offer<'a> {
         //    return Err(vec!["canceled"]);
         //}
 
-        let mut errors = self.field_exists(&["offer.date", "offer.appendix", "manager"]);
+        let mut errors =
+        search_errors(self, &["offer.date", "manager"], field_is_string)
+            .chain(search_errors(self, &["offer.appendix"], field_is_integer))
+            .collect::<ErrorList>();
+
         if Offerable::date(self).is_none() {
             errors.push("offer_date_format");
         }
 
-        if !errors.is_empty() {
-            return Err(errors);
-        }
-
-        Ok(())
+        errors.into() 
 
     }
 }
@@ -459,15 +456,10 @@ impl<'a> Invoicable for Invoice<'a> {
 
 impl<'a> Validatable for Invoice<'a> {
     fn validate(&self) -> SpecResult {
-        let errors = check_fields(self, &["invoice.number"], field_is_integer)
-            .chain(check_fields(self, &["invoice.date|invoice_date"], field_is_dmy))
-            .collect::<ErrorList>();
-
-        if !errors.is_empty() {
-            return Err(errors);
-        }
-
-        Ok(())
+        search_errors(self, &["invoice.number"], field_is_integer)
+            .chain(search_errors(self, &["invoice.date|invoice_date"], field_is_dmy))
+            .collect::<ErrorList>()
+            .into()
     }
 }
 
@@ -589,10 +581,6 @@ impl<'a> Validatable for Hours<'a> {
             errors.push("employees_payed");
         }
 
-        if !errors.is_empty() {
-            return Err(errors);
-        }
-
-        Ok(())
+        errors.into()
     }
 }

@@ -38,8 +38,8 @@ mod yaml_provider;
 pub mod error;
 mod computed_field;
 
-// #[cfg(test)]
-// mod tests;
+#[cfg(test)]
+mod tests;
 
 #[cfg(feature="deserialization")] pub mod import;
 #[cfg(feature="serialization")] pub mod export;
