@@ -58,6 +58,8 @@ pub mod templater;
 #[cfg(feature="server")] pub mod server;
 
 pub use yaml_rust::Yaml;
+#[cfg(test)]
+#[macro_use] extern crate pretty_assertions;
 
 pub static DOCUMENTATION_URL: &'static str  = "https://docs.rs/asciii/";
 

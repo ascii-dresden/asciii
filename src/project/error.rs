@@ -1,8 +1,10 @@
 #![allow(missing_docs)]
 
 use failure::Fail;
+use std::iter::FromIterator;
 
 use std::fmt;
+use std::result::Result;
 
 #[derive(Fail, Debug)]
 pub enum ProjectError {
@@ -28,7 +30,7 @@ pub fn combine_specresults(specs: Vec<SpecResult>) -> SpecResult {
                      )
 }
 
-#[derive(Debug, Default, Fail)]
+#[derive(Eq, PartialEq, Debug, Default, Fail)]
 pub struct ErrorList {
     pub errors: Vec<String>
 }
@@ -68,6 +70,19 @@ impl ErrorList {
     pub fn is_empty(&self) -> bool {
         self.errors.is_empty()
     }
+
+    pub fn into_vec(self) -> Vec<String> {
+        self.errors
+    }
+
+    pub fn into_result(self) -> Result<(), Self> {
+
+        if !self.is_empty() {
+            return Err(self);
+        }
+
+        Ok(())
+    }
 }
 
 use std::ops::Deref;
@@ -78,14 +93,15 @@ impl Deref for ErrorList {
     }
 }
 
-impl<'a> From<&'a [&'a str]> for ErrorList {
-    fn from(errs: &'a [&str]) -> ErrorList {
+impl FromIterator<String> for ErrorList {
+    fn from_iter<I: IntoIterator<Item=String>>(iter: I) -> Self {
         let mut list = ErrorList::new();
-        for e in errs {
-            list.push(e);
+        for e in iter {
+            list.errors.push(e);
         }
         list
     }
+
 }
 
 

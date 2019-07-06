@@ -33,9 +33,13 @@ use crate::templater::{Templater, IsKeyword};
 pub mod product;
 pub mod spec;
 mod spec_yaml;
+mod yaml_provider;
 
 pub mod error;
 mod computed_field;
+
+// #[cfg(test)]
+// mod tests;
 
 #[cfg(feature="deserialization")] pub mod import;
 #[cfg(feature="serialization")] pub mod export;
@@ -43,7 +47,7 @@ mod computed_field;
 
 use self::spec::{IsProject, IsClient};
 use self::spec::{Offerable, Invoicable, Redeemable, Validatable, HasEmployees};
-use self::spec_yaml::ProvidesData;
+use self::yaml_provider::*;
 
 pub use self::error:: ErrorList;
 use self::error::{ProjectError, SpecResult};
@@ -728,52 +732,5 @@ impl fmt::Debug for Project {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         //write!(f, "{:?}", self.debug())
         write!(f, "{:?}{:?}", self.name(), self.file())
-    }
-}
-
-
-#[cfg(test)]
-mod test {
-    use std::path::Path;
-    use crate::project::spec::*;
-    use crate::project::Project;
-    use crate::storage::Storable;
-
-    #[test]
-    fn compare_basics(){
-        println!("{:?}", ::std::env::current_dir());
-        let new_project = Project::open_file(Path::new("./tests/current.yml")).unwrap();
-        let old_project = Project::open_file(Path::new("./tests/old.yml")).unwrap();
-        //let config = &::CONFIG;
-
-        assert_eq!(old_project.name(),
-                   new_project.name());
-
-        assert_eq!(old_project.offer().number(),
-                   new_project.offer().number());
-
-        //assert_eq!(old_project.offer().date(), // old format had no offer date
-        //           new_project.offer().date());
-
-        assert_eq!(old_project.invoice().number_str(),
-                   new_project.invoice().number_str());
-
-        assert_eq!(old_project.invoice().date(),
-                   new_project.invoice().date());
-
-        assert_eq!(old_project.payed_date(),
-                   new_project.payed_date());
-
-        assert_eq!(old_project.client().title(),
-                   new_project.client().title());
-
-        assert_eq!(old_project.client().last_name(),
-                   new_project.client().last_name());
-
-        assert_eq!(old_project.client().addressing(),
-                   new_project.client().addressing());
-
-        assert_eq!(old_project.client().address(),
-                   new_project.client().address());
     }
 }

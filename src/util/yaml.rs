@@ -47,11 +47,12 @@ pub fn parse(file_content: &str) -> Result<Yaml, failure::Error> {
 /// Interprets `"25.12.2016"` as date.
 pub fn parse_dmy_date(date_str:&str) -> Option<Date<Utc>>{
     let date = date_str.split('.')
-        .map(|f|f.parse().unwrap_or(0))
-        .collect::<Vec<i32>>();
+                       .map(|f|f.parse().unwrap_or(0))
+                       .collect::<Vec<i32>>();
     if date.len() >=2 && date[0] > 0 && date[2] > 1900 {
         // XXX this neglects the old "01-05.12.2015" format
-        Utc.ymd_opt(date[2], date[1] as u32, date[0] as u32).single()
+        Utc.ymd_opt(date[2], date[1] as u32, date[0] as u32)
+        .single()
     } else {
         None
     }
@@ -166,7 +167,7 @@ pub fn get<'a>(yaml:&'a Yaml, key:&str) -> Option<&'a Yaml>{
 }
 
 /// Returns content at `path` in the yaml document.
-//#[deprecated(note="This is old style spec, please use the `ProvidesData` trait")]
+//#[deprecated(note="This is old style spec, please use the `YamlProvider` trait")]
 fn get_path<'a>(yaml:&'a Yaml, path:&[&str]) -> Option<&'a Yaml>{
     if let Some((&key, remainder)) = path.split_first(){
 

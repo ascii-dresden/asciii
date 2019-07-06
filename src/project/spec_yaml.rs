@@ -5,164 +5,14 @@ use icalendar::Event as CalEvent;
 use icalendar::{Component, Calendar};
 use failure::bail;
 use yaml_rust::Yaml;
-use yaml_rust::yaml::Hash as YamlHash;
 
 use super::*;
 use super::spec::*;
 use super::product::ProductError;
-
 use crate::util::{self, yaml, to_currency};
+use crate::util::yaml::parse_dmy_date;
 
-/// Enables access to structured data via a simple path
-///
-/// A path can be something like `users/clients/23/name`
-/// but also  `users.clients.23.name`
-pub trait ProvidesData {
-    /// You only need to implement this.
-    //fn data(&self) -> impl PathAccessible {
-    fn data(&self) -> &Yaml;
-
-    /// Wrapper around `get_path()`.
-    ///
-    /// Splits path string
-    /// and replaces `Yaml::Null` and `Yaml::BadValue`.
-    fn get<'a>(&'a self, path: &str) -> Option<&'a Yaml> {
-        self.get_direct(self.data(), path)
-    }
-
-    /// Wrapper around `get_path()`.
-    ///
-    /// Splits path string
-    /// and replaces `Yaml::Null` and `Yaml::BadValue`.
-    fn get_direct<'a>(&'a self, data: &'a Yaml, path: &str) -> Option<&'a Yaml> {
-        // TODO this can be without copying
-        let path = path.split(|p| p == '/' || p == '.')
-                       .filter(|k| !k.is_empty())
-                       .collect::<Vec<&str>>();
-        match self.get_path(data, &path) {
-            Some(&Yaml::BadValue) |
-            Some(&Yaml::Null) => None,
-            content => content,
-        }
-    }
-
-    /// Returns content at `path` in the yaml document.
-    /// TODO make this generic over the type of data to support more than just `Yaml`.
-    fn get_path<'a>(&'a self, data: &'a Yaml, path: &[&str]) -> Option<&'a Yaml> {
-        if let Some((&path, remainder)) = path.split_first() {
-            match *data {
-                // go further into the rabit hole
-                Yaml::Hash(ref hash) => {
-                    if remainder.is_empty() {
-                        hash.get(&Yaml::String(path.to_owned()))
-                    } else {
-                        hash.get(&Yaml::String(path.to_owned()))
-                            .and_then(|c| self.get_path(c, remainder))
-                    }
-                }
-                // interpret component as index
-                Yaml::Array(ref vec) => {
-                    if let Ok(index) = path.parse::<usize>() {
-                        if remainder.is_empty() {
-                            vec.get(index)
-                        } else {
-                            vec.get(index).and_then(|c| self.get_path(c, remainder))
-                        }
-                    } else { None }
-                },
-                // return none, because the path is longer than the data structure
-                _ => None
-            }
-        } else {
-            None
-        }
-    }
-
-    /// Gets a `&str` value.
-    ///
-    /// Same mentality as `yaml_rust`, only returns `Some`, if it's a `Yaml::String`.
-    fn get_str<'a>(&'a self, path: &str) -> Option<&'a str> {
-        self.get(path).and_then(Yaml::as_str)
-    }
-
-    /// Gets an `Int` value.
-    ///
-    /// Same mentality as `yaml_rust`, only returns `Some`, if it's a `Yaml::Int`.
-    fn get_int<'a>(&'a self, path: &str) -> Option<i64> {
-        self.get(path).and_then(Yaml::as_i64)
-    }
-
-    /// Gets a Date in `dd.mm.YYYY` format.
-    fn get_dmy(&self, path: &str) -> Option<Date<Utc>> {
-        self.get(path)
-            .and_then(Yaml::as_str)
-            .and_then(|d| self.parse_dmy_date(d))
-    }
-
-    /// Interprets `"25.12.2016"` as date.
-    fn parse_dmy_date(&self, date_str: &str) -> Option<Date<Utc>> {
-        let date = date_str.split('.')
-                           .map(|f| f.parse().unwrap_or(0))
-                           .collect::<Vec<i32>>();
-        if date.len() >= 2 && date[0] > 0 && date[2] > 1900 {
-            // XXX this neglects the old "01-05.12.2015" format
-            Utc.ymd_opt(date[2], date[1] as u32, date[0] as u32)
-               .single()
-        } else {
-            None
-        }
-    }
-
-    /// Gets a `Bool` value.
-    ///
-    /// **Careful** this is a bit sweeter then ordinary `YAML1.2`,
-    /// this will interpret `"yes"` and `"no"` as booleans, similar to `YAML1.1`.
-    /// Actually it will interpret any string but `"yes"` als `false`.
-    fn get_bool(&self, path: &str) -> Option<bool> {
-        self.get(path)
-            .and_then(|y| {
-            y
-                      .as_bool()
-                      // allowing it to be a str: "yes" or "no"
-                      .or_else(|| y.as_str()
-                           .map( |yes_or_no|
-                                 match yes_or_no.to_lowercase().as_ref() {
-                                     "yes" => true,
-                                     //"no" => false,
-                                     _ => false
-                                 })
-                         )
-        })
-    }
-
-    fn field_exists<'a>(&'a self, paths: &[&'a str]) -> ErrorList {
-        let mut errors = ErrorList::new();
-        for err in paths.iter()
-                        .cloned()
-                        .filter(|path| self.get(path).is_none())
-        {
-            errors.push(err);
-        }
-        errors
-
-    }
-
-    /// Gets `Some(Yaml::Hash)` or `None`.
-    //pub fn get_hash<'a>(yaml:&'a Yaml, key:&str) -> Option<&'a BTreeMap<Yaml,Yaml>> {
-    fn get_hash<'a>(&'a self, path: &str) -> Option<&'a YamlHash> {
-        self.get(path).and_then(Yaml::as_hash)
-    }
-
-    /// Gets a `Float` value.
-    ///
-    /// Also takes a `Yaml::I64` and reinterprets it.
-    fn get_f64(&self, path: &str) -> Option<f64> {
-        self.get(path)
-            .and_then(|y| y.as_f64().or_else(|| y.as_i64().map(|y| y as f64)))
-    }
-}
-
-impl ProvidesData for Project {
+impl YamlProvider for Project {
     fn data(&self) -> &Yaml {
         self.yaml()
     }
@@ -273,18 +123,18 @@ impl HasEvents for Project {
 
     #[allow(unused_qualifications)]
     fn events(&self) -> Option<Vec<spec::Event>> {
-        let dates = ProvidesData::get(self, "event.dates/")
+        let dates = YamlProvider::get(self, "event.dates/")
             .and_then(Yaml::as_vec)?;
         dates.iter()
              .map(|h| {
 
             let begin = self.get_direct(h, "begin")
                             .and_then(Yaml::as_str)
-                            .and_then(|d| self.parse_dmy_date(d))?;
+                            .and_then(|d| parse_dmy_date(d))?;
 
             let end = self.get_direct(h, "end")
                           .and_then(Yaml::as_str)
-                          .and_then(|d| self.parse_dmy_date(d));
+                          .and_then(|d| parse_dmy_date(d));
 
             Some(spec::Event {
                      begin,
@@ -437,7 +287,7 @@ impl Validatable for dyn Redeemable {
     }
 }
 
-impl<'a> ProvidesData for Client<'a> {
+impl<'a> YamlProvider for Client<'a> {
     fn data(&self) -> &Yaml {
         self.inner.data()
     }
@@ -526,7 +376,7 @@ impl<'a> Validatable for Client<'a> {
     }
 }
 
-impl<'a> ProvidesData for Offer<'a> {
+impl<'a> YamlProvider for Offer<'a> {
     fn data(&self) -> &Yaml {
         self.inner.data()
     }
@@ -573,7 +423,7 @@ impl<'a> Validatable for Offer<'a> {
     }
 }
 
-impl<'a> ProvidesData for Invoice<'a> {
+impl<'a> YamlProvider for Invoice<'a> {
     fn data(&self) -> &Yaml {
         self.inner.data()
     }
@@ -609,12 +459,9 @@ impl<'a> Invoicable for Invoice<'a> {
 
 impl<'a> Validatable for Invoice<'a> {
     fn validate(&self) -> SpecResult {
-        let mut errors = self.field_exists(&["invoice.number"]);
-
-        // if super::offer::validate(yaml).is_err() {errors.push("offer")}
-        if self.date().is_none() {
-            errors.push("invoice_date");
-        }
+        let errors = check_fields(self, &["invoice.number"], field_is_integer)
+            .chain(check_fields(self, &["invoice.date|invoice_date"], field_is_dmy))
+            .collect::<ErrorList>();
 
         if !errors.is_empty() {
             return Err(errors);
@@ -624,7 +471,7 @@ impl<'a> Validatable for Invoice<'a> {
     }
 }
 
-impl<'a> ProvidesData for Hours<'a> {
+impl<'a> YamlProvider for Hours<'a> {
     fn data(&self) -> &Yaml {
         self.inner.data()
     }
