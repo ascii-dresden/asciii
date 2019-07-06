@@ -20,6 +20,7 @@ fn setup_locale() {
 }
 
 fn main() {
+    color_backtrace::install();
     asciii::util::setup_log();
     setup_locale();
 

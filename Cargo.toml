@@ -83,6 +83,7 @@ toml          = "0.5"
 
 # feature: git_statuses
 git2 = {version = "0.9", default-features = false, optional = true}
+color-backtrace = "0.2.2"
 
 [dev-dependencies]
 pretty_assertions = "0.6"
