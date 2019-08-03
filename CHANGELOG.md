@@ -1,4 +1,11 @@
-# [](https://github.com/ascii-dresden/asciii/compare/v3.7.1...v) (2019-07-07)
+## [3.7.2](https://github.com/ascii-dresden/asciii/compare/v3.7.1...v3.7.2) (2019-08-03)
+
+
+### Features
+
+* don't auto open web page ([5ebd4b5](https://github.com/ascii-dresden/asciii/commit/5ebd4b5))
+* little fun with aliases ([a4218ff](https://github.com/ascii-dresden/asciii/commit/a4218ff))
+* make shell default feature ([90c5dd5](https://github.com/ascii-dresden/asciii/commit/90c5dd5))
 
 
 
