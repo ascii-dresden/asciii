@@ -256,7 +256,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     info!("listening on http://{}", bind_to);
     server().bind(bind_to)?.start();
-    open::that(&format!("http://localhost:{}", BIND_PORT))?;
 
     sys.run()?;
     info!("shutting down I guess");
