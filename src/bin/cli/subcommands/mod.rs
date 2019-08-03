@@ -40,6 +40,24 @@ pub use self::show::*;
 
 // TODO refactor this into actions module and actual, short subcommands
 
+pub fn double_command(_matches: &ArgMatches<'_>) -> Result<(), Error> {
+    let face = "🤣";
+    println!("{}", lformat!("asciii asciii? {}", face));
+    Ok(())
+}
+
+pub fn no_command(_matches: &ArgMatches<'_>) -> Result<(), Error> {
+    let face = "(ಠ_ಠ)";
+    println!("{}", lformat!("{} that's not a command", face));
+    Ok(())
+}
+
+pub fn no_shell(_matches: &ArgMatches<'_>) -> Result<(), Error> {
+    let face = "(ಠ_ಠ)";
+    println!("{}", lformat!("what do you think this is, a shell? {}", face));
+    Ok(())
+}
+
 /// Create NEW Project
 // #[deprecated(note="move to asciii::actions")]
 pub fn new(matches: &ArgMatches<'_>) -> Result<(), Error> {

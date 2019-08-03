@@ -908,6 +908,24 @@ pub fn with_cli<F> (app_handler:F) where F: Fn(App<'_, '_>) {
                 .about(lformat!("Opens the WebInterface 🤯").as_ref())
             )
 
+            .subcommand(SubCommand::with_name("asciii")
+                        .aliases(&["asci", "asciii", "ascii"])
+                        .arg(Arg::from_usage("[anything]..."))
+                        .setting(AppSettings::Hidden)
+            )
+
+            .subcommand(SubCommand::with_name("nocommand")
+                        .aliases(&[ "shit", "fuck", "git" ])
+                        .arg(Arg::from_usage("[anything]..."))
+                        .setting(AppSettings::Hidden)
+            )
+
+            .subcommand(SubCommand::with_name("notashell")
+                        .aliases(&["cp", "cd", "mv", "source", "ssh", "git" ])
+                        .arg(Arg::from_usage("[anything]..."))
+                        .setting(AppSettings::Hidden)
+            )
+
         );
 }
 
@@ -928,6 +946,9 @@ pub fn match_matches(matches: &ArgMatches<'_>) {
      ("unarchive", Some(sub_m)) => subcommands::unarchive(sub_m),
      ("config",    Some(sub_m)) => subcommands::config(sub_m),
      ("whoami",    _          ) => subcommands::config_show("user/name"),
+     ("nocommand", Some(sub_m)) => subcommands::no_command(sub_m),
+     ("notashell", Some(sub_m)) => subcommands::no_shell(sub_m),
+     ("asciii",    Some(sub_m)) => subcommands::double_command(sub_m),
 
      ("path",      Some(sub_m)) => subcommands::show_path(sub_m),
      ("open",      Some(sub_m)) => subcommands::open_path(sub_m),
