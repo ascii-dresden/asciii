@@ -55,10 +55,10 @@ linked-hash-map = {version = "0.5", features = ["serde_impl"]}
 dirs = "2.0"
 failure = "0.1"
 
-actix = { version = "0.8.0-betsa", optional = true }
-actix-web = { version = "1.0.0-beta", optional = true }
-actix-files = { version = "0.1.0-beta", optional = true }
-actix-web-actors = { version = "1.0.0-alpha", optional = true }
+actix = { version = "0.8.0", optional = true }
+actix-web = { version = "1.0.0", optional = true }
+actix-files = { version = "0.1.0", optional = true }
+actix-web-actors = { version = "1.0.0", optional = true }
 
 bill = {version= "0.4", features=["serialization"]}
 icalendar = "0.6"
