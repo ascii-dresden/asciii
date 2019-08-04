@@ -1,6 +1,6 @@
 [package]
 name = "asciii"
-version = "3.7.2"
+version = "3.7.3"
 authors = ["Hendrik Sollich <hendrik@hoodie.de>"]
 license = "MIT/Apache-2.0"
 readme = "README.md"
@@ -89,7 +89,7 @@ color-backtrace = "0.2.2"
 pretty_assertions = "0.6"
 
 [features]
-default = ["cli", "document_export", "git_statuses", "serialization", "deserialization", "server", "shell"]
+default = ["cli", "document_export", "git_statuses", "serialization", "deserialization", "server", "shell", "localize"]
 travis_compatible = ["cli", "document_export", "git_statuses", "serialization", "deserialization", "shell", "meta", "version_string"]
 full_tool = ["travis_compatible", "localize"]
 server= ["actix", "actix-files", "actix-web", "actix-web-actors"]

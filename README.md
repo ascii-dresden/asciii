@@ -83,6 +83,15 @@ Besides `debug`, you can also use `trace`, `warn` or `error`.
 You can enable logging per-module logging like this: `ASCIII_LOG=storage=debug`.
 Modules are all top-level files and folders in `src/`.
 
+### Localization
+When you build with the `"localize"` feature then the `lang/default.pot` should be updated automatically during the build. If you have `gettext` installed you can run 
+
+```
+msgmerge -U lang/de.po lang/default.pot
+```
+
+to update the german local file `lang/de.po`. Now you only need to update any empty field and check the file in as well.
+
 ## CI/CD
 
 ### Travis-CI [![Build Status](https://travis-ci.org/ascii-dresden/asciii.svg?branch=master)](https://travis-ci.org/ascii-dresden/asciii)
