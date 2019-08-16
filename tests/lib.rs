@@ -34,6 +34,7 @@ mod regression {
         fn export(path: &str, bill_type: BillType) -> String {
             let p = Project::open(path).unwrap();
             let exported: Complete = p.export();
+            std::env::set_var("ASCIII_PATH", "");
             fill_template(&exported, bill_type, "./templates/export.tex.hbs").unwrap()
         }
 
