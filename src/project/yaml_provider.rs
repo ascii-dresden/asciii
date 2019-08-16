@@ -144,7 +144,7 @@ pub trait YamlProvider {
 
 }
 
-pub fn search_errors<'a, F: 'a>(src: &'a YamlProvider, paths: &'a [&'a str], check: F) -> impl Iterator<Item = String> + 'a
+pub fn search_errors<'a, F: 'a>(src: &'a dyn YamlProvider, paths: &'a [&'a str], check: F) -> impl Iterator<Item = String> + 'a
     where F: Fn(&'a Yaml) -> bool
 {
     paths.iter()

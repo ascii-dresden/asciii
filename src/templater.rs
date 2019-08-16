@@ -41,7 +41,7 @@ pub trait IsKeyword {
     fn map_keywords<F>(&self, closure: F) -> String where F:Fn(&str) -> String;// -> Option<String>;
 }
 
-static REGEX: &'static str = r"##([0-9A-Z-]*)##*";
+static REGEX: &str = r"##([0-9A-Z-]*)##*";
 
 /// Allows very simplistic `##KEYWORD##` replacement.
 impl<U:Deref<Target=str>> IsKeyword for U {

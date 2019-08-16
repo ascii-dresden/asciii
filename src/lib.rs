@@ -61,7 +61,7 @@ pub use yaml_rust::Yaml;
 #[cfg(test)]
 #[macro_use] extern crate pretty_assertions;
 
-pub static DOCUMENTATION_URL: &'static str  = "https://docs.rs/asciii/";
+pub static DOCUMENTATION_URL: &str  = "https://docs.rs/asciii/";
 
 lazy_static!{
     /// Static `ConfigReader` to be able to access the configuration from everywhere.
