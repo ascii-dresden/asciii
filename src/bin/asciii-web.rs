@@ -41,7 +41,7 @@ lazy_static::lazy_static! {
                     debug!("updating projects");
                     PROJECTS.lock().unwrap().update();
                 }
-                debug!("callcount: {}", count);
+                debug!("call-count: {}", count);
             }
         });
         tx
@@ -99,7 +99,7 @@ pub mod api {
         use super::*;
 
         #[get("/year")]
-        pub fn years(req: HttpRequest) -> HttpResponse {
+        pub fn years(_req: HttpRequest) -> HttpResponse {
             info!("years");
             self::CHANNEL.send(()).unwrap();
             let loader = self::PROJECTS.lock().unwrap();
@@ -114,7 +114,7 @@ pub mod api {
             let loader = self::PROJECTS.lock().unwrap();
             let exported = loader.state.mapped.iter()
                 .filter(|&(_, p)| if let Some(y) = Storable::year(p) {y == param.year } else { false })
-                .map(|(ident, p)| ident.as_str())
+                .map(|(ident, _p)| ident.as_str())
                 .collect::<Vec<&str>>();
 
             HttpResponse::Ok().json(exported)
@@ -126,7 +126,7 @@ pub mod api {
             self::CHANNEL.send(()).unwrap();
             let loader = self::PROJECTS.lock().unwrap();
             let exported = loader.state.mapped.iter()
-                .filter(|&(ident, p)| *ident == param.name)
+                .filter(|&(ident, _p)| *ident == param.name)
                 .map(|(ident, p)| {
                     let exported: Complete = p.export();
                     (ident, exported)
