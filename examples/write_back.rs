@@ -1,12 +1,11 @@
 use asciii;
 
 use serde_json;
-
 use serde::Serialize;
 
+use asciii::project::Project;
 use asciii::project::export::*;
 use asciii::project::spec::*;
-use asciii::project::Project;
 use asciii::storage::StorageDir;
 
 fn main() {
@@ -20,12 +19,12 @@ fn main() {
         let name = project.name().unwrap_or("xx");
         let export: Complete = project.export();
         match project.parse_yaml() {
-            Ok(_p) => println!("{}", retoml(&export)),
+            Ok(_p) => println!("{}", reyaml(&export)),
             Err(e) => println!("cannot parse {} {:#?}", name, e),
         }
     }
 }
 
-fn retoml<T: Serialize>(imp: &T) -> String {
+fn reyaml<T: Serialize>(imp: &T) -> String {
     serde_json::to_string(imp).unwrap()
 }

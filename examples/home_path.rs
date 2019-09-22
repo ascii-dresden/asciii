@@ -1,12 +1,12 @@
-use std::path::{Path, PathBuf};
 use dirs::home_dir;
+use std::path::{Path, PathBuf};
 
 fn replace_home_tilde(p: &Path) -> PathBuf {
     let path = p.to_str().unwrap();
-    PathBuf::from( path.replace("~", home_dir().unwrap().to_str().unwrap()))
+    PathBuf::from(path.replace("~", home_dir().unwrap().to_str().unwrap()))
 }
 
-fn main(){
+fn main() {
     let p = Path::new("~/foo.txt");
     println!("{:?}, {}", p, p.display());
     println!("{}", p.exists());
