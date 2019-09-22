@@ -5,9 +5,12 @@ use asciii::project::Project;
 use asciii::storage::Storable;
 
 fn main() {
-    for project in [Project::open_file(Path::new("./examples/current.yml")).unwrap(),
-                    Project::open_file(Path::new("./examples/old.yml")).unwrap()]
-        .iter() {
+    for project in [
+        Project::open_file(Path::new("./examples/current.yml")).unwrap(),
+        Project::open_file(Path::new("./examples/old.yml")).unwrap(),
+    ]
+    .iter()
+    {
         println!("Index:     {:?}", project.index());
         println!("Canceled   {:?}", project.canceled());
         println!("Date:      {:?}", project.event_date());
@@ -26,9 +29,16 @@ fn main() {
         // let (_offer, invoice) = spec::billing::bills().unwrap();
         // println!("Products:  {:#?}", invoice.as_items().iter().map(|item|format!("{:?}",item)).collect::<Vec<_>>());
         println!("--------------");
-        println!("hours:     {:?}h * {}", project.hours().total_time(), project.hours().salary() .map(|c| c.postfix().to_string()).unwrap_or_else(|| String::from("0€")));
+        println!(
+            "hours:     {:?}h * {}",
+            project.hours().total_time(),
+            project
+                .hours()
+                .salary()
+                .map(|c| c.postfix().to_string())
+                .unwrap_or_else(|| String::from("0€"))
+        );
         println!("caterers:  {:?}", project.hours().employees_string());
         println!("\n\n\n");
     }
-
 }
