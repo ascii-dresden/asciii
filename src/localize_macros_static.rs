@@ -833,7 +833,7 @@ macro_rules! lformat {
     ("Open storage path") => ({
         let __guard = ::crowbook_intl_runtime::__get_lang();
         match __guard.as_str() {
-            "de" => format!("Öffnet peicherverzeichniss"),
+            "de" => format!("Öffnet Speicherverzeichniss"),
             _ => format!("Open storage path"),
         }
     });
