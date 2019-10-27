@@ -638,10 +638,28 @@ impl<L:Storable> Storage<L> {
     /// Please be adviced that this uses [`Storage::open_projects()`](struct.Storage.html#method.open_projects) and therefore opens all projects.
     pub fn search_projects(&self, directory:StorageDir, search_term:&str) -> Result<ProjectList<L>, Error> {
         trace!("searching for projects by {:?} in {:?}", search_term, directory);
-        let projects = self.open_projects(directory)?
-                           .into_iter()
-                           .filter(|project| project.matches_search(&search_term.to_lowercase()))
-                           .collect();
+        let search_index = if search_term.starts_with('N') {
+            match search_term.chars().skip(1).collect::<String>().parse::<usize>() {
+                Ok(n) => Some(n),
+                Err(_) => None,
+            }
+        } else {
+            None
+        };
+        let mut projects = self.open_projects(directory)?;
+        projects.sort_by(|pa, pb| {
+            pa.index()
+                .unwrap_or_else(|| "zzzz".to_owned())
+                .cmp(&pb.index().unwrap_or_else(|| "zzzz".to_owned()))
+        });
+        let projects = projects.into_iter()
+            .enumerate()
+            .filter(|(index,project)| {
+                search_index.map_or(false, |idx| idx == index + 1)
+                    || project.matches_search(&search_term.to_lowercase())
+            })
+            .map(|(_,project)| project)
+            .collect();
         Ok(ProjectList{projects})
     }
 
