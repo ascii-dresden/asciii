@@ -346,12 +346,11 @@ pub fn set(m: &ArgMatches<'_>) -> Result<(), Error> {
 
 /// Command INVOICE
 pub fn invoice(m: &ArgMatches<'_>) -> Result<(), Error> {
-    let mut field = "invoice/number".to_owned();
     let storage = setup::<Project>()?;
     let dir = StorageDir::Year(Utc::today().year());
     let projects = storage.open_projects(dir)?;
     let invoice_number = 1 + projects.iter()
-                             .filter_map(|p| p.field(&field))
+                             .filter_map(|p| p.field("invoice/number"))
                              .map(|s| s.parse::<u32>())
                              .filter_map(Result::ok)
                              .max()
@@ -360,15 +359,15 @@ pub fn invoice(m: &ArgMatches<'_>) -> Result<(), Error> {
 
     let (search_terms, dir) = matches_to_search(m);
 
-    field = "INVOICE-NUMBER".to_owned();
+    let field = "INVOICE-NUMBER";
     actions::with_projects(dir, &search_terms, |project| {
-        if !project.empty_fields().contains(&field) {
+        if !project.empty_fields().iter().any(|s| s == field) {
             return Err(format_err!("Invoice number already set in {}", project.short_desc()));
         }
-        if util::really(&format!("Do you want to set the invoice number in {:?} to {}?",
+        if util::really(&lformat!("Do you want to set the invoice number in {:?} to {}?",
                                  project.short_desc(),
                                  value)) {
-            project.replace_field(&field, &value)
+            project.replace_field(field, &value)
         } else {
             Err(format_err!("Don't want to"))
         }
