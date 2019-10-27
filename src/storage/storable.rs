@@ -21,7 +21,7 @@ pub type FolderPathBuf = PathBuf;
 
 pub trait Storable: Send+Sync {
 
-    /// opens a projectfolder
+    /// opens a project folder
     fn open_folder(_: &FolderPath) -> Result<Self, Error> where Self: Sized;
     fn open_file(_: &FilePath) -> Result<Self, Error> where Self: Sized;
 
@@ -55,15 +55,15 @@ pub trait Storable: Send+Sync {
 
     /// Tell a project its own git status after opening
     ///
-    /// This depoends on the feature `git_statuses`
+    /// This depends on the feature `git_statuses`
     fn set_git_status(&mut self, _: GitStatus){}
 
     /// Ask a project for its gitstatus
     ///
-    /// This depoends on the feature `git_statuses`
+    /// This depends on the feature `git_statuses`
     fn get_git_status(&self) -> GitStatus{GitStatus::Unknown}
 
-    /// Main Projectfile extension
+    /// Main project file extension
     fn file_extension() -> String {String::from("PROJECT")}
 
     /// Path to project file

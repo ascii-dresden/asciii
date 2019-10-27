@@ -256,7 +256,7 @@ pub fn with_cli<F> (app_handler:F) where F: Fn(App<'_, '_>) {
                              .long("offer")
                             )
                         )
-                        //# TODO add --invoice and --offer
+                        //# TODO: add --invoice and --offer
 
             .subcommand(SubCommand::with_name("edit")
                         .aliases(&["ed"])
@@ -342,7 +342,7 @@ pub fn with_cli<F> (app_handler:F) where F: Fn(App<'_, '_>) {
             .subcommand(SubCommand::with_name("unarchive")
                         .about(lformat!("Move a Project out of the archive").as_ref())
                         .arg(Arg::with_name("year")
-                             .help(lformat!("Specify the Archiv").as_ref())
+                             .help(lformat!("Specify the archive").as_ref())
                              .required(true)
                             )
                         .arg(Arg::with_name("name")
@@ -1000,7 +1000,7 @@ pub fn match_matches(matches: &ArgMatches<'_>) {
             println!("{:?}", e)
         } else {
             error!("{} (Cause: {})", e, e.find_root_cause());
-            info!("use --debug to see a backtracke");
+            info!("use --debug to see a backtrace");
         }
     }
 }
@@ -1017,7 +1017,6 @@ pub fn generate_completions(matches: &ArgMatches<'_>) -> Result<(), Error>{
 pub mod validators {
     use asciii::util::yaml::parse_dmy_date;
 
-    #[allow(clippy::needless_pass_by_value)]
     pub fn is_dmy(val: String) -> Result<(), String> {
         match parse_dmy_date(&val) {
             Some(_) => Ok(()),

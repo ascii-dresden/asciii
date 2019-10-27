@@ -27,9 +27,8 @@ pub fn setup_log() {
 
     if env::var(log_var).is_err() {
         logger
-            .default_format_level(true)
-            .default_format_timestamp(false)
-            .default_format_module_path(false)
+            .format_level(true)
+            .format_module_path(false)
             .filter_level(LevelFilter::Info);
     }
 
@@ -68,7 +67,7 @@ pub fn git_user_name() -> Option<String> {
 
 /// Shells out to print directory structure
 pub fn ls(path:&str){
-    println!("find {}", path); // TODO implement in here with walkdir
+    println!("find {}", path); // TODO: implement in here with walkdir
     let output = Command::new("find")
         .arg(&path)
         .output()
@@ -90,7 +89,7 @@ pub fn replace_home_tilde(p:&Path) -> PathBuf{
 /// Opens the passed paths in the editor set int config.
 ///
 /// This is by far the most important function of all utility functions.
-//TODO use https://crates.io/crates/open (supports linux, windows, mac)
+//TODO: use https://crates.io/crates/open (supports linux, windows, mac)
 pub fn pass_to_command<T:AsRef<OsStr>>(editor: Option<&str>, paths:&[T]) -> Result<(), Error> {
 
     let paths = paths.iter()
@@ -165,9 +164,9 @@ pub fn currency_to_string(currency:&Currency) -> String {
     currency.postfix().to_string()
 }
 
-/// Creates a currecny from an `f64`
+/// Creates a currency from an `f64`
 ///
-/// This is functionality which was explicitely left out of the `Claude` crate.
+/// This is functionality which was explicitly left out of the `Claude` crate.
 pub fn to_currency(f: f64) -> Currency {
     Currency{ symbol: crate::CONFIG.get_char("currency"), value: (f * 1000.0) as i64} / 10
 }

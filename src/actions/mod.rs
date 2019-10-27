@@ -127,8 +127,8 @@ pub fn dues() -> Result<Dues, Error> {
 }
 
 /// Testing only, tries to run complete spec on all projects.
-/// TODO make this not panic :D
-/// TODO move this to `spec::all_the_things`
+/// TODO: make this not panic :D
+/// TODO: move this to `spec::all_the_things`
 pub fn spec() -> Result<(), Error> {
     use crate::project::spec::*;
     let projects = storage::setup::<Project>()?.open_projects(StorageDir::Working)?;

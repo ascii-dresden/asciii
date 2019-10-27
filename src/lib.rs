@@ -16,12 +16,6 @@
 #![deny(trivial_casts, trivial_numeric_casts)]
 
 #![warn(unused_import_braces, unused_qualifications)]
-#![allow(clippy::identity_conversion)]
-
-#![cfg_attr(feature = "lints", allow(unstable_features))]
-#![cfg_attr(feature = "lints", feature(plugin))]
-#![cfg_attr(feature = "lints", plugin(clippy))]
-//#![cfg_attr(feature = "lints", plugin(herbie_lint))]
 
 //#![feature(alloc_system)]
 //extern crate alloc_system;
@@ -68,7 +62,7 @@ lazy_static!{
     pub static ref CONFIG: config::ConfigReader = config::ConfigReader::try_new().unwrap();
 
     /// Hint for app to point at `asciii::DOCUMENTATION_URL`
-    pub static ref DOCHINT: String = lformat!("Documentation at: {}", DOCUMENTATION_URL);
+    pub static ref DOC_HINT: String = lformat!("Documentation at: {}", DOCUMENTATION_URL);
 }
 
 lazy_static! {

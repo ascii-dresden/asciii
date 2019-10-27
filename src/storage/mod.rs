@@ -44,7 +44,7 @@ pub mod storable;
 pub use self::storable::*;
 
 
-// TODO rely more on IoError, it has most of what you need
+// TODO: rely more on IoError, it has most of what you need
 /// Manages project file storage.
 ///
 /// This includes:
@@ -105,7 +105,7 @@ pub enum StorageSelection {
     DirAndSearch(StorageDir, Vec<String>),
     Dir(StorageDir),
     Paths(Vec<PathBuf>),
-    Unintiailzed
+    Uninitialized
 }
 
 impl<'a> Into<StorageSelection> for &'a StorageSelection {
@@ -156,14 +156,14 @@ fn replace_home_tilde(p:&Path) -> PathBuf{
 
 /// Interprets storage path from config.
 ///
-/// Even if it starts with `~` or is a relatetive path.
+/// Even if it starts with `~` or is a relative path.
 /// This is by far the most important function of all utility functions.
 pub fn get_storage_path() -> PathBuf
 {
     let storage_path = PathBuf::from(crate::CONFIG.var_get_str("path"))
             .join(crate::CONFIG.var_get_str("dirs/storage"));
 
-    // TODO make replace tilde a Trait function
+    // TODO: make replace tilde a Trait function
     let storage_path = replace_home_tilde(&storage_path);
 
     if !storage_path.is_absolute(){
@@ -293,7 +293,7 @@ impl<L:Storable> Storage<L> {
 
     /// Getter for Storage::templates, returns `Result`.
     pub fn get_repository(&self) -> Result<&Repository, Error> {
-        self.repository.as_ref().ok_or_else(|| StorageError::RepoUnintialized.into())
+        self.repository.as_ref().ok_or_else(|| StorageError::RepoUninitialized.into())
     }
 
     /// Returns a struct containing all configured paths of this `Storage`.
@@ -315,7 +315,7 @@ impl<L:Storable> Storage<L> {
     ///    └── working
     ///</pre>
     /// If the directories already exist as expected, that's fine
-    /// TODO ought to fail when storage_dir already contains directories that do not correspond
+    /// TODO: ought to fail when storage_dir already contains directories that do not correspond
     /// with the names given in this setup.
     pub fn create_dirs(&self) -> Result<(), Error> {
         trace!("creating storage directories");
@@ -364,7 +364,7 @@ impl<L:Storable> Storage<L> {
 
     /// Produces a list of files in the `template_dir()`
     pub fn list_template_files(&self) -> Result<Vec<PathBuf>, Error> {
-        // TODO this is the only reference to `CONFIG`, lets get rid of it
+        // TODO: this is the only reference to `CONFIG`, lets get rid of it
         let template_file_extension = crate::CONFIG.get_str("extensions/project_template");
         trace!("listing template files (.{})", template_file_extension);
         let template_files =
@@ -378,7 +378,7 @@ impl<L:Storable> Storage<L> {
         Ok(template_files)
     }
 
-    /// Produces a list of names of all template filess in the `templates_dir()`
+    /// Produces a list of names of all template filses in the `templates_dir()`
     pub fn list_template_names(&self) -> Result<Vec<String>, Error> {
         trace!("listing template names");
         let template_names = self.list_template_files()?.iter()
@@ -449,11 +449,11 @@ impl<L:Storable> Storage<L> {
         trace!("creating project using concrete Project implementation of from_template");
         let mut project = L::from_template(&project_name, &template_path, &fill_data)?;
 
-        // TODO Hand of creation entirely to Storable implementation
+        // TODO: Hand of creation entirely to Storable implementation
         //      Storage it self should only concern itself with Project folders!
         fs::create_dir(&project_dir)?;
         fs::copy(project.file(), &target_file)?;
-        trace!("copied project file succesfully");
+        trace!("copied project file successfully");
         project.set_file(&target_file);
 
         Ok(project.storable)
@@ -489,11 +489,11 @@ impl<L:Storable> Storage<L> {
     ///└── root
     ///    ├── archive
     ///        ├── 2001
-    ///            ├── R0815_Birthdayparty
+    ///            ├── R0815_Birthday_party
     ///    ...
     ///</pre>
-    // TODO write extra tests
-    // TODO make year optional and default to project.year()
+    // TODO: write extra tests
+    // TODO: make year optional and default to project.year()
     pub fn archive_project(&self, project:&L, year:Year) -> Result<Vec<PathBuf>, Error> {
         debug!("trying archiving {:?} into {:?}", project.short_desc(), year);
 
@@ -509,7 +509,7 @@ impl<L:Storable> Storage<L> {
         let target = archive.join(&name_in_archive);
 
         fs::rename(&project_folder, &target)?;
-        info!("succesfully archived {:?} to {:?}", project.short_desc() ,target);
+        info!("successfully archived {:?} to {:?}", project.short_desc() ,target);
 
         moved_files.push(project.dir());
         moved_files.push(target);
@@ -632,10 +632,10 @@ impl<L:Storable> Storage<L> {
     /// Matches StorageDir's content against a term and returns matching project files.
     ///
     /// This only searches by name
-    /// TODO return opened `Project`, no need to reopen
+    /// TODO: return opened `Project`, no need to reopen
     ///
     /// # Warning
-    /// Please be adviced that this uses [`Storage::open_projects()`](struct.Storage.html#method.open_projects) and therefore opens all projects.
+    /// Please be advised that this uses [`Storage::open_projects()`](struct.Storage.html#method.open_projects) and therefore opens all projects.
     pub fn search_projects(&self, directory:StorageDir, search_term:&str) -> Result<ProjectList<L>, Error> {
         trace!("searching for projects by {:?} in {:?}", search_term, directory);
         let search_index = if search_term.starts_with('N') {
@@ -664,7 +664,7 @@ impl<L:Storable> Storage<L> {
     }
 
     /// Matches StorageDir's content against multiple terms and returns matching projects.
-    /// TODO add search_multiple_projects_deep
+    /// TODO: add search_multiple_projects_deep
     pub fn search_projects_any(&self, dir:StorageDir, search_terms:&[&str]) -> Result<ProjectList<L>, Error> {
         let mut projects = Vec::new();
         for search_term in search_terms{
@@ -677,7 +677,7 @@ impl<L:Storable> Storage<L> {
 
     /// Tries to find a concrete Project.
     pub fn get_project_dir(&self, name:&str, directory:StorageDir) -> Result<PathBuf, Error> {
-        trace!("getting project directoty for {:?} from {:?}", name, directory);
+        trace!("getting project directory for {:?} from {:?}", name, directory);
         let slugged_name = slugify(name);
         if let Ok(path) = match directory {
             StorageDir::Working => Ok(self.working_dir().join(&slugged_name)),
@@ -789,7 +789,7 @@ impl<L:Storable> Storage<L> {
             },
             Dir(dir) => self.open_projects_dir(dir)?,
             Paths(ref paths) => self.open_paths(paths),
-            Unintiailzed => unreachable!()
+            Uninitialized => unreachable!()
         };
         Ok(projects)
     }

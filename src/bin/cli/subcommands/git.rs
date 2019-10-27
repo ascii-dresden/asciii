@@ -172,12 +172,12 @@ pub fn git_cleanup(matches: &ArgMatches<'_>) -> Result<(), Error> {
     let storage = storage::setup_with_git::<Project>()?;
     let paths = matches_to_paths(matches, &storage)?;
     let repo = storage.repository().unwrap();
-    // TODO implement `.and()` for exitstatus
+    // TODO: implement `.and()` for exit status
 
     if util::really(&format!("Do you really want to reset any changes you made to:\n {:?}\n",
                              paths)) && !(repo.checkout(&paths).success() && repo.clean(&paths).success())
     {
-        bail!(format_err!("clean was not successfull"));
+        bail!(format_err!("clean was not successful"));
     }
     Ok(())
 }

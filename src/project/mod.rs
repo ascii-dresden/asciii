@@ -164,7 +164,7 @@ impl Project {
     ///
     /// Ready to send an **offer** to the client.
     pub fn is_ready_for_offer(&self) -> SpecResult {
-        self::error::combine_specresults(
+        self::error::combine_spec_results(
             vec![ self.offer().validate(),
                   self.client().validate(),
                   self.validate() ]
@@ -175,7 +175,7 @@ impl Project {
     ///
     /// Ready to send an **invoice** to the client.
     pub fn is_ready_for_invoice(&self) -> SpecResult{
-        self::error::combine_specresults(
+        self::error::combine_spec_results(
             vec![ self.is_ready_for_offer(),
                   self.invoice().validate()]
             )
@@ -188,7 +188,7 @@ impl Project {
         if self.canceled(){
             Ok(())
         } else {
-            self::error::combine_specresults(
+            self::error::combine_spec_results(
                 vec![ Redeemable::validate(self),
                       self.hours().validate() ]
                 )
@@ -222,7 +222,7 @@ impl Project {
         self.into()
     }
 
-    /// Check Templated for replacable markers
+    /// Check Templated for replaceable markers
     pub fn empty_fields(&self) -> Vec<String>{
         self.file_content.list_keywords()
     }
@@ -375,7 +375,7 @@ impl Project {
                                )?;
 
         let sold = get_f64(values, "sold");
-        // TODO test this
+        // TODO: test this
         let sold = if let Some(returned) = get_f64(values, "returned") {
             // if "returned", there must be no "sold"
             if sold.is_some() {
@@ -418,7 +418,7 @@ pub trait Exportable {
     /// Filename of the offer output file.
     fn offer_file_name(&self, extension: &str) -> Option<String>;
 
-    /// Filename of the invoice output file. **Carefull!** uses today's date.
+    /// Filename of the invoice output file. **Careful!** uses today's date.
     fn invoice_file_name(&self, extension: &str) -> Option<String>;
 
     fn output_file_exists(&self, bill_type: BillType) -> bool {
@@ -634,7 +634,7 @@ impl Storable for Project {
                     )
     }
 
-    fn file(&self) -> PathBuf{ self.file_path.to_owned() } // TODO reconsider returning PathBuf at all
+    fn file(&self) -> PathBuf{ self.file_path.to_owned() } // TODO: reconsider returning PathBuf at all
     fn set_file(&mut self, new_file:&Path){ self.file_path = new_file.to_owned(); }
 
     fn set_git_status(&mut self, status:GitStatus){
@@ -672,7 +672,7 @@ impl Storable for Project {
 
     /// UNIMPLEMENTED: Checks against a certain search term.
     ///
-    /// TODO compare agains InvoiceNumber, ClientFullName, Email, event/name, invoice/official Etc
+    /// TODO: compare agains InvoiceNumber, ClientFullName, Email, event/name, invoice/official Etc
     fn matches_search(&self, term: &str) -> bool{
         let search = term.to_lowercase();
         self.invoice()

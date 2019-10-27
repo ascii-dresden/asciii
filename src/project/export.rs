@@ -78,7 +78,7 @@ pub struct Service {
 
 #[derive(Debug, PartialEq)]
 #[cfg_attr(feature = "serialization", derive(Serialize))]
-/// TODO move this type to spec
+/// TODO: move this type to spec
 pub struct Employee {
     name: String,
     salary: String,
@@ -107,8 +107,8 @@ impl ExportTarget<Service> for Project {
             net_total:    self.hours().net_wages()
                                       .map(|s| s.postfix().to_string()),
             employees:    self.hours().employees()
-                                      .map(|empls|
-                                           empls.iter()
+                                      .map(|employees|
+                                           employees.iter()
                                                 .map(export_employee)
                                                 .collect()
                                       )

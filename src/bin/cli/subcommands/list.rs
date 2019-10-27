@@ -118,7 +118,7 @@ fn list_projects(dir: StorageDir, list_config: &ListConfig<'_>) -> Result<(), Er
                                    .unwrap_or_else(|| "zzzz".to_owned())
                                    .cmp(&pb.index().unwrap_or_else(|| "zzzz".to_owned()))
                              })
-        } // TODO rename to ident
+        } // TODO: rename to ident
         _ => {
             projects.sort_by(|pa, pb| {
                                  pa.index()
@@ -132,7 +132,7 @@ fn list_projects(dir: StorageDir, list_config: &ListConfig<'_>) -> Result<(), Er
     let wide_enough = true;
 
     if !wide_enough && list_config.mode != ListMode::Csv {
-        // TODO room for improvement
+        // TODO: room for improvement
         print::print_projects(print::simple_rows(&projects, list_config));
     } else {
         debug!("list_mode: {:?}", list_config.mode);

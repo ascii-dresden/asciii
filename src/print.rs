@@ -148,7 +148,7 @@ pub fn verbose_rows(projects:&[Project], list_config:&ListConfig<'_>) -> Vec<Row
             let row_style = if list_config.use_colors {project_to_style(project)}else{""};
             let mut cells = Vec::new();
 
-            // TODO how can we illustrate that a project has been removed? what about a red x
+            // TODO: how can we illustrate that a project has been removed? what about a red x
             // for every project that was just moved to the archive?
             // Or just git-add them when archiving automatically, that is what ascii2 would
             // have done
@@ -328,7 +328,7 @@ pub fn show_details(project:&Project, bill_type: BillType) {
         BillType::Invoice => invoice
     };
 
-    // TODO move to Project::product_table(&self) {
+    // TODO: move to Project::product_table(&self) {
     let mut table = Table::new();
     trace!("                   - created table");
     //table.set_format(*format::consts::FORMAT_BORDERS_ONLY);

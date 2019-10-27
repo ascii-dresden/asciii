@@ -261,7 +261,7 @@ msgid "Move a Project out of the archive"
 msgstr ""
 
 #: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:345
-msgid "Specify the Archiv"
+msgid "Specify the archive"
 msgstr ""
 
 #: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:349
@@ -552,7 +552,7 @@ msgstr ""
 msgid "please specify either bash, zsh, fish or powershell"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:1024
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:1023
 msgid "Date Format must be DD.MM.YYYY"
 msgstr ""
 
@@ -612,7 +612,7 @@ msgstr ""
 msgid "Project file is younger than pdf, continue anyway?"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/lib.rs:71
+#: /home/hendrik/code/ascii/asciii/src/lib.rs:65
 msgid "Documentation at: {}"
 msgstr ""
 

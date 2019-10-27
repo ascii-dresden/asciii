@@ -19,7 +19,7 @@ use super::error::{SpecResult, ErrorList};
 use super::product::Product;
 
 
-pub fn print_specresult(label: &str, result: &SpecResult) {
+pub fn print_spec_result(label: &str, result: &SpecResult) {
 match *result {
         Ok(_) => println!("{}: ✓", label),
         Err(ref errs) => println!("{}: ✗\n{}", label, errs)

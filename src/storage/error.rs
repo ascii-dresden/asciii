@@ -39,7 +39,7 @@ pub enum StorageError {
     #[fail(display = "Top Level storage path is not absolute.")]
     StoragePathNotAbsolute,
 
-    #[fail(display = "The filestructure under storage path does not correspond with the configuration.")]
+    #[fail(display = "The file structure under storage path does not correspond with the configuration.")]
     InvalidDirStructure,
 
     #[fail(display = "The described template file does not exist.")]
@@ -48,8 +48,8 @@ pub enum StorageError {
     #[fail(display = "Calling `git` failed")]
     GitProcessFailed,
 
-    #[fail(display = "Git Repository was not initiliazed.")]
-    RepoUnintialized,
+    #[fail(display = "Git Repository was not initialized.")]
+    RepoUninitialized,
 
     #[fail(display = "Nothing found for {:?}", _0)]
     NothingFound(Vec<String>),

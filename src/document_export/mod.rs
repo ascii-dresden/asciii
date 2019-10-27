@@ -67,7 +67,7 @@ impl HelperDef for CountHelper {
 
 /// Takes a `T: Serialize` and a template path and does it's thing.
 ///
-/// Returns path to created file, potenially in a `tempdir`.
+/// Returns path to created file, potentially in a `tempdir`.
 // pub fn fill_template<E:Serialize>(document:E, template_file:&Path) -> PathBuf{
 pub fn fill_template<E, P>(document: &E, bill_type: BillType, template_path: P) -> Result<String, Error>
     where E: Serialize, P:AsRef<Path>
@@ -144,7 +144,7 @@ fn project_to_doc(project: &Project, config: &ExportConfig<'_>) -> Result<Option
     debug!("converting with {:?}", convert_tool);
     debug!("template {:?}", template_path);
 
-    // project_readyness(&project) {
+    // project_readiness(&project) {
     let ready_for_offer = project.is_ready_for_offer();
     let ready_for_invoice = project.is_ready_for_invoice();
     let project_file = project.file();
@@ -156,11 +156,11 @@ fn project_to_doc(project: &Project, config: &ExportConfig<'_>) -> Result<Option
         (Some(Offer),   Ok(_),  _     ) |
         (None,          Ok(_),  Err(_)) => (Some(Offer), Some(project.dir()
                                                                     .join(project.offer_file_name(output_ext)
-                                                                                 .expect("this should have been cought by ready_for_offer()")))),
+                                                                                 .expect("this should have been caught by ready_for_offer()")))),
         (Some(Invoice), _,      Ok(_) ) |
         (None,          _,      Ok(_) ) => (Some(Invoice), Some(project.dir()
                                                                        .join(project.invoice_file_name(output_ext)
-                                                                                    .expect("this should have been cought by ready_for_invoice()")))),
+                                                                                    .expect("this should have been caught by ready_for_invoice()")))),
         (Some(Offer),   Err(e), _     ) => {error!("cannot create an offer, check out:{}",e);(None,None)},
         (Some(Invoice), _,      Err(e)) => {error!("cannot create an invoice, check out:{}",e);(None,None)},
         (_,         Err(e),     Err(_)) => {error!("Neither an Offer nor an Invoice can be created from this project\n please check out {}", e);(None,None)}

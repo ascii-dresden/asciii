@@ -9,7 +9,7 @@ use maplit::hashmap;
 use crate::util;
 use super::*;
 
-// TODO add tests for file or directories in return values
+// TODO: add tests for file or directories in return values
 
 #[allow(dead_code)]
 pub struct TestProject {
@@ -60,7 +60,7 @@ impl Storable for TestProject{
 }
 
 
-// TODO implement failing cases
+// TODO: implement failing cases
 const TEST_PROJECTS:[&str; 4] = [
     "test1", "test2",
     "foobar", "ich schreibe viel zu längliche projektnamen!",
@@ -74,7 +74,7 @@ fn setup() -> (TempDir, PathBuf, Storage<TestProject>) {
     (dir, storage_path, storage)
 }
 
-fn assert_existens(storage_path:&Path) {
+fn assert_existence(storage_path:&Path) {
     assert!(storage_path.exists()
             &&  storage_path.join("working").exists()
             &&  storage_path.join("archive").exists()
@@ -90,11 +90,11 @@ fn copy_template(target:PathBuf) {
 fn create_dirs() {
     let (dir , storage_path, storage) = setup();
     storage.create_dirs().unwrap();
-    assert_existens(&storage_path);
+    assert_existence(&storage_path);
 
     // calling it again does not cause problems
     assert!(storage.create_dirs().is_ok());
-    assert_existens(&storage_path);
+    assert_existence(&storage_path);
 
     util::ls(&dir.path().to_string_lossy());
 }
@@ -103,7 +103,7 @@ fn create_dirs() {
 fn list_template_files(){
     let (_dir , storage_path, storage) = setup();
     storage.create_dirs().unwrap();
-    assert_existens(&storage_path);
+    assert_existence(&storage_path);
 
     copy_template(storage_path.join("templates"));
 
@@ -118,7 +118,7 @@ fn list_template_files(){
 fn create_archive(){
     let (_dir , storage_path, storage) = setup();
     assert!(storage.create_dirs().is_ok());
-    assert_existens(&storage_path);
+    assert_existence(&storage_path);
     storage.create_archive(2001).unwrap();
     storage.create_archive(2002).unwrap();
     storage.create_archive(2002).unwrap(); // should this fail?
@@ -131,7 +131,7 @@ fn create_archive(){
 fn list_archives(){
     let (_dir , storage_path, storage) = setup();
     assert!(storage.create_dirs().is_ok());
-    assert_existens(&storage_path);
+    assert_existence(&storage_path);
     storage.create_archive(2001).unwrap();
     storage.create_archive(2002).unwrap();
     storage.create_archive(1999).unwrap();
@@ -160,7 +160,7 @@ fn list_archives(){
 fn create_project(){
     let (_dir , storage_path, storage) = setup();
     assert!(storage.create_dirs().is_ok());
-    assert_existens(&storage_path);
+    assert_existence(&storage_path);
     copy_template(storage_path.join("templates"));
 
     let templates = storage.list_template_names().unwrap();
@@ -186,7 +186,7 @@ fn create_project(){
 fn archive_project_by_name(){
     let (_dir , storage_path, storage) = setup();
     assert!(storage.create_dirs().is_ok());
-    assert_existens(&storage_path);
+    assert_existence(&storage_path);
     copy_template(storage_path.join("templates"));
 
     let templates = storage.list_template_names().unwrap();
@@ -211,7 +211,7 @@ fn archive_project_by_name(){
 fn archive_project(){
     let (_dir , storage_path, storage) = setup();
     assert!(storage.create_dirs().is_ok(), "could not even create storage in {:?}", storage_path);
-    assert_existens(&storage_path);
+    assert_existence(&storage_path);
     copy_template(storage_path.join("templates"));
 
     let year = Utc::today().year();
@@ -241,7 +241,7 @@ fn archive_project(){
 fn unarchive_project_dir(){
     let (_dir , storage_path, storage) = setup();
     assert!(storage.create_dirs().is_ok());
-    assert_existens(&storage_path);
+    assert_existence(&storage_path);
     copy_template(storage_path.join("templates"));
 
     let templates = storage.list_template_names().unwrap();

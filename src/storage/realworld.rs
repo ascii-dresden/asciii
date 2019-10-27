@@ -11,7 +11,7 @@ fn setup() -> (PathBuf, Storage<TestProject>) {
     (storage_path, storage)
 }
 
-fn assert_existens(storage_path:&Path) {
+fn assert_existence(storage_path:&Path) {
     assert!(storage_path.exists()
             &&  storage_path.join("working").exists()
             &&  storage_path.join("archive").exists()
@@ -23,7 +23,7 @@ fn assert_existens(storage_path:&Path) {
 fn list_template_files(){
     let (storage_path, storage) = setup();
     //storage.create_dirs().unwrap();
-    assert_existens(&storage_path);
+    assert_existence(&storage_path);
 
     let templates = storage.list_template_files().unwrap();
     println!("{:#?}",templates);

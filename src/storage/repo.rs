@@ -201,7 +201,7 @@ impl Repository {
     }
 
     pub fn commit(&self) -> ExitStatus {
-        // TODO override git editor with asciii editor
+        // TODO: override git editor with asciii editor
         self.execute_git("commit", &[], &[])
     }
 
@@ -217,7 +217,7 @@ impl Repository {
         self.execute_git("clean", &["-d", "--force"], paths)
     }
 
-    /// TODO not yet functional
+    /// TODO: not yet functional
     pub fn stash(&self) -> ExitStatus {
         self.execute_git("stash", &[], &[])
     }

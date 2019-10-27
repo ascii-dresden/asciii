@@ -35,7 +35,7 @@ custom_derive! {
         Age,
         /// Time in weeks it took to write the invoice
         OurBad,
-        /// Time in weeks it took the custumer to pay invoice
+        /// Time in weeks it took the customer to pay invoice
         TheirBad,
         /// Year of the event
         Year,
@@ -79,7 +79,7 @@ impl ComputedField {
                 Some(project.name()
                             .map(ToString::to_string)
                             .unwrap_or_else(|| project.file_name()))
-            } // TODO remove name() from `Storable`, storables only need a slug()
+            } // TODO: remove name() from `Storable`, storables only need a slug()
             ComputedField::Final => {
                 project.sum_sold()
                        .map(|c| util::currency_to_string(&c))

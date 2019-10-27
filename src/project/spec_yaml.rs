@@ -158,7 +158,7 @@ impl HasEvents for Project {
             let end = self.get_direct(h, "end")
                           .and_then(Yaml::as_str)
                           .and_then(util::naive_time_from_str)
-                          .or(start); // TODO assume a duration of one hour instead
+                          .or(start); // TODO: assume a duration of one hour instead
 
             if let (Some(start), Some(end)) = (start, end) {
                 Some(EventTime {
@@ -224,7 +224,7 @@ impl Redeemable for Project {
             self.get_hash("products")
                 .ok_or_else(|| ProductError::UnknownFormat)?;
 
-        // let document_tax =  // TODO activate this once the tax no longer 19%
+        // let document_tax =  // TODO: activate this once the tax no longer 19%
 
         for (desc, values) in raw_products {
             let (offer_item, invoice_item) = self.item_from_desc_and_value(desc, values)?;
@@ -343,10 +343,10 @@ impl<'a> IsClient for Client<'a> {
 
             let lang = crate::CONFIG.get_str("defaults/lang");
 
-            let gend_path = "gender_matches/".to_owned() + &salute.to_lowercase();
-            let gend = crate::CONFIG.get_str_or(&gend_path)?;
+            let gender_path = "gender_matches/".to_owned() + &salute.to_lowercase();
+            let gender = crate::CONFIG.get_str_or(&gender_path)?;
 
-            let addr_path = "lang_addressing/".to_owned() + &lang.to_lowercase() + "/" + gend;
+            let addr_path = "lang_addressing/".to_owned() + &lang.to_lowercase() + "/" + gender;
             let addr = crate::CONFIG.get_str_or(&addr_path)?;
 
             last_name.and(Some(format!("{} {} {}", addr, salute, last_name.unwrap_or(""))))
@@ -358,7 +358,7 @@ impl<'a> IsClient for Client<'a> {
 
 impl<'a> Validatable for Client<'a> {
     fn validate(&self) -> SpecResult {
-        let mut errors = search_errors(self, &[//"client/email", // TODO make this a requirement
+        let mut errors = search_errors(self, &[//"client/email", // TODO: make this a requirement
                                              "client/address",
                                              "client/title",
                                              "client/last_name",
@@ -445,7 +445,7 @@ impl<'a> Invoicable for Invoice<'a> {
 
     fn number_long_str(&self) -> Option<String> {
         let year = self.date()?.year();
-        // TODO Length or format should be a setting
+        // TODO: Length or format should be a setting
         self.number().map(|n| format!("R{}-{:03}", year, n))
     }
 

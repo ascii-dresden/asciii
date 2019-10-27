@@ -38,7 +38,7 @@ pub use self::show::*;
 
 #[cfg(feature="shell")] use super::shell;
 
-// TODO refactor this into actions module and actual, short subcommands
+// TODO: refactor this into actions module and actual, short subcommands
 
 pub fn double_command(_matches: &ArgMatches<'_>) -> Result<(), Error> {
     let face = "🤣";
@@ -127,7 +127,7 @@ fn matches_to_dir(matches: &ArgMatches<'_>) -> StorageDir {
 
         // or list all, but sort by date
         else if matches.is_present("all"){
-            // sort by date on --all of not overriden
+            // sort by date on --all of not overridden
             StorageDir::All }
 
         // or list normal
@@ -386,8 +386,8 @@ pub fn calendar(matches: &ArgMatches<'_>) -> Result<(), Error> {
 
 
 /// Command SPEC
-/// TODO make this not panic :D
-/// TODO move this to `spec::all_the_things`
+/// TODO: make this not panic :D
+/// TODO: move this to `spec::all_the_things`
 pub fn spec(_: &ArgMatches<'_>) -> Result<(), Error> {
     actions::spec()?;
     Ok(())
@@ -416,7 +416,7 @@ fn matches_to_export_config<'a>(m: &'a ArgMatches<'_>) -> Option<ExportConfig<'a
     let bill_type = infer_bill_type(m);
 
     let mut config = ExportConfig {
-            select:        StorageSelection::Unintiailzed,
+            select:        StorageSelection::Uninitialized,
             template_name,
             bill_type,
             output:        m.value_of("output").map(Path::new),
@@ -452,7 +452,7 @@ fn matches_to_export_config<'a>(m: &'a ArgMatches<'_>) -> Option<ExportConfig<'a
 pub fn make(m: &ArgMatches<'_>) -> Result<(), Error> {
     debug!("{:?}", m);
     if let Some(ref config) = matches_to_export_config(m) {
-        document_export::projects_to_doc(config)?; // TODO if-let this TODO should return Result
+        document_export::projects_to_doc(config)?; // TODO: if-let this TODO should return Result
         Ok(())
     } else {
         Ok(())
@@ -484,7 +484,7 @@ pub fn make(_: &ArgMatches) -> Result<(), Error> {
 
 
 
-/// TODO make this be have like `edit`, taking multiple names
+/// TODO: make this be have like `edit`, taking multiple names
 pub fn archive(matches: &ArgMatches<'_>) -> Result<(), Error> {
     if let Some(search_terms) = matches.values_of("search terms"){
         let search_terms = search_terms.collect::<Vec<_>>();

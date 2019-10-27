@@ -1,4 +1,3 @@
-#![allow(clippy::identity_conversion)]
 #[macro_use] extern crate clap;
 
 #[macro_use] pub mod localize_macros;

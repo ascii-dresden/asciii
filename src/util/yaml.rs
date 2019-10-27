@@ -115,7 +115,7 @@ pub fn get_int(yaml:&Yaml, key:&str) -> Option<i64> {
     get(yaml,key).and_then(Yaml::as_i64)
 }
 
-//TODO this would be nice
+//TODO: this would be nice
 //pub fn get_vec_of<T>(yaml:&Yaml, key:&str) -> Option<Vec<T>>{
 //    Some(Vec::new())
 //}
@@ -154,7 +154,7 @@ pub fn get_dmy(yaml:&Yaml, key:&str) -> Option<Date<Utc>> {
 ///
 /// Splits path string
 /// and replaces `Yaml::Null` and `Yaml::BadValue`.
-//#[deprecated(note="use `ProvicdesData` instead")]
+//#[deprecated(note="use `ProvidesData` instead")]
 pub fn get<'a>(yaml:&'a Yaml, key:&str) -> Option<&'a Yaml>{
     let path = key.split(|c| c == '/' || c == '.')
                   .filter(|k|!k.is_empty())

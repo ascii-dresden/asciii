@@ -18,7 +18,7 @@ pub enum ProjectError {
 
 pub type SpecResult = ::std::result::Result<(), ErrorList>;
 
-pub fn combine_specresults(specs: Vec<SpecResult>) -> SpecResult {
+pub fn combine_spec_results(specs: Vec<SpecResult>) -> SpecResult {
     specs.into_iter()
          .fold(Ok(()), |acc, x|
                       match (acc, x) {

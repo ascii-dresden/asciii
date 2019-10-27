@@ -30,7 +30,7 @@ pub trait YamlProvider {
     /// Splits path string
     /// and replaces `Yaml::Null` and `Yaml::BadValue`.
     fn get_direct<'a>(&'a self, data: &'a Yaml, path: &str) -> Option<&'a Yaml> {
-        // TODO this can be without copying
+        // TODO: this can be without copying
         let path = path.split(|p| p == '/' || p == '.')
                        .filter(|k| !k.is_empty())
                        .collect::<Vec<&str>>();
@@ -42,11 +42,11 @@ pub trait YamlProvider {
     }
 
     /// Returns content at `path` in the yaml document.
-    /// TODO make this generic over the type of data to support more than just `Yaml`.
+    /// TODO: make this generic over the type of data to support more than just `Yaml`.
     fn get_path<'a>(&'a self, data: &'a Yaml, path: &[&str]) -> Option<&'a Yaml> {
         if let Some((&path, remainder)) = path.split_first() {
             match *data {
-                // go further into the rabit hole
+                // go further into the rabbit hole
                 Yaml::Hash(ref hash) => {
                     if remainder.is_empty() {
                         hash.get(&Yaml::String(path.to_owned()))

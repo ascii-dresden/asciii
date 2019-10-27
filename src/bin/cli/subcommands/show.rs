@@ -24,7 +24,7 @@ pub fn show(m: &ArgMatches<'_>) -> Result<(), Error> {
         (true, true) => unreachable!("this should have been prevented by clap-rs"),
         (true, false) => BillType::Offer,
         // (false,true) => BillType::Invoice,
-        _ => BillType::Invoice, //TODO be inteligent here ( use date )
+        _ => BillType::Invoice, //TODO: be intelligent here ( use date )
     };
 
     if m.is_present("files") {
@@ -66,9 +66,9 @@ fn show_files(selection: StorageSelection) -> Result<(), Error> {
 fn show_errors(selection: StorageSelection) -> Result<(), Error> {
     for p in setup::<Project>()?.open_projects(selection)? {
         println!("{}: ", p.short_desc());
-        spec::print_specresult("offer", &p.is_ready_for_offer());
-        spec::print_specresult("invoice", &p.is_ready_for_invoice());
-        spec::print_specresult("archive", &p.is_ready_for_archive());
+        spec::print_spec_result("offer", &p.is_ready_for_offer());
+        spec::print_spec_result("invoice", &p.is_ready_for_invoice());
+        spec::print_spec_result("archive", &p.is_ready_for_archive());
     }
     Ok(())
 }
