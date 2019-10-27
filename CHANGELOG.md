@@ -1,3 +1,22 @@
+# [3.8.0](https://github.com/ascii-dresden/asciii/compare/v3.7.3...v3.8.0) (2019-10-27)
+
+
+### Features
+
+* add `invoice` command to auto-assign number ([3dd3436](https://github.com/ascii-dresden/asciii/commit/3dd3436))
+* allow opening projects by list index ([a84f7e7](https://github.com/ascii-dresden/asciii/commit/a84f7e7))
+
+
+
+## [3.7.3](https://github.com/ascii-dresden/asciii/compare/v3.7.2...v3.7.3) (2019-08-04)
+
+
+### Bug Fixes
+
+* update german localization ([2abb67f](https://github.com/ascii-dresden/asciii/commit/2abb67f))
+
+
+
 ## [3.7.2](https://github.com/ascii-dresden/asciii/compare/v3.7.1...v3.7.2) (2019-08-03)
 
 
