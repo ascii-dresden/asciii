@@ -646,15 +646,20 @@ impl<L:Storable> Storage<L> {
         } else {
             None
         };
-        let projects = self.open_projects(directory)?
-                           .into_iter()
-                           .enumerate()
-                           .filter(|(index,project)| {
-                               search_index.map_or(false, |idx| idx == index + 1)
-                                   || project.matches_search(&search_term.to_lowercase())
-                           })
-                           .map(|(_,project)| project)
-                           .collect();
+        let mut projexts = self.open_projects(directory)?;
+        projexts.sort_by(|pa, pb| {
+            pa.index()
+                .unwrap_or_else(|| "zzzz".to_owned())
+                .cmp(&pb.index().unwrap_or_else(|| "zzzz".to_owned()))
+        });
+        let projects = projexts.into_iter()
+                               .enumerate()
+                               .filter(|(index,project)| {
+                                   search_index.map_or(false, |idx| idx == index + 1)
+                                       || project.matches_search(&search_term.to_lowercase())
+                               })
+                               .map(|(_,project)| project)
+                               .collect();
         Ok(ProjectList{projects})
     }
 
