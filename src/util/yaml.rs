@@ -39,19 +39,18 @@ pub fn parse(file_content: &str) -> Result<Yaml, failure::Error> {
     Ok(
         YamlLoader::load_from_str(&file_content)?
         .get(0)
-        .map(ToOwned::to_owned)
-        .unwrap_or_else(||Yaml::from_str("[]"))
+        .map_or_else(||Yaml::from_str("[]"), ToOwned::to_owned)
       )
 }
 
 /// Interprets `"25.12.2016"` as date.
-pub fn parse_dmy_date(date_str:&str) -> Option<Date<Utc>>{
+pub fn parse_dmy_date(date_str: &str) -> Option<Date<Utc>> {
     let date = date_str.split('.')
                        .map(|f|f.parse().unwrap_or(0))
-                       .collect::<Vec<i32>>();
+                       .collect::<Vec<u32>>();
     if date.len() >=2 && date[0] > 0 && date[2] > 1900 {
         // XXX this neglects the old "01-05.12.2015" format
-        Utc.ymd_opt(date[2], date[1] as u32, date[0] as u32)
+        Utc.ymd_opt(date[2] as i32, date[1], date[0])
         .single()
     } else {
         None
@@ -66,9 +65,9 @@ pub fn parse_dmy_date_range(date_str:&str) -> Option<Date<Utc>>{
     let date = date_str.split('.')
         .map(|s|s.split('-').nth(0).unwrap_or("0"))
         .map(|f|f.parse().unwrap_or(0))
-        .collect::<Vec<i32>>();
+        .collect::<Vec<u32>>();
     if date[0] > 0 {
-        return Some(Utc.ymd(date[2], date[1] as u32, date[0] as u32))
+        return Some(Utc.ymd(date[2] as i32, date[1], date[0]))
     }
     None
 }

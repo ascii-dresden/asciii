@@ -1,5 +1,5 @@
 #![warn(unused_import_braces, unused_qualifications, clippy::pedantic, clippy::doc_markdown)]
-#![allow(clippy::non_ascii_literal, clippy::module_name_repetitions, clippy::use_self, clippy::must_use_candidate, clippy::if_not_else)]
+#![allow(clippy::non_ascii_literal, clippy::module_name_repetitions, clippy::use_self, clippy::must_use_candidate, clippy::if_not_else, clippy::filter_map)]
 
 #[macro_use] extern crate clap;
 

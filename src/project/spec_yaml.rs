@@ -515,13 +515,14 @@ impl<'a> HasEmployees for Hours<'a> {
         self.employees()
             .map(|e| {
             e.iter()
-             .filter(|e| e.time as u32 > 0)
-             .map(|e| {
+             .filter_map(|e| if e.time > 0_u64 {
+                 Some(
                       format!("{}: ({}h {})",
                               e.name,
                               e.time,
                               (e.salary * e.time).postfix())
-                  })
+             )
+                  } else { None })
              .collect::<Vec<String>>()
              .join(", ")
         })

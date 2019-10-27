@@ -37,9 +37,7 @@ pub struct ErrorList {
 
 impl ErrorList {
     pub fn new() -> Self {
-        ErrorList {
-            errors: Default::default()
-        }
+        ErrorList::default()
     }
 
     pub fn from_vec(errors: Vec<String>) -> Self {
