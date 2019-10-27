@@ -39,7 +39,7 @@ pub fn list(matches: &ArgMatches<'_>) -> Result<(), Error> {
                               .map(Iterator::collect),
             show_errors: matches.is_present("errors"),
 
-            ..Default::default()
+            ..ListConfig::default()
         };
 
         if matches.is_present("colors") {
@@ -153,7 +153,7 @@ fn list_broken_projects(dir: StorageDir) -> Result<(), Error> {
     let invalid_files = storage.list_project_folders(dir)?;
     let errors = invalid_files.iter()
                             .filter_map(|dir| Project::open_folder(dir).err())
-                            .collect::<Vec<failure::Error>>();
+                            .collect::<Vec<Error>>();
 
     for err in errors {
         println!("{}", err.as_fail());

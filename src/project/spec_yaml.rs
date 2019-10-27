@@ -487,7 +487,7 @@ impl<'a> HasEmployees for Hours<'a> {
     fn net_wages(&self) -> Option<Currency> {
         let triple = (self.total_time(), self.salary(), self.tax());
         match triple {
-            (Some(total_time), Some(salary), Some(tax)) => Some(total_time * salary * (tax.value() + 1f64)),
+            (Some(total_time), Some(salary), Some(tax)) => Some(total_time * salary * (tax.value() + 1_f64)),
             // covering the legacy case where Services always had Tax=0%
             (Some(total_time), Some(salary), None) => Some(total_time * salary),
             _ => None,
@@ -507,7 +507,7 @@ impl<'a> HasEmployees for Hours<'a> {
         self.employees()
             .map(|e| {
                      e.iter()
-                      .fold(0f64, |acc, e| acc + e.time)
+                      .fold(0_f64, |acc, e| acc + e.time)
                  })
     }
 
@@ -535,7 +535,7 @@ impl<'a> HasEmployees for Hours<'a> {
             employees.iter()
                      .map(|(c, h)| {(c.as_str().unwrap_or("").into(), make_float(h))
                      })
-                     .filter(|&(_, h)| h > 0f64)
+                     .filter(|&(_, h)| h > 0_f64)
                      .map(|(name, time)| {
                 let wage = self.salary()? * time;
                 let salary = self.salary()?;
@@ -569,7 +569,7 @@ impl<'a> HasEmployees for Hours<'a> {
 fn make_float(h: &Yaml) -> f64 {
     h.as_f64()
      .or_else(|| h.as_i64().map(|f| f as f64))
-     .unwrap_or(0f64)
+     .unwrap_or(0_f64)
 }
 
 

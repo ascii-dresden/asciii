@@ -5,7 +5,7 @@ use log::{info, error};
 use super::subcommands;
 use std::str::FromStr;
 
-#[allow(clippy::cognitive_complexity)]
+#[allow(clippy::cognitive_complexity, clippy::too_many_lines)]
 pub fn with_cli<F> (app_handler:F) where F: Fn(App<'_, '_>) {
     app_handler(
         App::new("asciii")
@@ -1016,7 +1016,7 @@ pub fn generate_completions(matches: &ArgMatches<'_>) -> Result<(), Error>{
 
 pub mod validators {
     use asciii::util::yaml::parse_dmy_date;
-
+    #[allow(clippy::needless_pass_by_value)]
     pub fn is_dmy(val: String) -> Result<(), String> {
         match parse_dmy_date(&val) {
             Some(_) => Ok(()),

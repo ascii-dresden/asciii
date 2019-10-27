@@ -536,7 +536,7 @@ impl Storable for Project {
         crate::CONFIG.get_to_string("extensions.project_file")
     }
 
-    fn from_template(project_name: &str, template:&Path, fill: &HashMap<&str, String>) -> Result<StorableAndTempDir<Self>, Error> {
+    fn from_template(project_name: &str, template:&Path, replacements: &HashMap<&str, String>) -> Result<StorableAndTempDir<Self>, Error> {
         let template_name = template.file_stem().unwrap().to_str().unwrap();
 
         let event_date = (Utc::today() + Duration::days(14)).format("%d.%m.%Y").to_string();
@@ -558,7 +558,7 @@ impl Storable for Project {
 
         // fills the template
         let file_content = Templater::from_file(template)?
-            .fill_in_data(&fill).fix()
+            .fill_in_data(&replacements).fix()
             .fill_in_data(&default_fill)
             .finalize()
             .filled;

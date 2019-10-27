@@ -101,11 +101,11 @@ pub fn launch_shell() -> Result<(), Error> {
 
             },
             Err(ReadlineError::Interrupted) => {
-                //println!("CTRL-C");
+                debug!("CTRL-C");
                 break
             },
             Err(ReadlineError::Eof) => {
-                //println!("CTRL-D");
+                debug!("CTRL-D");
                 break
             },
             Err(err) => {

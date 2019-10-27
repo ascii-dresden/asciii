@@ -242,7 +242,7 @@ pub struct MetaStore {
 #[cfg_attr(feature = "meta", derive(Serialize))]
 #[cfg_attr(feature = "meta", derive(Deserialize))]
 #[derive(Debug)]
-/// ApiKeys store
+/// `ApiKeys` store
 pub struct ApiKeys {
     pub keys: Vec<String>,
     pub users: HashMap<String, String>
@@ -259,7 +259,7 @@ pub fn parse_meta() -> Result<MetaStore, Error> {
     Ok(store)
 }
 
-/// get ApiKeys for server
+/// get `ApiKeys` for server
 #[cfg(feature = "meta")]
 pub fn get_api_keys() -> Result<ApiKeys, Error> {
     Ok(parse_meta()?.api)

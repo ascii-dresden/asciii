@@ -15,7 +15,8 @@
 #![recursion_limit = "1024"]
 #![deny(trivial_casts, trivial_numeric_casts)]
 
-#![warn(unused_import_braces, unused_qualifications)]
+#![warn(unused_import_braces, unused_qualifications, clippy::pedantic, clippy::doc_markdown)]
+#![allow(clippy::non_ascii_literal, clippy::module_name_repetitions, clippy::use_self, clippy::must_use_candidate, clippy::if_not_else)]
 
 //#![feature(alloc_system)]
 //extern crate alloc_system;

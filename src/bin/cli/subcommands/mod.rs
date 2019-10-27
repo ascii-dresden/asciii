@@ -152,8 +152,7 @@ fn matches_to_search<'a>(matches: &'a ArgMatches<'_>) -> (Vec<&'a str>, StorageD
 /// This is more general than `with_projects`, as this includes templates too.
 pub fn matches_to_paths(matches: &ArgMatches<'_>, storage: &Storage<Project>) -> Result<Vec<PathBuf>, Error> {
     let search_terms = matches.values_of("search_term")
-                              .map(Iterator::collect)
-                              .unwrap_or_else(Vec::new);
+                              .map_or_else(Vec::new, Iterator::collect);
 
     if matches.is_present("template") {
         Ok(storage.list_template_files()?
@@ -351,8 +350,7 @@ pub fn invoice(m: &ArgMatches<'_>) -> Result<(), Error> {
     let projects = storage.open_projects(dir)?;
     let invoice_number = 1 + projects.iter()
                              .filter_map(|p| p.field("invoice/number"))
-                             .map(|s| s.parse::<u32>())
-                             .filter_map(Result::ok)
+                             .filter_map(|s| s.parse::<u32>().ok())
                              .max()
                              .unwrap_or(0);
     let value = invoice_number.to_string();

@@ -142,7 +142,7 @@ impl Sum {
             tax_value: (tax.into_inner() * 100.0),
             gross_sum: currency_to_string(&gross_sum),
             tax_sum: currency_to_string(&tax_sum),
-            has_tax: (tax.into_inner() > 0f64),
+            has_tax: (tax.into_inner() > 0_f64),
         }
     }
 }
