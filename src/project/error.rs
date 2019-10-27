@@ -89,7 +89,7 @@ impl From<&[&str]> for ErrorList {
     fn from(errs: &[&str]) -> Self {
         let mut list = ErrorList::new();
         for e in errs {
-            list.errors.push(e.to_string());
+            list.errors.push((*e).to_string());
         }
         list
     }

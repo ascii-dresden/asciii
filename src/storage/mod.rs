@@ -626,7 +626,7 @@ impl<L:Storable> Storage<L> {
             bail!(StorageError::InvalidDirStructure);
         };
 
-        Ok(target.to_owned())
+        Ok(target)
     }
 
     /// Matches StorageDir's content against a term and returns matching project files.

@@ -27,7 +27,7 @@ fn reinitialize(storage: &Storage<Project>) -> State {
 
     let working = storage.open_projects(StorageDir::Working).unwrap()
         .into_iter()
-        .map(|p| (Storable::ident(&p).to_string(), p))
+        .map(|p| (Storable::ident(&p), p))
         .collect();
 
     let mapped = all.iter()
