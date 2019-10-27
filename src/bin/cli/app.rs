@@ -469,6 +469,22 @@ pub fn with_cli<F> (app_handler:F) where F: Fn(App<'_, '_>) {
                             )
                         )
 
+            .subcommand(SubCommand::with_name("invoice")
+                        .about(lformat!("Assign invoice id to project").as_ref())
+                        .arg(Arg::with_name("search_term")
+                             .help(lformat!("Search term, possibly event name").as_ref())
+                             .required(true)
+                            )
+
+                        .arg(Arg::with_name("archive")
+                             .help(lformat!("Pick an archived project").as_ref())
+                             .short("a")
+                             .long("archive")
+                             .min_values(0)
+                             .takes_value(true)
+                            )
+                        )
+
             .subcommand(SubCommand::with_name("path")
                         .about(lformat!("Show storage path").as_ref())
                         .group(ArgGroup::with_name("flags")
@@ -940,6 +956,7 @@ pub fn match_matches(matches: &ArgMatches<'_>) {
      ("meta",      Some(sub_m)) => subcommands::meta(sub_m),
      ("workspace", Some(sub_m)) => subcommands::workspace(sub_m),
      ("set",       Some(sub_m)) => subcommands::set(sub_m),
+     ("invoice",   Some(sub_m)) => subcommands::invoice(sub_m),
      ("show",      Some(sub_m)) => subcommands::show(sub_m),
      ("calendar",  Some(sub_m)) => subcommands::calendar(sub_m),
      ("archive",   Some(sub_m)) => subcommands::archive(sub_m),
