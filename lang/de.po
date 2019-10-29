@@ -64,6 +64,10 @@ msgstr "Fehler mit vollem Backtrace ausgeben"
 msgid "set's up a new instance"
 msgstr "richtet eine neue Instanz ein"
 
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:27
+msgid "set's up a new instance. Clones the repository and initializes the global config file."
+msgstr "richtet eine neue Instanz ein. Klont das Repository und initialisiert die globale Konfigurationsdatei."
+
 #: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:28
 msgid "Remote repository"
 msgstr "Remote Repository"

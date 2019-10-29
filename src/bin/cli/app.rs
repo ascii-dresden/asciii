@@ -24,6 +24,7 @@ pub fn with_cli<F> (app_handler:F) where F: Fn(App<'_, '_>) {
             .subcommand(SubCommand::with_name("bootstrap")
                         .aliases(&["boot", "clone"])
                         .about(lformat!("set's up a new instance").as_ref())
+                        .long_about(lformat!("set's up a new instance. Clones the repository and initializes the global config file.").as_ref())
                         .arg(Arg::with_name("repo")
                              .help(lformat!("Remote repository").as_ref())
                              .required(true))
