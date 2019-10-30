@@ -145,25 +145,37 @@ fn project_to_doc(project: &Project, config: &ExportConfig<'_>) -> Result<Option
     debug!("template {:?}", template_path);
 
     // project_readiness(&project) {
-    let ready_for_offer = project.is_ready_for_offer();
-    let ready_for_invoice = project.is_ready_for_invoice();
+    let missing_for_offer = project.is_missing_for_offer();
+    let missing_for_invoice = project.is_missing_for_invoice();
     let project_file = project.file();
 
+    let default_mode = if missing_for_invoice.is_empty() { Invoice } else { Offer };
     let (dyn_bill_type, outfile_tex):
         (Option<BillType>, Option<PathBuf>) =
-         match (bill_type, ready_for_offer, ready_for_invoice)
+         match bill_type.unwrap_or(default_mode) // (bill_type, missing_for_offer[..], missing_for_invoice[..])
     {
-        (Some(Offer),   Ok(_),  _     ) |
-        (None,          Ok(_),  Err(_)) => (Some(Offer), Some(project.dir()
-                                                                    .join(project.offer_file_name(output_ext)
-                                                                                 .expect("this should have been caught by ready_for_offer()")))),
-        (Some(Invoice), _,      Ok(_) ) |
-        (None,          _,      Ok(_) ) => (Some(Invoice), Some(project.dir()
-                                                                       .join(project.invoice_file_name(output_ext)
-                                                                                    .expect("this should have been caught by ready_for_invoice()")))),
-        (Some(Offer),   Err(e), _     ) => {error!("cannot create an offer, check out:{}",e);(None,None)},
-        (Some(Invoice), _,      Err(e)) => {error!("cannot create an invoice, check out:{}",e);(None,None)},
-        (_,         Err(e),     Err(_)) => {error!("Neither an Offer nor an Invoice can be created from this project\n please check out {}", e);(None,None)}
+        Offer if missing_for_offer.is_empty() =>
+            (Some(Offer), Some(project.dir().join(project.offer_file_name(output_ext)
+                                                  .expect("this should have been caught by missing_for_offer()")))),
+
+        Invoice if missing_for_invoice.is_empty() =>
+            (Some(Invoice), Some(project.dir().join(project.invoice_file_name(output_ext)
+                                                    .expect("this should have been caught by missing_for_invoice()")))),
+
+        Offer if !missing_for_offer.is_empty() && bill_type.is_some() => {
+            error!("cannot create an offer, check out:{}",missing_for_offer.join("|"));
+            (None,None)
+        },
+
+        Invoice if !missing_for_invoice.is_empty() && bill_type.is_some() => {
+            error!("cannot create an invoice, check out:{}",missing_for_invoice.join("|"));
+            (None,None)
+        }
+
+        _ => {
+            error!("Neither an Offer nor an Invoice can be created from this project\n please check out {}", missing_for_offer.join("|"));
+            (None,None)
+        }
     };
 
     // }

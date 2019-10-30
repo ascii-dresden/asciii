@@ -49,8 +49,7 @@ use self::spec::{IsProject, IsClient};
 use self::spec::{Offerable, Invoicable, Redeemable, Validatable, HasEmployees};
 use self::yaml_provider::*;
 
-pub use self::error:: ErrorList;
-use self::error::{ProjectError, SpecResult};
+use self::error::ProjectError;
 use self::product::{Product, ProductError};
 
 pub use self::computed_field::ComputedField;
@@ -75,7 +74,7 @@ impl Project {
     pub fn open<S: AsRef<OsStr> + ?Sized>(pathish: &S) -> Result<Project, Error> {
         let file_path = Path::new(&pathish);
         let file_content = fs::read_to_string(&file_path)?;
-        Ok(Project {
+        let project = Project {
             file_path: file_path.to_owned(),
             git_status: None,
             yaml: yaml::parse(&file_content).unwrap_or_else(|e|{
@@ -83,7 +82,23 @@ impl Project {
                 Yaml::Null
             }),
             file_content,
-        })
+        };
+
+        let validation = project.validate()
+            .and(project.client().validate())
+            .and(project.invoice().validate())
+            .and(project.offer().validate())
+            .and(project.hours().validate())
+            .and(Redeemable::validate(&project));
+        for err in validation.validation_errors {
+            let name = project.name().ok().map(ToString::to_string).unwrap_or_else(|| {
+                file_path.file_name().map(|x| x.to_string_lossy().to_string())
+                    .unwrap_or_else(|| "<unknown>".to_string())
+            });
+            warn!("project {}: {}", name, err);
+        }
+
+        Ok(project)
     }
 
     /// import from yaml file
@@ -163,35 +178,38 @@ impl Project {
     /// Ready to produce offer.
     ///
     /// Ready to send an **offer** to the client.
-    pub fn is_ready_for_offer(&self) -> SpecResult {
-        self::error::combine_spec_results(
-            vec![ self.offer().validate(),
-                  self.client().validate(),
-                  self.validate() ]
-            )
+    ///
+    /// Returns list of missing fields, empty vector if ready.
+    pub fn is_missing_for_offer(&self) -> Vec<String> {
+        self.offer().validate()
+            .and(self.client().validate())
+            .and(self.validate())
+            .missing_fields
     }
 
     /// Valid to produce invoice
     ///
     /// Ready to send an **invoice** to the client.
-    pub fn is_ready_for_invoice(&self) -> SpecResult{
-        self::error::combine_spec_results(
-            vec![ self.is_ready_for_offer(),
-                  self.invoice().validate()]
-            )
+    ///
+    /// Returns list of missing fields, empty vector if ready.
+    pub fn is_missing_for_invoice(&self) -> Vec<String>{
+        let mut missing = self.is_missing_for_offer();
+        missing.extend(self.invoice().validate().missing_fields);
+        missing
     }
 
     /// Completely done and in the past.
     ///
     /// Ready to be **h:
-    pub fn is_ready_for_archive(&self) -> SpecResult {
+    ///
+    /// Returns list of missing fields, empty vector if ready.
+    pub fn is_ready_for_archive(&self) -> Vec<String> {
         if self.canceled(){
-            Ok(())
+            Vec::new()
         } else {
-            self::error::combine_spec_results(
-                vec![ Redeemable::validate(self),
-                      self.hours().validate() ]
-                )
+            Redeemable::validate(self)
+                .and(self.hours().validate())
+                .missing_fields
         }
     }
 
@@ -253,8 +271,8 @@ impl Project {
 
     /// Time between event and creation of invoice
     pub fn our_bad(&self) -> Option<Duration> {
-        let event   = self.event_date()?;
-        let invoice = self.invoice().date().unwrap_or_else(Utc::today);
+        let event   = self.event_date().ok()?;
+        let invoice = self.invoice().date().ok().unwrap_or_else(Utc::today);
         let diff = invoice.signed_duration_since(event);
         if diff > Duration::zero() {
             Some(diff)
@@ -265,8 +283,8 @@ impl Project {
 
     /// Time between creation of invoice and payment
     pub fn their_bad(&self) -> Option<Duration> {
-        let invoice = self.invoice().date().unwrap_or_else(Utc::today);
-        let payed   = self.payed_date().unwrap_or_else(Utc::today);
+        let invoice = self.invoice().date().ok().unwrap_or_else(Utc::today);
+        let payed   = self.payed_date().ok().unwrap_or_else(Utc::today);
         Some(invoice.signed_duration_since(payed))
     }
 
@@ -277,10 +295,10 @@ impl Project {
         //return if self.canceled();
         let mut cal = Calendar::new();
 
-        let event   = self.event_date();
-        let invoice = self.invoice().date();
-        let payed   = self.payed_date();
-        let wages   = self.hours().wages_date();
+        let event   = self.event_date().ok();
+        let invoice = self.invoice().date().ok();
+        let payed   = self.payed_date().ok();
+        let wages   = self.hours().wages_date().ok();
         let today   = Utc::today();
 
         let days_since = |date:Date<Utc>| (today.signed_duration_since(date)).num_days();
@@ -367,7 +385,7 @@ impl Project {
                                   )
                          );
 
-        let product = Product::from_desc_and_value(desc, values, self.tax())?;
+        let product = Product::from_desc_and_value(desc, values, self.tax().ok())?;
 
         let offered = get_f64(values, "amount")
                            .ok_or_else(
@@ -517,15 +535,15 @@ impl Exportable for Project {
 
     fn offer_file_name(&self, extension: &str) -> Option<String>{
         let num = self.offer().number()?;
-        let name = slug::slugify(IsProject::name(self)?);
+        let name = slug::slugify(IsProject::name(self).ok()?);
         Some(format!("{} {}.{}", num, name, extension))
     }
 
     fn invoice_file_name(&self, extension: &str) -> Option<String>{
         let num = self.invoice().number_str()?;
-        let name = slug::slugify(self.name()?);
+        let name = slug::slugify(self.name().ok()?);
         //let date = Local::today().format("%Y-%m-%d").to_string();
-        let date = self.invoice().date()?.format("%Y-%m-%d").to_string();
+        let date = self.invoice().date().ok()?.format("%Y-%m-%d").to_string();
         Some(format!("{} {} {}.{}",num,name,date,extension))
     }
 
@@ -604,7 +622,7 @@ impl Storable for Project {
 
     fn index(&self) -> Option<String>{
         let prefix = self.invoice().number_long_str().unwrap_or_else(||String::from("zzzz"));
-        match (self.invoice().date(), self.modified_date()) {
+        match (self.invoice().date().ok(), self.modified_date()) {
             (Some(date), _) |
             (None, Some(date)) => {
                 Some(format!("{0}{1}", prefix, date.format("%Y%m%d").to_string()))
@@ -614,7 +632,7 @@ impl Storable for Project {
     }
 
     fn short_desc(&self) -> String {
-        self.name()
+        self.name().ok()
             .map(ToOwned::to_owned)
             .unwrap_or_else(|| format!("unnamed: {:?}",
                                        self.dir()
@@ -627,11 +645,8 @@ impl Storable for Project {
     fn modified_date(&self) -> Option<Date<Utc>> {
         self.get_dmy( "event.dates.0.begin")
             .or_else(||self.get_dmy("created"))
-            .or_else(||self.get_dmy("date"))
-            // probably the dd-dd.mm.yyyy format
-            .or_else(||self.get_str("date")
-                           .and_then(|s| yaml::parse_dmy_date_range(s))
-                    )
+            .or_else(||self.get_dmy_legacy_range("date"))
+            .ok()
     }
 
     fn file(&self) -> PathBuf{ self.file_path.to_owned() } // TODO: reconsider returning PathBuf at all
@@ -683,7 +698,7 @@ impl Storable for Project {
     }
 
     fn is_ready_for_archive(&self) -> bool {
-        Project::is_ready_for_archive(self).is_ok()
+        Project::is_ready_for_archive(self).is_empty()
     }
 }
 

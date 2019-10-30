@@ -5,7 +5,7 @@ use asciii::print;
 use asciii::storage::*;
 //use asciii::storage::error::*;
 
-use asciii::project::{spec, BillType, Project};
+use asciii::project::{BillType, Project};
 use asciii::project::spec::HasEvents;
 use asciii::templater::Templater;
 
@@ -63,12 +63,21 @@ fn show_files(selection: StorageSelection) -> Result<(), Error> {
     Ok(())
 }
 
+fn print_spec_result(label: &str, result: &[String]) {
+    if result.is_empty() {
+        println!("{}: ✓", label);
+    } else {
+        println!("{}: ✗\n{}", label, result.join("|"));
+    }
+}
+
+
 fn show_errors(selection: StorageSelection) -> Result<(), Error> {
     for p in setup::<Project>()?.open_projects(selection)? {
         println!("{}: ", p.short_desc());
-        spec::print_spec_result("offer", &p.is_ready_for_offer());
-        spec::print_spec_result("invoice", &p.is_ready_for_invoice());
-        spec::print_spec_result("archive", &p.is_ready_for_archive());
+        print_spec_result("offer", &p.is_missing_for_offer());
+        print_spec_result("invoice", &p.is_missing_for_invoice());
+        print_spec_result("archive", &p.is_ready_for_archive());
     }
     Ok(())
 }

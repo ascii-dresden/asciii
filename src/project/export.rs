@@ -31,11 +31,11 @@ impl ExportTarget<Client> for Project {
         Client {
             full_name: self.client().full_name(),
             addressing: self.client().addressing(),
-            email: opt_str(self.client().email()),
-            last_name: opt_str(self.client().last_name()),
-            first_name: opt_str(self.client().first_name()),
-            title: opt_str(self.client().title()),
-            address: opt_str(self.client().address()),
+            email: opt_str(self.client().email().ok()),
+            last_name: opt_str(self.client().last_name().ok()),
+            first_name: opt_str(self.client().first_name().ok()),
+            title: opt_str(self.client().title().ok()),
+            address: opt_str(self.client().address().ok()),
         }
     }
 }
@@ -56,9 +56,9 @@ fn dmy(date: Option<Date<Utc>>) -> Option<String> {
 impl ExportTarget<Event> for Project {
     fn export(&self) -> Event {
         Event {
-            name: IsProject::name(self).map(ToOwned::to_owned),
-            date: dmy(self.event_date()),
-            manager: self.responsible().map(ToOwned::to_owned),
+            name: IsProject::name(self).ok().map(ToOwned::to_owned),
+            date: dmy(self.event_date().ok()),
+            manager: self.responsible().ok().map(ToOwned::to_owned),
         }
     }
 }
@@ -99,14 +99,14 @@ impl ExportTarget<Service> for Project {
     fn export(&self) -> Service {
         Service {
             time:         self.hours().total_time(),
-            tax:          self.hours().tax().map(|t|t.value()),
-            salary:       self.hours().salary()
+            tax:          self.hours().tax().ok().map(|t|t.value()),
+            salary:       self.hours().salary().ok()
                                       .map(|s| s.postfix().to_string()),
             gross_total:  self.hours().gross_wages()
                                       .map(|s| s.postfix().to_string()),
             net_total:    self.hours().net_wages()
                                       .map(|s| s.postfix().to_string()),
-            employees:    self.hours().employees()
+            employees:    self.hours().employees().ok()
                                       .map(|employees|
                                            employees.iter()
                                                 .map(export_employee)
@@ -164,7 +164,7 @@ impl ExportTarget<Offer> for Project {
         let (offer, _) = self.bills().unwrap();
         Offer {
             // appendix: self.offer().appendix(),
-            date: dmy(self.offer().date()),
+            date: dmy(self.offer().date().ok()),
             number: self.offer().number(),
             sums: sums_from_bill(&offer),
             net_total: currency_to_string(&offer.net_total()),
@@ -191,10 +191,10 @@ impl ExportTarget<Invoice> for Project {
         let (_, invoice) = self.bills().unwrap();
 
         Invoice {
-            date: dmy(self.invoice().date()),
+            date: dmy(self.invoice().date().ok()),
             number: self.invoice().number_str(),
             number_long: self.invoice().number_long_str(),
-            official: self.invoice().official(),
+            official: self.invoice().official().ok(),
             sums: sums_from_bill(&invoice),
             net_total: currency_to_string(&invoice.net_total()),
             gross_total: currency_to_string(&invoice.gross_total()),
@@ -282,8 +282,8 @@ impl ExportTarget<Complete> for Project {
 #[derive(Debug, PartialEq)]
 #[cfg_attr(feature = "serialization", derive(Serialize))]
 pub struct Checks {
-    ready_for_offer: bool,
-    ready_for_invoice: bool,
+    missing_for_offer: bool,
+    missing_for_invoice: bool,
     ready_for_archive: bool,
     payed_by_customer: bool,
     payed_employees: bool,
@@ -293,13 +293,13 @@ pub struct Checks {
 impl ExportTarget<Checks> for Project {
     fn export(&self) -> Checks {
         Checks {
-            ready_for_offer: self.is_ready_for_offer().is_ok(),
-            ready_for_invoice: self.is_ready_for_invoice().is_ok(),
-            ready_for_archive: self.is_ready_for_archive().is_ok(),
+            missing_for_offer: self.is_missing_for_offer().is_empty(),
+            missing_for_invoice: self.is_missing_for_invoice().is_empty(),
+            ready_for_archive: self.is_ready_for_archive().is_empty(),
             payed_by_customer: self.is_payed(),
             payed_employees: self.hours().employees_payed(),
             canceled: self.canceled(),
-            // errors: self.is_ready_for_offer().err().map(|list| list.errors)
+            // errors: self.is_missing_for_offer().err().map(|list| list.errors)
         }
     }
 }
@@ -307,8 +307,8 @@ impl ExportTarget<Checks> for Project {
 #[derive(Debug, PartialEq)]
 #[cfg_attr(feature = "serialization", derive(Serialize))]
 pub struct Errors {
-    ready_for_offer:   Vec<String>,
-    ready_for_invoice: Vec<String>,
+    missing_for_offer:   Vec<String>,
+    missing_for_invoice: Vec<String>,
     ready_for_archive: Vec<String>,
 }
 
@@ -316,9 +316,9 @@ pub struct Errors {
 impl ExportTarget<Errors> for Project {
     fn export(&self) -> Errors {
         Errors {
-            ready_for_offer:   self.is_ready_for_offer()  .err().into_iter().flat_map(|x|x.errors).collect(),
-            ready_for_invoice: self.is_ready_for_invoice().err().into_iter().flat_map(|x|x.errors).collect(),
-            ready_for_archive: self.is_ready_for_archive().err().into_iter().flat_map(|x|x.errors).collect(),
+            missing_for_offer:   self.is_missing_for_offer(),
+            missing_for_invoice: self.is_missing_for_invoice(),
+            ready_for_archive: self.is_ready_for_archive(),
         }
     }
 }

@@ -71,12 +71,12 @@ impl ComputedField {
         let storage = storage::get_storage_path();
 
         match *self {
-            ComputedField::Responsible => project.responsible().map(ToOwned::to_owned),
+            ComputedField::Responsible => project.responsible().ok().map(ToOwned::to_owned),
             ComputedField::OfferNumber => project.offer().number(),
             ComputedField::InvoiceNumber => project.invoice().number_str(),
             ComputedField::InvoiceNumberLong => project.invoice().number_long_str(),
             ComputedField::Name => {
-                Some(project.name()
+                Some(project.name().ok()
                             .map(ToString::to_string)
                             .unwrap_or_else(|| project.file_name()))
             } // TODO: remove name() from `Storable`, storables only need a slug()
@@ -111,7 +111,7 @@ impl ComputedField {
                        .gross_wages()
                        .map(|c| util::currency_to_string(&c))
             }
-            ComputedField::Format => project.format().map(|f| f.to_string()),
+            ComputedField::Format => project.format().ok().map(|f| f.to_string()),
             ComputedField::Dir => {
                 project.dir()
                        .parent()

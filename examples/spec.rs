@@ -36,6 +36,7 @@ fn main() {
                 .hours()
                 .salary()
                 .map(|c| c.postfix().to_string())
+                .ok()
                 .unwrap_or_else(|| String::from("0€"))
         );
         println!("caterers:  {:?}", project.hours().employees_string());
