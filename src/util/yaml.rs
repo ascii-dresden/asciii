@@ -146,6 +146,7 @@ pub fn get_to_string(yaml:&Yaml, key:&str) -> Option<String> {
 }
 
 /// Gets a Date in `dd.mm.YYYY` format.
+#[deprecated]
 pub fn get_dmy(yaml:&Yaml, key:&str) -> Option<Date<Utc>> {
     get(yaml,key).and_then(Yaml::as_str).and_then(|d|parse_dmy_date(d))
 }

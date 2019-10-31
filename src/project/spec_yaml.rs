@@ -20,33 +20,29 @@ impl YamlProvider for Project {
 }
 
 impl IsProject for Project {
-    fn name(&self) -> FieldValue<&str> {
-        self.get_str("event.name")
-            // old spec
-            .or_else(|| self.get_str("event"))
+    fn name(&self) -> FieldResult<&str> {
+        self.get_str("event.name|event")
     }
 
-    fn event_date(&self) -> FieldValue<Date<Utc>> {
-        self.get_dmy("event.dates.0.begin")
-            .or_else(||self.get_dmy("created"))
-            .or_else(||self.get_dmy_legacy_range("date"))
+    fn event_date(&self) -> FieldResult<Date<Utc>> {
+        self.get_dmy("event.dates.0.begin|created|date")
     }
 
     //#[deprecated(note="Ambiguous: what format? use \"Version\"")]
-    fn format(&self) -> FieldValue<Version> {
+    fn format(&self) -> FieldResult<Version> {
         self.get_str("meta.format")
-            .or_else(|| self.get_str("format"))
-            .and_parse(Version::from_str)
+            .or_else(|_| self.get_str("format"))
+            .and_then(|s| Version::from_str(s).map_err(|e| FieldError::from(e)))
     }
 
     fn canceled(&self) -> bool {
         self.get_bool("canceled").unwrap_or(false)
     }
 
-    fn responsible(&self) -> FieldValue<&str> {
+    fn responsible(&self) -> FieldResult<&str> {
         self.get_str("manager")
         // old spec
-        .or_else(|| self.get_str("signature").and_parse(|c| c.lines().last().ok_or("invalid signature")))
+        .or_else(|_| self.get_str("signature").and_then(|c| c.lines().last().ok_or(FieldError::invalid("invalid signature"))))
     }
 
     fn long_desc(&self) -> String {
@@ -169,7 +165,7 @@ impl HasEvents for Project {
              .collect()
     }
 
-    fn location(&self) -> FieldValue<&str> {
+    fn location(&self) -> FieldResult<&str> {
         self.get_str("event.location")
     }
 }
@@ -189,17 +185,17 @@ fn service_to_product<'a, T: HasEmployees>(s: &T) -> Result<Product<'a>, Error> 
 }
 
 impl Redeemable for Project {
-    fn payed_date(&self) -> FieldValue<Date<Utc>> {
+    fn payed_date(&self) -> FieldResult<Date<Utc>> {
         self.get_dmy("invoice.payed_date")
         // old spec
-        .or_else(|| self.get_dmy("payed_date"))
+        .or_else(|_|  self.get_dmy("payed_date"))
     }
 
     fn is_payed(&self) -> bool {
         self.payed_date().ok().is_some()
     }
 
-    fn tax(&self) -> FieldValue<Tax> {
+    fn tax(&self) -> FieldResult<Tax> {
         self.get_f64("tax").map(Tax::new)
     }
 
@@ -274,36 +270,36 @@ impl<'a> YamlProvider for Client<'a> {
 }
 
 impl<'a> IsClient for Client<'a> {
-    fn email(&self) -> FieldValue<&str> {
+    fn email(&self) -> FieldResult<&str> {
         self.get_str("client/email")
-            .or_else(|| self.get_str("email"))
+            .or_else(|_|  self.get_str("email"))
     }
 
-    fn address(&self) -> FieldValue<&str> {
+    fn address(&self) -> FieldResult<&str> {
         self.get_str("client/address")
-            .or_else(|| self.get_str("address"))
+            .or_else(|_|  self.get_str("address"))
     }
 
-    fn title(&self) -> FieldValue<&str> {
+    fn title(&self) -> FieldResult<&str> {
         self.get_str("client/title")
         // old spec
-        .or_else(|| self.get_str("client").and_parse(|c|c.lines().nth(0).ok_or("invalid client name")))
+        .or_else(|_|  self.get_str("client").and_then(|c|c.lines().nth(0).ok_or(FieldError::invalid("invalid client name"))))
     }
 
-    fn salute(&self) -> FieldValue<&str> {
-        self.title().and_parse(|s| s.split_whitespace().nth(0).ok_or("title has no salute"))
+    fn salute(&self) -> FieldResult<&str> {
+        self.title().and_then(|s| s.split_whitespace().nth(0).ok_or(FieldError::invalid("title has no salute")))
     }
 
-    fn first_name(&self) -> FieldValue<&str> {
+    fn first_name(&self) -> FieldResult<&str> {
         self.get_str("client.first_name")
         // old spec
-        // .or_else(|| yaml::get_str(&yaml, "client").and_then(|c|c.lines().nth(0)))
+        // .or_else(|_|  yaml::get_str(&yaml, "client").and_then(|c|c.lines().nth(0)))
     }
 
-    fn last_name(&self) -> FieldValue<&str> {
+    fn last_name(&self) -> FieldResult<&str> {
         self.get_str("client.last_name")
         // old spec
-        .or_else(|| self.get_str("client").and_parse(|c|c.lines().nth(1).ok_or("invalid client name")))
+        .or_else(|_| self.get_str("client").and_then(|c|c.lines().nth(1).ok_or(FieldError::invalid("invalid client name"))))
     }
 
     fn full_name(&self) -> Option<String> {
@@ -357,11 +353,11 @@ impl<'a> YamlProvider for Offer<'a> {
 }
 
 impl<'a> Offerable for Offer<'a> {
-    fn appendix(&self) -> FieldValue<i64> {
+    fn appendix(&self) -> FieldResult<i64> {
         self.get_int("offer.appendix")
     }
 
-    fn date(&self) -> FieldValue<Date<Utc>> {
+    fn date(&self) -> FieldResult<Date<Utc>> {
         self.get_dmy("offer.date")
     }
 
@@ -396,16 +392,12 @@ impl<'a> YamlProvider for Invoice<'a> {
 }
 
 impl<'a> Invoicable for Invoice<'a> {
-    fn number(&self) -> FieldValue<i64> {
-        self.get_int("invoice.number")
-        // old spec
-        .or_else(|| self.get_int("rnumber"))
+    fn number(&self) -> FieldResult<i64> {
+        self.get_int("invoice.number|rnumber")
     }
 
-    fn date(&self) -> FieldValue<Date<Utc>> {
-        self.get_dmy("invoice.date")
-        // old spec
-        .or_else(|| self.get_dmy("invoice_date"))
+    fn date(&self) -> FieldResult<Date<Utc>> {
+        self.get_dmy("invoice.date|invoice_date")
     }
 
     fn number_str(&self) -> Option<String> {
@@ -418,7 +410,7 @@ impl<'a> Invoicable for Invoice<'a> {
         self.number().ok().map(|n| format!("R{}-{:03}", year, n))
     }
 
-    fn official(&self) -> FieldValue<String> {
+    fn official(&self) -> FieldResult<String> {
         self.get_str("invoice.official").map(ToOwned::to_owned)
     }
 }
@@ -441,17 +433,17 @@ impl<'a> YamlProvider for Hours<'a> {
 }
 
 impl<'a> HasEmployees for Hours<'a> {
-    fn wages_date(&self) -> FieldValue<Date<Utc>> {
+    fn wages_date(&self) -> FieldResult<Date<Utc>> {
         self.get_dmy("hours.wages_date")
         // old spec
-        .or_else(|| self.get_dmy("wages_date"))
+        .or_else(|_|  self.get_dmy("wages_date"))
     }
 
-    fn salary(&self) -> FieldValue<Currency> {
+    fn salary(&self) -> FieldResult<Currency> {
         self.get_f64("hours.salary").map(to_currency)
     }
 
-    fn tax(&self) -> FieldValue<Tax> {
+    fn tax(&self) -> FieldResult<Tax> {
         self.get_f64("hours.tax").map(Tax::new)
     }
 
@@ -498,31 +490,29 @@ impl<'a> HasEmployees for Hours<'a> {
         })
     }
 
-    fn employees(&self) -> FieldValue<Vec<Employee>> {
+    fn employees(&self) -> FieldResult<Vec<Employee>> {
         let employees = self.get_hash("hours.caterers")
-                            .or_else(|| self.get_hash("hours.employees"));
+                            .or_else(|_| self.get_hash("hours.employees"));
 
-        employees.filter_map(|employees| {
-            employees.iter()
-                .map(|(c, h)| {(c.as_str().unwrap_or("").into(), make_float(h))
-                })
-                .filter(|&(_, h)| h > 0f64)
-                .map(|(name, time)| {
-                    let wage = self.salary().ok()? * time;
-                    let salary = self.salary().ok()?;
-                    Some(Employee {
-                        name,
-                        time,
-                        wage,
-                        salary,
-                    })
-                })
-                .collect::<Option<Vec<Employee>>>()
-        })
+            employees?.iter()
+                     .map(|(c, h)| {(c.as_str().unwrap_or("").into(), make_float(h))
+                     })
+                     .filter(|&(_, h)| h > 0f64)
+                     .map(|(name, time)| {
+                let wage = self.salary()? * time;
+                let salary = self.salary()?;
+                FieldResult::Ok(Employee {
+                         name,
+                         time,
+                         wage,
+                         salary,
+                     })
+            })
+            .collect::<FieldResult<Vec<Employee>>>()
     }
 
     fn employees_payed(&self) -> bool {
-        self.employees().ok().is_none() || self.wages_date().ok().is_some()
+        self.employees().is_err() || self.wages_date().is_ok()
     }
 
     fn wages(&self) -> Option<Currency> {

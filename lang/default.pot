@@ -604,11 +604,11 @@ msgstr ""
 msgid "{} does not exist"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/document_export/mod.rs:185
+#: /home/hendrik/code/ascii/asciii/src/document_export/mod.rs:197
 msgid "WARNING: Can't make sense of {}"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/document_export/mod.rs:223
+#: /home/hendrik/code/ascii/asciii/src/document_export/mod.rs:235
 msgid "Project file is younger than pdf, continue anyway?"
 msgstr ""
 
@@ -624,43 +624,47 @@ msgstr ""
 msgid "{} weeks"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/project/mod.rs:304
+#: /home/hendrik/code/ascii/asciii/src/project/error.rs:49 /home/hendrik/code/ascii/asciii/src/project/error.rs:65
+msgid "field {} has invalid value: {}"
+msgstr ""
+
+#: /home/hendrik/code/ascii/asciii/src/project/mod.rs:322
 msgid "weird task edgecase in {:?}:\n{:?}"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/project/mod.rs:312
+#: /home/hendrik/code/ascii/asciii/src/project/mod.rs:330
 msgid "Create an Invoice"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/project/mod.rs:320
+#: /home/hendrik/code/ascii/asciii/src/project/mod.rs:338
 msgid "{}: Hungry employees!"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/project/mod.rs:321
+#: /home/hendrik/code/ascii/asciii/src/project/mod.rs:339
 msgid "Pay {}\nYou have had the money for {} days!"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/project/mod.rs:331
+#: /home/hendrik/code/ascii/asciii/src/project/mod.rs:349
 msgid "Inquire about: \"{event}\"!"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/project/mod.rs:332
+#: /home/hendrik/code/ascii/asciii/src/project/mod.rs:350
 msgid "{inum }{event:?} on {invoice_date} ({days} days ago) was already invoiced but is still not marked as payed.\nPlease check for incoming payments! You can ask {client} ({mail})."
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/project/mod.rs:342
+#: /home/hendrik/code/ascii/asciii/src/project/mod.rs:360
 msgid "{rnum}: payment is {weeks} weeks late: \"{event}\""
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/project/mod.rs:354
+#: /home/hendrik/code/ascii/asciii/src/project/mod.rs:372
 msgid "Archive {}"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/project/mod.rs:355
+#: /home/hendrik/code/ascii/asciii/src/project/mod.rs:373
 msgid "{:?} has been finished for {} days, get rid of it!"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/project/spec_yaml.rs:60
+#: /home/hendrik/code/ascii/asciii/src/project/spec_yaml.rs:57
 msgid "Responsible: {}"
 msgstr ""
 

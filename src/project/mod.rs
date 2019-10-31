@@ -71,7 +71,8 @@ impl Project {
     pub fn yaml(&self) -> &Yaml{ &self.yaml }
 
     /// Opens a project from file path;
-    pub fn open<S: AsRef<OsStr> + ?Sized>(pathish: &S) -> Result<Project, Error> {
+    pub fn open<S: AsRef<OsStr> + std::fmt::Debug + ?Sized>(pathish: &S) -> Result<Project, Error> {
+        trace!("Project::open({:?});", pathish);
         let file_path = Path::new(&pathish);
         let file_content = fs::read_to_string(&file_path)?;
         let project = Project {
@@ -90,14 +91,15 @@ impl Project {
             .and(project.offer().validate())
             .and(project.hours().validate())
             .and(Redeemable::validate(&project));
-        for err in validation.validation_errors {
-            let name = project.name().ok().map(ToString::to_string).unwrap_or_else(|| {
-                file_path.file_name().map(|x| x.to_string_lossy().to_string())
-                    .unwrap_or_else(|| "<unknown>".to_string())
-            });
-            warn!("project {}: {}", name, err);
-        }
 
+        if !validation.validation_errors.is_empty() {
+            let name = project.short_desc();
+            warn!("project {:?}:", name);
+            for err in validation.validation_errors {
+                println!(" * {}", err);
+            }
+
+        }
         Ok(project)
     }
 
@@ -150,7 +152,7 @@ impl Project {
 
     /// wrapper around yaml::get() with replacement
     pub fn field(&self, path:&str) -> Option<String> {
-        ComputedField::from(path).get(self).or_else(||
+        ComputedField::from(path).get(self).or_else(|| 
             yaml::get_to_string(self.yaml(),path)
         )
     }
@@ -644,8 +646,8 @@ impl Storable for Project {
 
     fn modified_date(&self) -> Option<Date<Utc>> {
         self.get_dmy( "event.dates.0.begin")
-            .or_else(||self.get_dmy("created"))
-            .or_else(||self.get_dmy_legacy_range("date"))
+            .or_else(|_| self.get_dmy("created"))
+            .or_else(|_| self.get_dmy_legacy_range("date"))
             .ok()
     }
 

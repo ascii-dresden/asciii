@@ -1,6 +1,6 @@
 use clap::ArgMatches;
 use failure::{bail, format_err, Error};
-use log::{trace, error};
+use log::trace;
 
 use asciii::{storage, util};
 use asciii::project::Project;

@@ -139,9 +139,9 @@ pub fn spec() -> Result<(), Error> {
         project.client().validate().missing_fields.into_iter().for_each(|error| println!("{}", error));
 
         project.client().full_name();
-        project.client().first_name();
-        project.client().title();
-        project.client().email();
+        project.client().first_name()?;
+        project.client().title()?;
+        project.client().email()?;
 
 
         project.hours().employees_string();

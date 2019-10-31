@@ -17,7 +17,7 @@ use yaml_rust::Yaml;
 use crate::storage::Storable;
 use super::error::ValidationResult;
 use super::product::Product;
-use super::yaml_provider::FieldValue;
+use super::yaml_provider::FieldResult;
 
 
 /// Every other trait in this module ought to be `Validatable`
@@ -44,19 +44,19 @@ impl<T: Validatable> ValidatableExt for T {
 pub trait IsProject {
 
     /// Project Name
-    fn name(&self) -> FieldValue<&str>;
+    fn name(&self) -> FieldResult<&str>;
 
     /// When was the event
-    fn event_date(&self) -> FieldValue<Date<Utc>>;
+    fn event_date(&self) -> FieldResult<Date<Utc>>;
 
     /// Version of project format
-    fn format(&self) -> FieldValue<Version>;
+    fn format(&self) -> FieldResult<Version>;
 
     /// Did the event actually occur
     fn canceled(&self) -> bool;
 
     /// Who organized the event
-    fn responsible(&self) -> FieldValue<&str>;
+    fn responsible(&self) -> FieldResult<&str>;
 
     /// Long description of the project
     fn long_desc(&self) -> String;
@@ -81,10 +81,10 @@ impl<T> IsProjectExt for T where T: Storable {
 /// Stage 1: requirements for an offer
 pub trait Offerable {
     /// Raised if the offer number is reused
-    fn appendix(&self) -> FieldValue<i64>;
+    fn appendix(&self) -> FieldResult<i64>;
 
     /// When was the offer created
-    fn date(&self) -> FieldValue<Date<Utc>>;
+    fn date(&self) -> FieldResult<Date<Utc>>;
 
     /// ID of an the offer
     fn number(&self) -> Option<String>;
@@ -95,22 +95,22 @@ pub trait Offerable {
 /// This is a [client](../struct.Project.html#method.client)
 pub trait IsClient {
     ///Returns the content of `/client/email`
-    fn email(&self) -> FieldValue<&str>;
+    fn email(&self) -> FieldResult<&str>;
 
     ///Returns the content of `/client/address`
-    fn address(&self) -> FieldValue<&str>;
+    fn address(&self) -> FieldResult<&str>;
 
     ///Returns the content of `/client/title`
-    fn title(&self) -> FieldValue<&str>;
+    fn title(&self) -> FieldResult<&str>;
 
     ///Returns the first word of `client/title`
-    fn salute(&self) -> FieldValue<&str>;
+    fn salute(&self) -> FieldResult<&str>;
 
     ///Returns the content of `/client/first_name`
-    fn first_name(&self) -> FieldValue<&str>;
+    fn first_name(&self) -> FieldResult<&str>;
 
     ///Returns the content of `/client/last_name`
-    fn last_name(&self) -> FieldValue<&str>;
+    fn last_name(&self) -> FieldResult<&str>;
 
     /// Combines `first_name` and `last_name`.
     fn full_name(&self) -> Option<String>;
@@ -122,10 +122,10 @@ pub trait IsClient {
 /// Stage 2: requirements for an invoice
 pub trait Invoicable {
     /// plain access to `invoice/number`
-    fn number(&self) -> FieldValue<i64>;
+    fn number(&self) -> FieldResult<i64>;
 
     /// When was the invoice created
-    fn date(&self) -> FieldValue<Date<Utc>>;
+    fn date(&self) -> FieldResult<Date<Utc>>;
 
     /// invoice number as a string
     fn number_str(&self) -> Option<String>;
@@ -134,7 +134,7 @@ pub trait Invoicable {
     fn number_long_str(&self) -> Option<String>;
 
     /// An official identifier
-    fn official(&self) -> FieldValue<String>;
+    fn official(&self) -> FieldResult<String>;
 }
 
 /// Represents an Employee
@@ -155,13 +155,13 @@ pub struct Employee {
 /// Something that has employees
 pub trait HasEmployees {
     /// When were the wages payed
-    fn wages_date(&self) -> FieldValue<Date<Utc>>;
+    fn wages_date(&self) -> FieldResult<Date<Utc>>;
 
     /// Salary
-    fn salary(&self) -> FieldValue<Currency>;
+    fn salary(&self) -> FieldResult<Currency>;
 
     /// Tax
-    fn tax(&self) -> FieldValue<Tax>;
+    fn tax(&self) -> FieldResult<Tax>;
 
     /// Sum of wages after tax
     fn net_wages(&self) -> Option<Currency> ;
@@ -191,7 +191,7 @@ pub trait HasEmployees {
     fn employees_string(&self) -> Option<String>;
 
     /// List of employees and their respective service hours
-    fn employees(&self) -> FieldValue<Vec<Employee>>;
+    fn employees(&self) -> FieldResult<Vec<Employee>>;
 
     /// Check if the employees have been payed
     fn employees_payed(&self) -> bool;
@@ -205,7 +205,7 @@ pub trait HasEmployees {
 pub trait Redeemable: IsProject {
 
     /// When was the project payed
-    fn payed_date(&self) -> FieldValue<Date<Utc>>;
+    fn payed_date(&self) -> FieldResult<Date<Utc>>;
 
     /// If was the project payed
     fn is_payed(&self) -> bool;
@@ -214,7 +214,7 @@ pub trait Redeemable: IsProject {
     fn bills(&self) -> Result<(Bill<Product<'_>>, Bill<Product<'_>>), Error>;
 
     /// When what is the MWsT of the project.
-    fn tax(&self) -> FieldValue<Tax>;
+    fn tax(&self) -> FieldResult<Tax>;
 
     /// Sum of sold products
     fn sum_sold(&self) -> Result<Currency, Error> {
@@ -272,6 +272,6 @@ pub trait HasEvents {
     fn times(&self,yaml: &Yaml) -> Option<Vec<EventTime>>;
 
     /// Returns the location of the event
-    fn location(&self) -> FieldValue<&str>;
+    fn location(&self) -> FieldResult<&str>;
 
 }
