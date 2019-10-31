@@ -2,7 +2,7 @@
 
 use failure::Fail;
 
-use super::yaml_provider::FieldValue;
+use super::yaml_provider::error::{FieldResult, FieldError};
 
 #[derive(Fail, Debug)]
 pub enum ProjectError {
@@ -44,9 +44,9 @@ impl ValidationResult {
         return self.validation_errors.is_empty() && self.missing_fields.is_empty()
     }
 
-    pub fn validate_field<T>(&mut self, name: &str, val: FieldValue<T>) {
-        if let FieldValue::Invalid(msg) = val {
-            self.validation_errors.push(lformat!("field {} has invalid value: {}", name, msg).to_string());
+    pub fn validate_field<T>(&mut self, name: &str, val: FieldResult<T>) {
+        if let Err(FieldError::Invalid(msg)) = val {
+            self.validation_errors.push(lformat!("{:?} is invalid: {}", name, msg).to_string());
         }
     }
 
@@ -56,13 +56,13 @@ impl ValidationResult {
         }
     }
 
-    pub fn require_field<T>(&mut self, name: &str, val: FieldValue<T>) {
+    pub fn require_field<T>(&mut self, name: &str, val: FieldResult<T>) {
         if !val.is_ok() {
             self.missing_fields.push(name.to_string())
         }
 
-        if let FieldValue::Invalid(msg) = val {
-            self.validation_errors.push(lformat!("field {} has invalid value: {}", name, msg).to_string());
+        if let Err(FieldError::Invalid(msg)) = val {
+            self.validation_errors.push(lformat!("{:?} is invalid: {}", name, msg).to_string());
         }
     }
 

@@ -220,9 +220,9 @@ pub fn verbose_rows(projects:&[Project], list_config:&ListConfig<'_>) -> Vec<Row
             if list_config.show_errors{
                 cells.extend_from_slice( &[
                     // Errors
-                    cell!(validation1.join("|")),
-                    cell!(validation2.join("|")),
-                    cell!(validation3.join("|")),
+                    cell!(validation1.join(",")),
+                    cell!(validation2.join(",")),
+                    cell!(validation3.join(",")),
                 ]);
             }
 
