@@ -13,7 +13,6 @@ use prettytable::{cell, row};
 
 use crate::project::{BillType, Project, Exportable};
 use crate::project::spec::{IsProject, Redeemable, Invoicable, HasEmployees, HasEvents};
-use crate::project::error::SpecResult;
 use crate::storage::Storable;
 use crate::util::currency_to_string;
 
@@ -58,12 +57,12 @@ fn payed_to_cell(project:&Project) -> Cell {
     }
 }
 
-fn result_to_cell(res: &SpecResult, bold:bool) -> Cell{
-    match (res, bold){
-        (&Ok(_),           false) => Cell::new("✓").with_style(Attr::ForegroundColor(color::GREEN)), // ✗
-        (&Ok(_),           true)  => Cell::new("✓").with_style(Attr::ForegroundColor(color::GREEN))
+fn result_to_cell(res: &[String], bold:bool) -> Cell{
+    match (res.is_empty(), bold){
+        (true, false) => Cell::new("✓").with_style(Attr::ForegroundColor(color::GREEN)), // ✗
+        (true,  true) => Cell::new("✓").with_style(Attr::ForegroundColor(color::GREEN))
                                                    .with_style(Attr::Bold), // ✗
-        (&Err(ref _errors),_)     => Cell::new("✗").with_style(Attr::ForegroundColor(color::RED))// + &errors.join(", ") )
+        (false,    _) => Cell::new("✗").with_style(Attr::ForegroundColor(color::RED))// + &errors.join(", ") )
         //&Err(ref errors) => Cell::new( &format!("✗ {}",  &errors.join(", ") )) .with_style(Attr::ForegroundColor(color::RED))
     }
 }
@@ -71,7 +70,7 @@ fn result_to_cell(res: &SpecResult, bold:bool) -> Cell{
 /// create a Style string from the properties of a project
 fn project_to_style(project:&Project) -> &str{
     // can be send as invoice
-    if project.is_ready_for_invoice().is_ok(){
+    if project.is_missing_for_invoice().is_empty(){
         return "d"
     }
 
@@ -161,8 +160,8 @@ pub fn verbose_rows(projects:&[Project], list_config:&ListConfig<'_>) -> Vec<Row
                       );
 
 
-            let validation1 = project.is_ready_for_offer();
-            let validation2 = project.is_ready_for_invoice();
+            let validation1 = project.is_missing_for_offer();
+            let validation2 = project.is_missing_for_invoice();
             let validation3 = project.is_ready_for_archive();
 
             cells.extend_from_slice( &[
@@ -220,10 +219,10 @@ pub fn verbose_rows(projects:&[Project], list_config:&ListConfig<'_>) -> Vec<Row
 
             if list_config.show_errors{
                 cells.extend_from_slice( &[
-                                         // Errors
-                                         cell!(validation1.err().map(|errs| errs.join("|")).unwrap_or_else(String::new)),
-                                         cell!(validation2.err().map(|errs| errs.join("|")).unwrap_or_else(String::new)),
-                                         cell!(validation3.err().map(|errs| errs.join("|")).unwrap_or_else(String::new)),
+                    // Errors
+                    cell!(validation1.join("|")),
+                    cell!(validation2.join("|")),
+                    cell!(validation3.join("|")),
                 ]);
             }
 
@@ -249,13 +248,13 @@ pub fn dynamic_rows(projects:&[Project], list_config:&ListConfig<'_>) -> Vec<Row
                                         ).collect::<Vec<Cell>>()
                     );
                 if list_config.show_errors{
-                    let validation = (project.is_ready_for_offer(), project.is_ready_for_invoice(), project.is_ready_for_archive());
+                    let validation = (project.is_missing_for_offer(), project.is_missing_for_invoice(), project.is_ready_for_archive());
 
                     cells.extend_from_slice( &[
-                                             // Errors
-                                             cell!(validation.0.err().map(|errs| errs.join("|")).unwrap_or_else(String::new)),
-                                             cell!(validation.1.err().map(|errs| errs.join("|")).unwrap_or_else(String::new)),
-                                             cell!(validation.2.err().map(|errs| errs.join("|")).unwrap_or_else(String::new)),
+                        // Errors
+                        cell!(validation.0.join("|")),
+                        cell!(validation.1.join("|")),
+                        cell!(validation.2.join("|")),
                     ]);
                 }
             }

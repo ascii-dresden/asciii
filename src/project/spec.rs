@@ -15,31 +15,26 @@ use semver::Version;
 use yaml_rust::Yaml;
 
 use crate::storage::Storable;
-use super::error::{SpecResult, ErrorList};
+use super::error::ValidationResult;
 use super::product::Product;
-
-
-pub fn print_spec_result(label: &str, result: &SpecResult) {
-match *result {
-        Ok(_) => println!("{}: ✓", label),
-        Err(ref errs) => println!("{}: ✗\n{}", label, errs)
-    }
-}
+use super::yaml_provider::FieldValue;
 
 
 /// Every other trait in this module ought to be `Validatable`
+///
 pub trait Validatable {
-    /// Checks for certain errors
-    fn validate(&self) -> SpecResult;
+    /// Validates the spec, checking for missing fields and invalid values
+    fn validate(&self) -> ValidationResult;
+}
 
-    /// Returns true if valid
-    fn is_valid(&self) -> bool {
-        self.validate().is_ok()
-    }
+pub trait ValidatableExt {
+    /// Returns fields that have invalid data or are missing
+    fn missing_fields(&self) -> Vec<String>;
+}
 
-    /// Returns list of found errors
-    fn errors(&self) -> Option<ErrorList>{
-        self.validate().err()
+impl<T: Validatable> ValidatableExt for T {
+    fn missing_fields(&self) -> Vec<String> {
+        return self.validate().missing_fields;
     }
 }
 
@@ -49,19 +44,19 @@ pub trait Validatable {
 pub trait IsProject {
 
     /// Project Name
-    fn name(&self) -> Option<&str>;
+    fn name(&self) -> FieldValue<&str>;
 
     /// When was the event
-    fn event_date(&self) -> Option<Date<Utc>>;
+    fn event_date(&self) -> FieldValue<Date<Utc>>;
 
     /// Version of project format
-    fn format(&self) -> Option<Version>;
+    fn format(&self) -> FieldValue<Version>;
 
     /// Did the event actually occur
     fn canceled(&self) -> bool;
 
     /// Who organized the event
-    fn responsible(&self) -> Option<&str>;
+    fn responsible(&self) -> FieldValue<&str>;
 
     /// Long description of the project
     fn long_desc(&self) -> String;
@@ -86,10 +81,10 @@ impl<T> IsProjectExt for T where T: Storable {
 /// Stage 1: requirements for an offer
 pub trait Offerable {
     /// Raised if the offer number is reused
-    fn appendix(&self) -> Option<i64>;
+    fn appendix(&self) -> FieldValue<i64>;
 
     /// When was the offer created
-    fn date(&self) -> Option<Date<Utc>>;
+    fn date(&self) -> FieldValue<Date<Utc>>;
 
     /// ID of an the offer
     fn number(&self) -> Option<String>;
@@ -100,22 +95,22 @@ pub trait Offerable {
 /// This is a [client](../struct.Project.html#method.client)
 pub trait IsClient {
     ///Returns the content of `/client/email`
-    fn email(&self) -> Option<&str>;
+    fn email(&self) -> FieldValue<&str>;
 
     ///Returns the content of `/client/address`
-    fn address(&self) -> Option<&str>;
+    fn address(&self) -> FieldValue<&str>;
 
     ///Returns the content of `/client/title`
-    fn title(&self) -> Option<&str>;
+    fn title(&self) -> FieldValue<&str>;
 
     ///Returns the first word of `client/title`
-    fn salute(&self) -> Option<&str>;
+    fn salute(&self) -> FieldValue<&str>;
 
     ///Returns the content of `/client/first_name`
-    fn first_name(&self) -> Option<&str>;
+    fn first_name(&self) -> FieldValue<&str>;
 
     ///Returns the content of `/client/last_name`
-    fn last_name(&self) -> Option<&str>;
+    fn last_name(&self) -> FieldValue<&str>;
 
     /// Combines `first_name` and `last_name`.
     fn full_name(&self) -> Option<String>;
@@ -127,10 +122,10 @@ pub trait IsClient {
 /// Stage 2: requirements for an invoice
 pub trait Invoicable {
     /// plain access to `invoice/number`
-    fn number(&self) -> Option<i64>;
+    fn number(&self) -> FieldValue<i64>;
 
     /// When was the invoice created
-    fn date(&self) -> Option<Date<Utc>>;
+    fn date(&self) -> FieldValue<Date<Utc>>;
 
     /// invoice number as a string
     fn number_str(&self) -> Option<String>;
@@ -139,7 +134,7 @@ pub trait Invoicable {
     fn number_long_str(&self) -> Option<String>;
 
     /// An official identifier
-    fn official(&self) -> Option<String>;
+    fn official(&self) -> FieldValue<String>;
 }
 
 /// Represents an Employee
@@ -160,13 +155,13 @@ pub struct Employee {
 /// Something that has employees
 pub trait HasEmployees {
     /// When were the wages payed
-    fn wages_date(&self) -> Option<Date<Utc>>;
+    fn wages_date(&self) -> FieldValue<Date<Utc>>;
 
     /// Salary
-    fn salary(&self) -> Option<Currency>;
+    fn salary(&self) -> FieldValue<Currency>;
 
     /// Tax
-    fn tax(&self) -> Option<Tax>;
+    fn tax(&self) -> FieldValue<Tax>;
 
     /// Sum of wages after tax
     fn net_wages(&self) -> Option<Currency> ;
@@ -182,23 +177,21 @@ pub trait HasEmployees {
 
     /// Returns a product from Service
     fn to_product(&self) -> Option<Product<'_>> {
-        if let Some(salary) = self.salary() {
-            Some(Product {
+        self.salary().ok().map(|s| {
+            Product {
                 name: "Service",
                 unit: Some("h"),
-                tax: self.tax().unwrap_or_else(|| Tax::new(0.0)),
-                price: salary
-            })
-        } else {
-            None
-        }
+                tax: self.tax().ok().unwrap_or_else(|| Tax::new(0.0)),
+                price: s,
+            }
+        })
     }
 
     /// Nicely formatted list of employees with their respective service hours
     fn employees_string(&self) -> Option<String>;
 
     /// List of employees and their respective service hours
-    fn employees(&self) -> Option<Vec<Employee>>;
+    fn employees(&self) -> FieldValue<Vec<Employee>>;
 
     /// Check if the employees have been payed
     fn employees_payed(&self) -> bool;
@@ -212,7 +205,7 @@ pub trait HasEmployees {
 pub trait Redeemable: IsProject {
 
     /// When was the project payed
-    fn payed_date(&self) -> Option<Date<Utc>>;
+    fn payed_date(&self) -> FieldValue<Date<Utc>>;
 
     /// If was the project payed
     fn is_payed(&self) -> bool;
@@ -221,7 +214,7 @@ pub trait Redeemable: IsProject {
     fn bills(&self) -> Result<(Bill<Product<'_>>, Bill<Product<'_>>), Error>;
 
     /// When what is the MWsT of the project.
-    fn tax(&self) -> Option<Tax>;
+    fn tax(&self) -> FieldValue<Tax>;
 
     /// Sum of sold products
     fn sum_sold(&self) -> Result<Currency, Error> {
@@ -279,6 +272,6 @@ pub trait HasEvents {
     fn times(&self,yaml: &Yaml) -> Option<Vec<EventTime>>;
 
     /// Returns the location of the event
-    fn location(&self) -> Option<&str>;
+    fn location(&self) -> FieldValue<&str>;
 
 }

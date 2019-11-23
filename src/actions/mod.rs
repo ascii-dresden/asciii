@@ -99,7 +99,7 @@ fn unpayed_employees(projects: &[Project]) -> HashMap<String, Currency> {
     let mut buckets = HashMap::new();
     let employees = projects.iter()
                             .filter(|p| !p.canceled() && p.age().unwrap_or(0) > 0)
-                            .filter_map(|p| p.hours().employees())
+                            .filter_map(|p| p.hours().employees().ok())
                             .flat_map(IntoIterator::into_iter);
 
     for employee in employees {
@@ -136,7 +136,7 @@ pub fn spec() -> Result<(), Error> {
     for project in projects {
         info!("{}", project.dir().display());
 
-        project.client().validate().map_err(|errors| println!("{}", errors)).unwrap();
+        project.client().validate().missing_fields.into_iter().for_each(|error| println!("{}", error));
 
         project.client().full_name();
         project.client().first_name();
@@ -163,7 +163,7 @@ pub fn delete_project_confirmation(dir: StorageDir, search_terms:&[&str]) -> Res
     for project in storage.search_projects_any(dir, search_terms)? {
         storage.delete_project_if(&project, || {
                     let file = project.file();
-                    let desc = project.name().or_else(|| file.to_str()).unwrap();
+                    let desc = project.name().ok().or_else(|| file.to_str()).unwrap();
                     util::really( &lformat!("do you realy want to delete {}?", desc))
                 })?
     }
@@ -180,7 +180,7 @@ pub fn archive_all_projects() -> Result<Vec<PathBuf>, Error> {
     let mut moved_files = Vec::new();
     for project in storage.open_projects(StorageDir::Working)?
                         .iter()
-                        .filter(|p| p.is_ready_for_archive().is_ok()) {
+                        .filter(|p| p.is_ready_for_archive().is_empty()) {
         info!("{}", lformat!("we could get rid of: {}", project.name().unwrap_or("")));
         moved_files.push(project.dir());
         moved_files.append(&mut storage.archive_project(&project, project.year().unwrap())?);

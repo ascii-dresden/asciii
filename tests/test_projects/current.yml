@@ -17,8 +17,8 @@ event:
   name: Party Hard
   location: APB/3105 # might be a list
   dates:
-  - begin: 01.05.1512 # bezieht sich auf die veranstaltung selbst
-    end:   03.05.1512
+  - begin: # bezieht sich auf die veranstaltung selbst
+    end: 
     times:
     -  begin: "19:00"
        #end:   "24:00"

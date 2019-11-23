@@ -8,8 +8,9 @@ use yaml_rust::Yaml;
 
 use super::*;
 use super::spec::*;
+use super::error::ValidationResult;
 use super::product::ProductError;
-use crate::util::{self, yaml, to_currency};
+use crate::util::{self, to_currency};
 use crate::util::yaml::parse_dmy_date;
 
 impl YamlProvider for Project {
@@ -19,44 +20,40 @@ impl YamlProvider for Project {
 }
 
 impl IsProject for Project {
-    fn name(&self) -> Option<&str> {
+    fn name(&self) -> FieldValue<&str> {
         self.get_str("event.name")
             // old spec
             .or_else(|| self.get_str("event"))
     }
 
-    fn event_date(&self) -> Option<Date<Utc>> {
+    fn event_date(&self) -> FieldValue<Date<Utc>> {
         self.get_dmy("event.dates.0.begin")
-        .or_else(||self.get_dmy("created"))
-        .or_else(||self.get_dmy("date"))
-        // probably the dd-dd.mm.yyyy format
-        .or_else(||self.get_str("date")
-                 .and_then(|s| yaml::parse_dmy_date_range(s))
-                 )
+            .or_else(||self.get_dmy("created"))
+            .or_else(||self.get_dmy_legacy_range("date"))
     }
 
     //#[deprecated(note="Ambiguous: what format? use \"Version\"")]
-    fn format(&self) -> Option<Version> {
+    fn format(&self) -> FieldValue<Version> {
         self.get_str("meta.format")
             .or_else(|| self.get_str("format"))
-            .and_then(|s| Version::from_str(s).ok())
+            .and_parse(Version::from_str)
     }
 
     fn canceled(&self) -> bool {
         self.get_bool("canceled").unwrap_or(false)
     }
 
-    fn responsible(&self) -> Option<&str> {
+    fn responsible(&self) -> FieldValue<&str> {
         self.get_str("manager")
         // old spec
-        .or_else(|| self.get_str("signature").and_then(|c|c.lines().last()))
+        .or_else(|| self.get_str("signature").and_parse(|c| c.lines().last().ok_or("invalid signature")))
     }
 
     fn long_desc(&self) -> String {
         use std::fmt::Write;
         let mut out_string = String::new();
 
-        if let Some(responsible) = self.responsible() {
+        if let Some(responsible) = self.responsible().ok() {
             out_string += &lformat!("Responsible: {}", responsible);
         }
 
@@ -78,7 +75,7 @@ impl HasEvents for Project {
                     let mut cal_event = CalEvent::new();
                     cal_event.description(&self.long_desc());
 
-                    if let Some(location) = self.location() {
+                    if let Some(location) = self.location().ok() {
                         cal_event.location(location);
                     }
 
@@ -97,7 +94,7 @@ impl HasEvents for Project {
 
                         let mut cal_event = CalEvent::new();
                         cal_event.description(&self.long_desc());
-                        if let Some(location) = self.location() {
+                        if let Some(location) = self.location().ok() {
                             cal_event.location(location);
                         }
 
@@ -172,18 +169,18 @@ impl HasEvents for Project {
              .collect()
     }
 
-    fn location(&self) -> Option<&str> {
+    fn location(&self) -> FieldValue<&str> {
         self.get_str("event.location")
     }
 }
 
 /// Returns a product from Service
 fn service_to_product<'a, T: HasEmployees>(s: &T) -> Result<Product<'a>, Error> {
-    if let Some(salary) = s.salary() {
+    if let Some(salary) = s.salary().ok() {
         Ok(Product {
                  name: "Service",
                  unit: Some("h"),
-                 tax: s.tax().unwrap_or_else(|| Tax::new(0.0)),
+                 tax: s.tax().ok().unwrap_or_else(|| Tax::new(0.0)),
                  price: salary,
              })
     } else {
@@ -192,17 +189,17 @@ fn service_to_product<'a, T: HasEmployees>(s: &T) -> Result<Product<'a>, Error> 
 }
 
 impl Redeemable for Project {
-    fn payed_date(&self) -> Option<Date<Utc>> {
+    fn payed_date(&self) -> FieldValue<Date<Utc>> {
         self.get_dmy("invoice.payed_date")
         // old spec
         .or_else(|| self.get_dmy("payed_date"))
     }
 
     fn is_payed(&self) -> bool {
-        self.payed_date().is_some()
+        self.payed_date().ok().is_some()
     }
 
-    fn tax(&self) -> Option<Tax> {
+    fn tax(&self) -> FieldValue<Tax> {
         self.get_f64("tax").map(Tax::new)
     }
 
@@ -222,7 +219,7 @@ impl Redeemable for Project {
 
         let raw_products =
             self.get_hash("products")
-                .ok_or_else(|| ProductError::UnknownFormat)?;
+                .ok().ok_or_else(|| ProductError::UnknownFormat)?;
 
         // let document_tax =  // TODO: activate this once the tax no longer 19%
 
@@ -241,49 +238,32 @@ impl Redeemable for Project {
 }
 
 impl Validatable for Project {
-    fn validate(&self) -> SpecResult {
-        let mut errors = ErrorList::new();
-        if self.name().is_none() {
-            errors.push("name")
-        }
-        if self.event_date().is_none() {
-            errors.push("date")
-        }
-        if self.responsible().is_none() {
-            errors.push("manager")
-        }
-        if self.format().is_none() {
-            errors.push("format")
-        }
-        //if hours::salary().is_none(){errors.push("salary")}
+    fn validate(&self) -> ValidationResult {
+        let mut validation = ValidationResult::new();
 
-        if !errors.is_empty() {
-            return Err(errors);
-        }
+        validation.require_field("name", self.name());
+        validation.require_field("date", self.event_date());
+        validation.require_field("manager", self.responsible());
+        validation.require_field("format", self.format());
 
-        Ok(())
+        validation
     }
 }
 
 
 impl Validatable for dyn Redeemable {
-    fn validate(&self) -> SpecResult {
-        let mut errors = ErrorList::new();
-        if self.payed_date().is_none() {
-            errors.push("payed_date");
-        }
+    fn validate(&self) -> ValidationResult {
+        let mut validation = ValidationResult::new();
 
-        if let Some(format) = self.format() {
+        validation.validate_field("format", self.format());
+        if let Some(format) = self.format().ok() {
             if format < Version::parse("2.0.0").unwrap() {
-                return Ok(());
+                return validation;
             }
         }
 
-        if !errors.is_empty() {
-            return Err(errors);
-        }
-
-        Ok(())
+        validation.require_field("payed_date", self.payed_date());
+        validation
     }
 }
 
@@ -294,51 +274,51 @@ impl<'a> YamlProvider for Client<'a> {
 }
 
 impl<'a> IsClient for Client<'a> {
-    fn email(&self) -> Option<&str> {
+    fn email(&self) -> FieldValue<&str> {
         self.get_str("client/email")
             .or_else(|| self.get_str("email"))
     }
 
-    fn address(&self) -> Option<&str> {
+    fn address(&self) -> FieldValue<&str> {
         self.get_str("client/address")
             .or_else(|| self.get_str("address"))
     }
 
-    fn title(&self) -> Option<&str> {
+    fn title(&self) -> FieldValue<&str> {
         self.get_str("client/title")
         // old spec
-        .or_else(|| self.get_str("client").and_then(|c|c.lines().nth(0)))
+        .or_else(|| self.get_str("client").and_parse(|c|c.lines().nth(0).ok_or("invalid client name")))
     }
 
-    fn salute(&self) -> Option<&str> {
-        self.title().and_then(|s| s.split_whitespace().nth(0))
+    fn salute(&self) -> FieldValue<&str> {
+        self.title().and_parse(|s| s.split_whitespace().nth(0).ok_or("title has no salute"))
     }
 
-    fn first_name(&self) -> Option<&str> {
+    fn first_name(&self) -> FieldValue<&str> {
         self.get_str("client.first_name")
         // old spec
         // .or_else(|| yaml::get_str(&yaml, "client").and_then(|c|c.lines().nth(0)))
     }
 
-    fn last_name(&self) -> Option<&str> {
+    fn last_name(&self) -> FieldValue<&str> {
         self.get_str("client.last_name")
         // old spec
-        .or_else(|| self.get_str("client").and_then(|c|c.lines().nth(1)))
+        .or_else(|| self.get_str("client").and_parse(|c|c.lines().nth(1).ok_or("invalid client name")))
     }
 
     fn full_name(&self) -> Option<String> {
-        let first = self.first_name();
-        let last = self.last_name();
+        let first = self.first_name().ok();
+        let last = self.last_name().ok();
         first.and(last)
              .and(Some(format!("{} {}", first.unwrap_or(""), last.unwrap_or(""))))
     }
 
     fn addressing(&self) -> Option<String> {
-        if let Some(salute) = self.salute()
+        if let Some(salute) = self.salute().ok()
                                   .and_then(|salute| salute.split_whitespace().nth(0))
         // only the first word
         {
-            let last_name = self.last_name();
+            let last_name = self.last_name().ok();
 
 
             let lang = crate::CONFIG.get_str("defaults/lang");
@@ -357,19 +337,16 @@ impl<'a> IsClient for Client<'a> {
 }
 
 impl<'a> Validatable for Client<'a> {
-    fn validate(&self) -> SpecResult {
-        let mut errors = search_errors(self, &[//"client/email", // TODO: make this a requirement
-                                             "client/address",
-                                             "client/title",
-                                             "client/last_name",
-                                             "client/first_name"], field_is_string)
-                                             .collect::<ErrorList>();
+    fn validate(&self) -> ValidationResult {
+        let mut validation = ValidationResult::new();
 
+        validation.require_field("client/address", self.address());
+        validation.require_field("client/title", self.title());
+        validation.require_field("client/last_name", self.last_name());
+        validation.require_field("client/first_name", self.first_name());
+        validation.require_option("client_addressing", self.addressing());
 
-        if self.addressing().is_none() {
-            errors.push("client_addressing");
-        }
-        errors.into() 
+        validation
     }
 }
 
@@ -380,43 +357,35 @@ impl<'a> YamlProvider for Offer<'a> {
 }
 
 impl<'a> Offerable for Offer<'a> {
-    fn appendix(&self) -> Option<i64> {
+    fn appendix(&self) -> FieldValue<i64> {
         self.get_int("offer.appendix")
     }
 
-    fn date(&self) -> Option<Date<Utc>> {
+    fn date(&self) -> FieldValue<Date<Utc>> {
         self.get_dmy("offer.date")
     }
 
     fn number(&self) -> Option<String> {
         let num = self.appendix().unwrap_or(1);
-        Offerable::date(self)
+        Offerable::date(self).ok()
             //.map(|d| d.format("%Y%m%d").to_string())
             .map(|d| d.format("A%Y%m%d").to_string())
             .map(|s| format!("{}-{}", s, num))
 
         // old spec
-        .or_else(|| self.get_str("manumber").map(ToString::to_string))
+        .or_else(|| self.get_str("manumber").ok().map(ToString::to_string))
     }
 }
 
 impl<'a> Validatable for Offer<'a> {
-    fn validate(&self) -> SpecResult {
-        //if IsProject::canceled(self) {
-        //    return Err(vec!["canceled"]);
-        //}
+    fn validate(&self) -> ValidationResult {
+        let mut validation = ValidationResult::new();
 
-        let mut errors =
-        search_errors(self, &["offer.date", "manager"], field_is_string)
-            .chain(search_errors(self, &["offer.appendix"], field_is_integer))
-            .collect::<ErrorList>();
+        validation.require_field("offer.date", self.date());
+        validation.require_field("manager", self.inner.responsible());
+        validation.require_field("appendix", self.appendix());
 
-        if Offerable::date(self).is_none() {
-            errors.push("offer_date_format");
-        }
-
-        errors.into() 
-
+        validation
     }
 }
 
@@ -427,39 +396,41 @@ impl<'a> YamlProvider for Invoice<'a> {
 }
 
 impl<'a> Invoicable for Invoice<'a> {
-    fn number(&self) -> Option<i64> {
+    fn number(&self) -> FieldValue<i64> {
         self.get_int("invoice.number")
         // old spec
         .or_else(|| self.get_int("rnumber"))
     }
 
-    fn date(&self) -> Option<Date<Utc>> {
+    fn date(&self) -> FieldValue<Date<Utc>> {
         self.get_dmy("invoice.date")
         // old spec
         .or_else(|| self.get_dmy("invoice_date"))
     }
 
     fn number_str(&self) -> Option<String> {
-        self.number().map(|n| format!("R{:03}", n))
+        self.number().ok().map(|n| format!("R{:03}", n))
     }
 
     fn number_long_str(&self) -> Option<String> {
-        let year = self.date()?.year();
+        let year = self.date().ok()?.year();
         // TODO: Length or format should be a setting
-        self.number().map(|n| format!("R{}-{:03}", year, n))
+        self.number().ok().map(|n| format!("R{}-{:03}", year, n))
     }
 
-    fn official(&self) -> Option<String> {
+    fn official(&self) -> FieldValue<String> {
         self.get_str("invoice.official").map(ToOwned::to_owned)
     }
 }
 
 impl<'a> Validatable for Invoice<'a> {
-    fn validate(&self) -> SpecResult {
-        search_errors(self, &["invoice.number"], field_is_integer)
-            .chain(search_errors(self, &["invoice.date|invoice_date"], field_is_dmy))
-            .collect::<ErrorList>()
-            .into()
+    fn validate(&self) -> ValidationResult {
+        let mut validation = ValidationResult::new();
+
+        validation.require_field("invoice.number", self.number());
+        validation.require_field("invoice.date", self.date());
+
+        validation
     }
 }
 
@@ -470,22 +441,22 @@ impl<'a> YamlProvider for Hours<'a> {
 }
 
 impl<'a> HasEmployees for Hours<'a> {
-    fn wages_date(&self) -> Option<Date<Utc>> {
+    fn wages_date(&self) -> FieldValue<Date<Utc>> {
         self.get_dmy("hours.wages_date")
         // old spec
         .or_else(|| self.get_dmy("wages_date"))
     }
 
-    fn salary(&self) -> Option<Currency> {
+    fn salary(&self) -> FieldValue<Currency> {
         self.get_f64("hours.salary").map(to_currency)
     }
 
-    fn tax(&self) -> Option<Tax> {
+    fn tax(&self) -> FieldValue<Tax> {
         self.get_f64("hours.tax").map(Tax::new)
     }
 
     fn net_wages(&self) -> Option<Currency> {
-        let triple = (self.total_time(), self.salary(), self.tax());
+        let triple = (self.total_time(), self.salary().ok(), self.tax().ok());
         match triple {
             (Some(total_time), Some(salary), Some(tax)) => Some(total_time * salary * (tax.value() + 1f64)),
             // covering the legacy case where Services always had Tax=0%
@@ -495,7 +466,7 @@ impl<'a> HasEmployees for Hours<'a> {
     }
 
     fn gross_wages(&self) -> Option<Currency> {
-        let tuple = (self.total_time(), self.salary());
+        let tuple = (self.total_time(), self.salary().ok());
         if let (Some(total_time), Some(salary)) = tuple {
             Some(total_time * salary)
         } else {
@@ -504,7 +475,7 @@ impl<'a> HasEmployees for Hours<'a> {
     }
 
     fn total_time(&self) -> Option<f64> {
-        self.employees()
+        self.employees().ok()
             .map(|e| {
                      e.iter()
                       .fold(0f64, |acc, e| acc + e.time)
@@ -512,7 +483,7 @@ impl<'a> HasEmployees for Hours<'a> {
     }
 
     fn employees_string(&self) -> Option<String> {
-        self.employees()
+        self.employees().ok()
             .map(|e| {
             e.iter()
              .filter(|e| e.time as u32 > 0)
@@ -527,37 +498,35 @@ impl<'a> HasEmployees for Hours<'a> {
         })
     }
 
-    fn employees(&self) -> Option<Vec<Employee>> {
+    fn employees(&self) -> FieldValue<Vec<Employee>> {
         let employees = self.get_hash("hours.caterers")
                             .or_else(|| self.get_hash("hours.employees"));
 
-        if let Some(employees) = employees {
+        employees.filter_map(|employees| {
             employees.iter()
-                     .map(|(c, h)| {(c.as_str().unwrap_or("").into(), make_float(h))
-                     })
-                     .filter(|&(_, h)| h > 0f64)
-                     .map(|(name, time)| {
-                let wage = self.salary()? * time;
-                let salary = self.salary()?;
-                Some(Employee {
-                         name,
-                         time,
-                         wage,
-                         salary,
-                     })
-            })
-                     .collect::<Option<Vec<Employee>>>()
-        } else {
-            None
-        }
+                .map(|(c, h)| {(c.as_str().unwrap_or("").into(), make_float(h))
+                })
+                .filter(|&(_, h)| h > 0f64)
+                .map(|(name, time)| {
+                    let wage = self.salary().ok()? * time;
+                    let salary = self.salary().ok()?;
+                    Some(Employee {
+                        name,
+                        time,
+                        wage,
+                        salary,
+                    })
+                })
+                .collect::<Option<Vec<Employee>>>()
+        })
     }
 
     fn employees_payed(&self) -> bool {
-        self.employees().is_none() || self.wages_date().is_some()
+        self.employees().ok().is_none() || self.wages_date().ok().is_some()
     }
 
     fn wages(&self) -> Option<Currency> {
-        if let (Some(total), Some(salary)) = (self.total_time(), self.salary()) {
+        if let (Some(total), Some(salary)) = (self.total_time(), self.salary().ok()) {
             Some(total * salary)
         } else {
             None
@@ -575,12 +544,21 @@ fn make_float(h: &Yaml) -> f64 {
 
 
 impl<'a> Validatable for Hours<'a> {
-    fn validate(&self) -> SpecResult {
-        let mut errors = ErrorList::new();
-        if !self.employees_payed() {
-            errors.push("employees_payed");
+    fn validate(&self) -> ValidationResult {
+        let mut validation = ValidationResult::new();
+
+        validation.validate_field("hours.caterers", self.employees());
+
+        // return directly if no employees need to be paid
+        if self.employees().unwrap_or(Vec::new()).is_empty() {
+            return validation
         }
 
-        errors.into()
+        // check that payment validates
+        validation.validate_field("hours.tax", self.tax());
+        validation.validate_field("hours.salary", self.salary());
+        validation.require_field("hours.wages_date", self.wages_date());
+
+        validation
     }
 }
