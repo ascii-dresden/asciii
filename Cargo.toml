@@ -36,7 +36,7 @@ exclude = [
 
 [dependencies]
 log = "0.4"
-env_logger = "0.7" # default feature requires regex
+env_logger = "0.7"
 yaml-rust = "0.4"
 chrono = "0.4"
 regex = "1.3"
@@ -83,7 +83,7 @@ toml          = "0.5"
 
 # feature: git_statuses
 git2 = {version = "0.10", default-features = false, optional = true}
-color-backtrace = "0.2"
+color-backtrace = "0.3"
 
 [dev-dependencies]
 pretty_assertions = "0.6"
