@@ -72,7 +72,7 @@ impl ComputedField {
 
         match *self {
             ComputedField::Responsible => project.responsible().ok().map(ToOwned::to_owned),
-            ComputedField::OfferNumber => project.offer().number(),
+            ComputedField::OfferNumber => project.offer().number().ok(),
             ComputedField::InvoiceNumber => project.invoice().number_str(),
             ComputedField::InvoiceNumberLong => project.invoice().number_long_str(),
             ComputedField::Name => {

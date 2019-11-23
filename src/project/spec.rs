@@ -87,7 +87,7 @@ pub trait Offerable {
     fn date(&self) -> FieldResult<Date<Utc>>;
 
     /// ID of an the offer
-    fn number(&self) -> Option<String>;
+    fn number(&self) -> FieldResult<String>;
 }
 
 /// Everything about the client

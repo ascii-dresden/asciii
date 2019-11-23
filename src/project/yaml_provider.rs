@@ -30,6 +30,24 @@ pub mod error {
     }
 
     pub type FieldResult<T> = Result<T, FieldError>;
+
+    pub trait FieldResultExt<T> {
+        /// Tries an alternative only if the original is actually Missing.
+        /// 
+        /// This makes sure we don't accidentally fall back to an old spec value if the original is invalid.
+        fn if_missing_try<F: FnOnce() -> FieldResult<T>>(self, f: F) -> FieldResult<T>;
+    }
+
+    impl<T> FieldResultExt<T> for FieldResult<T> {
+        fn if_missing_try<F: FnOnce() -> FieldResult<T>>(self, f: F) -> FieldResult<T> {
+            log::debug!("{:?}", self.as_ref().err());
+            if let Err(FieldError::Missing) = self {
+                f()
+            } else {
+                self
+            }
+        }
+    }
 }
 
 pub use error::{FieldResult, FieldError};
@@ -110,7 +128,7 @@ pub trait YamlProvider {
         match res {
             None => Err(FieldError::Missing),
             Some(ref node) => match parser(node) {
-                None => Err(FieldError::Invalid(err.to_string())),
+                None => Err(FieldError::Invalid(lformat!("{} ({:?})", err, node))),
                 Some(parsed) => FieldResult::Ok(parsed),
             }
         }
@@ -230,6 +248,7 @@ mod tests {
         assert_eq!(fallback.get_str("offer.date"), FieldResult::Err(FieldError::Missing));
     }
 
+    #[test]
     #[should_panic]
     fn paths_forbid_whitespaces() {
         let fallback = TestProvider::parse(FALLBACK_PATH);

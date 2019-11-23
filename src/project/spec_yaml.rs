@@ -10,6 +10,7 @@ use super::*;
 use super::spec::*;
 use super::error::ValidationResult;
 use super::product::ProductError;
+use super::yaml_provider::error::FieldResultExt;
 use crate::util::{self, to_currency};
 use crate::util::yaml::parse_dmy_date;
 
@@ -21,17 +22,22 @@ impl YamlProvider for Project {
 
 impl IsProject for Project {
     fn name(&self) -> FieldResult<&str> {
-        self.get_str("event.name|event")
+        self.get_str("event.name")
+            // old spec
+            .if_missing_try(|| self.get_str("event"))
     }
 
     fn event_date(&self) -> FieldResult<Date<Utc>> {
-        self.get_dmy("event.dates.0.begin|created|date")
+        self.get_dmy("event.dates.0.begin")
+            .if_missing_try(|| self.get_dmy("created"))
+            .if_missing_try(|| self.get_dmy_legacy_range("date"))
     }
 
     //#[deprecated(note="Ambiguous: what format? use \"Version\"")]
     fn format(&self) -> FieldResult<Version> {
         self.get_str("meta.format")
-            .or_else(|_| self.get_str("format"))
+            // old spec
+            .if_missing_try(|| self.get_str("format"))
             .and_then(|s| Version::from_str(s).map_err(|e| FieldError::from(e)))
     }
 
@@ -41,8 +47,8 @@ impl IsProject for Project {
 
     fn responsible(&self) -> FieldResult<&str> {
         self.get_str("manager")
-        // old spec
-        .or_else(|_| self.get_str("signature").and_then(|c| c.lines().last().ok_or(FieldError::invalid("invalid signature"))))
+            // old spec
+            .if_missing_try(|| self.get_str("signature").and_then(|c| c.lines().last().ok_or(FieldError::invalid("invalid signature"))))
     }
 
     fn long_desc(&self) -> String {
@@ -188,7 +194,7 @@ impl Redeemable for Project {
     fn payed_date(&self) -> FieldResult<Date<Utc>> {
         self.get_dmy("invoice.payed_date")
         // old spec
-        .or_else(|_|  self.get_dmy("payed_date"))
+        .if_missing_try(|| self.get_dmy("payed_date"))
     }
 
     fn is_payed(&self) -> bool {
@@ -272,18 +278,22 @@ impl<'a> YamlProvider for Client<'a> {
 impl<'a> IsClient for Client<'a> {
     fn email(&self) -> FieldResult<&str> {
         self.get_str("client/email")
-            .or_else(|_|  self.get_str("email"))
+            .if_missing_try(|| self.get_str("email"))
     }
 
     fn address(&self) -> FieldResult<&str> {
-        self.get_str("client/address")
-            .or_else(|_|  self.get_str("address"))
+        self.get_str("client.address")
+            // old spec
+            .if_missing_try(|| self.get_str("address"))
     }
 
     fn title(&self) -> FieldResult<&str> {
         self.get_str("client/title")
-        // old spec
-        .or_else(|_|  self.get_str("client").and_then(|c|c.lines().nth(0).ok_or(FieldError::invalid("invalid client name"))))
+            // old spec
+            .if_missing_try(|| self
+                .get_str("client")
+                .and_then(|c|c.lines().nth(0).ok_or(FieldError::invalid("invalid client name")))
+            )
     }
 
     fn salute(&self) -> FieldResult<&str> {
@@ -299,7 +309,7 @@ impl<'a> IsClient for Client<'a> {
     fn last_name(&self) -> FieldResult<&str> {
         self.get_str("client.last_name")
         // old spec
-        .or_else(|_| self.get_str("client").and_then(|c|c.lines().nth(1).ok_or(FieldError::invalid("invalid client name"))))
+        .if_missing_try(|| self.get_str("client").and_then(|c|c.lines().nth(1).ok_or(FieldError::invalid("invalid client name"))))
     }
 
     fn full_name(&self) -> Option<String> {
@@ -361,15 +371,15 @@ impl<'a> Offerable for Offer<'a> {
         self.get_dmy("offer.date")
     }
 
-    fn number(&self) -> Option<String> {
+    fn number(&self) -> FieldResult<String> {
         let num = self.appendix().unwrap_or(1);
-        Offerable::date(self).ok()
+        Offerable::date(self)
             //.map(|d| d.format("%Y%m%d").to_string())
             .map(|d| d.format("A%Y%m%d").to_string())
             .map(|s| format!("{}-{}", s, num))
 
         // old spec
-        .or_else(|| self.get_str("manumber").ok().map(ToString::to_string))
+        .if_missing_try(|| self.get_str("manumber").map(ToString::to_string))
     }
 }
 
@@ -393,11 +403,13 @@ impl<'a> YamlProvider for Invoice<'a> {
 
 impl<'a> Invoicable for Invoice<'a> {
     fn number(&self) -> FieldResult<i64> {
-        self.get_int("invoice.number|rnumber")
+        self.get_int("invoice.number")
+            .if_missing_try(|| self.get_int("rnumber"))
     }
 
     fn date(&self) -> FieldResult<Date<Utc>> {
-        self.get_dmy("invoice.date|invoice_date")
+        self.get_dmy("invoice.date")
+            .if_missing_try(|| self.get_dmy("invoice_date"))
     }
 
     fn number_str(&self) -> Option<String> {

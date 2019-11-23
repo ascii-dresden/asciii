@@ -147,7 +147,7 @@ pub fn spec() -> Result<(), Error> {
         project.hours().employees_string();
         project.invoice().number_long_str();
         project.invoice().number_str();
-        project.offer().number();
+        project.offer().number().unwrap();
         project.age().map(|a|format!("{} days", a)).unwrap();
         project.modified_date().map(|d|d.year().to_string()).unwrap();
         project.sum_sold().map(|c|util::currency_to_string(&c)).unwrap();

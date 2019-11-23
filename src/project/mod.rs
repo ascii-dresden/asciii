@@ -536,7 +536,7 @@ impl Exportable for Project {
     fn export_dir(&self)  -> PathBuf { Storable::dir(self) }
 
     fn offer_file_name(&self, extension: &str) -> Option<String>{
-        let num = self.offer().number()?;
+        let num = self.offer().number().ok()?;
         let name = slug::slugify(IsProject::name(self).ok()?);
         Some(format!("{} {}.{}", num, name, extension))
     }

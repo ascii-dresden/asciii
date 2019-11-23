@@ -165,7 +165,7 @@ impl ExportTarget<Offer> for Project {
         Offer {
             // appendix: self.offer().appendix(),
             date: dmy(self.offer().date().ok()),
-            number: self.offer().number(),
+            number: self.offer().number().ok(),
             sums: sums_from_bill(&offer),
             net_total: currency_to_string(&offer.net_total()),
             gross_total: currency_to_string(&offer.gross_total()),

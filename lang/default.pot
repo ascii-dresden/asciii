@@ -64,495 +64,499 @@ msgstr ""
 msgid "set's up a new instance"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:28
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:27
+msgid "set's up a new instance. Clones the repository and initializes the global config file."
+msgstr ""
+
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:29
 msgid "Remote repository"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:31
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:32
 msgid "where to clone to"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:36 /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:70 /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:284 /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:303 /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:538 /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:721
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:37 /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:71 /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:285 /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:304 /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:539 /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:722
 msgid "Override the configured editor"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:45
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:46
 msgid "Create a new project"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:48
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:49
 msgid "Project name"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:52
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:53
 msgid "Manually set the date of the project"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:59
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:60
 msgid "Override the description of the project"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:64
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:65
 msgid "Use a specific template"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:76
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:77
 msgid "Override the manager of the project"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:82
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:83
 msgid "Manually set the start time of the project"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:87
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:88
 msgid "Manually set the end time of the project"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:92
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:93
 msgid "Overrides the duration of the event"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:97
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:98
 msgid "Do not edit the file after creation"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:104
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:105
 msgid "List Projects"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:107
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:108
 msgid "list archived projects of a specific year, defaults to the current year"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:116 /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:551 /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:577
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:117 /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:552 /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:578
 msgid "List projects from that year, archived or not"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:124
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:125
 msgid "Add extra fields to print for each project listed"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:131
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:132
 msgid "Filter selection by field content"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:138
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:139
 msgid "Show Errors for each project"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:143
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:144
 msgid "Show colors"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:148
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:149
 msgid "Show colors for each project"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:154
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:155
 msgid "Show non-verbose list"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:158
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:159
 msgid "Print in csv form"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:164
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:165
 msgid "Opposite of simple"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:171
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:172
 msgid "Sort by :"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:178 /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:585
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:179 /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:586
 msgid "List all projects, ever"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:183
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:184
 msgid "List templates"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:189
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:190
 msgid "List years in archive"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:193
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:194
 msgid "List paths to each project file"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:199
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:200
 msgid "List broken projects  without project file"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:205
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:206
 msgid "List all computed data fields that can be used with --details"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:211
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:212
 msgid "Print nothing, expect the fields supplied via --details"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:218
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:219
 msgid "Open storage path"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:226 /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:265 /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:359 /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:450 /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:475 /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:497 /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:650 /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:692 /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:786 /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:811 /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:845 /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:870
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:227 /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:266 /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:360 /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:451 /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:476 /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:498 /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:651 /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:693 /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:787 /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:812 /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:846 /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:871
 msgid "Search term, possibly event name"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:231
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:232
 msgid "Open path to templates instead"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:237
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:238
 msgid "Open path to created documents instead"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:243 /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:511
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:244 /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:512
 msgid "Open path to current binary instead"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:249 /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:517
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:250 /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:518
 msgid "Open invoice file"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:255 /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:523
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:256 /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:524
 msgid "Open offer file"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:263
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:264
 msgid "Edit a specific project"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:271 /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:386 /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:464 /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:480 /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:666
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:272 /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:387 /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:465 /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:481 /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:667
 msgid "Pick an archived project"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:278 /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:297
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:279 /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:298
 msgid "Edit a template file, use `list --templates` to learn which."
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:294
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:295
 msgid "Edit the meta data store"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:314
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:315
 msgid "Move a Project into the archive"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:316
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:317
 msgid "Search terms to match the project"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:323
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:324
 msgid "Archives the project, even though it is not completely valid"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:329
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:330
 msgid "Archives all projects that can be archived"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:335
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:336
 msgid "Override the year"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:343
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:344
 msgid "Move a Project out of the archive"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:345
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:346
 msgid "Specify the archive"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:349
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:350
 msgid "The name of the project, duh!"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:357
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:358
 msgid "Display a specific project"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:365
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:366
 msgid "Show project as JSON"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:370
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:371
 msgid "Show project as iCal"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:375
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:376
 msgid "Show project as raw yaml"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:379
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:380
 msgid "Shows a particular detail"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:394
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:395
 msgid "Shows fields that can be filled automatically"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:400
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:401
 msgid "Shows the errors in this project"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:406
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:407
 msgid "Show fields in templates that are filled"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:413
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:414
 msgid "List files that belong to a project"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:417
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:418
 msgid "Display values in invoice mode"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:423
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:424
 msgid "Display values in offer mode"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:434
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:435
 msgid "Show as csv"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:448
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:449
 msgid "Set a value in a project file"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:455
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:456
 msgid "Which field to set"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:460
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:461
 msgid "What to put in the field"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:473
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:474
 msgid "Assign invoice id to project"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:489
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:490
 msgid "Show storage path"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:501
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:502
 msgid "Shows templates path instead"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:506
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:507
 msgid "Shows path to created documents instead"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:531
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:532
 msgid "Open an archive instead"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:543
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:544
 msgid "Open the working directory in an editor"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:549
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:550
 msgid "Produces a CSV report for a given year"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:562
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:563
 msgid "List archived projects of a specific year, defaults to the current year"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:571
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:572
 msgid "Include open tasks"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:591
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:592
 msgid "Experimental: open dues"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:594 /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:600
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:595 /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:601
 msgid "Show unpayed wages"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:608
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:609
 msgid "Creates documents from projects"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:612
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:613
 msgid "Manually pass a file path"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:618
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:619
 msgid "Manually pass a output folder"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:624
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:625
 msgid "Do it against better judgement"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:629
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:630
 msgid "Only create the PDF file"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:634 /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:686
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:635 /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:687
 msgid "Do not create final output file"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:640
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:641
 msgid "Only prints to stdout"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:645
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:646
 msgid "Open the pdf file afterwards."
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:655
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:656
 msgid "Produce an offer document"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:661
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:662
 msgid "Produce an invoice document"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:674
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:675
 msgid "Use a particular template"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:682
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:683
 msgid "Deletes a project"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:697 /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:790 /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:815 /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:850 /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:874
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:698 /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:791 /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:816 /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:851 /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:875
 msgid "list archived projects"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:713
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:714
 msgid "Show and edit your config"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:715
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:716
 msgid "Edit your config"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:727
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:728
 msgid "Show a specific config value"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:734
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:735
 msgid "Show default config"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:740
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:741
 msgid "set the root folder in the config"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:746
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:747
 msgid "Show the location of the config file"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:752
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:753
 msgid "Create config file."
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:761
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:762
 msgid "(experimental) starts interactive shell"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:765
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:766
 msgid "Show your name from config"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:770
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:771
 msgid "Show the working tree status"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:775
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:776
 msgid "Pull and merge new commits from remote"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:778
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:779
 msgid "git pull with --rebase"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:784
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:785
 msgid "git diff"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:797
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:798
 msgid "Changes between the index and your last commit"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:802 /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:822 /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:857 /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:881
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:803 /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:823 /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:858 /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:882
 msgid "A template"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:809
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:810
 msgid "Add file contents to the git-index"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:827
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:828
 msgid "Add all projects"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:835
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:836
 msgid "Save changes locally"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:839
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:840
 msgid "Upload locally saved changes to the remote"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:843
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:844
 msgid "cleans changes and untracked files in project folder"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:863
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:864
 msgid "equals git stash"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:864
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:865
 msgid "equals git pop"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:868
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:869
 msgid "Show commit logs"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:888
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:889
 msgid "Show information about the remote"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:893
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:894
 msgid "Generates completion for bash, zsh, etc"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:895
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:896
 msgid "what shell to generate completion for (bash, zsh, fish,PowerShell)"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:904
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:905
 msgid "Prints version information"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:909
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:910
 msgid "show also build information"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:914
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:915
 msgid "show verbose version as json"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:920
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:921
 msgid "Opens the online documentation, please read it"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:924
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:925
 msgid "Opens the WebInterface 🤯"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:1012
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:1013
 msgid "please specify either bash, zsh, fish or powershell"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:1023
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/app.rs:1024
 msgid "Date Format must be DD.MM.YYYY"
 msgstr ""
 

@@ -1,10 +1,10 @@
 use asciii;
-
 use asciii::project::Project;
 
 #[cfg(all(feature = "serialization", test))]
 mod regression {
     mod document_export {
+        use pretty_assertions::assert_eq;
         use asciii::{
             document_export::fill_template,
             project::{
@@ -53,6 +53,7 @@ mod regression {
 
 #[cfg(test)]
 mod taxed_service {
+    use pretty_assertions::assert_eq;
     use super::*;
     use asciii::project::spec::HasEmployees;
 
