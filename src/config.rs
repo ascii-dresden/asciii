@@ -15,6 +15,7 @@
 use std::env::{self, current_dir};
 use std::path::{Path, PathBuf};
 
+use anyhow::Result;
 use dirs::home_dir;
 use log::warn;
 
@@ -44,7 +45,7 @@ impl ConfigReader {
     }
 
     /// Opens config from `self.path()` and parses Yaml right away.
-    pub fn try_new() -> Result<ConfigReader, failure::Error> {
+    pub fn try_new() -> Result<ConfigReader> {
         let home_path = ConfigReader::path_home();
         let local_path = Path::new(DEFAULT_LOCATION);
 

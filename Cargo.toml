@@ -9,6 +9,7 @@ This is an internal tool of the Studentencafe ascii in Dresden and therefore spe
 homepage = "https://github.com/ascii-dresden/asciii/"
 repository = "https://github.com/ascii-dresden/asciii/"
 documentation = "https://docs.rs/asciii/"
+default-run = "asciii"
 edition = "2018"
 
 build = true
@@ -53,7 +54,8 @@ base64 = "0.11"
 rustyline = {version = "1.0.0", optional = true }
 linked-hash-map = {version = "0.5", features = ["serde_impl"]}
 dirs = "2.0"
-failure = "0.1"
+anyhow = "1.0"
+thiserror = "1.0"
 
 actix = { version = "0.8", optional = true }
 actix-web = { version = "1.0", optional = true }
@@ -89,7 +91,7 @@ color-backtrace = "0.3"
 pretty_assertions = "0.6"
 
 [features]
-default = ["cli", "document_export", "git_statuses", "serialization", "deserialization", "server", "shell", "localize"]
+default = ["cli", "document_export", "git_statuses", "serialization", "deserialization", "server", "shell"]
 travis_compatible = ["cli", "document_export", "git_statuses", "serialization", "deserialization", "shell", "meta", "version_string"]
 full_tool = ["travis_compatible", "localize"]
 server= ["actix", "actix-files", "actix-web", "actix-web-actors"]

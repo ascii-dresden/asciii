@@ -6,7 +6,7 @@ use std::{time,fs};
 use std::path::{Path, PathBuf};
 
 use serde::ser::Serialize;
-use failure::{bail, Error};
+use anyhow::{bail, Result};
 use yaml_rust::Yaml;
 
 use open;
@@ -69,7 +69,7 @@ impl HelperDef for CountHelper {
 ///
 /// Returns path to created file, potentially in a `tempdir`.
 // pub fn fill_template<E:Serialize>(document:E, template_file:&Path) -> PathBuf{
-pub fn fill_template<E, P>(document: &E, bill_type: BillType, template_path: P) -> Result<String, Error>
+pub fn fill_template<E, P>(document: &E, bill_type: BillType, template_path: P) -> Result<String>
     where E: Serialize, P:AsRef<Path>
 {
     let mut handlebars = Handlebars::new();
@@ -87,13 +87,13 @@ pub fn fill_template<E, P>(document: &E, bill_type: BillType, template_path: P) 
                            .replace(">", "}"))?)
 }
 
-fn file_age(path: &Path) -> Result<time::Duration, Error> {
+fn file_age(path: &Path) -> Result<time::Duration> {
     let metadata = fs::metadata(path)?;
     let modified = metadata.modified()?;
     Ok(modified.elapsed()?)
 }
 
-fn output_template_path(template_name:&str) -> Result<PathBuf, Error> {
+fn output_template_path(template_name:&str) -> Result<PathBuf> {
     // construct_template_path(&template_name) {
     let template_ext  = crate::CONFIG.get_str("extensions/output_template");
     let mut template_path = PathBuf::new();
@@ -115,7 +115,7 @@ fn output_template_path(template_name:&str) -> Result<PathBuf, Error> {
 /// Creates the latex files within each projects directory, either for Invoice or Offer.
 #[cfg(feature="document_export")]
 #[allow(clippy::cognitive_complexity)] // sorry
-fn project_to_doc(project: &Project, config: &ExportConfig<'_>) -> Result<Option<PathBuf>, Error> {
+fn project_to_doc(project: &Project, config: &ExportConfig<'_>) -> Result<Option<PathBuf>> {
     trace!("exporting a document: {:#?}", config);
 
     let &ExportConfig {
@@ -306,7 +306,7 @@ impl<'a> Default for ExportConfig<'a> {
 
 /// Creates the latex files within each projects directory, either for Invoice or Offer.
 #[cfg(feature="document_export")]
-pub fn projects_to_doc(config: &ExportConfig<'_>) -> Result<(), Error> {
+pub fn projects_to_doc(config: &ExportConfig<'_>) -> Result<()> {
     let storage = storage::setup::<Project>()?;
     for p in storage.open_projects(&config.select)? {
         if let Some(path) = project_to_doc(&p, &config)? {

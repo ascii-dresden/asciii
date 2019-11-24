@@ -2,7 +2,7 @@
 use chrono::prelude::*;
 use clap::ArgMatches;
 use log::debug;
-use failure::Error;
+use anyhow::{Error, Result};
 
 use asciii::CONFIG;
 use asciii::print::{self, ListConfig, ListMode};
@@ -12,7 +12,7 @@ use asciii::storage::*;
 
 
 /// Command LIST
-pub fn list(matches: &ArgMatches<'_>) -> Result<(), Error> {
+pub fn list(matches: &ArgMatches<'_>) -> Result<()> {
     if matches.is_present("templates") {
         list_templates()?; Ok(())
     } else if matches.is_present("years") {
@@ -148,15 +148,15 @@ fn list_projects(dir: StorageDir, list_config: &ListConfig<'_>) -> Result<(), Er
 }
 
 /// Command LIST --broken
-fn list_broken_projects(dir: StorageDir) -> Result<(), Error> {
+fn list_broken_projects(dir: StorageDir) -> Result<()> {
     let storage = setup::<Project>()?;
     let invalid_files = storage.list_project_folders(dir)?;
     let errors = invalid_files.iter()
                             .filter_map(|dir| Project::open_folder(dir).err())
-                            .collect::<Vec<failure::Error>>();
+                            .collect::<Vec<anyhow::Error>>();
 
     for err in errors {
-        println!("{}", err.as_fail());
+        println!("{}", err);
     }
     Ok(())
 }

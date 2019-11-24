@@ -22,7 +22,7 @@
 use rayon::prelude::*;
 use dirs::home_dir;
 use log::{info, debug, trace, error, warn};
-use failure::{bail, ensure, Error};
+use anyhow::{bail, ensure, Error};
 
 use std::fs;
 use std::env::{self, current_dir};
@@ -781,7 +781,7 @@ impl<L:Storable> Storage<L> {
                 let terms = search_terms.iter().map(AsRef::as_ref).collect::<Vec<_>>(); // sorry about this
                 let projects = self.search_projects_any(dir, &terms)?;
                 if projects.is_empty() {
-                    failure::bail!(
+                    bail!(
                         StorageError::NothingFound(search_terms.iter().map(ToString::to_string).collect())
                         );
                 }

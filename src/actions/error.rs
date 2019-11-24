@@ -1,14 +1,14 @@
-use failure::Fail;
+use thiserror::Error;
 
-#[derive(Fail, Debug)]
+#[derive(Debug, Error)]
 pub enum ActionError {
 
-    #[fail(display = "unexpected response from service")]
+    #[error("unexpected response from service")]
     ActionError,
 
-    #[fail(display = "Adding Failed")]
+    #[error("Adding Failed")]
     AddingFailed,
 
-    #[fail(display = "Nothing found for {:?}", _0)]
+    #[error("Nothing found for {:?}", _0)]
     NothingFound(Vec<String>),
 }

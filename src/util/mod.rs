@@ -8,7 +8,7 @@ use std::process::{self, Command, ExitStatus};
 use chrono::NaiveTime;
 
 use dirs::home_dir;
-use failure::{Error, ResultExt};
+use anyhow::{Error, Result, Context as _};
 
 use env_logger;
 use log::LevelFilter;

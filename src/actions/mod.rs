@@ -7,7 +7,7 @@ use icalendar::Calendar;
 #[cfg(feature = "meta")]
 use toml;
 use log::{info, trace};
-use failure::Error;
+use anyhow::{bail, Result};
 
 use std::fmt::Write;
 #[cfg(feature = "meta")] use std::fs;
@@ -25,13 +25,13 @@ pub mod error;
 use self::error::*;
 
 /// Helper method that passes projects matching the `search_terms` to the passt closure `f`
-pub fn with_projects<F>(dir:StorageDir, search_terms: &[&str], f:F) -> Result<(), Error>
-    where F:Fn(&Project)->Result<(), Error>
+pub fn with_projects<F>(dir:StorageDir, search_terms: &[&str], f:F) -> Result<()>
+    where F:Fn(&Project)->Result<()>
 {
     trace!("with_projects({:?})", search_terms);
     let projects = storage::setup::<Project>()?.search_projects_any(dir, search_terms)?;
     if projects.is_empty() {
-        failure::bail!(ActionError::NothingFound(search_terms.iter().map(ToString::to_string).collect() ));
+        bail!(ActionError::NothingFound(search_terms.iter().map(ToString::to_string).collect() ));
     }
     for project in projects {
         f(&project)?;
@@ -39,14 +39,14 @@ pub fn with_projects<F>(dir:StorageDir, search_terms: &[&str], f:F) -> Result<()
     Ok(())
 }
 
-pub fn csv(year:i32) -> Result<String, Error> {
+pub fn csv(year:i32) -> Result<String> {
     let mut projects = storage::setup::<Project>()?.open_projects(StorageDir::Year(year))?;
     projects.sort_by(|pa,pb| pa.index().unwrap_or_else(||"zzzz".to_owned()).cmp( &pb.index().unwrap_or_else(||"zzzz".to_owned())));
     projects_to_csv(&projects)
 }
 
 /// Produces a csv string from a list of `Project`s
-pub fn projects_to_csv(projects:&[Project]) -> Result<String, Error>{
+pub fn projects_to_csv(projects:&[Project]) -> Result<String>{
     let mut string = String::new();
     let splitter = ";";
 
@@ -117,7 +117,7 @@ pub struct Dues {
 }
 
 /// Command DUES
-pub fn dues() -> Result<Dues, Error> {
+pub fn dues() -> Result<Dues> {
     let projects = storage::setup::<Project>()?.open_projects(StorageDir::Working)?;
     let acc_sum_sold: Currency = open_payments(&projects);
     let acc_wages = open_wages(&projects);
@@ -129,7 +129,7 @@ pub fn dues() -> Result<Dues, Error> {
 /// Testing only, tries to run complete spec on all projects.
 /// TODO: make this not panic :D
 /// TODO: move this to `spec::all_the_things`
-pub fn spec() -> Result<(), Error> {
+pub fn spec() -> Result<()> {
     use crate::project::spec::*;
     let projects = storage::setup::<Project>()?.open_projects(StorageDir::Working)?;
     //let projects = super::execute(||storage.open_projects(StorageDir::All));
@@ -158,7 +158,7 @@ pub fn spec() -> Result<(), Error> {
     Ok(())
 }
 
-pub fn delete_project_confirmation(dir: StorageDir, search_terms:&[&str]) -> Result<(), Error> {
+pub fn delete_project_confirmation(dir: StorageDir, search_terms:&[&str]) -> Result<()> {
     let storage = storage::setup_with_git::<Project>()?;
     for project in storage.search_projects_any(dir, search_terms)? {
         storage.delete_project_if(&project, || {
@@ -170,12 +170,12 @@ pub fn delete_project_confirmation(dir: StorageDir, search_terms:&[&str]) -> Res
     Ok(())
 }
 
-pub fn archive_projects(search_terms:&[&str], manual_year:Option<i32>, force:bool) -> Result<Vec<PathBuf>, Error>{
+pub fn archive_projects(search_terms:&[&str], manual_year:Option<i32>, force:bool) -> Result<Vec<PathBuf>>{
     trace!("archive_projects matching ({:?},{:?},{:?})", search_terms, manual_year,force);
     Ok( storage::setup_with_git::<Project>()?.archive_projects_if(search_terms, manual_year, || force) ?)
 }
 
-pub fn archive_all_projects() -> Result<Vec<PathBuf>, Error> {
+pub fn archive_all_projects() -> Result<Vec<PathBuf>> {
     let storage = storage::setup_with_git::<Project>()?;
     let mut moved_files = Vec::new();
     for project in storage.open_projects(StorageDir::Working)?
@@ -190,23 +190,23 @@ pub fn archive_all_projects() -> Result<Vec<PathBuf>, Error> {
 
 /// Command UNARCHIVE <YEAR> <NAME>
 /// TODO: return a list of files that have to be updated in git
-pub fn unarchive_projects(year:i32, search_terms:&[&str]) -> Result<Vec<PathBuf>, Error> {
+pub fn unarchive_projects(year:i32, search_terms:&[&str]) -> Result<Vec<PathBuf>> {
     Ok( storage::setup_with_git::<Project>()?.unarchive_projects(year, search_terms) ?)
 }
 
 /// Produces a calendar from the selected `StorageDir`
-pub fn calendar(dir: StorageDir) -> Result<String, Error> {
+pub fn calendar(dir: StorageDir) -> Result<String> {
     calendar_with_tasks(dir, true)
 }
 
 /// Command CALENDAR
 ///
 /// Produces a calendar including tasks from the selected `StorageDir`
-pub fn calendar_and_tasks(dir: StorageDir) -> Result<String, Error> {
+pub fn calendar_and_tasks(dir: StorageDir) -> Result<String> {
     calendar_with_tasks(dir, false)
 }
 
-pub fn calendar_with_tasks(dir: StorageDir, show_tasks:bool) -> Result<String, Error> {
+pub fn calendar_with_tasks(dir: StorageDir, show_tasks:bool) -> Result<String> {
     let storage = storage::setup::<Project>()?;
     let mut cal = Calendar::new();
     if show_tasks {
@@ -222,7 +222,7 @@ pub fn calendar_with_tasks(dir: StorageDir, show_tasks:bool) -> Result<String, E
 
 /// Clone the repo
 ///
-pub fn clone_remote(url: &str, to: &str) -> Result<(), Error> {
+pub fn clone_remote(url: &str, to: &str) -> Result<()> {
     trace!("cloning {:?} to {:?}", url, to);
     Command::new("git")
         .args(&["clone", url, to])
@@ -251,7 +251,7 @@ pub struct ApiKeys {
 
 /// Parses meta store
 #[cfg(feature = "meta")]
-pub fn parse_meta() -> Result<MetaStore, Error> {
+pub fn parse_meta() -> Result<MetaStore> {
     let path = storage::setup::<Project>()?.get_extra_file("meta.toml")?;
     let file_content = fs::read_to_string(&path)?;
     let store: MetaStore = toml::from_str(&file_content)?;
@@ -261,11 +261,11 @@ pub fn parse_meta() -> Result<MetaStore, Error> {
 
 /// get ApiKeys for server
 #[cfg(feature = "meta")]
-pub fn get_api_keys() -> Result<ApiKeys, Error> {
+pub fn get_api_keys() -> Result<ApiKeys> {
     Ok(parse_meta()?.api)
 }
 
-pub fn store_meta() -> Result<(), Error> {
+pub fn store_meta() -> Result<()> {
     let storage = storage::setup_with_git::<Project>()?;
     let repo = storage.get_repository()?;
     let path = storage.get_extra_file("meta.toml")?;

@@ -1,4 +1,4 @@
-use failure::Error;
+use anyhow::Result;
 use serde_yaml;
 use ordered_float::OrderedFloat;
 use num_traits::Float;
@@ -121,7 +121,7 @@ pub struct Meta {
     format: String,
 }
 
-pub fn from_str(content: &str) -> Result<Project, Error> {
+pub fn from_str(content: &str) -> Result<Project> {
     Ok(serde_yaml::from_str(content)?)
 }
 

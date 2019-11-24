@@ -9,7 +9,7 @@ use std::fmt;
 
 use bill::{Bill, Currency, Tax};
 use chrono::{Date, Utc, NaiveTime};
-use failure::Error;
+use anyhow::Result;
 use icalendar::Calendar;
 use semver::Version;
 use yaml_rust::Yaml;
@@ -211,13 +211,13 @@ pub trait Redeemable: IsProject {
     fn is_payed(&self) -> bool;
 
     /// Returns a bill for the offer and one for the invoice.
-    fn bills(&self) -> Result<(Bill<Product<'_>>, Bill<Product<'_>>), Error>;
+    fn bills(&self) -> Result<(Bill<Product<'_>>, Bill<Product<'_>>)>;
 
     /// When what is the MWsT of the project.
     fn tax(&self) -> FieldResult<Tax>;
 
     /// Sum of sold products
-    fn sum_sold(&self) -> Result<Currency, Error> {
+    fn sum_sold(&self) -> Result<Currency> {
         let (_,invoice) = self.bills()?;
         Ok(invoice.net_total())
     }

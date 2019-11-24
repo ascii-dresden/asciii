@@ -22,20 +22,21 @@
 use std::fs;
 use std::path::Path;
 
+use anyhow::Result;
 pub use yaml_rust::Yaml;
 use yaml_rust::YamlLoader;
 use yaml_rust::yaml::Hash as YamlHash;
 use chrono::prelude::*;
 
 /// Wrapper that opens and parses a `.yml` file.
-pub fn open(path: &Path) -> Result<Yaml, failure::Error> {
+pub fn open(path: &Path) -> Result<Yaml> {
 
     let file_content = fs::read_to_string(&path)?;
     parse( &file_content )
 }
 
 /// Ruby like API to yaml-rust.
-pub fn parse(file_content: &str) -> Result<Yaml, failure::Error> {
+pub fn parse(file_content: &str) -> Result<Yaml> {
     Ok(
         YamlLoader::load_from_str(&file_content)?
         .get(0)

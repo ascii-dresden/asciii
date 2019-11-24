@@ -1,16 +1,16 @@
 #![allow(missing_docs)]
 
-use failure::Fail;
+use thiserror::Error;
 
 use super::yaml_provider::error::{FieldResult, FieldError};
 
-#[derive(Fail, Debug)]
+#[derive(Error, Debug)]
 pub enum ProjectError {
 
-    #[fail(display="This feature is not enabled in this build")]
+    #[error("This feature is not enabled in this build")]
     FeatureDeactivated,
 
-    #[fail(display="Cannot determine target file name")]
+    #[error("Cannot determine target file name")]
     CantDetermineTargetFile,
 }
 

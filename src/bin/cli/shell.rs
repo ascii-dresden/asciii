@@ -8,7 +8,7 @@ use asciii::CONFIG;
 use std::collections::BTreeSet;
 use clap::App;
 use log::{debug, error};
-use failure::Error;
+use anyhow::Result;
 use super::app::with_cli;
 
 static ESCAPE_CHAR: Option<char> = Some('\\');
@@ -45,7 +45,7 @@ impl completion::Completer for ClapCompleter {
     }
 }
 
-pub fn launch_shell() -> Result<(), Error> {
+pub fn launch_shell() -> Result<()> {
 
     with_cli( |mut app| {
 

@@ -1,6 +1,6 @@
 use asciii;
 use clap::{App, AppSettings, Arg, ArgGroup, ArgMatches, SubCommand, Shell};
-use failure::{Error, format_err};
+use anyhow::{format_err, Result};
 use log::{info, error};
 use super::subcommands;
 use std::str::FromStr;
@@ -1000,13 +1000,13 @@ pub fn match_matches(matches: &ArgMatches<'_>) {
         if matches.is_present("debug") {
             println!("{:?}", e)
         } else {
-            error!("{} (Cause: {})", e, e.find_root_cause());
+            error!("{} (Cause: {})", e, e.root_cause());
             info!("use --debug to see a backtrace");
         }
     }
 }
 
-pub fn generate_completions(matches: &ArgMatches<'_>) -> Result<(), Error>{
+pub fn generate_completions(matches: &ArgMatches<'_>) -> Result<()>{
     if let Some(shell) = matches.value_of("shell").and_then(|s|Shell::from_str(s).ok()) {
         with_cli(|mut app| app.gen_completions("asciii", shell, ".") );
     } else {
