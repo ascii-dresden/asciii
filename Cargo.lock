@@ -375,7 +375,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
 name = "asciii"
-version = "3.8.0"
+version = "3.9.0"
 dependencies = [
  "actix 0.8.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "actix-files 0.1.7 (registry+https://github.com/rust-lang/crates.io-index)",
