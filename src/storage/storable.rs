@@ -7,7 +7,7 @@ use std::path::{Path, PathBuf};
 use std::collections::HashMap;
 
 use chrono::{Date, Utc, Datelike};
-use failure::Error;
+use anyhow::Error;
 use tempdir::TempDir;
 use log::debug;
 

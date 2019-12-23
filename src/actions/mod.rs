@@ -7,7 +7,7 @@ use icalendar::Calendar;
 #[cfg(feature = "meta")]
 use toml;
 use log::{info, trace};
-use failure::Error;
+use anyhow::Error;
 
 use std::fmt::Write;
 #[cfg(feature = "meta")] use std::fs;
@@ -31,7 +31,7 @@ pub fn with_projects<F>(dir:StorageDir, search_terms: &[&str], f:F) -> Result<()
     trace!("with_projects({:?})", search_terms);
     let projects = storage::setup::<Project>()?.search_projects_any(dir, search_terms)?;
     if projects.is_empty() {
-        failure::bail!(ActionError::NothingFound(search_terms.iter().map(ToString::to_string).collect() ));
+        anyhow::bail!(ActionError::NothingFound(search_terms.iter().map(ToString::to_string).collect() ));
     }
     for project in projects {
         f(&project)?;

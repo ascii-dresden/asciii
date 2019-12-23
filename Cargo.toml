@@ -53,7 +53,8 @@ base64 = "0.11"
 rustyline = {version = "1.0.0", optional = true }
 linked-hash-map = {version = "0.5", features = ["serde_impl"]}
 dirs = "2.0"
-failure = "0.1"
+thiserror = "1.0"
+anyhow = "1.0"
 
 actix = { version = "0.8", optional = true }
 actix-web = { version = "1.0", optional = true }
@@ -84,7 +85,6 @@ toml          = "0.5"
 # feature: git_statuses
 git2 = {version = "0.10", default-features = false, optional = true}
 color-backtrace = "0.3"
-thiserror = "1.0"
 
 [dev-dependencies]
 pretty_assertions = "0.6"

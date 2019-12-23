@@ -2,7 +2,7 @@
 use chrono::prelude::*;
 use clap::ArgMatches;
 use log::debug;
-use failure::Error;
+use anyhow::Error;
 
 use asciii::CONFIG;
 use asciii::print::{self, ListConfig, ListMode};
@@ -153,10 +153,10 @@ fn list_broken_projects(dir: StorageDir) -> Result<(), Error> {
     let invalid_files = storage.list_project_folders(dir)?;
     let errors = invalid_files.iter()
                             .filter_map(|dir| Project::open_folder(dir).err())
-                            .collect::<Vec<failure::Error>>();
+                            .collect::<Vec<anyhow::Error>>();
 
     for err in errors {
-        println!("{}", err.as_fail());
+        println!("{}", err);
     }
     Ok(())
 }

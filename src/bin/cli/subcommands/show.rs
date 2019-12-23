@@ -1,5 +1,5 @@
 use clap::ArgMatches;
-use failure::Error;
+use anyhow::Error;
 
 use asciii::print;
 use asciii::storage::*;

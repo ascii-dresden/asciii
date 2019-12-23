@@ -16,7 +16,7 @@ use yaml_rust::Yaml;
 use maplit::hashmap;
 use slug;
 use tempdir::TempDir;
-use failure::{bail, Error};
+use anyhow::{bail, Error};
 
 use bill::BillItem;
 use icalendar::*;
