@@ -38,7 +38,7 @@ impl IsProject for Project {
         self.get_str("meta.format")
             // old spec
             .if_missing_try(|| self.get_str("format"))
-            .and_then(|s| Version::from_str(s).map_err(|e| FieldError::from(e)))
+            .and_then(|s| Version::from_str(s).map_err(|e| FieldError::Invalid(e.to_string())))
     }
 
     fn canceled(&self) -> bool {

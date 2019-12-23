@@ -6,26 +6,20 @@ use yaml_rust::{Yaml, yaml::Hash as YamlHash};
 use crate::util::yaml::{parse_dmy_date, parse_dmy_date_range};
 
 pub mod error {
-    use failure::Fail;
+    use thiserror::Error;
 
-    #[derive(Fail, Debug, PartialOrd, Ord, PartialEq, Eq)]
+    #[derive(Error, Debug, PartialOrd, Ord, PartialEq, Eq)]
     pub enum FieldError {
-        #[fail(display="The expected field is missing")]
+        #[error("The expected field is missing")]
         Missing,
 
-        #[fail(display="The field has an invalid value or type")]
+        #[error("The field has an invalid value or type")]
         Invalid(String),
     }
 
     impl FieldError {
         pub fn invalid(e: &str) -> FieldError {
             FieldError::Invalid(e.to_owned())
-        }
-    }
-
-    impl<T: std::error::Error> From<T> for FieldError {
-        fn from(e: T) -> FieldError {
-            FieldError::Invalid(e.to_string())
         }
     }
 

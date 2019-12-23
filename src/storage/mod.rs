@@ -575,7 +575,7 @@ impl<L:Storable> Storage<L> {
     /// Moves projects found through `search_terms` from the `year` back to the `Working` directory.
     ///
     /// Returns list of old and new paths.
-    pub fn unarchive_projects(&self, year:i32, search_terms:&[&str]) -> Result<Vec<(PathBuf)>, Error> {
+    pub fn unarchive_projects(&self, year:i32, search_terms:&[&str]) -> Result<Vec<PathBuf>, Error> {
         let projects = self.search_projects_any(StorageDir::Archive(year), search_terms)?;
 
         let mut moved_files = Vec::new();

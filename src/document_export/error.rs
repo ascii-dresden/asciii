@@ -1,15 +1,15 @@
-use failure::Fail;
+use thiserror::Error;
 
 use std::path::PathBuf;
 
-#[derive(Fail, Debug)]
+#[derive(Error, Debug)]
 pub enum ExportError {
-    #[fail(display = "No PDF Created")]
+    #[error("No PDF Created")]
     NoPdfCreated,
 
-    #[fail(display = "Nothing to do")]
+    #[error("Nothing to do")]
     NothingToDo,
 
-    #[fail(display = "Template not found at {:?}", _0)]
+    #[error("Template not found at {:?}", _0)]
     TemplateNotFoundAt(PathBuf),
 }
