@@ -4,7 +4,7 @@
 #![allow(missing_docs)]
 
 use bill::{Currency, BillProduct, Tax};
-use failure::Fail;
+use thiserror::Error;
 
 use crate::util::yaml;
 use crate::util::to_currency;
@@ -24,23 +24,23 @@ pub struct Product<'a> {
     pub price: Currency
 }
 
-#[derive(Fail, Debug)]
+#[derive(Error, Debug)]
 pub enum ProductError {
-    #[fail( display="Invalid price in {}", _0)]
+    #[error("Invalid price in {}", _0)]
     InvalidPrice(String),
 
-    #[fail(display = "unknown format")]
+    #[error("unknown format")]
     UnknownFormat,
-    #[fail(display = "more {:?} returned than provided", _0)]
+    #[error("more {:?} returned than provided", _0)]
     AmbiguousAmounts(String),
 
-    #[fail(display = "missing amount of {:?}", _0)]
+    #[error("missing amount of {:?}", _0)]
     MissingAmount(String),
     
-    #[fail(display = "too much returned of {:?}", _0)]
+    #[error("too much returned of {:?}", _0)]
     TooMuchReturned(String),
 
-    #[fail(display = "Cannot Parse Service")]
+    #[error("Cannot Parse Service")]
     InvalidServerSection 
 }
 
