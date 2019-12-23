@@ -7,7 +7,7 @@ use std::collections::HashMap;
 
 use open;
 use clap::ArgMatches;
-use failure::{bail, format_err, Error, ResultExt};
+use anyhow::{bail, format_err, Error, Context};
 use chrono::prelude::*;
 use log::{debug, trace, error, warn};
 use yaml_rust::Yaml;

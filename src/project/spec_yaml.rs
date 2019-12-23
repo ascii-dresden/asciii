@@ -3,7 +3,7 @@ use std::str::FromStr;
 use bill::{Bill, Currency, Tax};
 use icalendar::Event as CalEvent;
 use icalendar::{Component, Calendar};
-use failure::bail;
+use anyhow::bail;
 use yaml_rust::Yaml;
 
 use super::*;

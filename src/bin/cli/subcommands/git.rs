@@ -1,5 +1,5 @@
 use clap::ArgMatches;
-use failure::{bail, format_err, Error};
+use anyhow::{bail, format_err, Error};
 use log::{trace, error};
 
 use asciii::{storage, util};

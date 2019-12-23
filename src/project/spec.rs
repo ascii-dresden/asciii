@@ -9,7 +9,7 @@ use std::fmt;
 
 use bill::{Bill, Currency, Tax};
 use chrono::{Date, Utc, NaiveTime};
-use failure::Error;
+use anyhow::Error;
 use icalendar::Calendar;
 use semver::Version;
 use yaml_rust::Yaml;

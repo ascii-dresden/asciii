@@ -1,6 +1,6 @@
 use asciii;
 use clap::{App, AppSettings, Arg, ArgGroup, ArgMatches, SubCommand, Shell};
-use failure::{Error, format_err};
+use anyhow::{Error, format_err};
 use log::{info, error};
 use super::subcommands;
 use std::str::FromStr;
@@ -1000,7 +1000,7 @@ pub fn match_matches(matches: &ArgMatches<'_>) {
         if matches.is_present("debug") {
             println!("{:?}", e)
         } else {
-            error!("{} (Cause: {})", e, e.find_root_cause());
+            error!("{} (Cause: {})", e, e.root_cause());
             info!("use --debug to see a backtrace");
         }
     }

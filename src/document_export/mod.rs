@@ -6,7 +6,7 @@ use std::{time,fs};
 use std::path::{Path, PathBuf};
 
 use serde::ser::Serialize;
-use failure::{bail, Error};
+use anyhow::{bail, Error};
 use yaml_rust::Yaml;
 
 use open;

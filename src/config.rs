@@ -44,7 +44,7 @@ impl ConfigReader {
     }
 
     /// Opens config from `self.path()` and parses Yaml right away.
-    pub fn try_new() -> Result<ConfigReader, failure::Error> {
+    pub fn try_new() -> Result<ConfigReader, anyhow::Error> {
         let home_path = ConfigReader::path_home();
         let local_path = Path::new(DEFAULT_LOCATION);
 

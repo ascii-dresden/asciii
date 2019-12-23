@@ -9,7 +9,7 @@ use chrono::NaiveTime;
 use bill::Currency;
 
 use dirs::home_dir;
-use failure::{Error, ResultExt};
+use anyhow::{Error, Context};
 
 use env_logger;
 use log::LevelFilter;

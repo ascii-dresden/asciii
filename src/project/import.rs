@@ -1,4 +1,4 @@
-use failure::Error;
+use anyhow::Error;
 use serde_yaml;
 use ordered_float::OrderedFloat;
 use num_traits::Float;
