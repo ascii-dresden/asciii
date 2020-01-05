@@ -48,14 +48,14 @@ impl IsProject for Project {
     fn responsible(&self) -> FieldResult<&str> {
         self.get_str("manager")
             // old spec
-            .if_missing_try(|| self.get_str("signature").and_then(|c| c.lines().last().ok_or(FieldError::invalid("invalid signature"))))
+            .if_missing_try(|| self.get_str("signature").and_then(|c| c.lines().last().ok_or_else(||FieldError::invalid("invalid signature"))))
     }
 
     fn long_desc(&self) -> String {
         use std::fmt::Write;
         let mut out_string = String::new();
 
-        if let Some(responsible) = self.responsible().ok() {
+        if let Ok(responsible) = self.responsible() {
             out_string += &lformat!("Responsible: {}", responsible);
         }
 
@@ -77,7 +77,7 @@ impl HasEvents for Project {
                     let mut cal_event = CalEvent::new();
                     cal_event.description(&self.long_desc());
 
-                    if let Some(location) = self.location().ok() {
+                    if let Ok(location) = self.location() {
                         cal_event.location(location);
                     }
 
@@ -96,7 +96,7 @@ impl HasEvents for Project {
 
                         let mut cal_event = CalEvent::new();
                         cal_event.description(&self.long_desc());
-                        if let Some(location) = self.location().ok() {
+                        if let Ok(location) = self.location() {
                             cal_event.location(location);
                         }
 
@@ -178,7 +178,7 @@ impl HasEvents for Project {
 
 /// Returns a product from Service
 fn service_to_product<'a, T: HasEmployees>(s: &T) -> Result<Product<'a>, Error> {
-    if let Some(salary) = s.salary().ok() {
+    if let Ok(salary) = s.salary() {
         Ok(Product {
                  name: "Service",
                  unit: Some("h"),
@@ -258,7 +258,7 @@ impl Validatable for dyn Redeemable {
         let mut validation = ValidationResult::new();
 
         validation.validate_field("format", self.format());
-        if let Some(format) = self.format().ok() {
+        if let Ok(format) = self.format() {
             if format < Version::parse("2.0.0").unwrap() {
                 return validation;
             }
@@ -292,12 +292,12 @@ impl<'a> IsClient for Client<'a> {
             // old spec
             .if_missing_try(|| self
                 .get_str("client")
-                .and_then(|c|c.lines().nth(0).ok_or(FieldError::invalid("invalid client name")))
+                .and_then(|c|c.lines().nth(0).ok_or_else(|| FieldError::invalid("invalid client name")))
             )
     }
 
     fn salute(&self) -> FieldResult<&str> {
-        self.title().and_then(|s| s.split_whitespace().nth(0).ok_or(FieldError::invalid("title has no salute")))
+        self.title().and_then(|s| s.split_whitespace().nth(0).ok_or_else(|| FieldError::invalid("title has no salute")))
     }
 
     fn first_name(&self) -> FieldResult<&str> {
@@ -309,7 +309,7 @@ impl<'a> IsClient for Client<'a> {
     fn last_name(&self) -> FieldResult<&str> {
         self.get_str("client.last_name")
         // old spec
-        .if_missing_try(|| self.get_str("client").and_then(|c|c.lines().nth(1).ok_or(FieldError::invalid("invalid client name"))))
+        .if_missing_try(|| self.get_str("client").and_then(|c|c.lines().nth(1).ok_or_else(|| FieldError::invalid("invalid client name"))))
     }
 
     fn full_name(&self) -> Option<String> {
@@ -552,7 +552,7 @@ impl<'a> Validatable for Hours<'a> {
         validation.validate_field("hours.caterers", self.employees());
 
         // return directly if no employees need to be paid
-        if self.employees().unwrap_or(Vec::new()).is_empty() {
+        if self.employees().unwrap_or_default().is_empty() {
             return validation
         }
 

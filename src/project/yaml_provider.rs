@@ -218,12 +218,12 @@ mod tests {
     }
 
 
-    static NO_FALLBACK_PATH: &'static str = r#"
+    static NO_FALLBACK_PATH: &str = r#"
     offer:
         date: 07.11.2019
     "#;
 
-    static FALLBACK_PATH: &'static str = r#"
+    static FALLBACK_PATH: &str = r#"
     offer_date: 08.11.2019
     "#;
 

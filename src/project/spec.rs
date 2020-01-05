@@ -34,7 +34,7 @@ pub trait ValidatableExt {
 
 impl<T: Validatable> ValidatableExt for T {
     fn missing_fields(&self) -> Vec<String> {
-        return self.validate().missing_fields;
+        self.validate().missing_fields
     }
 }
 

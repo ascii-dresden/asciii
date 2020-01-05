@@ -41,12 +41,12 @@ impl ValidationResult {
     }
 
     pub fn is_ok(&self) -> bool {
-        return self.validation_errors.is_empty() && self.missing_fields.is_empty()
+        self.validation_errors.is_empty() && self.missing_fields.is_empty()
     }
 
     pub fn validate_field<T>(&mut self, name: &str, val: FieldResult<T>) {
         if let Err(FieldError::Invalid(msg)) = val {
-            self.validation_errors.push(lformat!("{:?} is invalid: {}", name, msg).to_string());
+            self.validation_errors.push(lformat!("{:?} is invalid: {}", name, msg));
         }
     }
 
@@ -57,12 +57,12 @@ impl ValidationResult {
     }
 
     pub fn require_field<T>(&mut self, name: &str, val: FieldResult<T>) {
-        if !val.is_ok() {
+        if val.is_err() {
             self.missing_fields.push(name.to_string())
         }
 
         if let Err(FieldError::Invalid(msg)) = val {
-            self.validation_errors.push(lformat!("{:?} is invalid: {}", name, msg).to_string());
+            self.validation_errors.push(lformat!("{:?} is invalid: {}", name, msg));
         }
     }
 
