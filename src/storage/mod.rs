@@ -128,6 +128,15 @@ impl Default for StorageSelection {
     }
 }
 
+fn is_dot_file(path: &Path) -> bool {
+    path
+        .file_name()
+        .and_then(std::ffi::OsStr::to_str)
+        .and_then(|s|s.chars().nth(0))
+        .map(|c| c == '.')
+        .unwrap_or(false)
+}
+
 #[cfg_attr(feature = "serialization", derive(Serialize))]
 #[derive(Debug)]
 pub struct Paths {
@@ -145,6 +154,7 @@ pub fn list_path_content(path:&Path) -> Result<Vec<PathBuf>, Error> {
 
     Ok(fs::read_dir(path)?
         .filter_map(Result::ok)
+        .filter(|entry| !is_dot_file(&entry.path()))
         .map(|entry| entry.path())
         .collect::<Vec<PathBuf>>())
 }
@@ -575,7 +585,7 @@ impl<L:Storable> Storage<L> {
     /// Moves projects found through `search_terms` from the `year` back to the `Working` directory.
     ///
     /// Returns list of old and new paths.
-    pub fn unarchive_projects(&self, year:i32, search_terms:&[&str]) -> Result<Vec<(PathBuf)>, Error> {
+    pub fn unarchive_projects(&self, year:i32, search_terms:&[&str]) -> Result<Vec<PathBuf>, Error> {
         let projects = self.search_projects_any(StorageDir::Archive(year), search_terms)?;
 
         let mut moved_files = Vec::new();
@@ -797,13 +807,6 @@ impl<L:Storable> Storage<L> {
     fn open_paths(&self, paths: &[PathBuf]) -> ProjectList<L> {
         trace!("open_paths({:?})", paths);
         let mut projects = paths.par_iter()
-            .filter(|path|
-                if let Ok(meta) = path.metadata() {
-                    meta.is_dir()
-                } else {
-                    false
-                }
-            )
             .filter_map(|path| Self::open_project(path).ok())
             .collect::<Vec<L>>();
 
@@ -866,7 +869,13 @@ impl<L:Storable> Storage<L> {
     }
 
     fn open_project(path: &PathBuf) -> Result<L, Error> {
-        let project = L::open_folder(path);
+        let meta = path.metadata().unwrap();
+        let project =
+        if meta.is_dir() {
+            L::open_folder(path)
+        } else {
+            L::open_file(path)
+        };
         if let Err(ref err) = project {
             warn!("{}", err);
         }

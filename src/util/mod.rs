@@ -6,6 +6,7 @@ use std::ffi::OsStr;
 use std::path::{Path, PathBuf};
 use std::process::{self, Command, ExitStatus};
 use chrono::NaiveTime;
+use bill::Currency;
 
 use dirs::home_dir;
 use failure::{Error, ResultExt};
@@ -156,8 +157,6 @@ pub fn get_valid_path<T:AsRef<OsStr>>(p:T) -> Option<PathBuf>{
 pub fn exit(status:ExitStatus) -> !{
     process::exit(status.code().unwrap_or(1));
 }
-
-use bill::Currency;
 
 /// One place to decide how to display currency
 pub fn currency_to_string(currency:&Currency) -> String {

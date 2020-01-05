@@ -1,6 +1,6 @@
 [package]
 name = "asciii"
-version = "3.9.0"
+version = "3.9.1"
 authors = ["Hendrik Sollich <hendrik@hoodie.de>"]
 license = "MIT/Apache-2.0"
 readme = "README.md"
@@ -91,6 +91,7 @@ pretty_assertions = "0.6"
 [features]
 default = ["cli", "document_export", "git_statuses", "serialization", "deserialization", "server", "shell", "localize"]
 travis_compatible = ["cli", "document_export", "git_statuses", "serialization", "deserialization", "shell", "meta", "version_string"]
+mini_tool = ["cli", "document_export"]
 full_tool = ["travis_compatible", "localize"]
 server= ["actix", "actix-files", "actix-web", "actix-web-actors"]
 webapp = ["server"]

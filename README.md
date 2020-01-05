@@ -92,6 +92,20 @@ msgmerge -U lang/de.po lang/default.pot
 
 to update the german local file `lang/de.po`. Now you only need to update any empty field and check the file in as well.
 
-## CI/CD
+## Features
+asciii comes with different sets of feature configurations, most of which are there to speed up development time. By default most useful features are turned on, such as `webapp`, `shell` and `localization`. You can build asciii with a reduced features set by passing these arguments to `cargo build`:
 
-### Travis-CI [![Build Status](https://travis-ci.org/ascii-dresden/asciii.svg?branch=master)](https://travis-ci.org/ascii-dresden/asciii)
+<<<<<<< HEAD
+### `--no-default-features --features full_tool` 
+* everything except the `webserver`
+
+### `--no-default-features --features mini_tool` 
+=======
+### `--no-default-features --features full_tool`
+* everything except the `webserver`
+
+### `--no-default-features --features mini_tool`
+>>>>>>> a76b17a24... fix: open file paths, not just folders
+* no `shell`, `git_statuses`, `localization`, `meta` or `serde`, just `cli` and `document_export`
+
+Please check `Cargo.toml` for all features.

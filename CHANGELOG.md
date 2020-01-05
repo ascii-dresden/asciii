@@ -1,3 +1,22 @@
+# [3.9.1](https://github.com/ascii-dresden/asciii/compare/v3.9.0...v) (2020-01-05)
+
+
+### Bug Fixes
+
+* open file paths, not just folders ([1b59d45](https://github.com/ascii-dresden/asciii/commit/1b59d45))
+
+
+
+# [3.9.0](https://github.com/ascii-dresden/asciii/compare/v3.8.0...v3.9.0) (2019-11-24)
+
+
+### Features
+
+* change fallback behavior ([fd8d91f](https://github.com/ascii-dresden/asciii/commit/fd8d91f))
+* print warning if yaml values are invalid ([cd0fea8](https://github.com/ascii-dresden/asciii/commit/cd0fea8)), closes [#81](https://github.com/ascii-dresden/asciii/issues/81)
+
+
+
 # [3.8.0](https://github.com/ascii-dresden/asciii/compare/v3.7.3...v3.8.0) (2019-10-27)
 
 
