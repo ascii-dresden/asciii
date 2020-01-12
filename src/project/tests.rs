@@ -9,11 +9,10 @@ fn parse_project(yaml: &str) -> Project{
 }
 
 #[test]
-#[ignore]
 fn compare_basics(){
     println!("{:?}", ::std::env::current_dir());
-    let new_project = Project::open_file(Path::new("./tests/current.yml")).unwrap();
-    let old_project = Project::open_file(Path::new("./tests/old.yml")).unwrap();
+    let new_project = Project::open_file(Path::new("./tests/test_projects/current.yml")).unwrap();
+    let old_project = Project::open_file(Path::new("./tests/test_projects/old.yml")).unwrap();
     //let config = &::CONFIG;
 
     assert_eq!(old_project.name(),

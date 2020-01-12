@@ -120,7 +120,7 @@ pub mod api {
             HttpResponse::Ok().json(exported)
         }
 
-         #[get("/{name}")]
+        #[get("/{name}")]
         pub fn by_name(param: web::Path<NameRequest>) -> HttpResponse {
             info!("by_name({:?})", param.name);
             self::CHANNEL.send(()).unwrap();
@@ -255,7 +255,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     });
 
     info!("listening on http://{}", bind_to);
-    server().bind(bind_to)?.start();
+    server().bind(bind_to)?.run();
 
     sys.run()?;
     info!("shutting down I guess");
