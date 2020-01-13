@@ -40,7 +40,7 @@
                 <div class="col-3">
                     {project.event.manager}
                     <ul class="list-inline">
-                    {#each project.errors.ready_for_invoice as error}
+                    {#each project.errors.missing_for_invoice as error}
                         <li>❌ {error}</li>
                     {/each}
                     </ul>

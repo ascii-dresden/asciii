@@ -50,11 +50,11 @@
             <td>{project.invoice.number || ''}</td>
             <td>{project.event.date}</td>
             <td class="checkbox">
-            <span class="checkbox" data-toggle="tooltip" data-placement="bottom" title="{project.errors.ready_for_offer }">
-                {boolSym(project.checks.ready_for_offer )}
+            <span class="checkbox" data-toggle="tooltip" data-placement="bottom" title="{project.errors.missing_for_offer }">
+                {boolSym(project.checks.missing_for_offer )}
             </span>
-            <span class="checkbox" data-toggle="tooltip" data-placement="bottom" title="{project.errors.ready_for_invoice}">
-                {boolSym(project.checks.ready_for_invoice)}
+            <span class="checkbox" data-toggle="tooltip" data-placement="bottom" title="{project.errors.missing_for_invoice}">
+                {boolSym(project.checks.missing_for_invoice)}
             </span>
             <span class="checkbox" data-toggle="tooltip" data-placement="bottom" title="{project.errors.ready_for_archive}">
                 {boolSym(project.checks.ready_for_archive)}
