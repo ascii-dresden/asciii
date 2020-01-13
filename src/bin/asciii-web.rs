@@ -16,6 +16,7 @@ use actix_files as fs;
 use actix_web_actors::ws;
 
 use asciii::server::ProjectLoader;
+use icalendar::Calendar;
 
 use std::env;
 use std::io;
@@ -90,9 +91,42 @@ pub mod api {
     #[get("/version")]
     pub fn version() -> HttpResponse {
         let version: &str = asciii::VERSION_JSON.as_ref();
+        info!("version {}", version);
         HttpResponse::Ok()
             .set_header(header::CONTENT_TYPE, "application/json")
             .body(version)
+    }
+
+
+    pub mod calendar {
+        use super::*;
+        use asciii::actions;
+        use asciii::project::spec::HasEvents;
+
+
+        #[get("/calendar")]
+        pub fn calendar() -> HttpResponse {
+            info!("calendar");
+            self::CHANNEL.send(()).unwrap();
+            let loader = self::PROJECTS.lock().unwrap();
+
+            let mut tasks = Calendar::new();
+            for project in loader.state.working.values() {
+                tasks.append(&mut project.to_tasks())
+            }
+
+            let mut cal = Calendar::new();
+            for project in loader.state.all.iter() {
+                cal.append(&mut project.to_ical())
+            }
+            cal.append(
+                &mut tasks
+            );
+
+            HttpResponse::Ok()
+                .set_header(header::CONTENT_TYPE, "text/calendar")
+                .body(cal.to_string())
+        }
     }
 
     pub mod projects {
@@ -205,7 +239,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     // color_backtrace::install();
 
     if env::var(LOG_VAR).is_err() {
-        env::set_var(LOG_VAR, "asciii=debug, asciii_web=trace, actix_web=debug");
+        //env::set_var(LOG_VAR, "asciii=debug, asciii_web=debug, actix_web=debug");
+        env::set_var(LOG_VAR, "asciii=info, asciii_web=debug");
     }
     env_logger::init_from_env(Env::new().filter(LOG_VAR));
     let bind_to = env::var(BIND_VAR)
@@ -235,23 +270,25 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     .service(api::full_projects::working_dir)
                     .service(api::projects::years)
                 )
+                .service(api::calendar::calendar)
             )
             // .service(fs::Files::new("/", "webapp/public").index_file("index.html"))
             .service(
                 web::resource("/").route(
-                    web::get()
-                    .to(|| HttpResponse::Ok().body(include_str!("../../webapp/public/index.html")))
+                    web::get().to(|| HttpResponse::Ok().body(include_str!("../../webapp/public/index.html")))
                     ))
             .service(
                 web::resource("/bundle.css").route(
-                    web::get()
-                    .to(|| HttpResponse::Ok().body(include_str!("../../webapp/public/bundle.css")))
+                    web::get().to(|| HttpResponse::Ok().body(include_str!("../../webapp/public/bundle.css")))
                     ))
             .service(
                 web::resource("/bundle.js").route(
-                    web::get()
-                    .to(|| HttpResponse::Ok().content_type("application/javascript").body(include_str!("../../webapp/public/bundle.js")))
+                    web::get().to(|| HttpResponse::Ok().content_type("application/javascript").body(include_str!("../../webapp/public/bundle.js")))
                     ))
+            // .service(
+            //     web::resource("/bundle.js.map").route(
+            //         web::get().to(|| HttpResponse::Ok().content_type("application/javascript").body(include_str!("../../webapp/public/bundle.js.map")))
+            //         ))
     });
 
     info!("listening on http://{}", bind_to);

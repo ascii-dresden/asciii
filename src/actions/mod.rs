@@ -206,7 +206,7 @@ pub fn calendar_and_tasks(dir: StorageDir) -> Result<String, Error> {
     calendar_with_tasks(dir, false)
 }
 
-pub fn calendar_with_tasks(dir: StorageDir, show_tasks:bool) -> Result<String, Error> {
+pub fn calendar_with_tasks(dir: StorageDir, show_tasks: bool) -> Result<String, Error> {
     let storage = storage::setup::<Project>()?;
     let mut cal = Calendar::new();
     if show_tasks {
