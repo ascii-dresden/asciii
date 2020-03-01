@@ -672,8 +672,8 @@ impl Storable for Project {
     fn open_folder(folder_path: &Path) -> Result<Project, Error>{
         let project_file_extension = crate::CONFIG.get_to_string("extensions.project_file");
         let file_path = list_path_content(folder_path)?.iter()
-            .filter(|f|f.extension().unwrap_or(&OsStr::new("")) == project_file_extension.as_str())
-            .nth(0).map(ToOwned::to_owned)
+            .find(|f|f.extension().unwrap_or(&OsStr::new("")) == project_file_extension.as_str())
+            .map(ToOwned::to_owned)
             .ok_or_else(|| StorageError::NoProjectFile(folder_path.to_owned()))?;
         Self::open_file(&file_path)
     }

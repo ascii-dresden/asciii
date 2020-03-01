@@ -18,17 +18,17 @@ fn gen_commit_file() {
 
     if let Some(git_log) = git_log_output {
         let count = git_log.lines().count().to_string();
-        if let Some(last_commit) = git_log.lines().nth(0) {
+        if let Some(last_commit) = git_log.lines().next() {
             println!(
                 "cargo:rustc-env=GIT_DESCRIPTION=commit {} ({})",
                 count.trim(),
                 last_commit.to_string().trim()
             );
         } else {
-            println!("cargo:rustc-env=GIT_DESCRIPTION={}", "no git description");
+            println!(r#"cargo:rustc-env=GIT_DESCRIPTION="no git description""#);
         }
     } else {
-        println!("cargo:rustc-env=GIT_DESCRIPTION={}", "no git description");
+        println!(r#"cargo:rustc-env=GIT_DESCRIPTION="no git description""#);
     }
 }
 

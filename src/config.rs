@@ -102,7 +102,7 @@ impl ConfigReader {
     /// This panics if nothing is found.
     /// You should have a default config for everything that you use.
     pub fn get_char(&self, key: &str) -> Option<char> {
-        self.get_str(key).chars().nth(0)
+        self.get_str(key).chars().next()
     }
 
     /// Returns the string in the position or an empty string

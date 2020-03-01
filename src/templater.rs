@@ -177,7 +177,7 @@ pub enum TemplateError{
 impl fmt::Display for TemplateError{
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result{
         match *self {
-            TemplateError::Incomplete(ref list) => write!(f, "{} ({:?})", self.description(), list),
+            TemplateError::Incomplete(ref list) => write!(f, "{} ({:?})", self, list),
         }
     }
 }

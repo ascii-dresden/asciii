@@ -50,7 +50,7 @@ pub fn parse_dmy_date(date_str:&str) -> Option<Date<Utc>>{
                        .map(|f|f.parse().unwrap_or(0))
                        .collect::<Vec<i32>>();
     if date.len() >=2 && date[0] > 0 && date[2] > 1900 {
-        // XXX this neglects the old "01-05.12.2015" format
+        // XXX: this neglects the old "01-05.12.2015" format
         Utc.ymd_opt(date[2], date[1] as u32, date[0] as u32)
         .single()
     } else {
@@ -64,7 +64,7 @@ pub fn parse_dmy_date(date_str:&str) -> Option<Date<Utc>>{
 /// This is not used in the current format.
 pub fn parse_dmy_date_range(date_str:&str) -> Option<Date<Utc>>{
     let date = date_str.split('.')
-        .map(|s|s.split('-').nth(0).unwrap_or("0"))
+        .map(|s|s.split('-').next().unwrap_or("0"))
         .map(|f|f.parse().unwrap_or(0))
         .collect::<Vec<i32>>();
     if date[0] > 0 {
@@ -114,11 +114,6 @@ pub fn get_f64(yaml:&Yaml, key:&str) -> Option<f64> {
 pub fn get_int(yaml:&Yaml, key:&str) -> Option<i64> {
     get(yaml,key).and_then(Yaml::as_i64)
 }
-
-//TODO: this would be nice
-//pub fn get_vec_of<T>(yaml:&Yaml, key:&str) -> Option<Vec<T>>{
-//    Some(Vec::new())
-//}
 
 /// Gets a `&str` value.
 ///

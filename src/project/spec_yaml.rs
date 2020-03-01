@@ -292,18 +292,18 @@ impl<'a> IsClient for Client<'a> {
             // old spec
             .if_missing_try(|| self
                 .get_str("client")
-                .and_then(|c|c.lines().nth(0).ok_or_else(|| FieldError::invalid("invalid client name")))
+                .and_then(|c|c.lines().next().ok_or_else(|| FieldError::invalid("invalid client name")))
             )
     }
 
     fn salute(&self) -> FieldResult<&str> {
-        self.title().and_then(|s| s.split_whitespace().nth(0).ok_or_else(|| FieldError::invalid("title has no salute")))
+        self.title().and_then(|s| s.split_whitespace().next().ok_or_else(|| FieldError::invalid("title has no salute")))
     }
 
     fn first_name(&self) -> FieldResult<&str> {
         self.get_str("client.first_name")
         // old spec
-        // .or_else(|_|  yaml::get_str(&yaml, "client").and_then(|c|c.lines().nth(0)))
+        // .or_else(|_|  yaml::get_str(&yaml, "client").and_then(|c|c.lines().next()))
     }
 
     fn last_name(&self) -> FieldResult<&str> {
@@ -321,7 +321,7 @@ impl<'a> IsClient for Client<'a> {
 
     fn addressing(&self) -> Option<String> {
         if let Some(salute) = self.salute().ok()
-                                  .and_then(|salute| salute.split_whitespace().nth(0))
+                                  .and_then(|salute| salute.split_whitespace().next())
         // only the first word
         {
             let last_name = self.last_name().ok();

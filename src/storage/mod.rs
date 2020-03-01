@@ -132,7 +132,7 @@ fn is_dot_file(path: &Path) -> bool {
     path
         .file_name()
         .and_then(std::ffi::OsStr::to_str)
-        .and_then(|s|s.chars().nth(0))
+        .and_then(|s|s.chars().next())
         .map(|c| c == '.')
         .unwrap_or(false)
 }
@@ -403,8 +403,8 @@ impl<L:Storable> Storage<L> {
     pub fn get_template_file(&self, name:&str) -> Result<PathBuf, Error> {
         self.list_template_files()?
             .into_iter()
-            .filter(|f|f.file_stem().unwrap_or_else(||OsStr::new("")) == name)
-            .nth(0).ok_or_else(||StorageError::TemplateNotFound.into())
+            .find(|f|f.file_stem().unwrap_or_else(||OsStr::new("")) == name)
+            .ok_or_else(||StorageError::TemplateNotFound.into())
     }
 
     /// Produces a list of paths to all archives in the `archive_dir`.
@@ -707,8 +707,8 @@ impl<L:Storable> Storage<L> {
     pub fn get_project_file(&self, directory:&Path) -> Result<PathBuf, Error> {
         trace!("getting project file from {:?}", directory);
         list_path_content(directory)?.iter()
-            .filter(|f|f.extension().unwrap_or_else(||OsStr::new("")) == L::file_extension().as_str())
-            .nth(0).map(ToOwned::to_owned)
+            .find(|f|f.extension().unwrap_or_else(||OsStr::new("")) == L::file_extension().as_str())
+            .map(ToOwned::to_owned)
             .ok_or_else(|| StorageError::ProjectDoesNotExist.into())
     }
 

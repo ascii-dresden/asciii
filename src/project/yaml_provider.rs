@@ -62,7 +62,7 @@ pub trait YamlProvider {
     fn get<'a>(&'a self, paths: &str) -> Option<&'a Yaml> {
         paths.split('|').filter_map(|path|
             self.get_direct(self.data(), path)
-        ).nth(0)
+        ).next()
     }
 
     /// Wrapper around `get_path()`.
