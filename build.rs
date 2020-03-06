@@ -72,7 +72,7 @@ fn main() {
     // passing variables to rustc
     println!(
         "cargo:rustc-env=PROFILE={}",
-        env::var("PROFILE").unwrap_or("unknown profile".into())
+        env::var("PROFILE").unwrap_or_else(|_| "unknown profile".into())
     );
     println!("cargo:rustc-env=BUILD_DATE={}", Utc::now().format("%+"));
 

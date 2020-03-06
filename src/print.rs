@@ -6,7 +6,6 @@ use prettytable::Row;
 use prettytable::Cell;
 use prettytable::format::{LineSeparator, LinePosition, FormatBuilder};
 use prettytable::{Attr, color};
-use term_size;
 use log::{debug, trace, error};
 use prettytable::{cell, row};
 

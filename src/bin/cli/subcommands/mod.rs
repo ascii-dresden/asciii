@@ -5,7 +5,6 @@ use std::io;
 use std::io::Write;
 use std::collections::HashMap;
 
-use open;
 use clap::ArgMatches;
 use anyhow::{bail, format_err, Error, Context};
 use chrono::prelude::*;

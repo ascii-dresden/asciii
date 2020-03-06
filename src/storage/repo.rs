@@ -9,7 +9,6 @@ use std::process::{Command, ExitStatus};
 use std::error::Error;
 
 #[cfg(feature="git_statuses")]
-use git2;
 use prettytable::{color, Attr};
 use prettytable::color::Color;
 use log::{info, debug};
@@ -257,13 +256,12 @@ pub struct GitError;
 
 
 #[cfg(not(feature="git_statuses"))]
-impl Error for GitError{
-    fn description(&self) -> &str{"git statuses is not a features of this build"}
+impl Error for GitError {
 }
 
 #[cfg(not(feature="git_statuses"))]
 impl fmt::Display for GitError{
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result{
-            write!(f, "{}", self.description())
+            write!(f, "git statuses is not a features of this build")
     }
 }

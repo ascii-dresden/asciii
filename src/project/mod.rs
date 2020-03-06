@@ -12,9 +12,7 @@ use std::collections::HashMap;
 use chrono::prelude::*;
 use chrono::Duration;
 use yaml_rust::Yaml;
-#[cfg(feature="serialization")] use serde_json;
 use maplit::hashmap;
-use slug;
 use tempdir::TempDir;
 use anyhow::{bail, Error};
 

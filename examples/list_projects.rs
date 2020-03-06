@@ -1,5 +1,3 @@
-use asciii;
-
 use asciii::project::Project;
 
 fn main() {

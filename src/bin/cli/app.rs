@@ -1,4 +1,3 @@
-use asciii;
 use clap::{App, AppSettings, Arg, ArgGroup, ArgMatches, SubCommand, Shell};
 use anyhow::{Error, format_err};
 use log::{info, error};

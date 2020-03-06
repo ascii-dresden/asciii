@@ -221,7 +221,6 @@ use std::ops::DerefMut;
 use std::collections::HashMap;
 use linked_hash_map::LinkedHashMap;
 
-use slug;
 fn slugify(string:&str) -> String{ slug::slugify(string) }
 
 impl<L:Storable> Storage<L> {

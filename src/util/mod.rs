@@ -11,11 +11,8 @@ use bill::Currency;
 use dirs::home_dir;
 use anyhow::{Error, Context};
 
-use env_logger;
 use log::LevelFilter;
 use log::{info, debug, error, warn};
-
-use open;
 
 pub mod yaml;
 

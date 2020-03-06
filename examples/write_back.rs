@@ -1,6 +1,3 @@
-use asciii;
-
-use serde_json;
 use serde::Serialize;
 
 use asciii::project::Project;

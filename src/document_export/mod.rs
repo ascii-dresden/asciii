@@ -9,7 +9,6 @@ use serde::ser::Serialize;
 use anyhow::{bail, Error};
 use yaml_rust::Yaml;
 
-use open;
 use handlebars::{Handlebars, no_escape, Helper, RenderContext, HelperDef, Context, Output, HelperResult};
 use log::{info, debug, trace, error, warn};
 

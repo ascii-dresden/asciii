@@ -2,8 +2,6 @@
 
 #[macro_use] pub mod localize_macros;
 
-use asciii;
-
 use std::env;
 
 use crowbook_intl_runtime::set_lang;

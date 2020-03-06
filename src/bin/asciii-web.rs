@@ -73,7 +73,6 @@ pub mod api {
     use asciii::project::export::Complete;
     use asciii::project::export::ExportTarget;
     use asciii::storage::{Storable, Year};
-    use serde_json;
     use serde::Deserialize;
 
     use super::*;
