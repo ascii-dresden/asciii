@@ -426,7 +426,7 @@ impl<L:Storable> Storage<L> {
             .filter_map(OsStr::to_str)
             .filter_map(|year_str| year_str.parse::<Year>().ok())
             .collect();
-        years.sort();
+        years.sort_unstable();
         Ok(years)
     }
 

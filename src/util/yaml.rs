@@ -91,14 +91,7 @@ pub fn get_bool(yaml:&Yaml, key:&str) -> Option<bool> {
                   .as_bool()
                   // allowing it to be a str: "yes" or "no"
                   .or_else(|| y.as_str()
-                       .map( |yes_or_no|
-                             match yes_or_no.to_lowercase().as_ref() // XXX ??? why as_ref?
-                             {
-                                 "yes" => true,
-                                 //"no" => false,
-                                 _ => false
-                             })
-                     ))
+                       .map( |yes_or_no| yes_or_no.to_lowercase().as_str() == "yes")))
 }
 
 /// Gets a `Float` value.
