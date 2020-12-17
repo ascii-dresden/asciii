@@ -73,7 +73,7 @@ impl ConfigReader {
         path.split(|c| c == '/' || c == '.')
             .map(str::to_uppercase)
             .fold(String::from("ASCIII"), |mut acc, w| {
-            acc.push_str("_");
+            acc.push('_');
             acc.push_str(&w);
             acc
         })

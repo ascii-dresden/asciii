@@ -221,7 +221,7 @@ impl Redeemable for Project {
 
         let raw_products =
             self.get_hash("products")
-                .ok().ok_or_else(|| ProductError::UnknownFormat)?;
+                .ok().ok_or(ProductError::UnknownFormat)?;
 
         // let document_tax =  // TODO: activate this once the tax no longer 19%
 

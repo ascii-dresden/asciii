@@ -220,7 +220,7 @@ fn bill_products(bill: &Bill<Product<'_>>) -> Vec<ExportProduct> {
         ExportProduct {
             name: item.product.name.to_string(),
             price: currency_to_string(&item.product.price),
-            unit: item.product.unit.unwrap_or_else(|| "").to_string(),
+            unit: item.product.unit.unwrap_or("").to_string(),
             amount: item.amount,
             cost: currency_to_string(&item.gross()),
             tax: tax.value(),

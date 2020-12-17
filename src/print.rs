@@ -155,7 +155,7 @@ pub fn verbose_rows(projects:&[Project], list_config:&ListConfig<'_>) -> Vec<Row
 
             cells.push( Cell::new( &status.to_string() )
                         .with_style( Attr::ForegroundColor(color) )
-                        .with_style( style.unwrap_or_else(||Attr::Standout(false)) )
+                        .with_style( style.unwrap_or(Attr::Standout(false)) )
                       );
 
 
