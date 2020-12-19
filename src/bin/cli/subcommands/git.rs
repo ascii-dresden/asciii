@@ -1,6 +1,5 @@
 use clap::ArgMatches;
 use anyhow::{bail, format_err, Error};
-use log::{trace, error};
 
 use asciii::{storage, util};
 use asciii::project::Project;
@@ -90,7 +89,7 @@ pub fn git_remote() -> Result<(), Error> {
 
 /// Command ADD
 pub fn git_add(matches: &ArgMatches<'_>) -> Result<(), Error> {
-    trace!("git_add {:#?}", matches);
+    log::trace!("git_add {:#?}", matches);
     let storage = storage::setup_with_git::<Project>()?;
     let repo = storage.repository().unwrap();
     let paths = matches_to_paths(matches, &storage)?;

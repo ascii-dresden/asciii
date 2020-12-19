@@ -560,15 +560,15 @@ msgstr ""
 msgid "Date Format must be DD.MM.YYYY"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/subcommands/git.rs:71
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/subcommands/git.rs:70
 msgid "{}  {} (fetch)\n{}  {} (push)"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/subcommands/git.rs:78
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/subcommands/git.rs:77
 msgid "no remote"
 msgstr ""
 
-#: /home/hendrik/code/ascii/asciii/src/bin/cli/subcommands/git.rs:82
+#: /home/hendrik/code/ascii/asciii/src/bin/cli/subcommands/git.rs:81
 msgid "no remote name"
 msgstr ""
 
