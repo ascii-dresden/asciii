@@ -137,7 +137,7 @@ pub trait YamlProvider {
     /// Gets an `Int` value.
     ///
     /// Same mentality as `yaml_rust`, only returns `Some`, if it's a `Yaml::Int`.
-    fn get_int<'a>(&'a self, path: &str) -> FieldResult<i64> {
+    fn get_int(&self, path: &str) -> FieldResult<i64> {
         self.field(path, "not an integer", Yaml::as_i64)
     }
 
