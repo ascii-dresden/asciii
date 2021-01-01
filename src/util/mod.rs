@@ -8,13 +8,14 @@ use std::process::{self, Command, ExitStatus};
 use chrono::NaiveTime;
 use bill::Currency;
 
-use dirs::home_dir;
+use self::dirs::home_dir;
 use anyhow::{Error, Context};
 
 use log::LevelFilter;
 use log::{info, debug, error, warn};
 
 pub mod yaml;
+pub mod dirs;
 
 /// Sets up logging initially.
 ///
@@ -142,7 +143,13 @@ pub fn delete_file_if<F,P:AsRef<OsStr>>(path:P, confirmed:F) -> io::Result<()>
 pub fn get_valid_path<T:AsRef<OsStr>>(p:T) -> Option<PathBuf>{
     let path = replace_home_tilde(Path::new(&p));
     let path = if !path.is_absolute(){
-        current_dir().unwrap().join(path)
+        
+        if cfg!(target_arch = "wasm32") {
+            Ok(PathBuf::from( std::env::var("PWD").expect("can't access $PWD")))
+        } else {
+            current_dir()
+        }
+        .unwrap().join(path)
     } else { path };
 
     if path.exists() {

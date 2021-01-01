@@ -8,7 +8,6 @@ use std::process::{Command, ExitStatus};
 #[cfg(not(feature="git_statuses"))]
 use std::error::Error;
 
-#[cfg(feature="git_statuses")]
 use prettytable::{color, Attr};
 use prettytable::color::Color;
 use log::{info, debug};
@@ -22,7 +21,7 @@ pub enum GitStatus{
 }
 
 impl GitStatus {
-    pub fn to_format(&self) -> Attr{
+    pub fn to_format(&self) -> Attr {
         //Bold,
         //Dim,
         //Italic(bool),

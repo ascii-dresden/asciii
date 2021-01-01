@@ -15,7 +15,10 @@
 use std::env::{self, current_dir};
 use std::path::{Path, PathBuf};
 
+#[cfg(not(target_arch = "wasm32"))]
 use dirs::home_dir;
+#[cfg(target_arch = "wasm32")]
+use crate::util::dirs::home_dir;
 use log::warn;
 
 use crate::util::yaml::{self, Yaml};

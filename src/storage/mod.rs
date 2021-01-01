@@ -19,8 +19,10 @@
 //! ```
 //!
 
-use rayon::prelude::*;
-use dirs::home_dir;
+#[cfg(feature="rayon")] use rayon::prelude::*;
+#[cfg(not(target_arch = "wasm32"))] use dirs::home_dir;
+#[cfg(target_arch = "wasm32")] use crate::util::dirs::home_dir;
+
 use log::{info, debug, trace, error, warn};
 use anyhow::{bail, ensure, Error};
 
@@ -803,9 +805,35 @@ impl<L:Storable> Storage<L> {
         Ok(projects)
     }
 
+    #[cfg(feature="rayon")]
     fn open_paths(&self, paths: &[PathBuf]) -> ProjectList<L> {
         trace!("open_paths({:?})", paths);
         let mut projects = paths.par_iter()
+            .filter_map(|path| Self::open_project(path).ok())
+            .collect::<Vec<L>>();
+
+        if cfg!(feature="git_statuses") {
+            if let Some(ref repo) = self.repository {
+                return projects
+                    .drain(..)
+                    .map(|mut project| {
+                        let dir = project.dir();
+                        project.set_git_status(repo.get_status(&dir));
+                        project
+                    })
+                    .collect();
+            }
+        }
+
+        ProjectList {
+            projects
+        }
+    }
+
+    #[cfg(not(feature="rayon"))]
+    fn open_paths(&self, paths: &[PathBuf]) -> ProjectList<L> {
+        trace!("open_paths({:?})", paths);
+        let mut projects = paths.iter()
             .filter_map(|path| Self::open_project(path).ok())
             .collect::<Vec<L>>();
 
