@@ -6,7 +6,6 @@ use prettytable::Row;
 use prettytable::Cell;
 use prettytable::format::{LineSeparator, LinePosition, FormatBuilder};
 use prettytable::{Attr, color};
-use log::{debug, trace, error};
 use prettytable::{cell, row};
 
 
@@ -139,7 +138,7 @@ pub fn simple_rows(projects:&[Project], list_config:&ListConfig<'_>) -> Vec<Row>
 /// produces the rows used in `print_projects()`
 #[inline]
 pub fn verbose_rows(projects:&[Project], list_config:&ListConfig<'_>) -> Vec<Row>{
-    trace!("verbose_rows {:#?}", list_config);
+    log::trace!("verbose_rows {:#?}", list_config);
     projects.iter().enumerate()
         .map(|(i, project)| {
             //trace!("configuring row: {:?}", project.name());
@@ -268,15 +267,15 @@ pub fn dynamic_rows(projects:&[Project], list_config:&ListConfig<'_>) -> Vec<Row
 /// the interesting code is in `dynamic_rows()`, `verbose_rows()`, `path_rows()` or `simple_rows()`.
 /// This Documentations is redundant, infact, it is already longer than the function itself.
 pub fn print_projects(rows: Vec<Row>){
-    trace!("starting table print");
+    log::trace!("starting table print");
     let mut table = Table::init(rows);
     table.set_format(FormatBuilder::new().column_separator(' ').padding(0,0).build());
     table.printstd();
-    debug!("this table has {} lines", table.len());
+    log::debug!("this table has {} lines", table.len());
     if let Some(term_dims) = term_size::dimensions() {
-        debug!("terminal dimension {:?}", term_dims);
+        log::debug!("terminal dimension {:?}", term_dims);
     }
-    trace!("done printing table.");
+    log::trace!("done printing table.");
 }
 
 /// Prints Projects as CSV
@@ -310,13 +309,13 @@ fn table_with_borders(table:&mut Table){
 }
 
 pub fn show_details(project:&Project, bill_type: BillType) {
-    trace!("print::show_details()");
+    log::trace!("print::show_details()");
     println!("{}: {}", bill_type.to_string(), project.short_desc());
 
     let (offer, invoice) = match project.bills() {
         Ok(tuple) => tuple,
         Err(e) => {
-            error!("{}, sorry", e);
+            log::error!("{}, sorry", e);
             return
         }
     };
@@ -328,12 +327,12 @@ pub fn show_details(project:&Project, bill_type: BillType) {
 
     // TODO: move to Project::product_table(&self) {
     let mut table = Table::new();
-    trace!("                   - created table");
+    log::trace!("                   - created table");
     //table.set_format(*format::consts::FORMAT_BORDERS_ONLY);
     table_with_borders(&mut table);
     //table.set_titles( row![cell!(""), bill_type, cell!(project.name())]);
     //table.add_row( row![cell!(""), cell!("name"), cell!("amount"), cell!("price"), cell!("cost")]);
-    trace!("                   - added a row");
+    log::trace!("                   - added a row");
     for (index,item) in bill.as_items().iter().enumerate(){
         table.add_row(
             row![ cell!((index+1).to_string()),

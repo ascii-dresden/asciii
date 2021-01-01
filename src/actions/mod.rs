@@ -6,7 +6,6 @@ use bill::Currency;
 use icalendar::Calendar;
 #[cfg(feature = "meta")]
 use toml;
-use log::{info, trace};
 use anyhow::Error;
 
 use std::fmt::Write;
@@ -28,7 +27,7 @@ use self::error::*;
 pub fn with_projects<F>(dir:StorageDir, search_terms: &[&str], f:F) -> Result<(), Error>
     where F:Fn(&Project)->Result<(), Error>
 {
-    trace!("with_projects({:?})", search_terms);
+    log::trace!("with_projects({:?})", search_terms);
     let projects = storage::setup::<Project>()?.search_projects_any(dir, search_terms)?;
     if projects.is_empty() {
         anyhow::bail!(ActionError::NothingFound(search_terms.iter().map(ToString::to_string).collect() ));
@@ -134,7 +133,7 @@ pub fn spec() -> Result<(), Error> {
     let projects = storage::setup::<Project>()?.open_projects(StorageDir::Working)?;
     //let projects = super::execute(||storage.open_projects(StorageDir::All));
     for project in projects {
-        info!("{}", project.dir().display());
+        log::info!("{}", project.dir().display());
 
         project.client().validate().missing_fields.into_iter().for_each(|error| println!("{}", error));
 
@@ -171,7 +170,7 @@ pub fn delete_project_confirmation(dir: StorageDir, search_terms:&[&str]) -> Res
 }
 
 pub fn archive_projects(search_terms:&[&str], manual_year:Option<i32>, force:bool) -> Result<Vec<PathBuf>, Error>{
-    trace!("archive_projects matching ({:?},{:?},{:?})", search_terms, manual_year,force);
+    log::trace!("archive_projects matching ({:?},{:?},{:?})", search_terms, manual_year,force);
     Ok( storage::setup_with_git::<Project>()?.archive_projects_if(search_terms, manual_year, || force) ?)
 }
 
@@ -181,7 +180,7 @@ pub fn archive_all_projects() -> Result<Vec<PathBuf>, Error> {
     for project in storage.open_projects(StorageDir::Working)?
                         .iter()
                         .filter(|p| p.is_ready_for_archive().is_empty()) {
-        info!("{}", lformat!("we could get rid of: {}", project.name().unwrap_or("")));
+        log::info!("{}", lformat!("we could get rid of: {}", project.name().unwrap_or("")));
         moved_files.push(project.dir());
         moved_files.append(&mut storage.archive_project(&project, project.year().unwrap())?);
     }
@@ -223,7 +222,7 @@ pub fn calendar_with_tasks(dir: StorageDir, show_tasks: bool) -> Result<String, 
 /// Clone the repo
 ///
 pub fn clone_remote(url: &str, to: &str) -> Result<(), Error> {
-    trace!("cloning {:?} to {:?}", url, to);
+    log::trace!("cloning {:?} to {:?}", url, to);
     Command::new("git")
         .args(&["clone", url, to])
         .status()

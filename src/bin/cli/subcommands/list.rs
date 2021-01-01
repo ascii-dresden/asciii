@@ -1,7 +1,6 @@
 
 use chrono::prelude::*;
 use clap::ArgMatches;
-use log::debug;
 use anyhow::Error;
 
 use asciii::CONFIG;
@@ -98,7 +97,7 @@ fn list_projects(dir: StorageDir, list_config: &ListConfig<'_>) -> Result<(), Er
     } else {
         setup::<Project>()?
     };
-    debug!("listing projects: {}", storage.working_dir().display());
+    log::debug!("listing projects: {}", storage.working_dir().display());
 
     let mut projects = storage.open_projects(dir)?;
 
@@ -135,7 +134,7 @@ fn list_projects(dir: StorageDir, list_config: &ListConfig<'_>) -> Result<(), Er
         // TODO: room for improvement
         print::print_projects(print::simple_rows(&projects, list_config));
     } else {
-        debug!("list_mode: {:?}", list_config.mode);
+        log::debug!("list_mode: {:?}", list_config.mode);
         match list_config.mode {
             ListMode::Csv => print::print_csv(&projects),
             ListMode::Paths => print::print_projects(print::path_rows(&projects, list_config)),
@@ -199,15 +198,15 @@ fn decide_mode(simple: bool, verbose: bool, paths: bool, nothing: bool, csv: boo
     } else {
         match (simple, verbose, CONFIG.get_bool("list/verbose")) {
             (false, true, _) => {
-                debug!("-v overwrites config");
+                log::debug!("-v overwrites config");
                 ListMode::Verbose
             }
             (false, _, true) => {
-                debug!("-v from config");
+                log::debug!("-v from config");
                 ListMode::Verbose
             }
             _ => {
-                debug!("simple mode");
+                log::debug!("simple mode");
                 ListMode::Simple
             }
         }

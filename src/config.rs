@@ -19,7 +19,6 @@ use std::path::{Path, PathBuf};
 use dirs::home_dir;
 #[cfg(target_arch = "wasm32")]
 use crate::util::dirs::home_dir;
-use log::warn;
 
 use crate::util::yaml::{self, Yaml};
 
@@ -59,12 +58,12 @@ impl ConfigReader {
                         });
 
         if !home_path.exists() {
-            warn!("{} does not exist, falling back to defaults", home_path.display());
+            log::warn!("{} does not exist, falling back to defaults", home_path.display());
         }
 
         if let (Some(home_dir), Ok(current_dir)) = (home_dir(), current_dir()) {
             if local_path.exists() && current_dir != home_dir {
-                warn!("{} exists, this overrides defaults and user settings",
+                log::warn!("{} exists, this overrides defaults and user settings",
                       local_path.display())
             }
         }

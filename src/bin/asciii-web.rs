@@ -1,9 +1,6 @@
 #![allow(unused_imports)]
 use env_logger::{self, Env};
 
-#[allow(unused_imports)]
-use log::{info, error, debug, warn, trace};
-
 use actix_web::HttpServer;
 use actix_web::{
     get,
@@ -33,16 +30,16 @@ lazy_static::lazy_static! {
         let (tx, rx) = sync_channel::<()>(1);
 
         thread::spawn(move || {
-            debug!("background thread");
+            log::debug!("background thread");
             let mut count = 0;
             loop {
                 rx.recv().unwrap();
                 count += 1;
                 if count % 6 == 0 {
-                    debug!("updating projects");
+                    log::debug!("updating projects");
                     PROJECTS.lock().unwrap().update();
                 }
-                debug!("call-count: {}", count);
+                log::debug!("call-count: {}", count);
             }
         });
         tx
@@ -66,9 +63,6 @@ pub mod api {
     use actix_files as fs;
     use actix_web_actors::ws;
 
-    #[allow(unused_imports)]
-    use log::{info, error, debug, warn, trace};
-
     use linked_hash_map::LinkedHashMap;
     use asciii::project::export::Complete;
     use asciii::project::export::ExportTarget;
@@ -90,7 +84,7 @@ pub mod api {
     #[get("/version")]
     pub fn version() -> HttpResponse {
         let version: &str = asciii::VERSION_JSON.as_ref();
-        info!("version {}", version);
+        log::info!("version {}", version);
         HttpResponse::Ok()
             .set_header(header::CONTENT_TYPE, "application/json")
             .body(version)
@@ -105,7 +99,7 @@ pub mod api {
 
         #[get("/calendar")]
         pub fn calendar() -> HttpResponse {
-            info!("calendar");
+            log::info!("calendar");
             self::CHANNEL.send(()).unwrap();
             let loader = self::PROJECTS.lock().unwrap();
 
@@ -133,7 +127,7 @@ pub mod api {
 
         #[get("/year")]
         pub fn years(_req: HttpRequest) -> HttpResponse {
-            info!("years");
+            log::info!("years");
             self::CHANNEL.send(()).unwrap();
             let loader = self::PROJECTS.lock().unwrap();
 
@@ -142,7 +136,7 @@ pub mod api {
 
         #[get("/year/{year}")]
         pub fn by_year(param: web::Path<YearRequest>) -> HttpResponse {
-            info!("by_year");
+            log::info!("by_year");
             self::CHANNEL.send(()).unwrap();
             let loader = self::PROJECTS.lock().unwrap();
             let exported = loader.state.mapped.iter()
@@ -155,7 +149,7 @@ pub mod api {
 
         #[get("/{name}")]
         pub fn by_name(param: web::Path<NameRequest>) -> HttpResponse {
-            info!("by_name({:?})", param.name);
+            log::info!("by_name({:?})", param.name);
             self::CHANNEL.send(()).unwrap();
             let loader = self::PROJECTS.lock().unwrap();
             let exported = loader.state.mapped.iter()
@@ -171,7 +165,7 @@ pub mod api {
 
         #[get("/workingdir")]
         pub fn working_dir() -> HttpResponse {
-            info!("projects/workingdir");
+            log::info!("projects/workingdir");
             let loader = self::PROJECTS.lock().unwrap();
             let list = loader.state.working.iter()
                             .map(|(ident, _)| ident)
@@ -217,7 +211,7 @@ pub mod api {
         
         #[get("/workingdir")]
         pub fn working_dir() -> HttpResponse {
-            info!("full_projects/workingdir");
+            log::info!("full_projects/workingdir");
             let loader = self::PROJECTS.lock().unwrap();
             let list = loader.state.working.iter()
                             .map(|(ident, p)| {
@@ -247,8 +241,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
 
 
-    info!("running asciii-web");
-    warn!("do not host this on a public server, there is no security by design");
+    log::info!("running asciii-web");
+    log::warn!("do not host this on a public server, there is no security by design");
 
     let sys = actix::System::new("signaler");
 
@@ -290,11 +284,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             //         ))
     });
 
-    info!("listening on http://{}", bind_to);
+    log::info!("listening on http://{}", bind_to);
     server().bind(bind_to)?.run();
 
     sys.run()?;
-    info!("shutting down I guess");
+    log::info!("shutting down I guess");
 
     Ok(())
 }

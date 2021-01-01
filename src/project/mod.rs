@@ -19,7 +19,6 @@ use anyhow::{bail, Error};
 use bill::BillItem;
 use icalendar::*;
 use semver::Version;
-use log::{debug, trace, error, warn};
 
 use crate::util::{yaml, get_valid_path};
 use crate::storage::{Storable, list_path_content};
@@ -70,14 +69,14 @@ impl Project {
 
     /// Opens a project from file path;
     pub fn open<S: AsRef<OsStr> + std::fmt::Debug + ?Sized>(pathish: &S) -> Result<Project, Error> {
-        trace!("Project::open({:?});", pathish);
+        log::trace!("Project::open({:?});", pathish);
         let file_path = Path::new(&pathish);
         let file_content = fs::read_to_string(&file_path)?;
         let project = Project {
             file_path: file_path.to_owned(),
             git_status: None,
             yaml: yaml::parse(&file_content).unwrap_or_else(|e|{
-                error!("syntax error in {}\n  {}", file_path.display(), e);
+                log::error!("syntax error in {}\n  {}", file_path.display(), e);
                 Yaml::Null
             }),
             file_content,
@@ -92,7 +91,7 @@ impl Project {
 
         if !validation.validation_errors.is_empty() {
             let name = project.short_desc();
-            warn!("project {:?}:", name);
+            log::warn!("project {:?}:", name);
             for err in validation.validation_errors {
                 println!(" * {}", err);
             }
@@ -261,7 +260,7 @@ impl Project {
                 Ok(())
             },
             Err(e) => {
-                error!("The resulting document is no valid yaml. SORRY!\n{}\n\n{}",
+                log::error!("The resulting document is no valid yaml. SORRY!\n{}\n\n{}",
                        filled.lines().enumerate().map(|(n,l)| format!("{:>3}. {}\n",n,l)).collect::<String>(), //line numbers :D
                        e);
                 bail!(e)
@@ -319,7 +318,7 @@ impl Project {
 
                 // everything's all set to close this
                 (Some(_),       Some(_),       Some(wages)) if days_since(wages) > 7 => { cal.push(self.task_close_project(wages)); },
-                _ => warn!("{}", lformat!("weird task edgecase in {:?}:\n{:?}", self.file(), (event, invoice, payed, wages) ))
+                _ => log::warn!("{}", lformat!("weird task edgecase in {:?}:\n{:?}", self.file(), (event, invoice, payed, wages) ))
 
             }
         }
@@ -480,7 +479,7 @@ pub trait Exportable {
     }
 
     fn write_to_path<P:AsRef<OsStr> + fmt::Debug>(content: &str, target: &P) -> Result<(), Error> {
-        trace!("writing content ({}bytes) to {:?}", content.len(), target);
+        log::trace!("writing content ({}bytes) to {:?}", content.len(), target);
         let mut file = File::create(Path::new(target))?;
         file.write_all(content.as_bytes())?;
         file.sync_all()?;
@@ -581,7 +580,7 @@ impl Storable for Project {
             .finalize()
             .filled;
 
-        debug!("remaining template fields: {:#?}", file_content.list_keywords());
+        log::debug!("remaining template fields: {:#?}", file_content.list_keywords());
 
         // generates a temp file
         let temp_dir  = TempDir::new(project_name).unwrap();
@@ -595,7 +594,7 @@ impl Storable for Project {
         let yaml = match yaml::parse(&file_content){
             Ok(y) => y,
             Err(e) => {
-                error!("The created document is no valid yaml. SORRY!\n{}\n\n{}",
+                log::error!("The created document is no valid yaml. SORRY!\n{}\n\n{}",
                        file_content.lines().enumerate().map(|(n,l)| format!("{:>3}. {}\n",n,l)).collect::<String>(), //line numbers :D
                        e);
                 bail!(e)

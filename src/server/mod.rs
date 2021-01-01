@@ -1,6 +1,5 @@
 #![cfg(feature = "server")]
 #![allow(clippy::new_without_default)]
-use log::debug;
 
 use linked_hash_map::LinkedHashMap;
 use itertools::Itertools;
@@ -59,7 +58,7 @@ impl<'a> ProjectLoader {
     }
 
     pub fn update(&mut self) {
-        debug!("updating projects");
+        log::debug!("updating projects");
         self.state = reinitialize(&self.storage);
     }
 }

@@ -1,6 +1,5 @@
 use chrono::prelude::*;
 #[allow(unused_imports)]
-use log::*;
 use yaml_rust::{Yaml, yaml::Hash as YamlHash};
 
 use crate::util::yaml::{parse_dmy_date, parse_dmy_date_range};
@@ -118,7 +117,7 @@ pub trait YamlProvider {
     fn field<'a, T, F> (&'a self, path: &str, err: &str, parser: F) -> FieldResult<T>
     where F: FnOnce(&'a Yaml) -> Option<T> {
         let res = self.get(path);
-        debug!("{}::get({:?}) -> {:?}", module_path!(), path, res);
+        log::debug!("{}::get({:?}) -> {:?}", module_path!(), path, res);
         match res {
             None => Err(FieldError::Missing),
             Some(ref node) => match parser(node) {

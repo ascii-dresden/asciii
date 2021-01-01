@@ -10,7 +10,6 @@ use std::error::Error;
 
 use prettytable::{color, Attr};
 use prettytable::color::Color;
-use log::{info, debug};
 
 /// More Rustacious way of representing a git status
 #[derive(Debug,Clone)]
@@ -170,7 +169,7 @@ impl Repository {
 
     fn execute_git(&self, command:&str, args:&[&str], paths: &[PathBuf]) -> ExitStatus{
         let gitdir  = self.workdir.join(".git");
-        debug!("{:?}", Command::new("git")
+        log::debug!("{:?}", Command::new("git")
                  .args(&["--work-tree", self.workdir.to_str().unwrap()])
                  .args(&["--git-dir",   gitdir.to_str().unwrap()])
                  .arg(command)
@@ -189,12 +188,12 @@ impl Repository {
     }
 
     pub fn add(&self, paths:&[PathBuf]) -> ExitStatus {
-        info!("adding to git: {:?}", paths);
+        log::info!("adding to git: {:?}", paths);
         self.execute_git("add", &[], paths)
     }
 
     pub fn add_all(&self) -> ExitStatus {
-        info!("adding all to git");
+        log::info!("adding all to git");
         self.execute_git("add", &["--all"], &[])
     }
 

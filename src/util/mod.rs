@@ -11,9 +11,6 @@ use bill::Currency;
 use self::dirs::home_dir;
 use anyhow::{Error, Context};
 
-use log::LevelFilter;
-use log::{info, debug, error, warn};
-
 pub mod yaml;
 pub mod dirs;
 
@@ -28,7 +25,7 @@ pub fn setup_log() {
         logger
             .format_level(true)
             .format_module_path(false)
-            .filter_level(LevelFilter::Info);
+            .filter_level(log::LevelFilter::Info);
     }
 
     logger.init();
@@ -55,7 +52,7 @@ pub fn git_user_name() -> Option<String> {
         .args(&["config", "user.name"])
         .output()
         .map_err(|e| {
-            error!("failed to execute process: {}", e);
+            log::error!("failed to execute process: {}", e);
             e
         })
         .ok()
@@ -98,7 +95,7 @@ pub fn pass_to_command<T:AsRef<OsStr>>(editor: Option<&str>, paths:&[T]) -> Resu
 
 
     if paths.is_empty() {
-        warn!("non of the provided paths could be found")
+        log::warn!("non of the provided paths could be found")
     } else if let Some(ref editor) = editor {
         if paths.len() < 5 || really (&format!("you are about to open {} files\n{:#?}\nAre you sure about this?", paths.len(), paths))
         {
@@ -107,7 +104,7 @@ pub fn pass_to_command<T:AsRef<OsStr>>(editor: Option<&str>, paths:&[T]) -> Resu
                 .collect::<Vec<&str>>();
 
             let (editor_command,args) = editor_config.split_first().unwrap() ;
-            info!("launching {:?} with {:?} and {:?}",
+            log::info!("launching {:?} with {:?} and {:?}",
                   editor_command,
                   args.join(" "),
                   paths);
@@ -134,7 +131,7 @@ pub fn delete_file_if<F,P:AsRef<OsStr>>(path:P, confirmed:F) -> io::Result<()>
 {
     let path = PathBuf::from(&path);
     if confirmed(){
-        debug!("$ rm {}", path.display());
+        log::debug!("$ rm {}", path.display());
         fs::remove_file(&path)
     } else {Ok(())}
 }

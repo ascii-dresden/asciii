@@ -8,7 +8,6 @@ use std::collections::HashMap;
 use clap::ArgMatches;
 use anyhow::{bail, format_err, Error, Context};
 use chrono::prelude::*;
-use log::{debug, trace, error, warn};
 use yaml_rust::Yaml;
 
 use asciii::{self, CONFIG, config, util, actions};
@@ -73,27 +72,27 @@ pub fn new(matches: &ArgMatches<'_>) -> Result<(), Error> {
     let mut fill_data: HashMap<&str, String> = HashMap::new();
 
     if let Some(description) = matches.value_of("description") {
-        debug!("Filling in DESCRIPTION");
+        log::debug!("Filling in DESCRIPTION");
         fill_data.insert("DESCRIPTION", description.to_owned());
     }
 
     if let Some(date) = matches.value_of("date") {
-        debug!("Filling in DATE-EVENT");
+        log::debug!("Filling in DATE-EVENT");
         fill_data.insert("DATE-EVENT", date.to_owned());
     }
 
     if let Some(time) = matches.value_of("time") {
-        debug!("Filling in TIME-START");
+        log::debug!("Filling in TIME-START");
         fill_data.insert("TIME-START", time.to_owned());
     }
 
     if let Some(time_end) = matches.value_of("time_end") {
-        debug!("Filling in TIME-END");
+        log::debug!("Filling in TIME-END");
         fill_data.insert("TIME-END", time_end.to_owned());
     }
 
     if let Some(manager) = matches.value_of("manager") {
-        debug!("Filling in MANAGER");
+        log::debug!("Filling in MANAGER");
         fill_data.insert("MANAGER", manager.to_owned());
     }
 
@@ -139,7 +138,7 @@ fn matches_to_search<'a>(matches: &'a ArgMatches<'_>) -> (Vec<&'a str>, StorageD
         .map(Iterator::collect)
         .unwrap_or_else(Vec::new);
 
-    debug!("matches_to_search: --archive={:?}", matches.value_of("archive"));
+    log::debug!("matches_to_search: --archive={:?}", matches.value_of("archive"));
 
 
     let dir = matches_to_dir(matches);
@@ -194,7 +193,7 @@ pub fn bootstrap(matches: &ArgMatches<'_>) -> Result<(), Error> {
         .expect("storage page not accessible");
 
     let to = matches.value_of("to").unwrap_or(&default_to);
-    trace!("cloning {:?} to {:?}", repo, to);
+    log::trace!("cloning {:?} to {:?}", repo, to);
     actions::clone_remote(repo, to)?;
     config_init(editor)?;
 
@@ -208,7 +207,7 @@ pub fn csv(matches: &ArgMatches<'_>) -> Result<(), Error> {
                       .and_then(|y| y.parse::<i32>().ok())
                       .unwrap_or_else(|| Local::now().year());
 
-    debug!("asciii csv --year {}", year);
+    log::debug!("asciii csv --year {}", year);
     let csv = actions::csv(year)?;
     println!("{}", csv);
     Ok(())
@@ -268,24 +267,24 @@ pub fn meta(_matches: &ArgMatches<'_>) -> Result<(), Error> {
 #[cfg(feature = "meta")]
 pub fn meta(matches: &ArgMatches<'_>) -> Result<(), Error> {
     let storage = setup::<Project>()?;
-    trace!("meta --> {:#?}", matches);
+    log::trace!("meta --> {:#?}", matches);
     if let Some(matches) = matches.subcommand_matches("edit") {
         let editor = matches.value_of("editor")
                             .or_else(|| CONFIG.get("user.editor")
                                       .and_then(Yaml::as_str));
-        trace!("--> editing");
+        log::trace!("--> editing");
         if let Ok(path) = storage.get_extra_file("meta.toml") {
             util::pass_to_command(editor, &[path])?;
         }
     }
 
     if let Some(_matches) = matches.subcommand_matches("store") {
-        trace!("--> storing");
+        log::trace!("--> storing");
         actions::store_meta()?;
     }
 
     if let Some(_matches) = matches.subcommand_matches("dump") {
-        trace!("--> dumping");
+        log::trace!("--> dumping");
         let meta = actions::parse_meta();
         println!("{:#?}", meta);
     }
@@ -429,17 +428,17 @@ fn matches_to_export_config<'a>(m: &'a ArgMatches<'_>) -> Option<ExportConfig<'a
     if  m.is_present("search_term") {
         let (search_terms, dir) = matches_to_search(m);
         let search_terms = search_terms.into_iter().map(ToOwned::to_owned).collect::<Vec<_>>();
-        debug!("make {t}({s}/{d:?}, invoice={i:?})", d = dir, s = search_terms[0], t = template_name, i = bill_type);
+        log::debug!("make {t}({s}/{d:?}, invoice={i:?})", d = dir, s = search_terms[0], t = template_name, i = bill_type);
         config.select = StorageSelection::DirAndSearch(dir, search_terms);
         Some(config)
 
     } else if let Some(file_path) = m.value_of("file") {
-        debug!("make {t}({d:?}, invoice={i:?})", d = file_path, t = template_name, i = bill_type);
+        log::debug!("make {t}({d:?}, invoice={i:?})", d = file_path, t = template_name, i = bill_type);
         config.select = StorageSelection::Paths(vec![PathBuf::from(file_path)]);
         Some(config)
 
     } else {
-        error!("{}", lformat!("You have to provide either a search term or path"));
+        log::error!("{}", lformat!("You have to provide either a search term or path"));
         None
     }
 
@@ -449,7 +448,7 @@ fn matches_to_export_config<'a>(m: &'a ArgMatches<'_>) -> Option<ExportConfig<'a
 /// Command MAKE
 #[cfg(feature="document_export")]
 pub fn make(m: &ArgMatches<'_>) -> Result<(), Error> {
-    debug!("{:?}", m);
+    log::debug!("{:?}", m);
     if let Some(ref config) = matches_to_export_config(m) {
         document_export::projects_to_doc(config)?; // TODO: if-let this TODO should return Result
         Ok(())
@@ -473,7 +472,7 @@ pub fn delete(m: &ArgMatches<'_>) -> Result<(), Error> {
 
 #[cfg(not(feature="document_export"))]
 pub fn make(_: &ArgMatches) -> Result<(), Error> {
-    error!("Make functionality not built-in with this release!");
+    log::error!("Make functionality not built-in with this release!");
     Ok(())
 }
 
@@ -489,13 +488,13 @@ pub fn archive(matches: &ArgMatches<'_>) -> Result<(), Error> {
         let search_terms = search_terms.collect::<Vec<_>>();
         let year = matches.value_of("year").and_then(|s| s.parse::<i32>().ok());
         let moved_files = actions::archive_projects(&search_terms, year, matches.is_present("force"))?;
-        debug!("archive({:?},{:?}) :\n{:?}", search_terms, year, moved_files);
+        log::debug!("archive({:?},{:?}) :\n{:?}", search_terms, year, moved_files);
     } else if matches.is_present("all"){
-        debug!("archiving all I can find");
+        log::debug!("archiving all I can find");
         let moved_files = actions::archive_all_projects()?;
-        debug!("git adding {:?} ", moved_files);
+        log::debug!("git adding {:?} ", moved_files);
     } else {
-        debug!("what do you wanna do?");
+        log::debug!("what do you wanna do?");
     }
     Ok(())
 }
@@ -506,7 +505,7 @@ pub fn unarchive(matches: &ArgMatches<'_>) -> Result<(), Error> {
         .unwrap_or_else(|e| panic!("can't parse year {:?}, {:?}", year, e));
     let search_terms = matches.values_of("name").unwrap().collect::<Vec<_>>();
     let moved_files = actions::unarchive_projects(year, &search_terms)?;
-    debug!("unarchive({:?},{:?}) :\n{:?}", search_terms, year, moved_files);
+    log::debug!("unarchive({:?},{:?}) :\n{:?}", search_terms, year, moved_files);
     Ok(())
 }
 
@@ -547,13 +546,13 @@ pub fn config_init(editor: Option<&str>) -> Result<(), Error> {
     let local = config::ConfigReader::path_home();
 
     if local.exists() {
-        error!("{:?} already exists, can't overwrite", local);
+        log::error!("{:?} already exists, can't overwrite", local);
 
     } else if let Ok(mut file) = fs::File::create(local){
 
         let content;
         let mut template = Templater::new(config::DEFAULT_CONFIG).finalize();
-        trace!("default config keywords: {:#?}", template.list_keywords());
+        log::trace!("default config keywords: {:#?}", template.list_keywords());
 
         if util::really(&lformat!("do you want to set your name?")) {
             let name = util::git_user_name().and_then(|user_name| {
@@ -603,7 +602,7 @@ fn config_edit(editor: Option<&str>) -> Result<(), Error> {
     if local.exists() {
         util::pass_to_command(editor, &[&CONFIG.path])?;
     } else {
-        error!("Cannot open {:?}, run `asciii config --init` to create it.", local)
+        log::error!("Cannot open {:?}, run `asciii config --init` to create it.", local)
     }
 
     Ok(())
@@ -661,7 +660,7 @@ pub fn dues(matches: &ArgMatches<'_>) -> Result<(), Error> {
 // pub fn open_path(matches:&ArgMatches){path(matches, |path| {open::that(path).unwrap();})}
 pub fn open_path(m: &ArgMatches<'_>) -> Result<(), Error> {
     path(m, |path| {
-        debug!("opening {:?}", path);
+        log::debug!("opening {:?}", path);
         open::that(path).map(|_| ())?;
         Ok(())
     })?;
@@ -684,34 +683,34 @@ pub fn path<F>(m: &ArgMatches<'_>, action: F) -> Result<(), Error>
         let storage = setup::<Project>()?;
         let selection = matches_to_selection(m);
         let projects = storage.open_projects(&selection)?;
-        debug!("opening project folder {:?} -> {:#?}", selection, projects);
+        log::debug!("opening project folder {:?} -> {:#?}", selection, projects);
 
         for project in projects.iter() {
             if m.is_present("offer") {
-                debug!("offer file for {:?}", project.offer_file());
+                log::debug!("offer file for {:?}", project.offer_file());
 
                 if let Some(offer_file) = &project.offer_file() {
                     if offer_file.exists() {
                         action(&offer_file)?;
                     } else {
-                        warn!("{}", lformat!("{} does not exist", offer_file.display()));
+                        log::warn!("{}", lformat!("{} does not exist", offer_file.display()));
                     }
                 }
 
             } else if m.is_present("invoice") {
-                debug!("invoice file for {:?}", project.invoice_file());
+                log::debug!("invoice file for {:?}", project.invoice_file());
                 if let Some(invoice_file) = &project.invoice_file() {
                     if invoice_file.exists() {
                         action(&invoice_file)?;
                     } else {
-                        warn!("{}", lformat!("{} does not exist", invoice_file.display()));
+                        log::warn!("{}", lformat!("{} does not exist", invoice_file.display()));
                     }
                 }
 
 
 
             } else {
-                debug!("executing action file for {:?}", project.dir());
+                log::debug!("executing action file for {:?}", project.dir());
                 action(&project.dir())?;
             }
         }

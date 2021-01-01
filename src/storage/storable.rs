@@ -9,7 +9,6 @@ use std::collections::HashMap;
 use chrono::{Date, Utc, Datelike};
 use anyhow::Error;
 use tempdir::TempDir;
-use log::debug;
 
 use super::repo::GitStatus;
 
@@ -39,7 +38,7 @@ pub trait Storable: Send+Sync {
     fn delete_project_dir_if(&self, confirmed: impl Fn()->bool) -> io::Result<()> {
         let folder = self.dir();
         if confirmed(){
-            debug!("$ rm {}", folder.display());
+            log::debug!("$ rm {}", folder.display());
             fs::remove_dir_all(&folder)
         } else {Ok(())}
     }

@@ -74,11 +74,11 @@ pub fn git_remote() -> Result<(), Error> {
                     remote.pushurl().or_else(|| remote.url()).unwrap_or(""),
                     ));
                 } else {
-                    error!("{}", lformat!("no remote"))
+                    log::error!("{}", lformat!("no remote"))
                 }
 
             } else {
-                error!("{}", lformat!("no remote name"))
+                log::error!("{}", lformat!("no remote name"))
             }
         }
 

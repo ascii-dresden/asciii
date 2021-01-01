@@ -10,7 +10,6 @@ use anyhow::{bail, Error};
 use yaml_rust::Yaml;
 
 use handlebars::{Handlebars, no_escape, Helper, RenderContext, HelperDef, Context, Output, HelperResult};
-use log::{info, debug, trace, error, warn};
 
 use crate::util;
 use crate::project::{self, Project, Exportable};
@@ -46,7 +45,7 @@ impl HelperDef for IncHelper {
     #[allow(clippy::extra_unused_lifetimes)]
     fn call<'reg: 'rc, 'rc>(&self, h: &Helper<'_, '_>, _: &Handlebars, _: &Context, _: &mut RenderContext<'_>, out: &mut dyn Output) -> HelperResult {
         let param = h.param(0).unwrap().value();
-        debug!("inc_helper({:?})", param);
+        log::debug!("inc_helper({:?})", param);
         out.write(&format!("{}", param.as_u64().expect("param can't be converted to u64") + 1))?;
         Ok(())
     }
@@ -103,7 +102,7 @@ fn output_template_path(template_name:&str) -> Result<PathBuf, Error> {
     // }
 
     // check stays here
-    debug!("template file={:?} exists={}", template_path, template_path.exists());
+    log::debug!("template file={:?} exists={}", template_path, template_path.exists());
     if template_path.exists() {
         Ok(template_path)
     } else {
@@ -115,7 +114,7 @@ fn output_template_path(template_name:&str) -> Result<PathBuf, Error> {
 #[cfg(feature="document_export")]
 #[allow(clippy::cognitive_complexity)] // sorry
 fn project_to_doc(project: &Project, config: &ExportConfig<'_>) -> Result<Option<PathBuf>, Error> {
-    trace!("exporting a document: {:#?}", config);
+    log::trace!("exporting a document: {:#?}", config);
 
     let &ExportConfig {
         template_name,
@@ -140,8 +139,8 @@ fn project_to_doc(project: &Project, config: &ExportConfig<'_>) -> Result<Option
                                 .map(Yaml::as_str).collect::<Vec<_>>();
 
     let  template_path = output_template_path(template_name)?;
-    debug!("converting with {:?}", convert_tool);
-    debug!("template {:?}", template_path);
+    log::debug!("converting with {:?}", convert_tool);
+    log::debug!("template {:?}", template_path);
 
     // project_readiness(&project) {
     let missing_for_offer = project.is_missing_for_offer();
@@ -162,17 +161,17 @@ fn project_to_doc(project: &Project, config: &ExportConfig<'_>) -> Result<Option
                                                     .expect("this should have been caught by missing_for_invoice()")))),
 
         Offer if !missing_for_offer.is_empty() && bill_type.is_some() => {
-            error!("cannot create an offer, check out:{}",missing_for_offer.join("|"));
+            log::error!("cannot create an offer, check out:{}",missing_for_offer.join("|"));
             (None,None)
         },
 
         Invoice if !missing_for_invoice.is_empty() && bill_type.is_some() => {
-            error!("cannot create an invoice, check out:{}",missing_for_invoice.join("|"));
+            log::error!("cannot create an invoice, check out:{}",missing_for_invoice.join("|"));
             (None,None)
         }
 
         _ => {
-            error!("Neither an Offer nor an Invoice can be created from this project\n please check out {}", missing_for_offer.join("|"));
+            log::error!("Neither an Offer nor an Invoice can be created from this project\n please check out {}", missing_for_offer.join("|"));
             (None,None)
         }
     };
@@ -187,10 +186,10 @@ fn project_to_doc(project: &Project, config: &ExportConfig<'_>) -> Result<Option
 
         let document_file = if let Some(output_path) = output_path {
             if output_path.is_dir() { // if dir, use my name and place in there
-                trace!("output_path is dir");
+                log::trace!("output_path is dir");
                 output_path.join(&pdffile)
             } else if output_path.parent().map(Path::exists).unwrap_or(false) {// if not dir, place at this path with this name
-                trace!("output_path is file");
+                log::trace!("output_path is file");
                 output_path.to_owned()
             } else {
                 println!("{}", lformat!("WARNING: Can't make sense of {}", output_path.display()));
@@ -200,7 +199,7 @@ fn project_to_doc(project: &Project, config: &ExportConfig<'_>) -> Result<Option
             output_folder.join(&pdffile)
         };
 
-        debug!("document file will be {:?}", document_file);
+        log::debug!("document file will be {:?}", document_file);
 
         let defy = force || pdf_only;
 
@@ -208,18 +207,18 @@ fn project_to_doc(project: &Project, config: &ExportConfig<'_>) -> Result<Option
         if !defy && document_file.exists() && file_age(&tex_file)? < file_age(&project_file)? {
             // no wait, nothing has changed, so lets save ourselves the work
             use std::ffi::OsStr;
-            info!("Nothing to do!\n{} is younger than {}\n\nuse --force if you don't agree\nuse --pdf to only render the pdf again",
+            log::info!("Nothing to do!\n{} is younger than {}\n\nuse --force if you don't agree\nuse --pdf to only render the pdf again",
                   tex_file.file_name().and_then(OsStr::to_str).unwrap(),
                   project_file.file_name().and_then(OsStr::to_str).unwrap()
                   );
             Ok(None)
 
         } else if dry_run { // just testing what is possible
-            warn!("Dry run! This does not produce any output:\n * {}\n * {}", tex_file.display(), pdffile.display());
+            log::warn!("Dry run! This does not produce any output:\n * {}\n * {}", tex_file.display(), pdffile.display());
             Ok(None)
 
         } else if print_only { // for debugging or pipelining purposes
-            debug!("only printing");
+            log::debug!("only printing");
             println!("{}", filled);
             Ok(None)
 
@@ -228,16 +227,16 @@ fn project_to_doc(project: &Project, config: &ExportConfig<'_>) -> Result<Option
 
             let mut outfile_path = if pdf_only {
                 let (tex_age, project_age) = (file_age(&tex_file)?, file_age(&project_file)?);
-                info!("recreating the pdf");
-                debug!("{:?} -> {:?}", tex_file, document_file);
-                debug!("{:?} -> {:?}", tex_age, project_age);
+                log::info!("recreating the pdf");
+                log::debug!("{:?} -> {:?}", tex_file, document_file);
+                log::debug!("{:?} -> {:?}", tex_age, project_age);
                 if project_age < tex_age && !util::really(&lformat!("Project file is younger than pdf, continue anyway?")) {
                     return Ok(None)
                 }
                 project.full_file_path(dyn_bill, output_ext)?
             } else {
                 let outfile_path = project.write_to_file(&filled, dyn_bill, output_ext)?;
-                debug!("{} vs\n        {}", tex_file.display(), outfile_path.display());
+                log::debug!("{} vs\n        {}", tex_file.display(), outfile_path.display());
                 outfile_path
             };
             util::pass_to_command(Some(convert_tool), &[&outfile_path])?;
@@ -247,9 +246,9 @@ fn project_to_doc(project: &Project, config: &ExportConfig<'_>) -> Result<Option
                 let trash_file = util::to_local_file(&tex_file, trash_ext);
                 if  trash_file.exists() {
                     fs::remove_file(&trash_file)?;
-                    debug!("just deleted: {}", trash_file.display())
+                    log::debug!("just deleted: {}", trash_file.display())
                 } else {
-                    debug!("I expected there to be a {}, but there wasn't any ?", trash_file.display())
+                    log::debug!("I expected there to be a {}, but there wasn't any ?", trash_file.display())
                 }
             }
 
@@ -261,7 +260,7 @@ fn project_to_doc(project: &Project, config: &ExportConfig<'_>) -> Result<Option
                 } else {
                     outfile_path
                 };
-                debug!("now there is be a {:?} -> {:?}", file, document_file);
+                log::debug!("now there is be a {:?} -> {:?}", file, document_file);
                 fs::rename(&file, &document_file)?;
             } else {
                 bail!(ExportError::NoPdfCreated);

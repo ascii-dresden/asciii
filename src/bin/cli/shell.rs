@@ -7,7 +7,6 @@ use asciii::CONFIG;
 
 use std::collections::BTreeSet;
 use clap::App;
-use log::{debug, error};
 use anyhow::Error;
 use super::app::with_cli;
 
@@ -56,7 +55,7 @@ pub fn launch_shell() -> Result<(), Error> {
 
     //rl.set_completer(Some(file_compl));
     rl.set_completer(Some(clap_compl));
-    //if rl.load_history("history.txt").is_err() { debug!("No previous shell history."); }
+    //if rl.load_history("history.txt").is_err() { log::debug!("No previous shell history."); }
 
     let exit_cmds = ["exit", "quit", "stop", "kill", "halt"];
 
@@ -86,14 +85,14 @@ pub fn launch_shell() -> Result<(), Error> {
 
                 // this operators are not allowed
                 if line.contains('>') || line.contains('>') || line.contains('|') {
-                    error!("What do you think this is? A shell?");
+                    log::error!("What do you think this is? A shell?");
                 }
 
                 let mut argv: Vec<_> = line.trim().split(' ').collect();
 
                 // you have to insert the binary name since clap expects it
                 argv.insert(0, "prog");
-                debug!("shell: {} -> {:?}", line, argv);
+                log::debug!("shell: {} -> {:?}", line, argv);
                 match app.get_matches_from_safe_borrow(argv) {
                     Ok(matches) => super::match_matches(&matches),
                     Err(e) => println!("{}", e.message)
@@ -109,7 +108,7 @@ pub fn launch_shell() -> Result<(), Error> {
                 break
             },
             Err(err) => {
-                error!("{:?}", err);
+                log::error!("{:?}", err);
                 break
             }
         }

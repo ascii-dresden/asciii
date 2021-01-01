@@ -190,7 +190,7 @@ fn archive_project_by_name(){
     copy_template(storage_path.join("templates"));
 
     let templates = storage.list_template_names().unwrap();
-    trace!("templates: {:#?}", templates);
+    log::trace!("templates: {:#?}", templates);
     for test_project in TEST_PROJECTS.iter() {
         // tested above
         let origin = storage.create_project( &test_project, &templates[0], &hashmap!{}).unwrap();
