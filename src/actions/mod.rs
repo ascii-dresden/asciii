@@ -171,7 +171,7 @@ pub fn delete_project_confirmation(dir: StorageDir, search_terms:&[&str]) -> Res
 
 pub fn archive_projects(search_terms:&[&str], manual_year:Option<i32>, force:bool) -> Result<Vec<PathBuf>, Error>{
     log::trace!("archive_projects matching ({:?},{:?},{:?})", search_terms, manual_year,force);
-    Ok( storage::setup_with_git::<Project>()?.archive_projects_if(search_terms, manual_year, || force) ?)
+    storage::setup_with_git::<Project>()?.archive_projects_if(search_terms, manual_year, || force)
 }
 
 pub fn archive_all_projects() -> Result<Vec<PathBuf>, Error> {
@@ -190,7 +190,7 @@ pub fn archive_all_projects() -> Result<Vec<PathBuf>, Error> {
 /// Command UNARCHIVE <YEAR> <NAME>
 /// TODO: return a list of files that have to be updated in git
 pub fn unarchive_projects(year:i32, search_terms:&[&str]) -> Result<Vec<PathBuf>, Error> {
-    Ok( storage::setup_with_git::<Project>()?.unarchive_projects(year, search_terms) ?)
+    storage::setup_with_git::<Project>()?.unarchive_projects(year, search_terms)
 }
 
 /// Produces a calendar from the selected `StorageDir`

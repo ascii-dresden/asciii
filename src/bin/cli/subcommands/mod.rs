@@ -531,7 +531,7 @@ pub fn config(matches: &ArgMatches<'_>) -> Result<(), Error> {
     }
 
     else if matches.is_present("default") {
-        config_show_default()?;
+        config_show_default();
     }
     Ok(())
 }
@@ -609,9 +609,8 @@ fn config_edit(editor: Option<&str>) -> Result<(), Error> {
 }
 
 /// Command CONFIG --default
-fn config_show_default() -> Result<(), Error> {
+fn config_show_default() {
     println!("{}", config::DEFAULT_CONFIG);
-    Ok(())
 }
 
 

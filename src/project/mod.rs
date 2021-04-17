@@ -676,7 +676,7 @@ impl Storable for Project {
     }
 
     fn open_file(file_path:&Path) -> Result<Project, Error> {
-        Ok(Project::open(file_path)?)
+        Project::open(file_path)
     }
 
     /// Checks against a certain key-val pair.

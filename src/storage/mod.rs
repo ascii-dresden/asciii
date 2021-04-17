@@ -109,16 +109,16 @@ pub enum StorageSelection {
     Uninitialized
 }
 
-impl<'a> Into<StorageSelection> for &'a StorageSelection {
-    fn into(self) -> StorageSelection {
-        self.clone()
+impl<'a> From<&'a StorageSelection> for StorageSelection {
+    fn from(val: &'a StorageSelection) -> Self {
+        val.clone()
     }
 }
 
 
-impl Into<StorageSelection> for StorageDir {
-    fn into(self) -> StorageSelection {
-        StorageSelection::Dir(self)
+impl From<StorageDir> for StorageSelection {
+    fn from(val: StorageDir) -> Self {
+        StorageSelection::Dir(val)
     }
 }
 
@@ -874,7 +874,7 @@ impl<L:Storable> Storage<L> {
 
     pub fn open_working_dir_projects(&self) -> Result<ProjectList<L>, Error> {
         log::debug!("OPENING ALL WORKING DIR PROJECTS");
-        Ok(self.open_projects(StorageDir::Working)?)
+        self.open_projects(StorageDir::Working)
     }
 
     pub fn open_all_archived_projects(&self) -> Result<ProjectsByYear<L>, Error> {
@@ -894,7 +894,7 @@ impl<L:Storable> Storage<L> {
         })
     }
 
-    fn open_project(path: &PathBuf) -> Result<L, Error> {
+    fn open_project(path: &Path) -> Result<L, Error> {
         let meta = path.metadata().unwrap();
         let project =
         if meta.is_dir() {

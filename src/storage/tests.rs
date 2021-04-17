@@ -140,7 +140,7 @@ fn list_archives(){
     let mut archives = storage.list_archives().unwrap();
     let mut years = storage.list_years().unwrap();
     archives.sort();
-    years.sort();
+    years.sort_unstable();
     println!("ARCHIVES\n{:#?}", archives);
 
     assert!(archives[0].ends_with("1999"));
