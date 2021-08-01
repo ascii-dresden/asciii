@@ -87,7 +87,7 @@ impl Project {
             .and(project.invoice().validate())
             .and(project.offer().validate())
             .and(project.hours().validate())
-            .and(Redeemable::validate(&project));
+            .and(<dyn Redeemable>::validate(&project));
 
         if !validation.validation_errors.is_empty() {
             let name = project.short_desc();
@@ -206,7 +206,7 @@ impl Project {
         if self.canceled(){
             Vec::new()
         } else {
-            Redeemable::validate(self)
+            <dyn Redeemable>::validate(self)
                 .and(self.hours().validate())
                 .missing_fields
         }

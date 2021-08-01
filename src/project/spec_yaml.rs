@@ -515,9 +515,9 @@ impl<'a> HasEmployees for Hours<'a> {
                 let salary = self.salary()?;
                 FieldResult::Ok(Employee {
                          name,
+                         salary,
                          time,
                          wage,
-                         salary,
                      })
             })
             .collect::<FieldResult<Vec<Employee>>>()

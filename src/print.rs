@@ -48,10 +48,10 @@ fn payed_to_cell(project:&Project) -> Cell {
     let sym = crate::CONFIG.get_str("currency");
 
     match (project.is_payed(), project.hours().employees_payed()) {
-        (false,false) => Cell::new("✗").with_style(Attr::ForegroundColor(color::RED)),
-        (_,    false) |
-        (false, _   ) => Cell::new(sym).with_style(Attr::ForegroundColor(color::YELLOW)),
-        (true, true ) => Cell::new(sym).with_style(Attr::ForegroundColor(color::GREEN)),
+        (false, false) => Cell::new("✗").with_style(Attr::ForegroundColor(color::RED)),
+        (_,     false) |
+        (false,  _   ) => Cell::new(sym).with_style(Attr::ForegroundColor(color::YELLOW)),
+        (true,  true ) => Cell::new(sym).with_style(Attr::ForegroundColor(color::GREEN)),
     }
 }
 

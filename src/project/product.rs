@@ -59,7 +59,7 @@ impl<'a> Product<'a> {
             .map(to_currency)
             .ok_or_else(||ProductError::InvalidPrice(name.to_string()))?;
 
-        Ok(Product { name, unit, price, tax })
+        Ok(Product { name, unit, tax, price })
     }
 
     fn from_new_format<'y>(desc: &'y yaml::Yaml, values: &'y yaml::Yaml, local_tax: Option<Tax>) -> Result<Product<'y>, ProductError> {
@@ -77,7 +77,7 @@ impl<'a> Product<'a> {
                 .map(to_currency)?;
         let unit = yaml::get_str(desc, "unit");
 
-        Ok(Product { name, unit, price, tax })
+        Ok(Product { name, unit, tax, price })
     }
 
     pub fn from_desc_and_value<'y>(desc: &'y yaml::Yaml, values: &'y yaml::Yaml, local_tax: Option<Tax>) -> Result<Product<'y>, ProductError> {
