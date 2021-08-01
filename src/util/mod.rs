@@ -96,7 +96,7 @@ pub fn pass_to_command<T:AsRef<OsStr>>(editor: Option<&str>, paths:&[T]) -> Resu
 
     if paths.is_empty() {
         log::warn!("non of the provided paths could be found")
-    } else if let Some(ref editor) = editor {
+    } else if let Some(editor) = editor {
         if paths.len() < 5 || really (&format!("you are about to open {} files\n{:#?}\nAre you sure about this?", paths.len(), paths))
         {
             let editor_config = editor

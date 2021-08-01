@@ -228,7 +228,7 @@ impl Repository {
     }
 
     pub fn diff(&self, paths: &[PathBuf], flags: &[&str]) -> ExitStatus {
-        self.execute_git("diff", flags, &paths)
+        self.execute_git("diff", flags, paths)
     }
 
     pub fn pull(&self) -> ExitStatus {

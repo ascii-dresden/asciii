@@ -189,7 +189,7 @@ pub fn verbose_rows(projects:&[Project], list_config:&ListConfig<'_>) -> Vec<Row
                 // status "✓  ✓  ✗"
                 result_to_cell(&validation1, project.offer_file_exists()),
                 result_to_cell(&validation2, project.invoice_file_exists()),
-                payed_to_cell(&project),
+                payed_to_cell(project),
                 result_to_cell(&validation3, false),
 
                 //cell!(output_file_exists(project, Project::offer_file_name)),
@@ -204,7 +204,7 @@ pub fn verbose_rows(projects:&[Project], list_config:&ListConfig<'_>) -> Vec<Row
             if let Some(ref details) = list_config.details{
                 cells.extend_from_slice(
                     &details.iter().map(|d|
-                                 cell!( project.field(&d).unwrap_or_else(String::new)),
+                                 cell!( project.field(d).unwrap_or_else(String::new)),
                                  ).collect::<Vec<Cell>>()
                     );
             }
@@ -242,7 +242,7 @@ pub fn dynamic_rows(projects:&[Project], list_config:&ListConfig<'_>) -> Vec<Row
             if let Some(ref details) = list_config.details{
                 cells.extend_from_slice(
                     &details.iter().map(|d|
-                                        cell!( project.field(&d).unwrap_or_else(String::new)).style_spec(row_style),
+                                        cell!( project.field(d).unwrap_or_else(String::new)).style_spec(row_style),
                                         ).collect::<Vec<Cell>>()
                     );
                 if list_config.show_errors{

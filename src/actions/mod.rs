@@ -182,7 +182,7 @@ pub fn archive_all_projects() -> Result<Vec<PathBuf>, Error> {
                         .filter(|p| p.is_ready_for_archive().is_empty()) {
         log::info!("{}", lformat!("we could get rid of: {}", project.name().unwrap_or("")));
         moved_files.push(project.dir());
-        moved_files.append(&mut storage.archive_project(&project, project.year().unwrap())?);
+        moved_files.append(&mut storage.archive_project(project, project.year().unwrap())?);
     }
     Ok(moved_files)
 }

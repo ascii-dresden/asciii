@@ -307,7 +307,7 @@ impl<'a> Default for ExportConfig<'a> {
 pub fn projects_to_doc(config: &ExportConfig<'_>) -> Result<(), Error> {
     let storage = storage::setup::<Project>()?;
     for p in storage.open_projects(&config.select)? {
-        if let Some(path) = project_to_doc(&p, &config)? {
+        if let Some(path) = project_to_doc(&p, config)? {
             if config.open {
                 open::that(&path).unwrap();
             }

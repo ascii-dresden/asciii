@@ -52,9 +52,9 @@ impl ConfigReader {
 
         let config = Ok(ConfigReader {
                             path: home_path.to_owned(),
-                            defaults: yaml::parse(&DEFAULT_CONFIG)?,
+                            defaults: yaml::parse(DEFAULT_CONFIG)?,
                             custom: yaml::open(&home_path).unwrap_or(Yaml::Null),
-                            local: yaml::open(&local_path).unwrap_or(Yaml::Null),
+                            local: yaml::open(local_path).unwrap_or(Yaml::Null),
                         });
 
         if !home_path.exists() {
@@ -116,7 +116,7 @@ impl ConfigReader {
 
     /// Returns the string in the position or an empty string
     pub fn var_get_str(&self, key: &str) -> String {
-        Self::var_get(key).unwrap_or_else(|| self.get_str(&key).into())
+        Self::var_get(key).unwrap_or_else(|| self.get_str(key).into())
     }
 
     /// Returns the string in the position or an empty string
@@ -189,9 +189,9 @@ fn simple_reading() {
     assert_eq!(config.get("list/colors").unwrap().as_bool().unwrap(),
                config.get_bool("list/colors"));
 
-    assert!(config.get(&"dirs").is_some());
-    assert!(config.get(&"dirs/storage").is_some());
-    assert!(config.get(&"dirs/working").is_some());
-    assert!(config.get(&"dirs/storage").is_some());
+    assert!(config.get("dirs").is_some());
+    assert!(config.get("dirs/storage").is_some());
+    assert!(config.get("dirs/working").is_some());
+    assert!(config.get("dirs/storage").is_some());
 
 }

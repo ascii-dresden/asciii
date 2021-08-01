@@ -39,7 +39,7 @@ impl completion::Completer for ClapCompleter {
         let break_chars = BTreeSet::new();
         let (start, path) = completion::extract_word(line, pos, &break_chars);
         //let path = completion::unescape(path, ESCAPE_CHAR);
-        let matches = self.naive_complete(&path, ESCAPE_CHAR, &break_chars)?;
+        let matches = self.naive_complete(path, ESCAPE_CHAR, &break_chars)?;
         Ok((start, matches))
     }
 }

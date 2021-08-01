@@ -142,7 +142,7 @@ impl Project {
         Ok(Project{
             file_path: PathBuf::new(),
             git_status: None,
-            yaml: yaml::parse(&content).unwrap(),
+            yaml: yaml::parse(content).unwrap(),
             file_content: String::from(content),
         })
     }
@@ -575,7 +575,7 @@ impl Storable for Project {
 
         // fills the template
         let file_content = Templater::from_file(template)?
-            .fill_in_data(&fill).fix()
+            .fill_in_data(fill).fix()
             .fill_in_data(&default_fill)
             .finalize()
             .filled;
@@ -669,7 +669,7 @@ impl Storable for Project {
     fn open_folder(folder_path: &Path) -> Result<Project, Error>{
         let project_file_extension = crate::CONFIG.get_to_string("extensions.project_file");
         let file_path = list_path_content(folder_path)?.iter()
-            .find(|f|f.extension().unwrap_or(&OsStr::new("")) == project_file_extension.as_str())
+            .find(|f|f.extension().unwrap_or_else(||OsStr::new("")) == project_file_extension.as_str())
             .map(ToOwned::to_owned)
             .ok_or_else(|| StorageError::NoProjectFile(folder_path.to_owned()))?;
         Self::open_file(&file_path)

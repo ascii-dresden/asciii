@@ -333,7 +333,7 @@ pub fn set(m: &ArgMatches<'_>) -> Result<(), Error> {
         if util::really(&format!("do you want to set the field {} in {:?}",
                                  field,
                                  project.short_desc())) {
-            project.replace_field(&field, &value)
+            project.replace_field(&field, value)
         } else {
             Err(format_err!("Don't want to"))
         }
@@ -592,7 +592,7 @@ pub fn config_init(editor: Option<&str>) -> Result<(), Error> {
 /// Command CONFIG --show
 pub fn config_show(path: &str) -> Result<(), Error> {
     println!("{}: {:#?}", path,
-             CONFIG.get_to_string(&path));
+             CONFIG.get_to_string(path));
     Ok(())
 }
 
@@ -690,7 +690,7 @@ pub fn path<F>(m: &ArgMatches<'_>, action: F) -> Result<(), Error>
 
                 if let Some(offer_file) = &project.offer_file() {
                     if offer_file.exists() {
-                        action(&offer_file)?;
+                        action(offer_file)?;
                     } else {
                         log::warn!("{}", lformat!("{} does not exist", offer_file.display()));
                     }
@@ -700,7 +700,7 @@ pub fn path<F>(m: &ArgMatches<'_>, action: F) -> Result<(), Error>
                 log::debug!("invoice file for {:?}", project.invoice_file());
                 if let Some(invoice_file) = &project.invoice_file() {
                     if invoice_file.exists() {
-                        action(&invoice_file)?;
+                        action(invoice_file)?;
                     } else {
                         log::warn!("{}", lformat!("{} does not exist", invoice_file.display()));
                     }

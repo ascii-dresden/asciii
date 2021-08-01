@@ -361,7 +361,7 @@ impl<L:Storable> Storage<L> {
     /// Produces a list of files in the `extras_dir()`
     pub fn list_extra_files(&self) -> Result<Vec<PathBuf>, Error> {
         log::trace!("listing extra files");
-        list_path_content(&self.extras_dir())
+        list_path_content(self.extras_dir())
     }
 
     /// Returns the Path to the extra file by the given name, maybe.
@@ -378,7 +378,7 @@ impl<L:Storable> Storage<L> {
         let template_file_extension = crate::CONFIG.get_str("extensions/project_template");
         log::trace!("listing template files (.{})", template_file_extension);
         let template_files =
-        list_path_content(&self.templates_dir())?
+        list_path_content(self.templates_dir())?
             .into_iter()
             .filter(|p|p.extension()
                         .unwrap_or_else(|| OsStr::new("")) == OsStr::new(template_file_extension)
@@ -457,7 +457,7 @@ impl<L:Storable> Storage<L> {
         let template_path = self.get_template_file(template_name)?;
 
         log::trace!("creating project using concrete Project implementation of from_template");
-        let mut project = L::from_template(&project_name, &template_path, &fill_data)?;
+        let mut project = L::from_template(project_name, &template_path, fill_data)?;
 
         // TODO: Hand of creation entirely to Storable implementation
         //      Storage it self should only concern itself with Project folders!
@@ -678,7 +678,7 @@ impl<L:Storable> Storage<L> {
     pub fn search_projects_any(&self, dir:StorageDir, search_terms:&[&str]) -> Result<ProjectList<L>, Error> {
         let mut projects = Vec::new();
         for search_term in search_terms{
-            let mut found_projects = self.search_projects(dir, &search_term)?;
+            let mut found_projects = self.search_projects(dir, search_term)?;
             projects.append(&mut found_projects);
         }
 
@@ -744,7 +744,7 @@ impl<L:Storable> Storage<L> {
                 for year in self.list_years()? {
                     all.append(&mut list_path_content(&self.archive_dir().join(year.to_string()))?);
                 }
-                all.append(&mut list_path_content(&self.working_dir())?);
+                all.append(&mut list_path_content(self.working_dir())?);
                 Ok(all)
             },
             _ => bail!(StorageError::BadChoice)

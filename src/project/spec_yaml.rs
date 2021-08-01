@@ -88,7 +88,7 @@ impl HasEvents for Project {
                         cal_event.all_day(event.begin);
                     }
 
-                    cal_event.summary(&self.name().unwrap_or("unnamed"));
+                    cal_event.summary(self.name().unwrap_or("unnamed"));
                     calendar.push(cal_event);
 
                 } else {
@@ -110,7 +110,7 @@ impl HasEvents for Project {
 
                         //cal_event.start_date(event.begin);
 
-                        cal_event.summary(&self.name().unwrap_or("unnamed"));
+                        cal_event.summary(self.name().unwrap_or("unnamed"));
                         calendar.push(cal_event);
                     }
                 }

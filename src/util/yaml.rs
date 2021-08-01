@@ -37,7 +37,7 @@ pub fn open(path: &Path) -> Result<Yaml, anyhow::Error> {
 /// Ruby like API to yaml-rust.
 pub fn parse(file_content: &str) -> Result<Yaml, anyhow::Error> {
     Ok(
-        YamlLoader::load_from_str(&file_content)?
+        YamlLoader::load_from_str(file_content)?
         .get(0)
         .map(ToOwned::to_owned)
         .unwrap_or_else(||Yaml::from_str("[]"))
