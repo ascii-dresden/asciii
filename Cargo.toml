@@ -9,7 +9,7 @@ This is an internal tool of the Studentencafe ascii in Dresden and therefore spe
 homepage = "https://github.com/ascii-dresden/asciii/"
 repository = "https://github.com/ascii-dresden/asciii/"
 documentation = "https://docs.rs/asciii/"
-edition = "2018"
+edition = "2021"
 
 build = true
 autobins = false
@@ -36,7 +36,7 @@ exclude = [
 
 [dependencies]
 log = "0.4"
-env_logger = "0.8"
+env_logger = "0.9"
 yaml-rust = "0.4"
 chrono = "0.4"
 regex = "1.4"
@@ -45,14 +45,14 @@ maplit = "1.0"
 clap = "2"
 enum_derive = "0.1"
 custom_derive = "0.1"
-open = "1.4"
+open = "2"
 crowbook-intl-runtime = "0.1"
 rayon = {version ="1.5", optional = true}
-itertools = "0.9"
+itertools = "0.10"
 base64 = "0.13"
 rustyline = {version = "1.0.0", optional = true }
 linked-hash-map = {version = "0.5", features = ["serde_impl"]}
-dirs = "3.0"
+dirs = "4.0"
 term = "=0.6.1"
 thiserror = "1.0"
 anyhow = "1.0"

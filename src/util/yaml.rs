@@ -149,8 +149,7 @@ pub fn get<'a>(yaml:&'a Yaml, key:&str) -> Option<&'a Yaml>{
                   .filter(|k|!k.is_empty())
                   .collect::<Vec<&str>>();
     match get_path(yaml, &path) {
-        Some(&Yaml::Null) |
-        Some(&Yaml::BadValue) => None,
+        Some(&(Yaml::Null | Yaml::BadValue)) => None,
         content => content
     }
 }

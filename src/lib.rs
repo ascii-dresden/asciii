@@ -2,7 +2,7 @@
 //!
 //!
 
-#![cfg_attr(feature = "manual", feature(external_doc))]
+#![cfg_attr(feature = "manual", feature(jexternal_doc))]
 #![cfg_attr(feature = "manual", doc(include = "../manual.md"))]
 
 #![warn(//missing_docs,
@@ -10,7 +10,15 @@
         //missing_debug_implementations,
         unstable_features,
         unused_import_braces,
+        // clippy::pedantic
         )]
+// #![allow(
+//     clippy::if_not_else,
+//     clippy::must_use_candidate,
+//     clippy::missing_errors_doc,
+//     clippy::missing_panics_doc,
+//     clippy::wildcard_imports,
+// )]
 
 #![recursion_limit = "1024"]
 #![deny(trivial_casts, trivial_numeric_casts)]

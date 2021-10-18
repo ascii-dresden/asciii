@@ -17,7 +17,7 @@ use tempdir::TempDir;
 use anyhow::{bail, Error};
 
 use bill::BillItem;
-use icalendar::*;
+use icalendar::{Calendar, Component, Todo};
 use semver::Version;
 
 use crate::util::{yaml, get_valid_path};
@@ -147,7 +147,7 @@ impl Project {
         })
     }
 
-    /// wrapper around yaml::get() with replacement
+    /// wrapper around `yaml::get()` with replacement
     pub fn field(&self, path:&str) -> Option<String> {
         ComputedField::from(path).get(self).or_else(|| 
             yaml::get_to_string(self.yaml(),path)
@@ -306,7 +306,7 @@ impl Project {
             match (invoice, payed, wages) {
 
                 // we need to issue an invoice invoice
-                (None,          None,          _) if today >= event => { cal.push(self.task_issue_invoice(event)); },
+                (None,          None,          _) if today >= event => { cal.push(Self::task_issue_invoice(event)); },
                 (None,          None,          _) if today < event => { /* no need to worry yet */ },
 
                 // they haven't payed us yet
@@ -325,7 +325,7 @@ impl Project {
         cal
     }
 
-    fn task_issue_invoice(&self, event_date: Date<Utc>) -> Todo {
+    fn task_issue_invoice(event_date: Date<Utc>) -> Todo {
         Todo::new().summary(&lformat!("Create an Invoice"))
                    .due(&(event_date + Duration::days(14)).and_hms(11, 10, 0))
                    .priority(6)
@@ -471,11 +471,11 @@ pub trait Exportable {
     }
 
     fn offer_file_exists(&self) -> bool {
-        self.offer_file().map(|f|f.exists()).unwrap_or(false)
+        self.offer_file().map_or(false, |f|f.exists())
     }
 
     fn invoice_file_exists(&self) -> bool {
-        self.invoice_file().map(|f|f.exists()).unwrap_or(false)
+        self.invoice_file().map_or(false, |f|f.exists())
     }
 
     fn write_to_path<P:AsRef<OsStr> + fmt::Debug>(content: &str, target: &P) -> Result<(), Error> {
@@ -648,7 +648,7 @@ impl Storable for Project {
             .ok()
     }
 
-    fn file(&self) -> PathBuf{ self.file_path.to_owned() } // TODO: reconsider returning PathBuf at all
+    fn file(&self) -> PathBuf{ self.file_path.clone() } // TODO: reconsider returning PathBuf at all
     fn set_file(&mut self, new_file:&Path){ self.file_path = new_file.to_owned(); }
 
     fn set_git_status(&mut self, status:GitStatus){
@@ -658,11 +658,10 @@ impl Storable for Project {
     /// Ask a project for its gitstatus
     #[cfg(feature="git_statuses")]
     fn get_git_status(&self) -> GitStatus{
-        if let Some(ref status) = self.git_status{
-            status.to_owned()
-        } else {
-            GitStatus::Unknown
-        }
+        self.git_status
+            .as_ref()
+            .map_or(GitStatus::Unknown, ToOwned::to_owned)
+
     }
 
     /// Opens a yaml and parses it.
@@ -686,7 +685,7 @@ impl Storable for Project {
 
     /// UNIMPLEMENTED: Checks against a certain search term.
     ///
-    /// TODO: compare agains InvoiceNumber, ClientFullName, Email, event/name, invoice/official Etc
+    /// TODO: compare agains [`InvoiceNumber`], [`ClientFullName`], Email, event/name, invoice/official Etc
     fn matches_search(&self, term: &str) -> bool{
         let search = term.to_lowercase();
         self.invoice()
