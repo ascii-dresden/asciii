@@ -17,7 +17,7 @@ use tempdir::TempDir;
 use anyhow::{bail, Error};
 
 use bill::BillItem;
-use icalendar::{Calendar, Component, Todo};
+use icalendar::{Calendar, CalendarDateTime, Component, Todo};
 use semver::Version;
 
 use crate::util::{yaml, get_valid_path};
@@ -327,7 +327,7 @@ impl Project {
 
     fn task_issue_invoice(event_date: Date<Utc>) -> Todo {
         Todo::new().summary(&lformat!("Create an Invoice"))
-                   .due(&(event_date + Duration::days(14)).and_hms(11, 10, 0))
+                   .due(CalendarDateTime::from((event_date + Duration::days(14)).and_hms(11, 10, 0)))
                    .priority(6)
                    .done()
     }
@@ -338,7 +338,7 @@ impl Project {
             .description( &lformat!("Pay {}\nYou have had the money for {} days!",
                                    self.hours().employees_string().unwrap_or_else(String::new),
                                    days_since_payed))
-            .due(&(payed_date + Duration::days(14)).and_hms(11, 10, 0))
+            .due(CalendarDateTime::from((payed_date + Duration::days(14)).and_hms(11, 10, 0)))
             .done()
     }
 

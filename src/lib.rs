@@ -2,8 +2,7 @@
 //!
 //!
 
-#![cfg_attr(feature = "manual", feature(jexternal_doc))]
-#![cfg_attr(feature = "manual", doc(include = "../manual.md"))]
+#![cfg_attr(feature = "manual", doc = include_str!("../manual.md"))]
 
 #![warn(//missing_docs,
         //missing_copy_implementations,
