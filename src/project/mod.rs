@@ -226,7 +226,7 @@ impl Project {
             for (index,item) in items.iter().enumerate(){
                                         write!(&mut csv_string, "{};",  &index.to_string())?;
                                         write!(&mut csv_string, "{};",  item.product.name)?;
-                                        write!(&mut csv_string, "{};",  item.amount.to_string())?;
+                                        write!(&mut csv_string, "{};",  item.amount)?;
                                         write!(&mut csv_string, "{:.2};",  item.product.price.as_float())?;
                                         write!(&mut csv_string, "{:.2};",  item.product.tax)?;
                                         writeln!(&mut csv_string, "{:.2}", (item.product.price * item.amount).as_float())?;
@@ -624,7 +624,7 @@ impl Storable for Project {
         match (self.invoice().date().ok(), self.modified_date()) {
             (Some(date), _) |
             (None, Some(date)) => {
-                Some(format!("{0}{1}", prefix, date.format("%Y%m%d").to_string()))
+                Some(format!("{0}{1}", prefix, date.format("%Y%m%d")))
             },
             (None, None) => None,
         }

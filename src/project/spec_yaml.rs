@@ -129,11 +129,11 @@ impl HasEvents for Project {
 
             let begin = self.get_direct(h, "begin")
                             .and_then(Yaml::as_str)
-                            .and_then(|d| parse_dmy_date(d))?;
+                            .and_then(parse_dmy_date)?;
 
             let end = self.get_direct(h, "end")
                           .and_then(Yaml::as_str)
-                          .and_then(|d| parse_dmy_date(d));
+                          .and_then(parse_dmy_date);
 
             Some(spec::Event {
                      begin,
