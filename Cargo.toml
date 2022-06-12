@@ -70,7 +70,7 @@ tempdir = "0.3"
 semver = "1.0"
 term_size = "0.3"
 
-prettytable-rs = { default-features = false, git = "https://github.com/phsym/prettytable-rs" }
+prettytable-rs = { default-features = false, version = "0.8" }
 
 # feature: document_export
 handlebars = {version = "2.0", optional = true}
