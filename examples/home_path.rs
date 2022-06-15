@@ -3,7 +3,7 @@ use std::path::{Path, PathBuf};
 
 fn replace_home_tilde(p: &Path) -> PathBuf {
     let path = p.to_str().unwrap();
-    PathBuf::from(path.replace("~", home_dir().unwrap().to_str().unwrap()))
+    PathBuf::from(path.replace('~', home_dir().unwrap().to_str().unwrap()))
 }
 
 fn main() {

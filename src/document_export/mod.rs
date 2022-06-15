@@ -73,7 +73,7 @@ pub fn fill_template<E, P>(document: &E, bill_type: BillType, template_path: P) 
     let mut handlebars = Handlebars::new();
 
     handlebars.register_escape_fn(no_escape);
-    handlebars.register_escape_fn(|data| data.replace("\n", r#"\newline "#));
+    handlebars.register_escape_fn(|data| data.replace('\n', r#"\newline "#));
 
     handlebars.register_helper("inc",   Box::new(IncHelper));
     // handlebars.register_helper("count", Box::new(count_helper));
@@ -81,8 +81,8 @@ pub fn fill_template<E, P>(document: &E, bill_type: BillType, template_path: P) 
     handlebars.register_template_file("document", template_path).unwrap();
 
     Ok(handlebars.render("document", &DocAndStorage::from(document, bill_type))
-                 .map(|r| r.replace("<", "{")
-                           .replace(">", "}"))?)
+                 .map(|r| r.replace('<', "{")
+                           .replace('>', "}"))?)
 }
 
 fn file_age(path: &Path) -> Result<time::Duration, Error> {

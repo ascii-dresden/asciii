@@ -65,7 +65,7 @@ pub mod client {
           01234 Countilvania
       "#;
 
-      assert_eq!(parse_project(&doc).client().validate().missing_fields, Vec::<String>::new());
+      assert_eq!(parse_project(doc).client().validate().missing_fields, Vec::<String>::new());
   }
 
   #[test]
@@ -78,7 +78,7 @@ pub mod client {
         email: this.man@example.com
       "#;
       assert_eq!(
-          parse_project(&doc).client().missing_fields(),
+          parse_project(doc).client().missing_fields(),
           vec!["client/address".to_string()]
       );
   }
@@ -96,7 +96,7 @@ pub mod client {
           01234 Countilvania
       "#;
       assert_eq!(
-        parse_project(&doc).client().missing_fields(),
+        parse_project(doc).client().missing_fields(),
         vec![
           "client/title".to_string(),
           "client_addressing".to_string(),
@@ -117,7 +117,7 @@ pub mod client {
           01234 Countilvania
       "#;
       assert_eq!(
-        parse_project(&doc).client().missing_fields(),
+        parse_project(doc).client().missing_fields(),
         vec![
           "client/last_name",
           "client_addressing"
@@ -141,7 +141,7 @@ pub mod offer {
       manager: somebody
       "#;
 
-      let errors = parse_project(&doc).offer().missing_fields();
+      let errors = parse_project(doc).offer().missing_fields();
       assert_eq!(errors, Vec::<String>::new());
   }
 
@@ -160,7 +160,7 @@ pub mod invoice {
         payed_date: 08.12.2014
       "#;
 
-      let errors = parse_project(&doc).invoice().missing_fields();
+      let errors = parse_project(doc).invoice().missing_fields();
       assert_eq!(errors, Vec::<String>::new());
   }
 

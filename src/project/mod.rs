@@ -334,9 +334,9 @@ impl Project {
 
     fn task_pay_employees(&self, payed_date: Date<Utc>) -> Todo {
         let days_since_payed = (Utc::today().signed_duration_since(payed_date)).num_days();
-        Todo::new().summary(&lformat!("{}: Hungry employees!", self.invoice().number_str().unwrap_or_else(String::new)))
+        Todo::new().summary(&lformat!("{}: Hungry employees!", self.invoice().number_str().unwrap_or_default()))
             .description( &lformat!("Pay {}\nYou have had the money for {} days!",
-                                   self.hours().employees_string().unwrap_or_else(String::new),
+                                   self.hours().employees_string().unwrap_or_default(),
                                    days_since_payed))
             .due(CalendarDateTime::from((payed_date + Duration::days(14)).and_hms(11, 10, 0)))
             .done()
@@ -349,15 +349,15 @@ impl Project {
         follow_up.description(&lformat!("{inum }{event:?} on {invoice_date} ({days} days ago) was already invoiced but is still not marked as payed.\nPlease check for incoming payments! You can ask {client} ({mail}).",
                                        event = self.name().unwrap(),
                                        days = days_since_invoice,
-                                       inum = self.invoice().number_str().unwrap_or_else(String::new),
+                                       inum = self.invoice().number_str().unwrap_or_default(),
                                        invoice_date = invoice_date.format("%d.%m.%Y").to_string(),
-                                       client = self.client().full_name().unwrap_or_else(String::new),
+                                       client = self.client().full_name().unwrap_or_default(),
                                        mail = self.client().email().unwrap_or(""),
                                        ));
         follow_up.priority(3);
         if days_since_invoice > 14 {
             follow_up.summary( &lformat!("{rnum}: payment is {weeks} weeks late: \"{event}\"",
-                                        rnum = self.invoice().number_str().unwrap_or_else(String::new),
+                                        rnum = self.invoice().number_str().unwrap_or_default(),
                                         weeks = days_since_invoice / 7,
                                         event = self.name().unwrap()),
                              );

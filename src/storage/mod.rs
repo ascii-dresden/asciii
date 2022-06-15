@@ -162,7 +162,7 @@ pub fn list_path_content(path:&Path) -> Result<Vec<PathBuf>, Error> {
 
 fn replace_home_tilde(p:&Path) -> PathBuf{
     let path = p.to_str().unwrap();
-    PathBuf::from( path.replace("~", home_dir().unwrap().to_str().unwrap()))
+    PathBuf::from( path.replace('~', home_dir().unwrap().to_str().unwrap()))
 }
 
 /// Interprets storage path from config.

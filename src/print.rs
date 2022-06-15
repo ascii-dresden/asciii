@@ -97,7 +97,7 @@ pub fn path_rows(projects:&[Project], list_config:&ListConfig<'_>) -> Vec<Row>{
         .map(|project| {
             let row_style = if list_config.use_colors {project_to_style(project)}else{""};
             Row::new(vec![
-                     cell!(project.invoice().number_str().unwrap_or_else(String::new)),
+                     cell!(project.invoice().number_str().unwrap_or_default()),
                      cell!(project.short_desc()).style_spec(row_style),
                      cell!(project.file().display()),
 
@@ -124,7 +124,7 @@ pub fn simple_rows(projects:&[Project], list_config:&ListConfig<'_>) -> Vec<Row>
                      .style_spec(row_style),
 
                      //cell!(project.manager()),
-                     cell!(project.invoice().number_str().unwrap_or_else(String::new)),
+                     cell!(project.invoice().number_str().unwrap_or_default()),
 
                      cell!(project.modified_date().map(|d|d.format("%d.%m.%Y").to_string()).unwrap_or_else(|| "no_date".into())),
                      //cell!(project.file().display()),
@@ -179,7 +179,7 @@ pub fn verbose_rows(projects:&[Project], list_config:&ListConfig<'_>) -> Vec<Row
                 //cell!(project.index().unwrap_or(String::from(""))),
 
                 // R042
-                cell!(project.invoice().number_str().unwrap_or_else(String::new))
+                cell!(project.invoice().number_str().unwrap_or_default())
                     .style_spec(row_style),
 
                 // Date
@@ -204,7 +204,7 @@ pub fn verbose_rows(projects:&[Project], list_config:&ListConfig<'_>) -> Vec<Row
             if let Some(ref details) = list_config.details{
                 cells.extend_from_slice(
                     &details.iter().map(|d|
-                                 cell!( project.field(d).unwrap_or_else(String::new)),
+                                 cell!( project.field(d).unwrap_or_default()),
                                  ).collect::<Vec<Cell>>()
                     );
             }
@@ -242,7 +242,7 @@ pub fn dynamic_rows(projects:&[Project], list_config:&ListConfig<'_>) -> Vec<Row
             if let Some(ref details) = list_config.details{
                 cells.extend_from_slice(
                     &details.iter().map(|d|
-                                        cell!( project.field(d).unwrap_or_else(String::new)).style_spec(row_style),
+                                        cell!( project.field(d).unwrap_or_default()).style_spec(row_style),
                                         ).collect::<Vec<Cell>>()
                     );
                 if list_config.show_errors{
@@ -373,6 +373,6 @@ pub fn show_details(project:&Project, bill_type: BillType) {
         }
     }
 
-    println!("{}", project.hours().employees_string().unwrap_or_else(String::new));
+    println!("{}", project.hours().employees_string().unwrap_or_default());
 
 }

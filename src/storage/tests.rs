@@ -20,7 +20,7 @@ impl Storable for TestProject{
     // creates in tempfile
     fn from_template(project_name: &str, template: &Path, _fill: &HashMap<&str, String>) -> Result<StorableAndTempDir<Self>, Error> where Self: Sized {
         // generates a temp file
-        let temp_dir  = TempDir::new_in("./target/debug/build/",&project_name).unwrap();
+        let temp_dir  = TempDir::new_in("./target/debug/build/",project_name).unwrap();
         let temp_file = temp_dir.path().join(project_name);
 
         // just copy over template
@@ -166,13 +166,13 @@ fn create_project(){
     let templates = storage.list_template_names().unwrap();
 
     for test_project in TEST_PROJECTS.iter() {
-        let project     = storage.create_project(&test_project, &templates[0], &hashmap!()).unwrap();
+        let project     = storage.create_project(test_project, &templates[0], &hashmap!()).unwrap();
         let target_file = project.file();
         let target_path = target_file.parent().unwrap();
         assert!(target_path.exists());
         assert!(target_file.exists());
         util::ls(&target_path.display().to_string());
-        assert_eq!(target_file, storage.get_project_file(&target_path).unwrap());
+        assert_eq!(target_file, storage.get_project_file(target_path).unwrap());
 
         let project_dir = storage.get_project_dir(test_project, StorageDir::Working);
         assert!(project_dir.unwrap().exists());
@@ -193,17 +193,17 @@ fn archive_project_by_name(){
     log::trace!("templates: {:#?}", templates);
     for test_project in TEST_PROJECTS.iter() {
         // tested above
-        let origin = storage.create_project( &test_project, &templates[0], &hashmap!{}).unwrap();
+        let origin = storage.create_project( test_project, &templates[0], &hashmap!{}).unwrap();
 
         // the actual tests
-        assert!(storage.archive_project_by_name(&test_project, 2015, None).is_ok());
+        assert!(storage.archive_project_by_name(test_project, 2015, None).is_ok());
         assert!(!origin.file().exists());
 
-        assert!(storage.get_project_dir(&test_project, StorageDir::Working).is_err());
-        assert!(storage.get_project_dir(&test_project, StorageDir::Archive(2015)).is_ok());
+        assert!(storage.get_project_dir(test_project, StorageDir::Working).is_err());
+        assert!(storage.get_project_dir(test_project, StorageDir::Archive(2015)).is_ok());
 
         //let false_origin = storage.create_project(&test_project, &templates[0]).unwrap();
-        assert!(storage.archive_project_by_name(&test_project, 2015, None).is_err());
+        assert!(storage.archive_project_by_name(test_project, 2015, None).is_err());
     }
 }
 
@@ -219,19 +219,19 @@ fn archive_project(){
     let templates = storage.list_template_names().unwrap();
     for test_project_name in TEST_PROJECTS.iter() {
         // tested above
-        let project = storage.create_project( &test_project_name, &templates[0], &hashmap!{}).unwrap();
+        let project = storage.create_project( test_project_name, &templates[0], &hashmap!{}).unwrap();
 
         // Before archiving
         assert!(project.file().exists());
-        assert!(storage.get_project_dir(&test_project_name, StorageDir::Working).is_ok());
+        assert!(storage.get_project_dir(test_project_name, StorageDir::Working).is_ok());
 
         // ARCHIVING
         assert!(storage.archive_project(&project, project.year().unwrap()).is_ok());
 
         // After archiving
         assert!(!project.file().exists());
-        assert!(storage.get_project_dir(&test_project_name, StorageDir::Working).is_err());
-        assert!(storage.get_project_dir(&test_project_name, StorageDir::Archive(year)).is_ok());
+        assert!(storage.get_project_dir(test_project_name, StorageDir::Working).is_err());
+        assert!(storage.get_project_dir(test_project_name, StorageDir::Archive(year)).is_ok());
 
         assert!(storage.archive_project(&project, year).is_err());
     }
@@ -246,7 +246,7 @@ fn unarchive_project_dir(){
 
     let templates = storage.list_template_names().unwrap();
     for test_project in TEST_PROJECTS.iter() {
-        let _origin = storage.create_project( &test_project, &templates[0], &hashmap!{}).unwrap();
+        let _origin = storage.create_project( test_project, &templates[0], &hashmap!{}).unwrap();
         storage.archive_project_by_name(test_project, 2015, None).unwrap();
     }
 

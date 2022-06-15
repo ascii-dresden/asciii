@@ -138,7 +138,7 @@ impl HasEvents for Project {
             Some(spec::Event {
                      begin,
                      end,
-                     times: self.times(h).unwrap_or_else(Vec::new),
+                     times: self.times(h).unwrap_or_default(),
                  })
         })
              .collect()
