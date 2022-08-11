@@ -185,7 +185,7 @@ pub fn naive_time_from_str(string: &str) -> Option<NaiveTime> {
         .map(|s|s.parse().unwrap_or(0))
         .collect();
 
-    if let (Some(h),m) = (t.get(0), t.get(1).unwrap_or(&0)) {
+    if let (Some(h),m) = (t.first(), t.get(1).unwrap_or(&0)) {
         if *h < 24 && *m < 60 {
             return Some(NaiveTime::from_hms(*h,*m,0))
         }

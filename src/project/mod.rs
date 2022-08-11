@@ -412,7 +412,7 @@ impl Project {
     }
 }
 
-#[derive(Debug, Copy, Clone, PartialEq)]
+#[derive(Debug, Copy, Clone, Eq, PartialEq)]
 pub enum BillType{
     Offer,
     Invoice
@@ -725,10 +725,10 @@ pub struct Hours<'a> {
 /// A project is storable, contains products, and you can create an offer or invoice from it.
 #[derive(Debug)]
 pub struct Debug {
-    file_path: PathBuf,
+    pub file_path: PathBuf,
     //temp_dir: Option<PathBuf>, // TODO
-    git_status: Option<GitStatus>,
-    yaml: Yaml
+    pub git_status: Option<GitStatus>,
+    pub yaml: Yaml
 }
 
 impl<'a> From<&'a Project> for Debug {

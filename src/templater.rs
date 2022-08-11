@@ -169,7 +169,7 @@ impl Templater{
 
 pub type TemplateResult<T> = Result<T, TemplateError>;
 
-#[derive(Debug,PartialEq)]
+#[derive(Debug, Eq, PartialEq)]
 pub enum TemplateError{
     Incomplete(Vec<String>)
 }
@@ -177,7 +177,7 @@ pub enum TemplateError{
 impl fmt::Display for TemplateError{
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result{
         match *self {
-            TemplateError::Incomplete(ref list) => write!(f, "{} ({:?})", self, list),
+            TemplateError::Incomplete(ref list) => write!(f, "Incomplete ({:?})", list),
         }
     }
 }

@@ -14,7 +14,7 @@ fn opt_str(opt: Option<&str>) -> Option<String> {
     opt.map(ToOwned::to_owned)
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, Eq, PartialEq)]
 #[cfg_attr(feature = "serialization", derive(Serialize))]
 pub struct Client {
     title: Option<String>,
@@ -40,7 +40,7 @@ impl ExportTarget<Client> for Project {
     }
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, Eq, PartialEq)]
 #[cfg_attr(feature = "serialization", derive(Serialize))]
 pub struct Event {
     name: Option<String>,
@@ -279,7 +279,7 @@ impl ExportTarget<Complete> for Project {
     }
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, Eq, PartialEq)]
 #[cfg_attr(feature = "serialization", derive(Serialize))]
 pub struct Checks {
     missing_for_offer: bool,
@@ -304,7 +304,7 @@ impl ExportTarget<Checks> for Project {
     }
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, Eq, PartialEq)]
 #[cfg_attr(feature = "serialization", derive(Serialize))]
 pub struct Errors {
     missing_for_offer:   Vec<String>,
@@ -323,7 +323,7 @@ impl ExportTarget<Errors> for Project {
     }
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, Eq, PartialEq)]
 #[cfg_attr(feature = "serialization", derive(Serialize))]
 pub struct Extras {
     dir: Option<String>,

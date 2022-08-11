@@ -26,7 +26,7 @@ pub struct ListConfig<'a>{
     pub details:      Option<Vec<&'a str>>,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, Eq, PartialEq)]
 pub enum ListMode{ Simple, Verbose, Nothing, Paths, Csv }
 
 impl<'a> Default for ListConfig<'a>{

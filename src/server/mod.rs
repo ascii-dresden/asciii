@@ -45,7 +45,7 @@ fn reinitialize(storage: &Storage<Project>) -> State {
     State {all, working, mapped, years}
 }
 
-impl<'a> ProjectLoader {
+impl ProjectLoader {
 
     pub fn new() -> Self {
         let storage = storage::setup().unwrap();

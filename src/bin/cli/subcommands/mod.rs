@@ -550,10 +550,10 @@ pub fn config_init(editor: Option<&str>) -> Result<(), Error> {
 
     } else if let Ok(mut file) = fs::File::create(local){
 
-        let content;
         let mut template = Templater::new(config::DEFAULT_CONFIG).finalize();
         log::trace!("default config keywords: {:#?}", template.list_keywords());
 
+        let content=
         if util::really(&lformat!("do you want to set your name?")) {
             let name = util::git_user_name().and_then(|user_name| {
                 if util::really(&lformat!("Is your name {:?}", user_name)) {
@@ -569,10 +569,10 @@ pub fn config_init(editor: Option<&str>) -> Result<(), Error> {
             });
 
             template.fill_in_field("YOUR-FULL-NAME", &name);
-            content = template.filled;
+            template.filled
         } else {
-            content = config::DEFAULT_CONFIG.to_owned();
-        }
+            config::DEFAULT_CONFIG.to_owned()
+        };
 
 
 
