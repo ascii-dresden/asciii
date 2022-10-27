@@ -418,8 +418,10 @@ impl<'a> Invoicable for Invoice<'a> {
 
     fn number_long_str(&self) -> Option<String> {
         let year = self.date().ok()?.year();
+        let month = self.date().ok()?.month();
+
         // TODO: Length or format should be a setting
-        self.number().ok().map(|n| format!("R{}-{:03}", year, n))
+        self.number().ok().map(|n| format!("R{}-{:02}-{:03}", year, month, n))
     }
 
     fn official(&self) -> FieldResult<String> {
