@@ -94,13 +94,13 @@ pub fn git_add(matches: &ArgMatches) -> Result<(), Error> {
     let repo = storage.repository().unwrap();
     let paths = matches_to_paths(matches, &storage)?;
 
-    if matches.is_present("all") {
+    if matches.get_flag("all") {
         if repo.add_all().success() {
             Ok(())
         } else {
             bail!(format_err!("git add did not exit successfully"));
         }
-    } else if matches.is_present("search_term") {
+    } else if matches.get_flag("search_term") {
 
         if repo.add(&paths).success() {
             Ok(())
@@ -119,7 +119,7 @@ pub fn git_diff(matches: &ArgMatches) -> Result<(), Error> {
     let storage = storage::setup_with_git::<Project>()?;
     let paths = matches_to_paths(matches, &storage)?;
     let repo = storage.repository().unwrap();
-    let flags = if matches.is_present("staged") {
+    let flags = if matches.get_flag("staged") {
         vec!["--staged"]
     } else {
         Vec::new()
@@ -135,7 +135,7 @@ pub fn git_pull(matches: &ArgMatches) -> Result<(), Error> {
     let storage = storage::setup_with_git::<Project>()?;
     let repo = storage.repository().unwrap();
 
-    let success = if matches.is_present("rebase") {
+    let success = if matches.get_flag("rebase") {
         repo.pull_rebase().success()
     } else {
         repo.pull().success()

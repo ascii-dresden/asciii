@@ -12,58 +12,64 @@ use asciii::storage::*;
 
 /// Command LIST
 pub fn list(matches: &ArgMatches) -> Result<(), Error> {
-    if matches.is_present("templates") {
-        list_templates()?; Ok(())
-    } else if matches.is_present("years") {
-        list_years()?; Ok(())
-    } else if matches.is_present("computed_fields") {
+    if dbg!(dbg!(matches).get_flag("templates")) {
+        dbg!(list_templates())?;
+        Ok(())
+    } else if matches.get_flag("years") {
+        list_years()?;
+        Ok(())
+    } else if matches.get_flag("computed_fields") {
         list_computed_fields()?; Ok(())
     } else {
-        let list_mode = decide_mode(matches.is_present("simple"),
-                                    matches.is_present("verbose"),
-                                    matches.is_present("paths"),
-                                    matches.is_present("nothing"),
-                                    matches.is_present("csv"));
+        let list_mode = decide_mode(matches.get_flag("simple"),
+                                    matches.get_flag("verbose"),
+                                    matches.get_flag("paths"),
+                                    matches.get_flag("nothing"),
+                                    matches.get_flag("csv"));
 
-        let extra_details = matches.values_of("details")
-                                   .map(Iterator::collect);
-        let config_details = CONFIG.get_strs("list/extra_details");
+        let extra_details = matches.get_many::<String>("details")
+                            .map(|x|x.map(|s| s.as_str()))
+                            .map(Iterator::collect)
+                            .or_else(|| CONFIG.get_strs("list/extra_details"));
+
 
         let mut list_config = ListConfig {
-            sort_by: matches.value_of("sort")
+            sort_by: matches.get_one::<String>("sort")
+                            .map(String::as_str)
                             .unwrap_or_else(|| CONFIG.get_str("list/sort")),
             mode: list_mode,
-            details: extra_details.or(config_details),
-            filter_by: matches.values_of("filter")
+            details: extra_details,
+            filter_by: matches.get_many::<String>("filter")
+                              .map(|x|x.map(|s| s.as_str()))
                               .map(Iterator::collect),
-            show_errors: matches.is_present("errors"),
+            show_errors: matches.get_flag("errors"),
 
             ..Default::default()
         };
 
-        if matches.is_present("colors") {
+        if matches.get_flag("colors") {
             list_config.use_colors = true;
         }
-        if matches.is_present("no-colors") {
+        if matches.get_flag("no-colors") {
             list_config.use_colors = false;
         }
 
         // list archive of year `archive`
-        let dir = if matches.is_present("archive") {
-            let archive_year = matches.value_of("archive")
+        let dir = if matches.get_flag("archive") {
+            let archive_year = matches.get_one::<String>("archive")
                                       .and_then(|y| y.parse::<i32>().ok())
                                       .unwrap_or_else(|| Utc::today().year());
             StorageDir::Archive(archive_year)
-        } else if matches.is_present("year") {
-            let year = matches.value_of("year")
+        } else if matches.get_flag("year") {
+            let year = matches.get_one::<String>("year")
                               .and_then(|y| y.parse::<i32>().ok())
                               .unwrap_or_else(|| Utc::today().year());
             StorageDir::Year(year)
         }
         // or list all, but sort by date
-        else if matches.is_present("all") {
+        else if matches.get_flag("all") {
             // sort by date on --all of not overriden
-            if !matches.is_present("sort") {
+            if !matches.get_flag("sort") {
                 list_config.sort_by = "date"
             }
             StorageDir::All
@@ -73,7 +79,7 @@ pub fn list(matches: &ArgMatches) -> Result<(), Error> {
             StorageDir::Working
         };
 
-        if matches.is_present("broken") {
+        if matches.get_flag("broken") {
                list_broken_projects(dir)?; // XXX Broken
            } else {
                list_projects(dir, &list_config)?;

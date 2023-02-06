@@ -93,7 +93,7 @@ pub fn launch_shell() -> Result<(), Error> {
                 // you have to insert the binary name since clap expects it
                 argv.insert(0, "prog");
                 log::debug!("shell: {} -> {:?}", line, argv);
-                match app.get_matches_from_safe_borrow(argv) {
+                match app.try_get_matches_from_mut(argv) {
                     Ok(matches) => super::match_matches(&matches),
                     Err(e) => println!("{}", e)
                 }

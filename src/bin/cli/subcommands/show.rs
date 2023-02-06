@@ -20,30 +20,30 @@ pub fn show(m: &ArgMatches) -> Result<(), Error> {
     let (search_terms, _) = matches_to_search(m);
     let selection = matches_to_selection(m);
 
-    let bill_type = match (m.is_present("offer"), m.is_present("invoice")) {
+    let bill_type = match (m.get_flag("offer"), m.get_flag("invoice")) {
         (true, true) => unreachable!("this should have been prevented by clap-rs"),
         (true, false) => BillType::Offer,
         // (false,true) => BillType::Invoice,
         _ => BillType::Invoice, //TODO: be intelligent here ( use date )
     };
 
-    if m.is_present("files") {
+    if m.get_flag("files") {
         show_files(selection)
-    } else if let Some(detail) = m.value_of("detail") {
+    } else if let Some(detail) = m.get_one::<String>("detail") {
         show_detail(&selection, detail)
-    } else if m.is_present("empty fields") {
+    } else if m.get_flag("empty fields") {
         show_empty_fields(selection)
-    } else if m.is_present("errors") {
+    } else if m.get_flag("errors") {
         show_errors(selection)
-    } else if m.is_present("yaml") {
+    } else if m.get_flag("yaml") {
         show_yaml(selection)
-    } else if m.is_present("json") {
+    } else if m.get_flag("json") {
         show_json(selection)
-    } else if m.is_present("ical") {
+    } else if m.get_flag("ical") {
         show_ical(selection)
-    } else if m.is_present("csv") {
+    } else if m.get_flag("csv") {
         show_csv(selection)
-    } else if m.is_present("template") {
+    } else if m.get_flag("template") {
         show_template(search_terms[0])
     } else {
         for p in setup::<Project>()?.open_projects(selection)? {

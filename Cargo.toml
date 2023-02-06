@@ -42,8 +42,8 @@ chrono = "0.4"
 regex = "1.4"
 lazy_static = "1.4"
 maplit = "1.0"
-clap = { version = "3", features = ["cargo"]}
-clap_complete = "3"
+clap = { version = "4", features = ["cargo"]}
+clap_complete = "4"
 enum_derive = "0.1"
 custom_derive = "0.1"
 open = "2"
