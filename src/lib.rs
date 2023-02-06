@@ -4,8 +4,8 @@
 
 #![cfg_attr(feature = "manual", doc = include_str!("../manual.md"))]
 
-#![allow(clippy::uninlined_format_args)]
 #![allow(deprecated)]
+#![allow(clippy::uninlined_format_args)]
 #![warn(//missing_docs,
         //missing_copy_implementations,
         //missing_debug_implementations,
