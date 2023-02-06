@@ -77,9 +77,9 @@ handlebars = {version = "2.0", optional = true}
 
 serde         = {version = "1.0", optional = true}
 serde_json    = {version = "1.0", optional = true}
-serde_yaml    = {version = "0.8", optional = true}
+serde_yaml    = {version = "0.9", optional = true}
 serde_derive  = {version = "1.0", optional = true}
-ordered-float = {version = "2.0", optional = true}
+ordered-float = {version = "3", optional = true}
 num-traits    = {version = "0.2", optional = true}
 toml          = "0.7"
 
