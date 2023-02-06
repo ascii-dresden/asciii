@@ -288,7 +288,7 @@ pub struct ApiKeys {
 #[cfg(feature = "meta")]
 pub fn parse_meta() -> Result<MetaStore, Error> {
     let path = storage::setup::<Project>()?.get_extra_file("meta.toml")?;
-    let file_content = fs::read_to_string(&path)?;
+    let file_content = fs::read_to_string(path)?;
     let store: MetaStore = toml::from_str(&file_content)?;
 
     Ok(store)

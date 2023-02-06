@@ -83,7 +83,8 @@ impl ToString for ExportFloat {
 impl serde::Serialize for ExportFloat {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
-        S: serde::Serializer {
+        S: serde::Serializer,
+    {
         serializer.serialize_str(&self.to_string())
     }
 }
@@ -95,10 +96,8 @@ fn test_export_float_to_sting() {
     assert_eq!(ToString::to_string(&ExportFloat(2.1)), "2.1");
     assert_eq!(ToString::to_string(&ExportFloat(2.11)), "2.11");
     assert_eq!(ToString::to_string(&ExportFloat(0.1)), "0.1");
-    assert_eq!(ToString::to_string(&ExportFloat(0.2+0.1)), "0.30000000000000004");
-    
+    assert_eq!(ToString::to_string(&ExportFloat(0.2 + 0.1)), "0.30000000000000004");
 }
-
 
 #[derive(Debug, PartialEq)]
 #[cfg_attr(feature = "serialization", derive(Serialize))]
