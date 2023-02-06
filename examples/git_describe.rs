@@ -6,8 +6,8 @@ fn execute_git(command: &str, args: &[&str]) -> Output {
 
     Command::new("git")
         .arg("--no-pager")
-        .args(&["--work-tree", workdir])
-        .args(&["--git-dir", gitdir])
+        .args(["--work-tree", workdir])
+        .args(["--git-dir", gitdir])
         .arg(command)
         .args(args)
         .output()
@@ -23,7 +23,7 @@ fn main() {
     let count = git_log.lines().count().to_string();
     let last_commit = git_log.lines().next().unwrap().to_string();
     let description = format!("build {} ({})", count.trim(), last_commit.trim());
-    println!("description string= {:?}", description);
+    println!("description string= {description:?}");
     let mut f = File::create("most_recent_commit.txt").unwrap();
     f.write_all(description.as_bytes()).unwrap();
 }

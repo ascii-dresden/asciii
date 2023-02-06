@@ -1,3 +1,5 @@
+#![allow(deprecated)]
+#![allow(clippy::uninlined_format_args)]
 #[macro_use] extern crate clap;
 
 #[macro_use] pub mod localize_macros;

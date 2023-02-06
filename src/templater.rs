@@ -112,7 +112,7 @@ impl Templater{
     }
 
     pub fn from_file(path: &Path) -> Result<Templater, io::Error> {
-        let template = fs::read_to_string(&path)?;
+        let template = fs::read_to_string(path)?;
         Ok(Templater::new(&template))
     }
 

@@ -6,7 +6,7 @@ use asciii::storage::{self, StorageDir};
 fn json_serde(project: &Project) -> String {
     let exported: Complete = project.export();
     println!("Serde");
-    format!("{:#}", serde_json::to_value(&exported).unwrap())
+    format!("{:#}", serde_json::to_value(exported).unwrap())
 }
 
 fn main() {

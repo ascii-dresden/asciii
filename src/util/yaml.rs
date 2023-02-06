@@ -30,7 +30,7 @@ use chrono::prelude::*;
 /// Wrapper that opens and parses a `.yml` file.
 pub fn open(path: &Path) -> Result<Yaml, anyhow::Error> {
 
-    let file_content = fs::read_to_string(&path)?;
+    let file_content = fs::read_to_string(path)?;
     parse( &file_content )
 }
 

@@ -331,10 +331,10 @@ impl<L:Storable> Storage<L> {
         log::trace!("creating storage directories");
         ensure!(self.root_dir().is_absolute(), StorageError::StoragePathNotAbsolute);
 
-        if !self.root_dir().exists()  { fs::create_dir(&self.root_dir())?;  }
-        if !self.working_dir().exists()  { fs::create_dir(&self.working_dir())?;  }
-        if !self.archive_dir().exists()  { fs::create_dir(&self.archive_dir())?;  }
-        if !self.templates_dir().exists() { fs::create_dir(&self.templates_dir())?; }
+        if !self.root_dir().exists()  { fs::create_dir(self.root_dir())?;  }
+        if !self.working_dir().exists()  { fs::create_dir(self.working_dir())?;  }
+        if !self.archive_dir().exists()  { fs::create_dir(self.archive_dir())?;  }
+        if !self.templates_dir().exists() { fs::create_dir(self.templates_dir())?; }
 
         Ok(())
     }
@@ -452,7 +452,7 @@ impl<L:Storable> Storage<L> {
         log::trace!("created project will be called {:?}", slugged_name);
 
         let target_file  = project_dir
-            .join(&(slugged_name + "." + &L::file_extension()));
+            .join(slugged_name + "." + &L::file_extension());
 
         let template_path = self.get_template_file(template_name)?;
 
@@ -485,10 +485,10 @@ impl<L:Storable> Storage<L> {
 
         let archive = self.create_archive(year)?;
         let project_folder = self.get_project_dir(name, StorageDir::Working)?;
-        let target = archive.join(&name_in_archive);
+        let target = archive.join(name_in_archive);
         log::trace!(" moving file into {:?}", target);
 
-        fs::rename(&project_folder, &target)?;
+        fs::rename(project_folder, &target)?;
 
         Ok(target)
     }
@@ -516,9 +516,9 @@ impl<L:Storable> Storage<L> {
 
         let archive = self.create_archive(year)?;
         let project_folder = project.dir();
-        let target = archive.join(&name_in_archive);
+        let target = archive.join(name_in_archive);
 
-        fs::rename(&project_folder, &target)?;
+        fs::rename(project_folder, &target)?;
         log::info!("successfully archived {:?} to {:?}", project.short_desc() ,target);
 
         moved_files.push(project.dir());
@@ -613,7 +613,7 @@ impl<L:Storable> Storage<L> {
         log::debug!("trying unarchiving {:?}", archived_dir);
 
         // has to be in archive_dir
-        let child_of_archive = archived_dir.starts_with(&self.archive_dir());
+        let child_of_archive = archived_dir.starts_with(self.archive_dir());
 
         // must not be the archive_dir
         let archive_itself =  archived_dir == self.archive_dir();
@@ -625,12 +625,12 @@ impl<L:Storable> Storage<L> {
             .map_or(false, |s| s.parse::<i32>().is_ok());
 
         let name = self.get_project_name(archived_dir)?;
-        let target = self.working_dir().join(&name);
+        let target = self.working_dir().join(name);
         ensure!(!target.exists(), StorageError::ProjectFileExists);
         log::info!("unarchiving project from {:?} to {:?}", archived_dir, target);
 
         if child_of_archive && !archive_itself && parent_is_num{
-            fs::rename(&archived_dir, &target)?;
+            fs::rename(archived_dir, &target)?;
         } else {
             log::error!("moving out of archive failed");
             bail!(StorageError::InvalidDirStructure);
@@ -690,7 +690,7 @@ impl<L:Storable> Storage<L> {
         log::trace!("getting project directory for {:?} from {:?}", name, directory);
         let slugged_name = slugify(name);
         if let Ok(path) = match directory {
-            StorageDir::Working => Ok(self.working_dir().join(&slugged_name)),
+            StorageDir::Working => Ok(self.working_dir().join(slugged_name)),
             StorageDir::Archive(year) => self.get_project_dir_from_archive(name, year),
             _ => bail!(StorageError::BadChoice)
         }{

@@ -6,12 +6,12 @@ fn execute_git(command: &str, args: &[&str]) -> Output {
 
     Command::new("git")
         .arg("--no-pager")
-        .args(&["--work-tree", workdir])
-        .args(&["--git-dir", gitdir])
+        .args(["--work-tree", workdir])
+        .args(["--git-dir", gitdir])
         .arg(command)
         .args(args)
         .output()
-        .unwrap_or_else(|e| panic!("git_failed {}", e))
+        .unwrap_or_else(|error| panic!("git_failed {error}"))
 }
 
 fn main() {
@@ -20,5 +20,5 @@ fn main() {
     let count = git_log.lines().count().to_string();
     let last_commit = git_log.lines().next().unwrap().to_string();
     let description = format!("commit {} ({})", count.trim(), last_commit.trim());
-    println!("description string= {:?}", description);
+    println!("description string= {description:?}");
 }

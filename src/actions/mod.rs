@@ -1,36 +1,39 @@
 //! General actions
 
-
-use chrono::prelude::*;
+use anyhow::Error;
 use bill::Currency;
+use chrono::prelude::*;
 use icalendar::Calendar;
 #[cfg(feature = "meta")]
 use toml;
-use anyhow::Error;
 
 use std::fmt::Write;
-#[cfg(feature = "meta")] use std::fs;
+#[cfg(feature = "meta")]
+use std::fs;
 
-use std::path::PathBuf;
 use std::collections::HashMap;
+use std::path::PathBuf;
 use std::process::Command;
 
-use crate::util;
-use crate::storage::{self, StorageDir, Storable};
-use crate::project::Project;
 use crate::project::spec::*;
+use crate::project::Project;
+use crate::storage::{self, Storable, StorageDir};
+use crate::util;
 
 pub mod error;
 use self::error::*;
 
 /// Helper method that passes projects matching the `search_terms` to the passt closure `f`
-pub fn with_projects<F>(dir:StorageDir, search_terms: &[&str], f:F) -> Result<(), Error>
-    where F:Fn(&Project)->Result<(), Error>
+pub fn with_projects<F>(dir: StorageDir, search_terms: &[&str], f: F) -> Result<(), Error>
+where
+    F: Fn(&Project) -> Result<(), Error>,
 {
     log::trace!("with_projects({:?})", search_terms);
     let projects = storage::setup::<Project>()?.search_projects_any(dir, search_terms)?;
     if projects.is_empty() {
-        anyhow::bail!(ActionError::NothingFound(search_terms.iter().map(ToString::to_string).collect() ));
+        anyhow::bail!(ActionError::NothingFound(
+            search_terms.iter().map(ToString::to_string).collect()
+        ));
     }
     for project in projects {
         f(&project)?;
@@ -38,71 +41,104 @@ pub fn with_projects<F>(dir:StorageDir, search_terms: &[&str], f:F) -> Result<()
     Ok(())
 }
 
-pub fn csv(year:i32) -> Result<String, Error> {
+pub fn csv(year: i32) -> Result<String, Error> {
     let mut projects = storage::setup::<Project>()?.open_projects(StorageDir::Year(year))?;
-    projects.sort_by(|pa,pb| pa.index().unwrap_or_else(||"zzzz".to_owned()).cmp( &pb.index().unwrap_or_else(||"zzzz".to_owned())));
+    projects.sort_by(|pa, pb| {
+        pa.index()
+            .unwrap_or_else(|| "zzzz".to_owned())
+            .cmp(&pb.index().unwrap_or_else(|| "zzzz".to_owned()))
+    });
     projects_to_csv(&projects)
 }
 
 /// Produces a csv string from a list of `Project`s
-pub fn projects_to_csv(projects:&[Project]) -> Result<String, Error>{
+pub fn projects_to_csv(projects: &[Project]) -> Result<String, Error> {
     let mut string = String::new();
     let splitter = ";";
 
-    writeln!(&mut string, "{}",
-             [
-             lformat!("INum"), // Rnum
-             lformat!("Designation"), //Bezeichnung
-             lformat!("Date"), // Datum
-             lformat!("InvoiceDate"), // Rechnungsdatum
-             lformat!("Caterer"), // Betreuer
-             lformat!("Responsible"), //Verantwortlich
-             lformat!("Payed on"), // Bezahlt am
-             lformat!("Amount"), // Betrag
-             lformat!("Canceled") //Canceled
-             ]
-             .join(splitter))?;
+    writeln!(
+        &mut string,
+        "{}",
+        [
+            lformat!("INum"),        // Rnum
+            lformat!("Designation"), //Bezeichnung
+            lformat!("Date"),        // Datum
+            lformat!("InvoiceDate"), // Rechnungsdatum
+            lformat!("Caterer"),     // Betreuer
+            lformat!("Responsible"), //Verantwortlich
+            lformat!("Payed on"),    // Bezahlt am
+            lformat!("Amount"),      // Betrag
+            lformat!("Canceled")     //Canceled
+        ]
+        .join(splitter)
+    )?;
 
     for project in projects {
-        writeln!(&mut string, "{}", [
-                 project.field("InvoiceNumber")                     .unwrap_or_else(|| String::from(r#""""#)),
-                 project.field("Name")                              .unwrap_or_else(|| String::from(r#""""#)),
-                 project.field("event/dates/0/begin")               .unwrap_or_else(|| String::from(r#""""#)),
-                 project.field("invoice/date")                      .unwrap_or_else(|| String::from(r#""""#)),
-                 project.field("Employees")                         .unwrap_or_else(|| String::from(r#""""#)),
-                 project.field("Responsible")                       .unwrap_or_else(|| String::from(r#""""#)),
-                 project.field("invoice/payed_date")                .unwrap_or_else(|| String::from(r#""""#)),
-                 project.sum_sold().map(|c|c.value().to_string()).unwrap_or_else(|_| String::from(r#""""#)),
-                 String::from(if project.canceled(){"canceled"} else {""})
-        ].join(splitter))?;
+        writeln!(
+            &mut string,
+            "{}",
+            [
+                project
+                    .field("InvoiceNumber")
+                    .unwrap_or_else(|| String::from(r#""""#)),
+                project
+                    .field("Name")
+                    .unwrap_or_else(|| String::from(r#""""#)),
+                project
+                    .field("event/dates/0/begin")
+                    .unwrap_or_else(|| String::from(r#""""#)),
+                project
+                    .field("invoice/date")
+                    .unwrap_or_else(|| String::from(r#""""#)),
+                project
+                    .field("Employees")
+                    .unwrap_or_else(|| String::from(r#""""#)),
+                project
+                    .field("Responsible")
+                    .unwrap_or_else(|| String::from(r#""""#)),
+                project
+                    .field("invoice/payed_date")
+                    .unwrap_or_else(|| String::from(r#""""#)),
+                project
+                    .sum_sold()
+                    .map(|c| c.value().to_string())
+                    .unwrap_or_else(|_| String::from(r#""""#)),
+                String::from(if project.canceled() { "canceled" } else { "" })
+            ]
+            .join(splitter)
+        )?;
     }
     Ok(string)
 }
 
-
 fn open_payments(projects: &[Project]) -> Currency {
-   projects.iter()
-           .filter(|&p| !p.canceled() && !p.is_payed() && p.age().unwrap_or(0) > 0)
-           .filter_map(|p| p.sum_sold().ok())
-           .fold(Currency::default(), |acc, x| acc + x)
+    projects
+        .iter()
+        .filter(|&p| !p.canceled() && !p.is_payed() && p.age().unwrap_or(0) > 0)
+        .filter_map(|p| p.sum_sold().ok())
+        .fold(Currency::default(), |acc, x| acc + x)
 }
 
 fn open_wages(projects: &[Project]) -> Currency {
-    projects.iter()
-            .filter(|p| !p.canceled() && p.age().unwrap_or(0) > 0)
-            .filter_map(|p| p.hours().net_wages())
-            .fold(Currency::default(), |acc, x| acc + x)
+    projects
+        .iter()
+        .filter(|p| !p.canceled() && p.age().unwrap_or(0) > 0)
+        .filter_map(|p| p.hours().net_wages())
+        .fold(Currency::default(), |acc, x| acc + x)
 }
 
 fn unpayed_employees(projects: &[Project]) -> HashMap<String, Currency> {
     let mut buckets = HashMap::new();
-    let employees = projects.iter()
-                            .filter(|p| !p.canceled() && p.age().unwrap_or(0) > 0)
-                            .filter_map(|p| p.hours().employees().ok())
-                            .flat_map(IntoIterator::into_iter);
+    let employees = projects
+        .iter()
+        .filter(|p| !p.canceled() && p.age().unwrap_or(0) > 0)
+        .filter_map(|p| p.hours().employees().ok())
+        .flat_map(IntoIterator::into_iter);
 
     for employee in employees {
-        let bucket = buckets.entry(employee.name.clone()).or_insert_with(Currency::new);
+        let bucket = buckets
+            .entry(employee.name.clone())
+            .or_insert_with(Currency::new);
         *bucket = *bucket + employee.salary;
     }
     buckets
@@ -122,7 +158,11 @@ pub fn dues() -> Result<Dues, Error> {
     let acc_wages = open_wages(&projects);
     let unpayed_employees = unpayed_employees(&projects);
 
-    Ok(Dues{ acc_sum_sold, acc_wages, unpayed_employees})
+    Ok(Dues {
+        acc_sum_sold,
+        acc_wages,
+        unpayed_employees,
+    })
 }
 
 /// Testing only, tries to run complete spec on all projects.
@@ -135,21 +175,31 @@ pub fn spec() -> Result<(), Error> {
     for project in projects {
         log::info!("{}", project.dir().display());
 
-        project.client().validate().missing_fields.into_iter().for_each(|error| println!("{}", error));
+        project
+            .client()
+            .validate()
+            .missing_fields
+            .into_iter()
+            .for_each(|error| println!("{}", error));
 
         project.client().full_name();
         project.client().first_name()?;
         project.client().title()?;
         project.client().email()?;
 
-
         project.hours().employees_string();
         project.invoice().number_long_str();
         project.invoice().number_str();
         project.offer().number().unwrap();
-        project.age().map(|a|format!("{} days", a)).unwrap();
-        project.modified_date().map(|d|d.year().to_string()).unwrap();
-        project.sum_sold().map(|c|util::currency_to_string(&c)).unwrap();
+        project.age().map(|a| format!("{} days", a)).unwrap();
+        project
+            .modified_date()
+            .map(|d| d.year().to_string())
+            .unwrap();
+        project
+            .sum_sold()
+            .map(|c| util::currency_to_string(&c))
+            .unwrap();
         project.responsible().map(ToOwned::to_owned).unwrap();
         project.name().map(ToOwned::to_owned).unwrap();
     }
@@ -157,30 +207,44 @@ pub fn spec() -> Result<(), Error> {
     Ok(())
 }
 
-pub fn delete_project_confirmation(dir: StorageDir, search_terms:&[&str]) -> Result<(), Error> {
+pub fn delete_project_confirmation(dir: StorageDir, search_terms: &[&str]) -> Result<(), Error> {
     let storage = storage::setup_with_git::<Project>()?;
     for project in storage.search_projects_any(dir, search_terms)? {
         storage.delete_project_if(&project, || {
-                    let file = project.file();
-                    let desc = project.name().ok().or_else(|| file.to_str()).unwrap();
-                    util::really( &lformat!("do you realy want to delete {}?", desc))
-                })?
+            let file = project.file();
+            let desc = project.name().ok().or_else(|| file.to_str()).unwrap();
+            util::really(&lformat!("do you realy want to delete {}?", desc))
+        })?
     }
     Ok(())
 }
 
-pub fn archive_projects(search_terms:&[&str], manual_year:Option<i32>, force:bool) -> Result<Vec<PathBuf>, Error>{
-    log::trace!("archive_projects matching ({:?},{:?},{:?})", search_terms, manual_year,force);
+pub fn archive_projects(
+    search_terms: &[&str],
+    manual_year: Option<i32>,
+    force: bool,
+) -> Result<Vec<PathBuf>, Error> {
+    log::trace!(
+        "archive_projects matching ({:?},{:?},{:?})",
+        search_terms,
+        manual_year,
+        force
+    );
     storage::setup_with_git::<Project>()?.archive_projects_if(search_terms, manual_year, || force)
 }
 
 pub fn archive_all_projects() -> Result<Vec<PathBuf>, Error> {
     let storage = storage::setup_with_git::<Project>()?;
     let mut moved_files = Vec::new();
-    for project in storage.open_projects(StorageDir::Working)?
-                        .iter()
-                        .filter(|p| p.is_ready_for_archive().is_empty()) {
-        log::info!("{}", lformat!("we could get rid of: {}", project.name().unwrap_or("")));
+    for project in storage
+        .open_projects(StorageDir::Working)?
+        .iter()
+        .filter(|p| p.is_ready_for_archive().is_empty())
+    {
+        log::info!(
+            "{}",
+            lformat!("we could get rid of: {}", project.name().unwrap_or(""))
+        );
         moved_files.push(project.dir());
         moved_files.append(&mut storage.archive_project(project, project.year().unwrap())?);
     }
@@ -189,7 +253,7 @@ pub fn archive_all_projects() -> Result<Vec<PathBuf>, Error> {
 
 /// Command UNARCHIVE <YEAR> <NAME>
 /// TODO: return a list of files that have to be updated in git
-pub fn unarchive_projects(year:i32, search_terms:&[&str]) -> Result<Vec<PathBuf>, Error> {
+pub fn unarchive_projects(year: i32, search_terms: &[&str]) -> Result<Vec<PathBuf>, Error> {
     storage::setup_with_git::<Project>()?.unarchive_projects(year, search_terms)
 }
 
@@ -209,11 +273,11 @@ pub fn calendar_with_tasks(dir: StorageDir, show_tasks: bool) -> Result<String, 
     let storage = storage::setup::<Project>()?;
     let mut cal = Calendar::new();
     if show_tasks {
-        for project in storage.open_projects(StorageDir::Working)?  {
+        for project in storage.open_projects(StorageDir::Working)? {
             cal.append(&mut project.to_tasks())
         }
     }
-    for project in storage.open_projects(dir)?{
+    for project in storage.open_projects(dir)? {
         cal.append(&mut project.to_ical())
     }
     Ok(cal.to_string())
@@ -224,9 +288,9 @@ pub fn calendar_with_tasks(dir: StorageDir, show_tasks: bool) -> Result<String, 
 pub fn clone_remote(url: &str, to: &str) -> Result<(), Error> {
     log::trace!("cloning {:?} to {:?}", url, to);
     Command::new("git")
-        .args(&["clone", url, to])
+        .args(["clone", url, to])
         .status()
-        .unwrap_or_else(|e| { panic!("failed to execute process: {}", e) });
+        .unwrap_or_else(|error| panic!("failed to execute process: {error}"));
     Ok(())
 }
 
@@ -235,7 +299,7 @@ pub fn clone_remote(url: &str, to: &str) -> Result<(), Error> {
 #[cfg_attr(feature = "meta", derive(Deserialize))]
 #[derive(Debug)]
 pub struct MetaStore {
-    pub api: ApiKeys
+    pub api: ApiKeys,
 }
 
 #[cfg_attr(feature = "meta", derive(Serialize))]
@@ -244,9 +308,8 @@ pub struct MetaStore {
 /// ApiKeys store
 pub struct ApiKeys {
     pub keys: Vec<String>,
-    pub users: HashMap<String, String>
+    pub users: HashMap<String, String>,
 }
-
 
 /// Parses meta store
 #[cfg(feature = "meta")]

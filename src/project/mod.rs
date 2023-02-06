@@ -71,7 +71,7 @@ impl Project {
     pub fn open<S: AsRef<OsStr> + std::fmt::Debug + ?Sized>(pathish: &S) -> Result<Project, Error> {
         log::trace!("Project::open({:?});", pathish);
         let file_path = Path::new(&pathish);
-        let file_content = fs::read_to_string(&file_path)?;
+        let file_content = fs::read_to_string(file_path)?;
         let project = Project {
             file_path: file_path.to_owned(),
             git_status: None,
@@ -456,7 +456,7 @@ pub trait Exportable {
         let output_folder = get_valid_path(crate::CONFIG.get_str("output_path"));
         let convert_ext  = crate::CONFIG.get_str("document_export/output_extension");
         match (output_folder, self.offer_file_name(convert_ext)) {
-            (Some(folder), Some(name)) => folder.join(&name).into(),
+            (Some(folder), Some(name)) => folder.join(name).into(),
             _ => None
         }
     }
@@ -465,7 +465,7 @@ pub trait Exportable {
         let output_folder = get_valid_path(crate::CONFIG.get_str("output_path"));
         let convert_ext  = crate::CONFIG.get_str("document_export/output_extension");
         match (output_folder, self.invoice_file_name(convert_ext)) {
-            (Some(folder), Some(name)) => folder.join(&name).into(),
+            (Some(folder), Some(name)) => folder.join(name).into(),
             _ => None
         }
     }
@@ -495,7 +495,7 @@ pub trait Exportable {
 
     fn full_offer_file_path(&self, ext: &str) -> Result<PathBuf, Error> {
         if let Some(target) = self.offer_file_name(ext) {
-            Ok(self.export_dir().join(&target))
+            Ok(self.export_dir().join(target))
         } else {
             bail!(ProjectError::CantDetermineTargetFile)
         }
@@ -503,7 +503,7 @@ pub trait Exportable {
 
     fn full_invoice_file_path(&self, ext: &str) -> Result<PathBuf, Error> {
         if let Some(target) = self.invoice_file_name(ext) {
-            Ok(self.export_dir().join(&target))
+            Ok(self.export_dir().join(target))
         } else {
             bail!(ProjectError::CantDetermineTargetFile)
         }

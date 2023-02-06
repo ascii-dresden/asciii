@@ -49,7 +49,7 @@ pub fn really(msg: &str) -> bool {
 
 pub fn git_user_name() -> Option<String> {
     Command::new("git")
-        .args(&["config", "user.name"])
+        .args(["config", "user.name"])
         .output()
         .map_err(|e| {
             log::error!("failed to execute process: {}", e);
@@ -65,7 +65,7 @@ pub fn git_user_name() -> Option<String> {
 pub fn ls(path:&str){
     println!("find {}", path); // TODO: implement in here with walkdir
     let output = Command::new("find")
-        .arg(&path)
+        .arg(path)
         .output()
         .unwrap_or_else(|e| { panic!("failed to execute process: {}", e) });
     println!("{}", String::from_utf8(output.stdout).unwrap());

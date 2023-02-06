@@ -8,10 +8,10 @@ use crowbook_intl::{Extractor, Localizer};
 fn gen_commit_file() {
     let git_log_output = Command::new("git")
         .arg("--no-pager")
-        .args(&["--work-tree", "."])
-        .args(&["--git-dir", "./.git"])
+        .args(["--work-tree", "."])
+        .args(["--git-dir", "./.git"])
         .arg("log")
-        .args(&["--oneline", r##"--format=%h"##])
+        .args(["--oneline", r##"--format=%h"##])
         .output()
         .ok()
         .and_then(|output| String::from_utf8(output.stdout).ok());
@@ -59,13 +59,13 @@ fn build_webapp() {
     Command::new("yarn")
         .current_dir("./webapp")
         .output()
-        .unwrap_or_else(|e| panic!("yarn install step failed {}", e));
+        .unwrap_or_else(|e| panic!("yarn install step failed {e}"));
 
     Command::new("yarn")
         .current_dir("./webapp")
         .arg("build")
         .output()
-        .unwrap_or_else(|e| panic!("yarn build step failed {}", e));
+        .unwrap_or_else(|e| panic!("yarn build step failed {e}"));
 }
 
 fn main() {

@@ -237,7 +237,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
     env_logger::init_from_env(Env::new().filter(LOG_VAR));
     let bind_to = env::var(BIND_VAR)
-                .unwrap_or_else(|_| format!("{}:{}", BIND_HOST, BIND_PORT));
+                .unwrap_or_else(|_| format!("{BIND_HOST}:{BIND_PORT}"));
 
 
 

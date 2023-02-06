@@ -170,16 +170,16 @@ impl Repository {
     fn execute_git(&self, command:&str, args:&[&str], paths: &[PathBuf]) -> ExitStatus{
         let gitdir  = self.workdir.join(".git");
         log::debug!("{:?}", Command::new("git")
-                 .args(&["--work-tree", self.workdir.to_str().unwrap()])
-                 .args(&["--git-dir",   gitdir.to_str().unwrap()])
+                 .args(["--work-tree", self.workdir.to_str().unwrap()])
+                 .args(["--git-dir",   gitdir.to_str().unwrap()])
                  .arg(command)
                  .args(args)
                  .args(paths)
                  );
 
         Command::new("git")
-            .args(&["--work-tree", self.workdir.to_str().unwrap()])
-            .args(&["--git-dir",   gitdir.to_str().unwrap()])
+            .args(["--work-tree", self.workdir.to_str().unwrap()])
+            .args(["--git-dir",   gitdir.to_str().unwrap()])
             .arg(command)
             .args(args)
             .args(paths)

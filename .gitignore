@@ -33,3 +33,4 @@ src/localize_macros_static.rs
 .idea/
 static/*
 node_modules
+.yarn

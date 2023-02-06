@@ -109,8 +109,8 @@ fn list_projects(dir: StorageDir, list_config: &ListConfig<'_>) -> Result<(), Er
     // sorting
     match list_config.sort_by {
         "manager" => projects.sort_by(|pa, pb| pa.responsible().cmp(&pb.responsible())),
-        "date" => projects.sort_by(|pa, pb| pa.modified_date().cmp(&pb.modified_date())),
-        "name" => projects.sort_by(|pa, pb| pa.short_desc().cmp(&pb.short_desc())),
+        "date" => projects.sort_by_key(|pa| pa.modified_date()),
+        "name" => projects.sort_by_key(|pa| pa.short_desc()),
         "index" => {
             projects.sort_by(|pa, pb| {
                                  pa.index()
