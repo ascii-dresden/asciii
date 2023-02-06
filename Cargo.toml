@@ -70,7 +70,7 @@ tempdir = "0.3"
 semver = "1.0"
 term_size = "0.3"
 
-prettytable-rs = { default-features = false, version = "0.8" }
+prettytable-rs = { default-features = false, version = "0.10" }
 
 # feature: document_export
 handlebars = {version = "2.0", optional = true}
