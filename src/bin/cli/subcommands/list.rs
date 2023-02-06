@@ -11,7 +11,7 @@ use asciii::storage::*;
 
 
 /// Command LIST
-pub fn list(matches: &ArgMatches<'_>) -> Result<(), Error> {
+pub fn list(matches: &ArgMatches) -> Result<(), Error> {
     if matches.is_present("templates") {
         list_templates()?; Ok(())
     } else if matches.is_present("years") {

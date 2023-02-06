@@ -7,7 +7,7 @@ use asciii::project::Project;
 use super::matches_to_paths;
 
 /// Command LOG
-pub fn git_log(matches: &ArgMatches<'_>) -> Result<(), Error> {
+pub fn git_log(matches: &ArgMatches) -> Result<(), Error> {
     let storage = storage::setup_with_git::<Project>()?;
     let paths = matches_to_paths(matches, &storage)?;
     let repo = storage.repository().unwrap();
@@ -88,7 +88,7 @@ pub fn git_remote() -> Result<(), Error> {
 }
 
 /// Command ADD
-pub fn git_add(matches: &ArgMatches<'_>) -> Result<(), Error> {
+pub fn git_add(matches: &ArgMatches) -> Result<(), Error> {
     log::trace!("git_add {:#?}", matches);
     let storage = storage::setup_with_git::<Project>()?;
     let repo = storage.repository().unwrap();
@@ -115,7 +115,7 @@ pub fn git_add(matches: &ArgMatches<'_>) -> Result<(), Error> {
 
 
 /// Command DIFF
-pub fn git_diff(matches: &ArgMatches<'_>) -> Result<(), Error> {
+pub fn git_diff(matches: &ArgMatches) -> Result<(), Error> {
     let storage = storage::setup_with_git::<Project>()?;
     let paths = matches_to_paths(matches, &storage)?;
     let repo = storage.repository().unwrap();
@@ -131,7 +131,7 @@ pub fn git_diff(matches: &ArgMatches<'_>) -> Result<(), Error> {
 }
 
 /// Command PULL
-pub fn git_pull(matches: &ArgMatches<'_>) -> Result<(), Error> {
+pub fn git_pull(matches: &ArgMatches) -> Result<(), Error> {
     let storage = storage::setup_with_git::<Project>()?;
     let repo = storage.repository().unwrap();
 
@@ -167,7 +167,7 @@ pub fn git_stash() -> Result<(), Error> {
 }
 
 /// Command CLEANUP
-pub fn git_cleanup(matches: &ArgMatches<'_>) -> Result<(), Error> {
+pub fn git_cleanup(matches: &ArgMatches) -> Result<(), Error> {
     let storage = storage::setup_with_git::<Project>()?;
     let paths = matches_to_paths(matches, &storage)?;
     let repo = storage.repository().unwrap();

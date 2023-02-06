@@ -16,7 +16,7 @@ use super::path;
 use std::fs;
 
 /// Command SHOW
-pub fn show(m: &ArgMatches<'_>) -> Result<(), Error> {
+pub fn show(m: &ArgMatches) -> Result<(), Error> {
     let (search_terms, _) = matches_to_search(m);
     let selection = matches_to_selection(m);
 
@@ -127,7 +127,7 @@ fn show_csv(selection: StorageSelection) -> Result<(), Error> {
     Ok(())
 }
 
-pub fn show_path(matches: &ArgMatches<'_>) -> Result<(), Error> {
+pub fn show_path(matches: &ArgMatches) -> Result<(), Error> {
     path(matches, |path| {
         println!("{}", path.display());
         Ok(())

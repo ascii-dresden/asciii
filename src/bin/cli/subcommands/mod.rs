@@ -38,19 +38,19 @@ pub use self::show::*;
 
 // TODO: refactor this into actions module and actual, short subcommands
 
-pub fn double_command(_matches: &ArgMatches<'_>) -> Result<(), Error> {
+pub fn double_command(_matches: &ArgMatches) -> Result<(), Error> {
     let face = "🤣";
     println!("{}", lformat!("asciii asciii? {}", face));
     Ok(())
 }
 
-pub fn no_command(_matches: &ArgMatches<'_>) -> Result<(), Error> {
+pub fn no_command(_matches: &ArgMatches) -> Result<(), Error> {
     let face = "(ಠ_ಠ)";
     println!("{}", lformat!("{} that's not a command", face));
     Ok(())
 }
 
-pub fn no_shell(_matches: &ArgMatches<'_>) -> Result<(), Error> {
+pub fn no_shell(_matches: &ArgMatches) -> Result<(), Error> {
     let face = "(ಠ_ಠ)";
     println!("{}", lformat!("what do you think this is, a shell? {}", face));
     Ok(())
@@ -58,7 +58,7 @@ pub fn no_shell(_matches: &ArgMatches<'_>) -> Result<(), Error> {
 
 /// Create NEW Project
 // #[deprecated(note="move to asciii::actions")]
-pub fn new(matches: &ArgMatches<'_>) -> Result<(), Error> {
+pub fn new(matches: &ArgMatches) -> Result<(), Error> {
     let project_name = matches.value_of("name").expect("You did not pass a \"Name\"!");
     let editor = CONFIG.get("user/editor").and_then(Yaml::as_str);
 
@@ -103,12 +103,12 @@ pub fn new(matches: &ArgMatches<'_>) -> Result<(), Error> {
     Ok(())
 }
 
-fn matches_to_selection(matches: &ArgMatches<'_>) -> StorageSelection {
+fn matches_to_selection(matches: &ArgMatches) -> StorageSelection {
     let (search_terms, dir) = matches_to_search(matches);
     StorageSelection::DirAndSearch(dir, search_terms.into_iter().map(ToOwned::to_owned).collect())
 }
 
-fn matches_to_dir(matches: &ArgMatches<'_>) -> StorageDir {
+fn matches_to_dir(matches: &ArgMatches) -> StorageDir {
         if matches.is_present("archive"){
             let archive_year = matches.value_of("archive")
                                       .and_then(|y|y.parse::<i32>().ok())
@@ -132,7 +132,7 @@ fn matches_to_dir(matches: &ArgMatches<'_>) -> StorageDir {
         else { StorageDir::Working }
 }
 
-fn matches_to_search<'a>(matches: &'a ArgMatches<'_>) -> (Vec<&'a str>, StorageDir) {
+fn matches_to_search(matches: &ArgMatches) -> (Vec<&str>, StorageDir) {
     let search_terms = matches
         .values_of("search_term")
         .map(Iterator::collect)
@@ -148,7 +148,7 @@ fn matches_to_search<'a>(matches: &'a ArgMatches<'_>) -> (Vec<&'a str>, StorageD
 
 /// Produces a list of paths.
 /// This is more general than `with_projects`, as this includes templates too.
-pub fn matches_to_paths(matches: &ArgMatches<'_>, storage: &Storage<Project>) -> Result<Vec<PathBuf>, Error> {
+pub fn matches_to_paths(matches: &ArgMatches, storage: &Storage<Project>) -> Result<Vec<PathBuf>, Error> {
     let search_terms = matches.values_of("search_term")
                               .map(Iterator::collect)
                               .unwrap_or_else(Vec::new);
@@ -180,7 +180,7 @@ pub fn matches_to_paths(matches: &ArgMatches<'_>, storage: &Storage<Project>) ->
 
 
 /// Command BOOTSTRAP
-pub fn bootstrap(matches: &ArgMatches<'_>) -> Result<(), Error> {
+pub fn bootstrap(matches: &ArgMatches) -> Result<(), Error> {
 
     let repo = matches.value_of("repo").unwrap();
     let editor = matches.value_of("editor")
@@ -202,7 +202,7 @@ pub fn bootstrap(matches: &ArgMatches<'_>) -> Result<(), Error> {
 
 
 /// Command CSV
-pub fn csv(matches: &ArgMatches<'_>) -> Result<(), Error> {
+pub fn csv(matches: &ArgMatches) -> Result<(), Error> {
     let year = matches.value_of("year")
                       .and_then(|y| y.parse::<i32>().ok())
                       .unwrap_or_else(|| Local::now().year());
@@ -215,7 +215,7 @@ pub fn csv(matches: &ArgMatches<'_>) -> Result<(), Error> {
 
 
 /// Command EDIT
-pub fn edit(matches: &ArgMatches<'_>) -> Result<(), Error> {
+pub fn edit(matches: &ArgMatches) -> Result<(), Error> {
     let search_term = matches.value_of("search_term").unwrap();
     let search_terms = matches.values_of("search_term").unwrap().collect::<Vec<&str>>();
 
@@ -259,13 +259,13 @@ fn edit_projects(dir: StorageDir, search_terms: &[&str], editor: Option<&str>) -
 
 /// Command META
 #[cfg(not(feature = "meta"))]
-pub fn meta(_matches: &ArgMatches<'_>) -> Result<(), Error> {
+pub fn meta(_matches: &ArgMatches) -> Result<(), Error> {
     bail!(format_err!("Meta functionality not built-in with this release!"));
 }
 
 /// Command META
 #[cfg(feature = "meta")]
-pub fn meta(matches: &ArgMatches<'_>) -> Result<(), Error> {
+pub fn meta(matches: &ArgMatches) -> Result<(), Error> {
     let storage = setup::<Project>()?;
     log::trace!("meta --> {:#?}", matches);
     if let Some(matches) = matches.subcommand_matches("edit") {
@@ -292,7 +292,7 @@ pub fn meta(matches: &ArgMatches<'_>) -> Result<(), Error> {
 }
 
 /// Command WORKSPACE
-pub fn workspace(matches: &ArgMatches<'_>) -> Result<(), Error> {
+pub fn workspace(matches: &ArgMatches) -> Result<(), Error> {
     println!("{:?}", matches);
     let storage = setup::<Project>()?;
 
@@ -316,7 +316,7 @@ pub fn with_templates<F>(name: &str, action: F) -> Result<(), Error>
 }
 
 /// Command SET
-pub fn set(m: &ArgMatches<'_>) -> Result<(), Error> {
+pub fn set(m: &ArgMatches) -> Result<(), Error> {
     let field = m.value_of("field name")
                             .unwrap()
                             .chars()
@@ -343,7 +343,7 @@ pub fn set(m: &ArgMatches<'_>) -> Result<(), Error> {
 
 
 /// Command INVOICE
-pub fn invoice(m: &ArgMatches<'_>) -> Result<(), Error> {
+pub fn invoice(m: &ArgMatches) -> Result<(), Error> {
     let storage = setup::<Project>()?;
     let dir = StorageDir::Year(Utc::today().year());
     let projects = storage.open_projects(dir)?;
@@ -375,7 +375,7 @@ pub fn invoice(m: &ArgMatches<'_>) -> Result<(), Error> {
 
 
 /// Command CALENDAR
-pub fn calendar(matches: &ArgMatches<'_>) -> Result<(), Error> {
+pub fn calendar(matches: &ArgMatches) -> Result<(), Error> {
     let calendar = actions::calendar_with_tasks(matches_to_dir(matches), matches.is_present("tasks"))?;
     println!("{}", calendar);
     Ok(())
@@ -386,7 +386,7 @@ pub fn calendar(matches: &ArgMatches<'_>) -> Result<(), Error> {
 /// Command SPEC
 /// TODO: make this not panic :D
 /// TODO: move this to `spec::all_the_things`
-pub fn spec(_: &ArgMatches<'_>) -> Result<(), Error> {
+pub fn spec(_: &ArgMatches) -> Result<(), Error> {
     actions::spec()?;
     Ok(())
 }
@@ -396,7 +396,7 @@ pub fn spec(_: &ArgMatches<'_>) -> Result<(), Error> {
 use self::document_export::ExportConfig;
 
 #[cfg(feature="document_export")]
-fn infer_bill_type(m: &ArgMatches<'_>) -> Option<BillType> {
+fn infer_bill_type(m: &ArgMatches) -> Option<BillType> {
     match (m.is_present("offer"), m.is_present("invoice")) {
         (true, true)   => unreachable!("this should have been prevented by clap-rs"),
         (true, false)  => Some(BillType::Offer),
@@ -406,7 +406,7 @@ fn infer_bill_type(m: &ArgMatches<'_>) -> Option<BillType> {
 }
 
 #[cfg(feature="document_export")]
-fn matches_to_export_config<'a>(m: &'a ArgMatches<'_>) -> Option<ExportConfig<'a>> {
+fn matches_to_export_config(m: &ArgMatches) -> Option<ExportConfig> {
 
     let template_name = m.value_of("template")
                          .or_else(||CONFIG.get("document_export/default_template").and_then(Yaml::as_str))
@@ -447,7 +447,7 @@ fn matches_to_export_config<'a>(m: &'a ArgMatches<'_>) -> Option<ExportConfig<'a
 
 /// Command MAKE
 #[cfg(feature="document_export")]
-pub fn make(m: &ArgMatches<'_>) -> Result<(), Error> {
+pub fn make(m: &ArgMatches) -> Result<(), Error> {
     log::debug!("{:?}", m);
     if let Some(ref config) = matches_to_export_config(m) {
         document_export::projects_to_doc(config)?; // TODO: if-let this TODO should return Result
@@ -460,7 +460,7 @@ pub fn make(m: &ArgMatches<'_>) -> Result<(), Error> {
 
 
 /// Command DELETE
-pub fn delete(m: &ArgMatches<'_>) -> Result<(), Error> {
+pub fn delete(m: &ArgMatches) -> Result<(), Error> {
     let (search_terms, dir) = matches_to_search(m);
     if m.is_present("template") {
         unimplemented!();
@@ -483,7 +483,7 @@ pub fn make(_: &ArgMatches) -> Result<(), Error> {
 
 
 /// TODO: make this be have like `edit`, taking multiple names
-pub fn archive(matches: &ArgMatches<'_>) -> Result<(), Error> {
+pub fn archive(matches: &ArgMatches) -> Result<(), Error> {
     if let Some(search_terms) = matches.values_of("search terms"){
         let search_terms = search_terms.collect::<Vec<_>>();
         let year = matches.value_of("year").and_then(|s| s.parse::<i32>().ok());
@@ -499,7 +499,7 @@ pub fn archive(matches: &ArgMatches<'_>) -> Result<(), Error> {
     Ok(())
 }
 
-pub fn unarchive(matches: &ArgMatches<'_>) -> Result<(), Error> {
+pub fn unarchive(matches: &ArgMatches) -> Result<(), Error> {
     let year = matches.value_of("year").unwrap();
     let year = year.parse::<i32>()
         .unwrap_or_else(|e| panic!("can't parse year {:?}, {:?}", year, e));
@@ -509,7 +509,7 @@ pub fn unarchive(matches: &ArgMatches<'_>) -> Result<(), Error> {
     Ok(())
 }
 
-pub fn config(matches: &ArgMatches<'_>) -> Result<(), Error> {
+pub fn config(matches: &ArgMatches) -> Result<(), Error> {
     let editor = matches.value_of("editor")
                         .or_else(|| CONFIG.get("user.editor")
                                   .and_then(Yaml::as_str));
@@ -630,7 +630,7 @@ pub fn web() -> Result<(), Error> {
 }
 
 /// Command VERSION
-pub fn version(matches: &ArgMatches<'_>) -> Result<(), Error> {
+pub fn version(matches: &ArgMatches) -> Result<(), Error> {
     if matches.is_present("verbose") {
         println!("{}", *asciii::VERSION_VERBOSE);
     } else if matches.is_present("json") {
@@ -642,7 +642,7 @@ pub fn version(matches: &ArgMatches<'_>) -> Result<(), Error> {
 }
 
 /// Command DUES
-pub fn dues(matches: &ArgMatches<'_>) -> Result<(), Error> {
+pub fn dues(matches: &ArgMatches) -> Result<(), Error> {
     let dues = actions::dues();
     if let Ok(dues) = dues {
         println!("Open Payments: {}", dues.acc_sum_sold.postfix());
@@ -657,7 +657,7 @@ pub fn dues(matches: &ArgMatches<'_>) -> Result<(), Error> {
 }
 
 // pub fn open_path(matches:&ArgMatches){path(matches, |path| {open::that(path).unwrap();})}
-pub fn open_path(m: &ArgMatches<'_>) -> Result<(), Error> {
+pub fn open_path(m: &ArgMatches) -> Result<(), Error> {
     path(m, |path| {
         log::debug!("opening {:?}", path);
         open::that(path).map(|_| ())?;
@@ -667,7 +667,7 @@ pub fn open_path(m: &ArgMatches<'_>) -> Result<(), Error> {
 }
 
 /// Command PATH
-pub fn path<F>(m: &ArgMatches<'_>, action: F) -> Result<(), Error>
+pub fn path<F>(m: &ArgMatches, action: F) -> Result<(), Error>
     where F: Fn(&Path) -> Result<(), Error>
 {
 
@@ -742,12 +742,12 @@ pub fn path<F>(m: &ArgMatches<'_>, action: F) -> Result<(), Error>
 }
 
 #[cfg(feature="shell")]
-pub fn shell(_matches: &ArgMatches<'_>) -> Result<(), Error> {
+pub fn shell(_matches: &ArgMatches) -> Result<(), Error> {
     shell::launch_shell()
 }
 
 #[cfg(not(feature="shell"))]
-pub fn shell(_matches: &ArgMatches<'_>) -> Result<(), Error> {
+pub fn shell(_matches: &ArgMatches) -> Result<(), Error> {
     bail!(format_err!("Shell functionality not built-in with this release!"));
 }
 

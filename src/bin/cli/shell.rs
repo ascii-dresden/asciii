@@ -6,7 +6,7 @@ use rustyline::Result as LineResult;
 use asciii::CONFIG;
 
 use std::collections::BTreeSet;
-use clap::App;
+use clap::Command;
 use anyhow::Error;
 use super::app::with_cli;
 
@@ -17,10 +17,10 @@ struct ClapCompleter{
 }
 
 impl ClapCompleter {
-    pub fn from_app(app:&App<'_, '_>) -> Self {
+    pub fn from_app(app: &Command) -> Self {
         ClapCompleter {
             commands:
-                app.p.subcommands.iter()
+                app.get_subcommands()
                 .map(|s|s.get_name().to_owned())
                 .collect::<Vec<_>>()
         }
@@ -95,7 +95,7 @@ pub fn launch_shell() -> Result<(), Error> {
                 log::debug!("shell: {} -> {:?}", line, argv);
                 match app.get_matches_from_safe_borrow(argv) {
                     Ok(matches) => super::match_matches(&matches),
-                    Err(e) => println!("{}", e.message)
+                    Err(e) => println!("{}", e)
                 }
 
             },
