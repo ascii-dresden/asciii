@@ -235,7 +235,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     log::info!("running asciii-web");
     log::warn!("do not host this on a public server, there is no security by design");
 
-    let sys = actix::System::new("signaler");
+    let sys = actix::System::new();
 
     let server =
         || {
