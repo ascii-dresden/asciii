@@ -1,4 +1,7 @@
-use rustyline::{completion, error::ReadlineError, Editor, Result as LineResult};
+use rustyline::{
+    completion, error::ReadlineError, history::DefaultHistory, Context, Editor, Helper, Highlighter, Hinter,
+    Result as LineResult, Validator,
+};
 
 use asciii::CONFIG;
 
@@ -9,6 +12,7 @@ use std::collections::BTreeSet;
 
 static ESCAPE_CHAR: Option<char> = Some('\\');
 
+#[derive(Hinter, Helper, Validator, Highlighter)]
 struct ClapCompleter {
     commands: Vec<String>,
 }
@@ -34,9 +38,11 @@ impl ClapCompleter {
 }
 
 impl completion::Completer for ClapCompleter {
-    fn complete(&self, line: &str, pos: usize) -> LineResult<(usize, Vec<String>)> {
+    type Candidate = String;
+
+    fn complete(&self, line: &str, pos: usize, _ctx: &Context<'_>) -> LineResult<(usize, Vec<String>)> {
         let break_chars = BTreeSet::new();
-        let (start, path) = completion::extract_word(line, pos, &break_chars);
+        let (start, path) = completion::extract_word(line, pos, None, |_| false);
         //let path = completion::unescape(path, ESCAPE_CHAR);
         let matches = self.naive_complete(path, ESCAPE_CHAR, &break_chars)?;
         Ok((start, matches))
@@ -47,10 +53,10 @@ pub fn launch_shell() -> Result<(), Error> {
     with_cli(|mut app| {
         //let file_compl = FilenameCompleter::new();
         let clap_compl = ClapCompleter::from_app(&app);
-        let mut rl = Editor::new();
+        let mut rl: Editor<ClapCompleter, DefaultHistory> = Editor::new().unwrap();
 
         //rl.set_completer(Some(file_compl));
-        rl.set_completer(Some(clap_compl));
+        rl.set_helper(Some(clap_compl));
         //if rl.load_history("history.txt").is_err() { log::debug!("No previous shell history."); }
 
         let exit_cmds = ["exit", "quit", "stop", "kill", "halt"];
@@ -70,7 +76,9 @@ pub fn launch_shell() -> Result<(), Error> {
             let readline = rl.readline(&ps1);
             match readline {
                 Ok(line) => {
-                    rl.add_history_entry(line.as_ref());
+                    if let Err(error) = rl.add_history_entry(&line) {
+                        log::warn!("failed to add history entry to shell {error}");
+                    }
 
                     if exit_cmds.contains(&line.trim()) {
                         break;
