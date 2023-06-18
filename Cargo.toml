@@ -28,11 +28,7 @@ include = [
     "tests/**/*.rs",
     "webapp/public/*",
 ]
-exclude = [
-    "*.pdf",
-    "webapp/**/*",
-    "pkg"
-]
+exclude = ["*.pdf", "webapp/**/*", "pkg"]
 
 [dependencies]
 log = "0.4"
@@ -42,16 +38,16 @@ chrono = "0.4"
 regex = "1.4"
 lazy_static = "1.4"
 maplit = "1.0"
-clap = { version = "3", features = ["cargo"]}
+clap = { version = "3", features = ["cargo"] }
 clap_complete = "3"
 enum_derive = "0.1"
 custom_derive = "0.1"
 open = "2"
 crowbook-intl-runtime = "0.1"
-rayon = {version ="1.5", optional = true}
+rayon = { version = "1.5", optional = true }
 itertools = "0.10"
-rustyline = {version = "1.0.0", optional = true }
-linked-hash-map = {version = "0.5", features = ["serde_impl"]}
+rustyline = { version = "1.0.0", optional = true }
+linked-hash-map = { version = "0.5", features = ["serde_impl"] }
 dirs = "4.0"
 term = "0.7"
 thiserror = "1.0"
@@ -62,7 +58,7 @@ actix-web = { version = "2.0", optional = true }
 actix-files = { version = "0.2", optional = true }
 actix-web-actors = { version = "2.0", optional = true }
 
-bill = {version= "0.4", features=["serialization"]}
+bill = { version = "0.4", features = ["serialization"] }
 icalendar = "0.10"
 
 slug = "0.1"
@@ -73,48 +69,67 @@ term_size = "0.3"
 prettytable-rs = { default-features = false, version = "0.10" }
 
 # feature: document_export
-handlebars = {version = "2.0", optional = true}
+handlebars = { version = "2.0", optional = true }
 
-serde         = {version = "1.0", optional = true}
-serde_json    = {version = "1.0", optional = true}
-serde_yaml    = {version = "0.9", optional = true}
-serde_derive  = {version = "1.0", optional = true}
-ordered-float = {version = "3", optional = true}
-num-traits    = {version = "0.2", optional = true}
-toml          = "0.7"
+serde = { version = "1.0", optional = true }
+serde_json = { version = "1.0", optional = true }
+serde_yaml = { version = "0.9", optional = true }
+serde_derive = { version = "1.0", optional = true }
+ordered-float = { version = "3", optional = true }
+num-traits = { version = "0.2", optional = true }
+toml = "0.7"
 
 # feature: git_statuses
-git2 = {version = "0.16", default-features = false, optional = true}
+git2 = { version = "0.16", default-features = false, optional = true }
 color-backtrace = "0.5"
 
 [dev-dependencies]
 pretty_assertions = "1.0"
 
 [features]
-default = ["cli", "document_export", "git_statuses", "serialization", "deserialization", "server", "shell", "localize"]
-travis_compatible = ["cli", "document_export", "git_statuses", "serialization", "deserialization", "shell", "meta", "version_string", "par_open"]
+default = [
+    "cli",
+    "document_export",
+    "git_statuses",
+    "serialization",
+    "deserialization",
+    "server",
+    "shell",
+    "localize",
+]
+travis_compatible = [
+    "cli",
+    "document_export",
+    "git_statuses",
+    "serialization",
+    "deserialization",
+    "shell",
+    "meta",
+    "version_string",
+    "par_open",
+]
 mini_tool = ["cli", "document_export"]
 full_tool = ["travis_compatible", "localize"]
-server= ["actix", "actix-files", "actix-web", "actix-web-actors"]
+server = ["actix", "actix-files", "actix-web", "actix-web-actors"]
 webapp = ["server"]
 
 document_export = ["handlebars", "serialization"]
 serde_base = ["serde", "serde_derive"]
 serialization = ["serde_base", "serde_json"]
-deserialization = ["serde_base","serde_yaml", "ordered-float", "num-traits"]
+deserialization = ["serde_base", "serde_yaml", "ordered-float", "num-traits"]
 
-meta = [ "serialization", "deserialization" ]
+meta = ["serialization", "deserialization"]
 git_statuses = ["git2"]
 shell = ["rustyline"]
 version_string = []
 localize = []
-cli= []
+cli = []
 nightly = []
 par_open = ["rayon"]
 manual = []
 
 [profile.release]
-opt-level = 'z'  # Optimize for size.
+opt-level = 'z'   # Optimize for size.
 lto = true
 codegen-units = 1
 panic = 'abort'
