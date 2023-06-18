@@ -1,14 +1,16 @@
-use clap::{AppSettings, Arg, ArgGroup, ArgMatches, Command, SubCommand};
-use clap_complete::Shell;
-use anyhow::{Error, format_err};
-use super::subcommands;
 use std::str::FromStr;
 
+use super::subcommands;
+use anyhow::{format_err, Error};
+use clap::{AppSettings, Arg, ArgGroup, ArgMatches, Command, SubCommand};
+use clap_complete::Shell;
+
 #[allow(clippy::cognitive_complexity)]
+#[rustfmt::skip]
 pub fn with_cli<F> (app_handler:F) where F: Fn(Command) {
     app_handler(
         Command::new("asciii")
-            .author(crate_authors!())
+            .author(clap::crate_authors!())
             .version(asciii::VERSION.as_ref())
             .about(lformat!("The ascii invoicer III").as_ref())
             .settings(&[AppSettings::SubcommandRequiredElseHelp,AppSettings::ColoredHelp,AppSettings::DeriveDisplayOrder])
@@ -946,6 +948,7 @@ pub fn with_cli<F> (app_handler:F) where F: Fn(Command) {
 }
 
 /// Starting point for handling commandline matches
+#[rustfmt::skip]
 pub fn match_matches(matches: &ArgMatches) {
     let res = match matches.subcommand() {
      Some(("bootstrap", sub_m)) => subcommands::bootstrap(sub_m),
@@ -1005,10 +1008,10 @@ pub fn match_matches(matches: &ArgMatches) {
     }
 }
 
-pub fn generate_completions(matches: &ArgMatches) -> Result<(), Error>{
-    if let Some(shell) = matches.value_of("shell").and_then(|s|Shell::from_str(s).ok()) {
+pub fn generate_completions(matches: &ArgMatches) -> Result<(), Error> {
+    if let Some(shell) = matches.value_of("shell").and_then(|s| Shell::from_str(s).ok()) {
         // with_cli(|mut app| app.gen_completions("asciii", shell, ".") );
-        with_cli(|mut command| clap_complete::generate(shell, &mut command, "asciii", &mut std::io::stdout()) );
+        with_cli(|mut command| clap_complete::generate(shell, &mut command, "asciii", &mut std::io::stdout()));
     } else {
         log::error!("{}", lformat!("please specify either bash, zsh, fish or powershell"));
     }
@@ -1021,7 +1024,7 @@ pub mod validators {
     pub fn is_dmy(val: &str) -> Result<(), String> {
         match parse_dmy_date(val) {
             Some(_) => Ok(()),
-            None => Err(lformat!("Date Format must be DD.MM.YYYY")),
+            None => Err(lformat!("Date Format must be DD.MM.YYYY"))
         }
     }
 }

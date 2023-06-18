@@ -1,5 +1,4 @@
 use chrono::prelude::*;
-#[allow(unused_imports)]
 use yaml_rust::{Yaml, yaml::Hash as YamlHash};
 
 use crate::util::yaml::{parse_dmy_date, parse_dmy_date_range};

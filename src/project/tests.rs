@@ -1,8 +1,5 @@
-#![allow(unused_imports, dead_code)]
 use std::path::Path;
-use crate::project::spec::*;
-use crate::project::Project;
-use crate::storage::Storable;
+use crate::{project::{spec::*, Project}, storage::Storable};
 
 fn parse_project(yaml: &str) -> Project{
   Project::from_file_content(yaml).unwrap()

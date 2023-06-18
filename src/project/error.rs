@@ -1,19 +1,15 @@
 #![allow(missing_docs)]
 
-use thiserror::Error;
+use super::yaml_provider::error::{FieldError, FieldResult};
 
-use super::yaml_provider::error::{FieldResult, FieldError};
-
-#[derive(Error, Debug)]
+#[derive(thiserror::Error, Debug)]
 pub enum ProjectError {
-
     #[error("This feature is not enabled in this build")]
     FeatureDeactivated,
 
     #[error("Cannot determine target file name")]
     CantDetermineTargetFile,
 }
-
 
 /// Result of validating part of a project.
 ///
@@ -29,7 +25,7 @@ pub struct ValidationResult {
     pub validation_errors: Vec<String>,
 
     /// soft error messages (incomplete data)
-    pub missing_fields: Vec<String>
+    pub missing_fields: Vec<String>,
 }
 
 impl ValidationResult {
@@ -71,6 +67,4 @@ impl ValidationResult {
         self.validation_errors.extend(next.validation_errors);
         self
     }
-
 }
-

@@ -1,10 +1,8 @@
 use bill::{Bill, ItemList, Tax};
-use crate::util::currency_to_string;
 
-use crate::storage::storable::Storable;
-use crate::project::Project;
-use super::spec::*;
-use super::computed_field::ComputedField;
+use crate::{project::Project, storage::storable::Storable, util::currency_to_string};
+
+use super::{computed_field::ComputedField, spec::*};
 
 pub trait ExportTarget<T> {
     fn export(&self) -> T;
@@ -63,7 +61,6 @@ impl ExportTarget<Event> for Project {
     }
 }
 
-
 #[derive(Debug, PartialEq)]
 #[cfg_attr(feature = "serialization", derive(Serialize))]
 pub struct Service {
@@ -74,7 +71,6 @@ pub struct Service {
     net_total: Option<String>,
     employees: Option<Vec<Employee>>,
 }
-
 
 #[derive(Debug, PartialEq)]
 #[cfg_attr(feature = "serialization", derive(Serialize))]
@@ -90,32 +86,27 @@ fn export_employee(e: &crate::project::spec::Employee) -> Employee {
     Employee {
         name: e.name.clone(),
         time: e.time,
-        salary:  e.salary.postfix().to_string(),
-        wage:  e.wage.postfix().to_string(),
+        salary: e.salary.postfix().to_string(),
+        wage: e.wage.postfix().to_string(),
     }
 }
 
 impl ExportTarget<Service> for Project {
     fn export(&self) -> Service {
         Service {
-            time:         self.hours().total_time(),
-            tax:          self.hours().tax().ok().map(|t|t.value()),
-            salary:       self.hours().salary().ok()
-                                      .map(|s| s.postfix().to_string()),
-            gross_total:  self.hours().gross_wages()
-                                      .map(|s| s.postfix().to_string()),
-            net_total:    self.hours().net_wages()
-                                      .map(|s| s.postfix().to_string()),
-            employees:    self.hours().employees().ok()
-                                      .map(|employees|
-                                           employees.iter()
-                                                .map(export_employee)
-                                                .collect()
-                                      )
+            time: self.hours().total_time(),
+            tax: self.hours().tax().ok().map(|t| t.value()),
+            salary: self.hours().salary().ok().map(|s| s.postfix().to_string()),
+            gross_total: self.hours().gross_wages().map(|s| s.postfix().to_string()),
+            net_total: self.hours().net_wages().map(|s| s.postfix().to_string()),
+            employees: self
+                .hours()
+                .employees()
+                .ok()
+                .map(|employees| employees.iter().map(export_employee).collect()),
         }
     }
 }
-
 
 #[derive(Debug, PartialEq)]
 #[cfg_attr(feature = "serialization", derive(Serialize))]
@@ -158,7 +149,6 @@ pub struct Offer {
     gross_total: String,
 }
 
-
 impl ExportTarget<Offer> for Project {
     fn export(&self) -> Offer {
         let (offer, _) = self.bills().unwrap();
@@ -184,7 +174,6 @@ pub struct Invoice {
     net_total: String,
     gross_total: String,
 }
-
 
 impl ExportTarget<Invoice> for Project {
     fn export(&self) -> Invoice {
@@ -216,16 +205,14 @@ pub struct ExportProduct {
 fn bill_products(bill: &Bill<Product<'_>>) -> Vec<ExportProduct> {
     bill.as_items_with_tax()
         .into_iter()
-        .map(|(tax, item)| {
-        ExportProduct {
+        .map(|(tax, item)| ExportProduct {
             name: item.product.name.to_string(),
             price: currency_to_string(&item.product.price),
             unit: item.product.unit.unwrap_or("").to_string(),
             amount: item.amount,
             cost: currency_to_string(&item.gross()),
             tax: tax.value(),
-        }
-    })
+        })
         .collect()
 }
 
@@ -235,7 +222,6 @@ pub struct Bills {
     pub offer: Vec<ExportProduct>,
     pub invoice: Vec<ExportProduct>,
 }
-
 
 impl ExportTarget<Bills> for Project {
     fn export(&self) -> Bills {
@@ -261,7 +247,6 @@ pub struct Complete {
     errors: Errors,
     extras: Extras,
 }
-
 
 impl ExportTarget<Complete> for Project {
     fn export(&self) -> Complete {
@@ -307,16 +292,15 @@ impl ExportTarget<Checks> for Project {
 #[derive(Debug, Eq, PartialEq)]
 #[cfg_attr(feature = "serialization", derive(Serialize))]
 pub struct Errors {
-    missing_for_offer:   Vec<String>,
+    missing_for_offer: Vec<String>,
     missing_for_invoice: Vec<String>,
     ready_for_archive: Vec<String>,
 }
 
-
 impl ExportTarget<Errors> for Project {
     fn export(&self) -> Errors {
         Errors {
-            missing_for_offer:   self.is_missing_for_offer(),
+            missing_for_offer: self.is_missing_for_offer(),
             missing_for_invoice: self.is_missing_for_invoice(),
             ready_for_archive: self.is_ready_for_archive(),
         }

@@ -1,13 +1,12 @@
-use clap::ArgMatches;
 use anyhow::Error;
+use clap::ArgMatches;
 
-use asciii::print;
-use asciii::storage::*;
-//use asciii::storage::error::*;
-
-use asciii::project::{BillType, Project};
-use asciii::project::spec::HasEvents;
-use asciii::templater::Templater;
+use asciii::{
+    print,
+    project::{spec::HasEvents, BillType, Project},
+    storage::*,
+    templater::Templater,
+};
 
 use super::{matches_to_search, matches_to_selection};
 
@@ -71,7 +70,6 @@ fn print_spec_result(label: &str, result: &[String]) {
     }
 }
 
-
 fn show_errors(selection: StorageSelection) -> Result<(), Error> {
     for p in setup::<Project>()?.open_projects(selection)? {
         println!("{}: ", p.short_desc());
@@ -88,7 +86,6 @@ fn show_empty_fields(selection: StorageSelection) -> Result<(), Error> {
     }
     Ok(())
 }
-
 
 fn show_json(selection: StorageSelection) -> Result<(), Error> {
     for p in setup::<Project>()?.open_projects(selection)? {
@@ -113,9 +110,11 @@ fn show_ical(selection: StorageSelection) -> Result<(), Error> {
 
 fn show_detail(selection: &StorageSelection, detail: &str) -> Result<(), Error> {
     for p in setup::<Project>()?.open_projects(selection.clone())? {
-        println!("{}",
-                 p.field(detail)
-                  .unwrap_or_else(|| format!("No {:?} found", selection)))
+        println!(
+            "{}",
+            p.field(detail)
+                .unwrap_or_else(|| format!("No {selection:?} found"))
+        )
     }
     Ok(())
 }

@@ -1,36 +1,35 @@
-use rustyline::completion;
-use rustyline::error::ReadlineError;
-use rustyline::Editor;
-use rustyline::Result as LineResult;
+use rustyline::{completion, error::ReadlineError, Editor, Result as LineResult};
 
 use asciii::CONFIG;
 
-use std::collections::BTreeSet;
-use clap::Command;
-use anyhow::Error;
 use super::app::with_cli;
+use anyhow::Error;
+use clap::Command;
+use std::collections::BTreeSet;
 
 static ESCAPE_CHAR: Option<char> = Some('\\');
 
-struct ClapCompleter{
+struct ClapCompleter {
     commands: Vec<String>
 }
 
 impl ClapCompleter {
     pub fn from_app(app: &Command) -> Self {
         ClapCompleter {
-            commands:
-                app.get_subcommands()
-                .map(|s|s.get_name().to_owned())
+            commands: app
+                .get_subcommands()
+                .map(|s| s.get_name().to_owned())
                 .collect::<Vec<_>>()
         }
     }
 
-    pub fn naive_complete(&self, start: &str, _esc_char: Option<char>, _break_chars: &BTreeSet<char>) -> LineResult<Vec<String>> {
-        Ok(self.commands.iter()
-                        .filter(|s|s.starts_with(start))
-                        .cloned()
-                        .collect())
+    pub fn naive_complete(
+        &self,
+        start: &str,
+        _esc_char: Option<char>,
+        _break_chars: &BTreeSet<char>
+    ) -> LineResult<Vec<String>> {
+        Ok(self.commands.iter().filter(|s| s.starts_with(start)).cloned().collect())
     }
 }
 
@@ -45,75 +44,72 @@ impl completion::Completer for ClapCompleter {
 }
 
 pub fn launch_shell() -> Result<(), Error> {
+    with_cli(|mut app| {
+        //let file_compl = FilenameCompleter::new();
+        let clap_compl = ClapCompleter::from_app(&app);
+        let mut rl = Editor::new();
 
-    with_cli( |mut app| {
+        //rl.set_completer(Some(file_compl));
+        rl.set_completer(Some(clap_compl));
+        //if rl.load_history("history.txt").is_err() { log::debug!("No previous shell history."); }
 
+        let exit_cmds = ["exit", "quit", "stop", "kill", "halt"];
 
-    //let file_compl = FilenameCompleter::new();
-    let clap_compl = ClapCompleter::from_app(&app);
-    let mut rl = Editor::new();
+        let username = CONFIG
+            .get_str_or("user.name")
+            .and_then(|full_name| full_name.split_whitespace().next())
+            .map(str::to_lowercase);
+        let shell_key = "asciii > ";
+        let ps1 = if let Some(username) = username {
+            format!("{}@{}", username, shell_key)
+        } else {
+            String::from(shell_key)
+        };
 
-    //rl.set_completer(Some(file_compl));
-    rl.set_completer(Some(clap_compl));
-    //if rl.load_history("history.txt").is_err() { log::debug!("No previous shell history."); }
+        loop {
+            let readline = rl.readline(&ps1);
+            match readline {
+                Ok(line) => {
+                    rl.add_history_entry(line.as_ref());
 
-    let exit_cmds = ["exit", "quit", "stop", "kill", "halt"];
+                    if exit_cmds.contains(&line.trim()) {
+                        break;
+                    }
 
-    let username = CONFIG.get_str_or("user.name")
-                         .and_then(|full_name| full_name.split_whitespace().next())
-                         .map(str::to_lowercase);
-    let shell_key = "asciii > ";
-    let ps1 = if let Some(username) = username {
-        format!("{}@{}", username, shell_key)
-    } else {
-        String::from(shell_key)
-    };
+                    if line.trim().is_empty() {
+                        continue;
+                    }
 
-    loop {
-        let readline = rl.readline(&ps1);
-        match readline {
-            Ok(line) => {
-                rl.add_history_entry(line.as_ref());
+                    // this operators are not allowed
+                    if line.contains('>') || line.contains('>') || line.contains('|') {
+                        log::error!("What do you think this is? A shell?");
+                    }
 
-                if exit_cmds.contains(&line.trim()){
-                    break
+                    let mut argv: Vec<_> = line.trim().split(' ').collect();
+
+                    // you have to insert the binary name since clap expects it
+                    argv.insert(0, "prog");
+                    log::debug!("shell: {} -> {:?}", line, argv);
+                    match app.get_matches_from_safe_borrow(argv) {
+                        Ok(matches) => super::match_matches(&matches),
+                        Err(e) => println!("{}", e)
+                    }
+                },
+                Err(ReadlineError::Interrupted) => {
+                    //println!("CTRL-C");
+                    break;
+                },
+                Err(ReadlineError::Eof) => {
+                    //println!("CTRL-D");
+                    break;
+                },
+                Err(err) => {
+                    log::error!("{:?}", err);
+                    break;
                 }
-
-                if line.trim().is_empty() {
-                    continue
-                }
-
-                // this operators are not allowed
-                if line.contains('>') || line.contains('>') || line.contains('|') {
-                    log::error!("What do you think this is? A shell?");
-                }
-
-                let mut argv: Vec<_> = line.trim().split(' ').collect();
-
-                // you have to insert the binary name since clap expects it
-                argv.insert(0, "prog");
-                log::debug!("shell: {} -> {:?}", line, argv);
-                match app.get_matches_from_safe_borrow(argv) {
-                    Ok(matches) => super::match_matches(&matches),
-                    Err(e) => println!("{}", e)
-                }
-
-            },
-            Err(ReadlineError::Interrupted) => {
-                //println!("CTRL-C");
-                break
-            },
-            Err(ReadlineError::Eof) => {
-                //println!("CTRL-D");
-                break
-            },
-            Err(err) => {
-                log::error!("{:?}", err);
-                break
             }
         }
-    }
-    //rl.save_history("history.txt").unwrap();
+        //rl.save_history("history.txt").unwrap();
     });
     Ok(())
 }

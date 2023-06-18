@@ -1,8 +1,6 @@
-use thiserror::Error;
-
 use std::path::PathBuf;
 
-#[derive(Error, Debug)]
+#[derive(thiserror::Error, Debug)]
 pub enum ExportError {
     #[error("No PDF Created")]
     NoPdfCreated,

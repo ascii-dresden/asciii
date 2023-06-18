@@ -3,22 +3,27 @@
 //! Looks for `DEFAULT_LOCATION` and patches unset fields from `DEFAULT_CONFIG`
 //!
 
-#![warn(missing_docs,
-        missing_copy_implementations,
-        trivial_casts, trivial_numeric_casts,
-        unsafe_code,
-        unstable_features,
-        unused_import_braces, unused_qualifications)]
+#![warn(
+    missing_docs,
+    missing_copy_implementations,
+    trivial_casts,
+    trivial_numeric_casts,
+    unsafe_code,
+    unstable_features,
+    unused_import_braces,
+    unused_qualifications
+)]
 //#![warn(missing_debug_implementations)]
 
+use std::{
+    env::{self, current_dir},
+    path::{Path, PathBuf}
+};
 
-use std::env::{self, current_dir};
-use std::path::{Path, PathBuf};
-
-#[cfg(not(target_arch = "wasm32"))]
-use dirs::home_dir;
 #[cfg(target_arch = "wasm32")]
 use crate::util::dirs::home_dir;
+#[cfg(not(target_arch = "wasm32"))]
+use dirs::home_dir;
 
 use crate::util::yaml::{self, Yaml};
 
@@ -51,11 +56,11 @@ impl ConfigReader {
         let local_path = Path::new(DEFAULT_LOCATION);
 
         let config = Ok(ConfigReader {
-                            path: home_path.to_owned(),
-                            defaults: yaml::parse(DEFAULT_CONFIG)?,
-                            custom: yaml::open(&home_path).unwrap_or(Yaml::Null),
-                            local: yaml::open(local_path).unwrap_or(Yaml::Null),
-                        });
+            path: home_path.to_owned(),
+            defaults: yaml::parse(DEFAULT_CONFIG)?,
+            custom: yaml::open(&home_path).unwrap_or(Yaml::Null),
+            local: yaml::open(local_path).unwrap_or(Yaml::Null)
+        });
 
         if !home_path.exists() {
             log::warn!("{} does not exist, falling back to defaults", home_path.display());
@@ -63,8 +68,10 @@ impl ConfigReader {
 
         if let (Some(home_dir), Ok(current_dir)) = (home_dir(), current_dir()) {
             if local_path.exists() && current_dir != home_dir {
-                log::warn!("{} exists, this overrides defaults and user settings",
-                      local_path.display())
+                log::warn!(
+                    "{} exists, this overrides defaults and user settings",
+                    local_path.display()
+                )
             }
         }
 
@@ -75,12 +82,11 @@ impl ConfigReader {
         path.split(|c| c == '/' || c == '.')
             .map(str::to_uppercase)
             .fold(String::from("ASCIII"), |mut acc, w| {
-            acc.push('_');
-            acc.push_str(&w);
-            acc
-        })
+                acc.push('_');
+                acc.push_str(&w);
+                acc
+            })
     }
-
 
     /// Looks up path in ENV
     ///
@@ -124,20 +130,22 @@ impl ConfigReader {
         yaml::get_str(&self.local, key)
             .or_else(|| yaml::get_str(&self.custom, key))
             .or_else(|| yaml::get_str(&self.defaults, key))
-            .unwrap_or_else(|| panic!("{}", format!("Config file {} in field {} does not contain a string value",
-                             DEFAULT_LOCATION,
-                             key)))
+            .unwrap_or_else(|| {
+                panic!(
+                    "{}",
+                    format!(
+                        "Config file {} in field {} does not contain a string value",
+                        DEFAULT_LOCATION, key
+                    )
+                )
+            })
     }
 
     /// Returns the a vec of &strs if possible
     pub fn get_strs(&self, key: &str) -> Option<Vec<&str>> {
         self.get(key)?
             .as_vec()
-            .map(|v| {
-                     v.iter()
-                      .filter_map(Yaml::as_str)
-                      .collect()
-                 })
+            .map(|v| v.iter().filter_map(Yaml::as_str).collect())
     }
 
     /// Returns the string in the position or an empty string
@@ -149,9 +157,15 @@ impl ConfigReader {
         yaml::get_to_string(&self.local, key)
             .or_else(|| yaml::get_to_string(&self.custom, key))
             .or_else(|| yaml::get_to_string(&self.defaults, key))
-            .unwrap_or_else(|| panic!("{}", format!("Config file {} in field {} does not contain a value",
-                             DEFAULT_LOCATION,
-                             key)))
+            .unwrap_or_else(|| {
+                panic!(
+                    "{}",
+                    format!(
+                        "Config file {} in field {} does not contain a value",
+                        DEFAULT_LOCATION, key
+                    )
+                )
+            })
     }
 
     /// Tries to get the config field as float
@@ -168,14 +182,17 @@ impl ConfigReader {
     /// This panics if nothing is found.
     /// You should have a default config for everything that you use.
     pub fn get_bool(&self, key: &str) -> bool {
-        self.get(key)
-            .and_then(Yaml::as_bool)
-            .unwrap_or_else(|| panic!("{}", format!("Config file {} in field {} does not contain a boolean value",
-                             DEFAULT_LOCATION,
-                             key)))
+        self.get(key).and_then(Yaml::as_bool).unwrap_or_else(|| {
+            panic!(
+                "{}",
+                format!(
+                    "Config file {} in field {} does not contain a boolean value",
+                    DEFAULT_LOCATION, key
+                )
+            )
+        })
     }
 }
-
 
 #[test]
 fn simple_reading() {
@@ -186,12 +203,13 @@ fn simple_reading() {
     //assert!(ConfigReader::path_home().exists());
     let config = ConfigReader::try_new().unwrap();
 
-    assert_eq!(config.get("list/colors").unwrap().as_bool().unwrap(),
-               config.get_bool("list/colors"));
+    assert_eq!(
+        config.get("list/colors").unwrap().as_bool().unwrap(),
+        config.get_bool("list/colors")
+    );
 
     assert!(config.get("dirs").is_some());
     assert!(config.get("dirs/storage").is_some());
     assert!(config.get("dirs/working").is_some());
     assert!(config.get("dirs/storage").is_some());
-
 }

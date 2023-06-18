@@ -1,8 +1,8 @@
-use clap::ArgMatches;
 use anyhow::{bail, format_err, Error};
+use clap::ArgMatches;
 
-use asciii::{storage, util};
 use asciii::project::Project;
+use asciii::{storage, util};
 
 use super::matches_to_paths;
 
@@ -63,25 +63,25 @@ pub fn git_remote() -> Result<(), Error> {
         let repo = &r.repo;
 
         for remote_name in repo.remotes().unwrap().iter() {
-
             if let Some(name) = remote_name {
-
                 if let Ok(remote) = repo.find_remote(name) {
-                    println!("{}", lformat!("{}  {} (fetch)\n{}  {} (push)",
-                    remote.name().unwrap_or("no name"),
-                    remote.url().unwrap_or("no url"),
-                    remote.name().unwrap_or("no name"),
-                    remote.pushurl().or_else(|| remote.url()).unwrap_or(""),
-                    ));
+                    println!(
+                        "{}",
+                        lformat!(
+                            "{}  {} (fetch)\n{}  {} (push)",
+                            remote.name().unwrap_or("no name"),
+                            remote.url().unwrap_or("no url"),
+                            remote.name().unwrap_or("no name"),
+                            remote.pushurl().or_else(|| remote.url()).unwrap_or(""),
+                        )
+                    );
                 } else {
                     log::error!("{}", lformat!("no remote"))
                 }
-
             } else {
                 log::error!("{}", lformat!("no remote name"))
             }
         }
-
     }
 
     Ok(())
@@ -101,18 +101,15 @@ pub fn git_add(matches: &ArgMatches) -> Result<(), Error> {
             bail!(format_err!("git add did not exit successfully"));
         }
     } else if matches.is_present("search_term") {
-
         if repo.add(&paths).success() {
             Ok(())
         } else {
             bail!(format_err!("git add did not exit successfully"));
         }
-
     } else {
         bail!(format_err!("Nothing selected"));
     }
 }
-
 
 /// Command DIFF
 pub fn git_diff(matches: &ArgMatches) -> Result<(), Error> {
@@ -173,8 +170,9 @@ pub fn git_cleanup(matches: &ArgMatches) -> Result<(), Error> {
     let repo = storage.repository().unwrap();
     // TODO: implement `.and()` for exit status
 
-    if util::really(&format!("Do you really want to reset any changes you made to:\n {:?}\n",
-                             paths)) && !(repo.checkout(&paths).success() && repo.clean(&paths).success())
+    if util::really(&format!(
+        "Do you really want to reset any changes you made to:\n {paths:?}\n",
+    )) && !(repo.checkout(&paths).success() && repo.clean(&paths).success())
     {
         bail!(format_err!("clean was not successful"));
     }

@@ -1,7 +1,6 @@
 //! Thank you for choosing `asciii`, the new and improved `ascii`.
 //!
 //!
-
 #![cfg_attr(feature = "manual", doc = include_str!("../manual.md"))]
 
 #![allow(deprecated)]

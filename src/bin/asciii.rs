@@ -1,8 +1,8 @@
 #![allow(deprecated)]
 #![allow(clippy::uninlined_format_args)]
-#[macro_use] extern crate clap;
 
-#[macro_use] pub mod localize_macros;
+#[macro_use]
+pub mod localize_macros;
 
 use std::env;
 
@@ -23,5 +23,5 @@ fn main() {
     asciii::util::setup_log();
     setup_locale();
 
-    cli::with_cli(|app| cli::match_matches(&app.get_matches()) );
+    cli::with_cli(|app| cli::match_matches(&app.get_matches()));
 }

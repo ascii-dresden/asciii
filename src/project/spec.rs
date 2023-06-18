@@ -7,18 +7,16 @@
 
 use std::fmt;
 
-use bill::{Bill, Currency, Tax};
-use chrono::{Date, Utc, NaiveTime};
 use anyhow::Error;
+use bill::{Bill, Currency, Tax};
+use chrono::{Date, NaiveTime, Utc};
 use icalendar::Calendar;
 use semver::Version;
 use yaml_rust::Yaml;
 
 use crate::storage::Storable;
-use super::error::ValidationResult;
-use super::product::Product;
-use super::yaml_provider::FieldResult;
 
+use super::{error::ValidationResult, product::Product, yaml_provider::FieldResult};
 
 /// Every other trait in this module ought to be `Validatable`
 ///
@@ -42,7 +40,6 @@ impl<T: Validatable> ValidatableExt for T {
 ///
 /// Provide the basics every Project should have.
 pub trait IsProject {
-
     /// Project Name
     fn name(&self) -> FieldResult<&str>;
 
@@ -68,13 +65,13 @@ pub trait IsProjectExt {
     fn age(&self) -> Option<i64>;
 }
 
-impl<T> IsProjectExt for T where T: Storable {
+impl<T> IsProjectExt for T
+where
+    T: Storable,
+{
     fn age(&self) -> Option<i64> {
         self.modified_date()
-            .map(|date|
-                 (Utc::today().signed_duration_since(date))
-                              .num_days()
-                )
+            .map(|date| (Utc::today().signed_duration_since(date)).num_days())
     }
 }
 
@@ -164,11 +161,10 @@ pub trait HasEmployees {
     fn tax(&self) -> FieldResult<Tax>;
 
     /// Sum of wages after tax
-    fn net_wages(&self) -> Option<Currency> ;
+    fn net_wages(&self) -> Option<Currency>;
 
     /// Sum of wages before tax
-    fn gross_wages(&self) -> Option<Currency> ;
-
+    fn gross_wages(&self) -> Option<Currency>;
 
     /// Full number of service hours
     ///
@@ -177,13 +173,11 @@ pub trait HasEmployees {
 
     /// Returns a product from Service
     fn to_product(&self) -> Option<Product<'_>> {
-        self.salary().ok().map(|s| {
-            Product {
-                name: "Service",
-                unit: Some("h"),
-                tax: self.tax().ok().unwrap_or_else(|| Tax::new(0.0)),
-                price: s,
-            }
+        self.salary().ok().map(|s| Product {
+            name: "Service",
+            unit: Some("h"),
+            tax: self.tax().ok().unwrap_or_else(|| Tax::new(0.0)),
+            price: s,
         })
     }
 
@@ -200,10 +194,8 @@ pub trait HasEmployees {
     fn wages(&self) -> Option<Currency>;
 }
 
-
 /// Stage 3: when an `IsProject` is redeem and can be archived
 pub trait Redeemable: IsProject {
-
     /// When was the project payed
     fn payed_date(&self) -> FieldResult<Date<Utc>>;
 
@@ -218,10 +210,9 @@ pub trait Redeemable: IsProject {
 
     /// Sum of sold products
     fn sum_sold(&self) -> Result<Currency, Error> {
-        let (_,invoice) = self.bills()?;
+        let (_, invoice) = self.bills()?;
         Ok(invoice.net_total())
     }
-
 }
 
 /// Holds the time of the beginning and end of an event
@@ -231,7 +222,7 @@ pub struct EventTime {
     pub start: NaiveTime,
 
     /// End of the event
-    pub end:   NaiveTime
+    pub end: NaiveTime,
 }
 
 /// Describes either the coarse begin and end date of the event
@@ -245,16 +236,22 @@ pub struct Event {
     pub end: Option<Date<Utc>>,
 
     /// Set of of times
-    pub times: Vec<EventTime>
+    pub times: Vec<EventTime>,
 }
 
 impl fmt::Display for Event {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        if let Some(end) = self.end { writeln!(f, "start: {}\nend:  {}", self.begin, end) }
-        else { writeln!(f, "start: {}", self.begin) }?;
+        if let Some(end) = self.end {
+            writeln!(f, "start: {}\nend:  {}", self.begin, end)
+        } else {
+            writeln!(f, "start: {}", self.begin)
+        }?;
         for time in &self.times {
-            if time.start == time.end { writeln!(f, " * {}", time.start) }
-            else { writeln!(f, " * {} - {}", time.start, time.end) } ?
+            if time.start == time.end {
+                writeln!(f, " * {}", time.start)
+            } else {
+                writeln!(f, " * {} - {}", time.start, time.end)
+            }?
         }
         Ok(())
     }
@@ -269,9 +266,8 @@ pub trait HasEvents {
     fn events(&self) -> Option<Vec<Event>>;
 
     /// Returns a list of `Event`s
-    fn times(&self,yaml: &Yaml) -> Option<Vec<EventTime>>;
+    fn times(&self, yaml: &Yaml) -> Option<Vec<EventTime>>;
 
     /// Returns the location of the event
     fn location(&self) -> FieldResult<&str>;
-
 }

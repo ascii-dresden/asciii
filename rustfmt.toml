@@ -1,0 +1,4 @@
+# using stable values from 1.5.2
+max_width = 120
+match_block_trailing_comma = true
+use_field_init_shorthand = true
