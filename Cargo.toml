@@ -42,13 +42,13 @@ clap = { version = "3", features = ["cargo"] }
 clap_complete = "3"
 enum_derive = "0.1"
 custom_derive = "0.1"
-open = "2"
+open = "4"
 crowbook-intl-runtime = "0.1"
 rayon = { version = "1.5", optional = true }
 itertools = "0.10"
 rustyline = { version = "1.0.0", optional = true }
 linked-hash-map = { version = "0.5", features = ["serde_impl"] }
-dirs = "4.0"
+dirs = "5"
 term = "0.7"
 thiserror = "1.0"
 anyhow = "1.0"
