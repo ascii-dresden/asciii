@@ -333,21 +333,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "actix-web-actors"
-version = "2.0.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "dc1bd41bd66c4e9b5274cec87aac30168e63d64e96fd19db38edef6b46ba2982"
-dependencies = [
- "actix",
- "actix-codec 0.2.0",
- "actix-http",
- "actix-web",
- "bytes 0.5.6",
- "futures",
- "pin-project 0.4.30",
-]
-
-[[package]]
 name = "actix-web-codegen"
 version = "0.2.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -424,7 +409,6 @@ dependencies = [
  "actix",
  "actix-files",
  "actix-web",
- "actix-web-actors",
  "anyhow",
  "bill",
  "chrono",
