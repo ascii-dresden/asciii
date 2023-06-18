@@ -45,10 +45,7 @@ fn generate_localization() {
     // Generate the `localize_macros.rs` file
     let mut localizer = Localizer::new(&extractor);
     localizer
-        .add_lang(
-            "de",
-            include_str!(concat!(env!("CARGO_MANIFEST_DIR"), "/lang/de.po")),
-        )
+        .add_lang("de", include_str!(concat!(env!("CARGO_MANIFEST_DIR"), "/lang/de.po")))
         .unwrap();
     // Use env::var instead of env! to avoid problems when cross-compiling
     let dest_path = PathBuf::from(env::var_os("OUT_DIR").unwrap()).join("localize_macros.rs");

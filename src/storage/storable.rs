@@ -32,7 +32,7 @@ pub trait Storable: Send + Sync {
     fn from_template(
         project_name: &str,
         template: &Path,
-        data: &HashMap<&str, String>
+        data: &HashMap<&str, String>,
     ) -> Result<StorableAndTempDir<Self>, Error>
     where
         Self: Sized;
@@ -114,7 +114,7 @@ pub trait Storable: Send + Sync {
 
 pub struct StorableAndTempDir<S: Storable> {
     pub storable: S,
-    pub temp_dir: TempDir
+    pub temp_dir: TempDir,
 }
 
 impl<S: Storable> Deref for StorableAndTempDir<S> {

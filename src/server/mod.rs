@@ -6,19 +6,19 @@ use linked_hash_map::LinkedHashMap;
 
 use crate::{
     project::Project,
-    storage::{self, ProjectList, Storable, Storage, StorageDir}
+    storage::{self, ProjectList, Storable, Storage, StorageDir},
 };
 
 pub struct ProjectLoader {
     pub storage: Storage<Project>,
-    pub state: State
+    pub state: State,
 }
 
 pub struct State {
     pub all: ProjectList<Project>,
     pub working: LinkedHashMap<String, Project>,
     pub mapped: LinkedHashMap<String, Project>,
-    pub years: Vec<i32>
+    pub years: Vec<i32>,
 }
 
 fn reinitialize(storage: &Storage<Project>) -> State {
@@ -43,7 +43,7 @@ fn reinitialize(storage: &Storage<Project>) -> State {
         all,
         working,
         mapped,
-        years
+        years,
     }
 }
 

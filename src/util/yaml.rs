@@ -122,7 +122,7 @@ pub fn get_to_string(yaml: &Yaml, key: &str) -> Option<String> {
         Integer(ref inner) => Some(inner.to_string()),
         Hash(ref inner) => Some(format!("{:?}", inner)),
         Array(ref inner) => Some(format!("{:?}", inner)),
-        _ => None
+        _ => None,
     })
 }
 
@@ -144,7 +144,7 @@ pub fn get<'a>(yaml: &'a Yaml, key: &str) -> Option<&'a Yaml> {
         .collect::<Vec<&str>>();
     match get_path(yaml, &path) {
         Some(&(Yaml::Null | Yaml::BadValue)) => None,
-        content => content
+        content => content,
     }
 }
 
@@ -173,7 +173,7 @@ fn get_path<'a>(yaml: &'a Yaml, path: &[&str]) -> Option<&'a Yaml> {
                     None
                 }
             },
-            _ => None
+            _ => None,
         };
     }
     None

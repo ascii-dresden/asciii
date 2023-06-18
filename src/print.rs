@@ -4,16 +4,16 @@ use chrono::prelude::*;
 use prettytable::{
     cell, color,
     format::{FormatBuilder, LinePosition, LineSeparator},
-    row, Attr, Cell, Row, Table
+    row, Attr, Cell, Row, Table,
 };
 
 use crate::{
     project::{
         spec::{HasEmployees, HasEvents, Invoicable, IsProject, Redeemable},
-        BillType, Exportable, Project
+        BillType, Exportable, Project,
     },
     storage::Storable,
-    util::currency_to_string
+    util::currency_to_string,
 };
 
 /// Configuration for this list output.
@@ -25,7 +25,7 @@ pub struct ListConfig<'a> {
     pub sort_by: &'a str,
     pub filter_by: Option<Vec<&'a str>>,
     pub use_colors: bool,
-    pub details: Option<Vec<&'a str>>
+    pub details: Option<Vec<&'a str>>,
 }
 
 #[derive(Debug, Eq, PartialEq)]
@@ -34,7 +34,7 @@ pub enum ListMode {
     Verbose,
     Nothing,
     Paths,
-    Csv
+    Csv,
 }
 
 impl<'a> Default for ListConfig<'a> {
@@ -50,7 +50,7 @@ impl<'a> Default for ListConfig<'a> {
             sort_by: crate::CONFIG.get_str("list/sort"),
             filter_by: None,
             use_colors: crate::CONFIG.get_bool("list/colors"),
-            details: None
+            details: None,
         }
     }
 }
@@ -183,7 +183,7 @@ pub fn verbose_rows(projects: &[Project], list_config: &ListConfig<'_>) -> Vec<R
             cells.push(
                 Cell::new(&status.to_string())
                     .with_style(Attr::ForegroundColor(color))
-                    .with_style(style.unwrap_or(Attr::Standout(false)))
+                    .with_style(style.unwrap_or(Attr::Standout(false))),
             );
 
             let validation1 = project.is_missing_for_offer();
@@ -219,8 +219,8 @@ pub fn verbose_rows(projects: &[Project], list_config: &ListConfig<'_>) -> Vec<R
                 result_to_cell(&validation3, false),
                 //cell!(output_file_exists(project, Project::offer_file_name)),
                 //cell!(output_file_exists(project, Project::invoice_file_name)),
-                cell!(r->project.sum_sold().map(|i|currency_to_string(&i)).unwrap_or_else(|e| format!("{}", e))) //cell!(project.wages().map(|i|i.to_string()).unwrap_or(String::from("none"))),
-                                                                                                                 //cell!(project.sum_sold_and_wages().map(|i|i.to_string()).unwrap_or(String::from("none"))),
+                cell!(r->project.sum_sold().map(|i|currency_to_string(&i)).unwrap_or_else(|e| format!("{}", e))), //cell!(project.wages().map(|i|i.to_string()).unwrap_or(String::from("none"))),
+                                                                                                                  //cell!(project.sum_sold_and_wages().map(|i|i.to_string()).unwrap_or(String::from("none"))),
             ]);
 
             if let Some(ref details) = list_config.details {
@@ -228,7 +228,7 @@ pub fn verbose_rows(projects: &[Project], list_config: &ListConfig<'_>) -> Vec<R
                     &details
                         .iter()
                         .map(|d| cell!(project.field(d).unwrap_or_default()))
-                        .collect::<Vec<Cell>>()
+                        .collect::<Vec<Cell>>(),
                 );
             }
 
@@ -242,7 +242,7 @@ pub fn verbose_rows(projects: &[Project], list_config: &ListConfig<'_>) -> Vec<R
                     // Errors
                     cell!(validation1.join(",")),
                     cell!(validation2.join(",")),
-                    cell!(validation3.join(","))
+                    cell!(validation3.join(",")),
                 ]);
             }
 
@@ -271,20 +271,20 @@ pub fn dynamic_rows(projects: &[Project], list_config: &ListConfig<'_>) -> Vec<R
                     &details
                         .iter()
                         .map(|d| cell!(project.field(d).unwrap_or_default()).style_spec(row_style))
-                        .collect::<Vec<Cell>>()
+                        .collect::<Vec<Cell>>(),
                 );
                 if list_config.show_errors {
                     let validation = (
                         project.is_missing_for_offer(),
                         project.is_missing_for_invoice(),
-                        project.is_ready_for_archive()
+                        project.is_ready_for_archive(),
                     );
 
                     cells.extend_from_slice(&[
                         // Errors
                         cell!(validation.0.join("|")),
                         cell!(validation.1.join("|")),
-                        cell!(validation.2.join("|"))
+                        cell!(validation.2.join("|")),
                     ]);
                 }
             }
@@ -314,7 +314,7 @@ pub fn print_projects(rows: Vec<Row>) {
 pub fn print_csv_year(year: i32) {
     match crate::actions::csv(year) {
         Ok(csv) => println!("{}", csv),
-        Err(err) => println!("{}", err)
+        Err(err) => println!("{}", err),
     }
 }
 
@@ -322,7 +322,7 @@ pub fn print_csv_year(year: i32) {
 pub fn print_csv(projects: &[Project]) {
     match crate::actions::projects_to_csv(projects) {
         Ok(csv) => println!("{}", csv),
-        Err(err) => println!("{}", err)
+        Err(err) => println!("{}", err),
     }
 }
 
@@ -350,12 +350,12 @@ pub fn show_details(project: &Project, bill_type: BillType) {
         Err(e) => {
             log::error!("{}, sorry", e);
             return;
-        }
+        },
     };
 
     let bill = match bill_type {
         BillType::Offer => offer,
-        BillType::Invoice => invoice
+        BillType::Invoice => invoice,
     };
 
     // TODO: move to Project::product_table(&self) {

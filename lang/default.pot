@@ -584,27 +584,27 @@ msgstr ""
 msgid "what do you think this is, a shell? {face}"
 msgstr ""
 
-#: /Users/hendrik/code/rust/asciii/src/bin/cli/subcommands/mod.rs:413
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/subcommands/mod.rs:377
 msgid "Do you want to set the invoice number in {:?} to {}?"
 msgstr ""
 
-#: /Users/hendrik/code/rust/asciii/src/bin/cli/subcommands/mod.rs:506
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/subcommands/mod.rs:460
 msgid "You have to provide either a search term or path"
 msgstr ""
 
-#: /Users/hendrik/code/rust/asciii/src/bin/cli/subcommands/mod.rs:610
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/subcommands/mod.rs:557
 msgid "do you want to set your name?"
 msgstr ""
 
-#: /Users/hendrik/code/rust/asciii/src/bin/cli/subcommands/mod.rs:613
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/subcommands/mod.rs:560
 msgid "Is your name {:?}"
 msgstr ""
 
-#: /Users/hendrik/code/rust/asciii/src/bin/cli/subcommands/mod.rs:620
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/subcommands/mod.rs:567
 msgid "What is your name?"
 msgstr ""
 
-#: /Users/hendrik/code/rust/asciii/src/bin/cli/subcommands/mod.rs:744 /Users/hendrik/code/rust/asciii/src/bin/cli/subcommands/mod.rs:753
+#: /Users/hendrik/code/rust/asciii/src/bin/cli/subcommands/mod.rs:691 /Users/hendrik/code/rust/asciii/src/bin/cli/subcommands/mod.rs:700
 msgid "{} does not exist"
 msgstr ""
 
@@ -616,7 +616,7 @@ msgstr ""
 msgid "Project file is younger than pdf, continue anyway?"
 msgstr ""
 
-#: /Users/hendrik/code/rust/asciii/src/lib.rs:73
+#: /Users/hendrik/code/rust/asciii/src/lib.rs:82
 msgid "Documentation at: {}"
 msgstr ""
 
@@ -672,7 +672,7 @@ msgstr ""
 msgid "Responsible: {}"
 msgstr ""
 
-#: /Users/hendrik/code/rust/asciii/src/project/yaml_provider.rs:123
+#: /Users/hendrik/code/rust/asciii/src/project/yaml_provider.rs:132
 msgid "{} ({:?})"
 msgstr ""
 

@@ -8,7 +8,7 @@ use std::{
     fmt,
     fs::{self, File},
     io::Write,
-    path::{Path, PathBuf}
+    path::{Path, PathBuf},
 };
 
 use anyhow::{bail, Error};
@@ -24,7 +24,7 @@ use semver::Version;
 use crate::{
     storage::{list_path_content, repo::GitStatus, Storable, StorableAndTempDir, StorageError},
     templater::{IsKeyword, Templater},
-    util::{get_valid_path, yaml}
+    util::{get_valid_path, yaml},
 };
 
 pub mod product;
@@ -49,7 +49,7 @@ use self::{
     error::ProjectError,
     product::{Product, ProductError},
     spec::{HasEmployees, Invoicable, IsClient, IsProject, Offerable, Redeemable, Validatable},
-    yaml_provider::*
+    yaml_provider::*,
 };
 
 pub use self::computed_field::ComputedField;
@@ -63,7 +63,7 @@ pub struct Project {
     file_path: PathBuf,
     git_status: Option<GitStatus>,
     file_content: String,
-    yaml: Yaml
+    yaml: Yaml,
 }
 
 impl Project {
@@ -84,7 +84,7 @@ impl Project {
                 log::error!("syntax error in {}\n  {}", file_path.display(), e);
                 Yaml::Null
             }),
-            file_content
+            file_content,
         };
 
         let validation = project
@@ -146,7 +146,7 @@ impl Project {
             file_path: PathBuf::new(),
             git_status: None,
             yaml: yaml::parse(content).unwrap(),
-            file_content: String::from(content)
+            file_content: String::from(content),
         })
     }
 
@@ -221,7 +221,7 @@ impl Project {
         let (offer, invoice) = self.bills()?;
         let bill = match bill_type {
             BillType::Offer => offer,
-            BillType::Invoice => invoice
+            BillType::Invoice => invoice,
         };
         let mut csv_string = String::new();
         let splitter = ";";
@@ -280,7 +280,7 @@ impl Project {
                     e
                 );
                 bail!(e)
-            }
+            },
         }
     }
 
@@ -348,7 +348,7 @@ impl Project {
                         self.file(),
                         (event, invoice, payed, wages)
                     )
-                )
+                ),
             }
         }
         cal
@@ -358,7 +358,7 @@ impl Project {
         Todo::new()
             .summary(&lformat!("Create an Invoice"))
             .due(CalendarDateTime::from(
-                (event_date + Duration::days(14)).and_hms(11, 10, 0)
+                (event_date + Duration::days(14)).and_hms(11, 10, 0),
             ))
             .priority(6)
             .done()
@@ -377,7 +377,7 @@ impl Project {
                 days_since_payed
             ))
             .due(CalendarDateTime::from(
-                (payed_date + Duration::days(14)).and_hms(11, 10, 0)
+                (payed_date + Duration::days(14)).and_hms(11, 10, 0),
             ))
             .done()
     }
@@ -422,7 +422,7 @@ impl Project {
     fn item_from_desc_and_value<'y>(
         &self,
         desc: &'y Yaml,
-        values: &'y Yaml
+        values: &'y Yaml,
     ) -> Result<(BillItem<Product<'y>>, BillItem<Product<'y>>), Error> {
         let get_f64 = |yaml, path| {
             self.get_direct(yaml, path)
@@ -453,9 +453,9 @@ impl Project {
         Ok((
             BillItem {
                 amount: offered,
-                product
+                product,
             },
-            BillItem { amount: sold, product }
+            BillItem { amount: sold, product },
         ))
     }
 }
@@ -463,14 +463,14 @@ impl Project {
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
 pub enum BillType {
     Offer,
-    Invoice
+    Invoice,
 }
 
 impl ToString for BillType {
     fn to_string(&self) -> String {
         match *self {
             BillType::Offer => "Offer",
-            BillType::Invoice => "Invoice"
+            BillType::Invoice => "Invoice",
         }
         .to_owned()
     }
@@ -490,14 +490,14 @@ pub trait Exportable {
     fn output_file_exists(&self, bill_type: BillType) -> bool {
         match bill_type {
             BillType::Offer => self.offer_file_exists(),
-            BillType::Invoice => self.invoice_file_exists()
+            BillType::Invoice => self.invoice_file_exists(),
         }
     }
 
     fn output_file(&self, bill_type: BillType) -> Option<PathBuf> {
         match bill_type {
             BillType::Offer => self.offer_file(),
-            BillType::Invoice => self.invoice_file()
+            BillType::Invoice => self.invoice_file(),
         }
     }
 
@@ -506,7 +506,7 @@ pub trait Exportable {
         let convert_ext = crate::CONFIG.get_str("document_export/output_extension");
         match (output_folder, self.offer_file_name(convert_ext)) {
             (Some(folder), Some(name)) => folder.join(name).into(),
-            _ => None
+            _ => None,
         }
     }
 
@@ -515,7 +515,7 @@ pub trait Exportable {
         let convert_ext = crate::CONFIG.get_str("document_export/output_extension");
         match (output_folder, self.invoice_file_name(convert_ext)) {
             (Some(folder), Some(name)) => folder.join(name).into(),
-            _ => None
+            _ => None,
         }
     }
 
@@ -538,7 +538,7 @@ pub trait Exportable {
     fn full_file_path(&self, bill_type: BillType, ext: &str) -> Result<PathBuf, Error> {
         match bill_type {
             BillType::Offer => self.full_offer_file_path(ext),
-            BillType::Invoice => self.full_invoice_file_path(ext)
+            BillType::Invoice => self.full_invoice_file_path(ext),
         }
     }
 
@@ -561,7 +561,7 @@ pub trait Exportable {
     fn write_to_file(&self, content: &str, bill_type: BillType, ext: &str) -> Result<PathBuf, Error> {
         match bill_type {
             BillType::Offer => self.write_to_offer_file(content, ext),
-            BillType::Invoice => self.write_to_invoice_file(content, ext)
+            BillType::Invoice => self.write_to_invoice_file(content, ext),
         }
     }
 
@@ -606,7 +606,7 @@ impl Storable for Project {
     fn from_template(
         project_name: &str,
         template: &Path,
-        fill: &HashMap<&str, String>
+        fill: &HashMap<&str, String>,
     ) -> Result<StorableAndTempDir<Self>, Error> {
         let template_name = template.file_stem().unwrap().to_str().unwrap();
 
@@ -661,7 +661,7 @@ impl Storable for Project {
                     e
                 );
                 bail!(e)
-            }
+            },
         };
 
         // project now lives in the temp_file
@@ -669,12 +669,12 @@ impl Storable for Project {
             file_path: temp_file,
             git_status: None,
             file_content,
-            yaml
+            yaml,
         };
 
         Ok(StorableAndTempDir {
             storable: project,
-            temp_dir
+            temp_dir,
         })
     }
 
@@ -686,7 +686,7 @@ impl Storable for Project {
         let prefix = self.invoice().number_long_str().unwrap_or_else(|| String::from("zzzz"));
         match (self.invoice().date().ok(), self.modified_date()) {
             (Some(date), _) | (None, Some(date)) => Some(format!("{0}{1}", prefix, date.format("%Y%m%d"))),
-            (None, None) => None
+            (None, None) => None,
         }
     }
 
@@ -762,22 +762,22 @@ impl Storable for Project {
 
 /// This is returned by `[Product::client()](struct.Project.html#method.client)`.
 pub struct Client<'a> {
-    inner: &'a Project
+    inner: &'a Project,
 }
 
 /// This is returned by [`Product::offer()`](struct.Project.html#method.offer).
 pub struct Offer<'a> {
-    inner: &'a Project
+    inner: &'a Project,
 }
 
 /// This is returned by [`Product::invoice()`](struct.Project.html#method.invoice).
 pub struct Invoice<'a> {
-    inner: &'a Project
+    inner: &'a Project,
 }
 
 /// This is returned by [`Product::hours()`](struct.Project.html#method.hours).
 pub struct Hours<'a> {
-    inner: &'a Project
+    inner: &'a Project,
 }
 
 /// Output of `Project::debug()`.
@@ -788,7 +788,7 @@ pub struct Debug {
     pub file_path: PathBuf,
     //temp_dir: Option<PathBuf>, // TODO
     pub git_status: Option<GitStatus>,
-    pub yaml: Yaml
+    pub yaml: Yaml,
 }
 
 impl<'a> From<&'a Project> for Debug {
@@ -796,7 +796,7 @@ impl<'a> From<&'a Project> for Debug {
         Debug {
             file_path: project.file_path.clone(),
             git_status: project.git_status.clone(),
-            yaml: project.yaml.clone()
+            yaml: project.yaml.clone(),
         }
     }
 }

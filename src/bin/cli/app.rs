@@ -1024,7 +1024,7 @@ pub mod validators {
     pub fn is_dmy(val: &str) -> Result<(), String> {
         match parse_dmy_date(val) {
             Some(_) => Ok(()),
-            None => Err(lformat!("Date Format must be DD.MM.YYYY"))
+            None => Err(lformat!("Date Format must be DD.MM.YYYY")),
         }
     }
 }

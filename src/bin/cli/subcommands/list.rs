@@ -32,9 +32,7 @@ pub fn list(matches: &ArgMatches) -> Result<(), Error> {
         let config_details = CONFIG.get_strs("list/extra_details");
 
         let mut list_config = ListConfig {
-            sort_by: matches
-                .value_of("sort")
-                .unwrap_or_else(|| CONFIG.get_str("list/sort")),
+            sort_by: matches.value_of("sort").unwrap_or_else(|| CONFIG.get_str("list/sort")),
             mode: list_mode,
             details: extra_details.or(config_details),
             filter_by: matches.values_of("filter").map(Iterator::collect),
@@ -203,15 +201,15 @@ fn decide_mode(simple: bool, verbose: bool, paths: bool, nothing: bool, csv: boo
             (false, true, _) => {
                 log::debug!("-v overwrites config");
                 ListMode::Verbose
-            }
+            },
             (false, _, true) => {
                 log::debug!("-v from config");
                 ListMode::Verbose
-            }
+            },
             _ => {
                 log::debug!("simple mode");
                 ListMode::Simple
-            }
+            },
         }
     }
 }

@@ -27,7 +27,7 @@ pub enum GitStatus {
     Ignored,
     Conflict,
     Current,
-    Unknown
+    Unknown,
 }
 
 impl GitStatus {
@@ -111,14 +111,14 @@ pub struct Repository {
     pub repo: git2::Repository,
     pub workdir: PathBuf,
     /// Maps GitStatus to each path
-    pub statuses: HashMap<PathBuf, GitStatus>
+    pub statuses: HashMap<PathBuf, GitStatus>,
 }
 
 /// Convenience Wrapper for `git2::Repository`
 #[cfg(not(feature = "git_statuses"))]
 pub struct Repository {
     /// Git Repository for StorageDir
-    pub workdir: PathBuf
+    pub workdir: PathBuf,
 }
 
 impl Repository {
@@ -129,14 +129,14 @@ impl Repository {
         Ok(Repository {
             repo,
             workdir: path.to_owned(),
-            statuses
+            statuses,
         })
     }
 
     #[cfg(not(feature = "git_statuses"))]
     pub fn try_new(path: &Path) -> Result<Self, GitError> {
         Ok(Repository {
-            workdir: path.to_owned()
+            workdir: path.to_owned(),
         })
     }
 
@@ -147,7 +147,7 @@ impl Repository {
         let git_statuses = repo.statuses(Some(
             git2::StatusOptions::new()
                 .include_ignored(false)
-                .include_untracked(true)
+                .include_untracked(true),
         ))?;
 
         let mut statuses: HashMap<PathBuf, GitStatus> = HashMap::new();

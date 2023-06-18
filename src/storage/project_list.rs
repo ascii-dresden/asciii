@@ -1,7 +1,7 @@
 //! Implementations of `ProjectList`
 use std::{
     iter::IntoIterator,
-    ops::{Deref, DerefMut}
+    ops::{Deref, DerefMut},
 };
 
 use linked_hash_map::LinkedHashMap;
@@ -16,7 +16,7 @@ pub struct Projects<P: Storable + Sized> {
     /// working directory
     pub working: ProjectList<P>,
     /// archived Projects by year
-    pub archive: ProjectsByYear<P>
+    pub archive: ProjectsByYear<P>,
 }
 
 /// Wrapper around `Vec<Storable>`
@@ -24,7 +24,7 @@ pub struct Projects<P: Storable + Sized> {
 /// This is produced by [`Storage::open_projects()`](struct.Storage.html#method.open_projects)
 #[derive(Debug)]
 pub struct ProjectList<P: Storable + Sized> {
-    pub projects: Vec<P>
+    pub projects: Vec<P>,
 }
 
 impl<L: Storable> ProjectList<L> {

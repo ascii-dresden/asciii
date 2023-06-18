@@ -112,8 +112,7 @@ fn show_detail(selection: &StorageSelection, detail: &str) -> Result<(), Error> 
     for p in setup::<Project>()?.open_projects(selection.clone())? {
         println!(
             "{}",
-            p.field(detail)
-                .unwrap_or_else(|| format!("No {selection:?} found"))
+            p.field(detail).unwrap_or_else(|| format!("No {selection:?} found"))
         )
     }
     Ok(())

@@ -2,7 +2,6 @@ use thiserror::Error;
 
 #[derive(Error, Debug)]
 pub enum ActionError {
-
     #[error("unexpected response from service")]
     ActionError,
 

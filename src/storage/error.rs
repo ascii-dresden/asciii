@@ -49,5 +49,5 @@ pub enum StorageError {
     RepoUninitialized,
 
     #[error("Nothing found for {:?}", _0)]
-    NothingFound(Vec<String>)
+    NothingFound(Vec<String>),
 }

@@ -133,7 +133,7 @@ impl HasEvents for Project {
                 Some(spec::Event {
                     begin,
                     end,
-                    times: self.times(h).unwrap_or_default()
+                    times: self.times(h).unwrap_or_default(),
                 })
             })
             .collect()
@@ -177,7 +177,7 @@ fn service_to_product<'a, T: HasEmployees>(s: &T) -> Result<Product<'a>, Error> 
             name: "Service",
             unit: Some("h"),
             tax: s.tax().ok().unwrap_or_else(|| Tax::new(0.0)),
-            price: salary
+            price: salary,
         })
     } else {
         bail!(ProductError::InvalidServerSection)
@@ -466,7 +466,7 @@ impl<'a> HasEmployees for Hours<'a> {
             (Some(total_time), Some(salary), Some(tax)) => Some(total_time * salary * (tax.value() + 1f64)),
             // covering the legacy case where Services always had Tax=0%
             (Some(total_time), Some(salary), None) => Some(total_time * salary),
-            _ => None
+            _ => None,
         }
     }
 
@@ -511,7 +511,7 @@ impl<'a> HasEmployees for Hours<'a> {
                     name,
                     salary,
                     time,
-                    wage
+                    wage,
                 })
             })
             .collect::<FieldResult<Vec<Employee>>>()

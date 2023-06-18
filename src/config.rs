@@ -17,7 +17,7 @@
 
 use std::{
     env::{self, current_dir},
-    path::{Path, PathBuf}
+    path::{Path, PathBuf},
 };
 
 #[cfg(target_arch = "wasm32")]
@@ -40,7 +40,7 @@ pub struct ConfigReader {
     pub path: PathBuf,
     defaults: Yaml,
     custom: Yaml,
-    local: Yaml
+    local: Yaml,
 }
 
 impl ConfigReader {
@@ -59,7 +59,7 @@ impl ConfigReader {
             path: home_path.to_owned(),
             defaults: yaml::parse(DEFAULT_CONFIG)?,
             custom: yaml::open(&home_path).unwrap_or(Yaml::Null),
-            local: yaml::open(local_path).unwrap_or(Yaml::Null)
+            local: yaml::open(local_path).unwrap_or(Yaml::Null),
         });
 
         if !home_path.exists() {

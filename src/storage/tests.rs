@@ -1,7 +1,7 @@
 use std::{
     collections::HashMap,
     fs,
-    path::{Path, PathBuf}
+    path::{Path, PathBuf},
 };
 
 use chrono::prelude::*;
@@ -15,7 +15,7 @@ use crate::util;
 
 #[allow(dead_code)]
 pub struct TestProject {
-    file_path: PathBuf
+    file_path: PathBuf,
 }
 
 impl Storable for TestProject {
@@ -23,10 +23,10 @@ impl Storable for TestProject {
     fn from_template(
         project_name: &str,
         template: &Path,
-        _fill: &HashMap<&str, String>
+        _fill: &HashMap<&str, String>,
     ) -> Result<StorableAndTempDir<Self>, Error>
     where
-        Self: Sized
+        Self: Sized,
     {
         // generates a temp file
         let temp_dir = TempDir::new_in("./target/debug/build/", project_name).unwrap();
@@ -40,7 +40,7 @@ impl Storable for TestProject {
 
         Ok(StorableAndTempDir {
             storable: project,
-            temp_dir
+            temp_dir,
         })
     }
 
@@ -69,7 +69,7 @@ impl Storable for TestProject {
 
     fn open_file(path: &Path) -> Result<Self, Error> {
         Ok(TestProject {
-            file_path: PathBuf::from(path)
+            file_path: PathBuf::from(path),
         })
     }
     fn matches_filter(&self, _key: &str, _val: &str) -> bool {
@@ -88,7 +88,7 @@ const TEST_PROJECTS: [&str; 4] = [
     "test1",
     "test2",
     "foobar",
-    "ich schreibe viel zu längliche projektnamen!"
+    "ich schreibe viel zu längliche projektnamen!",
 ];
 
 fn setup() -> (TempDir, PathBuf, Storage<TestProject>) {

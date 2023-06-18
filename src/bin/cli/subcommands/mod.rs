@@ -66,9 +66,7 @@ pub fn no_shell(_matches: &ArgMatches) -> Result<(), Error> {
 /// Create NEW Project
 // #[deprecated(note="move to asciii::actions")]
 pub fn new(matches: &ArgMatches) -> Result<(), Error> {
-    let project_name = matches
-        .value_of("name")
-        .expect("You did not pass a \"Name\"!");
+    let project_name = matches.value_of("name").expect("You did not pass a \"Name\"!");
     let editor = CONFIG.get("user/editor").and_then(Yaml::as_str);
 
     let template_name = matches
@@ -106,9 +104,7 @@ pub fn new(matches: &ArgMatches) -> Result<(), Error> {
         fill_data.insert("MANAGER", manager.to_owned());
     }
 
-    let project_file = storage
-        .create_project(project_name, template_name, &fill_data)?
-        .file();
+    let project_file = storage.create_project(project_name, template_name, &fill_data)?.file();
     if edit {
         util::pass_to_command(editor, &[project_file])?;
     }
@@ -117,10 +113,7 @@ pub fn new(matches: &ArgMatches) -> Result<(), Error> {
 
 fn matches_to_selection(matches: &ArgMatches) -> StorageSelection {
     let (search_terms, dir) = matches_to_search(matches);
-    StorageSelection::DirAndSearch(
-        dir,
-        search_terms.into_iter().map(ToOwned::to_owned).collect(),
-    )
+    StorageSelection::DirAndSearch(dir, search_terms.into_iter().map(ToOwned::to_owned).collect())
 }
 
 fn matches_to_dir(matches: &ArgMatches) -> StorageDir {
@@ -154,10 +147,7 @@ fn matches_to_search(matches: &ArgMatches) -> (Vec<&str>, StorageDir) {
         .map(Iterator::collect)
         .unwrap_or_else(Vec::new);
 
-    log::debug!(
-        "matches_to_search: --archive={:?}",
-        matches.value_of("archive")
-    );
+    log::debug!("matches_to_search: --archive={:?}", matches.value_of("archive"));
 
     let dir = matches_to_dir(matches);
 
@@ -166,10 +156,7 @@ fn matches_to_search(matches: &ArgMatches) -> (Vec<&str>, StorageDir) {
 
 /// Produces a list of paths.
 /// This is more general than `with_projects`, as this includes templates too.
-pub fn matches_to_paths(
-    matches: &ArgMatches,
-    storage: &Storage<Project>,
-) -> Result<Vec<PathBuf>, Error> {
+pub fn matches_to_paths(matches: &ArgMatches, storage: &Storage<Project>) -> Result<Vec<PathBuf>, Error> {
     let search_terms = matches
         .values_of("search_term")
         .map(Iterator::collect)
@@ -235,10 +222,7 @@ pub fn csv(matches: &ArgMatches) -> Result<(), Error> {
 /// Command EDIT
 pub fn edit(matches: &ArgMatches) -> Result<(), Error> {
     let search_term = matches.value_of("search_term").unwrap();
-    let search_terms = matches
-        .values_of("search_term")
-        .unwrap()
-        .collect::<Vec<&str>>();
+    let search_terms = matches.values_of("search_term").unwrap().collect::<Vec<&str>>();
 
     let editor = matches
         .value_of("editor")
@@ -257,11 +241,7 @@ pub fn edit(matches: &ArgMatches) -> Result<(), Error> {
     Ok(())
 }
 
-fn edit_projects(
-    dir: StorageDir,
-    search_terms: &[&str],
-    editor: Option<&str>,
-) -> Result<(), Error> {
+fn edit_projects(dir: StorageDir, search_terms: &[&str], editor: Option<&str>) -> Result<(), Error> {
     let storage = setup::<Project>()?;
     let mut all_projects = Vec::new();
     for search_term in search_terms {
@@ -278,10 +258,7 @@ fn edit_projects(
             search_terms.iter().map(ToString::to_string).collect()
         ));
     } else {
-        let all_paths = all_projects
-            .iter()
-            .map(Storable::file)
-            .collect::<Vec<PathBuf>>();
+        let all_paths = all_projects.iter().map(Storable::file).collect::<Vec<PathBuf>>();
         util::pass_to_command(editor, &all_paths)?;
         Ok(())
     }
@@ -290,9 +267,7 @@ fn edit_projects(
 /// Command META
 #[cfg(not(feature = "meta"))]
 pub fn meta(_matches: &ArgMatches) -> Result<(), Error> {
-    bail!(format_err!(
-        "Meta functionality not built-in with this release!"
-    ));
+    bail!(format_err!("Meta functionality not built-in with this release!"));
 }
 
 /// Command META
@@ -361,17 +336,9 @@ pub fn set(m: &ArgMatches) -> Result<(), Error> {
     let (search_terms, dir) = matches_to_search(m);
 
     actions::with_projects(dir, &search_terms, |project| {
-        println!(
-            "{}: {}",
-            project.short_desc(),
-            project.empty_fields().join(", ")
-        );
+        println!("{}: {}", project.short_desc(), project.empty_fields().join(", "));
         if !project.empty_fields().contains(&field) {
-            return Err(format_err!(
-                "{:?} was not found in {}",
-                field,
-                project.short_desc()
-            ));
+            return Err(format_err!("{:?} was not found in {}", field, project.short_desc()));
         }
         if util::really(&format!(
             "do you want to set the field {} in {:?}",
@@ -405,10 +372,7 @@ pub fn invoice(m: &ArgMatches) -> Result<(), Error> {
     let field = "INVOICE-NUMBER";
     actions::with_projects(dir, &search_terms, |project| {
         if !project.empty_fields().iter().any(|s| s == field) {
-            return Err(format_err!(
-                "Invoice number already set in {}",
-                project.short_desc()
-            ));
+            return Err(format_err!("Invoice number already set in {}", project.short_desc()));
         }
         if util::really(&lformat!(
             "Do you want to set the invoice number in {:?} to {}?",
@@ -425,8 +389,7 @@ pub fn invoice(m: &ArgMatches) -> Result<(), Error> {
 
 /// Command CALENDAR
 pub fn calendar(matches: &ArgMatches) -> Result<(), Error> {
-    let calendar =
-        actions::calendar_with_tasks(matches_to_dir(matches), matches.is_present("tasks"))?;
+    let calendar = actions::calendar_with_tasks(matches_to_dir(matches), matches.is_present("tasks"))?;
     println!("{}", calendar);
     Ok(())
 }
@@ -456,11 +419,7 @@ fn infer_bill_type(m: &ArgMatches) -> Option<BillType> {
 fn matches_to_export_config(m: &ArgMatches) -> Option<ExportConfig> {
     let template_name = m
         .value_of("template")
-        .or_else(|| {
-            CONFIG
-                .get("document_export/default_template")
-                .and_then(Yaml::as_str)
-        })
+        .or_else(|| CONFIG.get("document_export/default_template").and_then(Yaml::as_str))
         .unwrap();
     let bill_type = infer_bill_type(m);
 
@@ -478,10 +437,7 @@ fn matches_to_export_config(m: &ArgMatches) -> Option<ExportConfig> {
 
     if m.is_present("search_term") {
         let (search_terms, dir) = matches_to_search(m);
-        let search_terms = search_terms
-            .into_iter()
-            .map(ToOwned::to_owned)
-            .collect::<Vec<_>>();
+        let search_terms = search_terms.into_iter().map(ToOwned::to_owned).collect::<Vec<_>>();
         log::debug!(
             "make {t}({s}/{d:?}, invoice={i:?})",
             d = dir,
@@ -501,10 +457,7 @@ fn matches_to_export_config(m: &ArgMatches) -> Option<ExportConfig> {
         config.select = StorageSelection::Paths(vec![PathBuf::from(file_path)]);
         Some(config)
     } else {
-        log::error!(
-            "{}",
-            lformat!("You have to provide either a search term or path")
-        );
+        log::error!("{}", lformat!("You have to provide either a search term or path"));
         None
     }
 }
@@ -543,14 +496,8 @@ pub fn archive(matches: &ArgMatches) -> Result<(), Error> {
     if let Some(search_terms) = matches.values_of("search terms") {
         let search_terms = search_terms.collect::<Vec<_>>();
         let year = matches.value_of("year").and_then(|s| s.parse::<i32>().ok());
-        let moved_files =
-            actions::archive_projects(&search_terms, year, matches.is_present("force"))?;
-        log::debug!(
-            "archive({:?},{:?}) :\n{:?}",
-            search_terms,
-            year,
-            moved_files
-        );
+        let moved_files = actions::archive_projects(&search_terms, year, matches.is_present("force"))?;
+        log::debug!("archive({:?},{:?}) :\n{:?}", search_terms, year, moved_files);
     } else if matches.is_present("all") {
         log::debug!("archiving all I can find");
         let moved_files = actions::archive_all_projects()?;
@@ -786,7 +733,5 @@ pub fn shell(_matches: &ArgMatches) -> Result<(), Error> {
 
 #[cfg(not(feature = "shell"))]
 pub fn shell(_matches: &ArgMatches) -> Result<(), Error> {
-    bail!(format_err!(
-        "Shell functionality not built-in with this release!"
-    ));
+    bail!(format_err!("Shell functionality not built-in with this release!"));
 }

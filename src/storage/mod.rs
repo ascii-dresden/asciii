@@ -38,7 +38,7 @@ use std::{
     fmt, fs,
     marker::PhantomData,
     ops::DerefMut,
-    path::{Path, PathBuf}
+    path::{Path, PathBuf},
 };
 
 /// Year = `i32`
@@ -85,7 +85,7 @@ pub struct Storage<L: Storable> {
 
     project_type: PhantomData<L>,
 
-    repository: Option<Repository>
+    repository: Option<Repository>,
 }
 
 /// Used to identify what directory you are talking about.
@@ -109,7 +109,7 @@ pub enum StorageDir {
     /// Place to store extra.
     Extras,
     /// `Archive` and `Working` directory, not `Templates`.
-    All
+    All,
 }
 
 /// A description from which we can open Storables
@@ -118,7 +118,7 @@ pub enum StorageSelection {
     DirAndSearch(StorageDir, Vec<String>),
     Dir(StorageDir),
     Paths(Vec<PathBuf>),
-    Uninitialized
+    Uninitialized,
 }
 
 impl<'a> From<&'a StorageSelection> for StorageSelection {
@@ -153,7 +153,7 @@ pub struct Paths {
     pub storage: PathBuf,
     pub working: PathBuf,
     pub archive: PathBuf,
-    pub templates: PathBuf
+    pub templates: PathBuf,
 }
 
 /// Basically `ls`, returns a list of paths.
@@ -247,7 +247,7 @@ impl<L: Storable> Storage<L> {
                 templates: root.join(template),
                 extras: root.join("extras"),
                 project_type: PhantomData,
-                repository: None
+                repository: None,
             })
         } else {
             bail!(StorageError::StoragePathNotAbsolute)
@@ -259,7 +259,7 @@ impl<L: Storable> Storage<L> {
         root: P,
         working: &str,
         archive: &str,
-        template: &str
+        template: &str,
     ) -> Result<Self, Error> {
         log::trace!("initializing storage, with git");
         Ok(Storage {
@@ -330,7 +330,7 @@ impl<L: Storable> Storage<L> {
             storage: self.root_dir().into(),
             working: self.working_dir().into(),
             archive: self.archive_dir().into(),
-            templates: self.templates_dir().into()
+            templates: self.templates_dir().into(),
         }
     }
 
@@ -462,7 +462,7 @@ impl<L: Storable> Storage<L> {
         &self,
         project_name: &str,
         template_name: &str,
-        fill_data: &HashMap<&str, String>
+        fill_data: &HashMap<&str, String>,
     ) -> Result<L, Error> {
         log::debug!(
             "creating a project\n name: {name}\n template: {tmpl}",
@@ -510,7 +510,7 @@ impl<L: Storable> Storage<L> {
         let slugged_name = slugify(name);
         let name_in_archive = match prefix {
             Some(prefix) => format!("{}_{}", prefix, slugged_name),
-            None => slugged_name
+            None => slugged_name,
         };
 
         let archive = self.create_archive(year)?;
@@ -541,7 +541,7 @@ impl<L: Storable> Storage<L> {
 
         let name_in_archive = match project.prefix() {
             Some(prefix) => format!("{}_{}", prefix, project.ident()),
-            None => project.ident()
+            None => project.ident(),
         };
 
         let archive = self.create_archive(year)?;
@@ -568,10 +568,10 @@ impl<L: Storable> Storage<L> {
         &self,
         search_terms: &[&str],
         manual_year: Option<i32>,
-        confirm: F
+        confirm: F,
     ) -> Result<Vec<PathBuf>, Error>
     where
-        F: Fn() -> bool
+        F: Fn() -> bool,
     {
         let projects = self.search_projects_any(StorageDir::Working, search_terms)?;
         let force = confirm();
@@ -605,7 +605,7 @@ impl<L: Storable> Storage<L> {
 
     pub fn delete_project_if<F>(&self, project: &L, confirmed: F) -> Result<(), Error>
     where
-        F: Fn() -> bool
+        F: Fn() -> bool,
     {
         log::debug!("deleting {}", project.dir().display());
         project.delete_project_dir_if(confirmed)?;
@@ -688,7 +688,7 @@ impl<L: Storable> Storage<L> {
         let search_index = if search_term.starts_with('N') {
             match search_term.chars().skip(1).collect::<String>().parse::<usize>() {
                 Ok(n) => Some(n),
-                Err(_) => None
+                Err(_) => None,
             }
         } else {
             None
@@ -730,7 +730,7 @@ impl<L: Storable> Storage<L> {
         if let Ok(path) = match directory {
             StorageDir::Working => Ok(self.working_dir().join(slugged_name)),
             StorageDir::Archive(year) => self.get_project_dir_from_archive(name, year),
-            _ => bail!(StorageError::BadChoice)
+            _ => bail!(StorageError::BadChoice),
         } {
             if path.exists() {
                 return Ok(path);
@@ -780,7 +780,7 @@ impl<L: Storable> Storage<L> {
                 let path = self.archive_dir().join(year.to_string());
                 let list = list_path_content(&path).unwrap_or_else(|_| Vec::new());
                 Ok(list)
-            }
+            },
             StorageDir::All => {
                 let mut all: Vec<PathBuf> = Vec::new();
                 for year in self.list_years()? {
@@ -788,8 +788,8 @@ impl<L: Storable> Storage<L> {
                 }
                 all.append(&mut list_path_content(self.working_dir())?);
                 Ok(all)
-            }
-            _ => bail!(StorageError::BadChoice)
+            },
+            _ => bail!(StorageError::BadChoice),
         }
     }
 
@@ -815,7 +815,7 @@ impl<L: Storable> Storage<L> {
 
     pub fn filter_project_files<F>(&self, directory: StorageDir, filter: F) -> Result<Vec<PathBuf>, Error>
     where
-        F: FnMut(&PathBuf) -> bool
+        F: FnMut(&PathBuf) -> bool,
     {
         log::trace!("filtering project files in {:?}-directory", directory);
         let projects = self
@@ -830,7 +830,7 @@ impl<L: Storable> Storage<L> {
     /// Behaves like `list_project_files()` but also opens projects directly.
     pub fn open_projects<I>(&self, selection: I) -> Result<ProjectList<L>, Error>
     where
-        I: Into<StorageSelection>
+        I: Into<StorageSelection>,
     {
         use self::StorageSelection::*;
         let projects = match selection.into() {
@@ -843,10 +843,10 @@ impl<L: Storable> Storage<L> {
                     ));
                 }
                 projects
-            }
+            },
             Dir(dir) => self.open_projects_dir(dir)?,
             Paths(ref paths) => self.open_paths(paths),
-            Uninitialized => unreachable!()
+            Uninitialized => unreachable!(),
         };
         Ok(projects)
     }
@@ -910,8 +910,8 @@ impl<L: Storable> Storage<L> {
                 archived.append(working.deref_mut());
                 archived.filter_by_key_val("Year", year.to_string().as_ref());
                 Ok(archived)
-            }
-            _ => self.list_project_folders(directory).map(|p| self.open_paths(&p))
+            },
+            _ => self.list_project_folders(directory).map(|p| self.open_paths(&p)),
         }
     }
 
@@ -933,7 +933,7 @@ impl<L: Storable> Storage<L> {
         log::debug!("OPENING ALL PROJECTS");
         Ok(Projects {
             working: self.open_projects(StorageDir::Working)?,
-            archive: self.open_all_archived_projects()?
+            archive: self.open_all_archived_projects()?,
         })
     }
 

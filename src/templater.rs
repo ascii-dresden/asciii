@@ -81,7 +81,7 @@ impl<U: Deref<Target = str>> IsKeyword for U {
     ///
     fn map_keywords<F>(&self, closure: F) -> String
     where
-        F: Fn(&str) -> String
+        F: Fn(&str) -> String,
     {
         Regex::new(REGEX)
             .expect("broken regex")
@@ -97,14 +97,14 @@ pub struct Templater {
     pub original: String,
 
     /// content of filled template
-    pub filled: String
+    pub filled: String,
 }
 
 impl Templater {
     pub fn new(template: &str) -> Templater {
         Templater {
             original: template.to_owned(),
-            filled: String::new()
+            filled: String::new(),
         }
     }
 
@@ -133,7 +133,7 @@ impl Templater {
     pub fn fix(&self) -> Self {
         Templater {
             original: self.filled.to_owned(),
-            filled: String::new()
+            filled: String::new(),
         }
     }
 
@@ -150,7 +150,7 @@ impl Templater {
     pub fn fill_in_data(&mut self, data: &HashMap<&str, String>) -> &mut Templater {
         self.fill_template(|keyword| match data.get(keyword) {
             Some(content) => content.clone(),
-            None => format!("##{}##", keyword)
+            None => format!("##{}##", keyword),
         })
     }
 
@@ -160,7 +160,7 @@ impl Templater {
 
     pub fn fill_template<F>(&mut self, closure: F) -> &mut Templater
     where
-        F: Fn(&str) -> String
+        F: Fn(&str) -> String,
     {
         self.filled = self.original.map_keywords(closure);
         self
@@ -171,13 +171,13 @@ pub type TemplateResult<T> = Result<T, TemplateError>;
 
 #[derive(Debug, Eq, PartialEq)]
 pub enum TemplateError {
-    Incomplete(Vec<String>)
+    Incomplete(Vec<String>),
 }
 
 impl fmt::Display for TemplateError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match *self {
-            TemplateError::Incomplete(ref list) => write!(f, "Incomplete ({:?})", list)
+            TemplateError::Incomplete(ref list) => write!(f, "Incomplete ({:?})", list),
         }
     }
 }
@@ -197,7 +197,7 @@ impl ToOwned for Templater {
         Templater {
             //path :    self.path.to_owned(),
             original: self.original.to_owned(),
-            filled: self.filled.to_owned()
+            filled: self.filled.to_owned(),
         }
     }
 }

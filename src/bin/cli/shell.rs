@@ -10,7 +10,7 @@ use std::collections::BTreeSet;
 static ESCAPE_CHAR: Option<char> = Some('\\');
 
 struct ClapCompleter {
-    commands: Vec<String>
+    commands: Vec<String>,
 }
 
 impl ClapCompleter {
@@ -19,7 +19,7 @@ impl ClapCompleter {
             commands: app
                 .get_subcommands()
                 .map(|s| s.get_name().to_owned())
-                .collect::<Vec<_>>()
+                .collect::<Vec<_>>(),
         }
     }
 
@@ -27,7 +27,7 @@ impl ClapCompleter {
         &self,
         start: &str,
         _esc_char: Option<char>,
-        _break_chars: &BTreeSet<char>
+        _break_chars: &BTreeSet<char>,
     ) -> LineResult<Vec<String>> {
         Ok(self.commands.iter().filter(|s| s.starts_with(start)).cloned().collect())
     }
@@ -92,7 +92,7 @@ pub fn launch_shell() -> Result<(), Error> {
                     log::debug!("shell: {} -> {:?}", line, argv);
                     match app.get_matches_from_safe_borrow(argv) {
                         Ok(matches) => super::match_matches(&matches),
-                        Err(e) => println!("{}", e)
+                        Err(e) => println!("{}", e),
                     }
                 },
                 Err(ReadlineError::Interrupted) => {
@@ -106,7 +106,7 @@ pub fn launch_shell() -> Result<(), Error> {
                 Err(err) => {
                     log::error!("{:?}", err);
                     break;
-                }
+                },
             }
         }
         //rl.save_history("history.txt").unwrap();

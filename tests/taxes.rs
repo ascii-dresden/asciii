@@ -25,8 +25,5 @@ tax: 0.19"#;
 
     let project_taxed = Project::from_file_content(hours_taxed).unwrap();
     let project_untaxed = Project::from_file_content(hours_untaxed).unwrap();
-    assert_eq!(
-        project_taxed.hours().net_wages(),
-        project_untaxed.hours().net_wages()
-    );
+    assert_eq!(project_taxed.hours().net_wages(), project_untaxed.hours().net_wages());
 }

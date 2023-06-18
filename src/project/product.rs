@@ -19,7 +19,7 @@ pub struct Product<'a> {
     pub name: &'a str,
     pub unit: Option<&'a str>,
     pub tax: Tax,
-    pub price: Currency
+    pub price: Currency,
 }
 
 #[derive(Error, Debug)]
@@ -39,14 +39,14 @@ pub enum ProductError {
     TooMuchReturned(String),
 
     #[error("Cannot Parse Service")]
-    InvalidServerSection
+    InvalidServerSection,
 }
 
 impl<'a> Product<'a> {
     fn from_old_format<'y>(
         name: &'y str,
         values: &'y yaml::Yaml,
-        local_tax: Option<Tax>
+        local_tax: Option<Tax>,
     ) -> Result<Product<'y>, ProductError> {
         let default_tax = crate::CONFIG
             .get_f64("defaults/tax")
@@ -67,7 +67,7 @@ impl<'a> Product<'a> {
     fn from_new_format<'y>(
         desc: &'y yaml::Yaml,
         values: &'y yaml::Yaml,
-        local_tax: Option<Tax>
+        local_tax: Option<Tax>,
     ) -> Result<Product<'y>, ProductError> {
         let default_tax = crate::CONFIG
             .get_f64("defaults/tax")
@@ -90,12 +90,12 @@ impl<'a> Product<'a> {
     pub fn from_desc_and_value<'y>(
         desc: &'y yaml::Yaml,
         values: &'y yaml::Yaml,
-        local_tax: Option<Tax>
+        local_tax: Option<Tax>,
     ) -> Result<Product<'y>, ProductError> {
         match *desc {
             yaml::Yaml::String(ref name) => Self::from_old_format(name, values, local_tax),
             yaml::Yaml::Hash(_) => Self::from_new_format(desc, values, local_tax),
-            _ => Err(ProductError::UnknownFormat)
+            _ => Err(ProductError::UnknownFormat),
         }
     }
 }
