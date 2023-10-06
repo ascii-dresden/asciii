@@ -5,7 +5,7 @@
 use std::{
     collections::HashMap,
     ffi::OsStr,
-    fmt,
+    fmt::{self, Write as _},
     fs::{self, File},
     io::Write,
     path::{Path, PathBuf},
@@ -269,17 +269,17 @@ impl Project {
                 file.sync_all()?;
                 Ok(())
             },
-            Err(e) => {
+            Err(error) => {
                 log::error!(
                     "The resulting document is no valid yaml. SORRY!\n{}\n\n{}",
-                    filled
-                        .lines()
-                        .enumerate()
-                        .map(|(n, l)| format!("{:>3}. {}\n", n, l))
-                        .collect::<String>(), //line numbers :D
-                    e
+                    filled.lines().enumerate().fold(String::new(), |mut mes, (n, l)| {
+                        //line numbers :D
+                        let _ = writeln!(&mut mes, "{:>3}. {}", n, l);
+                        mes
+                    }),
+                    error
                 );
-                bail!(e)
+                bail!(error)
             },
         }
     }
@@ -650,17 +650,17 @@ impl Storable for Project {
 
         let yaml = match yaml::parse(&file_content) {
             Ok(y) => y,
-            Err(e) => {
+            Err(error) => {
                 log::error!(
                     "The created document is no valid yaml. SORRY!\n{}\n\n{}",
-                    file_content
-                        .lines()
-                        .enumerate()
-                        .map(|(n, l)| format!("{:>3}. {}\n", n, l))
-                        .collect::<String>(), //line numbers :D
-                    e
+                    file_content.lines().enumerate().fold(String::new(), |mut mes, (n, l)| {
+                        // line numbers :D
+                        let _ = writeln!(&mut mes, "{:>3}. {}", n, l);
+                        mes
+                    }),
+                    error
                 );
-                bail!(e)
+                bail!(error)
             },
         };
 

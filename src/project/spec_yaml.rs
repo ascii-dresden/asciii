@@ -5,7 +5,9 @@ use bill::{Bill, Currency, Tax};
 use icalendar::{Calendar, Component, Event as CalEvent};
 use yaml_rust::Yaml;
 
-use super::{error::ValidationResult, product::ProductError, spec::*, yaml_provider::error::FieldResultExt, *};
+use super::{
+    error::ValidationResult, product::ProductError, spec::Employee, spec::*, yaml_provider::error::FieldResultExt, *,
+};
 use crate::util::{self, to_currency, yaml::parse_dmy_date};
 
 impl YamlProvider for Project {

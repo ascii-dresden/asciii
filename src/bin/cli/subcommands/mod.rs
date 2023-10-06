@@ -145,7 +145,7 @@ fn matches_to_search(matches: &ArgMatches) -> (Vec<&str>, StorageDir) {
     let search_terms = matches
         .values_of("search_term")
         .map(Iterator::collect)
-        .unwrap_or_else(Vec::new);
+        .unwrap_or_default();
 
     log::debug!("matches_to_search: --archive={:?}", matches.value_of("archive"));
 
@@ -157,10 +157,10 @@ fn matches_to_search(matches: &ArgMatches) -> (Vec<&str>, StorageDir) {
 /// Produces a list of paths.
 /// This is more general than `with_projects`, as this includes templates too.
 pub fn matches_to_paths(matches: &ArgMatches, storage: &Storage<Project>) -> Result<Vec<PathBuf>, Error> {
-    let search_terms = matches
+    let search_terms: Vec<_> = matches
         .values_of("search_term")
         .map(Iterator::collect)
-        .unwrap_or_else(Vec::new);
+        .unwrap_or_default();
 
     if matches.is_present("template") {
         Ok(storage

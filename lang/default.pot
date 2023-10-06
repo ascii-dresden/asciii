@@ -668,7 +668,7 @@ msgstr ""
 msgid "{:?} has been finished for {} days, get rid of it!"
 msgstr ""
 
-#: /Users/hendrik/code/rust/asciii/src/project/spec_yaml.rs:56
+#: /Users/hendrik/code/rust/asciii/src/project/spec_yaml.rs:58
 msgid "Responsible: {}"
 msgstr ""
 

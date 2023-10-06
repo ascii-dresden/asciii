@@ -100,7 +100,7 @@ where
     let mut handlebars = Handlebars::new();
 
     handlebars.register_escape_fn(no_escape);
-    handlebars.register_escape_fn(|data| data.replace('\n', r#"\newline "#));
+    handlebars.register_escape_fn(|data| data.replace('\n', r"\newline "));
 
     handlebars.register_helper("inc", Box::new(IncHelper));
     // handlebars.register_helper("count", Box::new(count_helper));
