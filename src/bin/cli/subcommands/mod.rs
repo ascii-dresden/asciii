@@ -123,7 +123,7 @@ fn matches_to_dir(matches: &ArgMatches) -> StorageDir {
             .and_then(|y| y.parse::<i32>().ok())
             .unwrap_or_else(|| Utc::today().year());
         StorageDir::Archive(archive_year)
-    } else if matches.is_present("year") {
+    } else if matches.try_contains_id("year").is_ok() {
         let year = matches
             .value_of("year")
             .and_then(|y| y.parse::<i32>().ok())
@@ -131,7 +131,7 @@ fn matches_to_dir(matches: &ArgMatches) -> StorageDir {
         StorageDir::Year(year)
     }
     // or list all, but sort by date
-    else if matches.is_present("all") {
+    else if matches.try_contains_id("all").is_ok() {
         // sort by date on --all of not overridden
         StorageDir::All
     }
