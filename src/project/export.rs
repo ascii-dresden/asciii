@@ -62,10 +62,49 @@ impl ExportTarget<Event> for Project {
 }
 
 #[derive(Debug, PartialEq)]
+struct ExportFloat(f64);
+
+impl From<f64> for ExportFloat {
+    fn from(value: f64) -> Self {
+        ExportFloat(value)
+    }
+}
+
+impl ToString for ExportFloat {
+    fn to_string(&self) -> String {
+        let truncated = self.0.trunc();
+        if truncated == self.0 {
+            ToString::to_string(&truncated)
+        } else {
+            ToString::to_string(&self.0)
+        }
+    }
+}
+impl serde::Serialize for ExportFloat {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer {
+        serializer.serialize_str(&self.to_string())
+    }
+}
+
+#[test]
+fn test_export_float_to_sting() {
+    assert_eq!(ToString::to_string(&ExportFloat(1.0)), "1");
+    assert_eq!(ToString::to_string(&ExportFloat(1.1)), "1.1");
+    assert_eq!(ToString::to_string(&ExportFloat(2.1)), "2.1");
+    assert_eq!(ToString::to_string(&ExportFloat(2.11)), "2.11");
+    assert_eq!(ToString::to_string(&ExportFloat(0.1)), "0.1");
+    assert_eq!(ToString::to_string(&ExportFloat(0.2+0.1)), "0.30000000000000004");
+    
+}
+
+
+#[derive(Debug, PartialEq)]
 #[cfg_attr(feature = "serialization", derive(Serialize))]
 pub struct Service {
-    time: Option<f64>,
-    tax: Option<f64>,
+    time: Option<ExportFloat>,
+    tax: Option<ExportFloat>,
     salary: Option<String>,
     gross_total: Option<String>,
     net_total: Option<String>,
@@ -78,14 +117,14 @@ pub struct Service {
 pub struct Employee {
     name: String,
     salary: String,
-    time: f64,
+    time: ExportFloat,
     wage: String,
 }
 
 fn export_employee(e: &crate::project::spec::Employee) -> Employee {
     Employee {
         name: e.name.clone(),
-        time: e.time,
+        time: e.time.into(),
         salary: e.salary.postfix().to_string(),
         wage: e.wage.postfix().to_string(),
     }
@@ -94,8 +133,8 @@ fn export_employee(e: &crate::project::spec::Employee) -> Employee {
 impl ExportTarget<Service> for Project {
     fn export(&self) -> Service {
         Service {
-            time: self.hours().total_time(),
-            tax: self.hours().tax().ok().map(|t| t.value()),
+            time: self.hours().total_time().map(ExportFloat),
+            tax: self.hours().tax().ok().map(|t| t.value()).map(ExportFloat),
             salary: self.hours().salary().ok().map(|s| s.postfix().to_string()),
             gross_total: self.hours().gross_wages().map(|s| s.postfix().to_string()),
             net_total: self.hours().net_wages().map(|s| s.postfix().to_string()),
@@ -114,7 +153,7 @@ pub struct Sum {
     gross_sum: String,
     has_tax: bool,
     tax_sum: String,
-    tax_value: f64,
+    tax_value: ExportFloat,
 }
 
 use super::product::Product;
@@ -130,7 +169,7 @@ impl Sum {
         let gross_sum = list.gross_sum();
         let tax_sum = list.tax_sum();
         Sum {
-            tax_value: (tax.into_inner() * 100.0),
+            tax_value: ExportFloat(tax.into_inner() * 100.0),
             gross_sum: currency_to_string(&gross_sum),
             tax_sum: currency_to_string(&tax_sum),
             has_tax: (tax.into_inner() > 0f64),
@@ -197,9 +236,9 @@ pub struct ExportProduct {
     name: String,
     price: String,
     unit: String,
-    amount: f64,
+    amount: ExportFloat,
     cost: String,
-    tax: f64,
+    tax: ExportFloat,
 }
 
 fn bill_products(bill: &Bill<Product<'_>>) -> Vec<ExportProduct> {
@@ -209,9 +248,9 @@ fn bill_products(bill: &Bill<Product<'_>>) -> Vec<ExportProduct> {
             name: item.product.name.to_string(),
             price: currency_to_string(&item.product.price),
             unit: item.product.unit.unwrap_or("").to_string(),
-            amount: item.amount,
+            amount: item.amount.into(),
             cost: currency_to_string(&item.gross()),
-            tax: tax.value(),
+            tax: tax.value().into(),
         })
         .collect()
 }

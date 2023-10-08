@@ -592,7 +592,7 @@ dependencies = [
  "maplit",
  "num-traits",
  "open",
- "ordered-float",
+ "ordered-float 4.1.0",
  "pretty_assertions",
  "prettytable-rs",
  "rayon",
@@ -710,7 +710,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2025470f96c765160968fb382f84e11bfa9596963e3f8ba8589f043ee2d8cd51"
 dependencies = [
  "claude",
- "ordered-float",
+ "ordered-float 3.9.1",
  "serde",
  "serde_json",
 ]
@@ -1682,9 +1682,9 @@ dependencies = [
 
 [[package]]
 name = "itertools"
-version = "0.10.5"
+version = "0.11.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b0fd2260e829bddf4cb6ea802289de2f86d6a7a690192fbe91b3f46e0f2c8473"
+checksum = "b1c173a5686ce8bfa551b3563d0c2170bf24ca44da99c7ca4bfdab5418c3fe57"
 dependencies = [
  "either",
 ]
@@ -2045,6 +2045,15 @@ name = "ordered-float"
 version = "3.9.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2a54938017eacd63036332b4ae5c8a49fc8c0c1d6d629893057e4f13609edd06"
+dependencies = [
+ "num-traits",
+]
+
+[[package]]
+name = "ordered-float"
+version = "4.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e3a540f3e3b3d7929c884e46d093d344e4e5bdeed54d08bf007df50c93cc85d5"
 dependencies = [
  "num-traits",
 ]
