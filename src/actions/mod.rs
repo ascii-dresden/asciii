@@ -7,18 +7,16 @@ use icalendar::Calendar;
 #[cfg(feature = "meta")]
 use toml;
 
-use std::fmt::Write;
 #[cfg(feature = "meta")]
 use std::fs;
 
-use std::collections::HashMap;
-use std::path::PathBuf;
-use std::process::Command;
+use std::{collections::HashMap, fmt::Write, path::PathBuf, process::Command};
 
-use crate::project::spec::*;
-use crate::project::Project;
-use crate::storage::{self, Storable, StorageDir};
-use crate::util;
+use crate::{
+    project::{spec::*, Project},
+    storage::{self, Storable, StorageDir},
+    util,
+};
 
 pub mod error;
 use self::error::*;
@@ -78,24 +76,14 @@ pub fn projects_to_csv(projects: &[Project]) -> Result<String, Error> {
             &mut string,
             "{}",
             [
-                project
-                    .field("InvoiceNumber")
-                    .unwrap_or_else(|| String::from(r#""""#)),
-                project
-                    .field("Name")
-                    .unwrap_or_else(|| String::from(r#""""#)),
+                project.field("InvoiceNumber").unwrap_or_else(|| String::from(r#""""#)),
+                project.field("Name").unwrap_or_else(|| String::from(r#""""#)),
                 project
                     .field("event/dates/0/begin")
                     .unwrap_or_else(|| String::from(r#""""#)),
-                project
-                    .field("invoice/date")
-                    .unwrap_or_else(|| String::from(r#""""#)),
-                project
-                    .field("Employees")
-                    .unwrap_or_else(|| String::from(r#""""#)),
-                project
-                    .field("Responsible")
-                    .unwrap_or_else(|| String::from(r#""""#)),
+                project.field("invoice/date").unwrap_or_else(|| String::from(r#""""#)),
+                project.field("Employees").unwrap_or_else(|| String::from(r#""""#)),
+                project.field("Responsible").unwrap_or_else(|| String::from(r#""""#)),
                 project
                     .field("invoice/payed_date")
                     .unwrap_or_else(|| String::from(r#""""#)),
@@ -136,9 +124,7 @@ fn unpayed_employees(projects: &[Project]) -> HashMap<String, Currency> {
         .flat_map(IntoIterator::into_iter);
 
     for employee in employees {
-        let bucket = buckets
-            .entry(employee.name.clone())
-            .or_insert_with(Currency::new);
+        let bucket = buckets.entry(employee.name.clone()).or_insert_with(Currency::new);
         *bucket = *bucket + employee.salary;
     }
     buckets
@@ -192,14 +178,8 @@ pub fn spec() -> Result<(), Error> {
         project.invoice().number_str();
         project.offer().number().unwrap();
         project.age().map(|a| format!("{} days", a)).unwrap();
-        project
-            .modified_date()
-            .map(|d| d.year().to_string())
-            .unwrap();
-        project
-            .sum_sold()
-            .map(|c| util::currency_to_string(&c))
-            .unwrap();
+        project.modified_date().map(|d| d.year().to_string()).unwrap();
+        project.sum_sold().map(|c| util::currency_to_string(&c)).unwrap();
         project.responsible().map(ToOwned::to_owned).unwrap();
         project.name().map(ToOwned::to_owned).unwrap();
     }
@@ -219,11 +199,7 @@ pub fn delete_project_confirmation(dir: StorageDir, search_terms: &[&str]) -> Re
     Ok(())
 }
 
-pub fn archive_projects(
-    search_terms: &[&str],
-    manual_year: Option<i32>,
-    force: bool,
-) -> Result<Vec<PathBuf>, Error> {
+pub fn archive_projects(search_terms: &[&str], manual_year: Option<i32>, force: bool) -> Result<Vec<PathBuf>, Error> {
     log::trace!(
         "archive_projects matching ({:?},{:?},{:?})",
         search_terms,
@@ -241,10 +217,7 @@ pub fn archive_all_projects() -> Result<Vec<PathBuf>, Error> {
         .iter()
         .filter(|p| p.is_ready_for_archive().is_empty())
     {
-        log::info!(
-            "{}",
-            lformat!("we could get rid of: {}", project.name().unwrap_or(""))
-        );
+        log::info!("{}", lformat!("we could get rid of: {}", project.name().unwrap_or("")));
         moved_files.push(project.dir());
         moved_files.append(&mut storage.archive_project(project, project.year().unwrap())?);
     }

@@ -1,13 +1,15 @@
-use std::path::{Path, PathBuf};
-use std::fs;
-use std::collections::HashMap;
+use std::{
+    collections::HashMap,
+    fs,
+    path::{Path, PathBuf},
+};
 
 use chrono::prelude::*;
-use tempdir::TempDir;
 use maplit::hashmap;
+use tempdir::TempDir;
 
-use crate::util;
 use super::*;
+use crate::util;
 
 // TODO: add tests for file or directories in return values
 
@@ -16,77 +18,102 @@ pub struct TestProject {
     file_path: PathBuf,
 }
 
-impl Storable for TestProject{
+impl Storable for TestProject {
     // creates in tempfile
-    fn from_template(project_name: &str, template: &Path, _fill: &HashMap<&str, String>) -> Result<StorableAndTempDir<Self>, Error> where Self: Sized {
+    fn from_template(
+        project_name: &str,
+        template: &Path,
+        _fill: &HashMap<&str, String>,
+    ) -> Result<StorableAndTempDir<Self>, Error>
+    where
+        Self: Sized,
+    {
         // generates a temp file
-        let temp_dir  = TempDir::new_in("./target/debug/build/",project_name).unwrap();
+        let temp_dir = TempDir::new_in("./target/debug/build/", project_name).unwrap();
         let temp_file = temp_dir.path().join(project_name);
 
         // just copy over template
         fs::copy(template, &temp_file)?;
 
         // project now lives in the temp_file
-        let project = TestProject {
-            file_path: temp_file,
-        };
+        let project = TestProject { file_path: temp_file };
 
         Ok(StorableAndTempDir {
             storable: project,
-            temp_dir
+            temp_dir,
         })
     }
 
-    fn short_desc(&self) -> String{ self.file().file_stem().unwrap().to_str().unwrap().to_owned() }
-    fn modified_date(&self) -> Option<Date<Utc>>{ Some(Utc::today()) }
-    fn file(&self) -> PathBuf{ self.file_path.to_owned() }
-    fn set_file(&mut self, new_file:&Path){ self.file_path = new_file.to_owned(); }
-    fn index(&self) -> Option<String>{ Some("ZZ99".into()) }
-    fn prefix(&self) -> Option<String>{ self.index() }
+    fn short_desc(&self) -> String {
+        self.file().file_stem().unwrap().to_str().unwrap().to_owned()
+    }
+    fn modified_date(&self) -> Option<Date<Utc>> {
+        Some(Utc::today())
+    }
+    fn file(&self) -> PathBuf {
+        self.file_path.to_owned()
+    }
+    fn set_file(&mut self, new_file: &Path) {
+        self.file_path = new_file.to_owned();
+    }
+    fn index(&self) -> Option<String> {
+        Some("ZZ99".into())
+    }
+    fn prefix(&self) -> Option<String> {
+        self.index()
+    }
 
-    fn open_folder(path:&Path) -> Result<Self, Error>{
+    fn open_folder(path: &Path) -> Result<Self, Error> {
         Self::open_file(path)
     }
 
-    fn open_file(path:&Path) -> Result<Self, Error>{
-        Ok(TestProject{
-            file_path: PathBuf::from(path)
+    fn open_file(path: &Path) -> Result<Self, Error> {
+        Ok(TestProject {
+            file_path: PathBuf::from(path),
         })
     }
-    fn matches_filter(&self, _key: &str, _val: &str) -> bool {false}
-    fn matches_search(&self, _term: &str) -> bool {false}
-    fn is_ready_for_archive(&self) -> bool {true}
-
+    fn matches_filter(&self, _key: &str, _val: &str) -> bool {
+        false
+    }
+    fn matches_search(&self, _term: &str) -> bool {
+        false
+    }
+    fn is_ready_for_archive(&self) -> bool {
+        true
+    }
 }
 
-
 // TODO: implement failing cases
-const TEST_PROJECTS:[&str; 4] = [
-    "test1", "test2",
-    "foobar", "ich schreibe viel zu längliche projektnamen!",
+const TEST_PROJECTS: [&str; 4] = [
+    "test1",
+    "test2",
+    "foobar",
+    "ich schreibe viel zu längliche projektnamen!",
 ];
 
-
 fn setup() -> (TempDir, PathBuf, Storage<TestProject>) {
-    let dir = TempDir::new_in(Path::new("."),"storage_test").unwrap();
+    let dir = TempDir::new_in(Path::new("."), "storage_test").unwrap();
     let storage_path = dir.path().join("storage_test");
     let storage = Storage::try_new(&storage_path, "working", "archive", "templates").unwrap();
     (dir, storage_path, storage)
 }
 
-fn assert_existence(storage_path:&Path) {
-    assert!(storage_path.exists()
-            &&  storage_path.join("working").exists()
-            &&  storage_path.join("archive").exists()
-            &&  storage_path.join("templates").exists());
+fn assert_existence(storage_path: &Path) {
+    assert!(
+        storage_path.exists()
+            && storage_path.join("working").exists()
+            && storage_path.join("archive").exists()
+            && storage_path.join("templates").exists()
+    );
 }
 
-fn copy_template(target:PathBuf) {
+fn copy_template(target: PathBuf) {
     fs::copy("./templates/default.tyml", target.join("template1.tyml")).unwrap();
     fs::copy("./templates/default.tyml", target.join("template2.tyml")).unwrap();
 }
 
 #[test]
+#[rustfmt::skip]
 fn create_dirs() {
     let (dir , storage_path, storage) = setup();
     storage.create_dirs().unwrap();
@@ -100,6 +127,7 @@ fn create_dirs() {
 }
 
 #[test]
+#[rustfmt::skip]
 fn list_template_files(){
     let (_dir , storage_path, storage) = setup();
     storage.create_dirs().unwrap();
@@ -115,6 +143,7 @@ fn list_template_files(){
 }
 
 #[test]
+#[rustfmt::skip]
 fn create_archive(){
     let (_dir , storage_path, storage) = setup();
     assert!(storage.create_dirs().is_ok());
@@ -128,6 +157,7 @@ fn create_archive(){
 }
 
 #[test]
+#[rustfmt::skip]
 fn list_archives(){
     let (_dir , storage_path, storage) = setup();
     assert!(storage.create_dirs().is_ok());
@@ -157,6 +187,7 @@ fn list_archives(){
 }
 
 #[test]
+#[rustfmt::skip]
 fn create_project(){
     let (_dir , storage_path, storage) = setup();
     assert!(storage.create_dirs().is_ok());
@@ -183,6 +214,7 @@ fn create_project(){
 }
 
 #[test]
+#[rustfmt::skip]
 fn archive_project_by_name(){
     let (_dir , storage_path, storage) = setup();
     assert!(storage.create_dirs().is_ok());
@@ -208,6 +240,7 @@ fn archive_project_by_name(){
 }
 
 #[test]
+#[rustfmt::skip]
 fn archive_project(){
     let (_dir , storage_path, storage) = setup();
     assert!(storage.create_dirs().is_ok(), "could not even create storage in {:?}", storage_path);
@@ -238,6 +271,7 @@ fn archive_project(){
 }
 
 #[test]
+#[rustfmt::skip]
 fn unarchive_project_dir(){
     let (_dir , storage_path, storage) = setup();
     assert!(storage.create_dirs().is_ok());

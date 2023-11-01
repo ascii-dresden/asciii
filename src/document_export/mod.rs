@@ -2,20 +2,28 @@
 //!
 //! Haven't decided on a templating engine yet, my own will probably not do.
 
-use std::{time,fs};
-use std::path::{Path, PathBuf};
+use std::{
+    fs,
+    path::{Path, PathBuf},
+    time,
+};
 
-use serde::ser::Serialize;
 use anyhow::{bail, Error};
+use serde::ser::Serialize;
 use yaml_rust::Yaml;
 
-use handlebars::{Handlebars, no_escape, Helper, RenderContext, HelperDef, Context, Output, HelperResult};
+use handlebars::{no_escape, Context, Handlebars, Helper, HelperDef, HelperResult, Output, RenderContext};
 
-use crate::util;
-use crate::project::{self, Project, Exportable};
-use crate::project::BillType::{self, Invoice, Offer};
-use crate::project::export::ExportTarget;
-use crate::storage::{self, Storable, StorageSelection};
+use crate::{
+    project::{
+        self,
+        export::ExportTarget,
+        BillType::{self, Invoice, Offer},
+        Exportable, Project,
+    },
+    storage::{self, Storable, StorageSelection},
+    util,
+};
 
 pub mod error;
 
@@ -25,7 +33,7 @@ use self::error::*;
 struct DocAndStorage<'a, T: Serialize> {
     document: &'a T,
     storage: Option<storage::Paths>,
-    is_invoice: bool
+    is_invoice: bool,
 }
 
 impl<'a, T: 'a + Serialize> DocAndStorage<'a, T> {
@@ -33,7 +41,7 @@ impl<'a, T: 'a + Serialize> DocAndStorage<'a, T> {
         DocAndStorage {
             document,
             storage: storage::setup::<Project>().ok().map(|s| s.paths()),
-            is_invoice: bill_type == Invoice
+            is_invoice: bill_type == Invoice,
         }
     }
 }
@@ -43,10 +51,20 @@ struct IncHelper;
 
 impl HelperDef for IncHelper {
     #[allow(clippy::extra_unused_lifetimes)]
-    fn call<'reg: 'rc, 'rc>(&self, h: &Helper<'_, '_>, _: &Handlebars, _: &Context, _: &mut RenderContext<'_>, out: &mut dyn Output) -> HelperResult {
+    fn call<'reg: 'rc, 'rc>(
+        &self,
+        h: &Helper<'_, '_>,
+        _: &Handlebars,
+        _: &Context,
+        _: &mut RenderContext<'_>,
+        out: &mut dyn Output,
+    ) -> HelperResult {
         let param = h.param(0).unwrap().value();
         log::debug!("inc_helper({:?})", param);
-        out.write(&format!("{}", param.as_u64().expect("param can't be converted to u64") + 1))?;
+        out.write(&format!(
+            "{}",
+            param.as_u64().expect("param can't be converted to u64") + 1
+        ))?;
         Ok(())
     }
 }
@@ -56,7 +74,14 @@ struct CountHelper;
 
 impl HelperDef for CountHelper {
     #[allow(clippy::extra_unused_lifetimes)]
-    fn call<'reg: 'rc, 'rc>(&self, h: &Helper<'_, '_>, _: &Handlebars, _: &Context, _: &mut RenderContext<'_>, out: &mut dyn Output) -> HelperResult {
+    fn call<'reg: 'rc, 'rc>(
+        &self,
+        h: &Helper<'_, '_>,
+        _: &Handlebars,
+        _: &Context,
+        _: &mut RenderContext<'_>,
+        out: &mut dyn Output,
+    ) -> HelperResult {
         let count = h.param(0).unwrap().value().as_array().map_or(0, Vec::len);
         out.write(&format!("{}", count))?;
         Ok(())
@@ -68,21 +93,23 @@ impl HelperDef for CountHelper {
 /// Returns path to created file, potentially in a `tempdir`.
 // pub fn fill_template<E:Serialize>(document:E, template_file:&Path) -> PathBuf{
 pub fn fill_template<E, P>(document: &E, bill_type: BillType, template_path: P) -> Result<String, Error>
-    where E: Serialize, P:AsRef<Path>
+where
+    E: Serialize,
+    P: AsRef<Path>,
 {
     let mut handlebars = Handlebars::new();
 
     handlebars.register_escape_fn(no_escape);
-    handlebars.register_escape_fn(|data| data.replace('\n', r#"\newline "#));
+    handlebars.register_escape_fn(|data| data.replace('\n', r"\newline "));
 
-    handlebars.register_helper("inc",   Box::new(IncHelper));
+    handlebars.register_helper("inc", Box::new(IncHelper));
     // handlebars.register_helper("count", Box::new(count_helper));
 
     handlebars.register_template_file("document", template_path).unwrap();
 
-    Ok(handlebars.render("document", &DocAndStorage::from(document, bill_type))
-                 .map(|r| r.replace('<', "{")
-                           .replace('>', "}"))?)
+    Ok(handlebars
+        .render("document", &DocAndStorage::from(document, bill_type))
+        .map(|r| r.replace('<', "{").replace('>', "}"))?)
 }
 
 fn file_age(path: &Path) -> Result<time::Duration, Error> {
@@ -91,9 +118,9 @@ fn file_age(path: &Path) -> Result<time::Duration, Error> {
     Ok(modified.elapsed()?)
 }
 
-fn output_template_path(template_name:&str) -> Result<PathBuf, Error> {
+fn output_template_path(template_name: &str) -> Result<PathBuf, Error> {
     // construct_template_path(&template_name) {
-    let template_ext  = crate::CONFIG.get_str("extensions/output_template");
+    let template_ext = crate::CONFIG.get_str("extensions/output_template");
     let mut template_path = PathBuf::new();
     template_path.push(storage::get_storage_path());
     template_path.push(crate::CONFIG.get_str("dirs/templates"));
@@ -111,7 +138,7 @@ fn output_template_path(template_name:&str) -> Result<PathBuf, Error> {
 }
 
 /// Creates the latex files within each projects directory, either for Invoice or Offer.
-#[cfg(feature="document_export")]
+#[cfg(feature = "document_export")]
 #[allow(clippy::cognitive_complexity)] // sorry
 fn project_to_doc(project: &Project, config: &ExportConfig<'_>) -> Result<Option<PathBuf>, Error> {
     log::trace!("exporting a document: {:#?}", config);
@@ -128,17 +155,20 @@ fn project_to_doc(project: &Project, config: &ExportConfig<'_>) -> Result<Option
     } = config;
 
     // init_export_config()
-    let output_ext    = crate::CONFIG.get_str("extensions/output_file");
-    let convert_ext   = crate::CONFIG.get_str("document_export/output_extension");
-    let convert_tool  = crate::CONFIG.get_str("document_export/convert_tool");
+    let output_ext = crate::CONFIG.get_str("extensions/output_file");
+    let convert_ext = crate::CONFIG.get_str("document_export/output_extension");
+    let convert_tool = crate::CONFIG.get_str("document_export/convert_tool");
     let output_folder = util::get_valid_path(crate::CONFIG.get_str("output_path")).unwrap();
-    let trash_exts    = crate::CONFIG.get("document_export/trash_extensions")
-                                .expect("Faulty default config")
-                                .as_vec().expect("Faulty default config")
-                                .iter()
-                                .map(Yaml::as_str).collect::<Vec<_>>();
+    let trash_exts = crate::CONFIG
+        .get("document_export/trash_extensions")
+        .expect("Faulty default config")
+        .as_vec()
+        .expect("Faulty default config")
+        .iter()
+        .map(Yaml::as_str)
+        .collect::<Vec<_>>();
 
-    let  template_path = output_template_path(template_name)?;
+    let template_path = output_template_path(template_name)?;
     log::debug!("converting with {:?}", convert_tool);
     log::debug!("template {:?}", template_path);
 
@@ -148,9 +178,7 @@ fn project_to_doc(project: &Project, config: &ExportConfig<'_>) -> Result<Option
     let project_file = project.file();
 
     let default_mode = if missing_for_invoice.is_empty() { Invoice } else { Offer };
-    let (dyn_bill_type, outfile_tex):
-        (Option<BillType>, Option<PathBuf>) =
-         match bill_type.unwrap_or(default_mode) // (bill_type, missing_for_offer[..], missing_for_invoice[..])
+    let (dyn_bill_type, outfile_tex): (Option<BillType>, Option<PathBuf>) = match bill_type.unwrap_or(default_mode) // (bill_type, missing_for_offer[..], missing_for_invoice[..])
     {
         Offer if missing_for_offer.is_empty() =>
             (Some(Offer), Some(project.dir().join(project.offer_file_name(output_ext)
@@ -185,10 +213,12 @@ fn project_to_doc(project: &Project, config: &ExportConfig<'_>) -> Result<Option
         let pdffile = util::to_local_file(&tex_file, convert_ext);
 
         let document_file = if let Some(output_path) = output_path {
-            if output_path.is_dir() { // if dir, use my name and place in there
+            if output_path.is_dir() {
+                // if dir, use my name and place in there
                 log::trace!("output_path is dir");
                 output_path.join(&pdffile)
-            } else if output_path.parent().map(Path::exists).unwrap_or(false) {// if not dir, place at this path with this name
+            } else if output_path.parent().map(Path::exists).unwrap_or(false) {
+                // if not dir, place at this path with this name
                 log::trace!("output_path is file");
                 output_path.to_owned()
             } else {
@@ -212,26 +242,31 @@ fn project_to_doc(project: &Project, config: &ExportConfig<'_>) -> Result<Option
                   project_file.file_name().and_then(OsStr::to_str).unwrap()
                   );
             Ok(None)
-
-        } else if dry_run { // just testing what is possible
-            log::warn!("Dry run! This does not produce any output:\n * {}\n * {}", tex_file.display(), pdffile.display());
+        } else if dry_run {
+            // just testing what is possible
+            log::warn!(
+                "Dry run! This does not produce any output:\n * {}\n * {}",
+                tex_file.display(),
+                pdffile.display()
+            );
             Ok(None)
-
-        } else if print_only { // for debugging or pipelining purposes
+        } else if print_only {
+            // for debugging or pipelining purposes
             log::debug!("only printing");
             println!("{}", filled);
             Ok(None)
-
-
-        } else { // ok, we really have to work
+        } else {
+            // ok, we really have to work
 
             let mut outfile_path = if pdf_only {
                 let (tex_age, project_age) = (file_age(&tex_file)?, file_age(&project_file)?);
                 log::info!("recreating the pdf");
                 log::debug!("{:?} -> {:?}", tex_file, document_file);
                 log::debug!("{:?} -> {:?}", tex_age, project_age);
-                if project_age < tex_age && !util::really(&lformat!("Project file is younger than pdf, continue anyway?")) {
-                    return Ok(None)
+                if project_age < tex_age
+                    && !util::really(&lformat!("Project file is younger than pdf, continue anyway?"))
+                {
+                    return Ok(None);
                 }
                 project.full_file_path(dyn_bill, output_ext)?
             } else {
@@ -242,24 +277,23 @@ fn project_to_doc(project: &Project, config: &ExportConfig<'_>) -> Result<Option
             util::pass_to_command(Some(convert_tool), &[&outfile_path])?;
 
             // clean up expected log and aux files etc
-            for trash_ext in trash_exts.iter().filter_map(|x|*x) {
+            for trash_ext in trash_exts.iter().filter_map(|x| *x) {
                 let trash_file = util::to_local_file(&tex_file, trash_ext);
-                if  trash_file.exists() {
+                if trash_file.exists() {
                     fs::remove_file(&trash_file)?;
                     log::debug!("just deleted: {}", trash_file.display())
                 } else {
-                    log::debug!("I expected there to be a {}, but there wasn't any ?", trash_file.display())
+                    log::debug!(
+                        "I expected there to be a {}, but there wasn't any ?",
+                        trash_file.display()
+                    )
                 }
             }
 
             // now we move the created pdf
             outfile_path.set_extension("pdf");
             if pdffile.exists() || outfile_path.exists() {
-                let file = if pdffile.exists() {
-                    pdffile
-                } else {
-                    outfile_path
-                };
+                let file = if pdffile.exists() { pdffile } else { outfile_path };
                 log::debug!("now there is be a {:?} -> {:?}", file, document_file);
                 fs::rename(&file, &document_file)?;
             } else {
@@ -267,7 +301,6 @@ fn project_to_doc(project: &Project, config: &ExportConfig<'_>) -> Result<Option
             }
             Ok(Some(document_file))
         }
-
     } else {
         bail!(ExportError::NoPdfCreated);
     }
@@ -297,13 +330,13 @@ impl<'a> Default for ExportConfig<'a> {
             pdf_only: false,
             force: false,
             print_only: false,
-            open: true
+            open: true,
         }
     }
 }
 
 /// Creates the latex files within each projects directory, either for Invoice or Offer.
-#[cfg(feature="document_export")]
+#[cfg(feature = "document_export")]
 pub fn projects_to_doc(config: &ExportConfig<'_>) -> Result<(), Error> {
     let storage = storage::setup::<Project>()?;
     for p in storage.open_projects(&config.select)? {
@@ -315,4 +348,3 @@ pub fn projects_to_doc(config: &ExportConfig<'_>) -> Result<(), Error> {
     }
     Ok(())
 }
-

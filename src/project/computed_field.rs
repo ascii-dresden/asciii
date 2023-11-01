@@ -1,9 +1,9 @@
+use crate::{
+    storage::{self, Storable},
+    util,
+};
 
-use crate::storage::{self, Storable};
-use crate::util;
-
-use super::Project;
-use super::spec::*;
+use super::{spec::*, Project};
 
 // Fields that are accessible but are not directly found in the file format.
 // This is used to get fields that are computed through an ordinary `field("responsible")`
@@ -75,51 +75,34 @@ impl ComputedField {
             ComputedField::OfferNumber => project.offer().number().ok(),
             ComputedField::InvoiceNumber => project.invoice().number_str(),
             ComputedField::InvoiceNumberLong => project.invoice().number_long_str(),
-            ComputedField::Name => {
-                Some(project.name().ok()
-                            .map(ToString::to_string)
-                            .unwrap_or_else(|| project.file_name()))
-            } // TODO: remove name() from `Storable`, storables only need a slug()
-            ComputedField::Final => {
-                project.sum_sold()
-                       .map(|c| util::currency_to_string(&c))
-                       .ok()
-            }
+            ComputedField::Name => Some(
+                project
+                    .name()
+                    .ok()
+                    .map(ToString::to_string)
+                    .unwrap_or_else(|| project.file_name()),
+            ), // TODO: remove name() from `Storable`, storables only need a slug()
+            ComputedField::Final => project.sum_sold().map(|c| util::currency_to_string(&c)).ok(),
             ComputedField::Age => project.age().map(|a| lformat!("{} days", a)),
 
-            ComputedField::OurBad => {
-                project.our_bad()
-                       .map(|a| lformat!("{} weeks", a.num_weeks().abs()))
-            }
-            ComputedField::TheirBad => {
-                project.their_bad()
-                       .map(|a| lformat!("{} weeks", a.num_weeks().abs()))
-            }
+            ComputedField::OurBad => project.our_bad().map(|a| lformat!("{} weeks", a.num_weeks().abs())),
+            ComputedField::TheirBad => project.their_bad().map(|a| lformat!("{} weeks", a.num_weeks().abs())),
 
             ComputedField::Year => project.year().map(|i| i.to_string()),
-            ComputedField::Date => {
-                project.modified_date()
-                       .map(|d| d.format("%Y.%m.%d").to_string())
-            }
+            ComputedField::Date => project.modified_date().map(|d| d.format("%Y.%m.%d").to_string()),
             ComputedField::SortIndex => project.index(),
 
             ComputedField::Employees => project.hours().employees_string(),
             ComputedField::ClientFullName => project.client().full_name(),
             ComputedField::Deserializes => Some(format!("{:?}", project.parse_yaml().is_ok())),
-            ComputedField::Wages => {
-                project.hours()
-                       .gross_wages()
-                       .map(|c| util::currency_to_string(&c))
-            }
+            ComputedField::Wages => project.hours().gross_wages().map(|c| util::currency_to_string(&c)),
             ComputedField::Format => project.format().ok().map(|f| f.to_string()),
-            ComputedField::Dir => {
-                project.dir()
-                       .parent()
-                       .and_then(|d| d.strip_prefix(&storage).ok())
-                       .map(|d| d.display().to_string())
-            }
+            ComputedField::Dir => project
+                .dir()
+                .parent()
+                .and_then(|d| d.strip_prefix(&storage).ok())
+                .map(|d| d.display().to_string()),
             ComputedField::Invalid => None,
-
             // _ => None
         }
     }

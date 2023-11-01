@@ -8,8 +8,7 @@
 pub mod app;
 pub mod subcommands;
 
-#[cfg(feature="shell")]
+#[cfg(feature = "shell")]
 pub mod shell;
 
-pub use self::app::with_cli;
-pub use self::app::match_matches;
+pub use self::app::{match_matches, with_cli};

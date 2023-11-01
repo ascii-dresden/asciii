@@ -1,7 +1,6 @@
-use std::path::{Path,PathBuf};
+use std::path::{Path, PathBuf};
 
-use super::*;
-use super::tests::TestProject;
+use super::{tests::TestProject, *};
 
 const STORAGE: &str = "/home/hendrik/ascii/caterings";
 
@@ -11,28 +10,30 @@ fn setup() -> (PathBuf, Storage<TestProject>) {
     (storage_path, storage)
 }
 
-fn assert_existence(storage_path:&Path) {
-    assert!(storage_path.exists()
-            &&  storage_path.join("working").exists()
-            &&  storage_path.join("archive").exists()
-            &&  storage_path.join("templates").exists());
+fn assert_existence(storage_path: &Path) {
+    assert!(
+        storage_path.exists()
+            && storage_path.join("working").exists()
+            && storage_path.join("archive").exists()
+            && storage_path.join("templates").exists()
+    );
 }
 
 #[test]
 #[ignore]
-fn list_template_files(){
+fn list_template_files() {
     let (storage_path, storage) = setup();
     //storage.create_dirs().unwrap();
     assert_existence(&storage_path);
 
     let templates = storage.list_template_files().unwrap();
-    println!("{:#?}",templates);
+    println!("{:#?}", templates);
     assert!(templates.len() == 3);
 }
 
 #[test]
 #[ignore]
-fn list_archives(){
+fn list_archives() {
     let (_storage_path, storage) = setup();
     assert!(storage.create_dirs().is_ok());
 
@@ -48,7 +49,7 @@ fn list_archives(){
 
 #[test]
 #[ignore]
-fn list_project_folders(){
+fn list_project_folders() {
     let (_storage_path, storage) = setup();
     assert!(storage.create_dirs().is_ok());
 
@@ -57,4 +58,3 @@ fn list_project_folders(){
     println!("Projects");
     println!("{:#?}", projects);
 }
-

@@ -1,6 +1,6 @@
 use anyhow::Error;
-use ordered_float::OrderedFloat;
 use num_traits::Float;
+use ordered_float::OrderedFloat;
 
 use std::collections::HashMap;
 
@@ -9,13 +9,10 @@ use std::collections::HashMap;
 pub struct OrderedFloatDef<T: Float>(pub T);
 
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Hash, Clone)]
-pub struct Number(
-    #[serde(with = "OrderedFloatDef")]
-    OrderedFloat<f64>
-    );
+pub struct Number(#[serde(with = "OrderedFloatDef")] OrderedFloat<f64>);
 
 impl From<Number> for f64 {
-    fn from (num: Number) -> f64 {
+    fn from(num: Number) -> f64 {
         let Number(ord) = num;
         ord.into_inner()
     }
@@ -50,7 +47,7 @@ pub struct Event {
     name: String,
     location: Option<String>,
     description: Option<String>,
-    dates: Vec<ProjectDate>
+    dates: Vec<ProjectDate>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -58,35 +55,33 @@ pub struct Event {
 pub struct ProjectDate {
     begin: String,
     end: Option<String>,
-    times: Vec<Time>
+    times: Vec<Time>,
 }
 
 #[derive(Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum ProductDesc {
     Name(String),
-    Head{
+    Head {
         name: String,
         price: Number,
         unit: Option<String>,
-        tax: Option<Number>
+        tax: Option<Number>,
     },
-
 }
 
 impl ProductDesc {
     pub fn name(&self) -> String {
         match *self {
             ProductDesc::Name(ref name) => name.to_owned(),
-            ProductDesc::Head{ref name, .. } => name.clone(),
-
+            ProductDesc::Head { ref name, .. } => name.clone(),
         }
     }
 
     pub fn price(&self) -> Option<f64> {
         match *self {
             ProductDesc::Name(_) => None,
-            ProductDesc::Head{ref price, .. } => Some(price.clone().into()),
+            ProductDesc::Head { ref price, .. } => Some(price.clone().into()),
         }
     }
 }
@@ -98,7 +93,6 @@ pub struct Product {
     price: Option<f64>,
     sold: Option<f64>,
 }
-
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Hours {
@@ -112,7 +106,6 @@ pub struct Time {
     end: Option<String>,
 }
 
-
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Meta {
     invoicer_version: String,
@@ -123,4 +116,3 @@ pub struct Meta {
 pub fn from_str(content: &str) -> Result<Project, Error> {
     Ok(serde_yaml::from_str(content)?)
 }
-

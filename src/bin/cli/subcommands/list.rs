@@ -1,41 +1,41 @@
-
+use anyhow::Error;
 use chrono::prelude::*;
 use clap::ArgMatches;
-use anyhow::Error;
 
-use asciii::CONFIG;
 use asciii::print::{self, ListConfig, ListMode};
-use asciii::project::{Project, ComputedField};
 use asciii::project::spec::IsProject;
+use asciii::project::{ComputedField, Project};
 use asciii::storage::*;
-
+use asciii::CONFIG;
 
 /// Command LIST
-pub fn list(matches: &ArgMatches<'_>) -> Result<(), Error> {
+pub fn list(matches: &ArgMatches) -> Result<(), Error> {
     if matches.is_present("templates") {
-        list_templates()?; Ok(())
+        list_templates()?;
+        Ok(())
     } else if matches.is_present("years") {
-        list_years()?; Ok(())
+        list_years()?;
+        Ok(())
     } else if matches.is_present("computed_fields") {
-        list_computed_fields()?; Ok(())
+        list_computed_fields()?;
+        Ok(())
     } else {
-        let list_mode = decide_mode(matches.is_present("simple"),
-                                    matches.is_present("verbose"),
-                                    matches.is_present("paths"),
-                                    matches.is_present("nothing"),
-                                    matches.is_present("csv"));
+        let list_mode = decide_mode(
+            matches.is_present("simple"),
+            matches.is_present("verbose"),
+            matches.is_present("paths"),
+            matches.is_present("nothing"),
+            matches.is_present("csv"),
+        );
 
-        let extra_details = matches.values_of("details")
-                                   .map(Iterator::collect);
+        let extra_details = matches.values_of("details").map(Iterator::collect);
         let config_details = CONFIG.get_strs("list/extra_details");
 
         let mut list_config = ListConfig {
-            sort_by: matches.value_of("sort")
-                            .unwrap_or_else(|| CONFIG.get_str("list/sort")),
+            sort_by: matches.value_of("sort").unwrap_or_else(|| CONFIG.get_str("list/sort")),
             mode: list_mode,
             details: extra_details.or(config_details),
-            filter_by: matches.values_of("filter")
-                              .map(Iterator::collect),
+            filter_by: matches.values_of("filter").map(Iterator::collect),
             show_errors: matches.is_present("errors"),
 
             ..Default::default()
@@ -50,14 +50,16 @@ pub fn list(matches: &ArgMatches<'_>) -> Result<(), Error> {
 
         // list archive of year `archive`
         let dir = if matches.is_present("archive") {
-            let archive_year = matches.value_of("archive")
-                                      .and_then(|y| y.parse::<i32>().ok())
-                                      .unwrap_or_else(|| Utc::today().year());
+            let archive_year = matches
+                .value_of("archive")
+                .and_then(|y| y.parse::<i32>().ok())
+                .unwrap_or_else(|| Utc::today().year());
             StorageDir::Archive(archive_year)
         } else if matches.is_present("year") {
-            let year = matches.value_of("year")
-                              .and_then(|y| y.parse::<i32>().ok())
-                              .unwrap_or_else(|| Utc::today().year());
+            let year = matches
+                .value_of("year")
+                .and_then(|y| y.parse::<i32>().ok())
+                .unwrap_or_else(|| Utc::today().year());
             StorageDir::Year(year)
         }
         // or list all, but sort by date
@@ -74,10 +76,10 @@ pub fn list(matches: &ArgMatches<'_>) -> Result<(), Error> {
         };
 
         if matches.is_present("broken") {
-               list_broken_projects(dir)?; // XXX Broken
-           } else {
-               list_projects(dir, &list_config)?;
-           }
+            list_broken_projects(dir)?; // XXX Broken
+        } else {
+            list_projects(dir, &list_config)?;
+        }
         Ok(())
     }
 }
@@ -111,20 +113,16 @@ fn list_projects(dir: StorageDir, list_config: &ListConfig<'_>) -> Result<(), Er
         "manager" => projects.sort_by(|pa, pb| pa.responsible().cmp(&pb.responsible())),
         "date" => projects.sort_by_key(|pa| pa.modified_date()),
         "name" => projects.sort_by_key(|pa| pa.short_desc()),
-        "index" => {
-            projects.sort_by(|pa, pb| {
-                                 pa.index()
-                                   .unwrap_or_else(|| "zzzz".to_owned())
-                                   .cmp(&pb.index().unwrap_or_else(|| "zzzz".to_owned()))
-                             })
-        } // TODO: rename to ident
-        _ => {
-            projects.sort_by(|pa, pb| {
-                                 pa.index()
-                                   .unwrap_or_else(|| "zzzz".to_owned())
-                                   .cmp(&pb.index().unwrap_or_else(|| "zzzz".to_owned()))
-                             })
-        }
+        "index" => projects.sort_by(|pa, pb| {
+            pa.index()
+                .unwrap_or_else(|| "zzzz".to_owned())
+                .cmp(&pb.index().unwrap_or_else(|| "zzzz".to_owned()))
+        }), // TODO: rename to ident
+        _ => projects.sort_by(|pa, pb| {
+            pa.index()
+                .unwrap_or_else(|| "zzzz".to_owned())
+                .cmp(&pb.index().unwrap_or_else(|| "zzzz".to_owned()))
+        }),
     }
 
     // fit screen
@@ -150,9 +148,10 @@ fn list_projects(dir: StorageDir, list_config: &ListConfig<'_>) -> Result<(), Er
 fn list_broken_projects(dir: StorageDir) -> Result<(), Error> {
     let storage = setup::<Project>()?;
     let invalid_files = storage.list_project_folders(dir)?;
-    let errors = invalid_files.iter()
-                            .filter_map(|dir| Project::open_folder(dir).err())
-                            .collect::<Vec<anyhow::Error>>();
+    let errors = invalid_files
+        .iter()
+        .filter_map(|dir| Project::open_folder(dir).err())
+        .collect::<Vec<anyhow::Error>>();
 
     for err in errors {
         println!("{}", err);
@@ -180,10 +179,12 @@ pub fn list_years() -> Result<(), Error> {
 
 /// Command LIST --virt
 pub fn list_computed_fields() -> Result<(), Error> {
-    println!("{:?}",
-             ComputedField::iter_variant_names()
-                 .filter(|v| *v != "Invalid")
-                 .collect::<Vec<&str>>());
+    println!(
+        "{:?}",
+        ComputedField::iter_variant_names()
+            .filter(|v| *v != "Invalid")
+            .collect::<Vec<&str>>()
+    );
     Ok(())
 }
 
@@ -200,15 +201,15 @@ fn decide_mode(simple: bool, verbose: bool, paths: bool, nothing: bool, csv: boo
             (false, true, _) => {
                 log::debug!("-v overwrites config");
                 ListMode::Verbose
-            }
+            },
             (false, _, true) => {
                 log::debug!("-v from config");
                 ListMode::Verbose
-            }
+            },
             _ => {
                 log::debug!("simple mode");
                 ListMode::Simple
-            }
+            },
         }
     }
 }

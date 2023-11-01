@@ -1,7 +1,5 @@
 //! Error that may occur in Storage
 //!
-use thiserror::Error;
-
 use std::path::PathBuf;
 
 #[cfg(not(feature = "git_statuses"))]
@@ -9,8 +7,7 @@ mod git2 {
     pub use super::super::repo::GitError as Error;
 }
 
-
-#[derive(Error, Debug)]
+#[derive(thiserror::Error, Debug)]
 pub enum StorageError {
     #[error("The directory you passed cannot be used in this context. You perhaps passed `Templates` instead of `Archive` or `Working`")]
     BadChoice,
@@ -53,5 +50,4 @@ pub enum StorageError {
 
     #[error("Nothing found for {:?}", _0)]
     NothingFound(Vec<String>),
-
 }
