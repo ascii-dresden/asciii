@@ -1,6 +1,6 @@
 # asciii
 
-[![travis](https://img.shields.io/travis/ascii-dresden/asciii.svg)](https://travis-ci.org/ascii-dresden/asciii/)
+[![build](https://img.shields.io/github/actions/workflow/status/ascii-dresden/asciii/ci.yml?branch=main)](https://github.com/ascii-dresden/asciii/actions?query=workflow%3A"Continuous+Integration")
 [![license](https://img.shields.io/crates/l/asciii.svg)](https://crates.io/crates/asciii/)
 [![crates.io](https://img.shields.io/crates/d/asciii.svg)](https://crates.io/crates/asciii)
 [![version](https://img.shields.io/crates/v/asciii.svg)](https://crates.io/crates/asciii/)
