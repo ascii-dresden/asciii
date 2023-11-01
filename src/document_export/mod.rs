@@ -56,7 +56,7 @@ impl HelperDef for IncHelper {
         h: &Helper<'_, '_>,
         _: &Handlebars,
         _: &Context,
-        _: &mut RenderContext<'_>,
+        _: &mut RenderContext<'_, '_>,
         out: &mut dyn Output,
     ) -> HelperResult {
         let param = h.param(0).unwrap().value();
@@ -79,7 +79,7 @@ impl HelperDef for CountHelper {
         h: &Helper<'_, '_>,
         _: &Handlebars,
         _: &Context,
-        _: &mut RenderContext<'_>,
+        _: &mut RenderContext<'_, '_>,
         out: &mut dyn Output,
     ) -> HelperResult {
         let count = h.param(0).unwrap().value().as_array().map_or(0, Vec::len);
