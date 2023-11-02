@@ -64,11 +64,11 @@ pub mod api {
     }
 
     #[get("/version")]
-    pub fn version() -> HttpResponse {
+    pub async fn version() -> HttpResponse {
         let version: &str = asciii::VERSION_JSON.as_ref();
         log::info!("version {}", version);
         HttpResponse::Ok()
-            .set_header(header::CONTENT_TYPE, "application/json")
+            .insert_header((header::CONTENT_TYPE, "application/json"))
             .body(version)
     }
 
@@ -77,7 +77,7 @@ pub mod api {
         use asciii::project::spec::HasEvents;
 
         #[get("/calendar")]
-        pub fn calendar() -> HttpResponse {
+        pub async fn calendar() -> HttpResponse {
             log::info!("calendar");
             self::CHANNEL.send(()).unwrap();
             let loader = self::PROJECTS.lock().unwrap();
@@ -94,7 +94,7 @@ pub mod api {
             cal.append(&mut tasks);
 
             HttpResponse::Ok()
-                .set_header(header::CONTENT_TYPE, "text/calendar")
+                .insert_header((header::CONTENT_TYPE, "text/calendar"))
                 .body(cal.to_string())
         }
     }
@@ -103,7 +103,7 @@ pub mod api {
         use super::*;
 
         #[get("/year")]
-        pub fn years(_req: HttpRequest) -> HttpResponse {
+        pub async fn years(_req: HttpRequest) -> HttpResponse {
             log::info!("years");
             self::CHANNEL.send(()).unwrap();
             let loader = self::PROJECTS.lock().unwrap();
@@ -112,7 +112,7 @@ pub mod api {
         }
 
         #[get("/year/{year}")]
-        pub fn by_year(param: web::Path<YearRequest>) -> HttpResponse {
+        pub async fn by_year(param: web::Path<YearRequest>) -> HttpResponse {
             log::info!("by_year");
             self::CHANNEL.send(()).unwrap();
             let loader = self::PROJECTS.lock().unwrap();
@@ -134,7 +134,7 @@ pub mod api {
         }
 
         #[get("/{name}")]
-        pub fn by_name(param: web::Path<NameRequest>) -> HttpResponse {
+        pub async fn by_name(param: web::Path<NameRequest>) -> HttpResponse {
             log::info!("by_name({:?})", param.name);
             self::CHANNEL.send(()).unwrap();
             let loader = self::PROJECTS.lock().unwrap();
@@ -153,7 +153,7 @@ pub mod api {
         }
 
         #[get("/workingdir")]
-        pub fn working_dir() -> HttpResponse {
+        pub async fn working_dir() -> HttpResponse {
             log::info!("projects/workingdir");
             let loader = self::PROJECTS.lock().unwrap();
             let list = loader.state.working.iter().map(|(ident, _)| ident).collect::<Vec<_>>();
@@ -163,7 +163,7 @@ pub mod api {
             HttpResponse::Ok().json(&list)
         }
 
-        pub fn all_names() -> HttpResponse {
+        pub async fn all_names() -> HttpResponse {
             let loader = self::PROJECTS.lock().unwrap();
             let list = loader.state.mapped.iter().map(|(ident, _)| ident).collect::<Vec<_>>();
 
@@ -177,7 +177,7 @@ pub mod api {
         use super::*;
 
         #[get("/year/{year}")]
-        pub fn by_year(param: web::Path<YearRequest>) -> HttpResponse {
+        pub async fn by_year(param: web::Path<YearRequest>) -> HttpResponse {
             let loader = self::PROJECTS.lock().unwrap();
             let exported = loader
                 .state
@@ -202,7 +202,7 @@ pub mod api {
         }
 
         #[get("/workingdir")]
-        pub fn working_dir() -> HttpResponse {
+        pub async fn working_dir() -> HttpResponse {
             log::info!("full_projects/workingdir");
             let loader = self::PROJECTS.lock().unwrap();
             let list = loader
@@ -222,8 +222,9 @@ pub mod api {
     }
 }
 
-fn main() -> Result<(), Box<dyn std::error::Error>> {
-    // color_backtrace::install();
+#[actix_web::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    color_backtrace::install();
 
     if env::var(LOG_VAR).is_err() {
         //env::set_var(LOG_VAR, "asciii=debug, asciii_web=debug, actix_web=debug");
@@ -235,55 +236,48 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     log::info!("running asciii-web");
     log::warn!("do not host this on a public server, there is no security by design");
 
-    let sys = actix::System::new();
-
-    let server =
-        || {
-            HttpServer::new(move || {
-                App::new()
-                    .wrap(middleware::Logger::default())
+    let server = HttpServer::new(move || {
+        App::new()
+            .wrap(middleware::Logger::default())
+            .service(
+                web::scope("api")
+                    .service(web::resource("projects").route(web::get().to(api::projects::all_names)))
+                    .service(api::version)
                     .service(
-                        web::scope("api")
-                            .service(web::resource("projects").route(web::get().to(api::projects::all_names)))
-                            .service(api::version)
-                            .service(
-                                web::scope("projects")
-                                    .service(api::projects::years)
-                                    .service(api::projects::by_year)
-                                    .service(api::projects::working_dir)
-                                    .service(api::projects::by_name),
-                            )
-                            .service(
-                                web::scope("full_projects")
-                                    .service(api::full_projects::by_year)
-                                    .service(api::full_projects::working_dir)
-                                    .service(api::projects::years),
-                            )
-                            .service(api::calendar::calendar),
+                        web::scope("projects")
+                            .service(api::projects::years)
+                            .service(api::projects::by_year)
+                            .service(api::projects::working_dir)
+                            .service(api::projects::by_name),
                     )
-                    // .service(fs::Files::new("/", "webapp/public").index_file("index.html"))
-                    .service(web::resource("/").route(
-                        web::get().to(|| HttpResponse::Ok().body(include_str!("../../webapp/public/index.html"))),
-                    ))
-                    .service(web::resource("/bundle.css").route(
-                        web::get().to(|| HttpResponse::Ok().body(include_str!("../../webapp/public/bundle.css"))),
-                    ))
-                    .service(web::resource("/bundle.js").route(web::get().to(|| {
-                        HttpResponse::Ok()
-                            .content_type("application/javascript")
-                            .body(include_str!("../../webapp/public/bundle.js"))
-                    })))
-                // .service(
-                //     web::resource("/bundle.js.map").route(
-                //         web::get().to(|| HttpResponse::Ok().content_type("application/javascript").body(include_str!("../../webapp/public/bundle.js.map")))
-                //         ))
-            })
-        };
+                    .service(
+                        web::scope("full_projects")
+                            .service(api::full_projects::by_year)
+                            .service(api::full_projects::working_dir)
+                            .service(api::projects::years),
+                    )
+                    .service(api::calendar::calendar),
+            )
+            // .service(fs::Files::new("/", "webapp/public").index_file("index.html"))
+            .service(web::resource("/").route(
+                web::get().to(|| async { HttpResponse::Ok().body(include_str!("../../webapp/public/index.html")) }),
+            ))
+            .service(web::resource("/bundle.css").route(
+                web::get().to(|| async { HttpResponse::Ok().body(include_str!("../../webapp/public/bundle.css")) }),
+            ))
+            .service(web::resource("/bundle.js").route(web::get().to(|| async {
+                HttpResponse::Ok()
+                    .content_type("application/javascript")
+                    .body(include_str!("../../webapp/public/bundle.js"))
+            })))
+        // .service(
+        //     web::resource("/bundle.js.map").route(
+        //         web::get().to(|| HttpResponse::Ok().content_type("application/javascript").body(include_str!("../../webapp/public/bundle.js.map")))
+        //         ))
+    });
 
     log::info!("listening on http://{}", bind_to);
-    server().bind(bind_to)?.run();
-
-    sys.run()?;
+    server.bind(bind_to)?.run().await?;
     log::info!("shutting down I guess");
 
     Ok(())
