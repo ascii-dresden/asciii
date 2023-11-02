@@ -80,7 +80,7 @@ num-traits = { version = "0.2", optional = true }
 toml = "0.8"
 
 # feature: git_statuses
-git2 = { version = "0.17", default-features = false, optional = true }
+git2 = { version = "0.18", default-features = false, optional = true }
 color-backtrace = "0.5"
 
 [dev-dependencies]
