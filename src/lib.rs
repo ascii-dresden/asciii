@@ -3,21 +3,7 @@
 //!
 #![cfg_attr(feature = "manual", doc = include_str!("../manual.md"))]
 #![allow(deprecated)]
-#![allow(clippy::uninlined_format_args)]
-#![warn(//missing_docs,
-        //missing_copy_implementations,
-        //missing_debug_implementations,
-        unstable_features,
-        unused_import_braces,
-        // clippy::pedantic
-        )]
-// #![allow(
-//     clippy::if_not_else,
-//     clippy::must_use_candidate,
-//     clippy::missing_errors_doc,
-//     clippy::missing_panics_doc,
-//     clippy::wildcard_imports,
-// )]
+#![warn(clippy::if_not_else)]
 #![recursion_limit = "1024"]
 #![deny(trivial_casts, trivial_numeric_casts)]
 #![warn(unused_import_braces, unused_qualifications)]

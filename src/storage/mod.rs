@@ -184,7 +184,7 @@ pub fn get_storage_path() -> PathBuf {
     // TODO: make replace tilde a Trait function
     let storage_path = replace_home_tilde(&storage_path);
 
-    if !storage_path.is_absolute() {
+    if storage_path.is_relative() {
         current_dir().unwrap().join(storage_path)
     } else {
         storage_path
