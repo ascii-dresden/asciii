@@ -145,7 +145,7 @@ where
 /// takes a path that could be relative or contains a `~` and turn it into a path that exists
 pub fn get_valid_path<T: AsRef<OsStr>>(p: T) -> Option<PathBuf> {
     let path = replace_home_tilde(Path::new(&p));
-    let path = if !path.is_absolute() {
+    let path = if path.is_relative() {
         if cfg!(target_arch = "wasm32") {
             Ok(PathBuf::from(std::env::var("PWD").expect("can't access $PWD")))
         } else {

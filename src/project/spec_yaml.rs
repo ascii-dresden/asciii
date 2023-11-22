@@ -2,7 +2,7 @@ use std::str::FromStr;
 
 use anyhow::bail;
 use bill::{Bill, Currency, Tax};
-use icalendar::{Calendar, Component, Event as CalEvent};
+use icalendar::{Calendar, Component, Event as CalEvent, EventLike as _};
 use yaml_rust::Yaml;
 
 use super::{
@@ -80,10 +80,10 @@ impl HasEvents for Project {
                     }
 
                     if let Some(end) = event.end {
-                        cal_event.start_date(event.begin);
-                        cal_event.end_date(end);
+                        cal_event.starts(event.begin);
+                        cal_event.ends(end);
                     } else {
-                        cal_event.all_day(event.begin);
+                        cal_event.all_day(event.begin.naive_local());
                     }
 
                     cal_event.summary(self.name().unwrap_or("unnamed"));

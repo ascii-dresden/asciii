@@ -35,18 +35,18 @@ log = "0.4"
 env_logger = "0.10"
 yaml-rust = "0.4"
 chrono = "0.4"
-regex = "1.4"
+regex = "1.10"
 lazy_static = "1.4"
 maplit = "1.0"
 clap = { version = "3", features = ["cargo"] }
 clap_complete = "3"
 enum_derive = "0.1"
 custom_derive = "0.1"
-open = "4"
+open = "5"
 crowbook-intl-runtime = "0.1"
-rayon = { version = "1.5", optional = true }
+rayon = { version = "1.8", optional = true }
 itertools = "0.11"
-rustyline = { version = "11", optional = true, features = ["derive"] }
+rustyline = { version = "12", optional = true, features = ["derive"] }
 linked-hash-map = { version = "0.5", features = ["serde_impl"] }
 dirs = "5"
 term = "0.7"
@@ -54,11 +54,11 @@ thiserror = "1.0"
 anyhow = "1.0"
 
 actix = { version = "0.13", optional = true }
-actix-web = { version = "3", optional = true }
+actix-web = { version = "4", optional = true }
 actix-files = { version = "0.6", optional = true }
 
 bill = { version = "0.4", features = ["serialization"] }
-icalendar = "0.10"
+icalendar = "0.15"
 
 slug = "0.1"
 tempdir = "0.3"
@@ -69,7 +69,7 @@ prettytable-rs = { default-features = false, version = "0.10" }
 
 # feature: document_export
 # TODO:  update to 4.x is trivial but requires testing with current content
-handlebars = { version = "2.0", optional = true }
+handlebars = { version = "3.0", optional = true }
 
 serde = { version = "1.0", optional = true }
 serde_json = { version = "1.0", optional = true }
@@ -77,14 +77,14 @@ serde_yaml = { version = "0.9", optional = true }
 serde_derive = { version = "1.0", optional = true }
 ordered-float = { version = "4", optional = true }
 num-traits = { version = "0.2", optional = true }
-toml = "0.7"
+toml = "0.8"
 
 # feature: git_statuses
-git2 = { version = "0.17", default-features = false, optional = true }
-color-backtrace = "0.5"
+git2 = { version = "0.18", default-features = false, optional = true }
+color-backtrace = "0.6"
 
 [dev-dependencies]
-pretty_assertions = "1.0"
+pretty_assertions = "1.4"
 
 [features]
 default = [
