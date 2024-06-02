@@ -147,7 +147,7 @@ pub fn get_valid_path<T: AsRef<OsStr>>(p: T) -> Option<PathBuf> {
     let path = replace_home_tilde(Path::new(&p));
     let path = if path.is_relative() {
         if cfg!(target_arch = "wasm32") {
-            Ok(PathBuf::from(std::env::var("PWD").expect("can't access $PWD")))
+            Ok(PathBuf::from(env::var("PWD").expect("can't access $PWD")))
         } else {
             current_dir()
         }

@@ -73,7 +73,7 @@ impl Project {
     }
 
     /// Opens a project from file path;
-    pub fn open<S: AsRef<OsStr> + std::fmt::Debug + ?Sized>(pathish: &S) -> Result<Project, Error> {
+    pub fn open<S: AsRef<OsStr> + fmt::Debug + ?Sized>(pathish: &S) -> Result<Project, Error> {
         log::trace!("Project::open({:?});", pathish);
         let file_path = Path::new(&pathish);
         let file_content = fs::read_to_string(file_path)?;
@@ -710,7 +710,7 @@ impl Storable for Project {
         self.file_path.clone()
     } // TODO: reconsider returning PathBuf at all
     fn set_file(&mut self, new_file: &Path) {
-        self.file_path = new_file.to_owned();
+        new_file.clone_into(&mut self.file_path);
     }
 
     fn set_git_status(&mut self, status: GitStatus) {

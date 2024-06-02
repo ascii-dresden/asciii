@@ -69,24 +69,24 @@ impl HelperDef for IncHelper {
     }
 }
 
-#[derive(Clone, Copy)]
-struct CountHelper;
+// #[derive(Clone, Copy)]
+// struct CountHelper;
 
-impl HelperDef for CountHelper {
-    #[allow(clippy::extra_unused_lifetimes)]
-    fn call<'reg: 'rc, 'rc>(
-        &self,
-        h: &Helper<'_, '_>,
-        _: &Handlebars,
-        _: &Context,
-        _: &mut RenderContext<'_, '_>,
-        out: &mut dyn Output,
-    ) -> HelperResult {
-        let count = h.param(0).unwrap().value().as_array().map_or(0, Vec::len);
-        out.write(&format!("{}", count))?;
-        Ok(())
-    }
-}
+// impl HelperDef for CountHelper {
+//     #[allow(clippy::extra_unused_lifetimes)]
+//     fn call<'reg: 'rc, 'rc>(
+//         &self,
+//         h: &Helper<'_, '_>,
+//         _: &Handlebars,
+//         _: &Context,
+//         _: &mut RenderContext<'_, '_>,
+//         out: &mut dyn Output,
+//     ) -> HelperResult {
+//         let count = h.param(0).unwrap().value().as_array().map_or(0, Vec::len);
+//         out.write(&format!("{}", count))?;
+//         Ok(())
+//     }
+// }
 
 /// Takes a `T: Serialize` and a template path and does it's thing.
 ///

@@ -141,7 +141,7 @@ impl Default for StorageSelection {
 
 fn is_dot_file(path: &Path) -> bool {
     path.file_name()
-        .and_then(std::ffi::OsStr::to_str)
+        .and_then(OsStr::to_str)
         .and_then(|s| s.chars().next())
         .map(|c| c == '.')
         .unwrap_or(false)
